@@ -19,8 +19,8 @@ public class HomeController extends BasicsController{
     /**
      * @api {put} /app/node/init a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName init
-     * @apiGroup node
+     * @apiName node/init
+     * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -31,19 +31,21 @@ public class HomeController extends BasicsController{
      *      "result": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
-     *      	    "nodeName": "",//节点名称
-     *      	    "nodeAddress":"",//节点地址
-     *      	    "nodeStatus": //节点状态：1-正常，2-异常
+     *      	    "longitude": "",//经度
+     *      	    "latitude":"",//纬度
+     *      	    "nodeType": ,//节点状态：1-共识节点 2-非共识
+     *      	    "netState": //节点状态 1 正常 2 异常
      *           }
      *      ]
      *   }
      */
 
+
     /**
      * @api {get} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName new
-     * @apiGroup node
+     * @apiName node/new
+     * @apiGroup home
      * @apiDescription 增量数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -53,10 +55,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/index/init a.实时监控指标（websocket请求）初始数据
+     * @api {put} /app/index/init c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName init
-     * @apiGroup index
+     * @apiName index/init
+     * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -65,8 +67,7 @@ public class HomeController extends BasicsController{
      *   {
      *      "errMsg": "",//描述信息
      *      "result": 0,//成功（0），失败则由相关失败码
-     *      "data":[
-     *           {
+     *      "data": {
      *      	    "currentHeight": ,//当前区块高度
      *      	    "node":"",//出块节点
      *      	    "currentTransaction": //当前交易笔数
@@ -76,16 +77,15 @@ public class HomeController extends BasicsController{
      *      	    "proportion": //占比
      *      	    "ticketPrice": //票价
      *           }
-     *      ]
      *   }
      */
 
 
     /**
-     * @api {get} /topic/index/new b.实时监控指标（websocket请求）增量数据
+     * @api {get} /topic/index/new d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName new
-     * @apiGroup index
+     * @apiName index/new
+     * @apiGroup home
      * @apiDescription 增量数据
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
@@ -93,10 +93,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/statis/init a.出块时间及交易数据（websocket请求）初始数据
+     * @api {put} /app/statis/init e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName init
-     * @apiGroup statis
+     * @apiName statis/init
+     * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -127,10 +127,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/statis/new b.出块时间及交易数据（websocket请求）增量数据
+     * @api {get} /topic/statis/new f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName new
-     * @apiGroup statis
+     * @apiName statis/new
+     * @apiGroup home
      * @apiDescription 增量数据
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
@@ -139,10 +139,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/block/init a.最新区块列表（websocket请求）初始数据
+     * @api {put} /app/block/init g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName init
-     * @apiGroup block
+     * @apiName block/init
+     * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -167,10 +167,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/block/new b.最新区块列表（websocket请求）增量数据
+     * @api {get} /topic/block/new h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName new
-     * @apiGroup statis
+     * @apiName block/new
+     * @apiGroup home
      * @apiDescription 增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
@@ -178,10 +178,10 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/transaction/init a.最新交易列表（websocket请求）初始数据
+     * @api {put} /app/transaction/init i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName init
-     * @apiGroup transaction
+     * @apiName transaction/init
+     * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
      *   {}
@@ -191,11 +191,12 @@ public class HomeController extends BasicsController{
      *      "errMsg": "",//描述信息
      *      "result": 0,//成功（0），失败则由相关失败码
      *      "data":[
-     *       {
+     *           {
      *      	    "txHash": "",//交易Hash
      *      	    "from":"",//交易发起方地址
      *      	    "to": //交易接收方地址
      *      	    "value": ""//数额
+     *      	    "timestamp"：//交易时间
      *           }
      *      ]
      *   }
@@ -204,12 +205,49 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/transaction/new b.最新区块列表（websocket请求）增量数据
+     * @api {get} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName new
-     * @apiGroup transaction
+     * @apiName transaction/new
+     * @apiGroup home
      * @apiDescription 增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
+
+
+
+    /**
+     * @api {post} /home/query k.搜索
+     * @apiVersion 1.0.0
+     * @apiName query
+     * @apiGroup home
+     * @apiDescription 根据区块高度，区块hash，交易hash等查询信息
+     * @apiParamExample {json} Request-Example:
+     *   {
+     *       "parameter":""//块高，块hash，交易hash等
+     *   }
+     *  @apiSuccessExample {json} Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *      "errMsg": "",//描述信息
+     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "data":{
+     *          "type":"",//区块block，交易transaction，节点node,合约contract,
+     *           "struct":{
+     *      	        "height": 17888,//块高
+     *                  "timeStamp": 1798798798798,//出块时间
+     *                  "transaction": 10000,//块内交易数
+     *                  "size": 188,//块大小
+     *                  "miner": "0x234", // 出块节点
+     *                  "energonUsed": 111,//能量消耗
+     *                  "energonAverage": 11, //平均能量价值
+     *                  "blockReward": "123123",//区块奖励
+     *                  "serverTime": 1708098077  //服务器时间
+     *           }
+     *        }
+     *
+     *
+     *   }
+     */
+
 }

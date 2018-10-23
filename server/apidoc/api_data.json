@@ -1,5 +1,33 @@
 [
   {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "varname1",
+            "description": "<p>No type.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "varname2",
+            "description": "<p>With type.</p>"
+          }
+        ]
+      }
+    },
+    "type": "",
+    "url": "",
+    "version": "0.0.0",
+    "filename": "./apidoc/main.js",
+    "group": "D__GitWorkspace_browser_server_server_apidoc_main_js",
+    "groupTitle": "D__GitWorkspace_browser_server_server_apidoc_main_js",
+    "name": ""
+  },
+  {
     "type": "post",
     "url": "block/blockDetails",
     "title": "b.区块详情",
@@ -88,10 +116,10 @@
   {
     "type": "put",
     "url": "/app/block/init",
-    "title": "a.最新区块列表（websocket请求）初始数据",
+    "title": "g.实时区块列表（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "init",
-    "group": "block",
+    "name": "block_init",
+    "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
       "examples": [
@@ -112,15 +140,35 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "block"
+    "groupTitle": "home"
+  },
+  {
+    "type": "get",
+    "url": "/topic/block/new",
+    "title": "h.实时区块列表（websocket请求）增量数据",
+    "version": "1.0.0",
+    "name": "block_new",
+    "group": "home",
+    "description": "<p>增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "groupTitle": "home"
   },
   {
     "type": "put",
     "url": "/app/index/init",
-    "title": "a.实时监控指标（websocket请求）初始数据",
+    "title": "c.实时监控指标（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "init",
-    "group": "index",
+    "name": "index_init",
+    "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
       "examples": [
@@ -141,15 +189,15 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "index"
+    "groupTitle": "home"
   },
   {
     "type": "get",
     "url": "/topic/index/new",
-    "title": "b.实时监控指标（websocket请求）增量数据",
+    "title": "d.实时监控指标（websocket请求）增量数据",
     "version": "1.0.0",
-    "name": "new",
-    "group": "index",
+    "name": "index_new",
+    "group": "home",
     "description": "<p>增量数据</p>",
     "success": {
       "examples": [
@@ -161,15 +209,15 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "index"
+    "groupTitle": "home"
   },
   {
     "type": "put",
     "url": "/app/node/init",
     "title": "a.节点监控图标数据（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "init",
-    "group": "node",
+    "name": "node_init",
+    "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
       "examples": [
@@ -184,21 +232,21 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"nodeName\": \"\",//节点名称\n   \t    \"nodeAddress\":\"\",//节点地址\n   \t    \"nodeStatus\": //节点状态：1-正常，2-异常\n        }\n   ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"longitude\": \"\",//经度\n   \t    \"latitude\":\"\",//纬度\n   \t    \"nodeType\": //节点状态：1-共识节点 2-非共识\n        }\n   ]\n}",
           "type": "json"
         }
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "node"
+    "groupTitle": "home"
   },
   {
     "type": "get",
     "url": "/topic/node/new",
     "title": "b.节点监控图标数据（websocket请求）增量数据",
     "version": "1.0.0",
-    "name": "new",
-    "group": "node",
+    "name": "node_new",
+    "group": "home",
     "description": "<p>增量数据</p>",
     "parameter": {
       "examples": [
@@ -219,15 +267,44 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "node"
+    "groupTitle": "home"
+  },
+  {
+    "type": "post",
+    "url": "/home/query",
+    "title": "k.搜索",
+    "version": "1.0.0",
+    "name": "query",
+    "group": "home",
+    "description": "<p>根据区块高度，区块hash，交易hash等查询信息</p>",
+    "parameter": {
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"parameter\":\"\"//块高，块hash，交易hash等\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":{\n       \"type\":\"\",//区块block，交易transaction，节点node,合约contract,\n        \"struct\":{\n   \t        \"height\": 17888,//块高\n               \"timeStamp\": 1798798798798,//出块时间\n               \"transaction\": 10000,//块内交易数\n               \"size\": 188,//块大小\n               \"miner\": \"0x234\", // 出块节点\n               \"energonUsed\": 111,//能量消耗\n               \"energonAverage\": 11, //平均能量价值\n               \"blockReward\": \"123123\",//区块奖励\n               \"serverTime\": 1708098077  //服务器时间\n        }\n     }\n\n\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "groupTitle": "home"
   },
   {
     "type": "put",
     "url": "/app/statis/init",
-    "title": "a.出块时间及交易数据（websocket请求）初始数据",
+    "title": "e.出块时间及交易数据（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "init",
-    "group": "statis",
+    "name": "statis_init",
+    "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
       "examples": [
@@ -248,15 +325,15 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "statis"
+    "groupTitle": "home"
   },
   {
     "type": "get",
     "url": "/topic/statis/new",
-    "title": "b.出块时间及交易数据（websocket请求）增量数据",
+    "title": "f.出块时间及交易数据（websocket请求）增量数据",
     "version": "1.0.0",
-    "name": "new",
-    "group": "statis",
+    "name": "statis_new",
+    "group": "home",
     "description": "<p>增量数据</p>",
     "success": {
       "examples": [
@@ -268,35 +345,15 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "statis"
-  },
-  {
-    "type": "get",
-    "url": "/topic/block/new",
-    "title": "b.最新区块列表（websocket请求）增量数据",
-    "version": "1.0.0",
-    "name": "new",
-    "group": "statis",
-    "description": "<p>增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "statis"
+    "groupTitle": "home"
   },
   {
     "type": "put",
     "url": "/app/transaction/init",
-    "title": "a.最新交易列表（websocket请求）初始数据",
+    "title": "i.实时交易列表（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "init",
-    "group": "transaction",
+    "name": "transaction_init",
+    "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
       "examples": [
@@ -317,15 +374,15 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "transaction"
+    "groupTitle": "home"
   },
   {
     "type": "get",
     "url": "/topic/transaction/new",
-    "title": "b.最新区块列表（websocket请求）增量数据",
+    "title": "j.实时交易列表（websocket请求）增量数据",
     "version": "1.0.0",
-    "name": "new",
-    "group": "transaction",
+    "name": "transaction_new",
+    "group": "home",
     "description": "<p>增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送</p>",
     "success": {
       "examples": [
@@ -337,7 +394,7 @@
       ]
     },
     "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
-    "groupTitle": "transaction"
+    "groupTitle": "home"
   },
   {
     "type": "post",

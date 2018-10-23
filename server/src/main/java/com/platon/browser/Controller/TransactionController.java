@@ -26,7 +26,6 @@ public class TransactionController extends BasicsController{
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
-     *      "query": "",//区块高度/地址/块哈希/交易哈希(非必填)
      *      "pageNo": 1,//页数(必填)
      *      "pageSize": 10,//页大小(必填)
      * }
@@ -54,7 +53,8 @@ public class TransactionController extends BasicsController{
                         vote ： 投票
                         transactionExecute ： 合约执行
                         authorization ： 权限
-     *           "serverTime": 1123123//服务器时间
+     *           "serverTime": 1123123,//服务器时间
+     *           "failReason":""//失败原因
      *           }
      *       ]
      * }
