@@ -202,7 +202,7 @@ public class HomeController extends BasicsController{
      */
 
 
-    
+
     /**
      * @api {get} /topic/transaction/new b.最新区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
