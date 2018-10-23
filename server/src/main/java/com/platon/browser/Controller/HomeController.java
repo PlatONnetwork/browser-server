@@ -58,7 +58,7 @@ public class HomeController extends BasicsController{
     public MessageResp subscribeMapping(StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         System.out.println("获取节点初始化列表数据！");
-        MessageResp<List<NodeInfo>> message = new MessageResp();
+        MessageResp<List<NodeInfo>> message = new MessageResp<>();
         List<NodeInfo> nodeInfoList = new ArrayList<>();
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33");
