@@ -10,7 +10,7 @@
     </bean>
 
 
-    <bean id="brokerJedisCluster" class="com.platon.browserweb.common.redis.JedisClusterFactory">
+    <bean id="brokerJedisCluster" class="com.platon.browser.browser.common.redis.JedisClusterFactory">
         <property name="redisIpport">
             <value>${redis.ipport}</value>
         </property>
@@ -20,7 +20,7 @@
         <property name="genericObjectPoolConfig" ref="brokerGenericObjectPoolConfig"/>
     </bean>
 
-    <bean id="brokerRedisClient" class="com.platon.browserweb.common.redis.RedisClient">
+    <bean id="brokerRedisClient" class="com.platon.browser.browser.common.redis.RedisClient">
         <constructor-arg name="expire" value="1800"/>
         <property name="jedisCluster" ref="brokerJedisCluster"/>
     </bean>

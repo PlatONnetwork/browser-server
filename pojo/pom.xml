@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.platon.browserweb</groupId>
-		<artifactId>browser-web</artifactId>
+		<groupId>com.platon.browser</groupId>
+		<artifactId>browser-server</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>pojo</artifactId>
@@ -25,7 +25,7 @@
 			<artifactId>framework-database</artifactId>
 		</dependency>
         <dependency>
-            <groupId>com.platon.browserweb</groupId>
+            <groupId>com.platon.browser</groupId>
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

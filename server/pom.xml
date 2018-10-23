@@ -5,8 +5,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.platon.browserweb</groupId>
-		<artifactId>browser-web</artifactId>
+		<groupId>com.platon.browser</groupId>
+		<artifactId>browser-server</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>server</artifactId>
@@ -19,12 +19,12 @@
 	<dependencies>
 		<!-- 内部引用 -->
 		<dependency>
-			<groupId>com.platon.browserweb</groupId>
+			<groupId>com.platon.browser</groupId>
 			<artifactId>manager</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.platon.browserweb</groupId>
+			<groupId>com.platon.browser</groupId>
 			<artifactId>common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -74,7 +74,7 @@
            	<scope>true</scope>  
 		</dependency>
         <dependency>
-            <groupId>com.platon.browserweb</groupId>
+            <groupId>com.platon.browser</groupId>
             <artifactId>pojo</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
