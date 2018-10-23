@@ -103,4 +103,48 @@ public class TransactionController extends BasicsController{
      *           }
      * }
      */
+
+
+    /**
+     * @api {post} transaction/pendingList c.待处理交易列表
+     * @apiVersion 1.0.0
+     * @apiName transactionList
+     * @apiGroup transaction
+     * @apiDescription 交易列表
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "pageNo": 1,//页数(必填)
+     *      "pageSize": 10,//页大小(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "totalCount":18,//总数
+     *      "totalPages":1,//总页数
+     *      "data": [
+     *           {
+     *           "txHash": "0x234234",//交易hash
+     *           "blockHeight": "15566",//交易所在区块高度
+     *           "blockTime": 18080899999,//出块时间
+     *           "from": "0x667766",//发送方
+     *           "to": "0x667766",//接收方
+     *           "value": "222",//数额
+     *           "actualTxCoast": "22",//交易费用
+     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
+     *           "txType": "", // 交易类型
+    transfer ：转账
+    MPCtransaction ： MPC交易
+    contractCreate ： 合约创建
+    vote ： 投票
+    transactionExecute ： 合约执行
+    authorization ： 权限
+     *           "serverTime": 1123123,//服务器时间
+     *           "failReason":""//失败原因
+     *           }
+     *       ]
+     * }
+     */
 }

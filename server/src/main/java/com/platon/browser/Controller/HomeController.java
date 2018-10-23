@@ -17,7 +17,7 @@ public class HomeController extends BasicsController{
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     /**
-     * @api {put} /app/node/init a.节点监控图标数据（websocket请求）初始数据
+     * @api {subscribe} /app/node/init a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName node/init
      * @apiGroup home
@@ -42,7 +42,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
+     * @api {subscribe} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName node/new
      * @apiGroup home
@@ -55,7 +55,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/index/init c.实时监控指标（websocket请求）初始数据
+     * @api {subscribe} /app/index/init c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName index/init
      * @apiGroup home
@@ -82,7 +82,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/index/new d.实时监控指标（websocket请求）增量数据
+     * @api {subscribe} /topic/index/new d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName index/new
      * @apiGroup home
@@ -93,9 +93,9 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/statis/init e.出块时间及交易数据（websocket请求）初始数据
+     * @api {subscribe} /app/statistic/init e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName statis/init
+     * @apiName statistic/init
      * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
@@ -127,9 +127,9 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/statis/new f.出块时间及交易数据（websocket请求）增量数据
+     * @api {subscribe} /topic/statistic/new f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName statis/new
+     * @apiName statistic/new
      * @apiGroup home
      * @apiDescription 增量数据
      * @apiSuccessExample  Success-Response:
@@ -139,7 +139,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/block/init g.实时区块列表（websocket请求）初始数据
+     * @api {subscribe} /app/block/init g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName block/init
      * @apiGroup home
@@ -167,7 +167,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/block/new h.实时区块列表（websocket请求）增量数据
+     * @api {subscribe} /topic/block/new h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName block/new
      * @apiGroup home
@@ -178,7 +178,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/transaction/init i.实时交易列表（websocket请求）初始数据
+     * @api {subscribe} /app/transaction/init i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName transaction/init
      * @apiGroup home
@@ -205,7 +205,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
+     * @api {subscribe} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName transaction/new
      * @apiGroup home
