@@ -4,19 +4,19 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.platon.browserweb</groupId>
-		<artifactId>browser-web</artifactId>
+		<groupId>com.platon.browser</groupId>
+		<artifactId>browser-server</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>task</artifactId>
+	<artifactId>agent</artifactId>
 	<packaging>war</packaging>
-	<name>task</name>
+	<name>agent</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
 		<!-- 内部引用 -->
 		<dependency>
-			<groupId>com.platon.browserweb</groupId>
+			<groupId>com.platon.browser</groupId>
 			<artifactId>manager</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -89,7 +89,7 @@
 	</profiles>
 
 	<build>
-		<finalName>exchange-task</finalName>
+		<finalName>browser-agent</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources/${package.environment}/</directory>

@@ -12,7 +12,7 @@
   	<module>common</module>
   	<module>pojo</module>
   	<module>dao</module>
-    <module>task</module>
+    <module>agent</module>
   </modules>
   
   <parent>

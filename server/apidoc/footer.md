@@ -1,1 +1,0 @@
-Copyright © 2018. [juzix.io](http://www.juzix.net/) All Rights Reserved
