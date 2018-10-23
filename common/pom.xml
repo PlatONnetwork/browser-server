@@ -77,5 +77,10 @@
 			<artifactId>redisson</artifactId>
 			<version>3.7.5</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
 	</dependencies>
 </project>

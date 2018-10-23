@@ -1,9 +1,20 @@
 package com.platon.browser.Controller;
 
+import com.platon.browser.common.dto.MessageResp;
+import com.platon.browser.common.dto.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -11,10 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
  * Time: 9:40
  */
 @RestController
-@RequestMapping("/browser_api")
 public class HomeController extends BasicsController{
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
+
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
 
     /**
      * @api {subscribe} /app/node/init a.节点监控图标数据（websocket请求）初始数据
@@ -39,7 +54,21 @@ public class HomeController extends BasicsController{
      *      ]
      *   }
      */
-
+    @SubscribeMapping("/node/init")
+    public MessageResp subscribeMapping(StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        System.out.println("获取节点初始化列表数据！");
+        MessageResp<List<NodeInfo>> message = new MessageResp();
+        List<NodeInfo> nodeInfoList = new ArrayList<>();
+        NodeInfo n1 = new NodeInfo();
+        n1.setLatitude("3333.33");
+        n1.setLongitude("55555.33");
+        n1.setNetState(1);
+        n1.setNodeType(1);
+        nodeInfoList.add(n1);
+        message.setData(nodeInfoList);
+        return message;
+    }
 
     /**
      * @api {subscribe} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
