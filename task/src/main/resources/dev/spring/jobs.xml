@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd">
+
+    <!--配置作业注册中心 dubbo一样zk注册中心-->
+    <reg:zookeeper id="regCenter" server-lists="${regCenter.serverList}" namespace="${regCenter.namespace}"
+                   base-sleep-time-milliseconds="1000"
+                   max-sleep-time-milliseconds="3000" max-retries="3"/>
+
+    <job:simple id="quoteJob" class="com.juzix.exchange.task.job.QuoteTickerJob" registry-center-ref="regCenter"
+                cron="0 0/1 * * * ?" sharding-total-count="1" sharding-item-parameters="0=kline" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情信息修补任务"/>
+
+    <job:simple id="quoteImportDbJob" class="com.juzix.exchange.task.job.QuoteImportDbJob" registry-center-ref="regCenter"
+                cron="0 5 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=quoteImportDb" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情数据入库"/>
+
+    <job:simple id="currencyExchangeRateJob" class="com.juzix.exchange.task.job.CurrencyExchangeRateJob" registry-center-ref="regCenter"
+                cron="0 15 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=currencyExchangeRate" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "获取没有关联USDT币种费率"/>
+
+    <job:simple id="accountInfoRepairJob" class="com.juzix.exchange.task.job.AccountInfoRepairJob" registry-center-ref="regCenter"
+                cron="0 0/5 * * * ?" sharding-total-count="1" sharding-item-parameters="0=accountInfoRepair" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "修补新增币种的账户信息"/>
+
+    <job:simple id="feePreinstallChangeJob" class="com.juzix.exchange.task.job.FeePreinstallChangeJob" registry-center-ref="regCenter"
+				cron="0 0/2 * * * ?" sharding-total-count="1" sharding-item-parameters="0=feePreinstallChange" overwrite="true"
+				failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "预设费率切换"/>
+
+    <job:simple id="marketCapDayPullJob" class="com.juzix.exchange.task.job.MarketCapDayPullJob" registry-center-ref="regCenter"
+                cron="0 0 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=marketCapDayPullJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "每日所有币市值更新"/>
+
+    <job:simple id="quoteInitImportRedisJob" class="com.juzix.exchange.task.job.QuoteInitImportRedisJob" registry-center-ref="regCenter"
+                cron="0 44 19 18 7 ? 2018" sharding-total-count="1" sharding-item-parameters="0=quoteInitImportRedisJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "第一次数据库数据同步redis"/>
+
+    <job:simple id="syncHuobiKlineTmpJob" class="com.juzix.exchange.task.job.SyncHuobiKlineTmpJob" registry-center-ref="regCenter"
+                cron="0 0/1 * * * ?" sharding-total-count="1" sharding-item-parameters="0=syncHuobiKlineTmpJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "临时同步K线任务同步火币EOS_USDT"/>
+
+    <job:simple id="statisticsBrokerCollectJob" class="com.juzix.exchange.task.job.StatisticsBrokerCollectJob" registry-center-ref="regCenter"
+                cron="0 0/5 * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsBrokerCollectJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "每五分钟统计代理增量信息"/>
+         
+     
+    <job:simple id="depositAndWithdrawReconciliationJob" class="com.juzix.exchange.task.job.DepositAndWithdrawReconciliationJob" registry-center-ref="regCenter"
+                cron="0 */2 * * * ?" sharding-total-count="1" sharding-item-parameters="0=marketCapDayPullJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "充币和提币对账"/>
+
+
+      <job:simple id="statisticsBrokerTimeJob" class="com.juzix.exchange.task.job.StatisticsBrokerTimeJob" registry-center-ref="regCenter"
+                cron="*/5 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsBrokerTimeJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "代理商信息统计"/>
+
+	<job:simple id="gainForeignRateJob" class="com.juzix.exchange.task.job.GainForeignRateJob" registry-center-ref="regCenter"
+	          cron="0 0 0 * * ? " sharding-total-count="1" sharding-item-parameters="0=1" overwrite="true"
+	          failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "获取外汇汇率"/>
+
+    <job:simple id="tradeAmountScoreStatisticsJob" class="com.juzix.exchange.task.job.TradeAmountScoreStatisticsJob" registry-center-ref="regCenter"
+                cron="0 10 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=tradeAmountScoreStatisticsJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "积分每天统计"/>
+
+    <job:simple id="statisticsBrokerOrderLocationJob" class="com.juzix.exchange.task.job.StatisticsBrokerOrderLocationJob" registry-center-ref="regCenter"
+                cron="0 0/5 * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsBrokerOrderLocationJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "代理商订单位置统计"/>
+</beans>

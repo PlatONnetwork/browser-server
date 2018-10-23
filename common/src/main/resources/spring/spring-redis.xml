@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean name="brokerGenericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig">
+        <property name="maxWaitMillis" value="-1"/>
+        <property name="maxTotal" value="1024"/>
+        <property name="minIdle" value="6"/>
+        <property name="maxIdle" value="32"/>
+    </bean>
+
+
+    <bean id="brokerJedisCluster" class="com.platon.browserweb.common.redis.JedisClusterFactory">
+        <property name="redisIpport">
+            <value>${redis.ipport}</value>
+        </property>
+        <property name="addressKeyPrefix" value="redis"/>
+        <property name="timeout" value="300000"/>
+        <property name="maxRedirections" value="6"/>
+        <property name="genericObjectPoolConfig" ref="brokerGenericObjectPoolConfig"/>
+    </bean>
+
+    <bean id="brokerRedisClient" class="com.platon.browserweb.common.redis.RedisClient">
+        <constructor-arg name="expire" value="1800"/>
+        <property name="jedisCluster" ref="brokerJedisCluster"/>
+    </bean>
+
+    <bean id="brokerTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 线程池活跃的线程数 -->
+        <property name="corePoolSize" value="30"/>
+        <!-- 线程池最大活跃的线程数 -->
+        <property name="maxPoolSize" value="300"/>
+        <!-- 队列的最大容量 -->
+        <property name="queueCapacity" value="125"/>
+        <!-- 线程池维护线程所允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="300"/>
+    </bean>
+
+</beans>
