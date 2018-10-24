@@ -101,7 +101,8 @@ public class TransactionController extends BasicsController{
      *           "energonUsed": 122,//能量消耗
      *           "energonPrice": "123",//能量价格
      *           "inputData": "",//附加输入数据
-     *           "expectTime": 12312333 // 预计确认时间
+     *           "expectTime": 12312333, // 预计确认时间
+     *           "failReason":""//失败原因
      *           }
      * }
      */
