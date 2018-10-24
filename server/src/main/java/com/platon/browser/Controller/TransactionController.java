@@ -18,11 +18,12 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/transactionList a.交易列表
+     * @api {post} transaction/transactionList?cid=:chainId a.交易列表
      * @apiVersion 1.0.0
      * @apiName transactionList
      * @apiGroup transaction
      * @apiDescription 交易列表
+     * @apiParam {String} cid 链ID.
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
@@ -61,14 +62,13 @@ public class TransactionController extends BasicsController{
      */
 
 
-
-
     /**
-     * @api {post} transaction/transactionDetails b.交易详情
+     * @api {post} transaction/transactionDetails?cid=:chainId b.交易详情
      * @apiVersion 1.0.0
      * @apiName transactionDetails
      * @apiGroup transaction
      * @apiDescription 交易详情
+     * @apiParam {String} cid 链ID.
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
@@ -106,16 +106,18 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/pendingList c.待处理交易列表
+     * @api {post} transaction/pendingList?cid=:chainId c.待处理交易列表
      * @apiVersion 1.0.0
-     * @apiName transactionList
+     * @apiName pendingList
      * @apiGroup transaction
-     * @apiDescription 交易列表
+     * @apiDescription 待处理交易列表
+     * @apiParam {String} cid 链ID.
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "pageNo": 1,//页数(必填)
-     *      "pageSize": 10,//页大小(必填)
+     *      "pageSize": 10,//页大小(必填),
+     *      "address":"0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4", // 地址(可选)，用于筛选功能
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -127,24 +129,67 @@ public class TransactionController extends BasicsController{
      *      "data": [
      *           {
      *           "txHash": "0x234234",//交易hash
-     *           "blockHeight": "15566",//交易所在区块高度
-     *           "blockTime": 18080899999,//出块时间
+     *           "dwellTime": 33,// 停留时间=服务器时间-交易接收时间
+     *           "energonLimit": 55555,//能量限制
+     *           "energonPrice": 55555,//能量价格
      *           "from": "0x667766",//发送方
      *           "to": "0x667766",//接收方
      *           "value": "222",//数额
-     *           "actualTxCoast": "22",//交易费用
-     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "txType": "", // 交易类型
-    transfer ：转账
-    MPCtransaction ： MPC交易
-    contractCreate ： 合约创建
-    vote ： 投票
-    transactionExecute ： 合约执行
-    authorization ： 权限
+*                         transfer ：转账
+*                         MPCtransaction ： MPC交易
+*                         contractCreate ： 合约创建
+*                         vote ： 投票
+*                         transactionExecute ： 合约执行
+*                         authorization ： 权限
      *           "serverTime": 1123123,//服务器时间
-     *           "failReason":""//失败原因
      *           }
      *       ]
      * }
      */
+
+
+
+    /**
+     * @api {post} transaction/pendingDetails?cid=:chainId b.待处理交易详情
+     * @apiVersion 1.0.0
+     * @apiName pendingDetails
+     * @apiGroup transaction
+     * @apiDescription 待处理交易详情
+     * @apiParam {String} cid 链ID.
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "txHash": "",//交易Hash(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "data": {
+     *           "txHash": "0x234234",//交易hash
+     *           "timeStamp": 123123123879,//交易接收时间
+     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
+     *           "blockHeight": "15566",//交易所在区块高度
+     *           "from": "0x667766",//发送者
+     *           "to": "0x667766",//接收者
+     *           "txType": "", // 交易类型
+                        transfer ：转账
+                        MPCtransaction ： MPC交易
+                        contractCreate ： 合约创建
+                        vote ： 投票
+                        transactionExecute ： 合约执行
+                        authorization ： 权限
+     *           "value": "222",//数额
+     *           "actualTxCost": "22",//实际交易手续费
+     *           "energonLimit": 232,//能量限制
+     *           "energonUsed": 122,//能量消耗
+     *           "energonPrice": "123",//能量价格
+     *           "inputData": "",//附加输入数据
+     *           "expectTime": 12312333 // 预计确认时间
+     *           }
+     * }
+     */
+
 }

@@ -19,6 +19,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic");
         // 全局使用的消息前缀（客户端订阅路径上会体现出来）
         config.setApplicationDestinationPrefixes("/app");
+
     }
 
     /**
@@ -26,7 +27,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/platon-websocket").withSockJS();
+        registry.addEndpoint("/platon-websocket").setAllowedOrigins("*").withSockJS();
     }
 
 }

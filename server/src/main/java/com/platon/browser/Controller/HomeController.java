@@ -4,6 +4,7 @@ import com.platon.browser.common.dto.MessageResp;
 import com.platon.browser.common.dto.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,11 +33,12 @@ public class HomeController extends BasicsController{
     }
 
     /**
-     * @api {subscribe} /app/node/init a.节点监控图标数据（websocket请求）初始数据
+     * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName node/init
      * @apiGroup home
      * @apiDescription 初始数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      *  @apiSuccessExample {json} Success-Response:
@@ -54,8 +56,8 @@ public class HomeController extends BasicsController{
      *      ]
      *   }
      */
-    @SubscribeMapping("/node/init")
-    public MessageResp subscribeMapping(StompHeaderAccessor headerAccessor) {
+    @SubscribeMapping("/node/init?cid={chainId}")
+    public MessageResp subscribeMapping(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         System.out.println("获取节点初始化列表数据！");
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
@@ -71,11 +73,12 @@ public class HomeController extends BasicsController{
     }
 
     /**
-     * @api {subscribe} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
+     * @api {subscribe} /topic/node/new?cid=:chainId b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName node/new
      * @apiGroup home
      * @apiDescription 增量数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      * @apiSuccessExample  Success-Response:
@@ -84,11 +87,12 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /app/index/init c.实时监控指标（websocket请求）初始数据
+     * @api {subscribe} /app/index/init?cid=:chainId c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName index/init
      * @apiGroup home
      * @apiDescription 初始数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      *  @apiSuccessExample {json} Success-Response:
@@ -111,22 +115,24 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /topic/index/new d.实时监控指标（websocket请求）增量数据
+     * @api {subscribe} /topic/index/new?cid=:chainId d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName index/new
      * @apiGroup home
      * @apiDescription 增量数据
+     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
 
 
     /**
-     * @api {subscribe} /app/statistic/init e.出块时间及交易数据（websocket请求）初始数据
+     * @api {subscribe} /app/statistic/init?cid=:chainId e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName statistic/init
      * @apiGroup home
      * @apiDescription 初始数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      *  @apiSuccessExample {json} Success-Response:
@@ -156,11 +162,12 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /topic/statistic/new f.出块时间及交易数据（websocket请求）增量数据
+     * @api {subscribe} /topic/statistic/new?cid=:chainId f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName statistic/new
      * @apiGroup home
      * @apiDescription 增量数据
+     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
@@ -168,11 +175,12 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /app/block/init g.实时区块列表（websocket请求）初始数据
+     * @api {subscribe} /app/block/init?cid=:chainId g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName block/init
      * @apiGroup home
      * @apiDescription 初始数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      *  @apiSuccessExample {json} Success-Response:
@@ -196,22 +204,24 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /topic/block/new h.实时区块列表（websocket请求）增量数据
+     * @api {subscribe} /topic/block/new?cid=:chainId h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName block/new
      * @apiGroup home
      * @apiDescription 增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送
+     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
 
 
     /**
-     * @api {subscribe} /app/transaction/init i.实时交易列表（websocket请求）初始数据
+     * @api {subscribe} /app/transaction/init?cid=:chainId i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName transaction/init
      * @apiGroup home
      * @apiDescription 初始数据
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {}
      *  @apiSuccessExample {json} Success-Response:
@@ -234,11 +244,12 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {subscribe} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
+     * @api {subscribe} /topic/transaction/new?cid=:chainId j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName transaction/new
      * @apiGroup home
      * @apiDescription 增量数据，可手动开关是否订阅增量数据，开启之后实时接收最新数据推送
+     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
@@ -246,11 +257,12 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {post} /home/query k.搜索
+     * @api {post} /home/query?cid=:chainId k.搜索
      * @apiVersion 1.0.0
      * @apiName query
      * @apiGroup home
      * @apiDescription 根据区块高度，区块hash，交易hash等查询信息
+     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {
      *       "parameter":""//块高，块hash，交易hash等

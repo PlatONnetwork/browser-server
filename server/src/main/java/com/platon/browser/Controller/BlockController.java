@@ -17,11 +17,12 @@ public class BlockController extends BasicsController {
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
     /**
-     * @api {post} block/blockList a.区块列表
+     * @api {post} block/blockList?cid=:chainId a.区块列表
      * @apiVersion 1.0.0
      * @apiName blockList
      * @apiGroup blcok
      * @apiDescription 区块列表
+     * @apiParam {String} cid 链ID.
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
@@ -55,11 +56,12 @@ public class BlockController extends BasicsController {
 
 
     /**
-     * @api {post} block/blockDetails b.区块详情
+     * @api {post} block/blockDetails?cid=:chainId b.区块详情
      * @apiVersion 1.0.0
      * @apiName blockDetails
      * @apiGroup blcok
      * @apiDescription 区块详情
+     * @apiParam {String} cid 链ID.
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
