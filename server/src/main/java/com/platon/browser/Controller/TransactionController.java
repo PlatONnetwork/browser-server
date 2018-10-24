@@ -256,6 +256,13 @@ public class TransactionController extends BasicsController{
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
+     *      "txType":"", // 交易类型
+                  transfer ：转账
+                  MPCtransaction ： MPC交易
+                  contractCreate ： 合约创建
+                  vote ： 投票
+                  transactionExecute ： 合约执行
+                  authorization ： 权限
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
      *      "date":"2018-10-24 00:00:00" // 数据日期 (必填)
      * }
@@ -324,6 +331,13 @@ public class TransactionController extends BasicsController{
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
+     *      "txType":"", // 交易类型
+                transfer ：转账
+                MPCtransaction ： MPC交易
+                contractCreate ： 合约创建
+                vote ： 投票
+                transactionExecute ： 合约执行
+                authorization ： 权限
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
      *      "date":"2018-10-24 00:00:00" // 数据日期 (必填)
      * }
