@@ -3,6 +3,12 @@ package com.platon.browser.Controller;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.*;
 import com.platon.browser.dao.dao.dao.dao.common.enums.RetEnum;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +34,9 @@ public class HomeController extends BasicsController{
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private NodeMapper nodeMapper;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -68,6 +77,8 @@ public class HomeController extends BasicsController{
         n1.setNodeType(1);
         nodeInfoList.add(n1);
         message.setData(nodeInfoList);
+
+        List<Node> list = nodeMapper.selectByExample(new NodeExample());
         return message;
     }
 
@@ -386,6 +397,7 @@ public class HomeController extends BasicsController{
         transactionInfo.setTxHash("ww554234");
         transactionInfo.setTransactionIndex(333);
         transactionInfo.setValue(3.54);
+        transactionInfos.add(transactionInfo);
         message.setData(transactionInfos);
         return message;
     }
@@ -415,6 +427,7 @@ public class HomeController extends BasicsController{
         transactionInfo.setTxHash("ww554234");
         transactionInfo.setTransactionIndex(333);
         transactionInfo.setValue(3.54);
+        transactionInfos.add(transactionInfo);
         message.setData(transactionInfos);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
         messagingTemplate.convertAndSend("/topic/transaction/new?cid="+cid, message);

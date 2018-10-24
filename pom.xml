@@ -13,6 +13,7 @@
   	<module>pojo</module>
   	<module>dao</module>
     <module>agent</module>
+    <module>generator</module>
   </modules>
   
   <parent>
