@@ -4,9 +4,13 @@ import com.platon.browser.common.dto.MessageResp;
 import com.platon.browser.common.dto.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * User: dongqile
@@ -26,6 +31,8 @@ import java.util.List;
 public class HomeController extends BasicsController{
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/")
     public String index() {
@@ -62,6 +69,8 @@ public class HomeController extends BasicsController{
         System.out.println("获取节点初始化列表数据！");
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
         List<NodeInfo> nodeInfoList = new ArrayList<>();
+        message.setErrMsg("");
+        message.setResult(0);
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33");
         n1.setLongitude("55555.33");
@@ -84,6 +93,26 @@ public class HomeController extends BasicsController{
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
+    @Scheduled(fixedRate = 1000)
+    @SendTo("/topic/node/new?cid=666")
+    public MessageResp<NodeInfo> send() throws Exception {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Random r = new Random();
+        int i = r.nextInt(10);
+
+        MessageResp<NodeInfo> message = new MessageResp<>();
+        message.setErrMsg("");
+        message.setResult(0);
+        NodeInfo n1 = new NodeInfo();
+        n1.setLatitude("3333.33");
+        n1.setLongitude("55555.33");
+        n1.setNetState(1);
+        n1.setNodeType(1);
+        message.setData(n1);
+        return message;
+        //messagingTemplate.convertAndSend("/topic/node/new?cid=666", message);
+    }
 
 
     /**
