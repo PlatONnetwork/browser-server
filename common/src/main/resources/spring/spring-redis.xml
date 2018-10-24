@@ -9,22 +9,6 @@
         <property name="maxIdle" value="32"/>
     </bean>
 
-
-    <bean id="brokerJedisCluster" class="com.platon.browser.browser.common.redis.JedisClusterFactory">
-        <property name="redisIpport">
-            <value>${redis.ipport}</value>
-        </property>
-        <property name="addressKeyPrefix" value="redis"/>
-        <property name="timeout" value="300000"/>
-        <property name="maxRedirections" value="6"/>
-        <property name="genericObjectPoolConfig" ref="brokerGenericObjectPoolConfig"/>
-    </bean>
-
-    <bean id="brokerRedisClient" class="com.platon.browser.browser.common.redis.RedisClient">
-        <constructor-arg name="expire" value="1800"/>
-        <property name="jedisCluster" ref="brokerJedisCluster"/>
-    </bean>
-
     <bean id="brokerTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <!-- 线程池活跃的线程数 -->
         <property name="corePoolSize" value="30"/>

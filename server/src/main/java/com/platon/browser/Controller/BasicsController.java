@@ -6,9 +6,9 @@ import com.github.fartherp.framework.common.util.DateUtil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.platon.browser.common.enums.DateType2Enum;
-import com.platon.browser.common.enums.DateTypeEnum;
-import com.platon.browser.common.enums.NewDateTypeEnum;
+import com.platon.browser.dao.dao.dao.dao.common.enums.DateType2Enum;
+import com.platon.browser.dao.dao.dao.dao.common.enums.DateTypeEnum;
+import com.platon.browser.dao.dao.dao.dao.common.enums.NewDateTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 
 import static java.util.Calendar.HOUR_OF_DAY;
