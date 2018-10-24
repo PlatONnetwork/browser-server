@@ -23,8 +23,8 @@ define({ "api": [
     "url": "",
     "version": "0.0.0",
     "filename": "./apidoc/main.js",
-    "group": "D__GitWorkspace_browser_server_server_apidoc_main_js",
-    "groupTitle": "D__GitWorkspace_browser_server_server_apidoc_main_js",
+    "group": "D__Workspace_browser_server_server_apidoc_main_js",
+    "groupTitle": "D__Workspace_browser_server_server_apidoc_main_js",
     "name": ""
   },
   {
@@ -114,7 +114,7 @@ define({ "api": [
     }
   },
   {
-    "type": "put",
+    "type": "subscribe",
     "url": "/app/block/init",
     "title": "g.实时区块列表（websocket请求）初始数据",
     "version": "1.0.0",
@@ -143,7 +143,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "get",
+    "type": "subscribe",
     "url": "/topic/block/new",
     "title": "h.实时区块列表（websocket请求）增量数据",
     "version": "1.0.0",
@@ -163,7 +163,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "put",
+    "type": "subscribe",
     "url": "/app/index/init",
     "title": "c.实时监控指标（websocket请求）初始数据",
     "version": "1.0.0",
@@ -183,7 +183,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"currentHeight\": ,//当前区块高度\n   \t    \"node\":\"\",//出块节点\n   \t    \"currentTransaction\": //当前交易笔数\n   \t    \"consensusNodeAmount\": //共识节点数\n   \t    \"addressAmount\": //地址数\n   \t    \"voteAmount\": //投票数\n   \t    \"proportion\": //占比\n   \t    \"ticketPrice\": //票价\n        }\n   ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\": {\n   \t    \"currentHeight\": ,//当前区块高度\n   \t    \"node\":\"\",//出块节点\n   \t    \"currentTransaction\": //当前交易笔数\n   \t    \"consensusNodeAmount\": //共识节点数\n   \t    \"addressAmount\": //地址数\n   \t    \"voteAmount\": //投票数\n   \t    \"proportion\": //占比\n   \t    \"ticketPrice\": //票价\n        }\n}",
           "type": "json"
         }
       ]
@@ -192,7 +192,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "get",
+    "type": "subscribe",
     "url": "/topic/index/new",
     "title": "d.实时监控指标（websocket请求）增量数据",
     "version": "1.0.0",
@@ -212,7 +212,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "put",
+    "type": "subscribe",
     "url": "/app/node/init",
     "title": "a.节点监控图标数据（websocket请求）初始数据",
     "version": "1.0.0",
@@ -232,7 +232,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"longitude\": \"\",//经度\n   \t    \"latitude\":\"\",//纬度\n   \t    \"nodeType\": //节点状态：1-共识节点 2-非共识\n        }\n   ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"longitude\": \"\",//经度\n   \t    \"latitude\":\"\",//纬度\n   \t    \"nodeType\": ,//节点状态：1-共识节点 2-非共识\n   \t    \"netState\": //节点状态 1 正常 2 异常\n        }\n   ]\n}",
           "type": "json"
         }
       ]
@@ -241,7 +241,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "get",
+    "type": "subscribe",
     "url": "/topic/node/new",
     "title": "b.节点监控图标数据（websocket请求）增量数据",
     "version": "1.0.0",
@@ -299,11 +299,11 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "put",
-    "url": "/app/statis/init",
+    "type": "subscribe",
+    "url": "/app/statistic/init",
     "title": "e.出块时间及交易数据（websocket请求）初始数据",
     "version": "1.0.0",
-    "name": "statis_init",
+    "name": "statistic_init",
     "group": "home",
     "description": "<p>初始数据</p>",
     "parameter": {
@@ -328,11 +328,11 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "get",
-    "url": "/topic/statis/new",
+    "type": "subscribe",
+    "url": "/topic/statistic/new",
     "title": "f.出块时间及交易数据（websocket请求）增量数据",
     "version": "1.0.0",
-    "name": "statis_new",
+    "name": "statistic_new",
     "group": "home",
     "description": "<p>增量数据</p>",
     "success": {
@@ -348,7 +348,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "put",
+    "type": "subscribe",
     "url": "/app/transaction/init",
     "title": "i.实时交易列表（websocket请求）初始数据",
     "version": "1.0.0",
@@ -368,7 +368,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n    {\n   \t    \"txHash\": \"\",//交易Hash\n   \t    \"from\":\"\",//交易发起方地址\n   \t    \"to\": //交易接收方地址\n   \t    \"value\": \"\"//数额\n        }\n   ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n   \"errMsg\": \"\",//描述信息\n   \"result\": 0,//成功（0），失败则由相关失败码\n   \"data\":[\n        {\n   \t    \"txHash\": \"\",//交易Hash\n   \t    \"from\":\"\",//交易发起方地址\n   \t    \"to\": //交易接收方地址\n   \t    \"value\": \"\"//数额\n   \t    \"timestamp\"：//交易时间\n        }\n   ]\n}",
           "type": "json"
         }
       ]
@@ -377,7 +377,7 @@ define({ "api": [
     "groupTitle": "home"
   },
   {
-    "type": "get",
+    "type": "subscribe",
     "url": "/topic/transaction/new",
     "title": "j.实时交易列表（websocket请求）增量数据",
     "version": "1.0.0",
@@ -451,7 +451,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request-Example:",
-          "content": "{\n     \"query\": \"\",//区块高度/地址/块哈希/交易哈希(非必填)\n     \"pageNo\": 1,//页数(必填)\n     \"pageSize\": 10,//页大小(必填)\n}",
+          "content": "{\n     \"pageNo\": 1,//页数(必填)\n     \"pageSize\": 10,//页大小(必填)\n}",
           "type": "json"
         }
       ]
@@ -460,7 +460,50 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n     \"errMsg\": \"\",//描述信息\n     \"code\": 0,//成功（0），失败则由相关失败码\n     \"totalCount\":18,//总数\n     \"totalPages\":1,//总页数\n     \"data\": [\n          {\n          \"txHash\": \"0x234234\",//交易hash\n          \"blockHeight\": \"15566\",//交易所在区块高度\n          \"blockTime\": 18080899999,//出块时间\n          \"from\": \"0x667766\",//发送方\n          \"to\": \"0x667766\",//接收方\n          \"value\": \"222\",//数额\n          \"actualTxCoast\": \"22\",//交易费用\n          \"txReceiptStatus\": 1,//交易状态 -1 pending 1 成功  0 失败\n          \"txType\": \"\", // 交易类型\n                        transfer ：转账\n                        MPCtransaction ： MPC交易\n                        contractCreate ： 合约创建\n                        vote ： 投票\n                        transactionExecute ： 合约执行\n                        authorization ： 权限\n          \"serverTime\": 1123123//服务器时间\n          }\n      ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n     \"errMsg\": \"\",//描述信息\n     \"code\": 0,//成功（0），失败则由相关失败码\n     \"totalCount\":18,//总数\n     \"totalPages\":1,//总页数\n     \"data\": [\n          {\n          \"txHash\": \"0x234234\",//交易hash\n          \"blockHeight\": \"15566\",//交易所在区块高度\n          \"blockTime\": 18080899999,//出块时间\n          \"from\": \"0x667766\",//发送方\n          \"to\": \"0x667766\",//接收方\n          \"value\": \"222\",//数额\n          \"actualTxCoast\": \"22\",//交易费用\n          \"txReceiptStatus\": 1,//交易状态 -1 pending 1 成功  0 失败\n          \"txType\": \"\", // 交易类型\n                        transfer ：转账\n                        MPCtransaction ： MPC交易\n                        contractCreate ： 合约创建\n                        vote ： 投票\n                        transactionExecute ： 合约执行\n                        authorization ： 权限\n          \"serverTime\": 1123123,//服务器时间\n          \"failReason\":\"\"//失败原因\n          }\n      ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./src/main/java/com/platon/browser/Controller/TransactionController.java",
+    "groupTitle": "transaction",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": true,
+            "field": "Content-Type",
+            "defaultValue": "application/json;charset=UTF-8",
+            "description": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "post",
+    "url": "transaction/pendingList",
+    "title": "c.待处理交易列表",
+    "version": "1.0.0",
+    "name": "transactionList",
+    "group": "transaction",
+    "description": "<p>交易列表</p>",
+    "parameter": {
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n     \"pageNo\": 1,//页数(必填)\n     \"pageSize\": 10,//页大小(必填)\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n     \"errMsg\": \"\",//描述信息\n     \"code\": 0,//成功（0），失败则由相关失败码\n     \"totalCount\":18,//总数\n     \"totalPages\":1,//总页数\n     \"data\": [\n          {\n          \"txHash\": \"0x234234\",//交易hash\n          \"blockHeight\": \"15566\",//交易所在区块高度\n          \"blockTime\": 18080899999,//出块时间\n          \"from\": \"0x667766\",//发送方\n          \"to\": \"0x667766\",//接收方\n          \"value\": \"222\",//数额\n          \"actualTxCoast\": \"22\",//交易费用\n          \"txReceiptStatus\": 1,//交易状态 -1 pending 1 成功  0 失败\n          \"txType\": \"\", // 交易类型\n    transfer ：转账\n    MPCtransaction ： MPC交易\n    contractCreate ： 合约创建\n    vote ： 投票\n    transactionExecute ： 合约执行\n    authorization ： 权限\n          \"serverTime\": 1123123,//服务器时间\n          \"failReason\":\"\"//失败原因\n          }\n      ]\n}",
           "type": "json"
         }
       ]

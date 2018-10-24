@@ -1,9 +1,20 @@
 package com.platon.browser.Controller;
 
+import com.platon.browser.common.dto.MessageResp;
+import com.platon.browser.common.dto.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -11,13 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
  * Time: 9:40
  */
 @RestController
-@RequestMapping("/browser_api")
 public class HomeController extends BasicsController{
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
 
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+
     /**
-     * @api {put} /app/node/init a.节点监控图标数据（websocket请求）初始数据
+     * @api {subscribe} /app/node/init a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName node/init
      * @apiGroup home
@@ -39,10 +54,24 @@ public class HomeController extends BasicsController{
      *      ]
      *   }
      */
-
+    @SubscribeMapping("/node/init")
+    public MessageResp subscribeMapping(StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        System.out.println("获取节点初始化列表数据！");
+        MessageResp<List<NodeInfo>> message = new MessageResp();
+        List<NodeInfo> nodeInfoList = new ArrayList<>();
+        NodeInfo n1 = new NodeInfo();
+        n1.setLatitude("3333.33");
+        n1.setLongitude("55555.33");
+        n1.setNetState(1);
+        n1.setNodeType(1);
+        nodeInfoList.add(n1);
+        message.setData(nodeInfoList);
+        return message;
+    }
 
     /**
-     * @api {get} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
+     * @api {subscribe} /topic/node/new b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName node/new
      * @apiGroup home
@@ -55,7 +84,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/index/init c.实时监控指标（websocket请求）初始数据
+     * @api {subscribe} /app/index/init c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName index/init
      * @apiGroup home
@@ -82,7 +111,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/index/new d.实时监控指标（websocket请求）增量数据
+     * @api {subscribe} /topic/index/new d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName index/new
      * @apiGroup home
@@ -93,9 +122,9 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/statis/init e.出块时间及交易数据（websocket请求）初始数据
+     * @api {subscribe} /app/statistic/init e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
-     * @apiName statis/init
+     * @apiName statistic/init
      * @apiGroup home
      * @apiDescription 初始数据
      * @apiParamExample {json} Request-Example:
@@ -127,9 +156,9 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/statis/new f.出块时间及交易数据（websocket请求）增量数据
+     * @api {subscribe} /topic/statistic/new f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
-     * @apiName statis/new
+     * @apiName statistic/new
      * @apiGroup home
      * @apiDescription 增量数据
      * @apiSuccessExample  Success-Response:
@@ -139,7 +168,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/block/init g.实时区块列表（websocket请求）初始数据
+     * @api {subscribe} /app/block/init g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName block/init
      * @apiGroup home
@@ -167,7 +196,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/block/new h.实时区块列表（websocket请求）增量数据
+     * @api {subscribe} /topic/block/new h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName block/new
      * @apiGroup home
@@ -178,7 +207,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {put} /app/transaction/init i.实时交易列表（websocket请求）初始数据
+     * @api {subscribe} /app/transaction/init i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName transaction/init
      * @apiGroup home
@@ -205,7 +234,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {get} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
+     * @api {subscribe} /topic/transaction/new j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName transaction/new
      * @apiGroup home
