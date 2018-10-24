@@ -9,6 +9,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class HomeController extends BasicsController{
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    private NodeMapper nodeMapper;
+    private NodeService nodeService;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -65,20 +66,14 @@ public class HomeController extends BasicsController{
     @SubscribeMapping("/node/init?cid={chainId}")
     public MessageResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
-        System.out.println("获取节点初始化列表数据！");
+        logger.debug("获取节点初始化列表数据！");
+
+        List<NodeInfo> nodeInfoList = nodeService.getNodeInfoList();
+
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
-        List<NodeInfo> nodeInfoList = new ArrayList<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
         message.setResult(RetEnum.RET_SUCCESS.getCode());
-        NodeInfo n1 = new NodeInfo();
-        n1.setLatitude("3333.33");
-        n1.setLongitude("55555.33");
-        n1.setNetState(1);
-        n1.setNodeType(1);
-        nodeInfoList.add(n1);
         message.setData(nodeInfoList);
-
-        List<Node> list = nodeMapper.selectByExample(new NodeExample());
         return message;
     }
 
