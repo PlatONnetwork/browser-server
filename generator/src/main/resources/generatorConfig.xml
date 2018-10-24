@@ -12,7 +12,8 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser?useUnicode=true&amp;characterEncoding=utf-8" userId="platon"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser?useUnicode=true&amp;characterEncoding=utf-8"
+                        userId="platon"
                         password="platon"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity"
