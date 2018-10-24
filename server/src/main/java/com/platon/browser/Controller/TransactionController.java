@@ -188,11 +188,11 @@ public class TransactionController extends BasicsController{
                         authorization ： 权限
      *           "value": "222",//数额
      *           "actualTxCost": "22",//实际交易手续费
-     *           "energonLimit": 232,//能量限制
+     *           "energonLimit": 232,//能量限制（根据此值给警告提示，例如超过某个约定的数值则警告）
      *           "energonUsed": 122,//能量消耗
      *           "energonPrice": "123",//能量价格
      *           "inputData": "",//附加输入数据
-     *           "expectTime": 12312333 // 预计确认时间
+     *           "expectTime": 12312333, // 预计确认时间
      *           }
      * }
      */
