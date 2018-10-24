@@ -62,7 +62,7 @@ public class AccountController extends BasicsController{
 
 
     /**
-     * @api {post} account/download?cid=:chainId a.账户交易/出块记录下载
+     * @api {post} account/download?cid=:chainId b.账户交易/出块记录下载
      * @apiVersion 1.0.0
      * @apiName download
      * @apiGroup account
