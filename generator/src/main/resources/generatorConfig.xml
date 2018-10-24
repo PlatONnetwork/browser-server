@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry location="D:\Workspace\browser-server\generator\lib\mysql-connector-java-5.1.47.jar"/>
+    <classPathEntry location="./lib/mysql-connector-java-5.1.47.jar"/>
     <context id="my" targetRuntime="MyBatis3">
         <commentGenerator>
             <property name="suppressDate" value="false"/>
@@ -16,18 +16,18 @@
                         password="platon"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity"
-                            targetProject="D:\Workspace\browser-server\dao\src\main\java">
+                            targetProject="../dao/src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="mapper"
-                         targetProject="D:\Workspace\browser-server\dao\src\main\resources">
+                         targetProject="../dao/src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
         <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
-                             targetProject="D:\Workspace\browser-server\dao\src\main\java" type="XMLMAPPER">
+                             targetProject="../dao/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
