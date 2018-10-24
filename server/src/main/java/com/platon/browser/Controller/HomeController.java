@@ -286,7 +286,7 @@ public class HomeController extends BasicsController{
 
 
     /**
-     * @api {post} /home/query?cid=:chainId k.搜索
+     * @api {post} /home/query k.搜索
      * @apiVersion 1.0.0
      * @apiName query
      * @apiGroup home
@@ -294,6 +294,7 @@ public class HomeController extends BasicsController{
      * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {
+     *       "cid":"", // 链ID (必填)
      *       "parameter":""//块高，块hash，交易hash等
      *   }
      *  @apiSuccessExample {json} Success-Response:
