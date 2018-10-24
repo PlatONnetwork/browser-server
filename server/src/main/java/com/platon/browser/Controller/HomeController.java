@@ -1,24 +1,19 @@
 package com.platon.browser.Controller;
 
-import com.platon.browser.common.dto.MessageResp;
-import com.platon.browser.common.dto.NodeInfo;
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.dto.*;
+import com.platon.browser.dao.dao.dao.dao.common.enums.RetEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -33,11 +28,6 @@ public class HomeController extends BasicsController{
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -64,13 +54,13 @@ public class HomeController extends BasicsController{
      *   }
      */
     @SubscribeMapping("/node/init?cid={chainId}")
-    public MessageResp subscribeMapping(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public MessageResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         System.out.println("获取节点初始化列表数据！");
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
         List<NodeInfo> nodeInfoList = new ArrayList<>();
-        message.setErrMsg("");
-        message.setResult(0);
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33");
         n1.setLongitude("55555.33");
@@ -94,24 +84,18 @@ public class HomeController extends BasicsController{
      *   HTTP/1.1 200 OK
      */
     @Scheduled(fixedRate = 1000)
-    @SendTo("/topic/node/new?cid=666")
-    public MessageResp<NodeInfo> send() throws Exception {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        Random r = new Random();
-        int i = r.nextInt(10);
-
+    public void nodeSubscribe() throws Exception {
         MessageResp<NodeInfo> message = new MessageResp<>();
-        message.setErrMsg("");
-        message.setResult(0);
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
         NodeInfo n1 = new NodeInfo();
-        n1.setLatitude("3333.33");
-        n1.setLongitude("55555.33");
+        n1.setLatitude("3333.33"+new Random().nextInt(10));
+        n1.setLongitude("55555.33"+new Random().nextInt(10));
         n1.setNetState(1);
         n1.setNodeType(1);
         message.setData(n1);
-        return message;
-        //messagingTemplate.convertAndSend("/topic/node/new?cid=666", message);
+        String cid = "666";
+        messagingTemplate.convertAndSend("/topic/node/new?cid="+cid, message);
     }
 
 
@@ -141,6 +125,25 @@ public class HomeController extends BasicsController{
      *           }
      *   }
      */
+    @SubscribeMapping("/index/init?cid={chainId}")
+    public MessageResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        logger.debug("获取节点初始化列表数据！");
+        MessageResp<Index> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        Index index = new Index();
+        index.setAddressAmount(3);
+        index.setConsensusNodeAmount(33);
+        index.setCurrentHeight(333);
+        index.setCurrentTransaction(333);
+        index.setNode("node-1");
+        index.setProportion(66);
+        index.setTicketPrice(449);
+        index.setVoteAmount(333);
+        message.setData(index);
+        return message;
+    }
 
 
     /**
@@ -153,6 +156,24 @@ public class HomeController extends BasicsController{
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
+    @Scheduled(fixedRate = 1000)
+    public void indexSubscribe() throws Exception {
+        MessageResp<Index> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        Index index = new Index();
+        index.setAddressAmount(3);
+        index.setConsensusNodeAmount(33);
+        index.setCurrentHeight(333);
+        index.setCurrentTransaction(333);
+        index.setNode("node-1");
+        index.setProportion(66);
+        index.setTicketPrice(449);
+        index.setVoteAmount(333);
+        message.setData(index);
+        String cid = "666"; // 链的标识，需要从订阅的消息中获取
+        messagingTemplate.convertAndSend("/topic/index/new?cid="+cid, message);
+    }
 
 
     /**
@@ -170,25 +191,45 @@ public class HomeController extends BasicsController{
      *      "errMsg": "",//描述信息
      *      "result": 0,//成功（0），失败则由相关失败码
      *      "data": {
-     *      	    "avgTime": ,//平均出块时长
-     *      	    "current":"",//当前交易数量
-     *      	    "maxTps": //最大交易TPS
-     *      	    "avgTransaction": //平均区块交易数
-     *      	    "dayTransaction": //过去24小时交易笔数
-     *      	    "blockStatisList": [
+     *      	    "avgTime":365 ,//平均出块时长
+     *      	    "current":333,//当前交易数量
+     *      	    "maxTps":333, //最大交易TPS
+     *      	    "avgTransaction":33, //平均区块交易数
+     *      	    "dayTransaction":33, //过去24小时交易笔数
+     *      	    "blockStatisticList": [
      *      	    {
-     *      	        "height": ,//区块高度
-     *      	        "time":, //出块的时间
-     *      	        "transaction":  //区块打包数量
-     *
+     *      	        "height":333 ,//区块高度
+     *      	        "time":333, //出块的时间
+     *      	        "transaction":33  //区块打包数量
      *      	    }
      *      	    ]//投票数
-     *
      *           }
      *
      *   }
      */
-
+    @SubscribeMapping("/statistic/init?cid={chainId}")
+    public MessageResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        logger.debug("获取出块时间及交易数据初始数据！");
+        MessageResp<Statistic> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        Statistic statistic = new Statistic();
+        statistic.setAvgTime(333);
+        statistic.setAvgTransaction(333);
+        statistic.setCurrent(333);
+        statistic.setDayTransaction(333);
+        statistic.setMaxTps(333);
+        List<BlockStatistic> lists = new ArrayList<>();
+        BlockStatistic blockStatistic = new BlockStatistic();
+        blockStatistic.setHeight(333);
+        blockStatistic.setTime(333);
+        blockStatistic.setTransaction(333);
+        lists.add(blockStatistic);
+        statistic.setBlockStatisticList(lists);
+        message.setData(statistic);
+        return message;
+    }
 
     /**
      * @api {subscribe} /topic/statistic/new?cid=:chainId f.出块时间及交易数据（websocket请求）增量数据
@@ -200,6 +241,28 @@ public class HomeController extends BasicsController{
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
+    @Scheduled(fixedRate = 1000)
+    public void statisticSubscribe() throws Exception {
+        MessageResp<Statistic> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        Statistic statistic = new Statistic();
+        statistic.setAvgTime(333);
+        statistic.setAvgTransaction(333);
+        statistic.setCurrent(333);
+        statistic.setDayTransaction(333);
+        statistic.setMaxTps(333);
+        List<BlockStatistic> lists = new ArrayList<>();
+        BlockStatistic blockStatistic = new BlockStatistic();
+        blockStatistic.setHeight(333);
+        blockStatistic.setTime(333);
+        blockStatistic.setTransaction(333);
+        lists.add(blockStatistic);
+        statistic.setBlockStatisticList(lists);
+        message.setData(statistic);
+        String cid = "666"; // 链的标识，需要从订阅的消息中获取
+        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, message);
+    }
 
 
 
@@ -219,17 +282,35 @@ public class HomeController extends BasicsController{
      *      "result": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *       {
-     *      	    "height": ,//区块高度
-     *      	    "timeStamp":"",//出块时间
-     *      	    "serverTime": //服务器时间
-     *      	    "node": ""//出块节点
-     *      	    "transaction": //交易数
-     *      	    "blockReward": //区块奖励
+     *      	    "height":33 ,//区块高度
+     *      	    "timeStamp":33333,//出块时间
+     *      	    "serverTime":44444, //服务器时间
+     *      	    "node": "node-1",//出块节点
+     *      	    "transaction":333, //交易数
+     *      	    "blockReward":333 //区块奖励
      *           }
      *      ]
      *   }
      */
-
+    @SubscribeMapping("/block/init?cid={chainId}")
+    public MessageResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        logger.debug("获取出块时间及交易数据初始数据！");
+        MessageResp<List<BlockInfo>> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        List<BlockInfo> blockInfos = new ArrayList<>();
+        BlockInfo blockInfo = new BlockInfo();
+        blockInfo.setBlockReward(33);
+        blockInfo.setHeight(33);
+        blockInfo.setNode("node-1");
+        blockInfo.setServerTime(System.currentTimeMillis());
+        blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
+        blockInfo.setTransaction(333);
+        blockInfos.add(blockInfo);
+        message.setData(blockInfos);
+        return message;
+    }
 
 
     /**
@@ -242,6 +323,24 @@ public class HomeController extends BasicsController{
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
+    @Scheduled(fixedRate = 1000)
+    public void blockSubscribe() throws Exception {
+        MessageResp<List<BlockInfo>> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        List<BlockInfo> blockInfos = new ArrayList<>();
+        BlockInfo blockInfo = new BlockInfo();
+        blockInfo.setBlockReward(33);
+        blockInfo.setHeight(33);
+        blockInfo.setNode("node-1");
+        blockInfo.setServerTime(System.currentTimeMillis());
+        blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
+        blockInfo.setTransaction(333);
+        blockInfos.add(blockInfo);
+        message.setData(blockInfos);
+        String cid = "666"; // 链的标识，需要从订阅的消息中获取
+        messagingTemplate.convertAndSend("/topic/block/new?cid="+cid, message);
+    }
 
 
     /**
@@ -260,16 +359,36 @@ public class HomeController extends BasicsController{
      *      "result": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
-     *      	    "txHash": "",//交易Hash
-     *      	    "from":"",//交易发起方地址
-     *      	    "to": //交易接收方地址
-     *      	    "value": ""//数额
-     *      	    "timestamp"：//交易时间
+     *      	    "txHash": "x3222",//交易Hash
+     *      	    "blockHeight":5555, // 区块高度
+     *      	    "transactionIndex": 33, // 交易在区块中位置
+     *      	    "from":"ddddd",//交易发起方地址
+     *      	    "to":"aaaa", //交易接收方地址
+     *      	    "value": 3.6,//数额
+     *      	    "timestamp"：155788//交易时间
      *           }
      *      ]
      *   }
      */
-
+    @SubscribeMapping("/transaction/init?cid={chainId}")
+    public MessageResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+        Object headers = headerAccessor.getHeader("nativeHeaders");
+        logger.debug("获取出块时间及交易数据初始数据！");
+        MessageResp<List<TransactionInfo>> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        List<TransactionInfo> transactionInfos = new ArrayList<>();
+        TransactionInfo transactionInfo = new TransactionInfo();
+        transactionInfo.setBlockHeight(33);
+        transactionInfo.setFrom("33333");
+        transactionInfo.setTo("33444");
+        transactionInfo.setTimestamp(System.currentTimeMillis());
+        transactionInfo.setTxHash("ww554234");
+        transactionInfo.setTransactionIndex(333);
+        transactionInfo.setValue(3.54);
+        message.setData(transactionInfos);
+        return message;
+    }
 
 
     /**
@@ -282,7 +401,24 @@ public class HomeController extends BasicsController{
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-
+    @Scheduled(fixedRate = 1000)
+    public void transactionSubscribe() throws Exception {
+        MessageResp<List<TransactionInfo>> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        List<TransactionInfo> transactionInfos = new ArrayList<>();
+        TransactionInfo transactionInfo = new TransactionInfo();
+        transactionInfo.setBlockHeight(33);
+        transactionInfo.setFrom("33333");
+        transactionInfo.setTo("33444");
+        transactionInfo.setTimestamp(System.currentTimeMillis());
+        transactionInfo.setTxHash("ww554234");
+        transactionInfo.setTransactionIndex(333);
+        transactionInfo.setValue(3.54);
+        message.setData(transactionInfos);
+        String cid = "666"; // 链的标识，需要从订阅的消息中获取
+        messagingTemplate.convertAndSend("/topic/transaction/new?cid="+cid, message);
+    }
 
 
     /**
@@ -321,4 +457,27 @@ public class HomeController extends BasicsController{
      *   }
      */
 
+
+    @PostMapping("/home/query")
+    public MessageResp search(@RequestBody SearchParam param){
+        logger.debug(JSON.toJSONString(param));
+        MessageResp<SearchResult> message = new MessageResp<>();
+        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
+        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        SearchResult<NodeDetail> searchResult = new SearchResult<>();
+        searchResult.setType("block");
+        NodeDetail nodeDetail = new NodeDetail();
+        nodeDetail.setBlockReward(33.3);
+        nodeDetail.setEnergonAverage(333);
+        nodeDetail.setEnergonUsed(33);
+        nodeDetail.setHeight(333);
+        nodeDetail.setMiner("33333");
+        nodeDetail.setServerTime(System.currentTimeMillis());
+        nodeDetail.setSize(3333);
+        nodeDetail.setTimestamp(System.currentTimeMillis());
+        nodeDetail.setTransaction(333);
+        searchResult.setStruct(nodeDetail);
+        message.setData(searchResult);
+        return message;
+    }
 }
