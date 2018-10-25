@@ -109,7 +109,52 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/pendingList c.待处理交易列表
+     * @api {post} transaction/transactionDetailNavigate c.交易详情前后跳转浏览
+     * @apiVersion 1.0.0
+     * @apiName transactionDetailNavigate
+     * @apiGroup transaction
+     * @apiDescription 交易详情前后跳转浏览
+     * @apiParam {String} cid 链ID.
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "cid":"", // 链ID (必填)
+     *      "direction":"", // 方向：prev-上一个，next-下一个 (必填)
+     *      "txHash": "",//交易Hash(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "data": {
+     *           "txHash": "0x234234",//交易hash
+     *           "timeStamp": 123123123879,//交易接收时间
+     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
+     *           "blockHeight": "15566",//交易所在区块高度
+     *           "from": "0x667766",//发送者
+     *           "to": "0x667766",//接收者
+     *           "txType": "", // 交易类型
+                    transfer ：转账
+                    MPCtransaction ： MPC交易
+                    contractCreate ： 合约创建
+                    vote ： 投票
+                    transactionExecute ： 合约执行
+                    authorization ： 权限
+     *           "value": "222",//数额
+     *           "actualTxCost": "22",//实际交易手续费
+     *           "energonLimit": 232,//能量限制
+     *           "energonUsed": 122,//能量消耗
+     *           "energonPrice": "123",//能量价格
+     *           "inputData": "",//附加输入数据
+     *           "expectTime": 12312333, // 预计确认时间
+     *           }
+     * }
+     */
+
+
+    /**
+     * @api {post} transaction/pendingList d.待处理交易列表
      * @apiVersion 1.0.0
      * @apiName pendingList
      * @apiGroup transaction
@@ -155,7 +200,7 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/pendingDetails d.待处理交易详情
+     * @api {post} transaction/pendingDetails e.待处理交易详情
      * @apiVersion 1.0.0
      * @apiName pendingDetails
      * @apiGroup transaction
@@ -199,7 +244,52 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/addressDetails e.查询地址详情
+     * @api {post} transaction/pendingDetailNavigate f.待处理交易详情前后跳转浏览
+     * @apiVersion 1.0.0
+     * @apiName pendingDetailNavigate
+     * @apiGroup transaction
+     * @apiDescription 待处理交易详情前后跳转浏览
+     * @apiParam {String} cid 链ID.
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "cid":"", // 链ID (必填)
+     *      "direction":"", // 方向：prev-上一个，next-下一个 (必填)
+     *      "txHash": "",//交易Hash(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "data": {
+     *           "txHash": "0x234234",//交易hash
+     *           "timeStamp": 123123123879,//交易接收时间
+     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
+     *           "blockHeight": "15566",//交易所在区块高度
+     *           "from": "0x667766",//发送者
+     *           "to": "0x667766",//接收者
+     *           "txType": "", // 交易类型
+                    transfer ：转账
+                    MPCtransaction ： MPC交易
+                    contractCreate ： 合约创建
+                    vote ： 投票
+                    transactionExecute ： 合约执行
+                    authorization ： 权限
+     *           "value": "222",//数额
+     *           "actualTxCost": "22",//实际交易手续费
+     *           "energonLimit": 232,//能量限制
+     *           "energonUsed": 122,//能量消耗
+     *           "energonPrice": "123",//能量价格
+     *           "inputData": "",//附加输入数据
+     *           "expectTime": 12312333, // 预计确认时间
+     *           }
+     * }
+     */
+
+
+    /**
+     * @api {post} transaction/addressDetails g.查询地址详情
      * @apiVersion 1.0.0
      * @apiName addressDetails
      * @apiGroup transaction
@@ -254,7 +344,7 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/addressDownload f.导出地址详情
+     * @api {post} transaction/addressDownload h.导出地址详情
      * @apiVersion 1.0.0
      * @apiName addressDownload
      * @apiGroup transaction
@@ -274,7 +364,7 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/contractDetails g.查询合约详情
+     * @api {post} transaction/contractDetails i.查询合约详情
      * @apiVersion 1.0.0
      * @apiName contractDetails
      * @apiGroup transaction
@@ -329,7 +419,7 @@ public class TransactionController extends BasicsController{
 
 
     /**
-     * @api {post} transaction/contractDownload h.导出合约详情
+     * @api {post} transaction/contractDownload j.导出合约详情
      * @apiVersion 1.0.0
      * @apiName contractDownload
      * @apiGroup transaction

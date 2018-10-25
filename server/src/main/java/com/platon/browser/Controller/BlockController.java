@@ -87,4 +87,38 @@ public class BlockController extends BasicsController {
      *           }
      * }
      */
+
+    /**
+     * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览
+     * @apiVersion 1.0.0
+     * @apiName blockDetailNavigate
+     * @apiGroup blcok
+     * @apiDescription 区块详情前后跳转浏览
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "cid":"", // 链ID (必填)
+     *      "direction":"", // 方向：prev-上一个，next-下一个 (必填)
+     *      "height": 123,//区块高度(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "data": {
+     *           "height": 19988,//块高
+     *           "timeStamp": 123123123879,//出块时间
+     *           "transaction": 1288,//块内交易总数
+     *           "hash": "0x1238",//区块hash
+     *           "parentHash": "0x234",//父区块hash
+     *           "miner": "0x234", // 出块节点（多少时间内）
+     *           "size": 123,//区块大小
+     *           "energonLimit": 24234,//能量消耗限制
+     *           "energonUsed": 2342,//能量消耗
+     *           "blockReward": "123123",//区块奖励
+     *           "extraData": "xxx"//附加数据
+     *           }
+     * }
+     */
 }
