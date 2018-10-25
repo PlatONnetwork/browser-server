@@ -1,19 +1,18 @@
 package com.platon.browser.Controller;
 
 import com.github.fartherp.framework.common.util.DateUtil;
-
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.platon.browser.dao.dao.dao.dao.common.enums.DateType2Enum;
-import com.platon.browser.dao.dao.dao.dao.common.enums.DateTypeEnum;
-import com.platon.browser.dao.dao.dao.dao.common.enums.NewDateTypeEnum;
+import com.platon.browser.common.enums.DateType2Enum;
+import com.platon.browser.common.enums.DateTypeEnum;
+import com.platon.browser.common.enums.NewDateTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.SECOND;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Calendar.*;
 
 public class BasicsController {
 

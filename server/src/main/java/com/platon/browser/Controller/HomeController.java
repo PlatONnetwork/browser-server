@@ -2,13 +2,7 @@ package com.platon.browser.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.*;
-import com.platon.browser.dao.dao.dao.dao.common.enums.RetEnum;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
