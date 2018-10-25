@@ -12,7 +12,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser?useUnicode=true&amp;characterEncoding=utf-8"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
