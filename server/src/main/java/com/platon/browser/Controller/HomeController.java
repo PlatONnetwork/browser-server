@@ -67,7 +67,7 @@ public class HomeController {
 
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         message.setData(nodeInfoList);
         return message;
     }
@@ -88,7 +88,7 @@ public class HomeController {
     public void nodeSubscribe() throws Exception {
         MessageResp<NodeInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33"+new Random().nextInt(10));
         n1.setLongitude("55555.33"+new Random().nextInt(10));
@@ -132,7 +132,7 @@ public class HomeController {
         logger.debug("获取节点初始化列表数据！");
         MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
@@ -161,7 +161,7 @@ public class HomeController {
     public void inexSubscribe() throws Exception {
         MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
@@ -214,7 +214,7 @@ public class HomeController {
         logger.debug("获取出块时间及交易数据初始数据！");
         MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
@@ -246,7 +246,7 @@ public class HomeController {
     public void statisticSubscribe() throws Exception {
         MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
@@ -299,7 +299,7 @@ public class HomeController {
         logger.debug("获取出块时间及交易数据初始数据！");
         MessageResp<List<BlockInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -328,7 +328,7 @@ public class HomeController {
     public void blockSubscribe() throws Exception {
         MessageResp<List<BlockInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -377,7 +377,7 @@ public class HomeController {
         logger.debug("获取出块时间及交易数据初始数据！");
         MessageResp<List<TransactionInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -407,7 +407,7 @@ public class HomeController {
     public void transactionSubscribe() throws Exception {
         MessageResp<List<TransactionInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -442,7 +442,7 @@ public class HomeController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":{
-     *          "type":"",//区块block，交易transaction，节点node,合约contract,
+     *          "type":"",//区块block，交易transaction，节点node,合约contract,账户account
      *           "struct":{
      *      	        "height": 17888,//块高
      *                  "timeStamp": 1798798798798,//出块时间
@@ -466,7 +466,7 @@ public class HomeController {
         logger.debug(JSON.toJSONString(param));
         MessageResp<SearchResult> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         SearchResult<NodeDetail> searchResult = new SearchResult<>();
         searchResult.setType("block");
         NodeDetail nodeDetail = new NodeDetail();
