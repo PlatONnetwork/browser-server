@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class MessageResp<T> {
     private String errMsg;
-    private Integer result;
+    private Integer code;
     private T data;
 }

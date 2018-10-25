@@ -47,7 +47,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
      *      	    "longitude": "",//经度
@@ -113,7 +113,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *      	    "currentHeight": ,//当前区块高度
      *      	    "node":"",//出块节点
@@ -190,7 +190,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *      	    "avgTime":365 ,//平均出块时长
      *      	    "current":333,//当前交易数量
@@ -280,7 +280,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *       {
      *      	    "height":33 ,//区块高度
@@ -357,7 +357,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
      *      	    "txHash": "x3222",//交易Hash
@@ -440,7 +440,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":{
      *          "type":"",//区块block，交易transaction，节点node,合约contract,
      *           "struct":{
