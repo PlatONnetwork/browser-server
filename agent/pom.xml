@@ -20,6 +20,11 @@
 			<artifactId>manager</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.platon.browser</groupId>
+			<artifactId>common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- 外部引用 -->
 		<dependency>
