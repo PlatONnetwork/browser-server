@@ -45,6 +45,7 @@ public class BlockController extends BasicsController {
      *                  "size": 188,//块大小
      *                  "miner": "0x234", // 出块节点
      *                  "energonUsed": 111,//能量消耗
+     *                  "energonLimit": 24234,//能量消耗限制
      *                  "energonAverage": 11, //平均能量价值
      *                  "blockReward": "123123",//区块奖励
      *                  "serverTime": 1708098077  //服务器时间
