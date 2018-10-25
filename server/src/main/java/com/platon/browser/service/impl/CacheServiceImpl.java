@@ -7,9 +7,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 缓存服务
@@ -18,67 +18,126 @@ import java.util.List;
 @Service
 public class CacheServiceImpl implements CacheService {
 
+    private ReentrantReadWriteLock nodeInfoListLock = new ReentrantReadWriteLock();
     private List<NodeInfo> nodeInfoList = new ArrayList<>();
 
+    private ReentrantReadWriteLock indexInfoLock = new ReentrantReadWriteLock();
     private IndexInfo indexInfo = new IndexInfo();
 
+    private ReentrantReadWriteLock statisticInfoLock = new ReentrantReadWriteLock();
     private StatisticInfo statisticInfo = new StatisticInfo();
 
+    private ReentrantReadWriteLock blockInfoListLock = new ReentrantReadWriteLock();
     private LimitQueue<BlockInfo> blockInfoList = new LimitQueue<>(10);
 
+    private ReentrantReadWriteLock transactionInfoListLock = new ReentrantReadWriteLock();
     private LimitQueue<TransactionInfo> transactionInfoList = new LimitQueue<>(10);
 
     @Override
     public List<NodeInfo> getNodeInfoList() {
-        return Collections.unmodifiableList(nodeInfoList);
+        nodeInfoListLock.readLock().lock();
+        try{
+            return Collections.unmodifiableList(nodeInfoList);
+        }finally {
+            nodeInfoListLock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateNodeInfoList(NodeInfo... nodeInfos) {
-        nodeInfoList.addAll(Arrays.asList(nodeInfos));
+    public void updateNodeInfoList(boolean override, List<NodeInfo> nodeInfos) {
+        nodeInfoListLock.writeLock().lock();
+        try{
+            if(override){
+                nodeInfoList.clear();
+            }
+            nodeInfoList.addAll(nodeInfos);
+        }finally {
+            nodeInfoListLock.writeLock().unlock();
+        }
+
     }
 
     @Override
     public IndexInfo getIndexInfo() {
-        IndexInfo copy = new IndexInfo();
-        BeanUtils.copyProperties(indexInfo,copy);
-        return copy;
+        indexInfoLock.readLock().lock();
+        try{
+            IndexInfo copy = new IndexInfo();
+            BeanUtils.copyProperties(indexInfo,copy);
+            return copy;
+        }finally {
+            indexInfoLock.readLock().unlock();
+        }
     }
 
     @Override
     public void updateIndexInfo(IndexInfo indexInfo) {
-        BeanUtils.copyProperties(indexInfo,this.indexInfo);
+        indexInfoLock.writeLock().lock();
+        try{
+            BeanUtils.copyProperties(indexInfo,this.indexInfo);
+        }finally {
+            indexInfoLock.writeLock().unlock();
+        }
     }
 
     @Override
     public StatisticInfo getStatisticInfo() {
-        StatisticInfo copy = new StatisticInfo();
-        BeanUtils.copyProperties(statisticInfo,copy);
-        return copy;
+        statisticInfoLock.readLock().lock();
+        try{
+            StatisticInfo copy = new StatisticInfo();
+            BeanUtils.copyProperties(statisticInfo,copy);
+            return copy;
+        }finally {
+            statisticInfoLock.readLock().unlock();
+        }
     }
 
     @Override
     public void updateStatisticInfo(StatisticInfo statisticInfo) {
-        BeanUtils.copyProperties(statisticInfo,this.statisticInfo);
+        statisticInfoLock.writeLock().lock();
+        try{
+            BeanUtils.copyProperties(statisticInfo,this.statisticInfo);
+        }finally {
+            statisticInfoLock.writeLock().unlock();
+        }
     }
 
     @Override
     public List<BlockInfo> getBlockInfoList() {
-        return blockInfoList.elements();
+        blockInfoListLock.readLock().lock();
+        try{
+            return blockInfoList.elements();
+        }finally {
+            blockInfoListLock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateBlockInfoList(BlockInfo... blockInfos) {
-        Arrays.asList(blockInfos).forEach(e->blockInfoList.offer(e));
+    public void updateBlockInfoList(List<BlockInfo> blockInfos) {
+        blockInfoListLock.writeLock().lock();
+        try{
+            blockInfos.forEach(e->blockInfoList.offer(e));
+        }finally {
+            blockInfoListLock.writeLock().unlock();
+        }
     }
 
     @Override
     public List<TransactionInfo> getTransactionInfoList() {
-        return transactionInfoList.elements();
+        transactionInfoListLock.readLock().lock();
+        try{
+            return transactionInfoList.elements();
+        }finally {
+            transactionInfoListLock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateTransactionInfoList(TransactionInfo... transactionInfos) {
-        Arrays.asList(transactionInfos).forEach(e->transactionInfoList.offer(e));
+    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos) {
+        transactionInfoListLock.writeLock().lock();
+        try{
+            transactionInfos.forEach(e->transactionInfoList.offer(e));
+        }finally {
+            transactionInfoListLock.writeLock().unlock();
+        }
     }
 }

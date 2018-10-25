@@ -12,7 +12,13 @@ public interface CacheService {
      * 节点信息
      */
     List<NodeInfo> getNodeInfoList();
-    void updateNodeInfoList(NodeInfo... nodeInfos);
+
+    /**
+     * 更新节点信息列表
+     * @param nodeInfos
+     * @param override 是否覆盖，是则清除原来的数据，再添加；否则追加数据
+     */
+    void updateNodeInfoList(boolean override, List<NodeInfo> nodeInfos);
 
     /**
      * 指标信息
@@ -30,11 +36,11 @@ public interface CacheService {
      * 区块列表信息
      */
     List<BlockInfo> getBlockInfoList();
-    void updateBlockInfoList(BlockInfo... blockInfos);
+    void updateBlockInfoList(List<BlockInfo> blockInfos);
 
     /**
      * 交易列表信息
      */
     List<TransactionInfo> getTransactionInfoList();
-    void updateTransactionInfoList(TransactionInfo... transactionInfos);
+    void updateTransactionInfoList(List<TransactionInfo> transactionInfos);
 }
