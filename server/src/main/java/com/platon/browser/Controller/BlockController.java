@@ -26,7 +26,6 @@ public class BlockController extends BasicsController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "query": "",//区块高度/地址/块哈希/交易哈希(非必填)
      *      "pageNo": 1,//页数(必填)
      *      "pageSize": 10,//页大小(必填)
      * }
