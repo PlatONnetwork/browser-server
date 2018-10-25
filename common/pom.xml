@@ -29,7 +29,6 @@
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
 		</dependency>
-
 		<!-- web3j -->
 		<dependency>
 			<groupId>org.web3j</groupId>
