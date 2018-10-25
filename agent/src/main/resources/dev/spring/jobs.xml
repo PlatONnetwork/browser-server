@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.dangdang.com/schema/ddframe/reg
-                        ">
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd">
+    <!--配置作业注册中心 dubbo一样zk注册中心-->
+    <reg:zookeeper id="regCenter" server-lists="${regCenter.serverList}" namespace="${regCenter.namespace}"
+                   base-sleep-time-milliseconds="1000"
+                   max-sleep-time-milliseconds="3000" max-retries="3"/>
 
+    <job:simple id="quoteJob" class="com.juzix.exchange.task.job.QuoteTickerJob" registry-center-ref="regCenter"
+                cron="0 0/1 * * * ?" sharding-total-count="1" sharding-item-parameters="0=kline" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情信息修补任务"/>
 
+    <job:simple id="quoteImportDbJob" class="com.juzix.exchange.task.job.QuoteImportDbJob" registry-center-ref="regCenter"
+                cron="0 5 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=quoteImportDb" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情数据入库"/>
 </beans>
