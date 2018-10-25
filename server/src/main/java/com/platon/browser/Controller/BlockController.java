@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
     @RequestMapping("/browser_api")
-public class BlockController extends BasicsController {
+public class BlockController  {
 
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 

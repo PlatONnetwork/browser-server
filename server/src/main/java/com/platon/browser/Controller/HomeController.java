@@ -24,7 +24,7 @@ import java.util.Random;
  * Time: 9:40
  */
 @RestController
-public class HomeController extends BasicsController{
+public class HomeController {
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
     @Autowired

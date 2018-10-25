@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/browser_api")
-public class TransactionController extends BasicsController{
+public class TransactionController {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
