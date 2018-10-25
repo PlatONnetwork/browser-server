@@ -6,7 +6,7 @@ import lombok.Data;
  * 监控指标
  */
 @Data
-public class Index {
+public class IndexInfo {
     private int currentHeight;
     private String node;
     private int currentTransaction;

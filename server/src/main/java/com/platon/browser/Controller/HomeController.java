@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.*;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.service.NodeService;
+import com.sun.org.glassfish.external.statistics.Statistic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,10 +130,10 @@ public class HomeController {
     public MessageResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        MessageResp<Index> message = new MessageResp<>();
+        MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
         message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Index index = new Index();
+        IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
         index.setCurrentHeight(333);
@@ -157,11 +158,11 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      */
     @Scheduled(fixedRate = 1000)
-    public void indexSubscribe() throws Exception {
-        MessageResp<Index> message = new MessageResp<>();
+    public void inexSubscribe() throws Exception {
+        MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
         message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Index index = new Index();
+        IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
         index.setCurrentHeight(333);
@@ -211,10 +212,10 @@ public class HomeController {
     public MessageResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        MessageResp<Statistic> message = new MessageResp<>();
+        MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
         message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Statistic statistic = new Statistic();
+        StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
         statistic.setCurrent(333);
@@ -243,10 +244,10 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void statisticSubscribe() throws Exception {
-        MessageResp<Statistic> message = new MessageResp<>();
+        MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
         message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Statistic statistic = new Statistic();
+        StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
         statistic.setCurrent(333);

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Statistic {
+public class StatisticInfo {
     private int avgTime;
 
     private int current;
