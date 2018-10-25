@@ -3,6 +3,7 @@ package com.platon.browser.Controller;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.*;
 import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.service.CacheService;
 import com.platon.browser.service.NodeService;
 import com.sun.org.glassfish.external.statistics.Statistic;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class HomeController {
     @Autowired
     private NodeService nodeService;
 
+    @Autowired
+    private CacheService cacheService;
+
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
@@ -63,7 +67,7 @@ public class HomeController {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
 
-        List<NodeInfo> nodeInfoList = nodeService.getNodeInfoList();
+        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList();
 
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
