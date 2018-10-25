@@ -1,8 +1,10 @@
 package com.platon.browser.common.constant;
 
 public class MQConstant {
-    // 队列名称
-    public final static String PLATON_BROWSER_QUEUE = "platon-browser-queue";
+    // 推送队列名称
+    public final static String PLATON_BROWSER_QUEUE_PUSH = "platon-browser-queue-push";
+    // 持久化队列名称
+    public final static String PLATON_BROWSER_QUEUE_PERSIST = "platon-browser-queue-persist";
     // 交换机名称
     public final static String PLATON_BROWSER_EXCHANGE = "platon-browser-exchange";
     // 绑定的值

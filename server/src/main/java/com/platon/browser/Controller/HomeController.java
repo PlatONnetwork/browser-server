@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.*;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.service.NodeService;
+import com.sun.org.glassfish.external.statistics.Statistic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
      *      	    "longitude": "",//经度
@@ -66,7 +67,7 @@ public class HomeController {
 
         MessageResp<List<NodeInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         message.setData(nodeInfoList);
         return message;
     }
@@ -87,7 +88,7 @@ public class HomeController {
     public void nodeSubscribe() throws Exception {
         MessageResp<NodeInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33"+new Random().nextInt(10));
         n1.setLongitude("55555.33"+new Random().nextInt(10));
@@ -112,7 +113,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *      	    "currentHeight": ,//当前区块高度
      *      	    "node":"",//出块节点
@@ -129,10 +130,10 @@ public class HomeController {
     public MessageResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        MessageResp<Index> message = new MessageResp<>();
+        MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Index index = new Index();
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
+        IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
         index.setCurrentHeight(333);
@@ -157,11 +158,11 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      */
     @Scheduled(fixedRate = 1000)
-    public void indexSubscribe() throws Exception {
-        MessageResp<Index> message = new MessageResp<>();
+    public void inexSubscribe() throws Exception {
+        MessageResp<IndexInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Index index = new Index();
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
+        IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
         index.setCurrentHeight(333);
@@ -189,7 +190,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *      	    "avgTime":365 ,//平均出块时长
      *      	    "current":333,//当前交易数量
@@ -211,10 +212,10 @@ public class HomeController {
     public MessageResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        MessageResp<Statistic> message = new MessageResp<>();
+        MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Statistic statistic = new Statistic();
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
+        StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
         statistic.setCurrent(333);
@@ -243,10 +244,10 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void statisticSubscribe() throws Exception {
-        MessageResp<Statistic> message = new MessageResp<>();
+        MessageResp<StatisticInfo> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
-        Statistic statistic = new Statistic();
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
+        StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
         statistic.setCurrent(333);
@@ -279,7 +280,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *       {
      *      	    "height":33 ,//区块高度
@@ -298,7 +299,7 @@ public class HomeController {
         logger.debug("获取出块时间及交易数据初始数据！");
         MessageResp<List<BlockInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -327,7 +328,7 @@ public class HomeController {
     public void blockSubscribe() throws Exception {
         MessageResp<List<BlockInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -356,7 +357,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":[
      *           {
      *      	    "txHash": "x3222",//交易Hash
@@ -376,7 +377,7 @@ public class HomeController {
         logger.debug("获取出块时间及交易数据初始数据！");
         MessageResp<List<TransactionInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -406,7 +407,7 @@ public class HomeController {
     public void transactionSubscribe() throws Exception {
         MessageResp<List<TransactionInfo>> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -439,9 +440,9 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      *   {
      *      "errMsg": "",//描述信息
-     *      "result": 0,//成功（0），失败则由相关失败码
+     *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":{
-     *          "type":"",//区块block，交易transaction，节点node,合约contract,
+     *          "type":"",//区块block，交易transaction，节点node,合约contract,账户account
      *           "struct":{
      *      	        "height": 17888,//块高
      *                  "timeStamp": 1798798798798,//出块时间
@@ -465,7 +466,7 @@ public class HomeController {
         logger.debug(JSON.toJSONString(param));
         MessageResp<SearchResult> message = new MessageResp<>();
         message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setResult(RetEnum.RET_SUCCESS.getCode());
+        message.setCode(RetEnum.RET_SUCCESS.getCode());
         SearchResult<NodeDetail> searchResult = new SearchResult<>();
         searchResult.setType("block");
         NodeDetail nodeDetail = new NodeDetail();
