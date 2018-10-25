@@ -446,6 +446,8 @@ public class TransactionController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
+     *      "pageNo": 1,//页数(必填)
+     *      "pageSize": 10,//页大小(必填),
      *      "height": 123,//区块高度(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
