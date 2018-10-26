@@ -2,17 +2,16 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
+import com.platon.browser.common.dto.account.AccountDetail;
 import com.platon.browser.common.dto.transaction.PendingTxDetail;
 import com.platon.browser.common.dto.transaction.PendingTxList;
 import com.platon.browser.common.dto.transaction.TransactionDetail;
 import com.platon.browser.common.dto.transaction.TransactionList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.transaction.PendingTxDetailReq;
-import com.platon.browser.common.req.transaction.PendingTxListReq;
-import com.platon.browser.common.req.transaction.TransactionDetailReq;
-import com.platon.browser.common.req.transaction.TransactionListReq;
-import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.common.req.account.AccountDetailReq;
+import com.platon.browser.common.req.transaction.*;
+import com.platon.browser.service.AccountService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import org.slf4j.Logger;
@@ -42,6 +41,9 @@ public class TransactionController {
 
     @Autowired
     private PendingTxService pendingTxService;
+
+    @Autowired
+    private AccountService accountService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -392,7 +394,15 @@ public class TransactionController {
      *      }
      * }
      */
-
+    @PostMapping("addressDetails")
+    public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
+        try{
+            AccountDetail accountDetail = accountService.getAccountDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),accountDetail);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
 
     /**
