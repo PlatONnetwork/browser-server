@@ -2,12 +2,10 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
-import com.platon.browser.common.dto.block.BlockDetail;
 import com.platon.browser.common.dto.transaction.TransactionDetail;
 import com.platon.browser.common.dto.transaction.TransactionList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.block.BlockDetailReq;
 import com.platon.browser.common.req.transaction.TransactionDetailReq;
 import com.platon.browser.common.req.transaction.TransactionListReq;
 import com.platon.browser.service.TransactionService;
@@ -107,7 +105,7 @@ public class TransactionController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "txHash": "0x234234",//交易hash
-     *           "timeStamp": 123123123879,//交易时间
+     *           "timestamp": 123123123879,//交易时间
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "blockHeight": "15566",//交易所在区块高度
      *           "from": "0x667766",//发送者
@@ -161,7 +159,7 @@ public class TransactionController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "txHash": "0x234234",//交易hash
-     *           "timeStamp": 123123123879,//交易接收时间
+     *           "timestamp": 123123123879,//交易接收时间
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "blockHeight": "15566",//交易所在区块高度
      *           "from": "0x667766",//发送者
@@ -251,7 +249,7 @@ public class TransactionController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "txHash": "0x234234",//交易hash
-     *           "timeStamp": 123123123879,//交易接收时间
+     *           "timestamp": 123123123879,//交易接收时间
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "blockHeight": "15566",//交易所在区块高度
      *           "from": "0x667766",//发送者
@@ -296,7 +294,7 @@ public class TransactionController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "txHash": "0x234234",//交易hash
-     *           "timeStamp": 123123123879,//交易接收时间
+     *           "timestamp": 123123123879,//交易接收时间
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "blockHeight": "15566",//交易所在区块高度
      *           "from": "0x667766",//发送者

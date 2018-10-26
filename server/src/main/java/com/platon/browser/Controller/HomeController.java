@@ -275,7 +275,7 @@ public class HomeController {
      *      "data":[
      *       {
      *      	    "height":33 ,//区块高度
-     *      	    "timeStamp":33333,//出块时间
+     *      	    "timestamp":33333,//出块时间
      *      	    "serverTime":44444, //服务器时间
      *      	    "node": "node-1",//出块节点
      *      	    "transaction":333, //交易数
@@ -294,7 +294,7 @@ public class HomeController {
         blockInfo.setHeight(33);
         blockInfo.setNode("node-1");
         blockInfo.setServerTime(System.currentTimeMillis());
-        blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
+        blockInfo.setTimestamp(System.currentTimeMillis()-1999);
         blockInfo.setTransaction(333);
         blockInfos.add(blockInfo);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
@@ -320,7 +320,7 @@ public class HomeController {
         blockInfo.setHeight(33);
         blockInfo.setNode("node-1");
         blockInfo.setServerTime(System.currentTimeMillis());
-        blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
+        blockInfo.setTimestamp(System.currentTimeMillis()-1999);
         blockInfo.setTransaction(333);
         blockInfos.add(blockInfo);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
@@ -424,7 +424,7 @@ public class HomeController {
      *          "type":"",//区块block，交易transaction，节点node,合约contract,账户account
      *           "struct":{
      *      	        "height": 17888,//块高
-     *                  "timeStamp": 1798798798798,//出块时间
+     *                  "timestamp": 1798798798798,//出块时间
      *                  "transaction": 10000,//块内交易数
      *                  "size": 188,//块大小
      *                  "miner": "0x234", // 出块节点

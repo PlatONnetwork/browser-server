@@ -55,7 +55,7 @@ public class BlockController  {
      *      "data": [
      *                  {
      *                  "height": 17888,//块高
-     *                  "timeStamp": 1798798798798,//出块时间
+     *                  "timestamp": 1798798798798,//出块时间
      *                  "transaction": 10000,//块内交易数
      *                  "size": 188,//块大小
      *                  "miner": "0x234", // 出块节点
@@ -95,7 +95,7 @@ public class BlockController  {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "height": 19988,//块高
-     *           "timeStamp": 123123123879,//出块时间
+     *           "timestamp": 123123123879,//出块时间
      *           "transaction": 1288,//块内交易总数
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
@@ -139,7 +139,7 @@ public class BlockController  {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *           "height": 19988,//块高
-     *           "timeStamp": 123123123879,//出块时间
+     *           "timestamp": 123123123879,//出块时间
      *           "transaction": 1288,//块内交易总数
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
