@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.service.PendingTxService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +32,15 @@ public class PendingTxServiceImpl implements PendingTxService {
     @Override
     public List<PendingTxList> getTransactionList(PendingTxListReq req) {
         PendingTxExample condition = new PendingTxExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        condition.setOrderByClause("timestamp desc");
+        if(StringUtils.isBlank(req.getAddress())){
+            condition.createCriteria().andChainIdEqualTo(req.getCid());
+        }else {
+            condition.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress());
+            PendingTxExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress());
+            condition.or(criteria);
+        }
+
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
         List<PendingTxList> pendingTxList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
@@ -39,6 +48,7 @@ public class PendingTxServiceImpl implements PendingTxService {
             PendingTxList pt = new PendingTxList();
             BeanUtils.copyProperties(transaction,pt);
             pt.setTxHash(transaction.getHash());
+            pt.setDwellTime(serverTime-transaction.getTimestamp().getTime());
             pt.setServerTime(serverTime);
             pendingTxList.add(pt);
         });
@@ -49,7 +59,7 @@ public class PendingTxServiceImpl implements PendingTxService {
     public PendingTxDetail getTransactionDetail(PendingTxDetailReq req) {
         PendingTxExample condition = new PendingTxExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
-        List<PendingTx> transactions = pendingTxMapper.selectByExample(condition);
+        List<PendingTx> transactions = pendingTxMapper.selectByExampleWithBLOBs(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
@@ -62,6 +72,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         PendingTx transaction = transactions.get(0);
         BeanUtils.copyProperties(transaction,transactionDetail);
         transactionDetail.setTxHash(transaction.getHash());
+        transactionDetail.setInputData(transaction.getInput());
         return transactionDetail;
     }
 }

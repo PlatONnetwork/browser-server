@@ -9,6 +9,7 @@ import com.platon.browser.common.req.transaction.TransactionDetailReq;
 import com.platon.browser.common.req.transaction.TransactionListReq;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.service.TransactionService;
 import org.slf4j.Logger;
@@ -32,7 +33,8 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionList> getTransactionList(TransactionListReq req) {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid());
-        List<Transaction> transactions = transactionMapper.selectByExample(condition);
+        condition.setOrderByClause("block_number desc");
+        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionList> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
             TransactionList tl = new TransactionList();
@@ -48,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDetail getTransactionDetail(TransactionDetailReq req) {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
-        List<Transaction> transactions = transactionMapper.selectByExample(condition);
+        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
