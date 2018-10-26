@@ -1,5 +1,6 @@
 package com.platon.browser.common.dto;
 
+import com.platon.browser.common.dto.block.BlockStatistic;
 import lombok.Data;
 
 import java.util.List;

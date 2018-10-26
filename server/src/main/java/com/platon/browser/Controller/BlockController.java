@@ -1,9 +1,21 @@
 package com.platon.browser.Controller;
 
+import com.platon.browser.common.base.BaseResp;
+import com.platon.browser.common.base.JsonResp;
+import com.platon.browser.common.dto.block.BlockDetail;
+import com.platon.browser.common.dto.block.BlockList;
+import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.common.req.block.BlockDetailReq;
+import com.platon.browser.common.req.block.BlockListReq;
+import com.platon.browser.service.BlockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -11,8 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
  * Time: 09:35
  */
 @RestController
-    @RequestMapping("/browser_api")
+@RequestMapping("/block")
 public class BlockController  {
+
+    @Autowired
+    private BlockService blockService;
 
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
@@ -29,6 +44,7 @@ public class BlockController  {
      *      "pageNo": 1,//页数(必填)
      *      "pageSize": 10,//页大小(必填)
      * }
+     *
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -52,7 +68,12 @@ public class BlockController  {
      *              ]
      * }
      */
-
+    @PostMapping("blockList")
+    public JsonResp blockList (@Valid @RequestBody BlockListReq req) {
+        req.buildPage();
+        List<BlockList> blockList = blockService.getBlockList(req);
+        return JsonResp.asList().addAll(blockList).pagination(req).build();
+    }
 
 
     /**
@@ -87,6 +108,16 @@ public class BlockController  {
      *           }
      * }
      */
+    @PostMapping("blockDetails")
+    public BaseResp blockDetails (@Valid @RequestBody BlockDetailReq req) {
+        try{
+            BlockDetail blockDetail = blockService.getBlockDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockDetail);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
+
 
     /**
      * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览

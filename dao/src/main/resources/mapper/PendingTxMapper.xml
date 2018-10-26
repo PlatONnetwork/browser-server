@@ -77,11 +77,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, from, to, energon_used, energon_limit, energon_price, timestamp, chain_id, 
-    tx_type, value, create_time, update_time
+    hash, `from`, `to`, energon_used, energon_limit, energon_price, `timestamp`, chain_id, 
+    tx_type, `value`, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
-    input
+    `input`
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.PendingTxExample" resultMap="ResultMapWithBLOBs">
     select
@@ -132,11 +132,11 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.PendingTx">
-    insert into pending_tx (hash, from, to, 
+    insert into pending_tx (hash, `from`, `to`, 
       energon_used, energon_limit, energon_price, 
-      timestamp, chain_id, tx_type, 
-      value, create_time, update_time, 
-      input)
+      `timestamp`, chain_id, tx_type, 
+      `value`, create_time, update_time, 
+      `input`)
     values (#{hash,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, 
       #{energonUsed,jdbcType=INTEGER}, #{energonLimit,jdbcType=INTEGER}, #{energonPrice,jdbcType=VARCHAR}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{chainId,jdbcType=VARCHAR}, #{txType,jdbcType=VARCHAR}, 
@@ -150,10 +150,10 @@
         hash,
       </if>
       <if test="from != null">
-        from,
+        `from`,
       </if>
       <if test="to != null">
-        to,
+        `to`,
       </if>
       <if test="energonUsed != null">
         energon_used,
@@ -165,7 +165,7 @@
         energon_price,
       </if>
       <if test="timestamp != null">
-        timestamp,
+        `timestamp`,
       </if>
       <if test="chainId != null">
         chain_id,
@@ -174,7 +174,7 @@
         tx_type,
       </if>
       <if test="value != null">
-        value,
+        `value`,
       </if>
       <if test="createTime != null">
         create_time,
@@ -183,7 +183,7 @@
         update_time,
       </if>
       <if test="input != null">
-        input,
+        `input`,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -241,10 +241,10 @@
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
       <if test="record.from != null">
-        from = #{record.from,jdbcType=VARCHAR},
+        `from` = #{record.from,jdbcType=VARCHAR},
       </if>
       <if test="record.to != null">
-        to = #{record.to,jdbcType=VARCHAR},
+        `to` = #{record.to,jdbcType=VARCHAR},
       </if>
       <if test="record.energonUsed != null">
         energon_used = #{record.energonUsed,jdbcType=INTEGER},
@@ -256,7 +256,7 @@
         energon_price = #{record.energonPrice,jdbcType=VARCHAR},
       </if>
       <if test="record.timestamp != null">
-        timestamp = #{record.timestamp,jdbcType=TIMESTAMP},
+        `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="record.chainId != null">
         chain_id = #{record.chainId,jdbcType=VARCHAR},
@@ -265,7 +265,7 @@
         tx_type = #{record.txType,jdbcType=VARCHAR},
       </if>
       <if test="record.value != null">
-        value = #{record.value,jdbcType=VARCHAR},
+        `value` = #{record.value,jdbcType=VARCHAR},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -274,7 +274,7 @@
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.input != null">
-        input = #{record.input,jdbcType=LONGVARCHAR},
+        `input` = #{record.input,jdbcType=LONGVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -284,18 +284,18 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update pending_tx
     set hash = #{record.hash,jdbcType=VARCHAR},
-      from = #{record.from,jdbcType=VARCHAR},
-      to = #{record.to,jdbcType=VARCHAR},
+      `from` = #{record.from,jdbcType=VARCHAR},
+      `to` = #{record.to,jdbcType=VARCHAR},
       energon_used = #{record.energonUsed,jdbcType=INTEGER},
       energon_limit = #{record.energonLimit,jdbcType=INTEGER},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
-      timestamp = #{record.timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       tx_type = #{record.txType,jdbcType=VARCHAR},
-      value = #{record.value,jdbcType=VARCHAR},
+      `value` = #{record.value,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      input = #{record.input,jdbcType=LONGVARCHAR}
+      `input` = #{record.input,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -303,15 +303,15 @@
   <update id="updateByExample" parameterType="map">
     update pending_tx
     set hash = #{record.hash,jdbcType=VARCHAR},
-      from = #{record.from,jdbcType=VARCHAR},
-      to = #{record.to,jdbcType=VARCHAR},
+      `from` = #{record.from,jdbcType=VARCHAR},
+      `to` = #{record.to,jdbcType=VARCHAR},
       energon_used = #{record.energonUsed,jdbcType=INTEGER},
       energon_limit = #{record.energonLimit,jdbcType=INTEGER},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
-      timestamp = #{record.timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       tx_type = #{record.txType,jdbcType=VARCHAR},
-      value = #{record.value,jdbcType=VARCHAR},
+      `value` = #{record.value,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -322,10 +322,10 @@
     update pending_tx
     <set>
       <if test="from != null">
-        from = #{from,jdbcType=VARCHAR},
+        `from` = #{from,jdbcType=VARCHAR},
       </if>
       <if test="to != null">
-        to = #{to,jdbcType=VARCHAR},
+        `to` = #{to,jdbcType=VARCHAR},
       </if>
       <if test="energonUsed != null">
         energon_used = #{energonUsed,jdbcType=INTEGER},
@@ -337,7 +337,7 @@
         energon_price = #{energonPrice,jdbcType=VARCHAR},
       </if>
       <if test="timestamp != null">
-        timestamp = #{timestamp,jdbcType=TIMESTAMP},
+        `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="chainId != null">
         chain_id = #{chainId,jdbcType=VARCHAR},
@@ -346,7 +346,7 @@
         tx_type = #{txType,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        value = #{value,jdbcType=VARCHAR},
+        `value` = #{value,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -355,38 +355,38 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="input != null">
-        input = #{input,jdbcType=LONGVARCHAR},
+        `input` = #{input,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.PendingTx">
     update pending_tx
-    set from = #{from,jdbcType=VARCHAR},
-      to = #{to,jdbcType=VARCHAR},
+    set `from` = #{from,jdbcType=VARCHAR},
+      `to` = #{to,jdbcType=VARCHAR},
       energon_used = #{energonUsed,jdbcType=INTEGER},
       energon_limit = #{energonLimit,jdbcType=INTEGER},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
-      timestamp = #{timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       chain_id = #{chainId,jdbcType=VARCHAR},
       tx_type = #{txType,jdbcType=VARCHAR},
-      value = #{value,jdbcType=VARCHAR},
+      `value` = #{value,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      input = #{input,jdbcType=LONGVARCHAR}
+      `input` = #{input,jdbcType=LONGVARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.PendingTx">
     update pending_tx
-    set from = #{from,jdbcType=VARCHAR},
-      to = #{to,jdbcType=VARCHAR},
+    set `from` = #{from,jdbcType=VARCHAR},
+      `to` = #{to,jdbcType=VARCHAR},
       energon_used = #{energonUsed,jdbcType=INTEGER},
       energon_limit = #{energonLimit,jdbcType=INTEGER},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
-      timestamp = #{timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       chain_id = #{chainId,jdbcType=VARCHAR},
       tx_type = #{txType,jdbcType=VARCHAR},
-      value = #{value,jdbcType=VARCHAR},
+      `value` = #{value,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}

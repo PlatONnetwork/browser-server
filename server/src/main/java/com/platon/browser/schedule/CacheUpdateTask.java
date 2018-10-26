@@ -1,7 +1,7 @@
 package com.platon.browser.schedule;
 
 import com.maxmind.geoip.Location;
-import com.platon.browser.common.dto.NodeInfo;
+import com.platon.browser.common.dto.node.NodeInfo;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,8 @@ public class CacheUpdateTask {
     /**
      * 更新节点信息缓存
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
+    @Transactional
     void updateNodeInfoList(){
         NodeExample example = new NodeExample();
         List<Node> nodeList = nodeMapper.selectByExample(example);
@@ -55,7 +57,7 @@ public class CacheUpdateTask {
     /**
      * 更新指标信息缓存
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     void updateIndexInfo(){
 
     }
@@ -63,7 +65,7 @@ public class CacheUpdateTask {
     /**
      * 更新交易统计信息缓存
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     void updateStatisticInfo(){
 
     }
@@ -71,7 +73,7 @@ public class CacheUpdateTask {
     /**
      * 更新区块列表信息缓存
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     void updateBlockInfoList(){
 
     }
@@ -79,7 +81,7 @@ public class CacheUpdateTask {
     /**
      * 更新交易列表信息缓存
      */
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     void updateTransactionInfoList(){
 
     }

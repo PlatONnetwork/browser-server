@@ -176,62 +176,62 @@ public class BlockExample {
         }
 
         public Criteria andNumberIsNull() {
-            addCriterion("number is null");
+            addCriterion("`number` is null");
             return (Criteria) this;
         }
 
         public Criteria andNumberIsNotNull() {
-            addCriterion("number is not null");
+            addCriterion("`number` is not null");
             return (Criteria) this;
         }
 
         public Criteria andNumberEqualTo(Long value) {
-            addCriterion("number =", value, "number");
+            addCriterion("`number` =", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberNotEqualTo(Long value) {
-            addCriterion("number <>", value, "number");
+            addCriterion("`number` <>", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberGreaterThan(Long value) {
-            addCriterion("number >", value, "number");
+            addCriterion("`number` >", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberGreaterThanOrEqualTo(Long value) {
-            addCriterion("number >=", value, "number");
+            addCriterion("`number` >=", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberLessThan(Long value) {
-            addCriterion("number <", value, "number");
+            addCriterion("`number` <", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberLessThanOrEqualTo(Long value) {
-            addCriterion("number <=", value, "number");
+            addCriterion("`number` <=", value, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberIn(List<Long> values) {
-            addCriterion("number in", values, "number");
+            addCriterion("`number` in", values, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberNotIn(List<Long> values) {
-            addCriterion("number not in", values, "number");
+            addCriterion("`number` not in", values, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberBetween(Long value1, Long value2) {
-            addCriterion("number between", value1, value2, "number");
+            addCriterion("`number` between", value1, value2, "number");
             return (Criteria) this;
         }
 
         public Criteria andNumberNotBetween(Long value1, Long value2) {
-            addCriterion("number not between", value1, value2, "number");
+            addCriterion("`number` not between", value1, value2, "number");
             return (Criteria) this;
         }
 
@@ -516,62 +516,62 @@ public class BlockExample {
         }
 
         public Criteria andSizeIsNull() {
-            addCriterion("size is null");
+            addCriterion("`size` is null");
             return (Criteria) this;
         }
 
         public Criteria andSizeIsNotNull() {
-            addCriterion("size is not null");
+            addCriterion("`size` is not null");
             return (Criteria) this;
         }
 
         public Criteria andSizeEqualTo(Integer value) {
-            addCriterion("size =", value, "size");
+            addCriterion("`size` =", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeNotEqualTo(Integer value) {
-            addCriterion("size <>", value, "size");
+            addCriterion("`size` <>", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeGreaterThan(Integer value) {
-            addCriterion("size >", value, "size");
+            addCriterion("`size` >", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeGreaterThanOrEqualTo(Integer value) {
-            addCriterion("size >=", value, "size");
+            addCriterion("`size` >=", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeLessThan(Integer value) {
-            addCriterion("size <", value, "size");
+            addCriterion("`size` <", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeLessThanOrEqualTo(Integer value) {
-            addCriterion("size <=", value, "size");
+            addCriterion("`size` <=", value, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeIn(List<Integer> values) {
-            addCriterion("size in", values, "size");
+            addCriterion("`size` in", values, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeNotIn(List<Integer> values) {
-            addCriterion("size not in", values, "size");
+            addCriterion("`size` not in", values, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeBetween(Integer value1, Integer value2) {
-            addCriterion("size between", value1, value2, "size");
+            addCriterion("`size` between", value1, value2, "size");
             return (Criteria) this;
         }
 
         public Criteria andSizeNotBetween(Integer value1, Integer value2) {
-            addCriterion("size not between", value1, value2, "size");
+            addCriterion("`size` not between", value1, value2, "size");
             return (Criteria) this;
         }
 
@@ -756,62 +756,62 @@ public class BlockExample {
         }
 
         public Criteria andTimestampIsNull() {
-            addCriterion("timestamp is null");
+            addCriterion("`timestamp` is null");
             return (Criteria) this;
         }
 
         public Criteria andTimestampIsNotNull() {
-            addCriterion("timestamp is not null");
+            addCriterion("`timestamp` is not null");
             return (Criteria) this;
         }
 
         public Criteria andTimestampEqualTo(Date value) {
-            addCriterion("timestamp =", value, "timestamp");
+            addCriterion("`timestamp` =", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampNotEqualTo(Date value) {
-            addCriterion("timestamp <>", value, "timestamp");
+            addCriterion("`timestamp` <>", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampGreaterThan(Date value) {
-            addCriterion("timestamp >", value, "timestamp");
+            addCriterion("`timestamp` >", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampGreaterThanOrEqualTo(Date value) {
-            addCriterion("timestamp >=", value, "timestamp");
+            addCriterion("`timestamp` >=", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampLessThan(Date value) {
-            addCriterion("timestamp <", value, "timestamp");
+            addCriterion("`timestamp` <", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampLessThanOrEqualTo(Date value) {
-            addCriterion("timestamp <=", value, "timestamp");
+            addCriterion("`timestamp` <=", value, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampIn(List<Date> values) {
-            addCriterion("timestamp in", values, "timestamp");
+            addCriterion("`timestamp` in", values, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampNotIn(List<Date> values) {
-            addCriterion("timestamp not in", values, "timestamp");
+            addCriterion("`timestamp` not in", values, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampBetween(Date value1, Date value2) {
-            addCriterion("timestamp between", value1, value2, "timestamp");
+            addCriterion("`timestamp` between", value1, value2, "timestamp");
             return (Criteria) this;
         }
 
         public Criteria andTimestampNotBetween(Date value1, Date value2) {
-            addCriterion("timestamp not between", value1, value2, "timestamp");
+            addCriterion("`timestamp` not between", value1, value2, "timestamp");
             return (Criteria) this;
         }
 

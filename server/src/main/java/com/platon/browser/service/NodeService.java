@@ -1,7 +1,6 @@
 package com.platon.browser.service;
 
-import com.platon.browser.common.dto.NodeDetail;
-import com.platon.browser.common.dto.NodeInfo;
+import com.platon.browser.common.dto.node.NodeInfo;
 
 import java.util.List;
 

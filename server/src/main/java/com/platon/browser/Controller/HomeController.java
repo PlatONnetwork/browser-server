@@ -1,11 +1,16 @@
 package com.platon.browser.Controller;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.dto.*;
+import com.platon.browser.common.dto.block.BlockInfo;
+import com.platon.browser.common.dto.block.BlockStatistic;
+import com.platon.browser.common.dto.node.NodeDetail;
+import com.platon.browser.common.dto.node.NodeInfo;
+import com.platon.browser.common.dto.transaction.TransactionInfo;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.service.NodeService;
-import com.sun.org.glassfish.external.statistics.Statistic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,17 +68,12 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/node/init?cid={chainId}")
-    public MessageResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public BaseResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-
         List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList();
-
-        MessageResp<List<NodeInfo>> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
-        message.setData(nodeInfoList);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
+        return resp;
     }
 
     /**
@@ -90,17 +90,16 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void nodeSubscribe() throws Exception {
-        MessageResp<NodeInfo> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         NodeInfo n1 = new NodeInfo();
         n1.setLatitude("3333.33"+new Random().nextInt(10));
         n1.setLongitude("55555.33"+new Random().nextInt(10));
         n1.setNetState(1);
         n1.setNodeType(1);
-        message.setData(n1);
+
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),n1);
+
         String cid = "666";
-        messagingTemplate.convertAndSend("/topic/node/new?cid="+cid, message);
+        messagingTemplate.convertAndSend("/topic/node/new?cid="+cid, resp);
     }
 
 
@@ -131,12 +130,9 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/index/init?cid={chainId}")
-    public MessageResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public BaseResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        MessageResp<IndexInfo> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
@@ -146,8 +142,8 @@ public class HomeController {
         index.setProportion(66);
         index.setTicketPrice(449);
         index.setVoteAmount(333);
-        message.setData(index);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
+        return resp;
     }
 
 
@@ -163,9 +159,6 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void inexSubscribe() throws Exception {
-        MessageResp<IndexInfo> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
@@ -175,9 +168,9 @@ public class HomeController {
         index.setProportion(66);
         index.setTicketPrice(449);
         index.setVoteAmount(333);
-        message.setData(index);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/index/new?cid="+cid, message);
+        messagingTemplate.convertAndSend("/topic/index/new?cid="+cid, resp);
     }
 
 
@@ -213,12 +206,9 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/statistic/init?cid={chainId}")
-    public MessageResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public BaseResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        MessageResp<StatisticInfo> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
@@ -232,8 +222,8 @@ public class HomeController {
         blockStatistic.setTransaction(333);
         lists.add(blockStatistic);
         statistic.setBlockStatisticList(lists);
-        message.setData(statistic);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
+        return resp;
     }
 
     /**
@@ -248,9 +238,6 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void statisticSubscribe() throws Exception {
-        MessageResp<StatisticInfo> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         StatisticInfo statistic = new StatisticInfo();
         statistic.setAvgTime(333);
         statistic.setAvgTransaction(333);
@@ -264,9 +251,9 @@ public class HomeController {
         blockStatistic.setTransaction(333);
         lists.add(blockStatistic);
         statistic.setBlockStatisticList(lists);
-        message.setData(statistic);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, message);
+        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, resp);
     }
 
 
@@ -298,12 +285,9 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/block/init?cid={chainId}")
-    public MessageResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public BaseResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        MessageResp<List<BlockInfo>> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -313,8 +297,8 @@ public class HomeController {
         blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
         blockInfo.setTransaction(333);
         blockInfos.add(blockInfo);
-        message.setData(blockInfos);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
+        return resp;
     }
 
 
@@ -330,9 +314,6 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void blockSubscribe() throws Exception {
-        MessageResp<List<BlockInfo>> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<BlockInfo> blockInfos = new ArrayList<>();
         BlockInfo blockInfo = new BlockInfo();
         blockInfo.setBlockReward(33);
@@ -342,9 +323,9 @@ public class HomeController {
         blockInfo.setTimeStamp(System.currentTimeMillis()-1999);
         blockInfo.setTransaction(333);
         blockInfos.add(blockInfo);
-        message.setData(blockInfos);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/block/new?cid="+cid, message);
+        messagingTemplate.convertAndSend("/topic/block/new?cid="+cid, resp);
     }
 
 
@@ -376,12 +357,9 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/transaction/init?cid={chainId}")
-    public MessageResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
+    public BaseResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        MessageResp<List<TransactionInfo>> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -392,8 +370,8 @@ public class HomeController {
         transactionInfo.setTransactionIndex(333);
         transactionInfo.setValue(3.54);
         transactionInfos.add(transactionInfo);
-        message.setData(transactionInfos);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
+        return resp;
     }
 
 
@@ -409,9 +387,6 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void transactionSubscribe() throws Exception {
-        MessageResp<List<TransactionInfo>> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         List<TransactionInfo> transactionInfos = new ArrayList<>();
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setBlockHeight(33);
@@ -422,9 +397,9 @@ public class HomeController {
         transactionInfo.setTransactionIndex(333);
         transactionInfo.setValue(3.54);
         transactionInfos.add(transactionInfo);
-        message.setData(transactionInfos);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/transaction/new?cid="+cid, message);
+        messagingTemplate.convertAndSend("/topic/transaction/new?cid="+cid, resp);
     }
 
 
@@ -466,11 +441,8 @@ public class HomeController {
 
 
     @PostMapping("/home/query")
-    public MessageResp search(@RequestBody SearchParam param){
+    public BaseResp search(@RequestBody SearchParam param){
         logger.debug(JSON.toJSONString(param));
-        MessageResp<SearchResult> message = new MessageResp<>();
-        message.setErrMsg(RetEnum.RET_SUCCESS.getName());
-        message.setCode(RetEnum.RET_SUCCESS.getCode());
         SearchResult<NodeDetail> searchResult = new SearchResult<>();
         searchResult.setType("block");
         NodeDetail nodeDetail = new NodeDetail();
@@ -484,7 +456,7 @@ public class HomeController {
         nodeDetail.setTimestamp(System.currentTimeMillis());
         nodeDetail.setTransaction(333);
         searchResult.setStruct(nodeDetail);
-        message.setData(searchResult);
-        return message;
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),searchResult);
+        return resp;
     }
 }

@@ -77,8 +77,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, number, parent_hash, nonce, miner, extra_data, size, energon_used, energon_limit, 
-    energon_average, timestamp, block_reward, chain_id, create_time, update_time
+    hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit, 
+    energon_average, `timestamp`, block_reward, chain_id, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -111,10 +111,10 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Block">
-    insert into block (hash, number, parent_hash, 
+    insert into block (hash, `number`, parent_hash, 
       nonce, miner, extra_data, 
-      size, energon_used, energon_limit, 
-      energon_average, timestamp, block_reward, 
+      `size`, energon_used, energon_limit, 
+      energon_average, `timestamp`, block_reward, 
       chain_id, create_time, update_time
       )
     values (#{hash,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, #{parentHash,jdbcType=VARCHAR}, 
@@ -131,7 +131,7 @@
         hash,
       </if>
       <if test="number != null">
-        number,
+        `number`,
       </if>
       <if test="parentHash != null">
         parent_hash,
@@ -146,7 +146,7 @@
         extra_data,
       </if>
       <if test="size != null">
-        size,
+        `size`,
       </if>
       <if test="energonUsed != null">
         energon_used,
@@ -158,7 +158,7 @@
         energon_average,
       </if>
       <if test="timestamp != null">
-        timestamp,
+        `timestamp`,
       </if>
       <if test="blockReward != null">
         block_reward,
@@ -234,7 +234,7 @@
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
       <if test="record.number != null">
-        number = #{record.number,jdbcType=BIGINT},
+        `number` = #{record.number,jdbcType=BIGINT},
       </if>
       <if test="record.parentHash != null">
         parent_hash = #{record.parentHash,jdbcType=VARCHAR},
@@ -249,7 +249,7 @@
         extra_data = #{record.extraData,jdbcType=VARCHAR},
       </if>
       <if test="record.size != null">
-        size = #{record.size,jdbcType=INTEGER},
+        `size` = #{record.size,jdbcType=INTEGER},
       </if>
       <if test="record.energonUsed != null">
         energon_used = #{record.energonUsed,jdbcType=INTEGER},
@@ -261,7 +261,7 @@
         energon_average = #{record.energonAverage,jdbcType=INTEGER},
       </if>
       <if test="record.timestamp != null">
-        timestamp = #{record.timestamp,jdbcType=TIMESTAMP},
+        `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="record.blockReward != null">
         block_reward = #{record.blockReward,jdbcType=VARCHAR},
@@ -283,16 +283,16 @@
   <update id="updateByExample" parameterType="map">
     update block
     set hash = #{record.hash,jdbcType=VARCHAR},
-      number = #{record.number,jdbcType=BIGINT},
+      `number` = #{record.number,jdbcType=BIGINT},
       parent_hash = #{record.parentHash,jdbcType=VARCHAR},
       nonce = #{record.nonce,jdbcType=VARCHAR},
       miner = #{record.miner,jdbcType=VARCHAR},
       extra_data = #{record.extraData,jdbcType=VARCHAR},
-      size = #{record.size,jdbcType=INTEGER},
+      `size` = #{record.size,jdbcType=INTEGER},
       energon_used = #{record.energonUsed,jdbcType=INTEGER},
       energon_limit = #{record.energonLimit,jdbcType=INTEGER},
       energon_average = #{record.energonAverage,jdbcType=INTEGER},
-      timestamp = #{record.timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       block_reward = #{record.blockReward,jdbcType=VARCHAR},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -305,7 +305,7 @@
     update block
     <set>
       <if test="number != null">
-        number = #{number,jdbcType=BIGINT},
+        `number` = #{number,jdbcType=BIGINT},
       </if>
       <if test="parentHash != null">
         parent_hash = #{parentHash,jdbcType=VARCHAR},
@@ -320,7 +320,7 @@
         extra_data = #{extraData,jdbcType=VARCHAR},
       </if>
       <if test="size != null">
-        size = #{size,jdbcType=INTEGER},
+        `size` = #{size,jdbcType=INTEGER},
       </if>
       <if test="energonUsed != null">
         energon_used = #{energonUsed,jdbcType=INTEGER},
@@ -332,7 +332,7 @@
         energon_average = #{energonAverage,jdbcType=INTEGER},
       </if>
       <if test="timestamp != null">
-        timestamp = #{timestamp,jdbcType=TIMESTAMP},
+        `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="blockReward != null">
         block_reward = #{blockReward,jdbcType=VARCHAR},
@@ -351,16 +351,16 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Block">
     update block
-    set number = #{number,jdbcType=BIGINT},
+    set `number` = #{number,jdbcType=BIGINT},
       parent_hash = #{parentHash,jdbcType=VARCHAR},
       nonce = #{nonce,jdbcType=VARCHAR},
       miner = #{miner,jdbcType=VARCHAR},
       extra_data = #{extraData,jdbcType=VARCHAR},
-      size = #{size,jdbcType=INTEGER},
+      `size` = #{size,jdbcType=INTEGER},
       energon_used = #{energonUsed,jdbcType=INTEGER},
       energon_limit = #{energonLimit,jdbcType=INTEGER},
       energon_average = #{energonAverage,jdbcType=INTEGER},
-      timestamp = #{timestamp,jdbcType=TIMESTAMP},
+      `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       block_reward = #{blockReward,jdbcType=VARCHAR},
       chain_id = #{chainId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},

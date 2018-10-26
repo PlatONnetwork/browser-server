@@ -6,6 +6,9 @@
 <generatorConfiguration>
     <classPathEntry location="./lib/mysql-connector-java-5.1.47.jar"/>
     <context id="my" targetRuntime="MyBatis3">
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
         <commentGenerator>
             <property name="suppressDate" value="false"/>
             <property name="suppressAllComments" value="true"/>

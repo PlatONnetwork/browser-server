@@ -1,9 +1,26 @@
 package com.platon.browser.Controller;
 
+import com.platon.browser.common.base.BaseResp;
+import com.platon.browser.common.base.JsonResp;
+import com.platon.browser.common.dto.block.BlockDetail;
+import com.platon.browser.common.dto.transaction.TransactionDetail;
+import com.platon.browser.common.dto.transaction.TransactionList;
+import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.common.req.block.BlockDetailReq;
+import com.platon.browser.common.req.transaction.TransactionDetailReq;
+import com.platon.browser.common.req.transaction.TransactionListReq;
+import com.platon.browser.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -11,11 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
  * Time: 9:40
  */
 @RestController
-@RequestMapping("/browser_api")
+@RequestMapping("/transaction")
 public class TransactionController {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
+    @Autowired
+    private TransactionService transactionService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -46,7 +65,7 @@ public class TransactionController {
      *           "from": "0x667766",//发送方
      *           "to": "0x667766",//接收方
      *           "value": "222",//数额
-     *           "actualTxCoast": "22",//交易费用
+     *           "actualTxCost": "22",//交易费用
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "txType": "", // 交易类型
                         transfer ：转账
@@ -61,7 +80,12 @@ public class TransactionController {
      *       ]
      * }
      */
-
+    @PostMapping("transactionList")
+    public JsonResp transactionList (@Valid @RequestBody TransactionListReq req ) {
+        req.buildPage();
+        List<TransactionList> transactionListList = transactionService.getTransactionList(req);
+        return JsonResp.asList().addAll(transactionListList).pagination(req).build();
+    }
 
     /**
      * @api {post} transaction/transactionDetails b.交易详情
@@ -96,7 +120,7 @@ public class TransactionController {
                     transactionExecute ： 合约执行
                     authorization ： 权限
      *           "value": "222",//数额
-     *           "actualTxCoast": "22",//实际交易手续费
+     *           "actualTxCost": "22",//实际交易手续费
      *           "energonLimit": 232,//能量限制
      *           "energonUsed": 122,//能量消耗
      *           "energonPrice": "123",//能量价格
@@ -106,7 +130,15 @@ public class TransactionController {
      *           }
      * }
      */
-
+    @PostMapping("transactionDetails")
+    public BaseResp transactionDetails (@Valid @RequestBody TransactionDetailReq req) {
+        try{
+            TransactionDetail transactionDetail = transactionService.getTransactionDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionDetail);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
     /**
      * @api {post} transaction/transactionDetailNavigate c.交易详情前后跳转浏览

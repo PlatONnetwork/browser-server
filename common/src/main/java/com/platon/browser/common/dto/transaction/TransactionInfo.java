@@ -1,4 +1,4 @@
-package com.platon.browser.common.dto;
+package com.platon.browser.common.dto.transaction;
 
 import lombok.Data;
 

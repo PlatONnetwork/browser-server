@@ -19,7 +19,7 @@ public class JsonResp<T> {
     private T data;
 
     //成功（0），失败则由相关失败码
-    private int result = 0;
+    private int code = 0;
 
     //相关的错误信息
     private String errMsg = "";
@@ -28,18 +28,18 @@ public class JsonResp<T> {
     private int totalPages;    //	option	int	数据总页数
     private int totalCount;     //	option	int	数据总条数
 
-    public int getResult() {
-        return result;
+    public int getCode() {
+        return code;
     }
 
-    public void setResult(int result) {
-        this.result = result;
+    public void setCode(int result) {
+        this.code = result;
     }
 
     public String getErrMsg() {
         //return I18NUtils.getInstance().getResource(2000);
-        if(result > 0 && StringUtils.isEmpty(errMsg)){
-            errMsg = I18NUtils.getInstance().getResource(result);
+        if(code > 0 && StringUtils.isEmpty(errMsg)){
+            errMsg = I18NUtils.getInstance().getResource(code);
         }
         return errMsg;
     }
@@ -130,7 +130,7 @@ public class JsonResp<T> {
             if (errorCodeEnum == null) {
                 errorCodeEnum = ErrorCodeEnum.Default;
             }
-            resp.setResult(errorCodeEnum.getCode());
+            resp.setCode(errorCodeEnum.getCode());
             resp.setErrMsg(errorCodeEnum.getDesc());
             return this;
         }
@@ -142,7 +142,7 @@ public class JsonResp<T> {
          * @return 该响应对象.
          */
         public BaseResp errorMsg(int result, String message) {
-            resp.setResult(result);
+            resp.setCode(result);
             resp.setErrMsg(message);
             return this;
         }
@@ -291,7 +291,7 @@ public class JsonResp<T> {
     public String toString() {
         return "JsonResp{" +
                 "data=" + data +
-                ", result=" + result +
+                ", code=" + code +
                 ", errMsg='" + errMsg + '\'' +
                 ", pageNo=" + pageNo +
                 ", totalPages=" + totalPages +
