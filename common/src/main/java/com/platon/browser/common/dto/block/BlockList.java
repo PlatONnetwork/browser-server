@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BlockList {
-    private int height;
+    private long height;
     private long timestamp;
     private int transaction;
     private int size;
