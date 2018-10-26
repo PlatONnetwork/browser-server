@@ -6,7 +6,7 @@ import lombok.Data;
 public class BlockInfo {
     private int height;
 
-    private long timeStamp;
+    private long timestamp;
 
     private long serverTime;
 
