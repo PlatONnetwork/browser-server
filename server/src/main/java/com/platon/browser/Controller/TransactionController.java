@@ -2,12 +2,18 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
+import com.platon.browser.common.dto.transaction.PendingTxDetail;
+import com.platon.browser.common.dto.transaction.PendingTxList;
 import com.platon.browser.common.dto.transaction.TransactionDetail;
 import com.platon.browser.common.dto.transaction.TransactionList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.common.req.transaction.PendingTxDetailReq;
+import com.platon.browser.common.req.transaction.PendingTxListReq;
 import com.platon.browser.common.req.transaction.TransactionDetailReq;
 import com.platon.browser.common.req.transaction.TransactionListReq;
+import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +39,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private PendingTxService pendingTxService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -226,7 +235,12 @@ public class TransactionController {
      *       ]
      * }
      */
-
+    @PostMapping("pendingList")
+    public JsonResp pendingList (@Valid @RequestBody PendingTxListReq req ) {
+        req.buildPage();
+        List<PendingTxList> pendingTxList = pendingTxService.getTransactionList(req);
+        return JsonResp.asList().addAll(pendingTxList).pagination(req).build();
+    }
 
 
     /**
@@ -271,7 +285,15 @@ public class TransactionController {
      *           }
      * }
      */
-
+    @PostMapping("pendingDetails")
+    public BaseResp pendingDetails (@Valid @RequestBody PendingTxDetailReq req) {
+        try{
+            PendingTxDetail pendingTxDetail = pendingTxService.getTransactionDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingTxDetail);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
     /**
      * @api {post} transaction/pendingDetailNavigate f.待处理交易详情前后跳转浏览

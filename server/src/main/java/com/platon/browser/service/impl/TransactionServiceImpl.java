@@ -1,9 +1,7 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.block.BlockDetail;
 import com.platon.browser.common.dto.transaction.TransactionDetail;
 import com.platon.browser.common.dto.transaction.TransactionList;
-import com.platon.browser.common.enums.BlockErrorEnum;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.TransactionErrorEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -32,7 +30,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionList> getTransactionList(TransactionListReq req) {
-        List<Transaction> transactions = transactionMapper.selectByExample(new TransactionExample());
+        TransactionExample condition = new TransactionExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        List<Transaction> transactions = transactionMapper.selectByExample(condition);
         List<TransactionList> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
             TransactionList tl = new TransactionList();
@@ -46,9 +46,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetail getTransactionDetail(TransactionDetailReq req) {
-        TransactionExample example = new TransactionExample();
-        example.createCriteria().andHashEqualTo(req.getTxHash());
-        List<Transaction> transactions = transactionMapper.selectByExample(example);
+        TransactionExample condition = new TransactionExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
+        List<Transaction> transactions = transactionMapper.selectByExample(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);

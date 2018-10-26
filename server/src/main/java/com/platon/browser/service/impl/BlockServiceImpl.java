@@ -30,7 +30,9 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public List<BlockList> getBlockList(BlockListReq req) {
-        List<Block> blocks = blockMapper.selectByExample(new BlockExample());
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        List<Block> blocks = blockMapper.selectByExample(condition);
         List<BlockList> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
@@ -44,9 +46,9 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public BlockDetail getBlockDetail(BlockDetailReq req) {
-        BlockExample example = new BlockExample();
-        example.createCriteria().andNumberEqualTo(req.getHeight());
-        List<Block> blocks = blockMapper.selectByExample(example);
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight());
+        List<Block> blocks = blockMapper.selectByExample(condition);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
