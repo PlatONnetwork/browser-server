@@ -9,7 +9,7 @@ import java.util.List;
 public class ContractDetail {
     private String balance;
     private int tradeCount;
-    private String votePledge;
-    private int nodeCount;
+    private String developer;
+    private int ownerCount;
     private List<ConTransactionItem> trades;
 }
