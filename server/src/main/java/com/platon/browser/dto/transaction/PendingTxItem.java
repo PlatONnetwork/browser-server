@@ -3,7 +3,7 @@ package com.platon.browser.dto.transaction;
 import lombok.Data;
 
 @Data
-public class PendingTxList {
+public class PendingTxItem {
     private String txHash;
     private long dwellTime;
     private int energonLimit;

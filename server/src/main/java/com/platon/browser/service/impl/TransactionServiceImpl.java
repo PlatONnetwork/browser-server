@@ -2,14 +2,16 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.TransactionErrorEnum;
+import com.platon.browser.common.enums.TransactionTypeEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionList;
+import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.TransactionService;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -32,14 +35,14 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionMapper transactionMapper;
 
     @Override
-    public List<TransactionList> getTransactionList(TransactionListReq req) {
+    public List<TransactionItem> getTransactionList(TransactionListReq req) {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid());
         condition.setOrderByClause("block_number desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-        List<TransactionList> transactionList = new ArrayList<>();
+        List<TransactionItem> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
-            TransactionList tl = new TransactionList();
+            TransactionItem tl = new TransactionItem();
             BeanUtils.copyProperties(transaction,tl);
             tl.setTxHash(transaction.getHash());
             tl.setBlockHeight(transaction.getBlockNumber());
@@ -82,6 +85,28 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionExample.Criteria second = condition.createCriteria()
                 .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
+        if(StringUtils.isNotBlank(req.getTxType())){
+            first.andTxTypeEqualTo(req.getTxType());
+            second.andTxTypeEqualTo(req.getTxType());
+        }
+        condition.or(second);
+        condition.setOrderByClause("create_time desc");
+        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+        return transactions;
+    }
+
+    @Override
+    public List<TransactionWithBLOBs> getContractList(ContractDetailReq req) {
+        String [] types = {TransactionTypeEnum.CONTRACT_CREATE.code,TransactionTypeEnum.TRANSACTION_EXECUTE.code};
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria first = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress())
+                .andTxTypeIn(Arrays.asList(types));
+        TransactionExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress())
+                .andTxTypeIn(Arrays.asList(types));
         if(StringUtils.isNotBlank(req.getTxType())){
             first.andTxTypeEqualTo(req.getTxType());
             second.andTxTypeEqualTo(req.getTxType());

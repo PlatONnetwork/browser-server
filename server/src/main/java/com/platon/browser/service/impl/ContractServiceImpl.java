@@ -2,10 +2,11 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.transaction.AccTransactionItem;
-import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.service.AccountService;
+import com.platon.browser.dto.transaction.ConTransactionItem;
+import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.service.ContractService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import org.slf4j.Logger;
@@ -19,9 +20,9 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+public class ContractServiceImpl implements ContractService {
 
-    private final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(ContractServiceImpl.class);
 
     @Autowired
     private TransactionService transactionService;
@@ -29,54 +30,52 @@ public class AccountServiceImpl implements AccountService {
     private PendingTxService pendingTxService;
 
     @Override
-    public AccountDetail getAccountDetail(AccountDetailReq req) {
-        List<AccTransactionItem> accTransactionList = getTransactionList(req);
+    public ContractDetail getContractDetail(ContractDetailReq req) {
+        List<ConTransactionItem> contractList = getContractList(req);
 
-        AccountDetail accountDetail = new AccountDetail();
+        ContractDetail contractDetail = new ContractDetail();
 
-        // 大于20，则取前20条数据返回
-        if(accTransactionList.size()>20){
-            accountDetail.setTrades(accTransactionList.subList(0,20));
-        }else{
-            accountDetail.setTrades(accTransactionList);
-        }
-        return accountDetail;
+        contractDetail.setTrades(contractList);
+
+        return contractDetail;
     }
 
     @Override
-    public List<AccTransactionItem> getTransactionList(AccountDetailReq req) {
+    public List<ConTransactionItem> getContractList(ContractDetailReq req) {
         req.buildPage();
-        List<TransactionWithBLOBs> transactions = transactionService.getTransactionList(req);
+        List<TransactionWithBLOBs> transactions = transactionService.getContractList(req);
         req.buildPage();
-        List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
+        List<PendingTx> pendingTxes = pendingTxService.getContractList(req);
         long serverTime = System.currentTimeMillis();
-        List<AccTransactionItem> accTransactionList = new ArrayList<>();
+        List<ConTransactionItem> conTransactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
-            AccTransactionItem bean = new AccTransactionItem();
+            ConTransactionItem bean = new ConTransactionItem();
             BeanUtils.copyProperties(transaction,bean);
             bean.setTxHash(transaction.getHash());
             bean.setServerTime(serverTime);
             bean.setBlockTime(transaction.getTimestamp().getTime());
-            accTransactionList.add(bean);
+            conTransactionList.add(bean);
         });
 
         pendingTxes.forEach(pendingTx -> {
-            AccTransactionItem bean = new AccTransactionItem();
+            ConTransactionItem bean = new ConTransactionItem();
             BeanUtils.copyProperties(pendingTx,bean);
             bean.setTxHash(pendingTx.getHash());
             bean.setServerTime(serverTime);
             bean.setBlockTime(pendingTx.getTimestamp().getTime());
-            accTransactionList.add(bean);
+            conTransactionList.add(bean);
         });
 
         // 按时间倒排
-        Collections.sort(accTransactionList,(e1,e2)->{
+        Collections.sort(conTransactionList,(e1,e2)->{
             long t1 = e1.getCreateTime().getTime(),t2 = e2.getCreateTime().getTime();
             if(t1<t2) return 1;
             if(t1>t2) return -1;
             return 0;
         });
 
-        return accTransactionList;
+        return conTransactionList;
     }
+
+
 }

@@ -5,35 +5,28 @@ import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.account.AccountDowload;
+import com.platon.browser.dto.account.ContractDetail;
+import com.platon.browser.dto.account.ContractDowload;
 import com.platon.browser.dto.transaction.PendingTxDetail;
-import com.platon.browser.dto.transaction.PendingTxList;
+import com.platon.browser.dto.transaction.PendingTxItem;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionList;
+import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.req.transaction.PendingTxDetailReq;
-import com.platon.browser.req.transaction.PendingTxListReq;
-import com.platon.browser.req.transaction.TransactionDetailReq;
-import com.platon.browser.req.transaction.TransactionListReq;
-import com.platon.browser.service.AccountService;
-import com.platon.browser.service.PendingTxService;
-import com.platon.browser.service.TransactionService;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
+import com.platon.browser.req.account.AccountDownloadReq;
+import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.account.ContractDownloadReq;
+import com.platon.browser.req.transaction.*;
+import com.platon.browser.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,6 +48,12 @@ public class TransactionController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private ContractService contractService;
+
+    @Autowired
+    private ExportService exportService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -103,7 +102,7 @@ public class TransactionController {
     @PostMapping("transactionList")
     public JsonResp transactionList (@Valid @RequestBody TransactionListReq req ) {
         req.buildPage();
-        List<TransactionList> transactionListList = transactionService.getTransactionList(req);
+        List<TransactionItem> transactionListList = transactionService.getTransactionList(req);
         return JsonResp.asList().addAll(transactionListList).pagination(req).build();
     }
 
@@ -251,7 +250,7 @@ public class TransactionController {
     @PostMapping("pendingList")
     public JsonResp pendingList (@Valid @RequestBody PendingTxListReq req ) {
         req.buildPage();
-        List<PendingTxList> pendingTxList = pendingTxService.getTransactionList(req);
+        List<PendingTxItem> pendingTxList = pendingTxService.getTransactionList(req);
         return JsonResp.asList().addAll(pendingTxList).pagination(req).build();
     }
 
@@ -408,13 +407,13 @@ public class TransactionController {
     @PostMapping("addressDetails")
     public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
         try{
+            req.setPageSize(20);
             AccountDetail accountDetail = accountService.getAccountDetail(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),accountDetail);
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
         }
     }
-
 
     /**
      * @api {post} transaction/addressDownload h.导出地址详情
@@ -434,32 +433,16 @@ public class TransactionController {
      * 响应为 二进制文件流
      */
     @PostMapping("addressDownload")
-    public void addressExport(HttpServletResponse response) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        List<Object[]> rows = Arrays.asList(
-                new Object[][]{
-                        {"1997", "Ford", "E350", "ac, abs, moon", "3000.00"},
-                        {"1999", "Chevy", "Venture \"Extended Edition\"", "", "4900.00"},
-                        {"1996", "Jeep", "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded", "4799.00"},
-                        {},
-                        {"1999", "Chevy", "Venture \"Extended Edition, Very Large\"", null, "5000.00"},
-                        {null, "", "Venture \"Extended Edition\"", null, "4900.00"},
-                });
-
-        Writer outputWriter = new OutputStreamWriter(baos);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders("Year", "Make", "Model", "Description", "Price");
-        writer.writeRowsAndClose(rows);
-
-        response.setHeader("Content-Disposition", "attachment; filename=aaa.csv");
-        Integer contentLength = baos.size();
-        response.setHeader("content-length", contentLength + "");
+    public void addressDownload(@Valid @RequestBody AccountDownloadReq req, HttpServletResponse response) {
+        AccountDowload accountDowload = exportService.exportAccountCsv(req);
+        response.setHeader("Content-Disposition", "attachment; filename="+accountDowload.getFilename());
+        response.setContentType("application/octet-stream");
+        response.setContentLengthLong(accountDowload.getLength());
         try {
-            response.getOutputStream().write(baos.toByteArray());
+            response.getOutputStream().write(accountDowload.getData());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new ResponseException("下载数据异常！");
         }
     }
 
@@ -515,7 +498,16 @@ public class TransactionController {
      *      }
      * }
      */
-
+    @PostMapping("contractDetails")
+    public BaseResp contractDetails (@Valid @RequestBody ContractDetailReq req) {
+        try{
+            req.setPageSize(Integer.MAX_VALUE);
+            ContractDetail contractDetail = contractService.getContractDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),contractDetail);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
 
     /**
@@ -535,6 +527,19 @@ public class TransactionController {
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
+    @PostMapping("contractDownload")
+    public void contractDownload(@Valid @RequestBody ContractDownloadReq req, HttpServletResponse response) {
+        ContractDowload contractDowload = exportService.exportContractCsv(req);
+        response.setHeader("Content-Disposition", "attachment; filename="+contractDowload.getFilename());
+        response.setContentType("application/octet-stream");
+        response.setContentLengthLong(contractDowload.getLength());
+        try {
+            response.getOutputStream().write(contractDowload.getData());
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new ResponseException("下载数据异常！");
+        }
+    }
 
     /**
      * @api {post} transaction/blockTransaction k.查询区块交易信息

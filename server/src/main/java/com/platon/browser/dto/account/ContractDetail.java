@@ -1,15 +1,15 @@
 package com.platon.browser.dto.account;
 
-import com.platon.browser.dto.transaction.AccTransactionItem;
+import com.platon.browser.dto.transaction.ConTransactionItem;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class AccountDetail {
+public class ContractDetail {
     private String balance;
     private int tradeCount;
     private String votePledge;
     private int nodeCount;
-    private List<AccTransactionItem> trades;
+    private List<ConTransactionItem> trades;
 }

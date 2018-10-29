@@ -1,5 +1,11 @@
 package com.platon.browser.common.enums;
 
+import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 public enum  TransactionTypeEnum {
     TRANSFER("transfer","转账"),
     MPC_TRANSACTION("MPCtransaction","MPC交易"),
@@ -16,11 +22,12 @@ public enum  TransactionTypeEnum {
         this.desc = desc;
     }
 
-    public String getCode() {
-        return code;
+    private static Map<String,TransactionTypeEnum> map = new HashMap<>();
+    static {
+        Arrays.asList(TransactionTypeEnum.values()).forEach(typeEnum->map.put(typeEnum.code,typeEnum));
     }
 
-    public String getDesc() {
-        return desc;
+    public static TransactionTypeEnum getEnum(String code){
+        return map.get(code);
     }
 }
