@@ -1,6 +1,4 @@
-package com.platon.browser.common.enums;
-
-import lombok.Getter;
+package com.platon.browser.enums;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ public enum  TransactionTypeEnum {
         this.desc = desc;
     }
 
-    private static Map<String,TransactionTypeEnum> map = new HashMap<>();
+    private static Map<String, TransactionTypeEnum> map = new HashMap<>();
     static {
         Arrays.asList(TransactionTypeEnum.values()).forEach(typeEnum->map.put(typeEnum.code,typeEnum));
     }

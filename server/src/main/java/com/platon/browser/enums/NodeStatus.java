@@ -1,12 +1,12 @@
-package com.platon.browser.common.enums;
+package com.platon.browser.enums;
 
-public enum NodeType {
-    CONSENSUS(1,"共识节点"),
-    NON_CONSENSUS(2,"非共识节点");
+public enum NodeStatus {
+    NORMAL(1,"正常"),
+    ABNORMAL(2,"异常");
     public int code;
     public String desc;
 
-    NodeType ( int code, String desc) {
+    NodeStatus ( int code, String desc) {
         this.code = code;
         this.desc = desc;
     }

@@ -2,7 +2,7 @@
  * Copyright (c) 2018. juzhen.io. All rights reserved.
  */
 
-package com.platon.browser.common.enums;
+package com.platon.browser.enums;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,14 +10,14 @@ package com.platon.browser.common.enums;
  * @author: CK
  * @date: 2018/4/13
  */
-public enum BlockErrorEnum {
+public enum TransactionErrorEnum {
 
-    NOT_EXIST("区块不存在！"),
-    DUPLICATE("区块重复！");
+    NOT_EXIST("交易不存在！"),
+    DUPLICATE("交易重复！");
 
     public String desc;
 
-    BlockErrorEnum(String desc) {
+    TransactionErrorEnum(String desc) {
         this.desc = desc;
     }
 

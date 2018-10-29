@@ -21,6 +21,7 @@ import com.platon.browser.req.transaction.*;
 import com.platon.browser.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -584,4 +585,12 @@ public class TransactionController {
      *       ]
      * }
      */
+    @PostMapping("blockTransaction")
+    public JsonResp blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
+        TransactionListReq tlr = new TransactionListReq();
+        BeanUtils.copyProperties(req,tlr);
+        tlr.buildPage();
+        List<TransactionItem> transactionListList = transactionService.getTransactionList(tlr);
+        return JsonResp.asList().addAll(transactionListList).pagination(tlr).build();
+    }
 }

@@ -1,10 +1,10 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.enums.TransactionTypeEnum;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.ContractDowload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.ConTransactionItem;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.account.ContractDetailReq;

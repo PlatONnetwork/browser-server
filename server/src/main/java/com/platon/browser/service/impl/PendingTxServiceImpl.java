@@ -1,14 +1,14 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.common.enums.RetEnum;
-import com.platon.browser.common.enums.TransactionErrorEnum;
-import com.platon.browser.common.enums.TransactionTypeEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.PendingTxItem;
+import com.platon.browser.enums.TransactionErrorEnum;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
@@ -40,6 +40,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         if(StringUtils.isBlank(req.getAddress())){
             condition.createCriteria().andChainIdEqualTo(req.getCid());
         }else {
+            // 根据发送方或接收方地址筛选
             condition.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress());
             PendingTxExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress());
             condition.or(criteria);
@@ -70,7 +71,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(),TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
         PendingTxDetail transactionDetail = new PendingTxDetail();
         PendingTx transaction = transactions.get(0);

@@ -1,13 +1,16 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.enums.BlockErrorEnum;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.block.BlockDetail;
+import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.enums.BlockErrorEnum;
+import com.platon.browser.enums.NavigateEnum;
+import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.service.BlockService;
@@ -58,12 +61,38 @@ public class BlockServiceImpl implements BlockService {
         }
         if(blocks.size()==0){
             logger.error("invalid block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(),BlockErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.NOT_EXIST.desc);
         }
         BlockDetail blockDetail = new BlockDetail();
         Block block = blocks.get(0);
         BeanUtils.copyProperties(block,blockDetail);
         return blockDetail;
+    }
+
+    @Override
+    public BlockDetailNavigate getBlockDetailNavigate(BlockDetailNavigateReq req) {
+        BlockDetailReq detailReq = new BlockDetailReq();
+        BeanUtils.copyProperties(req,detailReq);
+        BlockDetail blockDetail = getBlockDetail(detailReq);
+        BlockDetailNavigate blockDetailNavigate = new BlockDetailNavigate();
+        BeanUtils.copyProperties(blockDetail,blockDetailNavigate);
+
+        switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+            case PREV:
+                detailReq.setHeight(req.getHeight()-1);
+                break;
+            case NEXT:
+                detailReq.setHeight(req.getHeight()+1);
+                break;
+        }
+        try {
+            getBlockDetail(detailReq);
+            blockDetailNavigate.setHas(true);
+        }catch (BusinessException be){
+            logger.warn("已浏览至第一个或最后一个区块！");
+        }
+
+        return blockDetailNavigate;
     }
 
 }

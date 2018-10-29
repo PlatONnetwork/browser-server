@@ -1,8 +1,6 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.common.enums.RetEnum;
-import com.platon.browser.common.enums.TransactionErrorEnum;
-import com.platon.browser.common.enums.TransactionTypeEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
@@ -10,6 +8,8 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.enums.TransactionErrorEnum;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
@@ -37,7 +37,12 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionItem> getTransactionList(TransactionListReq req) {
         TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        TransactionExample.Criteria criteria = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid());
+        if(req.getHeight()!=null){
+            // 根据块高筛选
+            criteria.andBlockNumberEqualTo(req.getHeight());
+        }
         condition.setOrderByClause("block_number desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionItem> transactionList = new ArrayList<>();
@@ -62,7 +67,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(),TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
         TransactionDetail transactionDetail = new TransactionDetail();
         Transaction transaction = transactions.get(0);
