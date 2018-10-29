@@ -4,7 +4,9 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockList;
@@ -30,6 +32,9 @@ public class BlockServiceImpl implements BlockService {
 
     @Autowired
     private BlockMapper blockMapper;
+
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     @Override
     public List<BlockList> getBlockList(BlockListReq req) {
@@ -66,6 +71,14 @@ public class BlockServiceImpl implements BlockService {
         BlockDetail blockDetail = new BlockDetail();
         Block block = blocks.get(0);
         BeanUtils.copyProperties(block,blockDetail);
+        blockDetail.setHeight(block.getNumber());
+        blockDetail.setTimestamp(block.getTimestamp().getTime());
+
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andBlockNumberEqualTo(block.getNumber());
+        long tradeCount = transactionMapper.countByExample(transactionExample);
+        blockDetail.setTransaction(tradeCount);
+
         return blockDetail;
     }
 

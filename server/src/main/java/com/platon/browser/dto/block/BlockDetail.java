@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class BlockDetail {
-    private int height;
+    private long height;
     private long timestamp;
-    private int transaction;
+    private long transaction;
     private String hash;
     private String parentHash;
     private String miner;
