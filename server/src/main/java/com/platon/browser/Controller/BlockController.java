@@ -2,12 +2,12 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
-import com.platon.browser.common.dto.block.BlockDetail;
-import com.platon.browser.common.dto.block.BlockList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.block.BlockDetailReq;
-import com.platon.browser.common.req.block.BlockListReq;
+import com.platon.browser.dto.block.BlockDetail;
+import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.service.BlockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

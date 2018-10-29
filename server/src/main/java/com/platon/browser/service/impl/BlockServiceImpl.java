@@ -1,15 +1,15 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.block.BlockDetail;
-import com.platon.browser.common.dto.block.BlockList;
 import com.platon.browser.common.enums.BlockErrorEnum;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.block.BlockDetailReq;
-import com.platon.browser.common.req.block.BlockListReq;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dto.block.BlockDetail;
+import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.service.BlockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

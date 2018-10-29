@@ -1,18 +1,17 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.transaction.AccTransactionList;
-import com.platon.browser.common.dto.transaction.TransactionDetail;
-import com.platon.browser.common.dto.transaction.TransactionList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.TransactionErrorEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.account.AccountDetailReq;
-import com.platon.browser.common.req.transaction.TransactionDetailReq;
-import com.platon.browser.common.req.transaction.TransactionListReq;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.transaction.TransactionDetail;
+import com.platon.browser.dto.transaction.TransactionList;
+import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.transaction.TransactionDetailReq;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

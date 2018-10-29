@@ -1,9 +1,9 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.node.NodeInfo;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.NodeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

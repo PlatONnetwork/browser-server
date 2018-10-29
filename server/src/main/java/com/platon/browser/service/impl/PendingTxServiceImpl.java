@@ -1,18 +1,16 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.transaction.PendingTxDetail;
-import com.platon.browser.common.dto.transaction.PendingTxList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.TransactionErrorEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.account.AccountDetailReq;
-import com.platon.browser.common.req.transaction.PendingTxDetailReq;
-import com.platon.browser.common.req.transaction.PendingTxListReq;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
-import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.PendingTxMapper;
+import com.platon.browser.dto.transaction.PendingTxDetail;
+import com.platon.browser.dto.transaction.PendingTxList;
+import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailReq;
+import com.platon.browser.req.transaction.PendingTxListReq;
 import com.platon.browser.service.PendingTxService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

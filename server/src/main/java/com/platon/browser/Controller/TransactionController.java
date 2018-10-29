@@ -2,18 +2,23 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
-import com.platon.browser.common.dto.account.AccountDetail;
-import com.platon.browser.common.dto.transaction.PendingTxDetail;
-import com.platon.browser.common.dto.transaction.PendingTxList;
-import com.platon.browser.common.dto.transaction.TransactionDetail;
-import com.platon.browser.common.dto.transaction.TransactionList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.account.AccountDetailReq;
-import com.platon.browser.common.req.transaction.*;
+import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.transaction.PendingTxDetail;
+import com.platon.browser.dto.transaction.PendingTxList;
+import com.platon.browser.dto.transaction.TransactionDetail;
+import com.platon.browser.dto.transaction.TransactionList;
+import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailReq;
+import com.platon.browser.req.transaction.PendingTxListReq;
+import com.platon.browser.req.transaction.TransactionDetailReq;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +27,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -422,8 +433,35 @@ public class TransactionController {
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
+    @PostMapping("addressDownload")
+    public void addressExport(HttpServletResponse response) {
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+        List<Object[]> rows = Arrays.asList(
+                new Object[][]{
+                        {"1997", "Ford", "E350", "ac, abs, moon", "3000.00"},
+                        {"1999", "Chevy", "Venture \"Extended Edition\"", "", "4900.00"},
+                        {"1996", "Jeep", "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded", "4799.00"},
+                        {},
+                        {"1999", "Chevy", "Venture \"Extended Edition, Very Large\"", null, "5000.00"},
+                        {null, "", "Venture \"Extended Edition\"", null, "4900.00"},
+                });
+
+        Writer outputWriter = new OutputStreamWriter(baos);
+        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+        writer.writeHeaders("Year", "Make", "Model", "Description", "Price");
+        writer.writeRowsAndClose(rows);
+
+        response.setHeader("Content-Disposition", "attachment; filename=aaa.csv");
+        Integer contentLength = baos.size();
+        response.setHeader("content-length", contentLength + "");
+        try {
+            response.getOutputStream().write(baos.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * @api {post} transaction/contractDetails i.查询合约详情

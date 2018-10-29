@@ -1,9 +1,9 @@
 package com.platon.browser.service;
 
-import com.platon.browser.common.dto.block.BlockDetail;
-import com.platon.browser.common.dto.block.BlockList;
-import com.platon.browser.common.req.block.BlockDetailReq;
-import com.platon.browser.common.req.block.BlockListReq;
+import com.platon.browser.dto.block.BlockDetail;
+import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockListReq;
 
 import java.util.List;
 
