@@ -100,8 +100,9 @@ public class BlockServiceImpl implements BlockService {
         }
         try {
             getBlockDetail(detailReq);
-            blockDetailNavigate.setHas(true);
+            blockDetailNavigate.setLast(false);
         }catch (BusinessException be){
+            blockDetailNavigate.setLast(true);
             logger.warn("已浏览至第一个或最后一个区块！");
         }
 
