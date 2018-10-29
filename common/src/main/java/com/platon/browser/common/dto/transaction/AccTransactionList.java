@@ -1,9 +1,15 @@
 package com.platon.browser.common.dto.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.util.Date;
+
+/**
+ * 账户详情中的交易列表Bean
+ */
 @Data
-public class AllTransactionList {
+public class AccTransactionList {
     private String txHash;
     private long blockTime;
     private String from;
@@ -14,4 +20,7 @@ public class AllTransactionList {
     private String txType;
     private long serverTime;
     private String failReason;
+
+    @JsonIgnore
+    private Date createTime;
 }

@@ -56,9 +56,5 @@
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>
-        <table tableName="all_transaction" domainObjectName="AllTransaction">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
-        </table>
     </context>
 </generatorConfiguration>

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class AllTransactionDetail {
+public class AccTransactionDetail {
     private String chainId;
     private String txHash;
     private Date blockTime;

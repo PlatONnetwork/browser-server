@@ -5,10 +5,13 @@ import com.platon.browser.common.dto.transaction.PendingTxList;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.TransactionErrorEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.common.req.account.AccountDetailReq;
 import com.platon.browser.common.req.transaction.PendingTxDetailReq;
 import com.platon.browser.common.req.transaction.PendingTxListReq;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.service.PendingTxService;
 import org.apache.commons.lang3.StringUtils;
@@ -74,5 +77,28 @@ public class PendingTxServiceImpl implements PendingTxService {
         transactionDetail.setTxHash(transaction.getHash());
         transactionDetail.setInputData(transaction.getInput());
         return transactionDetail;
+    }
+
+    /**
+     * 通过账户信息获取待处理交易列表
+     * @param req
+     * @return
+     */
+    @Override
+    public List<PendingTx> getTransactionList(AccountDetailReq req) {
+        PendingTxExample condition = new PendingTxExample();
+        PendingTxExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress());
+        PendingTxExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress());
+        if(StringUtils.isNotBlank(req.getTxType())){
+            first.andTxTypeEqualTo(req.getTxType());
+            second.andTxTypeEqualTo(req.getTxType());
+        }
+        condition.or(second);
+        condition.setOrderByClause("create_time desc");
+        List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
+        return pendingTxes;
     }
 }
