@@ -8,10 +8,8 @@ import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.account.ContractDowload;
-import com.platon.browser.dto.transaction.PendingTxDetail;
-import com.platon.browser.dto.transaction.PendingTxItem;
-import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.dto.block.BlockDetailNavigate;
+import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
@@ -203,7 +201,15 @@ public class TransactionController {
      *           }
      * }
      */
-
+    @PostMapping("transactionDetailNavigate")
+    public BaseResp transactionDetailNavigate (@Valid @RequestBody TransactionDetailNavigateReq req) {
+        try{
+            TransactionDetailNavigate transactionDetailNavigate = transactionService.getTransactionDetailNavigate(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionDetailNavigate);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
     /**
      * @api {post} transaction/pendingList d.待处理交易列表

@@ -37,14 +37,15 @@ import java.util.Random;
 public class HomeController {
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private NodeService nodeService;
 
     @Autowired
     private CacheService cacheService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -91,19 +92,7 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-    @Scheduled(fixedRate = 1000)
-    public void nodeSubscribe() throws Exception {
-        NodeInfo n1 = new NodeInfo();
-        n1.setLatitude("3333.33"+new Random().nextInt(10));
-        n1.setLongitude("55555.33"+new Random().nextInt(10));
-        n1.setNetState(1);
-        n1.setNodeType(1);
 
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),n1);
-
-        String cid = "666";
-        messagingTemplate.convertAndSend("/topic/node/new?cid="+cid, resp);
-    }
 
 
     /**
@@ -161,7 +150,7 @@ public class HomeController {
      *   HTTP/1.1 200 OK
      */
     @Scheduled(fixedRate = 1000)
-    public void inexSubscribe() throws Exception {
+    public void indexSubscribe() throws Exception {
         IndexInfo index = new IndexInfo();
         index.setAddressAmount(3);
         index.setConsensusNodeAmount(33);
@@ -315,21 +304,6 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-    @Scheduled(fixedRate = 1000)
-    public void blockSubscribe() throws Exception {
-        List<BlockInfo> blockInfos = new ArrayList<>();
-        BlockInfo blockInfo = new BlockInfo();
-        blockInfo.setBlockReward(33);
-        blockInfo.setHeight(33);
-        blockInfo.setNode("node-1");
-        blockInfo.setServerTime(System.currentTimeMillis());
-        blockInfo.setTimestamp(System.currentTimeMillis()-1999);
-        blockInfo.setTransaction(333);
-        blockInfos.add(blockInfo);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
-        String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/block/new?cid="+cid, resp);
-    }
 
 
     /**
@@ -388,22 +362,7 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-    @Scheduled(fixedRate = 1000)
-    public void transactionSubscribe() throws Exception {
-        List<TransactionInfo> transactionInfos = new ArrayList<>();
-        TransactionInfo transactionInfo = new TransactionInfo();
-        transactionInfo.setBlockHeight(33);
-        transactionInfo.setFrom("33333");
-        transactionInfo.setTo("33444");
-        transactionInfo.setTimestamp(System.currentTimeMillis());
-        transactionInfo.setTxHash("ww554234");
-        transactionInfo.setTransactionIndex(333);
-        transactionInfo.setValue(3.54);
-        transactionInfos.add(transactionInfo);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
-        String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/transaction/new?cid="+cid, resp);
-    }
+
 
 
     /**

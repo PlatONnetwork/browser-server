@@ -14,6 +14,8 @@ import com.platon.browser.service.ContractService;
 import com.platon.browser.service.ExportService;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.List;
 
 @Service
 public class ExportServiceImpl implements ExportService {
+    private final Logger logger = LoggerFactory.getLogger(ExportServiceImpl.class);
 
     @Autowired
     private AccountService accountService;

@@ -150,7 +150,8 @@ public class BlockController  {
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗
      *           "blockReward": "123123",//区块奖励
-     *           "extraData": "xxx"//附加数据
+     *           "extraData": "xxx",//附加数据
+     *           "last":true // 是否是最后一条数据
      *           }
      * }
      */

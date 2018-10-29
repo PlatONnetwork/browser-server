@@ -7,11 +7,13 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
+import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.TransactionService;
@@ -120,5 +122,15 @@ public class TransactionServiceImpl implements TransactionService {
         condition.setOrderByClause("create_time desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         return transactions;
+    }
+
+    /**
+     * 上一个、下一个，浏览交易信息，交易可能跨区块
+     * @param req
+     * @return
+     */
+    @Override
+    public TransactionDetailNavigate getTransactionDetailNavigate(TransactionDetailNavigateReq req) {
+        return null;
     }
 }
