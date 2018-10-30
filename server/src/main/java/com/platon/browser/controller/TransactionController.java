@@ -326,7 +326,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "direction":"", // 方向：prev-上一个，next-下一个 (必填)
-     *      "txHash": "",//交易Hash(必填)
+     *      "index": "",// 当前记录索引，从1开始(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
