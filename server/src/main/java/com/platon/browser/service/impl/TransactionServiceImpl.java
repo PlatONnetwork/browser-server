@@ -1,11 +1,11 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionDetailNavigate;
@@ -37,6 +37,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private BlockMapper blockMapper;
 
     @Override
     public List<TransactionItem> getTransactionList(TransactionListReq req) {
@@ -78,6 +80,18 @@ public class TransactionServiceImpl implements TransactionService {
         BeanUtils.copyProperties(transaction,transactionDetail);
         transactionDetail.setTxHash(transaction.getHash());
         transactionDetail.setBlockHeight(transaction.getBlockNumber());
+
+        // 计算区块确认数
+        BlockExample blockExample = new BlockExample();
+        blockExample.setOrderByClause("number desc");
+        PageHelper.startPage(1,1);
+        List<Block> blockList = blockMapper.selectByExample(blockExample);
+        if(blockList.size()==0){
+            transactionDetail.setConfirmNum(0l);
+            return transactionDetail;
+        }
+        Block block = blockList.get(0);
+        transactionDetail.setConfirmNum(block.getNumber()-transactionDetail.getBlockHeight());
         return transactionDetail;
     }
 
