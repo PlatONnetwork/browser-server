@@ -1,5 +1,7 @@
 package com.platon.browser.req.transaction;
 
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.req.PageReq;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -7,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class PendingTxDetailNavigateReq {
+public class PendingTxDetailNavigateReq extends PageReq {
     @NotBlank(message = "链ID不能为空！")
     private String cid;
     @NotNull(message = "数据索引不能为空！")
