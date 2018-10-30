@@ -1,4 +1,4 @@
-package com.platon.browse.agent;
+package com.platon.browser.agent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

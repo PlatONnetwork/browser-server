@@ -367,4 +367,11 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
+  
+  <select id="selectNewestBlockInfo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from block
+    order by block.create_time desc  LIMIT 1
+  </select>
 </mapper>

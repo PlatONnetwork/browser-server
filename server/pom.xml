@@ -119,7 +119,7 @@
     </profiles>
 
 	<build>
-		<finalName>browser-web</finalName>
+		<finalName>browser-server</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources/${package.environment}/</directory>

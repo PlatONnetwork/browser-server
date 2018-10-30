@@ -1,16 +1,17 @@
-package com.platon.browse.agent.dto;
+package com.platon.browser.agent.dto;
 
 /**
  * User: dongqile
  * Date: 2018/10/24
- * Time: 16:11
+ * Time: 17:15
  */
-public class Transaction {
+public class PendingTransactionDto {
 
     /**
      * 交易hash
      */
     private String hash;
+
 
     /**
      * 交易时间（单位：秒）
@@ -33,35 +34,9 @@ public class Transaction {
     private String value;
 
     /**
-     * 区块高度
-     */
-    private Integer blockNumber;
-
-    /**
-     * 区块hash
-     */
-    private String blockHash;
-
-    /**
      * 能量限制
      */
     private Integer energonLimit;
-
-
-    /**
-     * 能量消耗
-     */
-    private Integer energonUsed;
-
-    /**
-     * 能量价格
-     */
-    private float energonPrice;
-
-    /**
-     * 交易实际花费值(手续费)
-     */
-    private float actualTxCoast;
 
     /**
      * 交易类型
@@ -83,11 +58,6 @@ public class Transaction {
      * 交易输入数据
      */
     private String input;
-
-    /**
-     * 交易在区块中位置
-     */
-    private Integer transactionIndex;
 
     public String getHash () {
         return hash;
@@ -129,52 +99,12 @@ public class Transaction {
         this.value = value;
     }
 
-    public Integer getBlockNumber () {
-        return blockNumber;
-    }
-
-    public void setBlockNumber ( Integer blockNumber ) {
-        this.blockNumber = blockNumber;
-    }
-
-    public String getBlockHash () {
-        return blockHash;
-    }
-
-    public void setBlockHash ( String blockHash ) {
-        this.blockHash = blockHash;
-    }
-
     public Integer getEnergonLimit () {
         return energonLimit;
     }
 
     public void setEnergonLimit ( Integer energonLimit ) {
         this.energonLimit = energonLimit;
-    }
-
-    public Integer getEnergonUsed () {
-        return energonUsed;
-    }
-
-    public void setEnergonUsed ( Integer energonUsed ) {
-        this.energonUsed = energonUsed;
-    }
-
-    public float getEnergonPrice () {
-        return energonPrice;
-    }
-
-    public void setEnergonPrice ( float energonPrice ) {
-        this.energonPrice = energonPrice;
-    }
-
-    public float getActualTxCoast () {
-        return actualTxCoast;
-    }
-
-    public void setActualTxCoast ( float actualTxCoast ) {
-        this.actualTxCoast = actualTxCoast;
     }
 
     public String getTxType () {
@@ -199,13 +129,5 @@ public class Transaction {
 
     public void setInput ( String input ) {
         this.input = input;
-    }
-
-    public Integer getTransactionIndex () {
-        return transactionIndex;
-    }
-
-    public void setTransactionIndex ( Integer transactionIndex ) {
-        this.transactionIndex = transactionIndex;
     }
 }
