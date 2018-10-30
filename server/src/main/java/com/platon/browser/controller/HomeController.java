@@ -40,9 +40,6 @@ public class HomeController {
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @Autowired
-    private NodeService nodeService;
-
-    @Autowired
     private CacheService cacheService;
 
     @Autowired
@@ -126,16 +123,8 @@ public class HomeController {
     public BaseResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        IndexInfo index = new IndexInfo();
-        index.setAddressAmount(3);
-        index.setConsensusNodeAmount(33);
-        index.setCurrentHeight(333);
-        index.setCurrentTransaction(333);
-        index.setNode("node-1");
-        index.setProportion(66);
-        index.setTicketPrice(449);
-        index.setVoteAmount(333);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
+        IndexInfo indexInfo = cacheService.getIndexInfo();
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
         return resp;
     }
 
@@ -202,19 +191,7 @@ public class HomeController {
     public BaseResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        StatisticInfo statistic = new StatisticInfo();
-        statistic.setAvgTime(333);
-        statistic.setAvgTransaction(333);
-        statistic.setCurrent(333);
-        statistic.setDayTransaction(333);
-        statistic.setMaxTps(333);
-        List<BlockStatistic> lists = new ArrayList<>();
-        BlockStatistic blockStatistic = new BlockStatistic();
-        blockStatistic.setHeight(333);
-        blockStatistic.setTime(333);
-        blockStatistic.setTransaction(333);
-        lists.add(blockStatistic);
-        statistic.setBlockStatisticList(lists);
+        StatisticInfo statistic = cacheService.getStatisticInfo();
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         return resp;
     }
@@ -281,15 +258,7 @@ public class HomeController {
     public BaseResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<BlockInfo> blockInfos = new ArrayList<>();
-        BlockInfo blockInfo = new BlockInfo();
-        blockInfo.setBlockReward(33);
-        blockInfo.setHeight(33);
-        blockInfo.setNode("node-1");
-        blockInfo.setServerTime(System.currentTimeMillis());
-        blockInfo.setTimestamp(System.currentTimeMillis()-1999);
-        blockInfo.setTransaction(333);
-        blockInfos.add(blockInfo);
+        List<BlockInfo> blockInfos = cacheService.getBlockInfoList();
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
         return resp;
     }
@@ -338,16 +307,7 @@ public class HomeController {
     public BaseResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<TransactionInfo> transactionInfos = new ArrayList<>();
-        TransactionInfo transactionInfo = new TransactionInfo();
-        transactionInfo.setBlockHeight(33);
-        transactionInfo.setFrom("33333");
-        transactionInfo.setTo("33444");
-        transactionInfo.setTimestamp(System.currentTimeMillis());
-        transactionInfo.setTxHash("ww554234");
-        transactionInfo.setTransactionIndex(333);
-        transactionInfo.setValue(3.54);
-        transactionInfos.add(transactionInfo);
+        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList();
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
         return resp;
     }

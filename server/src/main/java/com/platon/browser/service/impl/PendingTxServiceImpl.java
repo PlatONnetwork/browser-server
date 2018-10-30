@@ -136,28 +136,30 @@ public class PendingTxServiceImpl implements PendingTxService {
 
     @Override
     public PendingTxDetailNavigate getPendingTxDetailNavigate(PendingTxDetailNavigateReq req) {
-        // 根据当前交易hash查出当前交易信息
-        PendingTxListReq pendingTxListReq = new PendingTxListReq();
-        pendingTxListReq.setCid(req.getCid());
-        pendingTxListReq.setPageSize(1);
+        req.setPageSize(1);
         switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
             case PREV:
-                pendingTxListReq.setPageNo(req.getIndex()-1);
+                req.setPageNo(req.getIndex()-1);
                 break;
             case NEXT:
-                pendingTxListReq.setPageNo(req.getIndex()+1);
+                req.setPageNo(req.getIndex()+1);
                 break;
         }
-        pendingTxListReq.buildPage();
-        List<PendingTxItem> pendingTxList = getTransactionList(pendingTxListReq);
-        if(pendingTxList.size()==0){
+        req.buildPage();
+        PendingTxExample condition = new PendingTxExample();
+        condition.setOrderByClause("timestamp desc");
+        List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
+        if(pendingTxes.size()==0){
             logger.error("no more pending transactions");
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
 
-        PendingTxItem pendingTxItem = pendingTxList.get(0);
+        PendingTx pendingTx = pendingTxes.get(0);
         PendingTxDetailNavigate pendingTxDetailNavigate = new PendingTxDetailNavigate();
-        BeanUtils.copyProperties(pendingTxItem,pendingTxDetailNavigate);
+        BeanUtils.copyProperties(pendingTx,pendingTxDetailNavigate);
+        pendingTxDetailNavigate.setTxHash(pendingTx.getHash());
+        pendingTxDetailNavigate.setInputData(pendingTx.getInput());
+        pendingTxDetailNavigate.setTimestamp(pendingTx.getTimestamp().getTime());
         return pendingTxDetailNavigate;
     }
 }

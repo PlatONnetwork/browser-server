@@ -7,10 +7,10 @@ import lombok.Data;
  */
 @Data
 public class IndexInfo {
-    private int currentHeight;
+    private long currentHeight;
     private String node;
-    private int currentTransaction;
-    private int consensusNodeAmount;
+    private long currentTransaction;
+    private long consensusNodeAmount;
     private int addressAmount;
     private int voteAmount;
     private double proportion;
