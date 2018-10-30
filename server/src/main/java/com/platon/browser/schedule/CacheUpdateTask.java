@@ -12,10 +12,8 @@ import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.NodeType;
-import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.GeoUtil;
-import org.apache.poi.ss.formula.functions.Index;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -101,6 +99,11 @@ public class CacheUpdateTask {
         long addressCount = distinctAddressViewMapper.countByExample(distinctAddressViewExample);
         indexInfo.setAddressAmount(addressCount);
 
+        // 未知如何获取相关数据，暂时设置为0 -- 2018/10/30
+        indexInfo.setProportion(0);
+        indexInfo.setTicketPrice(0);
+        indexInfo.setVoteAmount(0);
+        cacheService.updateIndexInfo(indexInfo);
     }
 
     /**
