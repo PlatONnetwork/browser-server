@@ -7,6 +7,8 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.LimitQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Service
 public class CacheServiceImpl implements CacheService {
+
+    private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
     private ReentrantReadWriteLock nodeInfoListLock = new ReentrantReadWriteLock();
     private List<NodeInfo> nodeInfoList = new ArrayList<>();

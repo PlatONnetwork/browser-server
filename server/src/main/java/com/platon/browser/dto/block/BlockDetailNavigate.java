@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class BlockDetailNavigate extends BlockDetail {
-    // 是否还有
-    private boolean has;
+    // 是否最后一条
+    private boolean last;
 }
