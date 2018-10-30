@@ -315,7 +315,7 @@ public class TransactionController {
     }
 
     /**
-     * @api {post} transaction/pendingDetailNavigate f.待处理交易详情前后跳转浏览
+     * @api {post} transaction/pendingDetailNavigate f.待处理交易详情前后跳转浏览 (已废弃，因为待处理交易块还未生成，随时在变，前后浏览没有意义)
      * @apiVersion 1.0.0
      * @apiName pendingDetailNavigate
      * @apiGroup transaction
