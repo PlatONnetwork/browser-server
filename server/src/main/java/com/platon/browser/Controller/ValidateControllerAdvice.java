@@ -2,6 +2,7 @@ package com.platon.browser.Controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.exception.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -31,6 +32,17 @@ public class ValidateControllerAdvice {
             logger.error(error.getField()+":"+error.getDefaultMessage());
         }
         return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),RetEnum.RET_PARAM_VALLID.getName(),msg);
+    }
+
+    /**
+     * 响应异常
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(ResponseException.class)
+    @ResponseBody
+    public BaseResp responseExceptionHandler(ResponseException e) {
+        return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(),RetEnum.RET_SYS_EXCEPTION.getName(),e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

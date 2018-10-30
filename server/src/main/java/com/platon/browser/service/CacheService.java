@@ -1,9 +1,10 @@
 package com.platon.browser.service;
 
-import com.platon.browser.common.dto.*;
-import com.platon.browser.common.dto.block.BlockInfo;
-import com.platon.browser.common.dto.node.NodeInfo;
-import com.platon.browser.common.dto.transaction.TransactionInfo;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.transaction.TransactionInfo;
 
 import java.util.List;
 

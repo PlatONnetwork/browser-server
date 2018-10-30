@@ -1,15 +1,18 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.dto.transaction.PendingTxDetail;
-import com.platon.browser.common.dto.transaction.PendingTxList;
 import com.platon.browser.common.enums.RetEnum;
-import com.platon.browser.common.enums.TransactionErrorEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.common.req.transaction.PendingTxDetailReq;
-import com.platon.browser.common.req.transaction.PendingTxListReq;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
+import com.platon.browser.dto.transaction.PendingTxDetail;
+import com.platon.browser.dto.transaction.PendingTxItem;
+import com.platon.browser.enums.TransactionErrorEnum;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailReq;
+import com.platon.browser.req.transaction.PendingTxListReq;
 import com.platon.browser.service.PendingTxService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,22 +34,23 @@ public class PendingTxServiceImpl implements PendingTxService {
     private PendingTxMapper pendingTxMapper;
 
     @Override
-    public List<PendingTxList> getTransactionList(PendingTxListReq req) {
+    public List<PendingTxItem> getTransactionList(PendingTxListReq req) {
         PendingTxExample condition = new PendingTxExample();
         condition.setOrderByClause("timestamp desc");
         if(StringUtils.isBlank(req.getAddress())){
             condition.createCriteria().andChainIdEqualTo(req.getCid());
         }else {
+            // 根据发送方或接收方地址筛选
             condition.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress());
             PendingTxExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress());
             condition.or(criteria);
         }
 
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
-        List<PendingTxList> pendingTxList = new ArrayList<>();
+        List<PendingTxItem> pendingTxList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         pendingTxes.forEach(transaction -> {
-            PendingTxList pt = new PendingTxList();
+            PendingTxItem pt = new PendingTxItem();
             BeanUtils.copyProperties(transaction,pt);
             pt.setTxHash(transaction.getHash());
             pt.setDwellTime(serverTime-transaction.getTimestamp().getTime());
@@ -66,7 +71,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(),TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
         PendingTxDetail transactionDetail = new PendingTxDetail();
         PendingTx transaction = transactions.get(0);
@@ -74,5 +79,55 @@ public class PendingTxServiceImpl implements PendingTxService {
         transactionDetail.setTxHash(transaction.getHash());
         transactionDetail.setInputData(transaction.getInput());
         return transactionDetail;
+    }
+
+    /**
+     * 通过账户信息获取待处理交易列表
+     * @param req
+     * @return
+     */
+    @Override
+    public List<PendingTx> getTransactionList(AccountDetailReq req) {
+        PendingTxExample condition = new PendingTxExample();
+        PendingTxExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress());
+        PendingTxExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress());
+        if(StringUtils.isNotBlank(req.getTxType())){
+            first.andTxTypeEqualTo(req.getTxType());
+            second.andTxTypeEqualTo(req.getTxType());
+        }
+        condition.or(second);
+        condition.setOrderByClause("create_time desc");
+        List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
+        return pendingTxes;
+    }
+
+    /**
+     * 查询合约
+     * @param req
+     * @return
+     */
+    @Override
+    public List<PendingTx> getContractList(ContractDetailReq req) {
+        String [] types = {TransactionTypeEnum.CONTRACT_CREATE.code,TransactionTypeEnum.TRANSACTION_EXECUTE.code};
+        PendingTxExample condition = new PendingTxExample();
+        PendingTxExample.Criteria first = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress())
+                .andTxTypeIn(Arrays.asList(types));
+        PendingTxExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress())
+                .andTxTypeIn(Arrays.asList(types));
+        if(StringUtils.isNotBlank(req.getTxType())){
+            first.andTxTypeEqualTo(req.getTxType());
+            second.andTxTypeEqualTo(req.getTxType());
+        }
+        condition.or(second);
+        condition.setOrderByClause("create_time desc");
+        List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
+        return pendingTxes;
     }
 }
