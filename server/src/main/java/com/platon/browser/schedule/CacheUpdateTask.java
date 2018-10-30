@@ -3,11 +3,9 @@ package com.platon.browser.schedule;
 import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.DistinctAddressViewMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
@@ -37,6 +35,10 @@ public class CacheUpdateTask {
     private TransactionMapper transactionMapper;
     @Autowired
     private DistinctAddressViewMapper distinctAddressViewMapper;
+    @Autowired
+    private AvgTransactionViewMapper avgTransactionViewMapper;
+    @Autowired
+    private StatisticTransactionViewMapper statisticTransactionViewMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -112,6 +114,50 @@ public class CacheUpdateTask {
     @Scheduled(fixedRate = 10000)
     void updateStatisticInfo(){
 
+        StatisticInfo statisticInfo = new StatisticInfo();
+
+        // 平均出块时长 = (最高块 - 第一个块)/最高块
+        BlockExample blockExample = new BlockExample();
+        blockExample.setOrderByClause("number desc");
+        PageHelper.startPage(1,1);
+        List<Block> topList = blockMapper.selectByExample(blockExample);
+        if(topList.size()==1){
+            // 先从最高块向前回溯3600个块
+            blockExample = new BlockExample();
+            blockExample.setOrderByClause("number desc");
+            PageHelper.startPage(3600,1);
+            List<Block> bottomList = blockMapper.selectByExample(blockExample);
+            if(bottomList.size()==0){
+                // 从后向前累计不足3600个块，则取链上第一个块
+                blockExample = new BlockExample();
+                blockExample.setOrderByClause("number asc");
+                PageHelper.startPage(1,1);
+                bottomList = blockMapper.selectByExample(blockExample);
+            }
+            Block top = topList.get(0);
+            Block bottom = bottomList.get(0);
+            long avgTime = (top.getTimestamp().getTime()-bottom.getTimestamp().getTime())/top.getNumber();
+            statisticInfo.setAvgTime(avgTime);
+
+        }else{
+            statisticInfo.setAvgTime(0);
+        }
+
+        // 计算当前交易TPS
+
+
+        // 计算平均区块交易数
+        AvgTransactionViewExample avgTransactionViewExample = new AvgTransactionViewExample();
+        List<AvgTransactionView> avgTransactionViews = avgTransactionViewMapper.selectByExample(avgTransactionViewExample);
+        AvgTransactionView avgTransactionView = avgTransactionViews.get(0);
+        statisticInfo.setAvgTransaction(avgTransactionView.getAvgtransaction());
+
+        // 获取最近3600区块
+        StatisticTransactionViewExample statisticTransactionViewExample = new StatisticTransactionViewExample();
+        List<StatisticTransactionView> statisticTransactionViews = statisticTransactionViewMapper.selectByExample(statisticTransactionViewExample);
+        statisticInfo.setBlockStatisticList(statisticTransactionViews);
+
+        cacheService.updateStatisticInfo(statisticInfo);
     }
 
     /**
