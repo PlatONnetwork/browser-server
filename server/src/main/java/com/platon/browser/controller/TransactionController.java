@@ -357,7 +357,7 @@ public class TransactionController {
      *           }
      * }
      */
-    @PostMapping("pendingDetailNavigate")
+    /*@PostMapping("pendingDetailNavigate")
     public BaseResp pendingDetailNavigate (@Valid @RequestBody PendingTxDetailNavigateReq req) {
         try{
             PendingTxDetailNavigate pendingTxDetailNavigate = pendingTxService.getPendingTxDetailNavigate(req);
@@ -365,7 +365,7 @@ public class TransactionController {
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
         }
-    }
+    }*/
 
     /**
      * @api {post} transaction/addressDetails g.查询地址详情
