@@ -79,6 +79,20 @@ public class BlockServiceImpl implements BlockService {
         long tradeCount = transactionMapper.countByExample(transactionExample);
         blockDetail.setTransaction(tradeCount);
 
+        // 取上一个区块
+        condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight()-1);
+        blocks = blockMapper.selectByExample(condition);
+        if (blocks.size()>1){
+            logger.error("duplicate block: block number {}",req.getHeight());
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
+        }
+        if(blocks.size()==0){
+            blockDetail.setTimeDiff(0);
+            return blockDetail;
+        }
+        block = blocks.get(0);
+        blockDetail.setTimeDiff(blockDetail.getTimestamp()-block.getTimestamp().getTime());
         return blockDetail;
     }
 

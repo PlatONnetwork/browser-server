@@ -15,4 +15,5 @@ public class BlockDetail {
     private int energonUsed;
     private String blockReward;
     private String extraData;
+    private long timeDiff;
 }

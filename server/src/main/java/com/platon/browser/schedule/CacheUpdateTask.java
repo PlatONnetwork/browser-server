@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.DistinctAddressViewMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
@@ -36,6 +37,8 @@ public class CacheUpdateTask {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private DistinctAddressViewMapper distinctAddressViewMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -94,7 +97,9 @@ public class CacheUpdateTask {
         indexInfo.setConsensusNodeAmount(nodeCount);
 
         // 取地址数
-
+        DistinctAddressViewExample distinctAddressViewExample = new DistinctAddressViewExample();
+        long addressCount = distinctAddressViewMapper.countByExample(distinctAddressViewExample);
+        indexInfo.setAddressAmount(addressCount);
 
     }
 

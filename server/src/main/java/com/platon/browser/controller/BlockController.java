@@ -102,6 +102,7 @@ public class BlockController  {
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
      *           "miner": "0x234", // 出块节点（多少时间内）
+     *           "timeDiff":424234, // 当前块出块时间距离上一个块出块时间之差（毫秒）
      *           "size": 123,//区块大小
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗

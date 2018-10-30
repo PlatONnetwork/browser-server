@@ -11,7 +11,7 @@ public class IndexInfo {
     private String node;
     private long currentTransaction;
     private long consensusNodeAmount;
-    private int addressAmount;
+    private long addressAmount;
     private int voteAmount;
     private double proportion;
     private double ticketPrice;
