@@ -208,19 +208,7 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void statisticSubscribe() throws Exception {
-        StatisticInfo statistic = new StatisticInfo();
-        statistic.setAvgTime(333);
-        statistic.setAvgTransaction(333);
-        statistic.setCurrent(333);
-        statistic.setDayTransaction(333);
-        statistic.setMaxTps(333);
-        List<BlockStatistic> lists = new ArrayList<>();
-        BlockStatistic blockStatistic = new BlockStatistic();
-        blockStatistic.setHeight(333);
-        blockStatistic.setTime(333);
-        blockStatistic.setTransaction(333);
-        lists.add(blockStatistic);
-        statistic.setBlockStatisticList(lists);
+        StatisticInfo statistic = cacheService.getStatisticInfo();
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
         messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, resp);
