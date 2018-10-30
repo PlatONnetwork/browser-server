@@ -403,7 +403,7 @@ public class TransactionController {
      *                "from": "0x667766",//发送方
      *                "to": "0x667766",//接收方
      *                "value": "222",//数额
-     *                "actualTxCoast": "22",//交易费用
+     *                "actualTxCost": "22",//交易费用
      *                "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *                "txType": "", // 交易类型
                          transfer ：转账
@@ -497,7 +497,7 @@ public class TransactionController {
      *                 "from": "0x667766",//发送方
      *                 "to": "0x667766",//接收方
      *                 "value": "222",//数额
-     *                 "actualTxCoast": "22",//交易费用
+     *                 "actualTxCost": "22",//交易费用
      *                 "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *                 "txType": "", // 交易类型
                           transfer ：转账
@@ -584,7 +584,7 @@ public class TransactionController {
      *           "from": "0x667766",//发送方
      *           "to": "0x667766",//接收方
      *           "value": "222",//数额
-     *           "actualTxCoast": "22",//交易费用
+     *           "actualTxCost": "22",//交易费用
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "txType": "", // 交易类型
                     transfer ：转账
