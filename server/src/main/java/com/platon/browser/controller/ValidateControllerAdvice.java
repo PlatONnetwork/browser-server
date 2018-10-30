@@ -1,4 +1,4 @@
-package com.platon.browser.Controller;
+package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;

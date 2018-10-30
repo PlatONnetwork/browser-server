@@ -6,11 +6,14 @@ import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dto.transaction.PendingTxDetail;
+import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
+import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxListReq;
 import com.platon.browser.service.PendingTxService;
@@ -129,5 +132,32 @@ public class PendingTxServiceImpl implements PendingTxService {
         condition.setOrderByClause("create_time desc");
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
         return pendingTxes;
+    }
+
+    @Override
+    public PendingTxDetailNavigate getPendingTxDetailNavigate(PendingTxDetailNavigateReq req) {
+        // 根据当前交易hash查出当前交易信息
+        PendingTxListReq pendingTxListReq = new PendingTxListReq();
+        pendingTxListReq.setCid(req.getCid());
+        pendingTxListReq.setPageSize(1);
+        switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+            case PREV:
+                pendingTxListReq.setPageNo(req.getIndex()-1);
+                break;
+            case NEXT:
+                pendingTxListReq.setPageNo(req.getIndex()+1);
+                break;
+        }
+        pendingTxListReq.buildPage();
+        List<PendingTxItem> pendingTxList = getTransactionList(pendingTxListReq);
+        if(pendingTxList.size()==0){
+            logger.error("no more pending transactions");
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+        }
+
+        PendingTxItem pendingTxItem = pendingTxList.get(0);
+        PendingTxDetailNavigate pendingTxDetailNavigate = new PendingTxDetailNavigate();
+        BeanUtils.copyProperties(pendingTxItem,pendingTxDetailNavigate);
+        return pendingTxDetailNavigate;
     }
 }

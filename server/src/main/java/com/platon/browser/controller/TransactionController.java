@@ -1,4 +1,4 @@
-package com.platon.browser.Controller;
+package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
@@ -8,7 +8,6 @@ import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.account.ContractDowload;
-import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
@@ -357,7 +356,15 @@ public class TransactionController {
      *           }
      * }
      */
-
+    @PostMapping("pendingDetailNavigate")
+    public BaseResp pendingDetailNavigate (@Valid @RequestBody PendingTxDetailNavigateReq req) {
+        try{
+            PendingTxDetailNavigate pendingTxDetailNavigate = pendingTxService.getPendingTxDetailNavigate(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingTxDetailNavigate);
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
+    }
 
     /**
      * @api {post} transaction/addressDetails g.查询地址详情

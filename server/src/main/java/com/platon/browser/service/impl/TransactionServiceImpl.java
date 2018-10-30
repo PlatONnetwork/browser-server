@@ -1,5 +1,6 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Transaction;
@@ -9,6 +10,7 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
@@ -131,6 +133,87 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionDetailNavigate getTransactionDetailNavigate(TransactionDetailNavigateReq req) {
-        return null;
+
+        // 根据当前交易hash查出当前交易信息
+        TransactionExample condition = new TransactionExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
+        List<Transaction> transactions = transactionMapper.selectByExample(condition);
+        if (transactions.size()>1){
+            logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+        }
+        if(transactions.size()==0){
+            logger.error("invalid transaction hash {}",req.getTxHash());
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+        }
+        Transaction currTransaction = transactions.get(0);
+
+        // 根据方向查询同一区块上一条或下一条交易
+        condition = new TransactionExample();
+        TransactionExample.Criteria criteria = condition.createCriteria()
+                .andChainIdEqualTo(currTransaction.getChainId())
+                .andBlockNumberEqualTo(currTransaction.getBlockNumber());
+        NavigateEnum direction = NavigateEnum.valueOf(req.getDirection().toUpperCase());
+        int step = 0;
+        switch (direction){
+            case PREV:
+                step = -1;
+                break;
+            case NEXT:
+                step = 1;
+                break;
+        }
+        criteria.andTransactionIndexEqualTo(currTransaction.getTransactionIndex()+step);
+        List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(condition);
+        if (transactionList.size()>1){
+            // 同一区块出现多条交易索引相同的记录
+            logger.error("duplicate transaction: transaction index {}",currTransaction.getTransactionIndex()+step);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+        }
+
+        TransactionDetailNavigate transactionDetailNavigate = new TransactionDetailNavigate();
+
+        if(transactionList.size()==1){
+            // 在当前区块找到一条交易记录
+            TransactionWithBLOBs transaction = transactionList.get(0);
+            BeanUtils.copyProperties(transaction,transactionDetailNavigate);
+            transactionDetailNavigate.setTxHash(transaction.getHash());
+            transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
+            transactionDetailNavigate.setInputData(transaction.getInput());
+        }
+
+        if(transactionList.size()==0){
+            // 当前区块找不到，则需要跨块查找
+            condition = new TransactionExample();
+            criteria = condition.createCriteria().andChainIdEqualTo(currTransaction.getChainId());
+            long blockNumber = 0;
+            switch (direction){
+                case PREV:
+                    // 上一条，则拿上一个块的最后一条交易
+                    blockNumber=currTransaction.getBlockNumber()-1;
+                    criteria.andBlockNumberEqualTo(blockNumber);
+                    condition.setOrderByClause("transaction_index desc");
+                    break;
+                case NEXT:
+                    // 下一条，则取下一个块的第一条交易
+                    blockNumber=currTransaction.getBlockNumber()+1;
+                    criteria.andBlockNumberEqualTo(blockNumber);
+                    condition.setOrderByClause("transaction_index asc");
+                    break;
+            }
+            // 只取一条
+            PageHelper.startPage(1,1);
+            transactionList = transactionMapper.selectByExampleWithBLOBs(condition);
+            if(transactionList.size()==0){
+                logger.error("no transaction found in block: {}",blockNumber);
+                throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+            }
+            TransactionWithBLOBs transaction = transactionList.get(0);
+            BeanUtils.copyProperties(transaction,transactionDetailNavigate);
+            transactionDetailNavigate.setTxHash(transaction.getHash());
+            transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
+            transactionDetailNavigate.setInputData(transaction.getInput());
+        }
+        return transactionDetailNavigate;
     }
 }

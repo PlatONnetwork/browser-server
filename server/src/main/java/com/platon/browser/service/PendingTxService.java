@@ -3,11 +3,15 @@ package com.platon.browser.service;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.transaction.PendingTxDetail;
+import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
+import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxListReq;
+import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 
 import java.util.List;
 
@@ -23,4 +27,6 @@ public interface PendingTxService {
     List<PendingTx> getTransactionList(AccountDetailReq req);
 
     List<PendingTx> getContractList(ContractDetailReq req);
+
+    PendingTxDetailNavigate getPendingTxDetailNavigate(PendingTxDetailNavigateReq req);
 }

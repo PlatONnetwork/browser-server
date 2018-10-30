@@ -82,22 +82,33 @@ public class BlockServiceImpl implements BlockService {
         return blockDetail;
     }
 
+    /**
+     * req中的height参数是当前页面上的区块高度，如果direction是prev，则此方法返回的是当前页面区块的上一个区块，如果是next则返回下一个区块
+     * @param req
+     * @return
+     */
     @Override
     public BlockDetailNavigate getBlockDetailNavigate(BlockDetailNavigateReq req) {
         BlockDetailReq detailReq = new BlockDetailReq();
         BeanUtils.copyProperties(req,detailReq);
+
+        int step = 1;
+        switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+            case PREV:
+                detailReq.setHeight(req.getHeight()-1);
+                step = -1;
+                break;
+            case NEXT:
+                detailReq.setHeight(req.getHeight()+1);
+                step = 1;
+                break;
+        }
+
         BlockDetail blockDetail = getBlockDetail(detailReq);
         BlockDetailNavigate blockDetailNavigate = new BlockDetailNavigate();
         BeanUtils.copyProperties(blockDetail,blockDetailNavigate);
 
-        switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-            case PREV:
-                detailReq.setHeight(req.getHeight()-1);
-                break;
-            case NEXT:
-                detailReq.setHeight(req.getHeight()+1);
-                break;
-        }
+        detailReq.setHeight(detailReq.getHeight()+step);
         try {
             getBlockDetail(detailReq);
             blockDetailNavigate.setLast(false);
