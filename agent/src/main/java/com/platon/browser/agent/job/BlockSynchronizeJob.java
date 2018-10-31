@@ -2,6 +2,7 @@ package com.platon.browser.agent.job;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.client.Web3jClient;
 import com.platon.browser.common.constant.ConfigConst;
@@ -10,6 +11,7 @@ import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +72,30 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
-            Block block = blockMapper.selectNewestBlockInfo();
-            if (null == block || block.equals("")) {
+            BlockExample condition = new BlockExample();
+            condition.setOrderByClause("timestamp desc");
+            PageHelper.startPage(1,1);
+            List<Block> blocks = blockMapper.selectByExample(condition);
+            if(blocks.size() > 0){
+                if (Long.valueOf(blockNumber) > blocks.get(0).getNumber()) {
+                    //链上块增长
+                    for (int i = blocks.get(0).getNumber().intValue(); i < Integer.parseInt(blockNumber); i++) {
+                        try {
+                            BlockDto newBlock = buildStruct(i, web3j);
+                            // 数据插入队列
+                            String str = JSONObject.toJSONString(newBlock);
+                            //chainId获取
+                            mqSender.send(ConfigConst.getChainId(), "blockInfo", str);
+                        } catch (Exception e) {
+                            log.error("同步区块信息异常", e);
+                            throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
+                        }
+                    }
+                } else if (Long.valueOf(blockNumber) < blocks.get(0).getNumber() || Long.valueOf(blockNumber) ==  blocks.get(0).getNumber()) {
+                    //链上块无增长
+                    log.info("无新区块");
+                }
+            }else {
                 //判断是否是首次
                 for (int i = 0; i < Long.valueOf(blockNumber); i++) {
                     try {
@@ -84,25 +108,6 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                         log.error("同步区块信息异常", e);
                         throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                     }
-                }
-            } else {
-                if (Long.valueOf(blockNumber) > block.getNumber()) {
-                    //链上块增长
-                    for (int i = block.getNumber().intValue(); i < Integer.parseInt(blockNumber); i++) {
-                        try {
-                            BlockDto newBlock = buildStruct(i, web3j);
-                            // 数据插入队列
-                            String str = JSONObject.toJSONString(newBlock);
-                            //chainId获取
-                            mqSender.send(ConfigConst.getChainId(), "blockInfo", str);
-                        } catch (Exception e) {
-                            log.error("同步区块信息异常", e);
-                            throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
-                        }
-                    }
-                } else if (Long.valueOf(blockNumber) < block.getNumber() || Long.valueOf(blockNumber) == block.getNumber()) {
-                    //链上块无增长
-                    log.info("无新区块");
                 }
             }
         }catch (Exception e){
