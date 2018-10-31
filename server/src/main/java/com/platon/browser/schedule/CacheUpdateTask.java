@@ -39,7 +39,7 @@ public class CacheUpdateTask {
     @Autowired
     private AvgTransactionViewMapper avgTransactionViewMapper;
     @Autowired
-    private TransactionStatisticViewMapper transactionStatisticViewMapper;
+    private BlockStatisticViewMapper blockStatisticViewMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -154,10 +154,10 @@ public class CacheUpdateTask {
         statisticInfo.setAvgTransaction(avgTransactionView.getAvgtransaction());
 
         // 获取最近3600区块
-        TransactionStatisticViewExample transactionStatisticViewExample = new TransactionStatisticViewExample();
-        List<TransactionStatisticView> transactionStatisticViews = transactionStatisticViewMapper.selectByExample(transactionStatisticViewExample);
+        BlockStatisticViewExample blockStatisticViewExample = new BlockStatisticViewExample();
+        List<BlockStatisticView> blockStatisticViews = blockStatisticViewMapper.selectByExample(blockStatisticViewExample);
         List<StatisticItem> statisticList = new ArrayList<>();
-        transactionStatisticViews.forEach(statistic->{
+        blockStatisticViews.forEach(statistic->{
             StatisticItem bean = new StatisticItem();
             BeanUtils.copyProperties(statistic,bean);
             statisticList.add(bean);

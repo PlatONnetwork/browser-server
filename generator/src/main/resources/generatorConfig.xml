@@ -57,11 +57,7 @@
                                 replaceString=""/>&ndash;&gt;
         </table>-->
 
-        <table tableName="transaction_statistic_view" domainObjectName="TransactionStatisticView">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
-        </table>
-        <table tableName="address_count_view" domainObjectName="AddressCountView">
+        <table tableName="block_statistic_view" domainObjectName="BlockStatisticView">
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>
