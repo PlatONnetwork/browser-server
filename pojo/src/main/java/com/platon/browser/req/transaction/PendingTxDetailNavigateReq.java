@@ -1,17 +1,20 @@
 package com.platon.browser.req.transaction;
 
+import com.platon.browser.common.req.PageReq;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class TransactionDetailNavigateReq {
+@EqualsAndHashCode(callSuper = false)
+public class PendingTxDetailNavigateReq extends PageReq {
     @NotBlank(message = "链ID不能为空！")
     private String cid;
-    @NotBlank(message = "交易Hash不能为空！")
-    private String txHash;
+    @NotNull(message = "数据索引不能为空！")
+    private Integer index;
     @NotBlank(message = "浏览方向不能为空！")
     @Pattern(regexp = "prev|next", message = "方向取值不合法！")
     private String direction;

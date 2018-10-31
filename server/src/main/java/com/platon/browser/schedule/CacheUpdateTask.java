@@ -6,6 +6,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
@@ -155,7 +156,13 @@ public class CacheUpdateTask {
         // 获取最近3600区块
         StatisticTransactionViewExample statisticTransactionViewExample = new StatisticTransactionViewExample();
         List<StatisticTransactionView> statisticTransactionViews = statisticTransactionViewMapper.selectByExample(statisticTransactionViewExample);
-        statisticInfo.setBlockStatisticList(statisticTransactionViews);
+        List<StatisticItem> statisticList = new ArrayList<>();
+        statisticTransactionViews.forEach(statistic->{
+            StatisticItem bean = new StatisticItem();
+            BeanUtils.copyProperties(statistic,bean);
+            statisticList.add(bean);
+        });
+        statisticInfo.setBlockStatisticList(statisticList);
 
         cacheService.updateStatisticInfo(statisticInfo);
     }

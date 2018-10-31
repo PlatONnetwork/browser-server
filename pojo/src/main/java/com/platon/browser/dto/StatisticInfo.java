@@ -1,7 +1,5 @@
 package com.platon.browser.dto;
 
-import com.platon.browser.dao.entity.StatisticTransactionView;
-import com.platon.browser.dto.block.BlockStatistic;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -19,6 +17,6 @@ public class StatisticInfo {
 
     private int dayTransaction;
 
-    private List<StatisticTransactionView> blockStatisticList ;
+    private List<StatisticItem> blockStatisticList ;
 
 }

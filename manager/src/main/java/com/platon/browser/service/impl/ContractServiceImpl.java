@@ -3,7 +3,6 @@ package com.platon.browser.service.impl;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.account.ContractDetail;
-import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.ConTransactionItem;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.service.ContractService;
