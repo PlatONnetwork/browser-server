@@ -9,9 +9,9 @@
     <result column="miner" jdbcType="VARCHAR" property="miner" />
     <result column="extra_data" jdbcType="VARCHAR" property="extraData" />
     <result column="size" jdbcType="INTEGER" property="size" />
-    <result column="energon_used" jdbcType="INTEGER" property="energonUsed" />
-    <result column="energon_limit" jdbcType="INTEGER" property="energonLimit" />
-    <result column="energon_average" jdbcType="INTEGER" property="energonAverage" />
+    <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
+    <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
+    <result column="energon_average" jdbcType="VARCHAR" property="energonAverage" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
@@ -119,8 +119,8 @@
       )
     values (#{hash,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, #{parentHash,jdbcType=VARCHAR}, 
       #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, #{extraData,jdbcType=VARCHAR}, 
-      #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=INTEGER}, #{energonLimit,jdbcType=INTEGER}, 
-      #{energonAverage,jdbcType=INTEGER}, #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, 
+      #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, 
+      #{energonAverage,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, 
       #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -196,13 +196,13 @@
         #{size,jdbcType=INTEGER},
       </if>
       <if test="energonUsed != null">
-        #{energonUsed,jdbcType=INTEGER},
+        #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        #{energonLimit,jdbcType=INTEGER},
+        #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonAverage != null">
-        #{energonAverage,jdbcType=INTEGER},
+        #{energonAverage,jdbcType=VARCHAR},
       </if>
       <if test="timestamp != null">
         #{timestamp,jdbcType=TIMESTAMP},
@@ -252,13 +252,13 @@
         `size` = #{record.size,jdbcType=INTEGER},
       </if>
       <if test="record.energonUsed != null">
-        energon_used = #{record.energonUsed,jdbcType=INTEGER},
+        energon_used = #{record.energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="record.energonLimit != null">
-        energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+        energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="record.energonAverage != null">
-        energon_average = #{record.energonAverage,jdbcType=INTEGER},
+        energon_average = #{record.energonAverage,jdbcType=VARCHAR},
       </if>
       <if test="record.timestamp != null">
         `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
@@ -289,9 +289,9 @@
       miner = #{record.miner,jdbcType=VARCHAR},
       extra_data = #{record.extraData,jdbcType=VARCHAR},
       `size` = #{record.size,jdbcType=INTEGER},
-      energon_used = #{record.energonUsed,jdbcType=INTEGER},
-      energon_limit = #{record.energonLimit,jdbcType=INTEGER},
-      energon_average = #{record.energonAverage,jdbcType=INTEGER},
+      energon_used = #{record.energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
+      energon_average = #{record.energonAverage,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       block_reward = #{record.blockReward,jdbcType=VARCHAR},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
@@ -323,13 +323,13 @@
         `size` = #{size,jdbcType=INTEGER},
       </if>
       <if test="energonUsed != null">
-        energon_used = #{energonUsed,jdbcType=INTEGER},
+        energon_used = #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        energon_limit = #{energonLimit,jdbcType=INTEGER},
+        energon_limit = #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonAverage != null">
-        energon_average = #{energonAverage,jdbcType=INTEGER},
+        energon_average = #{energonAverage,jdbcType=VARCHAR},
       </if>
       <if test="timestamp != null">
         `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
@@ -357,9 +357,9 @@
       miner = #{miner,jdbcType=VARCHAR},
       extra_data = #{extraData,jdbcType=VARCHAR},
       `size` = #{size,jdbcType=INTEGER},
-      energon_used = #{energonUsed,jdbcType=INTEGER},
-      energon_limit = #{energonLimit,jdbcType=INTEGER},
-      energon_average = #{energonAverage,jdbcType=INTEGER},
+      energon_used = #{energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{energonLimit,jdbcType=VARCHAR},
+      energon_average = #{energonAverage,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       block_reward = #{blockReward,jdbcType=VARCHAR},
       chain_id = #{chainId,jdbcType=VARCHAR},

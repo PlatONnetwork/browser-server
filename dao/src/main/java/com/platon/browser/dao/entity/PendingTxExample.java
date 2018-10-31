@@ -325,52 +325,62 @@ public class PendingTxExample {
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedEqualTo(Integer value) {
+        public Criteria andEnergonUsedEqualTo(String value) {
             addCriterion("energon_used =", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedNotEqualTo(Integer value) {
+        public Criteria andEnergonUsedNotEqualTo(String value) {
             addCriterion("energon_used <>", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedGreaterThan(Integer value) {
+        public Criteria andEnergonUsedGreaterThan(String value) {
             addCriterion("energon_used >", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedGreaterThanOrEqualTo(Integer value) {
+        public Criteria andEnergonUsedGreaterThanOrEqualTo(String value) {
             addCriterion("energon_used >=", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedLessThan(Integer value) {
+        public Criteria andEnergonUsedLessThan(String value) {
             addCriterion("energon_used <", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedLessThanOrEqualTo(Integer value) {
+        public Criteria andEnergonUsedLessThanOrEqualTo(String value) {
             addCriterion("energon_used <=", value, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedIn(List<Integer> values) {
+        public Criteria andEnergonUsedLike(String value) {
+            addCriterion("energon_used like", value, "energonUsed");
+            return (Criteria) this;
+        }
+
+        public Criteria andEnergonUsedNotLike(String value) {
+            addCriterion("energon_used not like", value, "energonUsed");
+            return (Criteria) this;
+        }
+
+        public Criteria andEnergonUsedIn(List<String> values) {
             addCriterion("energon_used in", values, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedNotIn(List<Integer> values) {
+        public Criteria andEnergonUsedNotIn(List<String> values) {
             addCriterion("energon_used not in", values, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedBetween(Integer value1, Integer value2) {
+        public Criteria andEnergonUsedBetween(String value1, String value2) {
             addCriterion("energon_used between", value1, value2, "energonUsed");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonUsedNotBetween(Integer value1, Integer value2) {
+        public Criteria andEnergonUsedNotBetween(String value1, String value2) {
             addCriterion("energon_used not between", value1, value2, "energonUsed");
             return (Criteria) this;
         }
@@ -385,52 +395,62 @@ public class PendingTxExample {
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitEqualTo(Integer value) {
+        public Criteria andEnergonLimitEqualTo(String value) {
             addCriterion("energon_limit =", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitNotEqualTo(Integer value) {
+        public Criteria andEnergonLimitNotEqualTo(String value) {
             addCriterion("energon_limit <>", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitGreaterThan(Integer value) {
+        public Criteria andEnergonLimitGreaterThan(String value) {
             addCriterion("energon_limit >", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitGreaterThanOrEqualTo(Integer value) {
+        public Criteria andEnergonLimitGreaterThanOrEqualTo(String value) {
             addCriterion("energon_limit >=", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitLessThan(Integer value) {
+        public Criteria andEnergonLimitLessThan(String value) {
             addCriterion("energon_limit <", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitLessThanOrEqualTo(Integer value) {
+        public Criteria andEnergonLimitLessThanOrEqualTo(String value) {
             addCriterion("energon_limit <=", value, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitIn(List<Integer> values) {
+        public Criteria andEnergonLimitLike(String value) {
+            addCriterion("energon_limit like", value, "energonLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andEnergonLimitNotLike(String value) {
+            addCriterion("energon_limit not like", value, "energonLimit");
+            return (Criteria) this;
+        }
+
+        public Criteria andEnergonLimitIn(List<String> values) {
             addCriterion("energon_limit in", values, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitNotIn(List<Integer> values) {
+        public Criteria andEnergonLimitNotIn(List<String> values) {
             addCriterion("energon_limit not in", values, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitBetween(Integer value1, Integer value2) {
+        public Criteria andEnergonLimitBetween(String value1, String value2) {
             addCriterion("energon_limit between", value1, value2, "energonLimit");
             return (Criteria) this;
         }
 
-        public Criteria andEnergonLimitNotBetween(Integer value1, Integer value2) {
+        public Criteria andEnergonLimitNotBetween(String value1, String value2) {
             addCriterion("energon_limit not between", value1, value2, "energonLimit");
             return (Criteria) this;
         }
