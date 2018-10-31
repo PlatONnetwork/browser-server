@@ -35,7 +35,7 @@ public class CacheUpdateTask {
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
-    private AddressCountViewMapper addressCountViewMapper;
+    private AddressCountMapper addressCountMapper;
     @Autowired
     private AvgTransactionViewMapper avgTransactionViewMapper;
     @Autowired
@@ -73,6 +73,7 @@ public class CacheUpdateTask {
 
         // 取当前高度和出块节点
         BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo("1");
         blockExample.setOrderByClause("number desc");
         PageHelper.startPage(1,1);
         List<Block> blockList = blockMapper.selectByExample(blockExample);
@@ -87,19 +88,22 @@ public class CacheUpdateTask {
 
         // 取当前交易笔数
         TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo("1");
         long transactionCount = transactionMapper.countByExample(transactionExample);
         indexInfo.setCurrentTransaction(transactionCount);
 
 
         // 取共识节点数
         NodeExample nodeExample = new NodeExample();
-        nodeExample.createCriteria().andNodeTypeEqualTo(NodeType.CONSENSUS.code);
+        nodeExample.createCriteria().andChainIdEqualTo("1")
+                .andNodeTypeEqualTo(NodeType.CONSENSUS.code);
         long nodeCount = nodeMapper.countByExample(nodeExample);
         indexInfo.setConsensusNodeAmount(nodeCount);
 
         // 取地址数
-        AddressCountViewExample addressCountViewExample = new AddressCountViewExample();
-        long addressCount = addressCountViewMapper.countByExample(addressCountViewExample);
+        AddressCountParam param = new AddressCountParam();
+        param.setChainId("1");
+        long addressCount = addressCountMapper.countByParam(param);
         indexInfo.setAddressAmount(addressCount);
 
         // 未知如何获取相关数据，暂时设置为0 -- 2018/10/30
@@ -119,6 +123,7 @@ public class CacheUpdateTask {
 
         // 平均出块时长 = (最高块 - 第一个块)/最高块
         BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo("1");
         blockExample.setOrderByClause("number desc");
         PageHelper.startPage(1,1);
         List<Block> topList = blockMapper.selectByExample(blockExample);
