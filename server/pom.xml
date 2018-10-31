@@ -162,7 +162,6 @@
 					<target>1.8</target>
 					<compilerArguments>
 						<!-- 打包本地jar包 -->
-						<extdirs>${project.basedir}/../lib</extdirs>
 					</compilerArguments>
 				</configuration>
 			</plugin>

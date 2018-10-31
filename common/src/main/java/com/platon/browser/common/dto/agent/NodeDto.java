@@ -1,4 +1,4 @@
-package com.platon.browser.agent.dto;
+package com.platon.browser.common.dto.agent;
 
 
 /**

@@ -1,6 +1,5 @@
-package com.platon.browser.agent.dto;
+package com.platon.browser.common.dto.agent;
 
-import javax.xml.crypto.Data;
 import java.math.BigInteger;
 import java.util.List;
 

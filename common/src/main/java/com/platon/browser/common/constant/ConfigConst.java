@@ -1,6 +1,5 @@
 package com.platon.browser.common.constant;
 
-import com.platon.browser.common.constant.ConfigLoader;
 
 /**
  * User: dongqile
@@ -16,14 +15,14 @@ public class ConfigConst extends ConfigLoader{
     private static final String CHAIN_ID ="chain.id";
 
     public static String getNodeIp () {
-        return NODE_IP;
+        return getProperties().getProperty(NODE_IP);
     }
 
     public static String getNodeTypeKey () {
-        return NODE_TYPE_KEY;
+        return  getProperties().getProperty(NODE_TYPE_KEY);
     }
 
     public static String getChainId () {
-        return CHAIN_ID;
+        return getProperties().getProperty(CHAIN_ID);
     }
 }

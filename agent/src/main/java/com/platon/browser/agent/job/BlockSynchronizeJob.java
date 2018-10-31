@@ -2,11 +2,11 @@ package com.platon.browser.agent.job;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
-import com.platon.browser.agent.dto.BlockDto;
-import com.platon.browser.agent.dto.TransactionDto;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.client.Web3jClient;
 import com.platon.browser.common.constant.ConfigConst;
+import com.platon.browser.common.dto.agent.BlockDto;
+import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Block;
@@ -53,6 +53,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     @Autowired
     private MQSender mqSender;
+
+    private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
@@ -149,38 +151,38 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         //交易相关
         List <TransactionDto> transactionDtolist = new ArrayList <>();
         List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
-        for (EthBlock.TransactionResult transactionResult : list) {
-            EthTransaction ethTransaction = web3j.ethGetTransactionByHash(transactionResult.toString()).send();
-            Optional <Transaction> value = ethTransaction.getTransaction();
-            if (!value.isPresent()) {
-                throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
+            for (EthBlock.TransactionResult transactionResult : list) {
+                EthTransaction ethTransaction = web3j.ethGetTransactionByHash(transactionResult.toString()).send();
+                Optional <Transaction> value = ethTransaction.getTransaction();
+                if (!value.isPresent()) {
+                    throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
+                }
+                //todo:tx的gaslimit是gas
+                Transaction transaction = value.get();
+                TransactionDto transactionDto = new TransactionDto();
+                EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(transaction.getHash()).send();
+                Optional <TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+                if (!transactionReceipt.isPresent()) {
+                    throw new AppException(ErrorCodeEnum.TX_ERROR);
+                }
+                TransactionReceipt receipt = transactionReceipt.get();
+                transactionDto.setHash(transaction.getHash());
+                transactionDto.setBlockHash(transaction.getBlockHash());
+                transactionDto.setBlockNumber(transaction.getBlockNumber());
+                transactionDto.setEnergonPrice(transaction.getGasPrice());
+                transactionDto.setTransactionIndex(receipt.getTransactionIndex());
+                transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
+                transactionDto.setEnergonLimit(transaction.getGas());
+                transactionDto.setFrom(transaction.getFrom());
+                transactionDto.setTo(transaction.getTo());
+                transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+                transactionDto.setInput(transaction.getInput());
+                transactionDto.setTransactionIndex(transaction.getTransactionIndex());
+                transactionDto.setNonce(transaction.getNonce().toString());
+                transactionDto.setValue(transaction.getValue().toString());
+                transactionDto.setTxType("");
+                transactionDtolist.add(transactionDto);
             }
-            //todo:tx的gaslimit是gas
-            Transaction transaction = value.get();
-            TransactionDto transactionDto = new TransactionDto();
-            EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(transaction.getHash()).send();
-            Optional <TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
-            if (!transactionReceipt.isPresent()) {
-                throw new AppException(ErrorCodeEnum.TX_ERROR);
-            }
-            TransactionReceipt receipt = transactionReceipt.get();
-            transactionDto.setHash(transaction.getHash());
-            transactionDto.setBlockHash(transaction.getBlockHash());
-            transactionDto.setBlockNumber(transaction.getBlockNumber());
-            transactionDto.setEnergonPrice(transaction.getGasPrice());
-            transactionDto.setTransactionIndex(receipt.getTransactionIndex());
-            transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
-            transactionDto.setEnergonLimit(transaction.getGas());
-            transactionDto.setFrom(transaction.getFrom());
-            transactionDto.setTo(transaction.getTo());
-            transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
-            transactionDto.setInput(transaction.getInput());
-            transactionDto.setTransactionIndex(transaction.getTransactionIndex());
-            transactionDto.setNonce(transaction.getNonce().toString());
-            transactionDto.setValue(transaction.getValue().toString());
-            transactionDto.setTxType("");
-            transactionDtolist.add(transactionDto);
-        }
             BlockDto newBlock = new BlockDto();
             newBlock.setHash(ethBlock.getBlock().getHash());
             newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
