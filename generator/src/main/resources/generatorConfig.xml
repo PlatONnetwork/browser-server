@@ -40,19 +40,24 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>-->
 
-        <table tableName="block" domainObjectName="Block">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
+        <!--<table tableName="block" domainObjectName="Block">
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
         </table>
         <table tableName="node" domainObjectName="Node">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
         </table>
         <table tableName="pending_tx" domainObjectName="PendingTx">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
         </table>
         <table tableName="transaction" domainObjectName="Transaction">
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
+        </table>-->
+
+        <table tableName="block_statistic_view" domainObjectName="BlockStatisticView">
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>
