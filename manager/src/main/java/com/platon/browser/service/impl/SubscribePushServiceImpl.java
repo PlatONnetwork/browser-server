@@ -1,7 +1,6 @@
-package com.platon.browser.agent.service.impl;
+package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.agent.service.SubscribePushService;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.constant.MQConstant;
 import com.platon.browser.common.dto.mq.Message;
@@ -10,6 +9,7 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.service.SubscribePushService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.ExchangeTypes;
