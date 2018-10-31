@@ -1,8 +1,10 @@
 package com.platon.browser.common.constant;
 
+import java.util.Random;
+
 public class MQConstant {
     // 推送队列名称
-    public final static String PLATON_BROWSER_QUEUE_PUSH = "platon-browser-queue-push";
+    public final static String PLATON_BROWSER_QUEUE_PUSH = "platon-browser-queue-push-"+ (new Random()).nextInt(Integer.MAX_VALUE);
     // 持久化队列名称
     public final static String PLATON_BROWSER_QUEUE_PERSIST = "platon-browser-queue-persist";
     // 交换机名称
