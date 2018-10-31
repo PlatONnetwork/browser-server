@@ -1,4 +1,4 @@
-package com.platon.browser.service;
+package com.platon.browser.agent.service;
 
 /*
 * 
@@ -7,5 +7,5 @@ package com.platon.browser.service;
 * Time: 18:27
 */
 public interface BlockStorageService {
-    void receive(String msg);
+    void receive ( String msg );
 }
