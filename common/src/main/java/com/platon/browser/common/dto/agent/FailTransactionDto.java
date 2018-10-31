@@ -1,11 +1,11 @@
-package com.platon.browse.agent.dto;
+package com.platon.browser.common.dto.agent;
 
 /**
  * User: dongqile
  * Date: 2018/10/24
  * Time: 17:18
  */
-public class FailTransaction {
+public class FailTransactionDto {
 
     /**
      * 交易hash

@@ -1,10 +1,10 @@
 package com.platon.browser.common.constant;
 
-import com.platon.browser.common.util.PropertyConfigurer;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -17,12 +17,11 @@ public abstract class ConfigLoader {
 
     private  static Properties properties;
 
-    public static void loadConfigPath(String configPath){
+    public static void loadConfigPath(){
         properties = new Properties();
         InputStream in = null;
         try {
-            File file = new File(configPath);
-            in = new FileInputStream(file);
+            in = ConfigLoader.class.getClassLoader().getResourceAsStream("web3j.properties");
             properties.load(in);
         } catch (Exception e) {
             throw new IllegalArgumentException("load config failed, please check config path", e);
@@ -38,4 +37,5 @@ public abstract class ConfigLoader {
     public static Properties getProperties() {
         return properties;
     }
+
 }

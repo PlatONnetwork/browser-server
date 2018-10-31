@@ -1,5 +1,6 @@
-package com.platon.browse.agent.dto;
+package com.platon.browser.common.dto.agent;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * Date: 2018/10/24
  * Time: 16:22
  */
-public class Block {
+public class BlockDto {
 
     /**
      * 区块高度
@@ -17,7 +18,7 @@ public class Block {
     /**
      * 区块中交易列表
      */
-    private List<Transaction> transaction;
+    private List<TransactionDto> transaction;
 
     /**
      * 区块大小
@@ -32,17 +33,17 @@ public class Block {
     /**
      * 能量消耗
      */
-    private Integer energonUsed;
+    private BigInteger energonUsed;
 
     /**
      * 平均能量消耗
      */
-    private Integer energonAverage;
+    private BigInteger energonAverage;
 
     /**
      * 能量限制
      */
-    private Integer energonLimit;
+    private BigInteger energonLimit;
 
     /**
      * 区块奖励
@@ -69,6 +70,16 @@ public class Block {
      */
     private String nonce;
 
+    private long timestamp;
+
+    public long getTimestamp () {
+        return timestamp;
+    }
+
+    public void setTimestamp ( long timestamp ) {
+        this.timestamp = timestamp;
+    }
+
     public Integer getNumber () {
         return number;
     }
@@ -77,11 +88,11 @@ public class Block {
         this.number = number;
     }
 
-    public List <Transaction> getTransaction () {
+    public List <TransactionDto> getTransaction () {
         return transaction;
     }
 
-    public void setTransaction ( List <Transaction> transaction ) {
+    public void setTransaction ( List <TransactionDto> transaction ) {
         this.transaction = transaction;
     }
 
@@ -101,27 +112,27 @@ public class Block {
         this.hash = hash;
     }
 
-    public Integer getEnergonUsed () {
+    public BigInteger getEnergonUsed () {
         return energonUsed;
     }
 
-    public void setEnergonUsed ( Integer energonUsed ) {
+    public void setEnergonUsed ( BigInteger energonUsed ) {
         this.energonUsed = energonUsed;
     }
 
-    public Integer getEnergonAverage () {
+    public BigInteger getEnergonAverage () {
         return energonAverage;
     }
 
-    public void setEnergonAverage ( Integer energonAverage ) {
+    public void setEnergonAverage ( BigInteger energonAverage ) {
         this.energonAverage = energonAverage;
     }
 
-    public Integer getEnergonLimit () {
+    public BigInteger getEnergonLimit () {
         return energonLimit;
     }
 
-    public void setEnergonLimit ( Integer energonLimit ) {
+    public void setEnergonLimit ( BigInteger energonLimit ) {
         this.energonLimit = energonLimit;
     }
 

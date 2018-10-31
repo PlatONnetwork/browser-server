@@ -14,11 +14,24 @@
                    base-sleep-time-milliseconds="1000"
                    max-sleep-time-milliseconds="3000" max-retries="3"/>
 
-    <job:simple id="quoteJob" class="com.juzix.exchange.task.job.QuoteTickerJob" registry-center-ref="regCenter"
-                cron="0 0/1 * * * ?" sharding-total-count="1" sharding-item-parameters="0=kline" overwrite="true"
-                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情信息修补任务"/>
+    <job:simple id="blockSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.BlockSynchronizeJob" registry-center-ref="regCenter"
+                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=blockSynchronizeJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "同步区块信息任务"/>
 
-    <job:simple id="quoteImportDbJob" class="com.juzix.exchange.task.job.QuoteImportDbJob" registry-center-ref="regCenter"
-                cron="0 5 0 * * ?" sharding-total-count="1" sharding-item-parameters="0=quoteImportDb" overwrite="true"
-                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "行情数据入库"/>
+
+    <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
+                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易信息任务"/>
+
+
+    <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
+                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "区块数据入库任务"/>
+
+
+
+    <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
+                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易入库任务"/>
+
 </beans>

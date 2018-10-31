@@ -1,11 +1,13 @@
-package com.platon.browse.agent.dto;
+package com.platon.browser.common.dto.agent;
+
+import java.math.BigInteger;
 
 /**
  * User: dongqile
  * Date: 2018/10/24
  * Time: 16:11
  */
-public class Transaction {
+public class TransactionDto {
 
     /**
      * 交易hash
@@ -35,7 +37,7 @@ public class Transaction {
     /**
      * 区块高度
      */
-    private Integer blockNumber;
+    private BigInteger blockNumber;
 
     /**
      * 区块hash
@@ -45,23 +47,23 @@ public class Transaction {
     /**
      * 能量限制
      */
-    private Integer energonLimit;
+    private BigInteger energonLimit;
 
 
     /**
      * 能量消耗
      */
-    private Integer energonUsed;
+    private BigInteger energonUsed;
 
     /**
      * 能量价格
      */
-    private float energonPrice;
+    private BigInteger energonPrice;
 
     /**
      * 交易实际花费值(手续费)
      */
-    private float actualTxCoast;
+    private BigInteger actualTxCoast;
 
     /**
      * 交易类型
@@ -87,7 +89,7 @@ public class Transaction {
     /**
      * 交易在区块中位置
      */
-    private Integer transactionIndex;
+    private BigInteger transactionIndex;
 
     public String getHash () {
         return hash;
@@ -129,11 +131,11 @@ public class Transaction {
         this.value = value;
     }
 
-    public Integer getBlockNumber () {
+    public BigInteger getBlockNumber () {
         return blockNumber;
     }
 
-    public void setBlockNumber ( Integer blockNumber ) {
+    public void setBlockNumber ( BigInteger blockNumber ) {
         this.blockNumber = blockNumber;
     }
 
@@ -145,35 +147,35 @@ public class Transaction {
         this.blockHash = blockHash;
     }
 
-    public Integer getEnergonLimit () {
+    public BigInteger getEnergonLimit () {
         return energonLimit;
     }
 
-    public void setEnergonLimit ( Integer energonLimit ) {
+    public void setEnergonLimit ( BigInteger energonLimit ) {
         this.energonLimit = energonLimit;
     }
 
-    public Integer getEnergonUsed () {
+    public BigInteger getEnergonUsed () {
         return energonUsed;
     }
 
-    public void setEnergonUsed ( Integer energonUsed ) {
+    public void setEnergonUsed ( BigInteger energonUsed ) {
         this.energonUsed = energonUsed;
     }
 
-    public float getEnergonPrice () {
+    public BigInteger getEnergonPrice () {
         return energonPrice;
     }
 
-    public void setEnergonPrice ( float energonPrice ) {
+    public void setEnergonPrice ( BigInteger energonPrice ) {
         this.energonPrice = energonPrice;
     }
 
-    public float getActualTxCoast () {
+    public BigInteger getActualTxCoast () {
         return actualTxCoast;
     }
 
-    public void setActualTxCoast ( float actualTxCoast ) {
+    public void setActualTxCoast ( BigInteger actualTxCoast ) {
         this.actualTxCoast = actualTxCoast;
     }
 
@@ -201,11 +203,11 @@ public class Transaction {
         this.input = input;
     }
 
-    public Integer getTransactionIndex () {
+    public BigInteger getTransactionIndex () {
         return transactionIndex;
     }
 
-    public void setTransactionIndex ( Integer transactionIndex ) {
+    public void setTransactionIndex ( BigInteger transactionIndex ) {
         this.transactionIndex = transactionIndex;
     }
 }

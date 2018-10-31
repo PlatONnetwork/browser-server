@@ -1,6 +1,7 @@
 package com.platon.browser.common.client;
 
 import com.platon.browser.common.constant.ConfigConst;
+import com.platon.browser.common.constant.ConfigLoader;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -15,6 +16,7 @@ public class Web3jClient {
     private Web3jClient (){}
 
     static {
+        ConfigLoader.loadConfigPath();
         web3j = Web3j.build(new HttpService(ConfigConst.getNodeIp()));
     }
 

@@ -1,4 +1,4 @@
-package com.platon.browse.agent.dto;
+package com.platon.browser.common.dto.agent;
 
 
 /**
@@ -6,7 +6,7 @@ package com.platon.browse.agent.dto;
  * Date: 2018/10/24
  * Time: 17:11
  */
-public class Node {
+public class NodeDto {
 
     //TODO:数据收集DTO节点相关暂时定义以下，后期补充以底层为主
 
