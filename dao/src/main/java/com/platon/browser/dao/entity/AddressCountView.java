@@ -1,6 +1,6 @@
 package com.platon.browser.dao.entity;
 
-public class DistinctAddressView {
+public class AddressCountView {
     private String from;
 
     public String getFrom() {

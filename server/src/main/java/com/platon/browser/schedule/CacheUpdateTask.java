@@ -35,11 +35,11 @@ public class CacheUpdateTask {
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
-    private DistinctAddressViewMapper distinctAddressViewMapper;
+    private AddressCountViewMapper addressCountViewMapper;
     @Autowired
     private AvgTransactionViewMapper avgTransactionViewMapper;
     @Autowired
-    private StatisticTransactionViewMapper statisticTransactionViewMapper;
+    private TransactionStatisticViewMapper transactionStatisticViewMapper;
 
     @Autowired
     private CacheService cacheService;
@@ -98,8 +98,8 @@ public class CacheUpdateTask {
         indexInfo.setConsensusNodeAmount(nodeCount);
 
         // 取地址数
-        DistinctAddressViewExample distinctAddressViewExample = new DistinctAddressViewExample();
-        long addressCount = distinctAddressViewMapper.countByExample(distinctAddressViewExample);
+        AddressCountViewExample addressCountViewExample = new AddressCountViewExample();
+        long addressCount = addressCountViewMapper.countByExample(addressCountViewExample);
         indexInfo.setAddressAmount(addressCount);
 
         // 未知如何获取相关数据，暂时设置为0 -- 2018/10/30
@@ -154,10 +154,10 @@ public class CacheUpdateTask {
         statisticInfo.setAvgTransaction(avgTransactionView.getAvgtransaction());
 
         // 获取最近3600区块
-        StatisticTransactionViewExample statisticTransactionViewExample = new StatisticTransactionViewExample();
-        List<StatisticTransactionView> statisticTransactionViews = statisticTransactionViewMapper.selectByExample(statisticTransactionViewExample);
+        TransactionStatisticViewExample transactionStatisticViewExample = new TransactionStatisticViewExample();
+        List<TransactionStatisticView> transactionStatisticViews = transactionStatisticViewMapper.selectByExample(transactionStatisticViewExample);
         List<StatisticItem> statisticList = new ArrayList<>();
-        statisticTransactionViews.forEach(statistic->{
+        transactionStatisticViews.forEach(statistic->{
             StatisticItem bean = new StatisticItem();
             BeanUtils.copyProperties(statistic,bean);
             statisticList.add(bean);

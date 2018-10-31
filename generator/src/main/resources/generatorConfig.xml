@@ -57,10 +57,13 @@
                                 replaceString=""/>&ndash;&gt;
         </table>-->
 
-        <table tableName="statistic_transaction_view" domainObjectName="StatisticTransactionView">
+        <table tableName="transaction_statistic_view" domainObjectName="TransactionStatisticView">
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>
-
+        <table tableName="address_count_view" domainObjectName="AddressCountView">
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
+        </table>
     </context>
 </generatorConfiguration>

@@ -1,17 +1,16 @@
 package com.platon.browser.dao.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class StatisticTransactionViewExample {
+public class AddressCountViewExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public StatisticTransactionViewExample() {
+    public AddressCountViewExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -105,183 +104,73 @@ public class StatisticTransactionViewExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
-        public Criteria andHeightIsNull() {
-            addCriterion("height is null");
+        public Criteria andFromIsNull() {
+            addCriterion("`from` is null");
             return (Criteria) this;
         }
 
-        public Criteria andHeightIsNotNull() {
-            addCriterion("height is not null");
+        public Criteria andFromIsNotNull() {
+            addCriterion("`from` is not null");
             return (Criteria) this;
         }
 
-        public Criteria andHeightEqualTo(Long value) {
-            addCriterion("height =", value, "height");
+        public Criteria andFromEqualTo(String value) {
+            addCriterion("`from` =", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightNotEqualTo(Long value) {
-            addCriterion("height <>", value, "height");
+        public Criteria andFromNotEqualTo(String value) {
+            addCriterion("`from` <>", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightGreaterThan(Long value) {
-            addCriterion("height >", value, "height");
+        public Criteria andFromGreaterThan(String value) {
+            addCriterion("`from` >", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightGreaterThanOrEqualTo(Long value) {
-            addCriterion("height >=", value, "height");
+        public Criteria andFromGreaterThanOrEqualTo(String value) {
+            addCriterion("`from` >=", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightLessThan(Long value) {
-            addCriterion("height <", value, "height");
+        public Criteria andFromLessThan(String value) {
+            addCriterion("`from` <", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightLessThanOrEqualTo(Long value) {
-            addCriterion("height <=", value, "height");
+        public Criteria andFromLessThanOrEqualTo(String value) {
+            addCriterion("`from` <=", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightIn(List<Long> values) {
-            addCriterion("height in", values, "height");
+        public Criteria andFromLike(String value) {
+            addCriterion("`from` like", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightNotIn(List<Long> values) {
-            addCriterion("height not in", values, "height");
+        public Criteria andFromNotLike(String value) {
+            addCriterion("`from` not like", value, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightBetween(Long value1, Long value2) {
-            addCriterion("height between", value1, value2, "height");
+        public Criteria andFromIn(List<String> values) {
+            addCriterion("`from` in", values, "from");
             return (Criteria) this;
         }
 
-        public Criteria andHeightNotBetween(Long value1, Long value2) {
-            addCriterion("height not between", value1, value2, "height");
+        public Criteria andFromNotIn(List<String> values) {
+            addCriterion("`from` not in", values, "from");
             return (Criteria) this;
         }
 
-        public Criteria andTimeIsNull() {
-            addCriterion("`time` is null");
+        public Criteria andFromBetween(String value1, String value2) {
+            addCriterion("`from` between", value1, value2, "from");
             return (Criteria) this;
         }
 
-        public Criteria andTimeIsNotNull() {
-            addCriterion("`time` is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeEqualTo(Date value) {
-            addCriterion("`time` =", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeNotEqualTo(Date value) {
-            addCriterion("`time` <>", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeGreaterThan(Date value) {
-            addCriterion("`time` >", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("`time` >=", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeLessThan(Date value) {
-            addCriterion("`time` <", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeLessThanOrEqualTo(Date value) {
-            addCriterion("`time` <=", value, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeIn(List<Date> values) {
-            addCriterion("`time` in", values, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeNotIn(List<Date> values) {
-            addCriterion("`time` not in", values, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeBetween(Date value1, Date value2) {
-            addCriterion("`time` between", value1, value2, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTimeNotBetween(Date value1, Date value2) {
-            addCriterion("`time` not between", value1, value2, "time");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionIsNull() {
-            addCriterion("`transaction` is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionIsNotNull() {
-            addCriterion("`transaction` is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionEqualTo(Long value) {
-            addCriterion("`transaction` =", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionNotEqualTo(Long value) {
-            addCriterion("`transaction` <>", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionGreaterThan(Long value) {
-            addCriterion("`transaction` >", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionGreaterThanOrEqualTo(Long value) {
-            addCriterion("`transaction` >=", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionLessThan(Long value) {
-            addCriterion("`transaction` <", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionLessThanOrEqualTo(Long value) {
-            addCriterion("`transaction` <=", value, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionIn(List<Long> values) {
-            addCriterion("`transaction` in", values, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionNotIn(List<Long> values) {
-            addCriterion("`transaction` not in", values, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionBetween(Long value1, Long value2) {
-            addCriterion("`transaction` between", value1, value2, "transaction");
-            return (Criteria) this;
-        }
-
-        public Criteria andTransactionNotBetween(Long value1, Long value2) {
-            addCriterion("`transaction` not between", value1, value2, "transaction");
+        public Criteria andFromNotBetween(String value1, String value2) {
+            addCriterion("`from` not between", value1, value2, "from");
             return (Criteria) this;
         }
     }

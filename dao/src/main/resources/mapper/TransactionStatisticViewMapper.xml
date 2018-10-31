@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.dao.mapper.StatisticTransactionViewMapper">
-  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.StatisticTransactionView">
+<mapper namespace="com.platon.browser.dao.mapper.TransactionStatisticViewMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.TransactionStatisticView">
     <result column="height" jdbcType="BIGINT" property="height" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="transaction" jdbcType="BIGINT" property="transaction" />
@@ -67,13 +67,13 @@
   <sql id="Base_Column_List">
     height, `time`, `transaction`
   </sql>
-  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.StatisticTransactionViewExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TransactionStatisticViewExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from statistic_transaction_view
+    from transaction_statistic_view
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -81,20 +81,20 @@
       order by ${orderByClause}
     </if>
   </select>
-  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.StatisticTransactionViewExample">
-    delete from statistic_transaction_view
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TransactionStatisticViewExample">
+    delete from transaction_statistic_view
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.platon.browser.dao.entity.StatisticTransactionView">
-    insert into statistic_transaction_view (height, `time`, `transaction`
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.TransactionStatisticView">
+    insert into transaction_statistic_view (height, `time`, `transaction`
       )
     values (#{height,jdbcType=BIGINT}, #{time,jdbcType=TIMESTAMP}, #{transaction,jdbcType=BIGINT}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.StatisticTransactionView">
-    insert into statistic_transaction_view
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TransactionStatisticView">
+    insert into transaction_statistic_view
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="height != null">
         height,
@@ -118,14 +118,14 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.platon.browser.dao.entity.StatisticTransactionViewExample" resultType="java.lang.Long">
-    select count(*) from statistic_transaction_view
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.TransactionStatisticViewExample" resultType="java.lang.Long">
+    select count(*) from transaction_statistic_view
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update statistic_transaction_view
+    update transaction_statistic_view
     <set>
       <if test="record.height != null">
         height = #{record.height,jdbcType=BIGINT},
@@ -142,7 +142,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update statistic_transaction_view
+    update transaction_statistic_view
     set height = #{record.height,jdbcType=BIGINT},
       `time` = #{record.time,jdbcType=TIMESTAMP},
       `transaction` = #{record.transaction,jdbcType=BIGINT}

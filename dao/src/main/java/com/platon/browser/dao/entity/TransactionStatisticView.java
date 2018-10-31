@@ -2,7 +2,7 @@ package com.platon.browser.dao.entity;
 
 import java.util.Date;
 
-public class StatisticTransactionView {
+public class TransactionStatisticView {
     private Long height;
 
     private Date time;
