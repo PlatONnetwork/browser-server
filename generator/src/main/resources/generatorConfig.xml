@@ -4,11 +4,20 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry location="./lib/mysql-connector-java-5.1.47.jar"/>
-    <context id="my" targetRuntime="MyBatis3">
+    <context id="default" targetRuntime="MyBatis3">
         <property name="autoDelimitKeywords" value="true"/>
         <property name="beginningDelimiter" value="`"/>
         <property name="endingDelimiter" value="`"/>
+        <!-- 批量插入插件 -->
+        <plugin type="com.itfsw.mybatis.generator.plugins.BatchInsertPlugin">
+            <!--
+            开启后可以实现官方插件根据属性是否为空决定是否插入该字段功能
+            ！需开启allowMultiQueries=true多条sql提交操作，所以不建议使用！插件默认不开启
+            -->
+            <property name="allowMultiQueries" value="false"/>
+        </plugin>
+        <!-- 数据Model属性对应Column获取插件 -->
+        <plugin type="com.itfsw.mybatis.generator.plugins.ModelColumnPlugin"/>
         <commentGenerator>
             <property name="suppressDate" value="false"/>
             <property name="suppressAllComments" value="true"/>
@@ -40,26 +49,31 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>-->
 
-        <!--<table tableName="block" domainObjectName="Block">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
-        </table>
-        <table tableName="node" domainObjectName="Node">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
-        </table>
-        <table tableName="pending_tx" domainObjectName="PendingTx">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
-        </table>
-        <table tableName="transaction" domainObjectName="Transaction">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
-        </table>-->
-
-        <table tableName="block_statistic_view" domainObjectName="BlockStatisticView">
+        <table tableName="block" domainObjectName="Block">
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>
+        <table tableName="node" domainObjectName="Node">
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
+        </table>
+        <table tableName="pending_tx" domainObjectName="PendingTx">
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
+        </table>
+        <table tableName="transaction" domainObjectName="Transaction">
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
+        </table>
+
+        <!--<table tableName="address_count" domainObjectName="AddressCount"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false" enableInsert="false"
+               enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
+               enableUpdateByPrimaryKey="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
+        </table>-->
     </context>
 </generatorConfiguration>

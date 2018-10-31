@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.AddressCountMapper">
+  <select id="countByParam" parameterType="com.platon.browser.dao.entity.AddressCountParam" resultType="java.lang.Long">
+    SELECT COUNT(0) FROM (
+      SELECT DISTINCT tr.`chain_id`, tr.`from` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer' AND tr.`chain_id`=#{param.chainId} GROUP BY tr.`chain_id`,tr.`from`
+      UNION
+      SELECT DISTINCT tr.`chain_id`, tr.`to` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer' AND tr.`chain_id`=#{param.chainId} GROUP BY tr.`chain_id`,tr.`to`
+    ) tmp
+  </select>
+</mapper>
