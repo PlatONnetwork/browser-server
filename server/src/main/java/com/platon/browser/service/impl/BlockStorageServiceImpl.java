@@ -74,9 +74,9 @@ public class BlockStorageServiceImpl implements BlockStorageService{
                 block.setChainId(message.getChainId());
                 block.setHash(blockDto.getHash());
                 block.setBlockReward(blockDto.getBlockReward());
-                block.setEnergonAverage(blockDto.getEnergonAverage());//考虑下换成BigInteger
+/*                block.setEnergonAverage(blockDto.getEnergonAverage());//考虑下换成BigInteger
                 block.setEnergonLimit(blockDto.getEnergonLimit());//考虑下换成BigInteger
-                block.setEnergonUsed(blockDto.getEnergonUsed());//考虑下换成BigInteger
+                block.setEnergonUsed(blockDto.getEnergonUsed());//考虑下换成BigInteger*/
                 break;
 
             case PENDING:
