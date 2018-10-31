@@ -8,8 +8,8 @@
     <result column="from" jdbcType="VARCHAR" property="from" />
     <result column="to" jdbcType="VARCHAR" property="to" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
-    <result column="energon_used" jdbcType="INTEGER" property="energonUsed" />
-    <result column="energon_limit" jdbcType="INTEGER" property="energonLimit" />
+    <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
+    <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
     <result column="energon_price" jdbcType="VARCHAR" property="energonPrice" />
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="nonce" jdbcType="VARCHAR" property="nonce" />
@@ -149,7 +149,7 @@
       `input`, fail_reason)
     values (#{hash,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, #{blockHash,jdbcType=VARCHAR}, 
       #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
-      #{energonUsed,jdbcType=INTEGER}, #{energonLimit,jdbcType=INTEGER}, #{energonPrice,jdbcType=VARCHAR}, 
+      #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, #{energonPrice,jdbcType=VARCHAR}, 
       #{value,jdbcType=VARCHAR}, #{nonce,jdbcType=VARCHAR}, #{transactionIndex,jdbcType=INTEGER}, 
       #{txReceiptStatus,jdbcType=INTEGER}, #{actualTxCost,jdbcType=VARCHAR}, #{txType,jdbcType=VARCHAR}, 
       #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
@@ -239,10 +239,10 @@
         #{timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="energonUsed != null">
-        #{energonUsed,jdbcType=INTEGER},
+        #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        #{energonLimit,jdbcType=INTEGER},
+        #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonPrice != null">
         #{energonPrice,jdbcType=VARCHAR},
@@ -310,10 +310,10 @@
         `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="record.energonUsed != null">
-        energon_used = #{record.energonUsed,jdbcType=INTEGER},
+        energon_used = #{record.energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="record.energonLimit != null">
-        energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+        energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="record.energonPrice != null">
         energon_price = #{record.energonPrice,jdbcType=VARCHAR},
@@ -364,8 +364,8 @@
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
-      energon_used = #{record.energonUsed,jdbcType=INTEGER},
-      energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+      energon_used = #{record.energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
       nonce = #{record.nonce,jdbcType=VARCHAR},
@@ -390,8 +390,8 @@
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
-      energon_used = #{record.energonUsed,jdbcType=INTEGER},
-      energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+      energon_used = #{record.energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
       nonce = #{record.nonce,jdbcType=VARCHAR},
@@ -425,10 +425,10 @@
         `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       </if>
       <if test="energonUsed != null">
-        energon_used = #{energonUsed,jdbcType=INTEGER},
+        energon_used = #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        energon_limit = #{energonLimit,jdbcType=INTEGER},
+        energon_limit = #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonPrice != null">
         energon_price = #{energonPrice,jdbcType=VARCHAR},
@@ -476,8 +476,8 @@
       `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
-      energon_used = #{energonUsed,jdbcType=INTEGER},
-      energon_limit = #{energonLimit,jdbcType=INTEGER},
+      energon_used = #{energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{energonLimit,jdbcType=VARCHAR},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
       nonce = #{nonce,jdbcType=VARCHAR},
@@ -499,8 +499,8 @@
       `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
-      energon_used = #{energonUsed,jdbcType=INTEGER},
-      energon_limit = #{energonLimit,jdbcType=INTEGER},
+      energon_used = #{energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{energonLimit,jdbcType=VARCHAR},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
       nonce = #{nonce,jdbcType=VARCHAR},

@@ -5,8 +5,8 @@
     <id column="hash" jdbcType="VARCHAR" property="hash" />
     <result column="from" jdbcType="VARCHAR" property="from" />
     <result column="to" jdbcType="VARCHAR" property="to" />
-    <result column="energon_used" jdbcType="INTEGER" property="energonUsed" />
-    <result column="energon_limit" jdbcType="INTEGER" property="energonLimit" />
+    <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
+    <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
     <result column="energon_price" jdbcType="VARCHAR" property="energonPrice" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
@@ -138,7 +138,7 @@
       `value`, create_time, update_time, 
       `input`)
     values (#{hash,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, 
-      #{energonUsed,jdbcType=INTEGER}, #{energonLimit,jdbcType=INTEGER}, #{energonPrice,jdbcType=VARCHAR}, 
+      #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, #{energonPrice,jdbcType=VARCHAR}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{chainId,jdbcType=VARCHAR}, #{txType,jdbcType=VARCHAR}, 
       #{value,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{input,jdbcType=LONGVARCHAR})
@@ -197,10 +197,10 @@
         #{to,jdbcType=VARCHAR},
       </if>
       <if test="energonUsed != null">
-        #{energonUsed,jdbcType=INTEGER},
+        #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        #{energonLimit,jdbcType=INTEGER},
+        #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonPrice != null">
         #{energonPrice,jdbcType=VARCHAR},
@@ -247,10 +247,10 @@
         `to` = #{record.to,jdbcType=VARCHAR},
       </if>
       <if test="record.energonUsed != null">
-        energon_used = #{record.energonUsed,jdbcType=INTEGER},
+        energon_used = #{record.energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="record.energonLimit != null">
-        energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+        energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="record.energonPrice != null">
         energon_price = #{record.energonPrice,jdbcType=VARCHAR},
@@ -286,8 +286,8 @@
     set hash = #{record.hash,jdbcType=VARCHAR},
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
-      energon_used = #{record.energonUsed,jdbcType=INTEGER},
-      energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+      energon_used = #{record.energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
@@ -305,8 +305,8 @@
     set hash = #{record.hash,jdbcType=VARCHAR},
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
-      energon_used = #{record.energonUsed,jdbcType=INTEGER},
-      energon_limit = #{record.energonLimit,jdbcType=INTEGER},
+      energon_used = #{record.energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       energon_price = #{record.energonPrice,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
@@ -328,10 +328,10 @@
         `to` = #{to,jdbcType=VARCHAR},
       </if>
       <if test="energonUsed != null">
-        energon_used = #{energonUsed,jdbcType=INTEGER},
+        energon_used = #{energonUsed,jdbcType=VARCHAR},
       </if>
       <if test="energonLimit != null">
-        energon_limit = #{energonLimit,jdbcType=INTEGER},
+        energon_limit = #{energonLimit,jdbcType=VARCHAR},
       </if>
       <if test="energonPrice != null">
         energon_price = #{energonPrice,jdbcType=VARCHAR},
@@ -364,8 +364,8 @@
     update pending_tx
     set `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
-      energon_used = #{energonUsed,jdbcType=INTEGER},
-      energon_limit = #{energonLimit,jdbcType=INTEGER},
+      energon_used = #{energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{energonLimit,jdbcType=VARCHAR},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       chain_id = #{chainId,jdbcType=VARCHAR},
@@ -380,8 +380,8 @@
     update pending_tx
     set `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
-      energon_used = #{energonUsed,jdbcType=INTEGER},
-      energon_limit = #{energonLimit,jdbcType=INTEGER},
+      energon_used = #{energonUsed,jdbcType=VARCHAR},
+      energon_limit = #{energonLimit,jdbcType=VARCHAR},
       energon_price = #{energonPrice,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       chain_id = #{chainId,jdbcType=VARCHAR},

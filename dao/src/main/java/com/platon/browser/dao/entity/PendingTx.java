@@ -9,9 +9,9 @@ public class PendingTx {
 
     private String to;
 
-    private Integer energonUsed;
+    private String energonUsed;
 
-    private Integer energonLimit;
+    private String energonLimit;
 
     private String energonPrice;
 
@@ -53,20 +53,20 @@ public class PendingTx {
         this.to = to == null ? null : to.trim();
     }
 
-    public Integer getEnergonUsed() {
+    public String getEnergonUsed() {
         return energonUsed;
     }
 
-    public void setEnergonUsed(Integer energonUsed) {
-        this.energonUsed = energonUsed;
+    public void setEnergonUsed(String energonUsed) {
+        this.energonUsed = energonUsed == null ? null : energonUsed.trim();
     }
 
-    public Integer getEnergonLimit() {
+    public String getEnergonLimit() {
         return energonLimit;
     }
 
-    public void setEnergonLimit(Integer energonLimit) {
-        this.energonLimit = energonLimit;
+    public void setEnergonLimit(String energonLimit) {
+        this.energonLimit = energonLimit == null ? null : energonLimit.trim();
     }
 
     public String getEnergonPrice() {
