@@ -1,20 +1,18 @@
-package com.platon.browser.service.impl;
+package com.platon.browser.agent.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.agent.service.BlockStorageService;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.constant.MQConstant;
 import com.platon.browser.common.dto.agent.BlockDto;
+import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.block.BlockInfo;
-import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.service.BlockService;
-import com.platon.browser.service.BlockStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -26,7 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -34,7 +34,7 @@ import java.util.Date;
  * Time: 18:28
  */
 @Service
-public class BlockStorageServiceImpl implements BlockStorageService{
+public class BlockStorageServiceImpl implements BlockStorageService {
     private final Logger logger = LoggerFactory.getLogger(BlockStorageServiceImpl.class);
 
     @Autowired
@@ -63,6 +63,7 @@ public class BlockStorageServiceImpl implements BlockStorageService{
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockDto);
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+message.getChainId(), resp);
                 //构建dto结构，转存数据库结构
+                //区块相关block
                 Block block = new Block();
                 block.setNumber(Long.valueOf(blockDto.getNumber()));
                 block.setTimestamp(new Date(blockDto.getTimestamp()));
@@ -74,9 +75,39 @@ public class BlockStorageServiceImpl implements BlockStorageService{
                 block.setChainId(message.getChainId());
                 block.setHash(blockDto.getHash());
                 block.setBlockReward(blockDto.getBlockReward());
-/*                block.setEnergonAverage(blockDto.getEnergonAverage());//考虑下换成BigInteger
-                block.setEnergonLimit(blockDto.getEnergonLimit());//考虑下换成BigInteger
-                block.setEnergonUsed(blockDto.getEnergonUsed());//考虑下换成BigInteger*/
+                block.setEnergonAverage(blockDto.getEnergonAverage().toString());
+                block.setEnergonLimit(blockDto.getEnergonLimit().toString());
+                block.setEnergonUsed(blockDto.getEnergonUsed().toString());
+                block.setCreateTime(new Date());
+                block.setUpdateTime(new Date());
+                blockMapper.insert(block);
+
+                //交易相关transaction
+                List<Transaction> transactionList = new ArrayList <>();
+                List<TransactionDto> transactionDtos = blockDto.getTransaction();
+                for(TransactionDto transactionDto : transactionDtos){
+                    Transaction transaction = new Transaction();
+                    transaction.setBlockHash(transactionDto.getBlockHash());
+                    transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
+                    transaction.setBlockNumber(Long.valueOf(transactionDto.getBlockNumber().toString()));
+                    transaction.setChainId(message.getChainId());
+                    transaction.setCreateTime(new Date());
+                    transaction.setUpdateTime(new Date());
+                    transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
+                    transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
+                    transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
+                    transaction.setFrom(transactionDto.getFrom());
+                    transaction.setTo(transactionDto.getTo());
+                    transaction.setHash(transactionDto.getHash());
+                    transaction.setNonce(transactionDto.getNonce());
+                    transaction.setTimestamp(transaction.getTimestamp());
+                    transaction.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
+                    transaction.setTxReceiptStatus(transaction.getTxReceiptStatus());
+                    transaction.setTxType(transactionDto.getTxType());
+                    transaction.setValue(transactionDto.getValue());
+                    transactionList.add(transaction);
+                }
+                transactionMapper.insert(transactionList);
                 break;
 
             case PENDING:
