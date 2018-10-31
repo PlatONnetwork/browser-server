@@ -2,9 +2,6 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.PendingTx;
-import com.platon.browser.dao.entity.PendingTxExample;
-import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
