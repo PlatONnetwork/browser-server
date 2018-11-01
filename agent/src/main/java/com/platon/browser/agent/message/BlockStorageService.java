@@ -1,29 +1,20 @@
-package com.platon.browser.agent.service.impl;
+package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.agent.service.BlockStorageService;
-import com.platon.browser.common.base.BaseResp;
-import com.platon.browser.common.constant.MQConstant;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
-import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.ExchangeTypes;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,12 +25,9 @@ import java.util.List;
  * Date: 2018/10/30
  * Time: 18:28
  */
-@Service
-public class BlockStorageServiceImpl implements BlockStorageService {
-    private final Logger logger = LoggerFactory.getLogger(BlockStorageServiceImpl.class);
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+@Component
+public class BlockStorageService {
+    private final Logger logger = LoggerFactory.getLogger(BlockStorageService.class);
 
     @Autowired
     private BlockMapper blockMapper;
@@ -47,14 +35,9 @@ public class BlockStorageServiceImpl implements BlockStorageService {
     @Autowired
     private TransactionMapper transactionMapper;
 
-    @Override
-    @RabbitListener(containerFactory = "rabbitListenerContainerFactory",
-            bindings = @QueueBinding(
-                    value = @Queue(value = MQConstant.PLATON_BROWSER_QUEUE_PERSIST, durable = "true", autoDelete="true"),
-                    exchange = @Exchange(value = MQConstant.PLATON_BROWSER_EXCHANGE, type = ExchangeTypes.TOPIC),
-                    key = MQConstant.PLATON_BROWSER_BIND_KEY)
-    )
+    @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
+        logger.info(msg);
         Message message = JSON.parseObject(msg,Message.class);
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case BLOCK:
