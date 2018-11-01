@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 从数据库定时加载最新数据更新缓存
  */
-@Component
+//@Component
 public class CacheUpdateTask {
 
     @Autowired
