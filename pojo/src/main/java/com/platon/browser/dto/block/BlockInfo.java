@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BlockInfo {
-    private int height;
+    private long height;
 
     private long timestamp;
 
@@ -14,5 +14,5 @@ public class BlockInfo {
 
     private int transaction;
 
-    private double blockReward;
+    private String blockReward;
 }

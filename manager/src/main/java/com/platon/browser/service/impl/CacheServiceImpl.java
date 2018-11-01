@@ -5,6 +5,7 @@ import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.LimitQueue;
 import org.slf4j.Logger;
@@ -12,10 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 缓存服务
@@ -26,126 +25,97 @@ public class CacheServiceImpl implements CacheService {
 
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
-    private ReentrantReadWriteLock nodeInfoListLock = new ReentrantReadWriteLock();
-    private List<NodeInfo> nodeInfoList = new ArrayList<>();
+    private Map<ChainEnum,List<NodeInfo>> nodeInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,IndexInfo> indexInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,StatisticInfo> statisticInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,LimitQueue<BlockInfo>> blockInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,LimitQueue<TransactionInfo>> transactionInfoMap = new ConcurrentHashMap<>();
 
-    private ReentrantReadWriteLock indexInfoLock = new ReentrantReadWriteLock();
-    private IndexInfo indexInfo = new IndexInfo();
-
-    private ReentrantReadWriteLock statisticInfoLock = new ReentrantReadWriteLock();
-    private StatisticInfo statisticInfo = new StatisticInfo();
-
-    private ReentrantReadWriteLock blockInfoListLock = new ReentrantReadWriteLock();
-    private LimitQueue<BlockInfo> blockInfoList = new LimitQueue<>(10);
-
-    private ReentrantReadWriteLock transactionInfoListLock = new ReentrantReadWriteLock();
-    private LimitQueue<TransactionInfo> transactionInfoList = new LimitQueue<>(10);
-
-    @Override
-    public List<NodeInfo> getNodeInfoList() {
-        nodeInfoListLock.readLock().lock();
-        try{
-            return Collections.unmodifiableList(nodeInfoList);
-        }finally {
-            nodeInfoListLock.readLock().unlock();
-        }
+    public CacheServiceImpl(){
+        Arrays.asList(ChainEnum.values()).forEach(chainId -> {
+            nodeInfoMap.put(chainId,new ArrayList<>());
+            indexInfoMap.put(chainId,new IndexInfo());
+            statisticInfoMap.put(chainId,new StatisticInfo());
+            blockInfoMap.put(chainId,new LimitQueue<>(10));
+            transactionInfoMap.put(chainId,new LimitQueue<>(10));
+        });
     }
 
     @Override
-    public void updateNodeInfoList(boolean override, List<NodeInfo> nodeInfos) {
-        nodeInfoListLock.writeLock().lock();
-        try{
+    public List<NodeInfo> getNodeInfoList(ChainEnum chainId) {
+        return Collections.unmodifiableList(nodeInfoMap.get(chainId));
+    }
+
+    @Override
+    public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, ChainEnum chainId) {
+        logger.debug("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
+        synchronized (chainId){
+            List<NodeInfo> nodeInfoList = nodeInfoMap.get(chainId);
             if(override){
-                nodeInfoList.clear();
+                nodeInfoMap.put(chainId,nodeInfos);
             }
             nodeInfoList.addAll(nodeInfos);
-        }finally {
-            nodeInfoListLock.writeLock().unlock();
-        }
-
-    }
-
-    @Override
-    public IndexInfo getIndexInfo() {
-        indexInfoLock.readLock().lock();
-        try{
-            IndexInfo copy = new IndexInfo();
-            BeanUtils.copyProperties(indexInfo,copy);
-            return copy;
-        }finally {
-            indexInfoLock.readLock().unlock();
         }
     }
 
     @Override
-    public void updateIndexInfo(IndexInfo indexInfo) {
-        indexInfoLock.writeLock().lock();
-        try{
-            BeanUtils.copyProperties(indexInfo,this.indexInfo);
-        }finally {
-            indexInfoLock.writeLock().unlock();
+    public IndexInfo getIndexInfo(ChainEnum chainId) {
+        return indexInfoMap.get(chainId);
+    }
+
+    @Override
+    public void updateIndexInfo(IndexInfo indexInfo, ChainEnum chainId) {
+        logger.debug("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
+        synchronized (chainId){
+            IndexInfo cache = indexInfoMap.get(chainId);
+            BeanUtils.copyProperties(indexInfo,cache);
         }
     }
 
     @Override
-    public StatisticInfo getStatisticInfo() {
-        statisticInfoLock.readLock().lock();
-        try{
-            StatisticInfo copy = new StatisticInfo();
-            BeanUtils.copyProperties(statisticInfo,copy);
-            return copy;
-        }finally {
-            statisticInfoLock.readLock().unlock();
+    public StatisticInfo getStatisticInfo(ChainEnum chainId) {
+        StatisticInfo cache = statisticInfoMap.get(chainId);
+        StatisticInfo copy = new StatisticInfo();
+        BeanUtils.copyProperties(cache,copy);
+        return copy;
+    }
+
+    @Override
+    public void updateStatisticInfo(StatisticInfo statisticInfo, ChainEnum chainId) {
+        logger.debug("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
+        synchronized (chainId){
+            StatisticInfo cache = statisticInfoMap.get(chainId);
+            BeanUtils.copyProperties(statisticInfo,cache);
         }
     }
 
     @Override
-    public void updateStatisticInfo(StatisticInfo statisticInfo) {
-        statisticInfoLock.writeLock().lock();
-        try{
-            BeanUtils.copyProperties(statisticInfo,this.statisticInfo);
-        }finally {
-            statisticInfoLock.writeLock().unlock();
+    public List<BlockInfo> getBlockInfoList(ChainEnum chainId) {
+        LimitQueue<BlockInfo> limitQueue = blockInfoMap.get(chainId);
+        return Collections.unmodifiableList(limitQueue.elements());
+    }
+
+    @Override
+    public void updateBlockInfoList(List<BlockInfo> blockInfos, ChainEnum chainId) {
+        logger.debug("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
+        synchronized (chainId){
+            LimitQueue<BlockInfo> limitQueue = blockInfoMap.get(chainId);
+            blockInfos.forEach(e->limitQueue.offer(e));
         }
     }
 
     @Override
-    public List<BlockInfo> getBlockInfoList() {
-        blockInfoListLock.readLock().lock();
-        try{
-            return blockInfoList.elements();
-        }finally {
-            blockInfoListLock.readLock().unlock();
-        }
+    public List<TransactionInfo> getTransactionInfoList(ChainEnum chainId) {
+        LimitQueue<TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
+        return Collections.unmodifiableList(limitQueue.elements());
     }
 
     @Override
-    public void updateBlockInfoList(List<BlockInfo> blockInfos) {
-        blockInfoListLock.writeLock().lock();
-        try{
-            blockInfos.forEach(e->blockInfoList.offer(e));
-        }finally {
-            blockInfoListLock.writeLock().unlock();
-        }
-    }
-
-    @Override
-    public List<TransactionInfo> getTransactionInfoList() {
-        transactionInfoListLock.readLock().lock();
-        try{
-            return transactionInfoList.elements();
-        }finally {
-            transactionInfoListLock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos) {
-        transactionInfoListLock.writeLock().lock();
-        try{
-            transactionInfos.forEach(e->transactionInfoList.offer(e));
-        }finally {
-            transactionInfoListLock.writeLock().unlock();
+    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId) {
+        logger.debug("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
+        synchronized (chainId){
+            LimitQueue<TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
+            transactionInfos.forEach(e->limitQueue.offer(e));
         }
     }
 }

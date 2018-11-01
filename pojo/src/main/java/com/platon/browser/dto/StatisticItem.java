@@ -9,6 +9,6 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 public class StatisticItem {
     private Long height;
-    private Date time;
+    private Long time;
     private Long transaction;
 }
