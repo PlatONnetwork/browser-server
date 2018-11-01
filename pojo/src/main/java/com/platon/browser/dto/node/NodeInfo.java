@@ -7,8 +7,8 @@ import lombok.Data;
  */
 @Data
 public class NodeInfo {
-    private String longitude;
-    private String latitude;
+    private float longitude;
+    private float latitude;
     private int nodeType;
     private int netState;
 }

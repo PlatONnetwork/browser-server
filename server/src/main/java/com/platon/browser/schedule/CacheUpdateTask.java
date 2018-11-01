@@ -62,8 +62,8 @@ public class CacheUpdateTask {
                 NodeInfo bean = new NodeInfo();
                 BeanUtils.copyProperties(node,bean);
                 Location location = GeoUtil.getLocation(node.getIp());
-                bean.setLongitude(String.valueOf(location.longitude));
-                bean.setLatitude(String.valueOf(location.latitude));
+                bean.setLongitude(location.longitude);
+                bean.setLatitude(location.latitude);
                 nodeInfoList.add(bean);
             });
             cacheService.updateNodeInfoList(nodeInfoList,true,chainEnum);
