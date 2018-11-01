@@ -10,9 +10,9 @@ public class TransactionInfo {
 
     private String to;
 
-    private double value;
+    private String value;
 
-    private int blockHeight;
+    private long blockHeight;
 
     private int transactionIndex;
 

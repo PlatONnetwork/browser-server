@@ -1,4 +1,4 @@
-CREATE VIEW address_count_view AS
-SELECT DISTINCT tr.`from` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer'
+CREATE VIEW address_count_view AS;
+SELECT DISTINCT tr.`chain_id`, tr.`from` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer' GROUP BY tr.`chain_id`,tr.`from`
 UNION
-SELECT DISTINCT tr.`to` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer'
+SELECT DISTINCT tr.`chain_id`, tr.`to` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer' GROUP BY tr.`chain_id`,tr.`to`

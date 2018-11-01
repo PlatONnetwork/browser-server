@@ -12,6 +12,7 @@ import com.platon.browser.dto.block.BlockStatistic;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.service.NodeService;
 import org.slf4j.Logger;
@@ -73,7 +74,7 @@ public class HomeController {
     public BaseResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList();
+        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
         return resp;
     }
@@ -123,7 +124,7 @@ public class HomeController {
     public BaseResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取节点初始化列表数据！");
-        IndexInfo indexInfo = cacheService.getIndexInfo();
+        IndexInfo indexInfo = cacheService.getIndexInfo(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
         return resp;
     }
@@ -191,7 +192,7 @@ public class HomeController {
     public BaseResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        StatisticInfo statistic = cacheService.getStatisticInfo();
+        StatisticInfo statistic = cacheService.getStatisticInfo(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         return resp;
     }
@@ -208,10 +209,10 @@ public class HomeController {
      */
     @Scheduled(fixedRate = 1000)
     public void statisticSubscribe() throws Exception {
-        StatisticInfo statistic = cacheService.getStatisticInfo();
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
+        //StatisticInfo statistic = cacheService.getStatisticInfo(ChainEnum.getEnum(chainId));
+        //BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, resp);
+        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, cid);
     }
 
 
@@ -246,7 +247,7 @@ public class HomeController {
     public BaseResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<BlockInfo> blockInfos = cacheService.getBlockInfoList();
+        List<BlockInfo> blockInfos = cacheService.getBlockInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
         return resp;
     }
@@ -295,7 +296,7 @@ public class HomeController {
     public BaseResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
         Object headers = headerAccessor.getHeader("nativeHeaders");
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList();
+        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
         return resp;
     }

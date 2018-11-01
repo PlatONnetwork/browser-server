@@ -3,11 +3,9 @@ package com.platon.browser.dao.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AddressCountParam {
+public class TpsCountParam {
     private String chainId;
-    private List<String> txTypes;
+    private int minute;
 }

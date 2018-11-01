@@ -9,13 +9,13 @@ import java.util.List;
 public class StatisticInfo {
     private long avgTime;
 
-    private int current;
+    private long current;
 
-    private int maxTps;
+    private double maxTps;
 
     private BigDecimal avgTransaction;
 
-    private int dayTransaction;
+    private long dayTransaction;
 
     private List<StatisticItem> blockStatisticList ;
 
