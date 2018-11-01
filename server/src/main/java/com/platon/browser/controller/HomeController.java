@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -352,7 +353,7 @@ public class HomeController {
 
 
     @PostMapping("/home/query")
-    public BaseResp search(@RequestBody SearchParam param){
+    public BaseResp search(@Valid @RequestBody SearchParam param){
         logger.debug(JSON.toJSONString(param));
         SearchResult<NodeDetail> searchResult = new SearchResult<>();
         searchResult.setType("block");
