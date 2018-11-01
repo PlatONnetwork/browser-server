@@ -29,13 +29,13 @@ public interface CacheService {
      * 指标信息
      */
     IndexInfo getIndexInfo(ChainEnum chainId);
-    void updateIndexInfo(IndexInfo indexInfo, ChainEnum chainId);
+    void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId);
 
     /**
      * 交易统计信息
      */
     StatisticInfo getStatisticInfo(ChainEnum chainId);
-    void updateStatisticInfo(StatisticInfo statisticInfo, ChainEnum chainId);
+    void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId);
 
     /**
      * 区块列表信息

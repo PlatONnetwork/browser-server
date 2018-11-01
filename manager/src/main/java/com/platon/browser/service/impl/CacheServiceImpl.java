@@ -2,17 +2,20 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.LimitQueue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,11 +67,23 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void updateIndexInfo(IndexInfo indexInfo, ChainEnum chainId) {
+    public void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId) {
         logger.debug("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             IndexInfo cache = indexInfoMap.get(chainId);
-            BeanUtils.copyProperties(indexInfo,cache);
+            if(override){
+                BeanUtils.copyProperties(indexInfo,cache);
+            }else{
+                if(StringUtils.isNotBlank(indexInfo.getNode())){
+                    cache.setNode(indexInfo.getNode());
+                }
+                if(indexInfo.getCurrentHeight()!=0){
+                    cache.setCurrentHeight(indexInfo.getCurrentHeight());
+                }
+                if(indexInfo.getConsensusNodeAmount()!=0){
+                    cache.setConsensusNodeAmount(cache.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                }
+            }
         }
     }
 
@@ -81,11 +96,44 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void updateStatisticInfo(StatisticInfo statisticInfo, ChainEnum chainId) {
+    public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId) {
         logger.debug("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             StatisticInfo cache = statisticInfoMap.get(chainId);
-            BeanUtils.copyProperties(statisticInfo,cache);
+            if(override){
+                BeanUtils.copyProperties(statisticInfo,cache);
+            }else{
+                if(statisticInfo.getBlockCount()!=0){
+                    cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
+                }
+                if(statisticInfo.getTransactionCount()!=0){
+                    cache.setCurrent(cache.getCurrent()+statisticInfo.getCurrent());
+                    cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
+                }
+                if(statisticInfo.getBlockCount()!=0||statisticInfo.getTransactionCount()!=0){
+                    cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
+                }
+                if(statisticInfo.getHighestBlockNumber()!=0){
+                    cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
+                    cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
+                }
+                if(statisticInfo.getDayTransaction()!=0){
+                    cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
+                }
+                if(statisticInfo.getBlockStatisticList()!=null){
+                    Map<Long, StatisticItem> map = new HashMap<>();
+                    List<StatisticItem> cacheStatisticItemList = cache.getBlockStatisticList();
+                    cacheStatisticItemList.forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
+                        StatisticItem item = map.get(statisticItem.getHeight());
+                        if(item==null){
+                            cacheStatisticItemList.add(statisticItem);
+                        }else{
+                            item.setTransaction(item.getTransaction()+statisticItem.getTransaction());
+                        }
+                    });
+                }
+            }
         }
     }
 

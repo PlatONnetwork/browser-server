@@ -140,21 +140,6 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-    @Scheduled(fixedRate = 1000)
-    public void indexSubscribe() throws Exception {
-        IndexInfo index = new IndexInfo();
-        index.setAddressAmount(3);
-        index.setConsensusNodeAmount(33);
-        index.setCurrentHeight(333);
-        index.setCurrentTransaction(333);
-        index.setNode("node-1");
-        index.setProportion(66);
-        index.setTicketPrice(449);
-        index.setVoteAmount(333);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
-        String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/index/new?cid="+cid, resp);
-    }
 
 
     /**
@@ -207,14 +192,6 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-    @Scheduled(fixedRate = 1000)
-    public void statisticSubscribe() throws Exception {
-        //StatisticInfo statistic = cacheService.getStatisticInfo(ChainEnum.getEnum(chainId));
-        //BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
-        String cid = "666"; // 链的标识，需要从订阅的消息中获取
-        messagingTemplate.convertAndSend("/topic/statistic/new?cid="+cid, cid);
-    }
-
 
 
     /**

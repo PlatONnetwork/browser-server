@@ -10,6 +10,7 @@ import java.util.List;
 public interface StatisticMapper {
     List<HomeBlock> blockList(@Param("chainId") String chainId);
     long countAddress(@Param("chainId") String chainId);
+    long countTransactionBlock(@Param("chainId") String chainId);
     long countTransactionIn24Hours(@Param("chainId") String chainId);
     long countTransactionInXMinute(@Param("param")TpsCountParam param);
     BigDecimal countAvgTransactionPerBlock(@Param("chainId") String chainId);
