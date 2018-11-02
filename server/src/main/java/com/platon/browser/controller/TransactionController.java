@@ -430,6 +430,17 @@ public class TransactionController {
         }
     }
 
+    private void download(HttpServletResponse response, String filename,long length, byte [] data){
+        response.setHeader("Content-Disposition", "attachment; filename="+filename);
+        response.setContentType("application/octet-stream");
+        response.setContentLengthLong(length);
+        try {
+            response.getOutputStream().write(data);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new ResponseException("下载数据异常！");
+        }
+    }
     /**
      * @api {post} transaction/addressDownload h.导出地址详情
      * @apiVersion 1.0.0
@@ -450,15 +461,7 @@ public class TransactionController {
     @PostMapping("addressDownload")
     public void addressDownload(@Valid @RequestBody AccountDownloadReq req, HttpServletResponse response) {
         AccountDowload accountDowload = exportService.exportAccountCsv(req);
-        response.setHeader("Content-Disposition", "attachment; filename="+accountDowload.getFilename());
-        response.setContentType("application/octet-stream");
-        response.setContentLengthLong(accountDowload.getLength());
-        try {
-            response.getOutputStream().write(accountDowload.getData());
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            throw new ResponseException("下载数据异常！");
-        }
+        download(response,accountDowload.getFilename(),accountDowload.getLength(),accountDowload.getData());
     }
 
     /**
@@ -524,7 +527,6 @@ public class TransactionController {
         }
     }
 
-
     /**
      * @api {post} transaction/contractDownload j.导出合约详情
      * @apiVersion 1.0.0
@@ -545,15 +547,7 @@ public class TransactionController {
     @PostMapping("contractDownload")
     public void contractDownload(@Valid @RequestBody ContractDownloadReq req, HttpServletResponse response) {
         ContractDowload contractDowload = exportService.exportContractCsv(req);
-        response.setHeader("Content-Disposition", "attachment; filename="+contractDowload.getFilename());
-        response.setContentType("application/octet-stream");
-        response.setContentLengthLong(contractDowload.getLength());
-        try {
-            response.getOutputStream().write(contractDowload.getData());
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            throw new ResponseException("下载数据异常！");
-        }
+        download(response,contractDowload.getFilename(),contractDowload.getLength(),contractDowload.getData());
     }
 
     /**
