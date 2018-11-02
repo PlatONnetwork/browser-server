@@ -81,6 +81,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         BeanUtils.copyProperties(transaction,transactionDetail);
         transactionDetail.setTxHash(transaction.getHash());
         transactionDetail.setInputData(transaction.getInput());
+        transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
         return transactionDetail;
     }
 

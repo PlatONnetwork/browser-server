@@ -13,8 +13,8 @@ public class TransactionDetail {
     private String txType;
     private String value;
     private String actualTxCost;
-    private int energonLimit;
-    private int energonUsed;
+    private String energonLimit;
+    private String energonUsed;
     private String energonPrice;
     private String inputData;
     private long expectTime;
