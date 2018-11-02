@@ -51,7 +51,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, ChainEnum chainId) {
-        logger.debug("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
+        logger.info("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             List<NodeInfo> nodeInfoList = nodeInfoMap.get(chainId);
             if(override){
@@ -68,7 +68,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId) {
-        logger.debug("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
+        logger.info("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             IndexInfo cache = indexInfoMap.get(chainId);
             if(override){
@@ -97,7 +97,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId) {
-        logger.debug("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
+        logger.info("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             StatisticInfo cache = statisticInfoMap.get(chainId);
             if(override){
@@ -145,7 +145,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateBlockInfoList(List<BlockInfo> blockInfos, ChainEnum chainId) {
-        logger.debug("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
+        logger.info("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             LimitQueue<BlockInfo> limitQueue = blockInfoMap.get(chainId);
             blockInfos.forEach(e->limitQueue.offer(e));
@@ -160,7 +160,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId) {
-        logger.debug("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
+        logger.info("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
         synchronized (chainId){
             LimitQueue<TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
             transactionInfos.forEach(e->limitQueue.offer(e));

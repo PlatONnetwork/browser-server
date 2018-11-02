@@ -55,7 +55,11 @@ public class SubscribePushService {
                 Location location = GeoUtil.getLocation(nodeDto.getIp());
                 nodeInfo.setLatitude(location.latitude);
                 nodeInfo.setLongitude(location.longitude);
-
+                // 更新节点缓存信息
+                List<NodeInfo> nodeInfoList = new ArrayList<>();
+                nodeInfoList.add(nodeInfo);
+                cacheService.updateNodeInfoList(nodeInfoList,false,chainId);
+                // 推送新节点信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfo);
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId.code, resp);
                 break;
@@ -71,7 +75,11 @@ public class SubscribePushService {
                 blockInfo.setHeight(blockDto.getNumber());
                 blockInfo.setBlockReward(blockDto.getBlockReward());
                 blockInfo.setTransaction(blockDto.getTransaction().size());
-
+                // 更新区块缓存
+                List<BlockInfo> blockInfoList = new ArrayList<>();
+                blockInfoList.add(blockInfo);
+                cacheService.updateBlockInfoList(blockInfoList,chainId);
+                // 推送新区块信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfo);
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId.code, resp);
 
@@ -79,7 +87,9 @@ public class SubscribePushService {
                 IndexInfo indexInfo = new IndexInfo();
                 indexInfo.setCurrentHeight(blockInfo.getHeight());
                 indexInfo.setCurrentTransaction(blockDto.getTransaction().size());
+                // 更新指标缓存信息
                 cacheService.updateIndexInfo(indexInfo,false, chainId);
+                // 推送整体指标信息
                 indexInfo = cacheService.getIndexInfo(chainId);
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId.code, resp);
@@ -99,6 +109,9 @@ public class SubscribePushService {
                     bean.setValue(transactionDto.getValue());
                     transactionInfos.add(bean);
                 });
+                // 更新交易缓存信息
+                cacheService.updateTransactionInfoList(transactionInfos,chainId);
+                // 推送新的交易信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
                 messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId.code, resp);
 
@@ -109,7 +122,6 @@ public class SubscribePushService {
                 statisticInfo.setTransactionCount(transactionInfos.size());
                 statisticInfo.setCurrent(transactionDtos.size());
                 statisticInfo.setDayTransaction(transactionInfos.size());
-
                 List<StatisticItem> statisticItems = new ArrayList<>();
                 StatisticItem statisticItem = new StatisticItem();
                 statisticItem.setHeight(blockInfo.getHeight());
@@ -117,10 +129,10 @@ public class SubscribePushService {
                 statisticItem.setTransaction(Long.valueOf(transactionInfos.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
+                // 更新统计缓存信息
                 cacheService.updateStatisticInfo(statisticInfo,false,chainId);
-
+                // 推送整体统计信息
                 statisticInfo = cacheService.getStatisticInfo(chainId);
-
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId.code, resp);
                 break;
