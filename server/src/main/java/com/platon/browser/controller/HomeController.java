@@ -42,10 +42,6 @@ public class HomeController {
 
     @Autowired
     private CacheService cacheService;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
@@ -71,8 +67,7 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/node/init?cid={chainId}")
-    public BaseResp nodeInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
-        Object headers = headerAccessor.getHeader("nativeHeaders");
+    public BaseResp nodeInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
         List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
@@ -121,14 +116,12 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/index/init?cid={chainId}")
-    public BaseResp indexInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
-        Object headers = headerAccessor.getHeader("nativeHeaders");
+    public BaseResp indexInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
         IndexInfo indexInfo = cacheService.getIndexInfo(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
         return resp;
     }
-
 
     /**
      * @api {subscribe} /topic/index/new?cid=:chainId d.实时监控指标（websocket请求）增量数据
@@ -174,8 +167,7 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/statistic/init?cid={chainId}")
-    public BaseResp statisticInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
-        Object headers = headerAccessor.getHeader("nativeHeaders");
+    public BaseResp statisticInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
         StatisticInfo statistic = cacheService.getStatisticInfo(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
@@ -221,14 +213,12 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/block/init?cid={chainId}")
-    public BaseResp blockInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
-        Object headers = headerAccessor.getHeader("nativeHeaders");
+    public BaseResp blockInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
         List<BlockInfo> blockInfos = cacheService.getBlockInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
         return resp;
     }
-
 
     /**
      * @api {subscribe} /topic/block/new?cid=:chainId h.实时区块列表（websocket请求）增量数据
@@ -270,14 +260,12 @@ public class HomeController {
      *   }
      */
     @SubscribeMapping("/transaction/init?cid={chainId}")
-    public BaseResp transactionInit(@DestinationVariable String chainId, StompHeaderAccessor headerAccessor) {
-        Object headers = headerAccessor.getHeader("nativeHeaders");
+    public BaseResp transactionInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
         List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList(ChainEnum.getEnum(chainId));
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
         return resp;
     }
-
 
     /**
      * @api {subscribe} /topic/transaction/new?cid=:chainId j.实时交易列表（websocket请求）增量数据
@@ -289,7 +277,6 @@ public class HomeController {
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
      */
-
 
 
     /**
