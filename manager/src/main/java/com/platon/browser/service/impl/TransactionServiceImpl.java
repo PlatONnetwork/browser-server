@@ -25,9 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -51,12 +49,29 @@ public class TransactionServiceImpl implements TransactionService {
         condition.setOrderByClause("block_number desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionItem> transactionList = new ArrayList<>();
+        long serverTime = System.currentTimeMillis();
+
+        // 查询交易所属的区块信息
+        List<Long> blockNumberList = new ArrayList<>();
+        transactions.forEach(transaction -> blockNumberList.add(transaction.getBlockNumber()));
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid())
+                .andNumberIn(blockNumberList);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        Map<Long, Block> map = new HashMap<>();
+        blocks.forEach(block->map.put(block.getNumber(),block));
+
         transactions.forEach(transaction -> {
-            TransactionItem tl = new TransactionItem();
-            BeanUtils.copyProperties(transaction,tl);
-            tl.setTxHash(transaction.getHash());
-            tl.setBlockHeight(transaction.getBlockNumber());
-            transactionList.add(tl);
+            TransactionItem bean = new TransactionItem();
+            BeanUtils.copyProperties(transaction,bean);
+            bean.setTxHash(transaction.getHash());
+            bean.setBlockHeight(transaction.getBlockNumber());
+            bean.setServerTime(serverTime);
+            Block block = map.get(transaction.getBlockNumber());
+            if(block!=null){
+                bean.setBlockTime(block.getTimestamp().getTime());
+            }
+            transactionList.add(bean);
         });
         return transactionList;
     }
