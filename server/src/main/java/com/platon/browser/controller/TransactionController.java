@@ -537,7 +537,7 @@ public class TransactionController {
     }
 
     /**
-     * @api {post} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
+     * @api {get} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
      * @apiVersion 1.0.0
      * @apiName contractDownload
      * @apiGroup transaction
