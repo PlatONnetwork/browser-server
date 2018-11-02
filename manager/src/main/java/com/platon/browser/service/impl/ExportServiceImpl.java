@@ -76,7 +76,7 @@ public class ExportServiceImpl implements ExportService {
         AccountDowload accountDowload = new AccountDowload();
         accountDowload.setData(baos.toByteArray());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+sdf.format(req.getDate()));
+        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
     }
@@ -119,7 +119,7 @@ public class ExportServiceImpl implements ExportService {
         ContractDowload contractDowload = new ContractDowload();
         contractDowload.setData(baos.toByteArray());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        contractDowload.setFilename("contract-"+req.getAddress()+"-"+sdf.format(req.getDate()));
+        contractDowload.setFilename("contract-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
         contractDowload.setLength(baos.size());
         return contractDowload;
     }

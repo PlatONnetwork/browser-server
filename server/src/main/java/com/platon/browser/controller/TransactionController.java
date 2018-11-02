@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -442,24 +444,31 @@ public class TransactionController {
         }
     }
     /**
-     * @api {post} transaction/addressDownload h.导出地址详情
+     * @api {get} transaction/addressDownload?cid=:cid&address=:address&date=:date h.导出地址详情
      * @apiVersion 1.0.0
      * @apiName addressDownload
      * @apiGroup transaction
      * @apiDescription 导出地址详情
      * @apiUse CommonHeaderFiled
-     * @apiParamExample {json} Request-Example:
-     * {
-     *      "cid":"", // 链ID (必填)
-     *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "date":"2018-10-24 00:00:00" // 数据日期 (必填)
-     * }
+     * @apiParam {String} cid 链ID
+     * @apiParam {String} address 合约地址
+     * @apiParam {String} date 数据起始日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
-    @PostMapping("addressDownload")
-    public void addressDownload(@Valid @RequestBody AccountDownloadReq req, HttpServletResponse response) {
+    @GetMapping("addressDownload")
+    public void addressDownload(@RequestParam String cid,@RequestParam String address, @RequestParam String date, HttpServletResponse response) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        AccountDownloadReq req = new AccountDownloadReq();
+        req.setCid(cid);
+        req.setAddress(address);
+        try {
+            req.setDate(sdf.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new ResponseException("日期格式错误！");
+        }
         AccountDowload accountDowload = exportService.exportAccountCsv(req);
         download(response,accountDowload.getFilename(),accountDowload.getLength(),accountDowload.getData());
     }
@@ -528,30 +537,37 @@ public class TransactionController {
     }
 
     /**
-     * @api {post} transaction/contractDownload j.导出合约详情
+     * @api {post} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
      * @apiVersion 1.0.0
      * @apiName contractDownload
      * @apiGroup transaction
      * @apiDescription 导出合约详情
      * @apiUse CommonHeaderFiled
-     * @apiParamExample {json} Request-Example:
-     * {
-     *      "cid":"", // 链ID (必填)
-     *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "date":"2018-10-24 00:00:00" // 数据日期 (必填)
-     * }
+     * @apiParam {String} cid 链ID
+     * @apiParam {String} address 合约地址
+     * @apiParam {String} date 数据起始日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
-    @PostMapping("contractDownload")
-    public void contractDownload(@Valid @RequestBody ContractDownloadReq req, HttpServletResponse response) {
+    @GetMapping("contractDownload")
+    public void contractDownload(@RequestParam String cid,@RequestParam String address,@RequestParam String date, HttpServletResponse response) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        ContractDownloadReq req = new ContractDownloadReq();
+        req.setCid(cid);
+        req.setAddress(address);
+        try {
+            req.setDate(sdf.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new ResponseException("日期格式错误！");
+        }
         ContractDowload contractDowload = exportService.exportContractCsv(req);
         download(response,contractDowload.getFilename(),contractDowload.getLength(),contractDowload.getData());
     }
 
     /**
-     * @api {post} transaction/blockTransaction k.查询区块交易信息
+     * @api {get} transaction/blockTransaction k.查询区块交易信息
      * @apiVersion 1.0.0
      * @apiName blockTransaction
      * @apiGroup transaction
