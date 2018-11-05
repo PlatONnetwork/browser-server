@@ -238,7 +238,7 @@ public class TransactionController {
      *      "data": [
      *           {
      *           "txHash": "0x234234",//交易hash
-     *           "dwellTime": 33,// 停留时间=服务器时间-交易接收时间
+     *           "timestamp": 33,// 交易接收时间
      *           "energonLimit": 55555,//能量限制
      *           "energonPrice": 55555,//能量价格
      *           "from": "0x667766",//发送方

@@ -56,7 +56,7 @@ public class PendingTxServiceImpl implements PendingTxService {
             PendingTxItem pt = new PendingTxItem();
             BeanUtils.copyProperties(transaction,pt);
             pt.setTxHash(transaction.getHash());
-            pt.setDwellTime(serverTime-transaction.getTimestamp().getTime());
+            pt.setTimestamp(transaction.getTimestamp().getTime());
             pt.setServerTime(serverTime);
             pendingTxList.add(pt);
         });

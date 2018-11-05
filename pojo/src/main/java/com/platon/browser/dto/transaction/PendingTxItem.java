@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PendingTxItem {
     private String txHash;
-    private long dwellTime;
+    private long timestamp;
     private String energonLimit;
     private String energonPrice;
     private String from;
