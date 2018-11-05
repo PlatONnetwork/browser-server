@@ -253,6 +253,13 @@ public class HomeController {
      *      	    "transactionIndex": 33, // 交易在区块中位置
      *      	    "from":"ddddd",//交易发起方地址
      *      	    "to":"aaaa", //交易接收方地址
+     *              "txType": "", // 交易类型
+                        transfer ：转账
+                        MPCtransaction ： MPC交易
+                        contractCreate ： 合约创建
+                        vote ： 投票
+                        transactionExecute ： 合约执行
+                        authorization ： 权限
      *      	    "value": 3.6,//数额
      *      	    "timestamp"：155788//交易时间
      *           }
