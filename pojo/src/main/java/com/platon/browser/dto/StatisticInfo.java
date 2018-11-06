@@ -1,5 +1,6 @@
 package com.platon.browser.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,5 +19,14 @@ public class StatisticInfo {
     private long dayTransaction;
 
     private List<StatisticItem> blockStatisticList ;
+
+    @JsonIgnore
+    private long transactionCount;
+    @JsonIgnore
+    private long blockCount;
+    @JsonIgnore
+    private long highestBlockNumber;
+    @JsonIgnore
+    private long lowestBlockNumber;
 
 }

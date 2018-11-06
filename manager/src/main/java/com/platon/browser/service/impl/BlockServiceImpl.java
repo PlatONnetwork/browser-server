@@ -4,8 +4,10 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.CustomBlock;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
@@ -34,14 +36,14 @@ public class BlockServiceImpl implements BlockService {
     private BlockMapper blockMapper;
 
     @Autowired
+    private CustomBlockMapper customBlockMapper;
+
+    @Autowired
     private TransactionMapper transactionMapper;
 
     @Override
     public List<BlockList> getBlockList(BlockListReq req) {
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid());
-        condition.setOrderByClause("number desc");
-        List<Block> blocks = blockMapper.selectByExample(condition);
+        List<CustomBlock> blocks = customBlockMapper.selectByChainId(req.getCid());
         List<BlockList> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {

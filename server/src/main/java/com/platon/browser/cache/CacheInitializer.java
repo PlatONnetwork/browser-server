@@ -1,9 +1,12 @@
-package com.platon.browser.schedule;
+package com.platon.browser.cache;
 
 import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StatisticMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
@@ -17,20 +20,19 @@ import com.platon.browser.util.GeoUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * 从数据库定时加载最新数据更新缓存
+ * 从数据库加载最新数据来初始化缓存
  */
 @Component
-public class CacheUpdateTask {
+public class CacheInitializer {
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -47,12 +49,19 @@ public class CacheUpdateTask {
     @Value("${transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
 
+    @PostConstruct
+    public void initCache(){
+        initBlockInfoList();
+        initIndexInfo();
+        initNodeInfoList();
+        initStatisticInfo();
+        initTransactionInfoList();
+    }
+
     /**
      * 更新节点信息缓存
      */
-    @Scheduled(fixedRate = 10000)
-    @Transactional
-    void updateNodeInfoList(){
+    private void initNodeInfoList(){
         Arrays.asList(ChainEnum.values()).forEach(chainEnum -> {
             NodeExample condition = new NodeExample();
             condition.createCriteria().andChainIdEqualTo(chainEnum.code);
@@ -73,8 +82,7 @@ public class CacheUpdateTask {
     /**
      * 更新指标信息缓存
      */
-    @Scheduled(fixedRate = 10000)
-    void updateIndexInfo(){
+    private void initIndexInfo(){
         Arrays.asList(ChainEnum.values()).forEach(chainEnum -> {
             IndexInfo indexInfo = new IndexInfo();
             // 取当前高度和出块节点
@@ -114,15 +122,14 @@ public class CacheUpdateTask {
             indexInfo.setProportion(0);
             indexInfo.setTicketPrice(0);
             indexInfo.setVoteAmount(0);
-            cacheService.updateIndexInfo(indexInfo,chainEnum);
+            cacheService.updateIndexInfo(indexInfo,true,chainEnum);
         });
     }
 
     /**
      * 更新交易统计信息缓存
      */
-    @Scheduled(fixedRate = 10000)
-    void updateStatisticInfo(){
+    private void initStatisticInfo(){
 
         Arrays.asList(ChainEnum.values()).forEach(chainEnum -> {
             StatisticInfo statisticInfo = new StatisticInfo();
@@ -149,7 +156,9 @@ public class CacheUpdateTask {
                     bottomList = blockMapper.selectByExample(blockExample);
                 }
                 Block top = topList.get(0);
+                statisticInfo.setHighestBlockNumber(top.getNumber());
                 Block bottom = bottomList.get(0);
+                statisticInfo.setLowestBlockNumber(bottom.getNumber());
                 long avgTime = (top.getTimestamp().getTime()-bottom.getTimestamp().getTime())/top.getNumber();
                 statisticInfo.setAvgTime(avgTime);
 
@@ -162,6 +171,12 @@ public class CacheUpdateTask {
             transactionExample.createCriteria().andChainIdEqualTo(chainEnum.code);
             long currentTransactionCount = transactionMapper.countByExample(transactionExample);
             statisticInfo.setCurrent(currentTransactionCount);
+
+            // 总交易数
+            statisticInfo.setTransactionCount(currentTransactionCount);
+            // 有交易的所有区块数
+            long blockCount = statisticMapper.countTransactionBlock(chainEnum.code);
+            statisticInfo.setBlockCount(blockCount);
 
             // 计算交易TPS - 最近五分钟内的TPS
             TpsCountParam param = new TpsCountParam();
@@ -191,7 +206,7 @@ public class CacheUpdateTask {
             });
             statisticInfo.setBlockStatisticList(statisticList);
 
-            cacheService.updateStatisticInfo(statisticInfo,chainEnum);
+            cacheService.updateStatisticInfo(statisticInfo,true,chainEnum);
         });
 
     }
@@ -199,8 +214,7 @@ public class CacheUpdateTask {
     /**
      * 更新区块列表信息缓存
      */
-    @Scheduled(fixedRate = 10000)
-    void updateBlockInfoList(){
+    private void initBlockInfoList(){
         Arrays.asList(ChainEnum.values()).forEach(chainEnum -> {
             List<HomeBlock> blockList = statisticMapper.blockList(chainEnum.code);
             List<BlockInfo> blockInfos = new ArrayList<>();
@@ -221,8 +235,7 @@ public class CacheUpdateTask {
     /**
      * 更新交易列表信息缓存
      */
-    @Scheduled(fixedRate = 10000)
-    void updateTransactionInfoList(){
+    private void initTransactionInfoList(){
         Arrays.asList(ChainEnum.values()).forEach(chainEnum -> {
             TransactionExample condition = new TransactionExample();
             condition.createCriteria().andChainIdEqualTo(chainEnum.code);

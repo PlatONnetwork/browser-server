@@ -6,12 +6,12 @@ import lombok.Data;
 public class BlockList {
     private long height;
     private long timestamp;
-    private int transaction;
+    private long transaction;
     private int size;
     private String miner;
-    private int energonUsed;
-    private int energonLimit;
-    private int energonAverage;
+    private String energonUsed;
+    private String energonLimit;
+    private String energonAverage;
     private String blockReward;
     private long serverTime;
 }

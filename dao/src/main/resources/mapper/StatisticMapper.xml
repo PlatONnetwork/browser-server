@@ -61,4 +61,13 @@
       GROUP BY `tr`.`block_number`
     ) `tmp`
   </select>
+
+  <select id="countTransactionBlock" parameterType="java.lang.String" resultType="java.lang.Long">
+    SELECT COUNT(0)
+    FROM (
+      SELECT DISTINCT `tr`.`block_number`
+      FROM `transaction` `tr`
+      WHERE tr.`chain_id` = #{chainId}
+    ) `tmp`;
+  </select>
 </mapper>

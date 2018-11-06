@@ -1,13 +1,14 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.*;
+import com.github.fartherp.framework.exception.web.ResponseException;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CalculateMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
@@ -16,24 +17,23 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.ChainEnum;
-import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
 import com.platon.browser.util.LimitQueue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * 缓存服务
@@ -65,97 +65,142 @@ public class CacheServiceImpl implements CacheService {
 
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
-    private Map <ChainEnum, List <NodeInfo>> nodeInfoMap = new ConcurrentHashMap <>();
-    private Map <ChainEnum, IndexInfo> indexInfoMap = new ConcurrentHashMap <>();
-    private Map <ChainEnum, StatisticInfo> statisticInfoMap = new ConcurrentHashMap <>();
-    private Map <ChainEnum, LimitQueue <BlockInfo>> blockInfoMap = new ConcurrentHashMap <>();
-    private Map <ChainEnum, LimitQueue <TransactionInfo>> transactionInfoMap = new ConcurrentHashMap <>();
+    private Map<ChainEnum,List<NodeInfo>> nodeInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,IndexInfo> indexInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,StatisticInfo> statisticInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,LimitQueue<BlockInfo>> blockInfoMap = new ConcurrentHashMap<>();
+    private Map<ChainEnum,LimitQueue<TransactionInfo>> transactionInfoMap = new ConcurrentHashMap<>();
 
-    public CacheServiceImpl () {
+    public CacheServiceImpl(){
         Arrays.asList(ChainEnum.values()).forEach(chainId -> {
-            nodeInfoMap.put(chainId, new ArrayList <>());
-            indexInfoMap.put(chainId, new IndexInfo());
-            statisticInfoMap.put(chainId, new StatisticInfo());
-            blockInfoMap.put(chainId, new LimitQueue <>(10));
-            transactionInfoMap.put(chainId, new LimitQueue <>(10));
+            nodeInfoMap.put(chainId,new ArrayList<>());
+            indexInfoMap.put(chainId,new IndexInfo());
+            statisticInfoMap.put(chainId,new StatisticInfo());
+            blockInfoMap.put(chainId,new LimitQueue<>(10));
+            transactionInfoMap.put(chainId,new LimitQueue<>(10));
         });
     }
 
     @Override
-    public List <NodeInfo> getNodeInfoList ( ChainEnum chainId ) {
+    public List<NodeInfo> getNodeInfoList(ChainEnum chainId) {
         return Collections.unmodifiableList(nodeInfoMap.get(chainId));
     }
 
     @Override
-    public void updateNodeInfoList ( List <NodeInfo> nodeInfos, boolean override, ChainEnum chainId ) {
-        logger.debug("更新链【{}-{}】的节点缓存", chainId.desc, chainId.code);
-        synchronized (chainId) {
-            List <NodeInfo> nodeInfoList = nodeInfoMap.get(chainId);
-            if (override) {
-                nodeInfoMap.put(chainId, nodeInfos);
+    public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, ChainEnum chainId) {
+        logger.info("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
+        List<NodeInfo> cache = nodeInfoMap.get(chainId);
+        synchronized (cache){
+            if(override){
+                cache.clear();
             }
-            nodeInfoList.addAll(nodeInfos);
+            cache.addAll(nodeInfos);
         }
     }
 
     @Override
-    public IndexInfo getIndexInfo ( ChainEnum chainId ) {
+    public IndexInfo getIndexInfo(ChainEnum chainId) {
         return indexInfoMap.get(chainId);
     }
 
     @Override
-    public void updateIndexInfo ( IndexInfo indexInfo, ChainEnum chainId ) {
-        logger.debug("更新链【{}-{}】的指标缓存", chainId.desc, chainId.code);
-        synchronized (chainId) {
-            IndexInfo cache = indexInfoMap.get(chainId);
-            BeanUtils.copyProperties(indexInfo, cache);
+    public void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId) {
+        logger.info("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
+        IndexInfo cache = indexInfoMap.get(chainId);
+        synchronized (cache){
+            if(override){
+                BeanUtils.copyProperties(indexInfo,cache);
+            }else{
+                if(StringUtils.isNotBlank(indexInfo.getNode())){
+                    cache.setNode(indexInfo.getNode());
+                }
+                if(indexInfo.getCurrentHeight()!=0){
+                    cache.setCurrentHeight(indexInfo.getCurrentHeight());
+                }
+                if(indexInfo.getConsensusNodeAmount()!=0){
+                    cache.setConsensusNodeAmount(cache.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                }
+            }
         }
     }
 
     @Override
-    public StatisticInfo getStatisticInfo ( ChainEnum chainId ) {
+    public StatisticInfo getStatisticInfo(ChainEnum chainId) {
         StatisticInfo cache = statisticInfoMap.get(chainId);
         StatisticInfo copy = new StatisticInfo();
-        BeanUtils.copyProperties(cache, copy);
+        BeanUtils.copyProperties(cache,copy);
         return copy;
     }
 
     @Override
-    public void updateStatisticInfo ( StatisticInfo statisticInfo, ChainEnum chainId ) {
-        logger.debug("更新链【{}-{}】的统计缓存", chainId.desc, chainId.code);
-        synchronized (chainId) {
-            StatisticInfo cache = statisticInfoMap.get(chainId);
-            BeanUtils.copyProperties(statisticInfo, cache);
+    public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId) {
+        logger.info("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
+        StatisticInfo cache = statisticInfoMap.get(chainId);
+        synchronized (cache){
+            if(override){
+                BeanUtils.copyProperties(statisticInfo,cache);
+            }else{
+                if(statisticInfo.getBlockCount()!=0){
+                    cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
+                }
+                if(statisticInfo.getTransactionCount()!=0){
+                    cache.setCurrent(cache.getCurrent()+statisticInfo.getCurrent());
+                    cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
+                }
+                if(statisticInfo.getBlockCount()!=0||statisticInfo.getTransactionCount()!=0){
+                    cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
+                }
+                if(statisticInfo.getHighestBlockNumber()!=0){
+                    cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
+                    cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
+                }
+                if(statisticInfo.getDayTransaction()!=0){
+                    cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
+                }
+                if(statisticInfo.getBlockStatisticList()!=null){
+                    Map<Long, StatisticItem> map = new HashMap<>();
+                    List<StatisticItem> cacheStatisticItemList = cache.getBlockStatisticList();
+                    cacheStatisticItemList.forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
+                        StatisticItem item = map.get(statisticItem.getHeight());
+                        if(item==null){
+                            cacheStatisticItemList.add(statisticItem);
+                        }else{
+                            item.setTransaction(item.getTransaction()+statisticItem.getTransaction());
+                        }
+                    });
+                }
+            }
         }
     }
 
     @Override
-    public List <BlockInfo> getBlockInfoList ( ChainEnum chainId ) {
-        LimitQueue <BlockInfo> limitQueue = blockInfoMap.get(chainId);
-        return Collections.unmodifiableList(limitQueue.elements());
+    public List<BlockInfo> getBlockInfoList(ChainEnum chainId) {
+        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
+        return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
-    public void updateBlockInfoList ( List <BlockInfo> blockInfos, ChainEnum chainId ) {
-        logger.debug("更新链【{}-{}】的块列表缓存", chainId.desc, chainId.code);
-        synchronized (chainId) {
-            LimitQueue <BlockInfo> limitQueue = blockInfoMap.get(chainId);
-            blockInfos.forEach(e -> limitQueue.offer(e));
+    public void updateBlockInfoList(List<BlockInfo> blockInfos, ChainEnum chainId) {
+        logger.info("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
+        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
+        synchronized (cache){
+            blockInfos.forEach(e->cache.offer(e));
         }
     }
 
     @Override
-    public List <TransactionInfo> getTransactionInfoList ( ChainEnum chainId ) {
-        LimitQueue <TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
-        return Collections.unmodifiableList(limitQueue.elements());
+    public List<TransactionInfo> getTransactionInfoList(ChainEnum chainId) {
+        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
+        return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
-    public void updateTransactionInfoList ( List <TransactionInfo> transactionInfos, ChainEnum chainId ) {
-        logger.debug("更新链【{}-{}】的交易列表缓存", chainId.desc, chainId.code);
-        synchronized (chainId) {
-            LimitQueue <TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
-            transactionInfos.forEach(e -> limitQueue.offer(e));
+    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId) {
+        logger.info("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
+        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
+        synchronized (cache){
+            transactionInfos.forEach(e->cache.offer(e));
         }
     }
 
@@ -218,18 +263,18 @@ public class CacheServiceImpl implements CacheService {
                 query.setStruct(transactionDetail);
                 query.setType("transaction");
             }else {
-             long blockSum = calculateMapper.countBlock(param.getParameter(),param.getCid());
-             if(blockSum > 0){
-                 BlockExample blockExample = new BlockExample();
-                 blockExample.createCriteria().andChainIdEqualTo(param.getCid()).andHashEqualTo(param.getParameter());
-                 List<Block> blocks = blockMapper.selectByExample(blockExample);
-                 BlockDetail blockDetail = new BlockDetail();
-                 Block block = blocks.get(0);
-                 BeanUtils.copyProperties(block,blockDetail);
-                 blockDetail.setHeight(block.getNumber());
-                 blockDetail.setTimestamp(block.getTimestamp().getTime());
-                 query.setType("block");
-                 query.setStruct(blockDetail);
+                long blockSum = calculateMapper.countBlock(param.getParameter(),param.getCid());
+                if(blockSum > 0){
+                    BlockExample blockExample = new BlockExample();
+                    blockExample.createCriteria().andChainIdEqualTo(param.getCid()).andHashEqualTo(param.getParameter());
+                    List<Block> blocks = blockMapper.selectByExample(blockExample);
+                    BlockDetail blockDetail = new BlockDetail();
+                    Block block = blocks.get(0);
+                    BeanUtils.copyProperties(block,blockDetail);
+                    blockDetail.setHeight(block.getNumber());
+                    blockDetail.setTimestamp(block.getTimestamp().getTime());
+                    query.setType("block");
+                    query.setStruct(blockDetail);
                 }
             }
             return query;
@@ -243,16 +288,5 @@ public class CacheServiceImpl implements CacheService {
         query.setStruct(blockDetail);
 
         return query;
-    }
-
-
-    public static void main ( String args[] ) {
-        String add = "0x9c050809105467872531b29eea4ab6622d32a5b2";
-        String tx = "0xd451fa31ef1435c6713995f524953c0a8e448a88d33c0e57ce35c485422796e9";
-        String nu = "0x0ca91748a58368802d638d5e8433825a589837a769cdb08d8685bc3334d8c392";
-        System.out.println(add.length());
-        System.out.println(tx.length());
-        System.out.println(nu.length());
-
     }
 }

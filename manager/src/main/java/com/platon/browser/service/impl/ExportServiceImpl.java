@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +75,8 @@ public class ExportServiceImpl implements ExportService {
         writer.writeRowsAndClose(rows);
         AccountDowload accountDowload = new AccountDowload();
         accountDowload.setData(baos.toByteArray());
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+req.getDate());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
     }
@@ -116,7 +118,8 @@ public class ExportServiceImpl implements ExportService {
         writer.writeRowsAndClose(rows);
         ContractDowload contractDowload = new ContractDowload();
         contractDowload.setData(baos.toByteArray());
-        contractDowload.setFilename("contract-"+req.getAddress()+"-"+req.getDate());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        contractDowload.setFilename("contract-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
         contractDowload.setLength(baos.size());
         return contractDowload;
     }

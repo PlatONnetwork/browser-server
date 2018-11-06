@@ -25,9 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -51,12 +49,29 @@ public class TransactionServiceImpl implements TransactionService {
         condition.setOrderByClause("block_number desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionItem> transactionList = new ArrayList<>();
+        long serverTime = System.currentTimeMillis();
+
+        // 查询交易所属的区块信息
+        List<Long> blockNumberList = new ArrayList<>();
+        transactions.forEach(transaction -> blockNumberList.add(transaction.getBlockNumber()));
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid())
+                .andNumberIn(blockNumberList);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        Map<Long, Block> map = new HashMap<>();
+        blocks.forEach(block->map.put(block.getNumber(),block));
+
         transactions.forEach(transaction -> {
-            TransactionItem tl = new TransactionItem();
-            BeanUtils.copyProperties(transaction,tl);
-            tl.setTxHash(transaction.getHash());
-            tl.setBlockHeight(transaction.getBlockNumber());
-            transactionList.add(tl);
+            TransactionItem bean = new TransactionItem();
+            BeanUtils.copyProperties(transaction,bean);
+            bean.setTxHash(transaction.getHash());
+            bean.setBlockHeight(transaction.getBlockNumber());
+            bean.setServerTime(serverTime);
+            Block block = map.get(transaction.getBlockNumber());
+            if(block!=null){
+                bean.setBlockTime(block.getTimestamp().getTime());
+            }
+            transactionList.add(bean);
         });
         return transactionList;
     }
@@ -75,10 +90,12 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
         TransactionDetail transactionDetail = new TransactionDetail();
-        Transaction transaction = transactions.get(0);
+        TransactionWithBLOBs transaction = transactions.get(0);
         BeanUtils.copyProperties(transaction,transactionDetail);
         transactionDetail.setTxHash(transaction.getHash());
         transactionDetail.setBlockHeight(transaction.getBlockNumber());
+        transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
+        transactionDetail.setInputData(transaction.getInput());
 
         // 计算区块确认数
         BlockExample blockExample = new BlockExample();
@@ -186,6 +203,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionDetailNavigate transactionDetailNavigate = new TransactionDetailNavigate();
 
+        // 取最高区块，用于计算区块确认数
+        BlockExample blockExample = new BlockExample();
+        blockExample.setOrderByClause("number desc");
+        PageHelper.startPage(1,1);
+        List<Block> blockList = blockMapper.selectByExample(blockExample);
+
         if(transactionList.size()==1){
             // 在当前区块找到一条交易记录
             TransactionWithBLOBs transaction = transactionList.get(0);
@@ -193,6 +216,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDetailNavigate.setTxHash(transaction.getHash());
             transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
             transactionDetailNavigate.setInputData(transaction.getInput());
+            transactionDetailNavigate.setTimestamp(transaction.getTimestamp().getTime());
         }
 
         if(transactionList.size()==0){
@@ -226,7 +250,16 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDetailNavigate.setTxHash(transaction.getHash());
             transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
             transactionDetailNavigate.setInputData(transaction.getInput());
+            transactionDetailNavigate.setTimestamp(transaction.getTimestamp().getTime());
         }
+
+        // 计算区块确认数
+        if(blockList.size()==0){
+            transactionDetailNavigate.setConfirmNum(0l);
+            return transactionDetailNavigate;
+        }
+        Block block = blockList.get(0);
+        transactionDetailNavigate.setConfirmNum(block.getNumber()-transactionDetailNavigate.getBlockHeight());
         return transactionDetailNavigate;
     }
 }
