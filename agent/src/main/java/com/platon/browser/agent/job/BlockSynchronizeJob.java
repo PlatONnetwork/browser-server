@@ -13,6 +13,7 @@ import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -63,6 +69,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
+
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {
@@ -185,8 +192,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setTransactionIndex(transaction.getTransactionIndex());
                 transactionDto.setNonce(transaction.getNonce().toString());
                 transactionDto.setValue(transaction.getValue().toString());
-                transactionDto.setTxType("");
+                String input = transactionDto.getInput();
+                String type = geTransactionTyep(input);
+                transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
+
+
             }
             BlockDto newBlock = new BlockDto();
             newBlock.setHash(ethBlock.getBlock().getHash());
@@ -204,6 +215,44 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             return newBlock;
     }
 
+
+    private String geTransactionTyep(String input)throws Exception{
+        RlpList rlpList = RlpDecoder.decode(Hex.decode(input));
+        List<RlpType> rlpTypes = rlpList.getValues();
+        RlpList rlpList1 = (RlpList)rlpTypes.get(0);
+        RlpString rlpString = (RlpString)rlpList1.getValues().get(0);
+        String typecode = Hex.toHexString(rlpString.getBytes());
+        byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+        String type = null;
+        //todo:置换web3j jar包platon版本
+        switch (type){
+            case "0":
+                //主币交易转账
+                type = "transfer";
+                break;
+            case "1":
+                //合约发布
+                type = "contractCreate";
+                break;
+            case "2":
+                //合约调用
+                type = "transactionExecute";
+                break;
+            case "3":
+                //投票
+                type = "vote";
+                break;
+            case "4":
+                //权限
+                type = "authorization";
+                break;
+            case "5":
+                //MPC交易
+                type = "MPCtransaction";
+                break;
+        }
+        return type;
+    }
 /*    public static void main(String args[]){
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setEnergonPrice(new BigInteger("12321321321321"));

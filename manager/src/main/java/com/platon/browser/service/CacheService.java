@@ -1,9 +1,11 @@
 package com.platon.browser.service;
 
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.ChainEnum;
 
@@ -48,4 +50,10 @@ public interface CacheService {
      */
     List<TransactionInfo> getTransactionInfoList(ChainEnum chainId);
     void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId);
+
+
+    /**
+     * 搜索
+     */
+    Query findInfoByParam(SearchParam param);
 }

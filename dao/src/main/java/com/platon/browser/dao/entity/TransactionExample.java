@@ -1304,6 +1304,76 @@ public class TransactionExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andReceiveTypeIsNull() {
+            addCriterion("receive_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeIsNotNull() {
+            addCriterion("receive_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeEqualTo(String value) {
+            addCriterion("receive_type =", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeNotEqualTo(String value) {
+            addCriterion("receive_type <>", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeGreaterThan(String value) {
+            addCriterion("receive_type >", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("receive_type >=", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeLessThan(String value) {
+            addCriterion("receive_type <", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeLessThanOrEqualTo(String value) {
+            addCriterion("receive_type <=", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeLike(String value) {
+            addCriterion("receive_type like", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeNotLike(String value) {
+            addCriterion("receive_type not like", value, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeIn(List<String> values) {
+            addCriterion("receive_type in", values, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeNotIn(List<String> values) {
+            addCriterion("receive_type not in", values, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeBetween(String value1, String value2) {
+            addCriterion("receive_type between", value1, value2, "receiveType");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiveTypeNotBetween(String value1, String value2) {
+            addCriterion("receive_type not between", value1, value2, "receiveType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
