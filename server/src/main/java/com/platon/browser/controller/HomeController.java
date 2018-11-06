@@ -3,6 +3,7 @@ package com.platon.browser.controller;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
@@ -298,7 +299,7 @@ public class HomeController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data":{
-     *          "type":"",//区块block，交易transaction，节点node,合约contract,账户account
+     *          "type":"",//区块block，交易transaction，节点node,合约contract,账户account,挂起交易pending
      *           "struct":{
      *      	        "height": 17888,//块高
      *                  "timestamp": 1798798798798,//出块时间
@@ -319,9 +320,13 @@ public class HomeController {
 
     @PostMapping("/home/query")
     public BaseResp search(@Valid @RequestBody SearchParam param){
-        logger.debug(JSON.toJSONString(param));
-        Query query = cacheService.findInfoByParam(param);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
-        return resp;
+        try{
+            logger.debug(JSON.toJSONString(param));
+            Query query = cacheService.findInfoByParam(param);
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
+            return resp;
+        }catch (BusinessException be){
+            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+        }
     }
 }

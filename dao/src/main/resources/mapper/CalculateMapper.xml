@@ -28,4 +28,12 @@
         `hash` = #{hash}
         and `chain_id`= #{chainId}
     </select>
+    <select id="countPendingTx"  resultType="java.lang.Long">
+        SELECT
+        count(*) as sum
+        FROM `pending_tx`
+        WHERE
+        `hash` = #{hash}
+        and `chain_id`= #{chainId}
+    </select>
 </mapper>
