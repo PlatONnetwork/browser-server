@@ -80,7 +80,7 @@ public class SubscribePushService {
                 blockInfoList.add(blockInfo);
                 cacheService.updateBlockInfoList(blockInfoList,chainId);
                 // 推送新区块信息
-                resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfo);
+                resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfoList);
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId.code, resp);
 
                 logger.info("STOMP推送指标信息: {}",msg);

@@ -52,14 +52,16 @@ public class TransactionServiceImpl implements TransactionService {
         long serverTime = System.currentTimeMillis();
 
         // 查询交易所属的区块信息
-        List<Long> blockNumberList = new ArrayList<>();
-        transactions.forEach(transaction -> blockNumberList.add(transaction.getBlockNumber()));
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(req.getCid())
-                .andNumberIn(blockNumberList);
-        List<Block> blocks = blockMapper.selectByExample(blockExample);
         Map<Long, Block> map = new HashMap<>();
-        blocks.forEach(block->map.put(block.getNumber(),block));
+        List<Long> blockNumberList = new ArrayList<>();
+        if(transactions.size()>0){
+            transactions.forEach(transaction -> blockNumberList.add(transaction.getBlockNumber()));
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(req.getCid())
+                    .andNumberIn(blockNumberList);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            blocks.forEach(block->map.put(block.getNumber(),block));
+        }
 
         transactions.forEach(transaction -> {
             TransactionItem bean = new TransactionItem();
