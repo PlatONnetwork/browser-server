@@ -1,8 +1,9 @@
 package com.platon.browser.service.impl;
 
-import com.github.fartherp.framework.exception.web.ResponseException;
+import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CalculateMapper;
 import com.platon.browser.dto.IndexInfo;
@@ -15,12 +16,14 @@ import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
+import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
 import com.platon.browser.util.LimitQueue;
@@ -216,10 +219,10 @@ public class CacheServiceImpl implements CacheService {
         boolean isHash = false;
         String par = param.getParameter();
         boolean result=param.getParameter().matches("[0-9]+");
-        if (result == false) {
+        if (!result) {
             //为false则可能为区块交易hash或者为账户
             if(par.length()<=2){
-                throw new ResponseException("请输入长度大于2的查询关键字!");
+                throw new BusinessException("请输入长度大于2的查询关键字!");
             }
             if(par.substring(0, 2) == "0x" && par.length() == 42){
                 isAccountOrContract = true;
@@ -276,6 +279,15 @@ public class CacheServiceImpl implements CacheService {
                     query.setType("block");
                     query.setStruct(blockDetail);
                 }
+            }
+            long  pendingTxSum = calculateMapper.countPendingTx(param.getParameter(),param.getCid());
+            if(pendingTxSum > 0){
+                PendingTxDetailReq pendingTxDetailReq = new PendingTxDetailReq();
+                pendingTxDetailReq.setCid(param.getCid());
+                pendingTxDetailReq.setTxHash(param.getParameter());
+                PendingTxDetail pendingTxDetail = pendingTxService.getTransactionDetail(pendingTxDetailReq);
+                query.setType("pending");
+                query.setStruct(pendingTxDetail);
             }
             return query;
         }

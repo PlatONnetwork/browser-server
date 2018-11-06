@@ -27,4 +27,9 @@ public interface CalculateMapper {
     */
     long countTransaction(@Param("hash") String hash,
                           @Param("chainId") String chainId);
+    /*
+    *  挂起交易统计
+    */
+    long countPendingTx (@Param("hash") String hash,
+                          @Param("chainId") String chainId);
 }
