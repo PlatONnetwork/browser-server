@@ -52,12 +52,12 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, ChainEnum chainId) {
         logger.info("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
-        synchronized (chainId){
-            List<NodeInfo> nodeInfoList = nodeInfoMap.get(chainId);
+        List<NodeInfo> cache = nodeInfoMap.get(chainId);
+        synchronized (cache){
             if(override){
-                nodeInfoMap.put(chainId,nodeInfos);
+                cache.clear();
             }
-            nodeInfoList.addAll(nodeInfos);
+            cache.addAll(nodeInfos);
         }
     }
 
@@ -69,8 +69,8 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId) {
         logger.info("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
-        synchronized (chainId){
-            IndexInfo cache = indexInfoMap.get(chainId);
+        IndexInfo cache = indexInfoMap.get(chainId);
+        synchronized (cache){
             if(override){
                 BeanUtils.copyProperties(indexInfo,cache);
             }else{
@@ -98,8 +98,8 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId) {
         logger.info("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
-        synchronized (chainId){
-            StatisticInfo cache = statisticInfoMap.get(chainId);
+        StatisticInfo cache = statisticInfoMap.get(chainId);
+        synchronized (cache){
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
             }else{
@@ -139,31 +139,31 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public List<BlockInfo> getBlockInfoList(ChainEnum chainId) {
-        LimitQueue<BlockInfo> limitQueue = blockInfoMap.get(chainId);
-        return Collections.unmodifiableList(limitQueue.elements());
+        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
+        return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
     public void updateBlockInfoList(List<BlockInfo> blockInfos, ChainEnum chainId) {
         logger.info("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
-        synchronized (chainId){
-            LimitQueue<BlockInfo> limitQueue = blockInfoMap.get(chainId);
-            blockInfos.forEach(e->limitQueue.offer(e));
+        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
+        synchronized (cache){
+            blockInfos.forEach(e->cache.offer(e));
         }
     }
 
     @Override
     public List<TransactionInfo> getTransactionInfoList(ChainEnum chainId) {
-        LimitQueue<TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
-        return Collections.unmodifiableList(limitQueue.elements());
+        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
+        return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
     public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId) {
         logger.info("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
-        synchronized (chainId){
-            LimitQueue<TransactionInfo> limitQueue = transactionInfoMap.get(chainId);
-            transactionInfos.forEach(e->limitQueue.offer(e));
+        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
+        synchronized (cache){
+            transactionInfos.forEach(e->cache.offer(e));
         }
     }
 }
