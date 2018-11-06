@@ -53,7 +53,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/BlockController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/BlockController.java",
     "groupTitle": "blcok",
     "header": {
       "fields": {
@@ -96,7 +96,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/BlockController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/BlockController.java",
     "groupTitle": "blcok",
     "header": {
       "fields": {
@@ -139,7 +139,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -159,7 +159,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -188,7 +188,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -208,7 +208,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -237,7 +237,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -266,7 +266,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -295,7 +295,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -324,7 +324,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -344,7 +344,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -373,7 +373,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -393,7 +393,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/HomeController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/HomeController.java",
     "groupTitle": "home"
   },
   {
@@ -422,7 +422,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/TransactionController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/TransactionController.java",
     "groupTitle": "transaction",
     "header": {
       "fields": {
@@ -465,7 +465,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/TransactionController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/TransactionController.java",
     "groupTitle": "transaction",
     "header": {
       "fields": {
@@ -508,7 +508,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./src/main/java/com/platon/browser/Controller/TransactionController.java",
+    "filename": "./src/main/java/com/platon/browser/controller/TransactionController.java",
     "groupTitle": "transaction",
     "header": {
       "fields": {

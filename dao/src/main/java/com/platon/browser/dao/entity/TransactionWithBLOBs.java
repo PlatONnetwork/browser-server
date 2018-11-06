@@ -50,6 +50,7 @@ public class TransactionWithBLOBs extends Transaction {
         chainId("chain_id", "chainId", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        receiveType("receive_type", "receiveType", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false);
 

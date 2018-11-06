@@ -1,18 +1,34 @@
 package com.platon.browser.service.impl;
 
+import com.github.fartherp.framework.exception.web.ResponseException;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CalculateMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
+import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.account.ContractDetail;
+import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.query.Query;
+import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.ChainEnum;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.ContractDetailReq;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.transaction.TransactionDetailReq;
+import com.platon.browser.service.*;
 import com.platon.browser.util.LimitQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +41,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class CacheServiceImpl implements CacheService {
+
+    @Autowired
+    private BlockMapper blockMapper;
+
+    @Autowired
+    private BlockService blockService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private PendingTxService pendingTxService;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private ContractService contractService;
+
+    @Autowired
+    private CalculateMapper calculateMapper;
 
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
@@ -165,5 +202,91 @@ public class CacheServiceImpl implements CacheService {
         synchronized (cache){
             transactionInfos.forEach(e->cache.offer(e));
         }
+    }
+
+    @Override
+    public Query findInfoByParam ( SearchParam param ) {
+        //以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x
+        //以太坊区块hash和交易hash都是0x打头长度33
+        //1.判断是否是块高
+        //2.判断是否是地址
+        //3.不是以上两种情况，就为交易hash或者区块hash，需要都查询
+        Query query = new Query();
+        boolean isAccountOrContract = false;
+        boolean isHash = false;
+        String par = param.getParameter();
+        boolean result=param.getParameter().matches("[0-9]+");
+        if (result == false) {
+            //为false则可能为区块交易hash或者为账户
+            if(par.length()<=2){
+                throw new ResponseException("请输入长度大于2的查询关键字!");
+            }
+            if(par.substring(0, 2) == "0x" && par.length() == 42){
+                isAccountOrContract = true;
+            }
+            isHash = true;
+        }
+
+        if (isAccountOrContract) {
+            //内部账户account
+            long accountSum = calculateMapper.countTransactionOrContract("account",param.getCid(),param.getParameter(),param.getParameter());
+            if(accountSum > 0){
+                AccountDetailReq adr = new AccountDetailReq();
+                adr.setCid(param.getCid());
+                adr.setAddress(param.getParameter());
+                AccountDetail detail = accountService.getAccountDetail(adr);
+                query.setStruct(detail);
+                query.setType("account");
+            }else {
+                //外部账户contract
+                long addressSum = calculateMapper.countTransactionOrContract("contract",param.getCid(),param.getParameter(),param.getParameter());
+                if(addressSum > 0){
+                    ContractDetailReq contractDetailReq = new ContractDetailReq();
+                    contractDetailReq.setCid(param.getCid());
+                    contractDetailReq.setAddress(param.getParameter());
+                    ContractDetail detail = contractService.getContractDetail(contractDetailReq);
+                    query.setStruct(detail);
+                    query.setType("contract");
+                }
+            }
+            return query;
+        }
+
+        if (isHash) {
+            //交易hash或者区块hash
+            long transactionSum = calculateMapper.countTransaction(param.getParameter(),param.getCid());
+            if(transactionSum > 0){
+                TransactionDetailReq transactionDetailReq = new TransactionDetailReq();
+                transactionDetailReq.setCid(param.getCid());
+                transactionDetailReq.setTxHash(param.getParameter());
+                TransactionDetail transactionDetail = transactionService.getTransactionDetail(transactionDetailReq);
+                query.setStruct(transactionDetail);
+                query.setType("transaction");
+            }else {
+                long blockSum = calculateMapper.countBlock(param.getParameter(),param.getCid());
+                if(blockSum > 0){
+                    BlockExample blockExample = new BlockExample();
+                    blockExample.createCriteria().andChainIdEqualTo(param.getCid()).andHashEqualTo(param.getParameter());
+                    List<Block> blocks = blockMapper.selectByExample(blockExample);
+                    BlockDetail blockDetail = new BlockDetail();
+                    Block block = blocks.get(0);
+                    BeanUtils.copyProperties(block,blockDetail);
+                    blockDetail.setHeight(block.getNumber());
+                    blockDetail.setTimestamp(block.getTimestamp().getTime());
+                    query.setType("block");
+                    query.setStruct(blockDetail);
+                }
+            }
+            return query;
+        }
+        //区块高度
+        query.setType("block");
+        BlockDetailReq req = new BlockDetailReq();
+        req.setCid(param.getCid());
+        req.setHeight(Long.valueOf(param.getParameter()));
+        BlockDetail blockDetail = blockService.getBlockDetail(req);
+        query.setStruct(blockDetail);
+
+        return query;
     }
 }

@@ -5,29 +5,23 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.SearchParam;
-import com.platon.browser.dto.SearchResult;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
-import com.platon.browser.dto.block.BlockStatistic;
-import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
-import com.platon.browser.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -324,22 +318,10 @@ public class HomeController {
 
 
     @PostMapping("/home/query")
-    public BaseResp search(@RequestBody SearchParam param){
+    public BaseResp search(@Valid @RequestBody SearchParam param){
         logger.debug(JSON.toJSONString(param));
-        SearchResult<NodeDetail> searchResult = new SearchResult<>();
-        searchResult.setType("block");
-        NodeDetail nodeDetail = new NodeDetail();
-        nodeDetail.setBlockReward(33.3);
-        nodeDetail.setEnergonAverage(333);
-        nodeDetail.setEnergonUsed(33);
-        nodeDetail.setHeight(333);
-        nodeDetail.setMiner("33333");
-        nodeDetail.setServerTime(System.currentTimeMillis());
-        nodeDetail.setSize(3333);
-        nodeDetail.setTimestamp(System.currentTimeMillis());
-        nodeDetail.setTransaction(333);
-        searchResult.setStruct(nodeDetail);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),searchResult);
+        Query query = cacheService.findInfoByParam(param);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
         return resp;
     }
 }
