@@ -228,10 +228,11 @@ public class CacheServiceImpl implements CacheService {
             if(par.length()<=2){
                 throw new BusinessException("请输入长度大于2的查询关键字!");
             }
-            if(par.substring(0, 2) == "0x" && par.length() == 42){
+            if(par.substring(0, 2).equals("0x") && par.length() == 42){
                 isAccountOrContract = true;
-            }
-            isHash = true;
+            }else
+                isHash = true;
+
         }
 
         if (isAccountOrContract) {
@@ -304,5 +305,14 @@ public class CacheServiceImpl implements CacheService {
         query.setStruct(blockDetail);
 
         return query;
+    }
+
+    public static void main(String args[]){
+        String address = "0x493301712671ada506ba6ca7891f436d29185821";
+        String fix = address.substring(0,2);
+        System.out.println(address.length());
+        boolean a = address.substring(0, 2).equals("0x") && address.length() == 42;
+        System.out.println(fix);
+        System.out.println(a);
     }
 }
