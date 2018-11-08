@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
@@ -11,7 +12,6 @@ import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,9 @@ import java.util.List;
 public class HomeController {
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
+
+    @Autowired
+    private ChainsConfig chainsConfig;
 
     @Autowired
     private CacheService cacheService;
@@ -64,7 +67,10 @@ public class HomeController {
     @SubscribeMapping("/node/init?cid={chainId}")
     public BaseResp nodeInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
-        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(ChainEnum.getEnum(chainId));
+        if(!chainsConfig.isValid(chainId)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+        }
+        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
         return resp;
     }
@@ -113,7 +119,10 @@ public class HomeController {
     @SubscribeMapping("/index/init?cid={chainId}")
     public BaseResp indexInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
-        IndexInfo indexInfo = cacheService.getIndexInfo(ChainEnum.getEnum(chainId));
+        if(!chainsConfig.isValid(chainId)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+        }
+        IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
         return resp;
     }
@@ -164,7 +173,10 @@ public class HomeController {
     @SubscribeMapping("/statistic/init?cid={chainId}")
     public BaseResp statisticInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
-        StatisticInfo statistic = cacheService.getStatisticInfo(ChainEnum.getEnum(chainId));
+        if(!chainsConfig.isValid(chainId)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+        }
+        StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         return resp;
     }
@@ -210,7 +222,10 @@ public class HomeController {
     @SubscribeMapping("/block/init?cid={chainId}")
     public BaseResp blockInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<BlockInfo> blockInfos = cacheService.getBlockInfoList(ChainEnum.getEnum(chainId));
+        if(!chainsConfig.isValid(chainId)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+        }
+        List<BlockInfo> blockInfos = cacheService.getBlockInfoList(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
         return resp;
     }
@@ -264,7 +279,10 @@ public class HomeController {
     @SubscribeMapping("/transaction/init?cid={chainId}")
     public BaseResp transactionInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
-        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList(ChainEnum.getEnum(chainId));
+        if(!chainsConfig.isValid(chainId)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+        }
+        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
         return resp;
     }

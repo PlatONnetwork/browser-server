@@ -1,9 +1,9 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CalculateMapper;
 import com.platon.browser.dto.IndexInfo;
@@ -19,7 +19,6 @@ import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
@@ -34,6 +33,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,16 +66,20 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     private CalculateMapper calculateMapper;
 
+    @Autowired
+    private ChainsConfig chainsConfig;
+
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
-    private Map<ChainEnum,List<NodeInfo>> nodeInfoMap = new ConcurrentHashMap<>();
-    private Map<ChainEnum,IndexInfo> indexInfoMap = new ConcurrentHashMap<>();
-    private Map<ChainEnum,StatisticInfo> statisticInfoMap = new ConcurrentHashMap<>();
-    private Map<ChainEnum,LimitQueue<BlockInfo>> blockInfoMap = new ConcurrentHashMap<>();
-    private Map<ChainEnum,LimitQueue<TransactionInfo>> transactionInfoMap = new ConcurrentHashMap<>();
+    private Map<String,List<NodeInfo>> nodeInfoMap = new ConcurrentHashMap<>();
+    private Map<String,IndexInfo> indexInfoMap = new ConcurrentHashMap<>();
+    private Map<String,StatisticInfo> statisticInfoMap = new ConcurrentHashMap<>();
+    private Map<String,LimitQueue<BlockInfo>> blockInfoMap = new ConcurrentHashMap<>();
+    private Map<String,LimitQueue<TransactionInfo>> transactionInfoMap = new ConcurrentHashMap<>();
 
-    public CacheServiceImpl(){
-        Arrays.asList(ChainEnum.values()).forEach(chainId -> {
+    @PostConstruct
+    private void init(){
+        chainsConfig.getChainIds().forEach(chainId -> {
             nodeInfoMap.put(chainId,new ArrayList<>());
             indexInfoMap.put(chainId,new IndexInfo());
             statisticInfoMap.put(chainId,new StatisticInfo());
@@ -85,13 +89,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public List<NodeInfo> getNodeInfoList(ChainEnum chainId) {
+    public List<NodeInfo> getNodeInfoList(String chainId) {
         return Collections.unmodifiableList(nodeInfoMap.get(chainId));
     }
 
     @Override
-    public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, ChainEnum chainId) {
-        logger.info("更新链【{}-{}】的节点缓存",chainId.desc,chainId.code);
+    public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, String chainId) {
+        logger.info("更新链【ID={}】的节点缓存",chainId);
         List<NodeInfo> cache = nodeInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -102,13 +106,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public IndexInfo getIndexInfo(ChainEnum chainId) {
+    public IndexInfo getIndexInfo(String chainId) {
         return indexInfoMap.get(chainId);
     }
 
     @Override
-    public void updateIndexInfo(IndexInfo indexInfo, boolean override, ChainEnum chainId) {
-        logger.info("更新链【{}-{}】的指标缓存",chainId.desc,chainId.code);
+    public void updateIndexInfo(IndexInfo indexInfo, boolean override, String chainId) {
+        logger.info("更新链【ID={}】的指标缓存",chainId);
         IndexInfo cache = indexInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -128,7 +132,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public StatisticInfo getStatisticInfo(ChainEnum chainId) {
+    public StatisticInfo getStatisticInfo(String chainId) {
         StatisticInfo cache = statisticInfoMap.get(chainId);
         StatisticInfo copy = new StatisticInfo();
         BeanUtils.copyProperties(cache,copy);
@@ -136,8 +140,8 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, ChainEnum chainId) {
-        logger.info("更新链【{}-{}】的统计缓存",chainId.desc,chainId.code);
+    public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, String chainId) {
+        logger.info("更新链【ID={}】的统计缓存",chainId);
         StatisticInfo cache = statisticInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -178,14 +182,14 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public List<BlockInfo> getBlockInfoList(ChainEnum chainId) {
+    public List<BlockInfo> getBlockInfoList(String chainId) {
         LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
         return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
-    public void updateBlockInfoList(List<BlockInfo> blockInfos, ChainEnum chainId) {
-        logger.info("更新链【{}-{}】的块列表缓存",chainId.desc,chainId.code);
+    public void updateBlockInfoList(List<BlockInfo> blockInfos, String chainId) {
+        logger.info("更新链【ID={}】的块列表缓存",chainId);
         LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
         synchronized (cache){
             blockInfos.forEach(e->cache.offer(e));
@@ -193,14 +197,14 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public List<TransactionInfo> getTransactionInfoList(ChainEnum chainId) {
+    public List<TransactionInfo> getTransactionInfoList(String chainId) {
         LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
         return Collections.unmodifiableList(cache.elements());
     }
 
     @Override
-    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, ChainEnum chainId) {
-        logger.info("更新链【{}-{}】的交易列表缓存",chainId.desc,chainId.code);
+    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, String chainId) {
+        logger.info("更新链【ID={}】的交易列表缓存",chainId);
         LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
         synchronized (cache){
             transactionInfos.forEach(e->cache.offer(e));

@@ -9,13 +9,13 @@ import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.enums.ChainEnum;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.GeoUtil;
 import org.slf4j.Logger;
@@ -40,11 +40,20 @@ public class SubscribePushService {
     @Autowired
     private CacheService cacheService;
 
+    @Autowired
+    private ChainsConfig chainsConfig;
+
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive(String msg) {
         Message message = JSON.parseObject(msg,Message.class);
         BaseResp resp;
-        ChainEnum chainId = ChainEnum.getEnum(message.getChainId());
+
+        String chainId = message.getChainId();
+        if(!chainsConfig.isValid(chainId)){
+            logger.error("链ID={}在本系统中未作配置！",message.getChainId());
+            return;
+        }
+
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case NODE:
                 logger.info("STOMP推送节点信息: {}",msg);
@@ -61,7 +70,7 @@ public class SubscribePushService {
                 cacheService.updateNodeInfoList(nodeInfoList,false,chainId);
                 // 推送新节点信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfo);
-                messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId.code, resp);
+                messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
                 break;
             case BLOCK:
                 logger.info("STOMP推送区块信息: {}",msg);
@@ -81,7 +90,7 @@ public class SubscribePushService {
                 cacheService.updateBlockInfoList(blockInfoList,chainId);
                 // 推送新区块信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfoList);
-                messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId.code, resp);
+                messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
 
                 logger.info("STOMP推送指标信息: {}",msg);
                 IndexInfo indexInfo = new IndexInfo();
@@ -92,7 +101,7 @@ public class SubscribePushService {
                 // 推送整体指标信息
                 indexInfo = cacheService.getIndexInfo(chainId);
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
-                messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId.code, resp);
+                messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
 
                 logger.info("STOMP推送交易信息: {}",msg);
                 List<TransactionDto> transactionDtos = blockDto.getTransaction();
@@ -113,7 +122,7 @@ public class SubscribePushService {
                 cacheService.updateTransactionInfoList(transactionInfos,chainId);
                 // 推送新的交易信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
-                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId.code, resp);
+                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
 
                 logger.info("STOMP推送统计信息: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
@@ -134,7 +143,7 @@ public class SubscribePushService {
                 // 推送整体统计信息
                 statisticInfo = cacheService.getStatisticInfo(chainId);
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
-                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId.code, resp);
+                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
                 break;
         }
     }
