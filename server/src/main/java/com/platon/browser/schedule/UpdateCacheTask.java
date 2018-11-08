@@ -1,5 +1,7 @@
 package com.platon.browser.schedule;
 
+import com.platon.browser.common.base.BaseResp;
+import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
@@ -10,10 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -26,6 +30,9 @@ public class UpdateCacheTask {
 
     // 保存每条链的上次TPS统计的时间戳
     private Map<String,Long> prevTimestampMap = new HashMap<>();
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private CacheService cacheService;
@@ -57,7 +64,7 @@ public class UpdateCacheTask {
             // 间隔时间毫秒表示
             long intervalInMillisecond = intervalInSecond*1000;
 
-            StatisticInfo cache = cacheService.getStatisticInfo(chainId);
+            StatisticInfo statisticInfo = new StatisticInfo();
 
             logger.info("统计链【ID={}】交易TPS",chainId);
 
@@ -77,13 +84,29 @@ public class UpdateCacheTask {
                     .andTimestampBetween(startDate,endDate);
             List<Transaction> transactionList = transactionMapper.selectByExample(condition);
             int transactionCount = transactionList.size();
-            cache.setTransactionCount(Long.valueOf(transactionCount));
-            cache.setCurrent(transactionCount);
-            double transactionTps = transactionCount/intervalInSecond;
-            cache.setMaxTps(transactionTps);
+            statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
+            statisticInfo.setCurrent(Long.valueOf(transactionCount));
+            BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(intervalInSecond),4,BigDecimal.ROUND_DOWN);
+            statisticInfo.setMaxTps(transactionTps.doubleValue());
+            cacheService.updateStatisticInfo(statisticInfo,false,chainId);
+
 
             // 更新统计时间戳
             prevTimestampMap.put(chainId,currentTimestamp);
+        });
+    }
+
+    /**
+     * 推送统计信息，1秒推送一次
+     */
+    @Scheduled(cron="0/1 * * * * ?")
+    public void pushStatisticInfo(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            // 推送整体统计信息
+            StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
+            statisticInfo.setBlockStatisticList(statisticInfo.getLimitQueue().elementsAsc());
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
+            messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
         });
     }
 }

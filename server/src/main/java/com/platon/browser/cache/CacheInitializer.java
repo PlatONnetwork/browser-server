@@ -9,6 +9,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.LimitQueue;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
@@ -162,7 +163,7 @@ public class CacheInitializer {
                 statisticInfo.setAvgTime(avgTime);
 
             }else{
-                statisticInfo.setAvgTime(0);
+                statisticInfo.setAvgTime(0l);
             }
 
             // 当前交易数
@@ -195,15 +196,15 @@ public class CacheInitializer {
 
             // 获取最近10个区块
             List<HomeBlock> blockList = statisticMapper.blockList(chainId);
-            List<StatisticItem> statisticList = new ArrayList<>();
+            LimitQueue<StatisticItem> limitQueue = new LimitQueue<>(100);
             blockList.forEach(block->{
                 StatisticItem bean = new StatisticItem();
                 BeanUtils.copyProperties(block,bean);
                 bean.setHeight(block.getNumber());
                 bean.setTime(block.getTimestamp().getTime());
-                statisticList.add(bean);
+                limitQueue.offer(bean);
             });
-            statisticInfo.setBlockStatisticList(statisticList);
+            statisticInfo.setLimitQueue(limitQueue);
 
             cacheService.updateStatisticInfo(statisticInfo,true,chainId);
         });

@@ -8,25 +8,27 @@ import java.util.List;
 
 @Data
 public class StatisticInfo {
-    private long avgTime;
+    private Long avgTime;
 
-    private long current;
+    private Long current;
 
-    private double maxTps;
+    private Double maxTps;
 
     private BigDecimal avgTransaction;
 
-    private long dayTransaction;
+    private Long dayTransaction;
 
     private List<StatisticItem> blockStatisticList ;
 
     @JsonIgnore
-    private long transactionCount;
+    private LimitQueue<StatisticItem> limitQueue;
     @JsonIgnore
-    private long blockCount;
+    private Long transactionCount;
     @JsonIgnore
-    private long highestBlockNumber;
+    private Long blockCount;
     @JsonIgnore
-    private long lowestBlockNumber;
+    private Long highestBlockNumber;
+    @JsonIgnore
+    private Long lowestBlockNumber;
 
 }

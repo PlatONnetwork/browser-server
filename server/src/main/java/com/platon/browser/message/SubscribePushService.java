@@ -126,13 +126,11 @@ public class SubscribePushService {
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
                 messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
 
-                logger.info("STOMP推送统计信息: {}",msg);
+                logger.info("更新统计信息: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
-                statisticInfo.setBlockCount(1);
-                statisticInfo.setTransactionCount(transactionInfos.size());
-                statisticInfo.setCurrent(transactionDtos.size());
-                statisticInfo.setDayTransaction(transactionInfos.size());
+                statisticInfo.setBlockCount(1l);
+                statisticInfo.setDayTransaction(Long.valueOf(transactionInfos.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();
                 StatisticItem statisticItem = new StatisticItem();
                 statisticItem.setHeight(blockInfo.getHeight());
@@ -142,10 +140,6 @@ public class SubscribePushService {
                 statisticInfo.setBlockStatisticList(statisticItems);
                 // 更新统计缓存信息
                 cacheService.updateStatisticInfo(statisticInfo,false,chainId);
-                // 推送整体统计信息
-                statisticInfo = cacheService.getStatisticInfo(chainId);
-                resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
-                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
                 break;
         }
     }

@@ -25,7 +25,7 @@ import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
-import com.platon.browser.util.LimitQueue;
+import com.platon.browser.dto.LimitQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,9 @@ public class CacheServiceImpl implements CacheService {
         chainsConfig.getChainIds().forEach(chainId -> {
             nodeInfoMap.put(chainId,new ArrayList<>());
             indexInfoMap.put(chainId,new IndexInfo());
-            statisticInfoMap.put(chainId,new StatisticInfo());
+            StatisticInfo statisticInfo = new StatisticInfo();
+            statisticInfo.setLimitQueue(new LimitQueue<>(100));
+            statisticInfoMap.put(chainId,statisticInfo);
             blockInfoMap.put(chainId,new LimitQueue<>(10));
             transactionInfoMap.put(chainId,new LimitQueue<>(10));
         });
@@ -147,31 +149,38 @@ public class CacheServiceImpl implements CacheService {
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
             }else{
-                if(statisticInfo.getBlockCount()!=0){
+                if(statisticInfo.getCurrent()!=null){
+                    // 当前交易数
+                    cache.setCurrent(statisticInfo.getCurrent());
+                }
+                if(statisticInfo.getMaxTps()!=null){
+                    cache.setMaxTps(statisticInfo.getMaxTps());
+                }
+
+                if(statisticInfo.getBlockCount()!=null){
                     cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
                 }
-                if(statisticInfo.getTransactionCount()!=0){
-                    cache.setCurrent(cache.getCurrent()+statisticInfo.getCurrent());
+                if(statisticInfo.getTransactionCount()!=null){
                     cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
                 }
-                if(statisticInfo.getBlockCount()!=0||statisticInfo.getTransactionCount()!=0){
+                if(statisticInfo.getBlockCount()!=null&&statisticInfo.getBlockCount()!=0&&statisticInfo.getTransactionCount()!=null){
                     cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
                 }
-                if(statisticInfo.getHighestBlockNumber()!=0){
+                if(statisticInfo.getHighestBlockNumber()!=null){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
                 }
-                if(statisticInfo.getDayTransaction()!=0){
+                if(statisticInfo.getDayTransaction()!=null){
                     cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
                 }
                 if(statisticInfo.getBlockStatisticList()!=null){
                     Map<Long, StatisticItem> map = new HashMap<>();
-                    List<StatisticItem> cacheStatisticItemList = cache.getBlockStatisticList();
-                    cacheStatisticItemList.forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    LimitQueue<StatisticItem> limitQueue = cache.getLimitQueue();
+                    limitQueue.elements().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
                     statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
                         StatisticItem item = map.get(statisticItem.getHeight());
                         if(item==null){
-                            cacheStatisticItemList.add(statisticItem);
+                            limitQueue.offer(statisticItem);
                         }else{
                             item.setTransaction(item.getTransaction()+statisticItem.getTransaction());
                         }
