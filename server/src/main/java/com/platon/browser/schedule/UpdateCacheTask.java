@@ -68,15 +68,18 @@ public class UpdateCacheTask {
 
             logger.info("统计链【ID={}】交易TPS",chainId);
 
-            // 取当前日期作为查询交易记录的结束时间
-            Date endDate = new Date(currentTimestamp);
             // 默认取上一次统计时间作为查询交易记录的开始时间
             Date startDate = new Date(prevTimestamp);
-            if(prevTimestamp==0||(currentTimestamp-prevTimestamp)>intervalInMillisecond){
-                // 如果上次统计时间戳为0，或者当前时间戳与上次统计时间戳之差超出指定的统计间隔，
-                // 则取【当前时刻回溯一个间隔时间】到【当前时刻】的交易来统计交易TPS
-                // 取得指定时间范围内的交易记录，判断第一条和最后一条记录的
-                startDate = new Date(currentTimestamp-intervalInMillisecond); // 当前日期往前推一个间隔的日期
+            // 取上次统计时间戳+intervalInMillisecond日期作为查询交易记录的结束时间
+            long tmp = prevTimestamp+intervalInMillisecond;
+            Date endDate = new Date(tmp);
+            // 计算TPS时默认使用设置的间隔的秒数作为除数
+            long divisor = intervalInSecond;
+            if(tmp>currentTimestamp){
+                // 上次时间加上间隔时间大于当前时间，则取当前时间为结束时间
+                endDate = new Date(currentTimestamp);
+                // 使用实际的时间间隔作为除数
+                divisor = (currentTimestamp-prevTimestamp)/1000;
             }
 
             TransactionExample condition = new TransactionExample();
@@ -86,7 +89,7 @@ public class UpdateCacheTask {
             int transactionCount = transactionList.size();
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
             statisticInfo.setCurrent(Long.valueOf(transactionCount));
-            BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(intervalInSecond),4,BigDecimal.ROUND_DOWN);
+            BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
             statisticInfo.setMaxTps(transactionTps.doubleValue());
             cacheService.updateStatisticInfo(statisticInfo,false,chainId);
 
