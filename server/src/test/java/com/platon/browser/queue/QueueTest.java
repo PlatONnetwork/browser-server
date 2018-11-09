@@ -1,6 +1,7 @@
 package com.platon.browser.queue;
 
-import com.platon.browser.util.LimitQueue;
+
+import com.platon.browser.dto.LimitQueue;
 
 public class QueueTest {
     public static void main(String[] args) {
