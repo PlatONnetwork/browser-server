@@ -1,12 +1,17 @@
 package com.platon.browser.schedule;
 
+import com.platon.browser.cache.CacheInitializer;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +44,9 @@ public class UpdateCacheTask {
 
     @Autowired
     private TransactionMapper transactionMapper;
+
+    @Autowired
+    private CacheInitializer cacheInitializer;
 
     // 交易TPS统计时间间隔, 单位：分钟
     @Value("${platon.transaction.tps.statistic.interval}")
@@ -112,6 +120,40 @@ public class UpdateCacheTask {
             statisticInfo.setBlockStatisticList(statisticInfo.getLimitQueue().elementsAsc());
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
             messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
+        });
+    }
+
+    /**
+     * 检查缓存，如果发现缓存为空，则初始化
+     */
+    @Scheduled(cron="0/5 * * * * ?")
+    public void initCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
+            if(nodeInfoList.size()==0){
+                logger.info("节点缓存为空, 执行初始化...");
+                cacheInitializer.initNodeInfoList(chainId);
+            }
+            IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
+            if(indexInfo.getCurrentHeight()==0){
+                logger.info("指标缓存为空, 执行初始化...");
+                cacheInitializer.initIndexInfo(chainId);
+            }
+            StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
+            if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
+                logger.info("统计缓存为空, 执行初始化...");
+                cacheInitializer.initStatisticInfo(chainId);
+            }
+            List<BlockInfo> blockInfoList = cacheService.getBlockInfoList(chainId);
+            if(blockInfoList.size()==0){
+                logger.info("区块缓存为空, 执行初始化...");
+                cacheInitializer.initBlockInfoList(chainId);
+            }
+            List<TransactionInfo> transactionInfoList = cacheService.getTransactionInfoList(chainId);
+            if(transactionInfoList.size()==0){
+                logger.info("交易缓存为空, 执行初始化...");
+                cacheInitializer.initTransactionInfoList(chainId);
+            }
         });
     }
 }
