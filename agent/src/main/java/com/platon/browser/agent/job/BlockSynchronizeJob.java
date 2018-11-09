@@ -13,14 +13,18 @@ import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
+import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -81,44 +85,40 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
             BlockExample condition = new BlockExample();
             condition.setOrderByClause("timestamp desc");
-            PageHelper.startPage(1,1);
-            List<Block> blocks = blockMapper.selectByExample(condition);
-            if(blocks.size() > 0){
+            PageHelper.startPage(1, 1);
+            List <Block> blocks = blockMapper.selectByExample(condition);
+            if (blocks.size() > 0) {
                 if (Long.valueOf(blockNumber) > blocks.get(0).getNumber()) {
                     //链上块增长
-                    for (int i = blocks.get(0).getNumber().intValue(); i < Integer.parseInt(blockNumber); i++) {
+                    for (int i = blocks.get(0).getNumber().intValue()+1 ; i < Integer.parseInt(blockNumber); i++) {
                         try {
                             BlockDto newBlock = buildStruct(i, web3j);
-                            // 数据插入队列
-                            String str = JSONObject.toJSONString(newBlock);
                             //chainId获取
-                            mqSender.send(ConfigConst.getChainId(), "blockInfo", str);
+                            mqSender.send(ConfigConst.getChainId(), "block", newBlock);
                         } catch (Exception e) {
                             log.error("同步区块信息异常", e);
                             throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                         }
                     }
-                } else if (Long.valueOf(blockNumber) < blocks.get(0).getNumber() || Long.valueOf(blockNumber) ==  blocks.get(0).getNumber()) {
+                } else if (Long.valueOf(blockNumber) < blocks.get(0).getNumber() || Long.valueOf(blockNumber) == blocks.get(0).getNumber()) {
                     //链上块无增长
                     log.info("无新区块");
                 }
-            }else {
+            } else {
                 //判断是否是首次
-                for (int i = 0; i < Long.valueOf(blockNumber); i++) {
+                for (int i = 1; i < Long.valueOf(blockNumber); i++) {
                     try {
                         BlockDto newBlock = buildStruct(i, web3j);
-                        // 数据插入队列
-                        String str = JSONObject.toJSONString(newBlock);
                         //chainId获取
-                        mqSender.send(ConfigConst.getChainId(), "blockInfo", str);
+                        mqSender.send(ConfigConst.getChainId(), "block", newBlock);
                     } catch (Exception e) {
                         log.error("同步区块信息异常", e);
                         throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                     }
                 }
             }
-        }catch (Exception e){
-                log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
         } finally {
             stopWatch.stop();
             log.info("BlockSynchronizeJob-->{}", stopWatch.shortSummary());
@@ -137,7 +137,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     // 计算区块中的交易费
     private BigInteger getGasInBlock ( List <TransactionDto> transactionList ) {
         BigInteger txfee = null;
-        if (transactionList.size() > 0) {
+        if (transactionList != null  && transactionList.size() > 0) {
             for (TransactionDto transactionDto : transactionList) {
                 BigInteger price = transactionDto.getEnergonPrice();
                 BigInteger used = transactionDto.getEnergonUsed();
@@ -150,11 +150,14 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     }
 
     //区块奖励
-    private BigInteger getBlockReward ( String height, List <TransactionDto> transactionList ) {
+    private String getBlockReward ( String height, List <TransactionDto> transactionList ) {
         BigInteger reward = getConstReward(height);
-        BigInteger txfee = getGasInBlock(transactionList);
+        BigInteger txfee = BigInteger.ZERO;
+        if (transactionList != null  && transactionList.size() > 0) {
+            txfee = getGasInBlock(transactionList);
+        }
         BigInteger blockReward = reward.add(txfee);
-        return blockReward;
+        return String.valueOf(blockReward);
     }
 
     private BlockDto buildStruct ( int i, Web3j web3j ) throws Exception {
@@ -162,9 +165,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
         //交易相关
         List <TransactionDto> transactionDtolist = new ArrayList <>();
-        List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
+        if(!ethBlock.getBlock().getTransactions().equals(null) && ethBlock.getBlock().getTransactions().size() > 0){
+            List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             for (EthBlock.TransactionResult transactionResult : list) {
-                EthTransaction ethTransaction = web3j.ethGetTransactionByHash(transactionResult.toString()).send();
+                Transaction txList = (Transaction)transactionResult.get();
+                EthTransaction ethTransaction = web3j.ethGetTransactionByHash(txList.getHash()).send();
                 Optional <Transaction> value = ethTransaction.getTransaction();
                 if (!value.isPresent()) {
                     throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
@@ -178,80 +183,89 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     throw new AppException(ErrorCodeEnum.TX_ERROR);
                 }
                 TransactionReceipt receipt = transactionReceipt.get();
+                BeanUtils.copyProperties(receipt,transactionDto);
                 transactionDto.setHash(transaction.getHash());
-                transactionDto.setBlockHash(transaction.getBlockHash());
-                transactionDto.setBlockNumber(transaction.getBlockNumber());
-                transactionDto.setEnergonPrice(transaction.getGasPrice());
                 transactionDto.setTransactionIndex(receipt.getTransactionIndex());
-                transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
+                transactionDto.setEnergonPrice(transaction.getGasPrice());
                 transactionDto.setEnergonLimit(transaction.getGas());
-                transactionDto.setFrom(transaction.getFrom());
-                transactionDto.setTo(transaction.getTo());
-                transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
-                transactionDto.setInput(transaction.getInput());
-                transactionDto.setTransactionIndex(transaction.getTransactionIndex());
+                transactionDto.setEnergonUsed(receipt.getGasUsed());
                 transactionDto.setNonce(transaction.getNonce().toString());
                 transactionDto.setValue(transaction.getValue().toString());
+                transactionDto.setTxReceiptStatus(receipt.getStatus());
+                transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                 String input = transactionDto.getInput();
+                if(null != transaction.getTo()){
+                    EthGetCode ethGetCode  = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                    if(!ethGetCode.getCode().equals("0x")){
+                        transactionDto.setReceiveType("contract");
+                    }else {
+                        transactionDto.setReceiveType("account");
+                    }
+                }
+                transactionDto.setReceiveType("contract");
                 String type = geTransactionTyep(input);
                 transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
-
-
             }
-            BlockDto newBlock = new BlockDto();
-            newBlock.setHash(ethBlock.getBlock().getHash());
-            newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
-            newBlock.setParentHash(ethBlock.getBlock().getParentHash());
-            newBlock.setNonce(ethBlock.getBlock().getNonce().toString());
-            newBlock.setMiner(ethBlock.getBlock().getMiner());
-            newBlock.setExtraData(ethBlock.getBlock().getExtraData());
-            newBlock.setSize(ethBlock.getBlock().getSize().intValue());
-            newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
-            newBlock.setEnergonUsed(ethBlock.getBlock().getGasUsed());
-            newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
-            newBlock.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(list.size()))));
-            newBlock.setBlockReward(getBlockReward(String.valueOf(newBlock.getNumber()), newBlock.getTransaction()).toString());
-            return newBlock;
+        }
+        BlockDto newBlock = new BlockDto();
+        BeanUtils.copyProperties(ethBlock.getBlock(),newBlock);
+        newBlock.setEnergonUsed(ethBlock.getBlock().getGasUsed());
+        newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
+        newBlock.setNonce(String.valueOf(ethBlock.getBlock().getNonce()));
+        newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
+        newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+        if (ethBlock.getBlock().getTransactions().size() > 0) {
+            newBlock.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))));
+        } else
+        newBlock.setEnergonAverage(BigInteger.ZERO);
+        newBlock.setBlockReward(getBlockReward(String.valueOf(newBlock.getNumber()),newBlock.getTransaction()));
+        newBlock.setTransaction(transactionDtolist);
+        return newBlock;
+
     }
 
 
-    private String geTransactionTyep(String input)throws Exception{
-        RlpList rlpList = RlpDecoder.decode(Hex.decode(input));
-        List<RlpType> rlpTypes = rlpList.getValues();
-        RlpList rlpList1 = (RlpList)rlpTypes.get(0);
-        RlpString rlpString = (RlpString)rlpList1.getValues().get(0);
-        String typecode = Hex.toHexString(rlpString.getBytes());
-        byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+    private String geTransactionTyep ( String input ) throws Exception {
         String type = null;
-        //todo:置换web3j jar包platon版本
-        switch (type){
-            case "0":
-                //主币交易转账
-                type = "transfer";
-                break;
-            case "1":
-                //合约发布
-                type = "contractCreate";
-                break;
-            case "2":
-                //合约调用
-                type = "transactionExecute";
-                break;
-            case "3":
-                //投票
-                type = "vote";
-                break;
-            case "4":
-                //权限
-                type = "authorization";
-                break;
-            case "5":
-                //MPC交易
-                type = "MPCtransaction";
-                break;
+        if(StringUtils.isNotEmpty(input)){
+            RlpList rlpList = RlpDecoder.decode(Hex.decode(input));
+            List <RlpType> rlpTypes = rlpList.getValues();
+            RlpList rlpList1 = (RlpList) rlpTypes.get(0);
+            RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
+            String typecode = Hex.toHexString(rlpString.getBytes());
+            byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+            //todo:置换web3j jar包platon版本
+            switch (type) {
+                case "0":
+                    //主币交易转账
+                    type = "transfer";
+                    break;
+                case "1":
+                    //合约发布
+                    type = "contractCreate";
+                    break;
+                case "2":
+                    //合约调用
+                    type = "transactionExecute";
+                    break;
+                case "3":
+                    //投票
+                    type = "vote";
+                    break;
+                case "4":
+                    //权限
+                    type = "authorization";
+                    break;
+                case "5":
+                    //MPC交易
+                    type = "MPCtransaction";
+                    break;
+            }
+            return type;
         }
-        return type;
+        return type = "transfer";
+
     }
 /*    public static void main(String args[]){
         TransactionDto transactionDto = new TransactionDto();

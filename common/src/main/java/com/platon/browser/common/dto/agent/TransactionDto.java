@@ -96,6 +96,19 @@ public class TransactionDto {
      */
     private String receiveType;
 
+    /**
+     *  交易状态
+     */
+    private String txReceiptStatus;
+
+    public String getTxReceiptStatus () {
+        return txReceiptStatus;
+    }
+
+    public void setTxReceiptStatus ( String txReceiptStatus ) {
+        this.txReceiptStatus = txReceiptStatus;
+    }
+
     public String getHash () {
         return hash;
     }
