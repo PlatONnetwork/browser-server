@@ -1,6 +1,5 @@
 package com.platon.browser.config;
 
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,18 +10,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
+@Component
 public class ChainsConfig {
 
     private static final String CHAIN_CONFIG_SPLITER = ",";
     private static final String NAME_ID_SPLITER = ":";
 
+    @Value("${platon.chains}")
     private String configStr;
 
     private Map<String,String> chainsConfig = new HashMap<>();
 
-    public ChainsConfig(String configStr){
-        this.configStr = configStr;
+    @PostConstruct
+    public void init(){
         if(StringUtils.isNotBlank(configStr)){
             String [] confsArr = configStr.split(CHAIN_CONFIG_SPLITER);
             if(confsArr!=null){
