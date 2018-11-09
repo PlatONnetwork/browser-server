@@ -126,7 +126,7 @@ public class UpdateCacheTask {
     /**
      * 检查缓存，如果发现缓存为空，则初始化
      */
-    @Scheduled(cron="0/5 * * * * ?")
+    @Scheduled(cron="0/10 * * * * ?")
     public void initCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
             List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
