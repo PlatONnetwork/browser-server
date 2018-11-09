@@ -1,4 +1,4 @@
-package com.platon.browser.util;
+package com.platon.browser.dto;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,6 +47,14 @@ public class LimitQueue<E>{
     public List<E> elements(){
         List<E> list = new ArrayList<>();
         for (int i=queue.size()-1;i>=0;i--){
+            list.add(queue.get(i));
+        }
+        return list;
+    }
+
+    public List<E> elementsAsc(){
+        List<E> list = new ArrayList<>();
+        for (int i=0;i<queue.size();i++){
             list.add(queue.get(i));
         }
         return list;
