@@ -1,38 +1,28 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CalculateMapper;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockInfo;
-import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 /**
  * 缓存服务
