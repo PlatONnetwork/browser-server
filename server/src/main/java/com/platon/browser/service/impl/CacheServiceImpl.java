@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 缓存服务
- * 提供首页节点信息、统计信息、区块信息、交易信息
+ * 提供首页节点信息、指标信息、统计信息、区块信息、交易信息
  */
 @Service
 public class CacheServiceImpl implements CacheService {
