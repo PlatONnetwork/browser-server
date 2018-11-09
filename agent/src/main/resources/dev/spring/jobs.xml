@@ -15,11 +15,11 @@
                    max-sleep-time-milliseconds="3000" max-retries="3"/>
 
     <job:simple id="blockSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.BlockSynchronizeJob" registry-center-ref="regCenter"
-                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=blockSynchronizeJob" overwrite="true"
+                cron="*/30 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=blockSynchronizeJob" overwrite="true"
                 failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "同步区块信息任务"/>
 
 
-    <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
+    <!--<job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
                 failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易信息任务"/>
 
@@ -32,6 +32,6 @@
 
     <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
-                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易入库任务"/>
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易入库任务"/>-->
 
 </beans>

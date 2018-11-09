@@ -12,9 +12,10 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,14 +47,31 @@ public class BlockStorageService {
                 //构建dto结构，转存数据库结构
                 //区块相关block
                 Block block = bulidBlock(blockDto,message);
-                blockMapper.insert(block);
+                try{
+                    blockMapper.insertSelective(block);
+                }catch (Exception e){
+                    Block block1 = blockMapper.selectByPrimaryKey(block.getHash());
+                    if(!ObjectUtils.isEmpty(block1)){
+                        blockMapper.updateByPrimaryKeySelective(block);
+                        logger.debug("block数据重复，查询并更新",e.getMessage());
+
+                    }
+                }
 
                 //交易相关transaction
                 if(blockDto.getTransaction().size() > 0){
                     List<TransactionWithBLOBs> transactionList = buildTransaction(blockDto,message);
-                    transactionMapper.batchInsert(transactionList);
-                }else {
-                    logger.info("STOMP区块信息中交易信息为空: {}",msg);
+                    try{
+                        transactionMapper.batchInsert(transactionList);
+                    }catch (Exception e){
+                        for(TransactionWithBLOBs transactionWithBLOBs : transactionList){
+                            TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(transactionWithBLOBs.getHash());
+                            if(!ObjectUtils.isEmpty(transaction)){
+                                transactionMapper.updateByPrimaryKeySelective(transaction);
+                                logger.debug("transaction数据重复，查询并更新",e.getMessage());
+                            }
+                        }
+                    }
                 }
                 break;
 
@@ -65,21 +83,24 @@ public class BlockStorageService {
 
     private Block bulidBlock(BlockDto blockDto,Message message){
         Block block = new Block();
-        block.setNumber(Long.valueOf(blockDto.getNumber()));
-        block.setTimestamp(new Date(blockDto.getTimestamp()));
-        block.setSize((int)blockDto.getSize());//考虑转换格式类型，高精度转低精度可能会导致数据失准
-        block.setMiner(blockDto.getMiner());
-        block.setExtraData(blockDto.getExtraData());
-        block.setNonce(blockDto.getNonce());
-        block.setParentHash(blockDto.getParentHash());
-        block.setChainId(message.getChainId());
-        block.setHash(blockDto.getHash());
-        block.setBlockReward(blockDto.getBlockReward());
-        block.setEnergonAverage(blockDto.getEnergonAverage().toString());
-        block.setEnergonLimit(blockDto.getEnergonLimit().toString());
-        block.setEnergonUsed(blockDto.getEnergonUsed().toString());
-        block.setCreateTime(new Date());
-        block.setUpdateTime(new Date());
+        try{
+            BeanUtils.copyProperties(blockDto,block);
+            block.setNumber(Long.valueOf(blockDto.getNumber()));
+            if(blockDto.getTimestamp() == 0){
+                block.setTimestamp(new Date(3600));
+            }else{
+                block.setTimestamp(new Date(blockDto.getTimestamp() * 1000l));
+            }
+            block.setSize((int)blockDto.getSize());//考虑转换格式类型，高精度转低精度可能会导致数据失准
+            block.setChainId(message.getChainId());
+            block.setEnergonAverage(blockDto.getEnergonAverage().toString());
+            block.setEnergonLimit(blockDto.getEnergonLimit().toString());
+            block.setEnergonUsed(blockDto.getEnergonUsed().toString());
+            block.setCreateTime(new Date());
+            block.setUpdateTime(new Date());
+        }catch (Exception e){
+            logger.error("数据转化异常",e.getMessage());
+        }
         return block;
     }
 
@@ -88,7 +109,7 @@ public class BlockStorageService {
         List<TransactionDto> transactionDtos = blockDto.getTransaction();
         for(TransactionDto transactionDto : transactionDtos){
             TransactionWithBLOBs transaction = new TransactionWithBLOBs();
-            transaction.setBlockHash(transactionDto.getBlockHash());
+            BeanUtils.copyProperties(transactionDto,transaction);
             transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
             transaction.setBlockNumber(Long.valueOf(transactionDto.getBlockNumber().toString()));
             transaction.setChainId(message.getChainId());
@@ -97,17 +118,13 @@ public class BlockStorageService {
             transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
             transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
             transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
-            transaction.setFrom(transactionDto.getFrom());
-            transaction.setTo(transactionDto.getTo());
-            transaction.setHash(transactionDto.getHash());
-            transaction.setNonce(transactionDto.getNonce());
-            transaction.setTimestamp(transaction.getTimestamp());
+            transaction.setTxReceiptStatus(Integer.parseInt(transactionDto.getTxReceiptStatus().substring(2),16));
             transaction.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
-            transaction.setTxReceiptStatus(transaction.getTxReceiptStatus());
-            transaction.setTxType(transactionDto.getTxType());
-            transaction.setValue(transactionDto.getValue());
+            transaction.setReceiveType(transactionDto.getReceiveType());
+            transaction.setInput(transactionDto.getInput() != null ? transactionDto.getInput() : "0x");
             transactionList.add(transaction);
         }
         return transactionList;
     }
+
 }
