@@ -2,7 +2,6 @@ package com.platon.browser.cache;
 
 import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -18,12 +17,10 @@ import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.enums.NodeType;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.util.GeoUtil;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
