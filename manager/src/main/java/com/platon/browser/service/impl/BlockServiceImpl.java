@@ -4,10 +4,8 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.CustomBlock;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
@@ -36,23 +34,23 @@ public class BlockServiceImpl implements BlockService {
     private BlockMapper blockMapper;
 
     @Autowired
-    private CustomBlockMapper customBlockMapper;
-
-    @Autowired
     private TransactionMapper transactionMapper;
 
     @Override
     public List<BlockList> getBlockList(BlockListReq req) {
-        List<CustomBlock> blocks = customBlockMapper.selectByChainId(req.getCid());
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        List<Block> blocks = blockMapper.selectByExample(condition);
         List<BlockList> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
-            BlockList bl = new BlockList();
-            BeanUtils.copyProperties(block,bl);
-            bl.setHeight(block.getNumber());
-            bl.setServerTime(serverTime);
-            bl.setTimestamp(block.getTimestamp().getTime());
-            blockList.add(bl);
+            BlockList bean = new BlockList();
+            BeanUtils.copyProperties(block,bean);
+            bean.setHeight(block.getNumber());
+            bean.setServerTime(serverTime);
+            bean.setTimestamp(block.getTimestamp().getTime());
+            bean.setTransaction(block.getTransactionNumber());
+            blockList.add(bean);
         });
         return blockList;
     }
