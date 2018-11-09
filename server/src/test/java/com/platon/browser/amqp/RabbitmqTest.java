@@ -1,8 +1,6 @@
 package com.platon.browser.amqp;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.ServiceApplication;
-import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Node;
 import org.junit.Test;

@@ -8,7 +8,7 @@ import java.io.IOException;
 public class GeoTest {
     public static void main(String[] args) {
         try {
-            String path = LookupService.class.getClassLoader().getResource("GeoLiteCity.dat").getPath();
+            String path = LookupService.class.getClassLoader().getResource("dev/GeoLiteCity.dat").getPath();
             LookupService cl = new LookupService(path, LookupService.GEOIP_MEMORY_CACHE);
             Location l2 = cl.getLocation("14.215.177.39");
             System.out.println(
