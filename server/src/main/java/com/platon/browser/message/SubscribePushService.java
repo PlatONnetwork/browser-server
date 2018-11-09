@@ -56,7 +56,7 @@ public class SubscribePushService {
 
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case NODE:
-                logger.info("STOMP推送节点信息: {}",msg);
+                logger.debug("STOMP推送节点信息: {}",msg);
                 NodeDto nodeDto = JSON.parseObject(message.getStruct(), NodeDto.class);
 
                 NodeInfo nodeInfo = new NodeInfo();
@@ -73,7 +73,7 @@ public class SubscribePushService {
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
                 break;
             case BLOCK:
-                logger.info("STOMP推送区块信息: {}",msg);
+                logger.debug("STOMP推送区块信息: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
 
                 BlockInfo blockInfo = new BlockInfo();
@@ -92,7 +92,7 @@ public class SubscribePushService {
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfoList);
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
 
-                logger.info("STOMP推送指标信息: {}",msg);
+                logger.debug("STOMP推送指标信息: {}",msg);
                 IndexInfo indexInfo = new IndexInfo();
                 indexInfo.setCurrentHeight(blockInfo.getHeight());
                 indexInfo.setCurrentTransaction(blockDto.getTransaction().size());
@@ -103,28 +103,32 @@ public class SubscribePushService {
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
 
-                logger.info("STOMP推送交易信息: {}",msg);
+                logger.debug("STOMP推送交易信息: {}",msg);
                 List<TransactionDto> transactionDtos = blockDto.getTransaction();
-                List<TransactionInfo> transactionInfos = new ArrayList<>();
-                transactionDtos.forEach(transactionDto -> {
-                    TransactionInfo bean = new TransactionInfo();
-                    BeanUtils.copyProperties(transactionDto,bean);
-                    bean.setTxHash(transactionDto.getHash());
-                    bean.setTimestamp(transactionDto.getTimestamp());
-                    bean.setBlockHeight(transactionDto.getBlockNumber().longValue());
-                    bean.setFrom(transactionDto.getFrom());
-                    bean.setTo(transactionDto.getTo());
-                    bean.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
-                    bean.setValue(transactionDto.getValue());
-                    transactionInfos.add(bean);
-                });
-                // 更新交易缓存信息
-                cacheService.updateTransactionInfoList(transactionInfos,chainId);
-                // 推送新的交易信息
-                resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
-                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
 
-                logger.info("更新统计信息: {}",msg);
+                List<TransactionInfo> transactionInfos = new ArrayList<>();
+                if(transactionDtos.size()>0){
+                    // 只有区块有交易数据才推送交易信息
+                    transactionDtos.forEach(transactionDto -> {
+                        TransactionInfo bean = new TransactionInfo();
+                        BeanUtils.copyProperties(transactionDto,bean);
+                        bean.setTxHash(transactionDto.getHash());
+                        bean.setTimestamp(transactionDto.getTimestamp());
+                        bean.setBlockHeight(transactionDto.getBlockNumber().longValue());
+                        bean.setFrom(transactionDto.getFrom());
+                        bean.setTo(transactionDto.getTo());
+                        bean.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
+                        bean.setValue(transactionDto.getValue());
+                        transactionInfos.add(bean);
+                    });
+                    // 更新交易缓存信息
+                    cacheService.updateTransactionInfoList(transactionInfos,chainId);
+                    // 推送新的交易信息
+                    resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
+                    messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
+                }
+
+                logger.debug("更新统计信息: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
                 statisticInfo.setBlockCount(1l);
