@@ -25,12 +25,6 @@
     COUNT(0) AS `transaction`
     FROM `block` bl LEFT JOIN `transaction` tr ON tr.`chain_id`=bl.`chain_id` AND bl.`number`=tr.`block_number`
     WHERE bl.`chain_id`=#{chainId}
-    GROUP BY bl.`chain_id`,bl.`number`,bl.`timestamp`,
-    bl.`size`,
-    bl.`miner`,
-    bl.`energon_used`,
-    bl.`energon_average`,
-    bl.`energon_limit`,
-    bl.`block_reward` ORDER BY bl.`number` DESC
+    GROUP BY bl.`chain_id`,bl.`number`,bl.`timestamp` ORDER BY bl.`number` DESC
   </select>
 </mapper>

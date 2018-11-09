@@ -19,13 +19,7 @@
     FROM
       block bl LEFT JOIN `transaction` tr ON bl.`chain_id`=tr.`chain_id` AND bl.`number`=tr.`block_number`
     WHERE bl.`chain_id` = #{chainId}
-    GROUP BY
-      bl.`number`,
-      bl.miner,
-      bl.`timestamp`,
-      bl.block_reward,
-      bl.chain_id
-    ORDER BY bl.`number` DESC LIMIT 10;
+    GROUP BY bl.`number` ORDER BY bl.`number` DESC LIMIT 10;
   </select>
 
   <select id="countAddress" parameterType="java.lang.String" resultType="java.lang.Long">
