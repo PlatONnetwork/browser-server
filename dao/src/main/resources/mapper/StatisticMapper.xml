@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.StatisticMapper">
-  <resultMap id="HomeBlockResultMap" type="com.platon.browser.dao.entity.HomeBlock">
-    <result column="number" jdbcType="BIGINT" property="number" />
-    <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
-    <result column="miner" jdbcType="VARCHAR" property="miner" />
-    <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
-    <result column="transaction" jdbcType="BIGINT" property="transaction" />
-  </resultMap>
-  <select id="blockList" parameterType="java.lang.String" resultMap="HomeBlockResultMap">
-    SELECT
-      bl.`number`,
-      bl.miner,
-      bl.`timestamp`,
-      bl.block_reward,
-      bl.chain_id,
-      COUNT(0) AS `transaction`
-    FROM
-      block bl LEFT JOIN `transaction` tr ON bl.`chain_id`=tr.`chain_id` AND bl.`number`=tr.`block_number`
-    WHERE bl.`chain_id` = #{chainId}
-    GROUP BY bl.`number` ORDER BY bl.`number` DESC LIMIT 10;
-  </select>
-
   <select id="countAddress" parameterType="java.lang.String" resultType="java.lang.Long">
     SELECT COUNT(0) FROM (
       SELECT DISTINCT tr.`chain_id`, tr.`from` FROM `transaction` tr WHERE tr.`tx_type` = 'transfer' AND tr.`chain_id`=#{chainId} GROUP BY tr.`chain_id`,tr.`from`
@@ -35,14 +14,6 @@
       SELECT COUNT(*) FROM `transaction` `tr`
       WHERE `tr`.`timestamp` >= (NOW() - INTERVAL 1 DAY)
       AND `tr`.`timestamp` <= NOW() AND `tr`.`chain_id`=#{chainId} ;
-    ]]>
-  </select>
-
-  <select id="countTransactionInXMinute" parameterType="com.platon.browser.dao.entity.TpsCountParam" resultType="java.lang.Long">
-    <![CDATA[
-      SELECT COUNT(0) FROM `transaction` `tr`
-      WHERE `tr`.`timestamp` >= (NOW() - INTERVAL #{param.minute} MINUTE)
-      AND `tr`.`timestamp` <= NOW() AND `tr`.`chain_id`=#{param.chainId} ;
     ]]>
   </select>
 

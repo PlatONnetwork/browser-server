@@ -193,8 +193,12 @@ public class CacheInitializer {
             long count = statisticMapper.countTransactionIn24Hours(chainId);
             statisticInfo.setDayTransaction(count);
 
-            // 获取最近10个区块
-            List<HomeBlock> blockList = statisticMapper.blockList(chainId);
+            // 获取最近100个区块
+            BlockExample condition = new BlockExample();
+            condition.createCriteria().andChainIdEqualTo(chainId);
+            condition.setOrderByClause("number desc");
+            PageHelper.startPage(1,100);
+            List<Block> blockList = blockMapper.selectByExample(condition);
             LimitQueue<StatisticItem> limitQueue = new LimitQueue<>(100);
             blockList.forEach(block->{
                 StatisticItem bean = new StatisticItem();
@@ -215,7 +219,11 @@ public class CacheInitializer {
      */
     private void initBlockInfoList(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            List<HomeBlock> blockList = statisticMapper.blockList(chainId);
+            BlockExample condition = new BlockExample();
+            condition.createCriteria().andChainIdEqualTo(chainId);
+            condition.setOrderByClause("number desc");
+            PageHelper.startPage(1,10);
+            List<Block> blockList = blockMapper.selectByExample(condition);
             List<BlockInfo> blockInfos = new ArrayList<>();
             long serverTime = System.currentTimeMillis();
             blockList.forEach(block -> {
@@ -225,6 +233,7 @@ public class CacheInitializer {
                 bean.setHeight(block.getNumber());
                 bean.setTimestamp(block.getTimestamp().getTime());
                 bean.setNode(block.getMiner());
+                bean.setTransaction(block.getTransactionNumber());
                 blockInfos.add(bean);
             });
             cacheService.updateBlockInfoList(blockInfos,chainId);
