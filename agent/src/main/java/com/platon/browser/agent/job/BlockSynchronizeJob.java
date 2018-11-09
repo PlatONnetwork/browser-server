@@ -221,6 +221,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         newBlock.setEnergonAverage(BigInteger.ZERO);
         newBlock.setBlockReward(getBlockReward(String.valueOf(newBlock.getNumber()),newBlock.getTransaction()));
         newBlock.setTransaction(transactionDtolist);
+        newBlock.setTransactionNumber(transactionDtolist.size() > 0 ? transactionDtolist.size() : new Integer(0));
         return newBlock;
 
     }

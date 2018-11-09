@@ -1104,6 +1104,66 @@ public class BlockExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andTransactionNumberIsNull() {
+            addCriterion("transaction_number is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberIsNotNull() {
+            addCriterion("transaction_number is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberEqualTo(Integer value) {
+            addCriterion("transaction_number =", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberNotEqualTo(Integer value) {
+            addCriterion("transaction_number <>", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberGreaterThan(Integer value) {
+            addCriterion("transaction_number >", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberGreaterThanOrEqualTo(Integer value) {
+            addCriterion("transaction_number >=", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberLessThan(Integer value) {
+            addCriterion("transaction_number <", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberLessThanOrEqualTo(Integer value) {
+            addCriterion("transaction_number <=", value, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberIn(List<Integer> values) {
+            addCriterion("transaction_number in", values, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberNotIn(List<Integer> values) {
+            addCriterion("transaction_number not in", values, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberBetween(Integer value1, Integer value2) {
+            addCriterion("transaction_number between", value1, value2, "transactionNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andTransactionNumberNotBetween(Integer value1, Integer value2) {
+            addCriterion("transaction_number not between", value1, value2, "transactionNumber");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
