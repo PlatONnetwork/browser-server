@@ -49,22 +49,22 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>-->
 
-        <!--<table tableName="block" domainObjectName="Block">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
+        <table tableName="block" domainObjectName="Block">
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
         </table>
-        <table tableName="node" domainObjectName="Node">
+        <!--<table tableName="node" domainObjectName="Node">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
                                 replaceString=""/>&ndash;&gt;
         </table>
         <table tableName="pending_tx" domainObjectName="PendingTx">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
                                 replaceString=""/>&ndash;&gt;
-        </table>-->
-        <table tableName="transaction" domainObjectName="Transaction">
-            <!--<columnRenamingRule searchString="^D_"
-                                replaceString=""/>-->
         </table>
+        <table tableName="transaction" domainObjectName="Transaction">
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
+        </table>-->
 
         <!--<table tableName="address_count" domainObjectName="AddressCount"
                enableUpdateByExample="false"

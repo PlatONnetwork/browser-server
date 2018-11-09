@@ -72,6 +72,8 @@ public class BlockDto {
 
     private long timestamp;
 
+    private Integer transactionNumber;
+
     public long getTimestamp () {
         return timestamp;
     }
@@ -174,5 +176,13 @@ public class BlockDto {
 
     public void setNonce ( String nonce ) {
         this.nonce = nonce;
+    }
+
+    public Integer getTransactionNumber () {
+        return transactionNumber;
+    }
+
+    public void setTransactionNumber ( Integer transactionNumber ) {
+        this.transactionNumber = transactionNumber;
     }
 }

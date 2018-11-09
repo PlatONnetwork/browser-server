@@ -96,6 +96,7 @@ public class BlockStorageService {
             block.setEnergonAverage(blockDto.getEnergonAverage().toString());
             block.setEnergonLimit(blockDto.getEnergonLimit().toString());
             block.setEnergonUsed(blockDto.getEnergonUsed().toString());
+            block.setTransactionNumber(blockDto.getTransactionNumber());
             block.setCreateTime(new Date());
             block.setUpdateTime(new Date());
         }catch (Exception e){
