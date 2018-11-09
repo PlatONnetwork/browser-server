@@ -59,7 +59,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, String chainId) {
-        logger.info("更新链【ID={}】的节点缓存",chainId);
+        logger.debug("更新链【ID={}】的节点缓存",chainId);
         List<NodeInfo> cache = nodeInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -76,7 +76,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateIndexInfo(IndexInfo indexInfo, boolean override, String chainId) {
-        logger.info("更新链【ID={}】的指标缓存",chainId);
+        logger.debug("更新链【ID={}】的指标缓存",chainId);
         IndexInfo cache = indexInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -105,7 +105,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, String chainId) {
-        logger.info("更新链【ID={}】的统计缓存",chainId);
+        logger.debug("更新链【ID={}】的统计缓存",chainId);
         StatisticInfo cache = statisticInfoMap.get(chainId);
         synchronized (cache){
             if(override){
@@ -160,7 +160,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateBlockInfoList(List<BlockInfo> blockInfos, String chainId) {
-        logger.info("更新链【ID={}】的块列表缓存",chainId);
+        logger.debug("更新链【ID={}】的块列表缓存",chainId);
         LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
         synchronized (cache){
             blockInfos.forEach(e->cache.offer(e));
@@ -175,7 +175,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, String chainId) {
-        logger.info("更新链【ID={}】的交易列表缓存",chainId);
+        logger.debug("更新链【ID={}】的交易列表缓存",chainId);
         LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
         synchronized (cache){
             transactionInfos.forEach(e->cache.offer(e));
