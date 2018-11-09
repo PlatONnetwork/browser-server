@@ -42,12 +42,8 @@ public class CacheInitializer {
     private TransactionMapper transactionMapper;
     @Autowired
     private StatisticMapper statisticMapper;
-
     @Autowired
     private CacheService cacheService;
-
-    @Autowired
-    private ChainsConfig chainsConfig;
 
     /**
      * 更新节点信息缓存
