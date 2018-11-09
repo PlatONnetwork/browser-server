@@ -13,6 +13,7 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
+import com.platon.browser.service.SearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class HomeController {
 
     @Autowired
     private CacheService cacheService;
+
+    @Autowired
+    private SearchService searchService;
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
@@ -340,7 +344,7 @@ public class HomeController {
     public BaseResp search(@Valid @RequestBody SearchParam param){
         try{
             logger.debug(JSON.toJSONString(param));
-            Query query = cacheService.findInfoByParam(param);
+            Query query = searchService.findInfoByParam(param);
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
             return resp;
         }catch (BusinessException be){

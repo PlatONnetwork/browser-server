@@ -89,8 +89,10 @@ public class UpdateCacheTask {
             int transactionCount = transactionList.size();
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
             statisticInfo.setCurrent(Long.valueOf(transactionCount));
-            BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-            statisticInfo.setMaxTps(transactionTps.doubleValue());
+            if(divisor!=0){
+                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
+                statisticInfo.setMaxTps(transactionTps.doubleValue());
+            }
             cacheService.updateStatisticInfo(statisticInfo,false,chainId);
 
 
