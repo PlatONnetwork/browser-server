@@ -19,7 +19,7 @@ public class StatisticInfo {
 
     private Long dayTransaction;
 
-    private List<StatisticItem> blockStatisticList ;
+    private List<StatisticItem> blockStatisticList;
 
     @JsonIgnore
     private LimitQueue<StatisticItem> limitQueue;

@@ -193,6 +193,7 @@ public class CacheServiceImpl implements CacheService {
         try{
             StatisticInfo copy = new StatisticInfo();
             BeanUtils.copyProperties(cache,copy);
+            copy.setBlockStatisticList(copy.getLimitQueue().elementsAsc());
             cache.setChanged(false);
             return copy;
         }finally {
