@@ -7,7 +7,8 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.CacheService;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class UpdateCacheTask {
@@ -117,7 +115,7 @@ public class UpdateCacheTask {
     @PostConstruct
     public void initCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
+            Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
             if(nodeInfoList.size()==0){
                 logger.info("节点缓存为空, 执行初始化...");
                 cacheInitializer.initNodeInfoList(chainId);

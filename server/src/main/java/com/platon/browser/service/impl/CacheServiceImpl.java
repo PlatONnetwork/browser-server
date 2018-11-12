@@ -33,7 +33,7 @@ public class CacheServiceImpl implements CacheService {
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
     // 初始数据Map
-    private Map<String,List<NodeInfo>> nodeInitMap = new ConcurrentHashMap<>();
+    private Map<String,Set<NodeInfo>> nodeInitMap = new ConcurrentHashMap<>();
     private Map<String,IndexInfo> indexInitMap = new ConcurrentHashMap<>();
     private Map<String,StatisticInfo> statisticInitMap = new ConcurrentHashMap<>();
     private Map<String, LimitQueue<BlockInfo>> blockInitMap = new ConcurrentHashMap<>();
@@ -47,7 +47,7 @@ public class CacheServiceImpl implements CacheService {
     @PostConstruct
     private void init(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            nodeInitMap.put(chainId,new ArrayList<>());
+            nodeInitMap.put(chainId,new HashSet<>());
             indexInitMap.put(chainId,new IndexInfo());
             StatisticInfo statisticInfo = new StatisticInfo();
             statisticInfo.setLimitQueue(new LimitQueue<>(100));
@@ -112,14 +112,15 @@ public class CacheServiceImpl implements CacheService {
 
 
     @Override
-    public List<NodeInfo> getNodeInfoList(String chainId) {
-        return Collections.unmodifiableList(nodeInitMap.get(chainId));
+    public Set<NodeInfo> getNodeInfoSet(String chainId) {
+        Set<NodeInfo> nodeInfoSet = nodeInitMap.get(chainId);
+        return Collections.unmodifiableSet(nodeInfoSet);
     }
 
     @Override
     public void updateNodeCache(List<NodeInfo> nodeInfos,boolean override, String chainId) {
         logger.debug("更新链【ID={}】的节点缓存",chainId);
-        List<NodeInfo> init = nodeInitMap.get(chainId);
+        Set<NodeInfo> init = nodeInitMap.get(chainId);
         synchronized (init){
             if(override){
                 init.clear();

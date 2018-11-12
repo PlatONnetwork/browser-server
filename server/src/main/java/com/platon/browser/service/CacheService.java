@@ -1,12 +1,14 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 进程缓存服务
@@ -21,7 +23,7 @@ public interface CacheService {
     /**
      * 节点信息
      */
-    List<NodeInfo> getNodeInfoList(String chainId);
+    Set<NodeInfo> getNodeInfoSet(String chainId);
 
     /**
      * 更新节点信息列表
