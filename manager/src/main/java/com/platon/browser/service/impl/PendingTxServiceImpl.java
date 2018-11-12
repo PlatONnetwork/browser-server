@@ -103,7 +103,7 @@ public class PendingTxServiceImpl implements PendingTxService {
             second.andTxTypeEqualTo(req.getTxType());
         }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
         return pendingTxes;
     }
@@ -130,7 +130,7 @@ public class PendingTxServiceImpl implements PendingTxService {
             second.andTxTypeEqualTo(req.getTxType());
         }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
         return pendingTxes;
     }

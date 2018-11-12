@@ -40,6 +40,7 @@ public class BlockServiceImpl implements BlockService {
     public List<BlockList> getBlockList(BlockListReq req) {
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid());
+        condition.setOrderByClause("number desc");
         List<Block> blocks = blockMapper.selectByExample(condition);
         List<BlockList> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();

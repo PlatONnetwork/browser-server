@@ -46,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
             // 根据块高筛选
             criteria.andBlockNumberEqualTo(req.getHeight());
         }
-        condition.setOrderByClause("block_number desc");
+        condition.setOrderByClause("block_number desc,transaction_index desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionItem> transactionList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
