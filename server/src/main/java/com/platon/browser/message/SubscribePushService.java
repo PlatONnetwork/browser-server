@@ -56,7 +56,7 @@ public class SubscribePushService {
 
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case NODE:
-                logger.debug("STOMP推送节点信息: {}",msg);
+                logger.debug("更新增量节点缓存: {}",msg);
                 NodeDto nodeDto = JSON.parseObject(message.getStruct(), NodeDto.class);
 
                 NodeInfo nodeInfo = new NodeInfo();
@@ -67,13 +67,10 @@ public class SubscribePushService {
                 // 更新节点缓存信息
                 List<NodeInfo> nodeInfoList = new ArrayList<>();
                 nodeInfoList.add(nodeInfo);
-                cacheService.updateNodeInfoList(nodeInfoList,false,chainId);
-                // 推送新节点信息
-                resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfo);
-                messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
+                cacheService.updateNodeCache(nodeInfoList,false,chainId);
                 break;
             case BLOCK:
-                logger.debug("STOMP推送区块信息: {}",msg);
+                logger.debug("更新增量区块缓存: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
 
                 BlockInfo blockInfo = new BlockInfo();
@@ -87,23 +84,23 @@ public class SubscribePushService {
                 // 更新区块缓存
                 List<BlockInfo> blockInfoList = new ArrayList<>();
                 blockInfoList.add(blockInfo);
-                cacheService.updateBlockInfoList(blockInfoList,chainId);
+                cacheService.updateBlockCache(blockInfoList,chainId);
                 // 推送新区块信息
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfoList);
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
 
-                logger.debug("STOMP推送指标信息: {}",msg);
+                logger.debug("更新整体指标缓存: {}",msg);
                 IndexInfo indexInfo = new IndexInfo();
                 indexInfo.setCurrentHeight(blockInfo.getHeight());
                 indexInfo.setCurrentTransaction(blockDto.getTransaction().size());
                 // 更新指标缓存信息
-                cacheService.updateIndexInfo(indexInfo,false, chainId);
+                cacheService.updateIndexCache(indexInfo,false, chainId);
                 // 推送整体指标信息
                 indexInfo = cacheService.getIndexInfo(chainId);
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
 
-                logger.debug("STOMP推送交易信息: {}",msg);
+                logger.debug("更新交易缓存: {}",msg);
                 List<TransactionDto> transactionDtos = blockDto.getTransaction();
 
                 List<TransactionInfo> transactionInfos = new ArrayList<>();
@@ -122,13 +119,13 @@ public class SubscribePushService {
                         transactionInfos.add(bean);
                     });
                     // 更新交易缓存信息
-                    cacheService.updateTransactionInfoList(transactionInfos,chainId);
+                    cacheService.updateTransactionCache(transactionInfos,chainId);
                     // 推送新的交易信息
                     resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
                     messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
                 }
 
-                logger.debug("更新统计信息: {}",msg);
+                logger.debug("更新整体统计缓存: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
                 statisticInfo.setBlockCount(1l);
@@ -141,7 +138,7 @@ public class SubscribePushService {
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
                 // 更新统计缓存信息
-                cacheService.updateStatisticInfo(statisticInfo,false,chainId);
+                cacheService.updateStatisticCache(statisticInfo,false,chainId);
                 break;
         }
     }

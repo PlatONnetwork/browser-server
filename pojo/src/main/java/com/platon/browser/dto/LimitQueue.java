@@ -3,8 +3,21 @@ package com.platon.browser.dto;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LimitQueue<E>{
+
+    private boolean changed=false;// 是否改变
+
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+    public boolean isChanged(){
+        return changed;
+    }
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(); // 读写锁
+    public ReentrantReadWriteLock getLock(){return lock;}
 
     private int limit; // 队列长度
 

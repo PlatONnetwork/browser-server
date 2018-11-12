@@ -1,5 +1,6 @@
 package com.platon.browser.schedule;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.cache.CacheInitializer;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
@@ -7,8 +8,7 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class UpdateCacheTask {
@@ -101,7 +104,7 @@ public class UpdateCacheTask {
                 BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
                 statisticInfo.setMaxTps(transactionTps.doubleValue());
             }
-            cacheService.updateStatisticInfo(statisticInfo,false,chainId);
+            cacheService.updateStatisticCache(statisticInfo,false,chainId);
 
 
             // 更新统计时间戳
@@ -110,23 +113,10 @@ public class UpdateCacheTask {
     }
 
     /**
-     * 推送统计信息，1秒推送一次
-     */
-    @Scheduled(cron="0/1 * * * * ?")
-    public void pushStatisticInfo(){
-        chainsConfig.getChainIds().forEach(chainId -> {
-            // 推送整体统计信息
-            StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
-            statisticInfo.setBlockStatisticList(statisticInfo.getLimitQueue().elementsAsc());
-            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticInfo);
-            messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
-        });
-    }
-
-    /**
      * 检查缓存，如果发现缓存为空，则初始化
      */
-    @Scheduled(cron="0/10 * * * * ?")
+//    @Scheduled(cron="0/10 * * * * ?")
+    @PostConstruct
     public void initCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
             List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
@@ -144,16 +134,117 @@ public class UpdateCacheTask {
                 logger.info("统计缓存为空, 执行初始化...");
                 cacheInitializer.initStatisticInfo(chainId);
             }
-            List<BlockInfo> blockInfoList = cacheService.getBlockInfoList(chainId);
-            if(blockInfoList.size()==0){
+            LimitQueue<BlockInfo> blockQueue = cacheService.getBlockQueue(chainId);
+            if(blockQueue.size()==0){
                 logger.info("区块缓存为空, 执行初始化...");
                 cacheInitializer.initBlockInfoList(chainId);
             }
-            List<TransactionInfo> transactionInfoList = cacheService.getTransactionInfoList(chainId);
-            if(transactionInfoList.size()==0){
+            LimitQueue<TransactionInfo> transactionQueue = cacheService.getTransactionQueue(chainId);
+            if(transactionQueue.size()==0){
                 logger.info("交易缓存为空, 执行初始化...");
                 cacheInitializer.initTransactionInfoList(chainId);
             }
         });
     }
+
+
+    /**
+     * 首页信息，1秒推送一次
+     */
+    @Scheduled(cron="0/1 * * * * ?")
+    public void push(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            // 增量推送节点信息，1秒推送一次
+            NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
+            if(nodeIncrement.isChanged()){
+                logger.info("节点增量缓存有变更，推送STOMP消息: {}", JSON.toJSONString(nodeIncrement.getIncrement()));
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeIncrement.getIncrement());
+                messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
+            }
+
+            // 增量推送区块信息，1秒推送一次
+            BlockIncrement blockIncrement = cacheService.getBlockIncrement(chainId);
+            if(blockIncrement.isChanged()){
+                logger.info("区块增量缓存有变更，推送STOMP消息: {}", JSON.toJSONString(blockIncrement.getIncrement()));
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockIncrement.getIncrement());
+                messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
+            }
+
+            // 增量推送交易信息，1秒推送一次
+            TransactionIncrement transactionIncrement = cacheService.getTransactionIncrement(chainId);
+            if(transactionIncrement.isChanged()){
+                logger.info("交易增量缓存有变更，推送STOMP: {}", JSON.toJSONString(transactionIncrement.getIncrement()));
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionIncrement.getIncrement());
+                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
+            }
+
+            IndexInfo indexWhole = cacheService.getIndexInfo(chainId);
+            if(indexWhole.isChanged()){
+                logger.info("指标缓存有变更，推送STOMP消息: {}", JSON.toJSONString(indexWhole));
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexWhole);
+                messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
+            }
+
+            StatisticInfo statisticWhole = cacheService.getStatisticInfo(chainId);
+            if(statisticWhole.isChanged()){
+                logger.info("统计缓存有变更，推送STOMP消息: {}", JSON.toJSONString(statisticWhole));
+                statisticWhole.setBlockStatisticList(statisticWhole.getLimitQueue().elementsAsc());
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticWhole);
+                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
+            }
+        });
+    }
+
+
+    /**
+     * 增量推送节点信息，1秒推送一次
+     */
+    /*@Scheduled(cron="0/1 * * * * ?")
+    public void pushNodeInfo(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            // 增量推送节点信息，1秒推送一次
+            List<NodeInfo> increment = cacheService.getIncrementNodeInfo(chainId);
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),increment);
+            messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
+        });
+    }*/
+
+    /**
+     * 整体推送指标信息，1秒推送一次
+     */
+    /*@Scheduled(cron="0/1 * * * * ?")
+    public void pushIndexInfo(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            IndexInfo whole = cacheService.getIndexInfo(chainId);
+            // 整体推送指标信息，1秒推送一次
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),whole);
+            messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
+        });
+    }*/
+
+    /**
+     * 增量推送区块信息，1秒推送一次
+     */
+    /*@Scheduled(cron="0/1 * * * * ?")
+    public void pushBlockInfo(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            // 增量推送区块信息，1秒推送一次
+            List<BlockInfo> increment = cacheService.getBlockInfoList(chainId);
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),increment);
+            messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
+        });
+    }*/
+
+    /**
+     * 增量推送交易信息，1秒推送一次
+     */
+    /*@Scheduled(cron="0/1 * * * * ?")
+    public void pushTransactionInfo(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            // 增量推送交易信息，1秒推送一次
+            List<TransactionInfo> increment = cacheService.getTransactionInfoList(chainId);
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),increment);
+            messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
+        });
+    }*/
 }

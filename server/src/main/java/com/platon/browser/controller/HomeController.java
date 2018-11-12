@@ -6,6 +6,7 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.LimitQueue;
 import com.platon.browser.dto.SearchParam;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockInfo;
@@ -229,8 +230,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
-        List<BlockInfo> blockInfos = cacheService.getBlockInfoList(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInfos);
+        LimitQueue<BlockInfo> blockQueue = cacheService.getBlockQueue(chainId);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockQueue.elements());
         return resp;
     }
 
@@ -286,8 +287,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
-        List<TransactionInfo> transactionInfos = cacheService.getTransactionInfoList(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInfos);
+        LimitQueue<TransactionInfo> transactionQueue = cacheService.getTransactionQueue(chainId);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionQueue.elements());
         return resp;
     }
 

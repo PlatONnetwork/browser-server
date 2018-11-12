@@ -61,7 +61,7 @@ public class CacheInitializer {
             bean.setLatitude(location.latitude);
             nodeInfoList.add(bean);
         });
-        cacheService.updateNodeInfoList(nodeInfoList,true,chainId);
+        cacheService.updateNodeCache(nodeInfoList,true,chainId);
     }
 
     /**
@@ -106,7 +106,7 @@ public class CacheInitializer {
         indexInfo.setProportion(0);
         indexInfo.setTicketPrice(0);
         indexInfo.setVoteAmount(0);
-        cacheService.updateIndexInfo(indexInfo,true,chainId);
+        cacheService.updateIndexCache(indexInfo,true,chainId);
     }
 
     /**
@@ -192,7 +192,7 @@ public class CacheInitializer {
         });
         statisticInfo.setLimitQueue(limitQueue);
 
-        cacheService.updateStatisticInfo(statisticInfo,true,chainId);
+        cacheService.updateStatisticCache(statisticInfo,true,chainId);
 
     }
 
@@ -217,7 +217,7 @@ public class CacheInitializer {
             bean.setTransaction(block.getTransactionNumber());
             blockInfos.add(bean);
         });
-        cacheService.updateBlockInfoList(blockInfos,chainId);
+        cacheService.updateBlockCache(blockInfos,chainId);
     }
 
     /**
@@ -238,6 +238,6 @@ public class CacheInitializer {
             bean.setTimestamp(transaction.getTimestamp().getTime());
             transactionInfos.add(bean);
         });
-        cacheService.updateTransactionInfoList(transactionInfos,chainId);
+        cacheService.updateTransactionCache(transactionInfos,chainId);
     }
 }
