@@ -1,4 +1,4 @@
-package com.platon.browser.dto;
+package com.platon.browser.dto.cache;
 
 import com.platon.browser.dto.node.NodeInfo;
 import lombok.Data;

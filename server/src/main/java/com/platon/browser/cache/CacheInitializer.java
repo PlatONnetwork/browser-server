@@ -8,7 +8,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.LimitQueue;
+import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;

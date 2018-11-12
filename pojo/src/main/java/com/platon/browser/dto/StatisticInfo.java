@@ -1,6 +1,7 @@
 package com.platon.browser.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platon.browser.dto.cache.LimitQueue;
 import lombok.Data;
 
 import java.math.BigDecimal;

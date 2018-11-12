@@ -6,6 +6,8 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.*;
+import com.platon.browser.dto.cache.BlockInit;
+import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
 import com.platon.browser.service.CacheService;

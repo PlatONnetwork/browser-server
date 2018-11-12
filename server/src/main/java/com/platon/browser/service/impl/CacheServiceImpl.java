@@ -3,6 +3,7 @@ package com.platon.browser.service.impl;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
@@ -35,7 +36,7 @@ public class CacheServiceImpl implements CacheService {
     private Map<String,List<NodeInfo>> nodeInitMap = new ConcurrentHashMap<>();
     private Map<String,IndexInfo> indexInitMap = new ConcurrentHashMap<>();
     private Map<String,StatisticInfo> statisticInitMap = new ConcurrentHashMap<>();
-    private Map<String,LimitQueue<BlockInfo>> blockInitMap = new ConcurrentHashMap<>();
+    private Map<String, LimitQueue<BlockInfo>> blockInitMap = new ConcurrentHashMap<>();
     private Map<String,LimitQueue<TransactionInfo>> transactionInitMap = new ConcurrentHashMap<>();
 
     // 增量Map

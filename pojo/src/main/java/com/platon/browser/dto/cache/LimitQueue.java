@@ -1,4 +1,4 @@
-package com.platon.browser.dto;
+package com.platon.browser.dto.cache;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

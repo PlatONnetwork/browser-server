@@ -1,6 +1,5 @@
 package com.platon.browser.schedule;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.cache.CacheInitializer;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
@@ -9,9 +8,8 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.*;
-import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

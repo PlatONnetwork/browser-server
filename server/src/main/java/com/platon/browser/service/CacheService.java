@@ -2,6 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 
