@@ -121,7 +121,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             log.error(e.getMessage());
         } finally {
             stopWatch.stop();
-            log.info("BlockSynchronizeJob-->{}", stopWatch.shortSummary());
+            log.debug("BlockSynchronizeJob-->{}", stopWatch.shortSummary());
         }
 
     }

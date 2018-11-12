@@ -38,11 +38,11 @@ public class BlockStorageService {
 
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
-        logger.info(msg);
+        logger.debug(msg);
         Message message = JSON.parseObject(msg,Message.class);
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case BLOCK:
-                logger.info("STOMP区块信息入库: {}",msg);
+                logger.debug("STOMP区块信息入库: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
                 //构建dto结构，转存数据库结构
                 //区块相关block

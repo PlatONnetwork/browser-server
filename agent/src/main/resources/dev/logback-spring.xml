@@ -28,10 +28,9 @@
         <appender-ref ref="file" />
     </root>
 
-    <!-- logback为java中的包 -->
-    <logger name="com.juzix.exchange"/>
+
     <!--logback.LogbackDemo：类的全路径 -->
-    <logger name="com.juzix.exchange" level="debug" additivity="false">
+    <logger name="com.platon.browser" level="info" additivity="false">
         <appender-ref ref="console"/>
         <appender-ref ref="file"/>
     </logger>
