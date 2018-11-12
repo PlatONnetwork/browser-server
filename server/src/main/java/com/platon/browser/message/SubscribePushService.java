@@ -42,7 +42,7 @@ public class SubscribePushService {
         Message message = JSON.parseObject(msg,Message.class);
         String chainId = message.getChainId();
         if(!chainsConfig.isValid(chainId)){
-            logger.error("链ID={}在本系统中未作配置！",message.getChainId());
+            logger.error("[ID为{}]的链不受本系统监控！",message.getChainId());
             return;
         }
 
