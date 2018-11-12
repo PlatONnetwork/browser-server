@@ -279,37 +279,6 @@ public class TransactionController {
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
-    {
-        type:"pending", // 结果类型:pending-待处理，transaction-已处理交易；
-                        // 原因：待处理交易可能随时在变化，在查询开始前可能此笔交易已被处理，所以这里需要添加结果类型作为区分;
-                        // 前端页面处理时，如果发现此值为transaction，则需要使用交易hash作为参数跳转到交易详情页面
-        data:{
-            "errMsg": "",//描述信息
-            "code": 0,//成功（0），失败则由相关失败码
-            "data": {
-                "txHash": "0x234234",//交易hash
-                "timestamp": 123123123879,//交易接收时间
-                "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
-                "blockHeight": "15566",//交易所在区块高度
-                "from": "0x667766",//发送者
-                "to": "0x667766",//接收者
-                "txType": "", // 交易类型
-                    transfer ：转账
-                    MPCtransaction ： MPC交易
-                    contractCreate ： 合约创建
-                    vote ： 投票
-                    transactionExecute ： 合约执行
-                    authorization ： 权限
-                "value": "222",//数额
-                "actualTxCost": "22",//实际交易手续费
-                "energonLimit": 232,//能量限制
-                "energonUsed": 122,//能量消耗
-                "energonPrice": "123",//能量价格
-                "inputData": "",//附加输入数据
-                "expectTime": 12312333, // 预计确认时间
-            }
-        }
-    }
 
     {
         "errMsg": "成功",
