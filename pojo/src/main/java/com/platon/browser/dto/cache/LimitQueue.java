@@ -1,10 +1,23 @@
-package com.platon.browser.dto;
+package com.platon.browser.dto.cache;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LimitQueue<E>{
+
+    private boolean changed=false;// 是否改变
+
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+    public boolean isChanged(){
+        return changed;
+    }
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(); // 读写锁
+    public ReentrantReadWriteLock getLock(){return lock;}
 
     private int limit; // 队列长度
 
@@ -44,7 +57,7 @@ public class LimitQueue<E>{
         return queue.size();
     }
 
-    public List<E> elements(){
+    public List<E> elementsAsc(){
         List<E> list = new ArrayList<>();
         for (int i=queue.size()-1;i>=0;i--){
             list.add(queue.get(i));
@@ -52,7 +65,7 @@ public class LimitQueue<E>{
         return list;
     }
 
-    public List<E> elementsAsc(){
+    public List<E> elementsDesc(){
         List<E> list = new ArrayList<>();
         for (int i=0;i<queue.size();i++){
             list.add(queue.get(i));

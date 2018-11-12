@@ -1,10 +1,12 @@
 package com.platon.browser.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platon.browser.dto.cache.LimitQueue;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Data
 public class StatisticInfo {
@@ -18,7 +20,7 @@ public class StatisticInfo {
 
     private Long dayTransaction;
 
-    private List<StatisticItem> blockStatisticList ;
+    private List<StatisticItem> blockStatisticList;
 
     @JsonIgnore
     private LimitQueue<StatisticItem> limitQueue;
@@ -30,5 +32,10 @@ public class StatisticInfo {
     private Long highestBlockNumber;
     @JsonIgnore
     private Long lowestBlockNumber;
+
+    @JsonIgnore
+    private boolean changed=false;
+    @JsonIgnore
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
 }

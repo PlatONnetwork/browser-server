@@ -1,14 +1,12 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.LimitQueue;
-import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.StatisticItem;
+import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.service.*;
+import com.platon.browser.service.CacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 缓存服务
@@ -33,112 +32,223 @@ public class CacheServiceImpl implements CacheService {
 
     private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
-    private Map<String,List<NodeInfo>> nodeInfoMap = new ConcurrentHashMap<>();
-    private Map<String,IndexInfo> indexInfoMap = new ConcurrentHashMap<>();
-    private Map<String,StatisticInfo> statisticInfoMap = new ConcurrentHashMap<>();
-    private Map<String,LimitQueue<BlockInfo>> blockInfoMap = new ConcurrentHashMap<>();
-    private Map<String,LimitQueue<TransactionInfo>> transactionInfoMap = new ConcurrentHashMap<>();
+    // 初始数据Map
+    private Map<String,List<NodeInfo>> nodeInitMap = new ConcurrentHashMap<>();
+    private Map<String,IndexInfo> indexInitMap = new ConcurrentHashMap<>();
+    private Map<String,StatisticInfo> statisticInitMap = new ConcurrentHashMap<>();
+    private Map<String, LimitQueue<BlockInfo>> blockInitMap = new ConcurrentHashMap<>();
+    private Map<String,LimitQueue<TransactionInfo>> transactionInitMap = new ConcurrentHashMap<>();
+
+    // 增量Map
+    private Map<String, NodeIncrement> nodeIncrementMap = new ConcurrentHashMap<>();
+    private Map<String, BlockIncrement> blockIncrementMap = new ConcurrentHashMap<>();
+    private Map<String, TransactionIncrement> transactionIncrementMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            nodeInfoMap.put(chainId,new ArrayList<>());
-            indexInfoMap.put(chainId,new IndexInfo());
+            nodeInitMap.put(chainId,new ArrayList<>());
+            indexInitMap.put(chainId,new IndexInfo());
             StatisticInfo statisticInfo = new StatisticInfo();
             statisticInfo.setLimitQueue(new LimitQueue<>(100));
-            statisticInfoMap.put(chainId,statisticInfo);
-            blockInfoMap.put(chainId,new LimitQueue<>(10));
-            transactionInfoMap.put(chainId,new LimitQueue<>(10));
+            statisticInitMap.put(chainId,statisticInfo);
+            blockInitMap.put(chainId,new LimitQueue<>(10));
+            transactionInitMap.put(chainId,new LimitQueue<>(10));
+
+            // 初始化增量Map
+            nodeIncrementMap.put(chainId,new NodeIncrement());
+            blockIncrementMap.put(chainId,new BlockIncrement());
+            transactionIncrementMap.put(chainId,new TransactionIncrement());
         });
     }
 
+    // 取增量数据
+    @Override
+    public NodeIncrement getNodeIncrement(String chainId){
+        NodeIncrement increment = nodeIncrementMap.get(chainId);
+        ReentrantReadWriteLock lock = increment.getLock();
+        lock.readLock().lock();
+        try{
+            NodeIncrement copy = new NodeIncrement();
+            BeanUtils.copyProperties(increment,copy);
+            // 取完此增量节点信息推送后，设置为未更改状态
+            increment.setChanged(false);
+            // 返回副本
+            return copy;
+        }finally {
+            lock.readLock().unlock();
+        }
+    }
+    @Override
+    public BlockIncrement getBlockIncrement(String chainId){
+        BlockIncrement increment = blockIncrementMap.get(chainId);
+        ReentrantReadWriteLock lock = increment.getLock();
+        lock.readLock().lock();
+        try{
+            BlockIncrement copy = new BlockIncrement();
+            BeanUtils.copyProperties(increment,copy);
+            // 取完此增量区块信息推送后，设置为未更改状态
+            increment.setChanged(false);
+            return copy;
+        }finally {
+            lock.readLock().unlock();
+        }
+    }
+    @Override
+    public TransactionIncrement getTransactionIncrement(String chainId){
+        TransactionIncrement increment = transactionIncrementMap.get(chainId);
+        ReentrantReadWriteLock lock = increment.getLock();
+        lock.readLock().lock();
+        try{
+            TransactionIncrement copy = new TransactionIncrement();
+            BeanUtils.copyProperties(increment,copy);
+            // 取完此增量交易信息推送后，设置为未更改状态
+            increment.setChanged(false);
+            return copy;
+        }finally {
+            lock.readLock().unlock();
+        }
+    }
+
+
     @Override
     public List<NodeInfo> getNodeInfoList(String chainId) {
-        return Collections.unmodifiableList(nodeInfoMap.get(chainId));
+        return Collections.unmodifiableList(nodeInitMap.get(chainId));
     }
 
     @Override
-    public void updateNodeInfoList(List<NodeInfo> nodeInfos,boolean override, String chainId) {
+    public void updateNodeCache(List<NodeInfo> nodeInfos,boolean override, String chainId) {
         logger.debug("更新链【ID={}】的节点缓存",chainId);
-        List<NodeInfo> cache = nodeInfoMap.get(chainId);
-        synchronized (cache){
+        List<NodeInfo> init = nodeInitMap.get(chainId);
+        synchronized (init){
             if(override){
-                cache.clear();
+                init.clear();
             }
-            cache.addAll(nodeInfos);
+            init.addAll(nodeInfos);
+        }
+
+        logger.debug("更新链【ID={}】的节点增量缓存",chainId);
+        NodeIncrement increment = nodeIncrementMap.get(chainId);
+        ReentrantReadWriteLock lock = increment.getLock();
+        lock.writeLock().lock();
+        try{
+            increment.getIncrement().clear();
+            increment.getIncrement().addAll(nodeInfos);
+            increment.setChanged(true);
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
     @Override
     public IndexInfo getIndexInfo(String chainId) {
-        return indexInfoMap.get(chainId);
+        IndexInfo cache = indexInitMap.get(chainId);
+        ReentrantReadWriteLock lock = cache.getLock();
+        lock.readLock().lock();
+        try{
+            IndexInfo copy = new IndexInfo();
+            BeanUtils.copyProperties(cache,copy);
+            cache.setChanged(false);
+            return copy;
+        }finally {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateIndexInfo(IndexInfo indexInfo, boolean override, String chainId) {
+    public void updateIndexCache(IndexInfo indexInfo, boolean override, String chainId) {
         logger.debug("更新链【ID={}】的指标缓存",chainId);
-        IndexInfo cache = indexInfoMap.get(chainId);
-        synchronized (cache){
+        IndexInfo index = indexInitMap.get(chainId);
+        ReentrantReadWriteLock lock = index.getLock();
+        lock.writeLock().lock();
+        try{
+            boolean changed = false;
             if(override){
-                BeanUtils.copyProperties(indexInfo,cache);
+                BeanUtils.copyProperties(indexInfo,index);
+                changed=true;
             }else{
                 if(StringUtils.isNotBlank(indexInfo.getNode())){
-                    cache.setNode(indexInfo.getNode());
+                    index.setNode(indexInfo.getNode());
+                    changed=true;
                 }
                 if(indexInfo.getCurrentHeight()!=0){
-                    cache.setCurrentHeight(indexInfo.getCurrentHeight());
+                    index.setCurrentHeight(indexInfo.getCurrentHeight());
+                    changed=true;
                 }
                 if(indexInfo.getConsensusNodeAmount()!=0){
-                    cache.setConsensusNodeAmount(cache.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                    index.setConsensusNodeAmount(index.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                    changed=true;
                 }
             }
+            index.setChanged(changed);
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
     @Override
     public StatisticInfo getStatisticInfo(String chainId) {
-        StatisticInfo cache = statisticInfoMap.get(chainId);
-        StatisticInfo copy = new StatisticInfo();
-        BeanUtils.copyProperties(cache,copy);
-        return copy;
+        StatisticInfo cache = statisticInitMap.get(chainId);
+        ReentrantReadWriteLock lock = cache.getLock();
+        lock.readLock().lock();
+        try{
+            StatisticInfo copy = new StatisticInfo();
+            BeanUtils.copyProperties(cache,copy);
+            copy.setBlockStatisticList(copy.getLimitQueue().elementsAsc());
+            cache.setChanged(false);
+            return copy;
+        }finally {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateStatisticInfo(StatisticInfo statisticInfo, boolean override, String chainId) {
+    public void updateStatisticCache(StatisticInfo statisticInfo, boolean override, String chainId) {
         logger.debug("更新链【ID={}】的统计缓存",chainId);
-        StatisticInfo cache = statisticInfoMap.get(chainId);
-        synchronized (cache){
+        StatisticInfo cache = statisticInitMap.get(chainId);
+        ReentrantReadWriteLock lock = cache.getLock();
+        lock.writeLock().lock();
+        try{
+            boolean changed = false;
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
+                changed = true;
             }else{
                 if(statisticInfo.getCurrent()!=null){
                     // 当前交易数
                     cache.setCurrent(statisticInfo.getCurrent());
+                    changed = true;
                 }
                 if(statisticInfo.getMaxTps()!=null){
                     cache.setMaxTps(statisticInfo.getMaxTps());
+                    changed = true;
                 }
 
                 if(statisticInfo.getBlockCount()!=null){
                     cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
+                    changed = true;
                 }
                 if(statisticInfo.getTransactionCount()!=null){
                     cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
+                    changed = true;
                 }
                 if(statisticInfo.getBlockCount()!=null&&statisticInfo.getBlockCount()!=0&&statisticInfo.getTransactionCount()!=null){
                     cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
+                    changed = true;
                 }
                 if(statisticInfo.getHighestBlockNumber()!=null){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
+                    changed = true;
                 }
                 if(statisticInfo.getDayTransaction()!=null){
                     cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
+                    changed = true;
                 }
                 if(statisticInfo.getBlockStatisticList()!=null){
                     Map<Long, StatisticItem> map = new HashMap<>();
                     LimitQueue<StatisticItem> limitQueue = cache.getLimitQueue();
-                    limitQueue.elements().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    limitQueue.elementsDesc().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
                     statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
                         StatisticItem item = map.get(statisticItem.getHeight());
                         if(item==null){
@@ -147,38 +257,96 @@ public class CacheServiceImpl implements CacheService {
                             item.setTransaction(item.getTransaction()+statisticItem.getTransaction());
                         }
                     });
+                    changed = true;
                 }
             }
+            cache.setChanged(changed);
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
     @Override
-    public List<BlockInfo> getBlockInfoList(String chainId) {
-        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
-        return Collections.unmodifiableList(cache.elements());
+    public BlockInit getBlockInit(String chainId) {
+        LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
+        ReentrantReadWriteLock lock = cache.getLock();
+        lock.readLock().lock();
+        try{
+            BlockInit blockInit = new BlockInit();
+            blockInit.setChanged(cache.isChanged());
+            blockInit.setList(cache.elementsDesc());
+            cache.setChanged(false);
+            return blockInit;
+        }finally {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateBlockInfoList(List<BlockInfo> blockInfos, String chainId) {
+    public void updateBlockCache(List<BlockInfo> blockInfos, String chainId) {
         logger.debug("更新链【ID={}】的块列表缓存",chainId);
-        LimitQueue<BlockInfo> cache = blockInfoMap.get(chainId);
-        synchronized (cache){
-            blockInfos.forEach(e->cache.offer(e));
+        LimitQueue<BlockInfo> init = blockInitMap.get(chainId);
+        ReentrantReadWriteLock lock = init.getLock();
+        lock.writeLock().lock();
+        try{
+            blockInfos.forEach(e->init.offer(e));
+            init.setChanged(true);
+        }finally {
+            lock.writeLock().unlock();
+        }
+
+        logger.debug("更新链【ID={}】的块增量缓存",chainId);
+        BlockIncrement increment = blockIncrementMap.get(chainId);
+        lock = increment.getLock();
+        lock.writeLock().lock();
+        try{
+            increment.getIncrement().clear();
+            increment.getIncrement().addAll(blockInfos);
+            increment.setChanged(true);
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 
     @Override
-    public List<TransactionInfo> getTransactionInfoList(String chainId) {
-        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
-        return Collections.unmodifiableList(cache.elements());
+    public TransactionInit getTransactionInit(String chainId) {
+        LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
+        ReentrantReadWriteLock lock = cache.getLock();
+        lock.readLock().lock();
+        try{
+            TransactionInit transactionInit = new TransactionInit();
+            transactionInit.setChanged(cache.isChanged());
+            transactionInit.setList(cache.elementsDesc());
+            cache.setChanged(false);
+            return transactionInit;
+        }finally {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
-    public void updateTransactionInfoList(List<TransactionInfo> transactionInfos, String chainId) {
+    public void updateTransactionCache(List<TransactionInfo> transactionInfos, String chainId) {
         logger.debug("更新链【ID={}】的交易列表缓存",chainId);
-        LimitQueue<TransactionInfo> cache = transactionInfoMap.get(chainId);
-        synchronized (cache){
-            transactionInfos.forEach(e->cache.offer(e));
+        LimitQueue<TransactionInfo> init = transactionInitMap.get(chainId);
+        ReentrantReadWriteLock lock = init.getLock();
+        lock.writeLock().lock();
+        try{
+            transactionInfos.forEach(e->init.offer(e));
+            init.setChanged(true);
+        }finally {
+            lock.writeLock().unlock();
+        }
+
+        logger.debug("更新链【ID={}】的交易增量缓存",chainId);
+        TransactionIncrement increment = transactionIncrementMap.get(chainId);
+        lock = increment.getLock();
+        lock.writeLock().lock();
+        try{
+            increment.getIncrement().clear();
+            increment.getIncrement().addAll(transactionInfos);
+            increment.setChanged(true);
+        }finally {
+            lock.writeLock().unlock();
         }
     }
 }
