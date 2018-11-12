@@ -4,7 +4,10 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
@@ -35,6 +38,8 @@ public class PendingTxServiceImpl implements PendingTxService {
 
     @Autowired
     private PendingTxMapper pendingTxMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     @Override
     public List<PendingTxItem> getTransactionList(PendingTxListReq req) {
@@ -64,7 +69,17 @@ public class PendingTxServiceImpl implements PendingTxService {
     }
 
     @Override
-    public PendingTxDetail getTransactionDetail(PendingTxDetailReq req) {
+    public PendingOrTransaction getTransactionDetail(PendingTxDetailReq req) {
+        PendingOrTransaction pot = new PendingOrTransaction();
+        // 先根据交易Hash查询交易表
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
+        long transactionCount = transactionMapper.countByExample(transactionExample);
+        if(transactionCount>0){
+            pot.setType("transaction");
+            return pot;
+        }
+
         PendingTxExample condition = new PendingTxExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
         List<PendingTx> transactions = pendingTxMapper.selectByExampleWithBLOBs(condition);
@@ -76,13 +91,15 @@ public class PendingTxServiceImpl implements PendingTxService {
             logger.error("invalid transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
         }
-        PendingTxDetail transactionDetail = new PendingTxDetail();
+        PendingTxDetail pendingTxDetail = new PendingTxDetail();
         PendingTx transaction = transactions.get(0);
-        BeanUtils.copyProperties(transaction,transactionDetail);
-        transactionDetail.setTxHash(transaction.getHash());
-        transactionDetail.setInputData(transaction.getInput());
-        transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
-        return transactionDetail;
+        BeanUtils.copyProperties(transaction,pendingTxDetail);
+        pendingTxDetail.setTxHash(transaction.getHash());
+        pendingTxDetail.setInputData(transaction.getInput());
+        pendingTxDetail.setTimestamp(transaction.getTimestamp().getTime());
+        pot.setType("pending");
+        pot.setData(pendingTxDetail);
+        return pot;
     }
 
     /**

@@ -314,8 +314,8 @@ public class TransactionController {
     @PostMapping("pendingDetails")
     public BaseResp pendingDetails (@Valid @RequestBody PendingTxDetailReq req) {
         try{
-            PendingTxDetail pendingTxDetail = pendingTxService.getTransactionDetail(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingTxDetail);
+            PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingOrTransaction);
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
         }
