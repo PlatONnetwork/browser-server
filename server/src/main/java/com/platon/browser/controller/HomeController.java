@@ -5,7 +5,9 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.SearchParam;
+import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Set;
 
 /**
  * User: dongqile
@@ -72,7 +74,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
-        List<NodeInfo> nodeInfoList = cacheService.getNodeInfoList(chainId);
+        Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
         return resp;
     }

@@ -10,6 +10,7 @@ import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.query.Query;
+import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.req.account.AccountDetailReq;
@@ -131,9 +132,9 @@ public class SearchServiceImpl implements SearchService {
                 PendingTxDetailReq pendingTxDetailReq = new PendingTxDetailReq();
                 pendingTxDetailReq.setCid(param.getCid());
                 pendingTxDetailReq.setTxHash(param.getParameter());
-                PendingTxDetail pendingTxDetail = pendingTxService.getTransactionDetail(pendingTxDetailReq);
+                PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
                 query.setType("pending");
-                query.setStruct(pendingTxDetail);
+                query.setStruct(pendingOrTransaction.getData());
             }
             return query;
         }
