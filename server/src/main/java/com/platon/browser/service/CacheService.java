@@ -44,13 +44,13 @@ public interface CacheService {
     /**
      * 区块列表信息
      */
-    LimitQueue<BlockInfo> getBlockQueue(String chainId);
+    BlockInit getBlockInit(String chainId);
     void updateBlockCache(List<BlockInfo> blockInfos, String chainId);
 
     /**
      * 交易列表信息
      */
-    LimitQueue<TransactionInfo> getTransactionQueue(String chainId);
+    TransactionInit getTransactionInit(String chainId);
     void updateTransactionCache(List<TransactionInfo> transactionInfos, String chainId);
 
 }

@@ -134,13 +134,13 @@ public class UpdateCacheTask {
                 logger.info("统计缓存为空, 执行初始化...");
                 cacheInitializer.initStatisticInfo(chainId);
             }
-            LimitQueue<BlockInfo> blockQueue = cacheService.getBlockQueue(chainId);
-            if(blockQueue.size()==0){
+            BlockInit blockInit = cacheService.getBlockInit(chainId);
+            if(blockInit.getList().size()==0){
                 logger.info("区块缓存为空, 执行初始化...");
                 cacheInitializer.initBlockInfoList(chainId);
             }
-            LimitQueue<TransactionInfo> transactionQueue = cacheService.getTransactionQueue(chainId);
-            if(transactionQueue.size()==0){
+            TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
+            if(transactionInit.getList().size()==0){
                 logger.info("交易缓存为空, 执行初始化...");
                 cacheInitializer.initTransactionInfoList(chainId);
             }

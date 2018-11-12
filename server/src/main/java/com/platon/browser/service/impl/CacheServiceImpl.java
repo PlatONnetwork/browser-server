@@ -266,15 +266,16 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public LimitQueue<BlockInfo> getBlockQueue(String chainId) {
+    public BlockInit getBlockInit(String chainId) {
         LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
-            LimitQueue<BlockInfo> copy = new LimitQueue<>(cache.size());
-            BeanUtils.copyProperties(cache,copy);
+            BlockInit blockInit = new BlockInit();
+            blockInit.setChanged(cache.isChanged());
+            blockInit.setList(cache.elements());
             cache.setChanged(false);
-            return copy;
+            return blockInit;
         }finally {
             lock.readLock().unlock();
         }
@@ -307,15 +308,16 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public LimitQueue<TransactionInfo> getTransactionQueue(String chainId) {
+    public TransactionInit getTransactionInit(String chainId) {
         LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
-            LimitQueue<TransactionInfo> copy = new LimitQueue<>(cache.size());
-            BeanUtils.copyProperties(cache,copy);
+            TransactionInit transactionInit = new TransactionInit();
+            transactionInit.setChanged(cache.isChanged());
+            transactionInit.setList(cache.elements());
             cache.setChanged(false);
-            return copy;
+            return transactionInit;
         }finally {
             lock.readLock().unlock();
         }

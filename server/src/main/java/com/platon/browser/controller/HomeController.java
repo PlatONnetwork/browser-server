@@ -5,14 +5,9 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.LimitQueue;
-import com.platon.browser.dto.SearchParam;
-import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
-import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.service.SearchService;
 import org.slf4j.Logger;
@@ -226,12 +221,12 @@ public class HomeController {
      */
     @SubscribeMapping("/block/init?cid={chainId}")
     public BaseResp blockInit(@DestinationVariable String chainId) {
-        logger.debug("获取出块时间及交易数据初始数据！");
+        logger.debug("获取区块列表初始数据！");
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
-        LimitQueue<BlockInfo> blockQueue = cacheService.getBlockQueue(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockQueue.elements());
+        BlockInit blockInit = cacheService.getBlockInit(chainId);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
         return resp;
     }
 
@@ -287,8 +282,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
-        LimitQueue<TransactionInfo> transactionQueue = cacheService.getTransactionQueue(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionQueue.elements());
+        TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInit.getList());
         return resp;
     }
 
