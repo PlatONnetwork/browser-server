@@ -19,7 +19,9 @@ public enum ErrorCodeEnum {
     RECORD_NOT_EXIST(4,"记录不存在"),
     RECORD_DELETED(5,"该id记录已删除"),
     BLOCKCHAIN_ERROR(6,"同步链信息异常"),
-    TX_ERROR(7,"同步交易信息异常");
+    TX_ERROR(7,"同步交易信息异常"),
+    PENDINGTX_ERROR(8,"同步pending交易异常"),
+    PENDINGTX_REPEAT(9,"pengding交易更新异常");
 
 
 	

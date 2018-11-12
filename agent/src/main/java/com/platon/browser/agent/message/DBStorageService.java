@@ -30,8 +30,8 @@ import java.util.List;
  * Time: 18:28
  */
 @Component
-public class BlockStorageService {
-    private final Logger logger = LoggerFactory.getLogger(BlockStorageService.class);
+public class DBStorageService {
+    private final Logger logger = LoggerFactory.getLogger(DBStorageService.class);
 
     @Autowired
     private BlockMapper blockMapper;
@@ -45,38 +45,38 @@ public class BlockStorageService {
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
         logger.debug(msg);
-        Message message = JSON.parseObject(msg,Message.class);
-        switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
+        Message message = JSON.parseObject(msg, Message.class);
+        switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())) {
             case BLOCK:
-                logger.debug("STOMP区块信息入库: {}",msg);
-                BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
+                logger.debug("STOMP区块信息入库: {}", msg);
+                BlockDto blockDto = JSON.parseObject(message.getStruct(), BlockDto.class);
                 //构建dto结构，转存数据库结构
                 //区块相关block
-                Block block = bulidBlock(blockDto,message);
-                try{
+                Block block = bulidBlock(blockDto, message);
+                try {
                     blockMapper.insertSelective(block);
                     logger.debug("block data insert...");
-                }catch (Exception e){
+                } catch (Exception e) {
                     Block block1 = blockMapper.selectByPrimaryKey(block.getHash());
-                    if(!ObjectUtils.isEmpty(block1)){
+                    if (!ObjectUtils.isEmpty(block1)) {
                         blockMapper.updateByPrimaryKeySelective(block);
-                        logger.debug("block data repeat...,update data",e.getMessage());
+                        logger.debug("block data repeat...,update data", e.getMessage());
 
                     }
                 }
 
                 //交易相关transaction
-                if(blockDto.getTransaction().size() > 0){
-                    List<TransactionWithBLOBs> transactionList = buildTransaction(blockDto,message);
-                    try{
+                if (blockDto.getTransaction().size() > 0) {
+                    List <TransactionWithBLOBs> transactionList = buildTransaction(blockDto, message);
+                    try {
                         transactionMapper.batchInsert(transactionList);
                         logger.debug("transaction data insert...");
-                    }catch (Exception e){
-                        for(TransactionWithBLOBs transactionWithBLOBs : transactionList){
+                    } catch (Exception e) {
+                        for (TransactionWithBLOBs transactionWithBLOBs : transactionList) {
                             TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(transactionWithBLOBs.getHash());
-                            if(!ObjectUtils.isEmpty(transaction)){
+                            if (!ObjectUtils.isEmpty(transaction)) {
                                 transactionMapper.updateByPrimaryKeySelective(transaction);
-                                logger.debug("transaction data repeat...,update data",e.getMessage());
+                                logger.debug("transaction data repeat...,update data", e.getMessage());
                             }
                         }
                     }
@@ -84,38 +84,37 @@ public class BlockStorageService {
                 break;
 
             case PENDING:
-                logger.debug("STOMP挂起交易信息入库: {}",msg);
+                logger.debug("STOMP挂起交易信息入库: {}", msg);
                 //获取信息中pending交易列表
-                List<PendingTransactionDto> list = JSON.parseArray(message.getStruct(),PendingTransactionDto.class);
-                List<PendingTx> pendingTxes = buidPendingTx(list,message);
-                try{
+                List <PendingTransactionDto> list = JSON.parseArray(message.getStruct(), PendingTransactionDto.class);
+                List <PendingTx> pendingTxes = buidPendingTx(list, message);
+                try {
                     pendingTxMapper.batchInsert(pendingTxes);
                     logger.debug("pendingtransaction data insert...");
-                }catch (Exception e){
-                    for(PendingTx pendingTx : pendingTxes){
+                } catch (Exception e) {
+                    for (PendingTx pendingTx : pendingTxes) {
                         PendingTx pending = pendingTxMapper.selectByPrimaryKey(pendingTx.getHash());
-                        if(!ObjectUtils.isEmpty(pending)){
+                        if (!ObjectUtils.isEmpty(pending)) {
                             pendingTxMapper.updateByPrimaryKeySelective(pendingTx);
-                            logger.debug("pendingtransaction data repeat...,update data",e.getMessage());
+                            logger.debug("pendingtransaction data repeat...,update data", e.getMessage());
                         }
                     }
                 }
                 break;
-
         }
     }
 
-    private Block bulidBlock(BlockDto blockDto,Message message){
+    private Block bulidBlock ( BlockDto blockDto, Message message ) {
         Block block = new Block();
-        try{
-            BeanUtils.copyProperties(blockDto,block);
+        try {
+            BeanUtils.copyProperties(blockDto, block);
             block.setNumber(Long.valueOf(blockDto.getNumber()));
-            if(blockDto.getTimestamp() == 0){
+            if (blockDto.getTimestamp() == 0) {
                 block.setTimestamp(new Date(3600));
-            }else{
+            } else {
                 block.setTimestamp(new Date(blockDto.getTimestamp() * 1000l));
             }
-            block.setSize((int)blockDto.getSize());//考虑转换格式类型，高精度转低精度可能会导致数据失准
+            block.setSize((int) blockDto.getSize());//考虑转换格式类型，高精度转低精度可能会导致数据失准
             block.setChainId(message.getChainId());
             block.setEnergonAverage(blockDto.getEnergonAverage().toString());
             block.setEnergonLimit(blockDto.getEnergonLimit().toString());
@@ -123,18 +122,18 @@ public class BlockStorageService {
             block.setTransactionNumber(blockDto.getTransactionNumber());
             block.setCreateTime(new Date());
             block.setUpdateTime(new Date());
-        }catch (Exception e){
-            logger.error("数据转化异常",e.getMessage());
+        } catch (Exception e) {
+            logger.error("数据转化异常", e.getMessage());
         }
         return block;
     }
 
-    private List<TransactionWithBLOBs> buildTransaction(BlockDto blockDto,Message message){
-        List<TransactionWithBLOBs> transactionList = new ArrayList <>();
-        List<TransactionDto> transactionDtos = blockDto.getTransaction();
-        for(TransactionDto transactionDto : transactionDtos){
+    private List <TransactionWithBLOBs> buildTransaction ( BlockDto blockDto, Message message ) {
+        List <TransactionWithBLOBs> transactionList = new ArrayList <>();
+        List <TransactionDto> transactionDtos = blockDto.getTransaction();
+        for (TransactionDto transactionDto : transactionDtos) {
             TransactionWithBLOBs transaction = new TransactionWithBLOBs();
-            BeanUtils.copyProperties(transactionDto,transaction);
+            BeanUtils.copyProperties(transactionDto, transaction);
             transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
             transaction.setBlockNumber(Long.valueOf(transactionDto.getBlockNumber().toString()));
             transaction.setChainId(message.getChainId());
@@ -143,7 +142,7 @@ public class BlockStorageService {
             transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
             transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
             transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
-            transaction.setTxReceiptStatus(Integer.parseInt(transactionDto.getTxReceiptStatus().substring(2),16));
+            transaction.setTxReceiptStatus(Integer.parseInt(transactionDto.getTxReceiptStatus().substring(2), 16));
             transaction.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
             transaction.setReceiveType(transactionDto.getReceiveType());
             transaction.setInput(transactionDto.getInput() != null ? transactionDto.getInput() : "0x");
@@ -152,12 +151,12 @@ public class BlockStorageService {
         return transactionList;
     }
 
-    private List<PendingTx> buidPendingTx(List<PendingTransactionDto> list,Message message){
-        List<PendingTx> pendingTxes = new ArrayList <>();
-        if(list.size() > 0){
-            for(PendingTransactionDto pendingTransactionDto : list){
+    private List <PendingTx> buidPendingTx ( List <PendingTransactionDto> list, Message message ) {
+        List <PendingTx> pendingTxes = new ArrayList <>();
+        if (list.size() > 0) {
+            for (PendingTransactionDto pendingTransactionDto : list) {
                 PendingTx pendingTx = new PendingTx();
-                BeanUtils.copyProperties(pendingTransactionDto,pendingTx);
+                BeanUtils.copyProperties(pendingTransactionDto, pendingTx);
                 pendingTx.setUpdateTime(new Date());
                 pendingTx.setCreateTime(new Date());
                 pendingTx.setEnergonLimit(pendingTransactionDto.getEnergonLimit().toString());

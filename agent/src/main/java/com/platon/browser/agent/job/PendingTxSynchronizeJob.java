@@ -1,9 +1,11 @@
 package com.platon.browser.agent.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
+import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.client.Web3jClient;
 import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
+import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.common.util.TransactionType;
 import org.slf4j.Logger;
@@ -25,16 +27,17 @@ import java.util.List;
  * Date: 2018/10/25
  * Time: 18:07
  */
-public class PendingTxSynchrinizeJob extends AbstractTaskJob{
+public class PendingTxSynchronizeJob extends AbstractTaskJob{
 
     /**
      * 挂起交易同步任务
      * 1.根据web3j配置文件获取节点信息
      * 2.构建web3jclient
-     *
+     * 3.同步链上挂起交易列表
+     * 4.数据整合推送至rabbitMQ队列
      */
 
-    private static Logger log = LoggerFactory.getLogger(PendingTxSynchrinizeJob.class);
+    private static Logger log = LoggerFactory.getLogger(PendingTxSynchronizeJob.class);
 
     @Autowired
     private MQSender mqSender;
@@ -69,6 +72,7 @@ public class PendingTxSynchrinizeJob extends AbstractTaskJob{
             log.info("newest pendingtx is null");
         }catch (Exception e){
             log.error(e.getMessage());
+            throw new AppException(ErrorCodeEnum.PENDINGTX_ERROR);
         } finally {
             stopWatch.stop();
             log.info("PendingTxSynchrinizeJob-->{}", stopWatch.shortSummary());

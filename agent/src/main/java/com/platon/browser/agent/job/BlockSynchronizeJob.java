@@ -1,6 +1,5 @@
 package com.platon.browser.agent.job;
 
-import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.AppException;
@@ -14,8 +13,6 @@ import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -25,13 +22,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
-import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.*;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -80,7 +71,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             try {
                 ethBlockNumber = web3j.ethBlockNumber().send();
             } catch (Exception e) {
-                log.error("获取区块高度异常", e);
+                log.error("Get blockNumber exception...", e);
                 throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
@@ -97,13 +88,13 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                             //chainId获取
                             mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
                         } catch (Exception e) {
-                            log.error("同步区块信息异常", e);
+                            log.error("Synchronize block exception...", e);
                             throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                         }
                     }
                 } else if (Long.valueOf(blockNumber) < blocks.get(0).getNumber() || Long.valueOf(blockNumber) == blocks.get(0).getNumber()) {
                     //链上块无增长
-                    log.info("无新区块");
+                    log.info("Blockchain blockinfo is newest...");
                 }
             } else {
                 //判断是否是首次
@@ -113,7 +104,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                         //chainId获取
                         mqSender.send(ConfigConst.getChainId(), "block", newBlock);
                     } catch (Exception e) {
-                        log.error("同步区块信息异常", e);
+                        log.error("Synchronize block exception", e);
                         throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                     }
                 }
