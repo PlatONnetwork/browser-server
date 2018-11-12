@@ -247,7 +247,7 @@ public class CacheServiceImpl implements CacheService {
                 if(statisticInfo.getBlockStatisticList()!=null){
                     Map<Long, StatisticItem> map = new HashMap<>();
                     LimitQueue<StatisticItem> limitQueue = cache.getLimitQueue();
-                    limitQueue.elements().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    limitQueue.elementsDesc().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
                     statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
                         StatisticItem item = map.get(statisticItem.getHeight());
                         if(item==null){
@@ -273,7 +273,7 @@ public class CacheServiceImpl implements CacheService {
         try{
             BlockInit blockInit = new BlockInit();
             blockInit.setChanged(cache.isChanged());
-            blockInit.setList(cache.elements());
+            blockInit.setList(cache.elementsDesc());
             cache.setChanged(false);
             return blockInit;
         }finally {
@@ -315,7 +315,7 @@ public class CacheServiceImpl implements CacheService {
         try{
             TransactionInit transactionInit = new TransactionInit();
             transactionInit.setChanged(cache.isChanged());
-            transactionInit.setList(cache.elements());
+            transactionInit.setList(cache.elementsDesc());
             cache.setChanged(false);
             return transactionInit;
         }finally {
