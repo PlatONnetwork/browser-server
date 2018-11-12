@@ -157,7 +157,7 @@ public class UpdateCacheTask {
             // 增量推送节点信息，1秒推送一次
             NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
             if(nodeIncrement.isChanged()){
-                logger.info("节点增量缓存有变更，推送STOMP消息: {}", JSON.toJSONString(nodeIncrement.getIncrement()));
+                logger.info("节点增量缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
             }
@@ -165,7 +165,7 @@ public class UpdateCacheTask {
             // 增量推送区块信息，1秒推送一次
             BlockIncrement blockIncrement = cacheService.getBlockIncrement(chainId);
             if(blockIncrement.isChanged()){
-                logger.info("区块增量缓存有变更，推送STOMP消息: {}", JSON.toJSONString(blockIncrement.getIncrement()));
+                logger.info("区块增量缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
             }
@@ -173,21 +173,21 @@ public class UpdateCacheTask {
             // 增量推送交易信息，1秒推送一次
             TransactionIncrement transactionIncrement = cacheService.getTransactionIncrement(chainId);
             if(transactionIncrement.isChanged()){
-                logger.info("交易增量缓存有变更，推送STOMP: {}", JSON.toJSONString(transactionIncrement.getIncrement()));
+                logger.debug("交易增量缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
             }
 
             IndexInfo indexWhole = cacheService.getIndexInfo(chainId);
             if(indexWhole.isChanged()){
-                logger.info("指标缓存有变更，推送STOMP消息: {}", JSON.toJSONString(indexWhole));
+                logger.info("指标缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexWhole);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
             }
 
             StatisticInfo statisticWhole = cacheService.getStatisticInfo(chainId);
             if(statisticWhole.isChanged()){
-                logger.info("统计缓存有变更，推送STOMP消息: {}", JSON.toJSONString(statisticWhole));
+                logger.info("统计缓存有变更，推送STOMP消息...");
                 statisticWhole.setBlockStatisticList(statisticWhole.getLimitQueue().elementsAsc());
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticWhole);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
