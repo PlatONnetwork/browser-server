@@ -19,19 +19,19 @@
                 failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "同步区块信息任务"/>
 
 
-    <!--<job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
-                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
+    <job:simple id="pendingTxSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchronizeJob" registry-center-ref="regCenter"
+                cron="*/15 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchronizeJob" overwrite="true"
                 failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易信息任务"/>
 
 
+    <job:simple id="pendingTxUpdateTaskJob${netInfo}" class="com.platon.browser.agent.job.PendingTxUpdateTaskJob" registry-center-ref="regCenter"
+                cron="*/30 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxUpdateTaskJob" overwrite="true"
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易同步任务"/>
+
+
+<!--
     <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
-                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "区块数据入库任务"/>
-
-
-
-    <job:simple id="pendingTxSynchrinizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchrinizeJob" registry-center-ref="regCenter"
-                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchrinizeJob" overwrite="true"
-                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易入库任务"/>-->
+                failover = "true" misfire = "true" event-trace-rdb-data-source="dataSource" description = "挂起交易入库任务"/>&ndash;&gt;-->
 
 </beans>
