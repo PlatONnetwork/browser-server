@@ -2,12 +2,15 @@ package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.agent.BlockDto;
+import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,9 @@ public class BlockStorageService {
     @Autowired
     private TransactionMapper transactionMapper;
 
+    @Autowired
+    private PendingTxMapper pendingTxMapper;
+
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
         logger.debug(msg);
@@ -49,11 +55,12 @@ public class BlockStorageService {
                 Block block = bulidBlock(blockDto,message);
                 try{
                     blockMapper.insertSelective(block);
+                    logger.debug("block data insert...");
                 }catch (Exception e){
                     Block block1 = blockMapper.selectByPrimaryKey(block.getHash());
                     if(!ObjectUtils.isEmpty(block1)){
                         blockMapper.updateByPrimaryKeySelective(block);
-                        logger.debug("block数据重复，查询并更新",e.getMessage());
+                        logger.debug("block data repeat...,update data",e.getMessage());
 
                     }
                 }
@@ -63,12 +70,13 @@ public class BlockStorageService {
                     List<TransactionWithBLOBs> transactionList = buildTransaction(blockDto,message);
                     try{
                         transactionMapper.batchInsert(transactionList);
+                        logger.debug("transaction data insert...");
                     }catch (Exception e){
                         for(TransactionWithBLOBs transactionWithBLOBs : transactionList){
                             TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(transactionWithBLOBs.getHash());
                             if(!ObjectUtils.isEmpty(transaction)){
                                 transactionMapper.updateByPrimaryKeySelective(transaction);
-                                logger.debug("transaction数据重复，查询并更新",e.getMessage());
+                                logger.debug("transaction data repeat...,update data",e.getMessage());
                             }
                         }
                     }
@@ -76,6 +84,22 @@ public class BlockStorageService {
                 break;
 
             case PENDING:
+                logger.debug("STOMP挂起交易信息入库: {}",msg);
+                //获取信息中pending交易列表
+                List<PendingTransactionDto> list = JSON.parseArray(message.getStruct(),PendingTransactionDto.class);
+                List<PendingTx> pendingTxes = buidPendingTx(list,message);
+                try{
+                    pendingTxMapper.batchInsert(pendingTxes);
+                    logger.debug("pendingtransaction data insert...");
+                }catch (Exception e){
+                    for(PendingTx pendingTx : pendingTxes){
+                        PendingTx pending = pendingTxMapper.selectByPrimaryKey(pendingTx.getHash());
+                        if(!ObjectUtils.isEmpty(pending)){
+                            pendingTxMapper.updateByPrimaryKeySelective(pendingTx);
+                            logger.debug("pendingtransaction data repeat...,update data",e.getMessage());
+                        }
+                    }
+                }
                 break;
 
         }
@@ -126,6 +150,25 @@ public class BlockStorageService {
             transactionList.add(transaction);
         }
         return transactionList;
+    }
+
+    private List<PendingTx> buidPendingTx(List<PendingTransactionDto> list,Message message){
+        List<PendingTx> pendingTxes = new ArrayList <>();
+        if(list.size() > 0){
+            for(PendingTransactionDto pendingTransactionDto : list){
+                PendingTx pendingTx = new PendingTx();
+                BeanUtils.copyProperties(pendingTransactionDto,pendingTx);
+                pendingTx.setUpdateTime(new Date());
+                pendingTx.setCreateTime(new Date());
+                pendingTx.setEnergonLimit(pendingTransactionDto.getEnergonLimit().toString());
+                pendingTx.setEnergonPrice(pendingTransactionDto.getEnergonPrice().toString());
+                pendingTx.setEnergonUsed("pending");
+                pendingTx.setTimestamp(new Date(pendingTransactionDto.getTimestamp()));
+                pendingTx.setChainId(message.getChainId());
+                pendingTxes.add(pendingTx);
+            }
+        }
+        return pendingTxes;
     }
 
 }

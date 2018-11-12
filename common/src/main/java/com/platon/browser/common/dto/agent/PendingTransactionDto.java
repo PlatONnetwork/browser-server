@@ -1,5 +1,7 @@
 package com.platon.browser.common.dto.agent;
 
+import java.math.BigInteger;
+
 /**
  * User: dongqile
  * Date: 2018/10/24
@@ -36,7 +38,7 @@ public class PendingTransactionDto {
     /**
      * 能量限制
      */
-    private Integer energonLimit;
+    private BigInteger energonLimit;
 
     /**
      * 交易类型
@@ -58,6 +60,11 @@ public class PendingTransactionDto {
      * 交易输入数据
      */
     private String input;
+
+    /**
+     * 能量价格
+     */
+    private BigInteger energonPrice;
 
     public String getHash () {
         return hash;
@@ -99,11 +106,11 @@ public class PendingTransactionDto {
         this.value = value;
     }
 
-    public Integer getEnergonLimit () {
+    public BigInteger getEnergonLimit () {
         return energonLimit;
     }
 
-    public void setEnergonLimit ( Integer energonLimit ) {
+    public void setEnergonLimit ( BigInteger energonLimit ) {
         this.energonLimit = energonLimit;
     }
 
@@ -129,5 +136,13 @@ public class PendingTransactionDto {
 
     public void setInput ( String input ) {
         this.input = input;
+    }
+
+    public BigInteger getEnergonPrice () {
+        return energonPrice;
+    }
+
+    public void setEnergonPrice ( BigInteger energonPrice ) {
+        this.energonPrice = energonPrice;
     }
 }

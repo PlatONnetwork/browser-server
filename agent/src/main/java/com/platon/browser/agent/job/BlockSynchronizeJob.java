@@ -10,6 +10,7 @@ import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.spring.MQSender;
+import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -94,7 +95,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                         try {
                             BlockDto newBlock = buildStruct(i, web3j);
                             //chainId获取
-                            mqSender.send(ConfigConst.getChainId(), "block", newBlock);
+                            mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
                         } catch (Exception e) {
                             log.error("同步区块信息异常", e);
                             throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
@@ -203,7 +204,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     }
                 }
                 transactionDto.setReceiveType("contract");
-                String type = geTransactionTyep(input);
+                String type = TransactionType.geTransactionTyep(input);
                 transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
             }
@@ -227,47 +228,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     }
 
 
-    private String geTransactionTyep ( String input ) throws Exception {
-        String type = null;
-        if(StringUtils.isNotEmpty(input)){
-            RlpList rlpList = RlpDecoder.decode(Hex.decode(input));
-            List <RlpType> rlpTypes = rlpList.getValues();
-            RlpList rlpList1 = (RlpList) rlpTypes.get(0);
-            RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
-            String typecode = Hex.toHexString(rlpString.getBytes());
-            byte[] hexByte = Numeric.hexStringToByteArray(typecode);
-            //todo:置换web3j jar包platon版本
-            switch (type) {
-                case "0":
-                    //主币交易转账
-                    type = "transfer";
-                    break;
-                case "1":
-                    //合约发布
-                    type = "contractCreate";
-                    break;
-                case "2":
-                    //合约调用
-                    type = "transactionExecute";
-                    break;
-                case "3":
-                    //投票
-                    type = "vote";
-                    break;
-                case "4":
-                    //权限
-                    type = "authorization";
-                    break;
-                case "5":
-                    //MPC交易
-                    type = "MPCtransaction";
-                    break;
-            }
-            return type;
-        }
-        return type = "transfer";
 
-    }
 /*    public static void main(String args[]){
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setEnergonPrice(new BigInteger("12321321321321"));

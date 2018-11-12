@@ -31,9 +31,21 @@
 		</dependency>
 		<!-- web3j -->
 		<dependency>
-			<groupId>org.web3j</groupId>
+			<groupId>com.platon.web3j</groupId>
 			<artifactId>core</artifactId>
-			<version>3.5.0</version>
+			<version>0.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
 		</dependency>
 
 		<!-- redis -->
