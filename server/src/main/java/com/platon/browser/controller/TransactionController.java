@@ -280,7 +280,8 @@ public class TransactionController {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
     {
-        type:"pending", // 结果类型，待处理交易可能随时在变化，在查询开始前可能会变成已处理交易，所以这里需要添加结果类型作为区分
+        type:"pending", // 结果类型:pending-待处理，transaction-已处理交易；
+                        // 原因：待处理交易可能随时在变化，在查询开始前可能此笔交易已被处理，所以这里需要添加结果类型作为区分;
                         // 前端页面处理时，如果发现此值为transaction，则需要使用交易hash作为参数跳转到交易详情页面
         data:{
             "errMsg": "",//描述信息
