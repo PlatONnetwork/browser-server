@@ -32,6 +32,10 @@ public class StatisticInfo {
     private Long highestBlockNumber;
     @JsonIgnore
     private Long lowestBlockNumber;
+    @JsonIgnore
+    private Long highestBlockTimestamp;
+    @JsonIgnore
+    private Long lowestBlockTimestamp;
 
     @JsonIgnore
     private boolean changed=false;

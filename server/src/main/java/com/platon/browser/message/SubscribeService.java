@@ -67,7 +67,7 @@ public class SubscribeService {
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
                 blockInfo.setNode(blockDto.getMiner());
-                blockInfo.setTimestamp(blockDto.getTimestamp());
+                blockInfo.setTimestamp(blockDto.getTimestamp()*1000);
                 blockInfo.setHeight(blockDto.getNumber());
                 blockInfo.setBlockReward(blockDto.getBlockReward());
                 blockInfo.setTransaction(blockDto.getTransaction().size());
@@ -103,6 +103,7 @@ public class SubscribeService {
                 logger.debug("整体更新统计缓存: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
+                statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp()*1000);
                 statisticInfo.setBlockCount(1l);
                 statisticInfo.setDayTransaction(Long.valueOf(transactionInfos.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();

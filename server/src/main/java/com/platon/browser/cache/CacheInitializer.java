@@ -136,8 +136,11 @@ public class CacheInitializer {
             }
             Block top = topList.get(0);
             statisticInfo.setHighestBlockNumber(top.getNumber());
+            statisticInfo.setHighestBlockTimestamp(top.getTimestamp().getTime());
             Block bottom = bottomList.get(0);
             statisticInfo.setLowestBlockNumber(bottom.getNumber());
+            statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
+
             long avgTime = (top.getTimestamp().getTime()-bottom.getTimestamp().getTime())/top.getNumber();
             statisticInfo.setAvgTime(avgTime);
 

@@ -247,7 +247,8 @@ public class CacheServiceImpl implements CacheService {
                 }
                 if(statisticInfo.getHighestBlockNumber()!=null){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
-                    cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
+                    cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
+                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()!=null){
