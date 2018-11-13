@@ -62,7 +62,7 @@ public class SubscribeService {
             case BLOCK:
                 logger.debug("更新增量区块缓存: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
-                logger.info("区块号：{}", blockDto.getNumber());
+                //logger.info("区块号：{}", blockDto.getNumber());
                 BlockInfo blockInfo = new BlockInfo();
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
