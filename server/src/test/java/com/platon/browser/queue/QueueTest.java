@@ -3,6 +3,7 @@ package com.platon.browser.queue;
 
 import com.platon.browser.dto.cache.LimitQueue;
 
+
 import java.util.Collections;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class QueueTest {
         queue.offer(2);
         queue.offer(8);
         queue.offer(5);
-
+   /*     System.out.println(queue.elements());*/
         List<Integer> list = queue.list();
         Collections.sort(list,(c1,c2)->{
             if(c1>c2) return -1;
