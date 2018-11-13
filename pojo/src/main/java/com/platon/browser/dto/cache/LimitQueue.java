@@ -57,17 +57,9 @@ public class LimitQueue<E>{
         return queue.size();
     }
 
-    public List<E> elementsAsc(){
+    public List<E> list(){
         List<E> list = new ArrayList<>();
         for (int i=queue.size()-1;i>=0;i--){
-            list.add(queue.get(i));
-        }
-        return list;
-    }
-
-    public List<E> elementsDesc(){
-        List<E> list = new ArrayList<>();
-        for (int i=0;i<queue.size();i++){
             list.add(queue.get(i));
         }
         return list;

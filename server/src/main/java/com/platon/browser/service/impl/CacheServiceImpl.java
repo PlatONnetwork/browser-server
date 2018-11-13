@@ -195,7 +195,15 @@ public class CacheServiceImpl implements CacheService {
         try{
             StatisticInfo copy = new StatisticInfo();
             BeanUtils.copyProperties(cache,copy);
-            copy.setBlockStatisticList(copy.getLimitQueue().elementsAsc());
+
+            List<StatisticItem> itemList = cache.getLimitQueue().list();
+            Collections.sort(itemList,(c1,c2)->{
+                // 根据区块高度正排
+                if(c1.getHeight()>c2.getHeight()) return 1;
+                if(c1.getHeight()<c2.getHeight()) return -1;
+                return 0;
+            });
+            copy.setBlockStatisticList(itemList);
             cache.setChanged(false);
             return copy;
         }finally {
@@ -249,7 +257,14 @@ public class CacheServiceImpl implements CacheService {
                 if(statisticInfo.getBlockStatisticList()!=null){
                     Map<Long, StatisticItem> map = new HashMap<>();
                     LimitQueue<StatisticItem> limitQueue = cache.getLimitQueue();
-                    limitQueue.elementsDesc().forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
+                    List<StatisticItem> itemList = limitQueue.list();
+                    Collections.sort(itemList,(c1,c2)->{
+                        // 根据区块高度正排
+                        if(c1.getHeight()>c2.getHeight()) return 1;
+                        if(c1.getHeight()<c2.getHeight()) return -1;
+                        return 0;
+                    });
+                    itemList.forEach(statisticItem -> map.put(statisticItem.getHeight(),statisticItem));
                     statisticInfo.getBlockStatisticList().forEach(statisticItem -> {
                         StatisticItem item = map.get(statisticItem.getHeight());
                         if(item==null){
@@ -275,7 +290,15 @@ public class CacheServiceImpl implements CacheService {
         try{
             BlockInit blockInit = new BlockInit();
             blockInit.setChanged(cache.isChanged());
-            blockInit.setList(cache.elementsDesc());
+
+            List<BlockInfo> blockInfoList = cache.list();
+            Collections.sort(blockInfoList,(c1,c2)->{
+                // 根据区块高度倒排
+                if(c1.getHeight()>c2.getHeight()) return -1;
+                if(c1.getHeight()<c2.getHeight()) return 1;
+                return 0;
+            });
+            blockInit.setList(blockInfoList);
             cache.setChanged(false);
             return blockInit;
         }finally {
@@ -296,7 +319,7 @@ public class CacheServiceImpl implements CacheService {
             lock.writeLock().unlock();
         }
 
-        logger.debug("更新链【ID={}】的块增量缓存",chainId);
+        /*logger.debug("更新链【ID={}】的块增量缓存",chainId);
         BlockIncrement increment = blockIncrementMap.get(chainId);
         lock = increment.getLock();
         lock.writeLock().lock();
@@ -306,7 +329,7 @@ public class CacheServiceImpl implements CacheService {
             increment.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 
     @Override
@@ -317,7 +340,14 @@ public class CacheServiceImpl implements CacheService {
         try{
             TransactionInit transactionInit = new TransactionInit();
             transactionInit.setChanged(cache.isChanged());
-            transactionInit.setList(cache.elementsDesc());
+            List<TransactionInfo> transactionInfoList = cache.list();
+            Collections.sort(transactionInfoList,(c1,c2)->{
+                // 根据区块高度倒排
+                if(c1.getBlockHeight()>c2.getBlockHeight()) return -1;
+                if(c1.getBlockHeight()<c2.getBlockHeight()) return 1;
+                return 0;
+            });
+            transactionInit.setList(transactionInfoList);
             cache.setChanged(false);
             return transactionInit;
         }finally {
@@ -338,7 +368,7 @@ public class CacheServiceImpl implements CacheService {
             lock.writeLock().unlock();
         }
 
-        logger.debug("更新链【ID={}】的交易增量缓存",chainId);
+        /*logger.debug("更新链【ID={}】的交易增量缓存",chainId);
         TransactionIncrement increment = transactionIncrementMap.get(chainId);
         lock = increment.getLock();
         lock.writeLock().lock();
@@ -348,6 +378,6 @@ public class CacheServiceImpl implements CacheService {
             increment.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 }
