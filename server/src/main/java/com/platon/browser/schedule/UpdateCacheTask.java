@@ -9,6 +9,7 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.cache.*;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.CacheService;
@@ -158,19 +159,19 @@ public class UpdateCacheTask {
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
             }
 
-            // 增量推送区块信息，1秒推送一次
-            BlockIncrement blockIncrement = cacheService.getBlockIncrement(chainId);
-            if(blockIncrement.isChanged()){
-                logger.info("区块增量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockIncrement.getIncrement());
+            // 全量推送区块信息，1秒推送一次
+            BlockInit blockInit = cacheService.getBlockInit(chainId);
+            if(blockInit.isChanged()){
+                logger.info("区块全量缓存有变更，推送STOMP消息...");
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
             }
 
-            // 增量推送交易信息，1秒推送一次
-            TransactionIncrement transactionIncrement = cacheService.getTransactionIncrement(chainId);
-            if(transactionIncrement.isChanged()){
-                logger.debug("交易增量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionIncrement.getIncrement());
+            // 全量推送交易信息，1秒推送一次
+            TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
+            if(transactionInit.isChanged()){
+                logger.debug("交易全量缓存有变更，推送STOMP消息...");
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInit.getList());
                 messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
             }
 
@@ -184,7 +185,16 @@ public class UpdateCacheTask {
             StatisticInfo statisticWhole = cacheService.getStatisticInfo(chainId);
             if(statisticWhole.isChanged()){
                 logger.info("统计缓存有变更，推送STOMP消息...");
-                statisticWhole.setBlockStatisticList(statisticWhole.getLimitQueue().elementsAsc());
+
+                LimitQueue<StatisticItem> limitQueue = statisticWhole.getLimitQueue();
+                List<StatisticItem> itemList = limitQueue.list();
+                Collections.sort(itemList,(c1,c2)->{
+                    // 按区块高度正排
+                    if(c1.getHeight()>c2.getHeight()) return 1;
+                    if(c1.getHeight()<c2.getHeight()) return -1;
+                    return 0;
+                });
+                statisticWhole.setBlockStatisticList(itemList);
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticWhole);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
             }

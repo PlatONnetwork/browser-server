@@ -13,8 +13,8 @@ import java.util.Map;
 @Component
 public class ChainsConfig {
 
-    private static final String CHAIN_CONFIG_SPLITER = ",";
-    private static final String NAME_ID_SPLITER = ":";
+    private static final String CHAIN_CONFIG_SPLITTER = ",";
+    private static final String NAME_ID_SPLITTER = ":";
 
     @Value("${platon.chains}")
     private String configStr;
@@ -24,10 +24,10 @@ public class ChainsConfig {
     @PostConstruct
     public void init(){
         if(StringUtils.isNotBlank(configStr)){
-            String [] confsArr = configStr.split(CHAIN_CONFIG_SPLITER);
+            String [] confsArr = configStr.split(CHAIN_CONFIG_SPLITTER);
             if(confsArr!=null){
                 Arrays.asList(confsArr).forEach(config->{
-                    String [] nameId = config.split(NAME_ID_SPLITER);
+                    String [] nameId = config.split(NAME_ID_SPLITTER);
                     if(nameId!=null&&nameId.length==2){
                         chainsConfig.put(nameId[0],nameId[1]);
                     }

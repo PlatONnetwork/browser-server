@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class SubscribePushService {
+public class SubscribeService {
 
-    private final Logger logger = LoggerFactory.getLogger(SubscribePushService.class);
+    private final Logger logger = LoggerFactory.getLogger(SubscribeService.class);
 
     @Autowired
     private CacheService cacheService;
@@ -62,6 +62,7 @@ public class SubscribePushService {
             case BLOCK:
                 logger.debug("更新增量区块缓存: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
+                //logger.info("区块号：{}", blockDto.getNumber());
                 BlockInfo blockInfo = new BlockInfo();
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
