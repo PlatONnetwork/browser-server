@@ -1,7 +1,7 @@
 package com.platon.browser.queue;
 
 
-import com.platon.browser.dto.LimitQueue;
+import com.platon.browser.dto.cache.LimitQueue;
 
 public class QueueTest {
     public static void main(String[] args) {
@@ -10,6 +10,6 @@ public class QueueTest {
         queue.offer(2);
         queue.offer(4);
         queue.offer(5);
-        System.out.println(queue.elements());
+   /*     System.out.println(queue.elements());*/
     }
 }
