@@ -58,6 +58,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     @Autowired
     private MQSender mqSender;
 
+    private static Long alreadyGetBlockNubmer = 0l;
+
     private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
     @Override
@@ -65,7 +67,6 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {
@@ -80,33 +81,40 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             PageHelper.startPage(1, 1);
             List <Block> blocks = blockMapper.selectByExample(condition);
             if (blocks.size() > 0) {
-                if (Long.valueOf(blockNumber) > blocks.get(0).getNumber()) {
-                    //链上块增长
-                    for (int i = blocks.get(0).getNumber().intValue()+1 ; i < Integer.parseInt(blockNumber); i++) {
-                        try {
-                            BlockDto newBlock = buildStruct(i, web3j);
-                            //chainId获取
-                            mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
-                        } catch (Exception e) {
-                            log.error("Synchronize block exception...", e);
-                            throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
-                        }
-                    }
-                } else if (Long.valueOf(blockNumber) < blocks.get(0).getNumber() || Long.valueOf(blockNumber) == blocks.get(0).getNumber()) {
-                    //链上块无增长
-                    log.info("Blockchain blockinfo is newest...");
-                }
-            } else {
+                alreadyGetBlockNubmer = blocks.get(0).getNumber();
+            }
+            if (alreadyGetBlockNubmer == 0) {
                 //判断是否是首次
                 for (int i = 1; i < Long.valueOf(blockNumber); i++) {
                     try {
                         BlockDto newBlock = buildStruct(i, web3j);
                         //chainId获取
                         mqSender.send(ConfigConst.getChainId(), "block", newBlock);
+                        alreadyGetBlockNubmer = newBlock.getNumber().longValue();
+                        log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     } catch (Exception e) {
                         log.error("Synchronize block exception", e);
                         throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                     }
+                }
+            } else {
+                if (Long.valueOf(blockNumber) > alreadyGetBlockNubmer) {
+                    //链上块增长
+                    for (int i = alreadyGetBlockNubmer.intValue() + 1; i < Integer.parseInt(blockNumber); i++) {
+                        try {
+                            BlockDto newBlock = buildStruct(i, web3j);
+                            //chainId获取
+                            mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
+                            alreadyGetBlockNubmer = newBlock.getNumber().longValue();
+                            log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
+                        } catch (Exception e) {
+                            log.error("Synchronize block exception...", e);
+                            throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
+                        }
+                    }
+                } else if (Long.valueOf(blockNumber) < alreadyGetBlockNubmer || Long.valueOf(blockNumber) == alreadyGetBlockNubmer) {
+                    //链上块无增长
+                    log.info("Blockchain blockinfo is newest...");
                 }
             }
         } catch (Exception e) {
@@ -129,7 +137,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     // 计算区块中的交易费
     private BigInteger getGasInBlock ( List <TransactionDto> transactionList ) {
         BigInteger txfee = null;
-        if (transactionList != null  && transactionList.size() > 0) {
+        if (transactionList != null && transactionList.size() > 0) {
             for (TransactionDto transactionDto : transactionList) {
                 BigInteger price = transactionDto.getEnergonPrice();
                 BigInteger used = transactionDto.getEnergonUsed();
@@ -145,7 +153,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     private String getBlockReward ( String height, List <TransactionDto> transactionList ) {
         BigInteger reward = getConstReward(height);
         BigInteger txfee = BigInteger.ZERO;
-        if (transactionList != null  && transactionList.size() > 0) {
+        if (transactionList != null && transactionList.size() > 0) {
             txfee = getGasInBlock(transactionList);
         }
         BigInteger blockReward = reward.add(txfee);
@@ -157,10 +165,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
         //交易相关
         List <TransactionDto> transactionDtolist = new ArrayList <>();
-        if(!ethBlock.getBlock().getTransactions().equals(null) && ethBlock.getBlock().getTransactions().size() > 0){
+        if (!ethBlock.getBlock().getTransactions().equals(null) && ethBlock.getBlock().getTransactions().size() > 0) {
             List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             for (EthBlock.TransactionResult transactionResult : list) {
-                Transaction txList = (Transaction)transactionResult.get();
+                Transaction txList = (Transaction) transactionResult.get();
                 EthTransaction ethTransaction = web3j.ethGetTransactionByHash(txList.getHash()).send();
                 Optional <Transaction> value = ethTransaction.getTransaction();
                 if (!value.isPresent()) {
@@ -175,7 +183,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     throw new AppException(ErrorCodeEnum.TX_ERROR);
                 }
                 TransactionReceipt receipt = transactionReceipt.get();
-                BeanUtils.copyProperties(receipt,transactionDto);
+                BeanUtils.copyProperties(receipt, transactionDto);
                 transactionDto.setHash(transaction.getHash());
                 transactionDto.setTransactionIndex(receipt.getTransactionIndex());
                 transactionDto.setEnergonPrice(transaction.getGasPrice());
@@ -186,11 +194,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setTxReceiptStatus(receipt.getStatus());
                 transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                 String input = transactionDto.getInput();
-                if(null != transaction.getTo()){
-                    EthGetCode ethGetCode  = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                    if(!ethGetCode.getCode().equals("0x")){
+                if (null != transaction.getTo()) {
+                    EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                    if (!ethGetCode.getCode().equals("0x")) {
                         transactionDto.setReceiveType("contract");
-                    }else {
+                    } else {
                         transactionDto.setReceiveType("account");
                     }
                 }
@@ -201,7 +209,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             }
         }
         BlockDto newBlock = new BlockDto();
-        BeanUtils.copyProperties(ethBlock.getBlock(),newBlock);
+        BeanUtils.copyProperties(ethBlock.getBlock(), newBlock);
         newBlock.setEnergonUsed(ethBlock.getBlock().getGasUsed());
         newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
         newBlock.setNonce(String.valueOf(ethBlock.getBlock().getNonce()));
@@ -210,8 +218,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         if (ethBlock.getBlock().getTransactions().size() > 0) {
             newBlock.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))));
         } else
-        newBlock.setEnergonAverage(BigInteger.ZERO);
-        newBlock.setBlockReward(getBlockReward(String.valueOf(newBlock.getNumber()),newBlock.getTransaction()));
+            newBlock.setEnergonAverage(BigInteger.ZERO);
+        newBlock.setBlockReward(getBlockReward(String.valueOf(newBlock.getNumber()), newBlock.getTransaction()));
         newBlock.setTransaction(transactionDtolist);
         newBlock.setTransactionNumber(transactionDtolist.size() > 0 ? transactionDtolist.size() : new Integer(0));
         return newBlock;
