@@ -98,7 +98,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         pendingTxDetail.setInputData(transaction.getInput());
         pendingTxDetail.setTimestamp(transaction.getTimestamp().getTime());
         pot.setType("pending");
-        pot.setData(pendingTxDetail);
+        pot.setPending(pendingTxDetail);
         return pot;
     }
 

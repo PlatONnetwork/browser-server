@@ -134,7 +134,7 @@ public class SearchServiceImpl implements SearchService {
                 pendingTxDetailReq.setTxHash(param.getParameter());
                 PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
                 query.setType("pending");
-                query.setStruct(pendingOrTransaction.getData());
+                query.setStruct(pendingOrTransaction.getPending());
             }
             return query;
         }
