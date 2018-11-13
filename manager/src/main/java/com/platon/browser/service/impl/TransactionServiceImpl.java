@@ -9,6 +9,7 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
@@ -222,21 +223,50 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         if(transactionList.size()==0){
-            // 当前区块找不到，则需要跨块查找
-            condition = new TransactionExample();
-            criteria = condition.createCriteria().andChainIdEqualTo(currTransaction.getChainId());
-            long blockNumber = 0;
+            // 需要先查询下一个区块是否有交易，如果没有，则再查询下一个区块是否有交易，如此类推,直到找到下一个有交易记录的区块为止
+            /** 取下一条交易记录所在的区块号: blockNumber **/
+            int blockStep=0;
             switch (direction){
                 case PREV:
                     // 上一条，则拿上一个块的最后一条交易
-                    blockNumber=currTransaction.getBlockNumber()-1;
-                    criteria.andBlockNumberEqualTo(blockNumber);
+                    blockStep=-1;
+                    break;
+                case NEXT:
+                    // 下一条，则取下一个块的第一条交易
+                    blockStep=1;
+                    break;
+            }
+            // 下一个区块的块号
+            long blockNumber = currTransaction.getBlockNumber();
+            while (true){
+                blockNumber += blockStep;
+                blockExample = new BlockExample();
+                blockExample.createCriteria().andChainIdEqualTo(currTransaction.getChainId()).andNumberEqualTo(blockNumber);
+                // 只查一条数据
+                PageHelper.startPage(1,1);
+                List<Block> nextBlockList = blockMapper.selectByExample(blockExample);
+                if(nextBlockList.size()==0){
+                    // 查无此块，表示已经到了链的头部或尾部
+                    logger.error("block: Number = {} not exist",blockNumber);
+                    throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.NOT_EXIST.desc);
+                }
+                Block nextBlock = nextBlockList.get(0);
+                if(nextBlock.getTransactionNumber()>0){
+                    // 如果此块存在交易记录，则停止循环，以此块的块高作为后续查询下一条交易记录的参数
+                    break;
+                }
+            }
+
+            // 当前区块找不到，则需要跨块查找
+            condition = new TransactionExample();
+            condition.createCriteria().andChainIdEqualTo(currTransaction.getChainId()).andBlockNumberEqualTo(blockNumber);
+            switch (direction){
+                case PREV:
+                    // 上一条，则拿上一个块的最后一条交易
                     condition.setOrderByClause("transaction_index desc");
                     break;
                 case NEXT:
                     // 下一条，则取下一个块的第一条交易
-                    blockNumber=currTransaction.getBlockNumber()+1;
-                    criteria.andBlockNumberEqualTo(blockNumber);
                     condition.setOrderByClause("transaction_index asc");
                     break;
             }
