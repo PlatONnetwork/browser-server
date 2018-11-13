@@ -7,7 +7,7 @@ import com.dangdang.ddframe.job.api.ShardingContext;
  * Date: 2018/10/25
  * Time: 18:07
  */
-public class NodeSynchrinizeJob extends AbstractTaskJob{
+public class NodeSynchronizeJob extends AbstractTaskJob{
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
 
