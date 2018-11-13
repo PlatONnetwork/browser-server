@@ -103,7 +103,7 @@ public class SubscribeService {
                 logger.debug("整体更新统计缓存: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
-                statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp()*1000);
+                statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp());
                 statisticInfo.setBlockCount(1l);
                 statisticInfo.setDayTransaction(Long.valueOf(transactionInfos.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();

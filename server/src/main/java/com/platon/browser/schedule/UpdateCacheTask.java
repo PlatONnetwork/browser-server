@@ -8,6 +8,7 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticGraphData;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.cache.*;
@@ -194,7 +195,18 @@ public class UpdateCacheTask {
                     if(c1.getHeight()<c2.getHeight()) return -1;
                     return 0;
                 });
-                statisticWhole.setBlockStatisticList(itemList);
+
+                StatisticGraphData graphData = new StatisticGraphData();
+                for (int i=0;i<itemList.size();i++){
+                    StatisticItem item = itemList.get(i);
+                    if(i==0||i==itemList.size()-1) continue;
+                    StatisticItem prevItem = itemList.get(i-1);
+                    graphData.getX().add(item.getHeight());
+                    graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
+                    graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
+                }
+                statisticWhole.setGraphData(graphData);
+
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticWhole);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
             }

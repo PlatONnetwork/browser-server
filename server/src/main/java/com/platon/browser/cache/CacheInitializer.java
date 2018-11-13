@@ -19,10 +19,12 @@ import com.platon.browser.service.CacheService;
 import com.platon.browser.util.GeoUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +43,10 @@ public class CacheInitializer {
     private StatisticMapper statisticMapper;
     @Autowired
     private CacheService cacheService;
+
+    // 交易TPS统计时间间隔, 单位：分钟
+    @Value("${platon.transaction.tps.statistic.interval}")
+    private int transactionTpsStatisticInterval;
 
     /**
      * 更新节点信息缓存
@@ -148,25 +154,33 @@ public class CacheInitializer {
             statisticInfo.setAvgTime(0l);
         }
 
-        // 当前交易数
+        // 取当前时间回溯五分钟的交易数统计TPS
+        Date endDate = new Date();
+        Date startDate = new Date(endDate.getTime()-transactionTpsStatisticInterval*60*1000);
+        // 计算TPS时默认使用设置的间隔的秒数作为除数
+        long divisor = transactionTpsStatisticInterval*60;
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andChainIdEqualTo(chainId);
-        long currentTransactionCount = transactionMapper.countByExample(transactionExample);
-        statisticInfo.setCurrent(currentTransactionCount);
+        transactionExample.createCriteria().andChainIdEqualTo(chainId)
+                .andTimestampBetween(startDate,endDate);
+        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        int currentCount = transactionList.size();
+        statisticInfo.setTransactionCount(Long.valueOf(currentCount));
+        // 当前交易数
+        statisticInfo.setCurrent(Long.valueOf(currentCount));
+        if(divisor!=0){
+            BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
+            statisticInfo.setMaxTps(transactionTps.doubleValue());
+        }
+
 
         // 总交易数
+        transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(chainId);
+        long currentTransactionCount = transactionMapper.countByExample(transactionExample);
         statisticInfo.setTransactionCount(currentTransactionCount);
         // 有交易的所有区块数
         long blockCount = statisticMapper.countTransactionBlock(chainId);
         statisticInfo.setBlockCount(blockCount);
-
-        // 计算交易TPS - 最近五分钟内的TPS
-            /*TpsCountParam param = new TpsCountParam();
-            param.setChainId(chainEnum.code);
-            param.setMinute(transactionTpsStatisticInterval);
-            long transactionCount = statisticMapper.countTransactionInXMinute(param);
-            double tps = transactionCount/(transactionTpsStatisticInterval*3600);
-            statisticInfo.setMaxTps(tps);*/
 
         // 计算平均区块交易数
         BigDecimal avgTransactionCount = statisticMapper.countAvgTransactionPerBlock(chainId);
