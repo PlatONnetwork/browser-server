@@ -164,13 +164,11 @@ public class HomeController {
      *      	    "maxTps":333, //最大交易TPS
      *      	    "avgTransaction":33, //平均区块交易数
      *      	    "dayTransaction":33, //过去24小时交易笔数
-     *      	    "graphData": [
-     *      	    {
-     *      	        "x":[] ,//区块高度
-     *      	        "ya":[], //出块的时间
-     *      	        "yb":[]  //交易数量数量
-     *      	    }
-     *      	    ]
+     *      	    "graphData": {
+         *    	        "x":[] ,//区块高度
+         *    	        "ya":[], //出块的时间
+         *    	        "yb":[]  //交易数量数量
+         *    	    }
      *           }
      *
      *   }
