@@ -164,9 +164,6 @@ public class UpdateCacheTask {
             BlockInit blockInit = cacheService.getBlockInit(chainId);
             if(blockInit.isChanged()){
                 logger.info("区块全量缓存有变更，推送STOMP消息...");
-                // 统一serverTime
-                long severTime = System.currentTimeMillis();
-                blockInit.getList().forEach(blockInfo -> blockInfo.setServerTime(severTime));
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
                 messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
             }

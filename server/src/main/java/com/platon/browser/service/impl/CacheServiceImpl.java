@@ -134,15 +134,23 @@ public class CacheServiceImpl implements CacheService {
                 changed=true;
             }else{
                 if(StringUtils.isNotBlank(indexInfo.getNode())){
+                    // 更新当前出块节点
                     index.setNode(indexInfo.getNode());
                     changed=true;
                 }
                 if(indexInfo.getCurrentHeight()!=0){
+                    // 更新当前区块高度
                     index.setCurrentHeight(indexInfo.getCurrentHeight());
                     changed=true;
                 }
                 if(indexInfo.getConsensusNodeAmount()!=0){
+                    // 更新共识节点数
                     index.setConsensusNodeAmount(index.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                    changed=true;
+                }
+                if(indexInfo.getCurrentTransaction()!=0){
+                    // 更新当前交易数
+                    index.setCurrentTransaction(index.getCurrentTransaction()+indexInfo.getCurrentTransaction());
                     changed=true;
                 }
             }
