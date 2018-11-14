@@ -46,6 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
             // 根据块高筛选
             criteria.andBlockNumberEqualTo(req.getHeight());
         }
+        // 交易记录先根据区块号倒排，再根据交易索引倒排
         condition.setOrderByClause("block_number desc,transaction_index desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         List<TransactionItem> transactionList = new ArrayList<>();

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -240,18 +241,21 @@ public class CacheInitializer {
     public void initTransactionInfoList(String chainId){
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("timestamp desc");
+        // 交易记录先根据区块号倒排，再根据交易索引倒排
+        condition.setOrderByClause("block_number desc,transaction_index desc");
         PageHelper.startPage(1,10);
         List<Transaction> transactions = transactionMapper.selectByExample(condition);
-        List<TransactionInfo> transactionInfos = new ArrayList<>();
-        transactions.forEach(transaction -> {
+        List<TransactionInfo> transactionInfos = new LinkedList<>();
+        // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
+        for (int i=transactions.size()-1;i>0;i--){
+            Transaction transaction = transactions.get(i);
             TransactionInfo bean = new TransactionInfo();
             BeanUtils.copyProperties(transaction,bean);
             bean.setTxHash(transaction.getHash());
             bean.setBlockHeight(transaction.getBlockNumber());
             bean.setTimestamp(transaction.getTimestamp().getTime());
             transactionInfos.add(bean);
-        });
+        }
         cacheService.updateTransactionCache(transactionInfos,chainId);
     }
 }

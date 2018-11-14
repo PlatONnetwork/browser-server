@@ -368,17 +368,5 @@ public class CacheServiceImpl implements CacheService {
         }finally {
             lock.writeLock().unlock();
         }
-
-        /*logger.debug("更新链【ID={}】的交易增量缓存",chainId);
-        TransactionIncrement increment = transactionIncrementMap.get(chainId);
-        lock = increment.getLock();
-        lock.writeLock().lock();
-        try{
-            increment.getIncrement().clear();
-            increment.getIncrement().addAll(transactionInfos);
-            increment.setChanged(true);
-        }finally {
-            lock.writeLock().unlock();
-        }*/
     }
 }
