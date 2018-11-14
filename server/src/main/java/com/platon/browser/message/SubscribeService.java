@@ -1,6 +1,7 @@
 package com.platon.browser.message;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.NodeDto;
@@ -8,6 +9,9 @@ import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
@@ -23,21 +27,43 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.util.*;
 
 @Component
 public class SubscribeService {
 
     private final Logger logger = LoggerFactory.getLogger(SubscribeService.class);
 
+    // 记录每条链上已处理的最高块编号，防止重复处理
+    private final Map<String,Long> highestBlockNumberMap = new HashMap<>();
+
     @Autowired
     private CacheService cacheService;
 
     @Autowired
     private ChainsConfig chainsConfig;
+    @Autowired
+    private BlockMapper blockMapper;
+
+    @PostConstruct
+    private void init(){
+        // 从数据库加载最高块初始化每条链上的最高块编号标记
+        chainsConfig.getChainIds().forEach(chainId->{
+            logger.info("初始化链[{}]的最高块编号标记...",chainId);
+            BlockExample condition = new BlockExample();
+            condition.createCriteria().andChainIdEqualTo(chainId);
+            condition.setOrderByClause("number desc");
+            PageHelper.startPage(1,1);
+            List<Block> blocks = blockMapper.selectByExample(condition);
+            if(blocks.size()==0){
+                highestBlockNumberMap.put(chainId,0l);
+                return;
+            }
+            Block block = blocks.get(0);
+            highestBlockNumberMap.put(chainId,block.getNumber());
+        });
+    }
 
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive(String msg) {
@@ -64,7 +90,11 @@ public class SubscribeService {
             case BLOCK:
                 logger.debug("更新增量区块缓存: {}",msg);
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
-                //logger.info("区块号：{}", blockDto.getNumber());
+                long highestNumber = highestBlockNumberMap.get(chainId);
+                if(blockDto.getNumber()<=highestNumber){
+                    logger.error("消息中的块号低于当前链最高块号【当前链ID:{},最高块号:{},消息块号:{}】",chainId,highestNumber,blockDto.getNumber());
+                    return;
+                }
                 BlockInfo blockInfo = new BlockInfo();
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
@@ -126,6 +156,9 @@ public class SubscribeService {
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
                 cacheService.updateStatisticCache(statisticInfo,false,chainId);
+
+                // 更新最高块号
+                highestBlockNumberMap.put(chainId,Long.valueOf(blockDto.getNumber()));
                 break;
         }
     }
