@@ -234,7 +234,7 @@ public class CacheInitializer {
         List<BlockInfo> blockInfos = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
-        for(int i=blockItemList.size()-1;i>0;i--) {
+        for(int i=blockItemList.size()-1;i>=0;i--) {
             BlockItem block = blockItemList.get(i);
             BlockInfo bean = new BlockInfo();
             BeanUtils.copyProperties(block,bean);
@@ -259,7 +259,7 @@ public class CacheInitializer {
         List<TransactionItem> transactionItemList = transactionService.getTransactionList(req);
         List<TransactionInfo> transactionInfos = new LinkedList<>();
         // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
-        for (int i=transactionItemList.size()-1;i>0;i--){
+        for (int i=transactionItemList.size()-1;i>=0;i--){
             TransactionItem transaction = transactionItemList.get(i);
             TransactionInfo bean = new TransactionInfo();
             BeanUtils.copyProperties(transaction,bean);
