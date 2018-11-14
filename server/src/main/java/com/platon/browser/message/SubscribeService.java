@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
@@ -67,7 +69,7 @@ public class SubscribeService {
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
                 blockInfo.setNode(blockDto.getMiner());
-                blockInfo.setTimestamp(blockDto.getTimestamp());
+                blockInfo.setTimestamp(blockDto.getTimestamp()*1000);
                 blockInfo.setHeight(blockDto.getNumber());
                 blockInfo.setBlockReward(blockDto.getBlockReward());
                 blockInfo.setTransaction(blockDto.getTransaction().size());
@@ -83,7 +85,17 @@ public class SubscribeService {
 
                 logger.debug("更新交易缓存: {}",msg);
                 List<TransactionDto> transactionDtos = blockDto.getTransaction();
-                List<TransactionInfo> transactionInfos = new ArrayList<>();
+
+                // 对交易按交易索引正向排序
+                Collections.sort(transactionDtos,(c1,c2)->{
+                    long index1 = c1.getTransactionIndex().longValue();
+                    long index2 = c2.getTransactionIndex().longValue();
+                    if (index1>index2) return 1;
+                    if (index1<index2) return -1;
+                    return 0;
+                });
+
+                List<TransactionInfo> transactionInfos = new LinkedList<>();
                 if(transactionDtos.size()>0){
                     transactionDtos.forEach(transactionDto -> {
                         TransactionInfo bean = new TransactionInfo();
@@ -103,6 +115,7 @@ public class SubscribeService {
                 logger.debug("整体更新统计缓存: {}",msg);
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
+                statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp());
                 statisticInfo.setBlockCount(1l);
                 statisticInfo.setDayTransaction(Long.valueOf(transactionInfos.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();

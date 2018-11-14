@@ -20,8 +20,10 @@ public class StatisticInfo {
 
     private Long dayTransaction;
 
-    private List<StatisticItem> blockStatisticList;
+    private StatisticGraphData graphData;
 
+    @JsonIgnore
+    private List<StatisticItem> blockStatisticList;
     @JsonIgnore
     private LimitQueue<StatisticItem> limitQueue;
     @JsonIgnore
@@ -32,10 +34,13 @@ public class StatisticInfo {
     private Long highestBlockNumber;
     @JsonIgnore
     private Long lowestBlockNumber;
+    @JsonIgnore
+    private Long highestBlockTimestamp;
+    @JsonIgnore
+    private Long lowestBlockTimestamp;
 
     @JsonIgnore
     private boolean changed=false;
     @JsonIgnore
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
 }

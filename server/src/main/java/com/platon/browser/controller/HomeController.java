@@ -5,10 +5,9 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.SearchParam;
-import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.*;
 import com.platon.browser.dto.cache.BlockInit;
+import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
@@ -24,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -163,13 +164,11 @@ public class HomeController {
      *      	    "maxTps":333, //最大交易TPS
      *      	    "avgTransaction":33, //平均区块交易数
      *      	    "dayTransaction":33, //过去24小时交易笔数
-     *      	    "blockStatisticList": [
-     *      	    {
-     *      	        "height":333 ,//区块高度
-     *      	        "time":333, //出块的时间
-     *      	        "transaction":33  //区块打包数量
-     *      	    }
-     *      	    ]//投票数
+     *      	    "graphData": {
+         *    	        "x":[] ,//区块高度
+         *    	        "ya":[], //出块的时间
+         *    	        "yb":[]  //交易数量数量
+         *    	    }
      *           }
      *
      *   }
@@ -181,6 +180,29 @@ public class HomeController {
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
         }
         StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
+
+
+        LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
+        List<StatisticItem> itemList = limitQueue.list();
+        Collections.sort(itemList,(c1, c2)->{
+            // 按区块高度正排
+            if(c1.getHeight()>c2.getHeight()) return 1;
+            if(c1.getHeight()<c2.getHeight()) return -1;
+            return 0;
+        });
+
+        StatisticGraphData graphData = new StatisticGraphData();
+        for (int i=0;i<itemList.size();i++){
+            StatisticItem item = itemList.get(i);
+            if(i==0||i==itemList.size()-1) continue;
+            StatisticItem prevItem = itemList.get(i-1);
+            graphData.getX().add(item.getHeight());
+            graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
+            graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
+        }
+        statistic.setGraphData(graphData);
+
+
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
         return resp;
     }

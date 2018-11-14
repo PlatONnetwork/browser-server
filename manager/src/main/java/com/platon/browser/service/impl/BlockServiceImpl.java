@@ -9,7 +9,7 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
-import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
@@ -37,15 +37,15 @@ public class BlockServiceImpl implements BlockService {
     private TransactionMapper transactionMapper;
 
     @Override
-    public List<BlockList> getBlockList(BlockListReq req) {
+    public List<BlockItem> getBlockList(BlockListReq req) {
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid());
         condition.setOrderByClause("number desc");
         List<Block> blocks = blockMapper.selectByExample(condition);
-        List<BlockList> blockList = new ArrayList<>();
+        List<BlockItem> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
-            BlockList bean = new BlockList();
+            BlockItem bean = new BlockItem();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getNumber());
             bean.setServerTime(serverTime);
@@ -107,29 +107,36 @@ public class BlockServiceImpl implements BlockService {
         BlockDetailReq detailReq = new BlockDetailReq();
         BeanUtils.copyProperties(req,detailReq);
 
-        int step = 1;
         switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
             case PREV:
                 detailReq.setHeight(req.getHeight()-1);
-                step = -1;
                 break;
             case NEXT:
                 detailReq.setHeight(req.getHeight()+1);
-                step = 1;
                 break;
         }
 
+        /** 取得下一个块，记为A块 **/
         BlockDetail blockDetail = getBlockDetail(detailReq);
         BlockDetailNavigate blockDetailNavigate = new BlockDetailNavigate();
         BeanUtils.copyProperties(blockDetail,blockDetailNavigate);
 
-        detailReq.setHeight(detailReq.getHeight()+step);
+        /** 取A块的上一个块，用来决定first的值 **/
+        detailReq.setHeight(detailReq.getHeight()-1);
         try {
             getBlockDetail(detailReq);
-            blockDetailNavigate.setLast(false);
         }catch (BusinessException be){
+            logger.warn("已浏览至第一个区块！");
+            blockDetailNavigate.setFirst(true);
+        }
+
+        /** 取A块的下一个块，用来决定last的值 **/
+        detailReq.setHeight(detailReq.getHeight()+2);
+        try {
+            getBlockDetail(detailReq);
+        }catch (BusinessException be){
+            logger.warn("已浏览至最后一个区块！");
             blockDetailNavigate.setLast(true);
-            logger.warn("已浏览至第一个或最后一个区块！");
         }
 
         return blockDetailNavigate;

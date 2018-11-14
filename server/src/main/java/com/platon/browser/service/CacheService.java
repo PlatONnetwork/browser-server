@@ -17,8 +17,6 @@ public interface CacheService {
 
     // 取增量数据
     NodeIncrement getNodeIncrement(String chainId);
-    BlockIncrement getBlockIncrement(String chainId);
-    TransactionIncrement getTransactionIncrement(String chainId);
 
     /**
      * 节点信息

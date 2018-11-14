@@ -1,5 +1,6 @@
 package com.platon.browser.dto.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
@@ -15,4 +16,7 @@ public class TransactionItem {
     private String txType;
     private long serverTime;
     private String failReason;
+
+    @JsonIgnore
+    private long timestamp;
 }

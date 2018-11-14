@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BlockDetailNavigate extends BlockDetail {
+    // 是否第一条
+    private boolean first;
     // 是否最后一条
     private boolean last;
 }

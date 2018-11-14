@@ -3,7 +3,7 @@ package com.platon.browser.dto.block;
 import lombok.Data;
 
 @Data
-public class BlockList {
+public class BlockItem {
     private long height;
     private long timestamp;
     private long transaction;

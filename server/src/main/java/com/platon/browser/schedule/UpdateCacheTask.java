@@ -8,6 +8,7 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticGraphData;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.cache.*;
@@ -119,27 +120,27 @@ public class UpdateCacheTask {
             Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
             if(nodeInfoList.size()==0){
                 logger.info("节点缓存为空, 执行初始化...");
-                cacheInitializer.initNodeInfoList(chainId);
+                cacheInitializer.initNodeCache(chainId);
             }
             IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
             if(indexInfo.getCurrentHeight()==0){
                 logger.info("指标缓存为空, 执行初始化...");
-                cacheInitializer.initIndexInfo(chainId);
+                cacheInitializer.initIndexCache(chainId);
             }
             StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
             if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
                 logger.info("统计缓存为空, 执行初始化...");
-                cacheInitializer.initStatisticInfo(chainId);
+                cacheInitializer.initStatisticCache(chainId);
             }
             BlockInit blockInit = cacheService.getBlockInit(chainId);
             if(blockInit.getList().size()==0){
                 logger.info("区块缓存为空, 执行初始化...");
-                cacheInitializer.initBlockInfoList(chainId);
+                cacheInitializer.initBlockCache(chainId);
             }
             TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
             if(transactionInit.getList().size()==0){
                 logger.info("交易缓存为空, 执行初始化...");
-                cacheInitializer.initTransactionInfoList(chainId);
+                cacheInitializer.initTransactionCache(chainId);
             }
         });
     }
@@ -194,7 +195,18 @@ public class UpdateCacheTask {
                     if(c1.getHeight()<c2.getHeight()) return -1;
                     return 0;
                 });
-                statisticWhole.setBlockStatisticList(itemList);
+
+                StatisticGraphData graphData = new StatisticGraphData();
+                for (int i=0;i<itemList.size();i++){
+                    StatisticItem item = itemList.get(i);
+                    if(i==0||i==itemList.size()-1) continue;
+                    StatisticItem prevItem = itemList.get(i-1);
+                    graphData.getX().add(item.getHeight());
+                    graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
+                    graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
+                }
+                statisticWhole.setGraphData(graphData);
+
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statisticWhole);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
             }

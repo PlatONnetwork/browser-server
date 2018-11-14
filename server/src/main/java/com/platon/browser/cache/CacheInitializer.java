@@ -8,21 +8,30 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NodeType;
+import com.platon.browser.req.block.BlockListReq;
+import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CacheService;
+import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.GeoUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,11 +50,19 @@ public class CacheInitializer {
     private StatisticMapper statisticMapper;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private BlockService blockService;
+    @Autowired
+    private TransactionService transactionService;
+
+    // 交易TPS统计时间间隔, 单位：分钟
+    @Value("${platon.transaction.tps.statistic.interval}")
+    private int transactionTpsStatisticInterval;
 
     /**
      * 更新节点信息缓存
      */
-    public void initNodeInfoList(String chainId){
+    public void initNodeCache(String chainId){
         NodeExample condition = new NodeExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         List<Node> nodeList = nodeMapper.selectByExample(condition);
@@ -64,7 +81,7 @@ public class CacheInitializer {
     /**
      * 更新指标信息缓存
      */
-    public void initIndexInfo(String chainId){
+    public void initIndexCache(String chainId){
         IndexInfo indexInfo = new IndexInfo();
         // 取当前高度和出块节点
         BlockExample blockExample = new BlockExample();
@@ -109,7 +126,7 @@ public class CacheInitializer {
     /**
      * 更新交易统计信息缓存
      */
-    public void initStatisticInfo(String chainId){
+    public void initStatisticCache(String chainId){
 
         StatisticInfo statisticInfo = new StatisticInfo();
 
@@ -136,8 +153,11 @@ public class CacheInitializer {
             }
             Block top = topList.get(0);
             statisticInfo.setHighestBlockNumber(top.getNumber());
+            statisticInfo.setHighestBlockTimestamp(top.getTimestamp().getTime());
             Block bottom = bottomList.get(0);
             statisticInfo.setLowestBlockNumber(bottom.getNumber());
+            statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
+
             long avgTime = (top.getTimestamp().getTime()-bottom.getTimestamp().getTime())/top.getNumber();
             statisticInfo.setAvgTime(avgTime);
 
@@ -145,25 +165,33 @@ public class CacheInitializer {
             statisticInfo.setAvgTime(0l);
         }
 
-        // 当前交易数
+        // 取当前时间回溯五分钟的交易数统计TPS
+        Date endDate = new Date();
+        Date startDate = new Date(endDate.getTime()-transactionTpsStatisticInterval*60*1000);
+        // 计算TPS时默认使用设置的间隔的秒数作为除数
+        long divisor = transactionTpsStatisticInterval*60;
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andChainIdEqualTo(chainId);
-        long currentTransactionCount = transactionMapper.countByExample(transactionExample);
-        statisticInfo.setCurrent(currentTransactionCount);
+        transactionExample.createCriteria().andChainIdEqualTo(chainId)
+                .andTimestampBetween(startDate,endDate);
+        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        int currentCount = transactionList.size();
+        statisticInfo.setTransactionCount(Long.valueOf(currentCount));
+        // 当前交易数
+        statisticInfo.setCurrent(Long.valueOf(currentCount));
+        if(divisor!=0){
+            BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
+            statisticInfo.setMaxTps(transactionTps.doubleValue());
+        }
+
 
         // 总交易数
+        transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(chainId);
+        long currentTransactionCount = transactionMapper.countByExample(transactionExample);
         statisticInfo.setTransactionCount(currentTransactionCount);
         // 有交易的所有区块数
         long blockCount = statisticMapper.countTransactionBlock(chainId);
         statisticInfo.setBlockCount(blockCount);
-
-        // 计算交易TPS - 最近五分钟内的TPS
-            /*TpsCountParam param = new TpsCountParam();
-            param.setChainId(chainEnum.code);
-            param.setMinute(transactionTpsStatisticInterval);
-            long transactionCount = statisticMapper.countTransactionInXMinute(param);
-            double tps = transactionCount/(transactionTpsStatisticInterval*3600);
-            statisticInfo.setMaxTps(tps);*/
 
         // 计算平均区块交易数
         BigDecimal avgTransactionCount = statisticMapper.countAvgTransactionPerBlock(chainId);
@@ -196,45 +224,50 @@ public class CacheInitializer {
     /**
      * 更新区块列表信息缓存
      */
-    public void initBlockInfoList(String chainId){
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("number desc");
-        PageHelper.startPage(1,10);
-        List<Block> blockList = blockMapper.selectByExample(condition);
+    public void initBlockCache(String chainId){
+
+        BlockListReq req = new BlockListReq();
+        req.setCid(chainId);
+        req.setPageSize(10);
+        req.buildPage();
+        List<BlockItem> blockItemList = blockService.getBlockList(req);
         List<BlockInfo> blockInfos = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
-        blockList.forEach(block -> {
+        // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
+        for(int i=blockItemList.size()-1;i>=0;i--) {
+            BlockItem block = blockItemList.get(i);
             BlockInfo bean = new BlockInfo();
-            bean.setServerTime(serverTime);
             BeanUtils.copyProperties(block,bean);
-            bean.setHeight(block.getNumber());
-            bean.setTimestamp(block.getTimestamp().getTime());
+            bean.setHeight(block.getHeight());
+            bean.setTimestamp(block.getTimestamp());
             bean.setNode(block.getMiner());
-            bean.setTransaction(block.getTransactionNumber());
+            bean.setTransaction(block.getTransaction());
+            bean.setServerTime(serverTime);
             blockInfos.add(bean);
-        });
+        }
         cacheService.updateBlockCache(blockInfos,chainId);
     }
 
     /**
      * 更新交易列表信息缓存
      */
-    public void initTransactionInfoList(String chainId){
-        TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("timestamp desc");
-        PageHelper.startPage(1,10);
-        List<Transaction> transactions = transactionMapper.selectByExample(condition);
-        List<TransactionInfo> transactionInfos = new ArrayList<>();
-        transactions.forEach(transaction -> {
+    public void initTransactionCache(String chainId){
+        TransactionListReq req = new TransactionListReq();
+        req.setCid(chainId);
+        req.setPageSize(10);
+        req.buildPage();
+        List<TransactionItem> transactionItemList = transactionService.getTransactionList(req);
+        List<TransactionInfo> transactionInfos = new LinkedList<>();
+        // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
+        for (int i=transactionItemList.size()-1;i>=0;i--){
+            TransactionItem transaction = transactionItemList.get(i);
             TransactionInfo bean = new TransactionInfo();
             BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setBlockHeight(transaction.getBlockNumber());
-            bean.setTimestamp(transaction.getTimestamp().getTime());
+            bean.setTxHash(transaction.getTxHash());
+            bean.setBlockHeight(transaction.getBlockHeight());
+            bean.setTimestamp(transaction.getTimestamp());
             transactionInfos.add(bean);
-        });
+        }
         cacheService.updateTransactionCache(transactionInfos,chainId);
     }
 }

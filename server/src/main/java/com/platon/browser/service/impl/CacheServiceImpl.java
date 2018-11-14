@@ -41,8 +41,6 @@ public class CacheServiceImpl implements CacheService {
 
     // 增量Map
     private Map<String, NodeIncrement> nodeIncrementMap = new ConcurrentHashMap<>();
-    private Map<String, BlockIncrement> blockIncrementMap = new ConcurrentHashMap<>();
-    private Map<String, TransactionIncrement> transactionIncrementMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init(){
@@ -57,8 +55,6 @@ public class CacheServiceImpl implements CacheService {
 
             // 初始化增量Map
             nodeIncrementMap.put(chainId,new NodeIncrement());
-            blockIncrementMap.put(chainId,new BlockIncrement());
-            transactionIncrementMap.put(chainId,new TransactionIncrement());
         });
     }
 
@@ -79,37 +75,6 @@ public class CacheServiceImpl implements CacheService {
             lock.readLock().unlock();
         }
     }
-    @Override
-    public BlockIncrement getBlockIncrement(String chainId){
-        BlockIncrement increment = blockIncrementMap.get(chainId);
-        ReentrantReadWriteLock lock = increment.getLock();
-        lock.readLock().lock();
-        try{
-            BlockIncrement copy = new BlockIncrement();
-            BeanUtils.copyProperties(increment,copy);
-            // 取完此增量区块信息推送后，设置为未更改状态
-            increment.setChanged(false);
-            return copy;
-        }finally {
-            lock.readLock().unlock();
-        }
-    }
-    @Override
-    public TransactionIncrement getTransactionIncrement(String chainId){
-        TransactionIncrement increment = transactionIncrementMap.get(chainId);
-        ReentrantReadWriteLock lock = increment.getLock();
-        lock.readLock().lock();
-        try{
-            TransactionIncrement copy = new TransactionIncrement();
-            BeanUtils.copyProperties(increment,copy);
-            // 取完此增量交易信息推送后，设置为未更改状态
-            increment.setChanged(false);
-            return copy;
-        }finally {
-            lock.readLock().unlock();
-        }
-    }
-
 
     @Override
     public Set<NodeInfo> getNodeInfoSet(String chainId) {
@@ -247,7 +212,8 @@ public class CacheServiceImpl implements CacheService {
                 }
                 if(statisticInfo.getHighestBlockNumber()!=null){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
-                    cache.setAvgTime((cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/cache.getHighestBlockNumber());
+                    cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
+                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()!=null){
@@ -318,18 +284,6 @@ public class CacheServiceImpl implements CacheService {
         }finally {
             lock.writeLock().unlock();
         }
-
-        /*logger.debug("更新链【ID={}】的块增量缓存",chainId);
-        BlockIncrement increment = blockIncrementMap.get(chainId);
-        lock = increment.getLock();
-        lock.writeLock().lock();
-        try{
-            increment.getIncrement().clear();
-            increment.getIncrement().addAll(blockInfos);
-            increment.setChanged(true);
-        }finally {
-            lock.writeLock().unlock();
-        }*/
     }
 
     @Override
@@ -367,17 +321,5 @@ public class CacheServiceImpl implements CacheService {
         }finally {
             lock.writeLock().unlock();
         }
-
-        /*logger.debug("更新链【ID={}】的交易增量缓存",chainId);
-        TransactionIncrement increment = transactionIncrementMap.get(chainId);
-        lock = increment.getLock();
-        lock.writeLock().lock();
-        try{
-            increment.getIncrement().clear();
-            increment.getIncrement().addAll(transactionInfos);
-            increment.setChanged(true);
-        }finally {
-            lock.writeLock().unlock();
-        }*/
     }
 }
