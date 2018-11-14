@@ -66,7 +66,7 @@ public class ExportServiceImpl implements ExportService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()
+                    transaction.getActualTxCost()+"ATP"
             };
             rows.add(row);
         });
@@ -112,7 +112,7 @@ public class ExportServiceImpl implements ExportService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()
+                    transaction.getActualTxCost()+"ATP"
             };
             rows.add(row);
         });
