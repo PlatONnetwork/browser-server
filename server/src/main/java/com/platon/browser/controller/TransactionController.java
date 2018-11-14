@@ -200,7 +200,9 @@ public class TransactionController {
      *           "energonPrice": "123",//能量价格
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
-     *           }
+     *           "first":false, // 是否第一条记录
+     *           "last":true // 是否最后一条记录
+     *     }
      * }
      */
     @PostMapping("transactionDetailNavigate")

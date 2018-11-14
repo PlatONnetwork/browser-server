@@ -107,29 +107,36 @@ public class BlockServiceImpl implements BlockService {
         BlockDetailReq detailReq = new BlockDetailReq();
         BeanUtils.copyProperties(req,detailReq);
 
-        int step = 1;
         switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
             case PREV:
                 detailReq.setHeight(req.getHeight()-1);
-                step = -1;
                 break;
             case NEXT:
                 detailReq.setHeight(req.getHeight()+1);
-                step = 1;
                 break;
         }
 
+        /** 取得下一个块，记为A块 **/
         BlockDetail blockDetail = getBlockDetail(detailReq);
         BlockDetailNavigate blockDetailNavigate = new BlockDetailNavigate();
         BeanUtils.copyProperties(blockDetail,blockDetailNavigate);
 
-        detailReq.setHeight(detailReq.getHeight()+step);
+        /** 取A块的上一个块，用来决定first的值 **/
+        detailReq.setHeight(detailReq.getHeight()-1);
         try {
             getBlockDetail(detailReq);
-            blockDetailNavigate.setLast(false);
         }catch (BusinessException be){
+            logger.warn("已浏览至第一个区块！");
+            blockDetailNavigate.setFirst(true);
+        }
+
+        /** 取A块的下一个块，用来决定last的值 **/
+        detailReq.setHeight(detailReq.getHeight()+2);
+        try {
+            getBlockDetail(detailReq);
+        }catch (BusinessException be){
+            logger.warn("已浏览至最后一个区块！");
             blockDetailNavigate.setLast(true);
-            logger.warn("已浏览至第一个或最后一个区块！");
         }
 
         return blockDetailNavigate;
