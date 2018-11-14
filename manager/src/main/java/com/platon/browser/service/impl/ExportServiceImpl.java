@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -39,6 +40,8 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public AccountDowload exportAccountCsv(AccountDownloadReq req) {
+
+        SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         AccountDetailReq accountDetailReq = new AccountDetailReq();
         accountDetailReq.setPageSize(Integer.MAX_VALUE);
@@ -58,11 +61,11 @@ public class ExportServiceImpl implements ExportService {
 
             Object[] row = {
                     transaction.getTxHash(),
-                    transaction.getBlockTime(),
+                    ymdhms.format(new Date(transaction.getBlockTime())),
                     transactionType,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    transaction.getValue(),
+                    transaction.getValue()+"ATP",
                     transaction.getActualTxCost()
             };
             rows.add(row);
@@ -75,14 +78,17 @@ public class ExportServiceImpl implements ExportService {
         writer.writeRowsAndClose(rows);
         AccountDowload accountDowload = new AccountDowload();
         accountDowload.setData(baos.toByteArray());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
+        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
     }
 
     @Override
     public ContractDowload exportContractCsv(ContractDownloadReq req) {
+
+        SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         ContractDetailReq contractDetailReq = new ContractDetailReq();
         contractDetailReq.setPageSize(Integer.MAX_VALUE);
         BeanUtils.copyProperties(req,contractDetailReq);
@@ -101,11 +107,11 @@ public class ExportServiceImpl implements ExportService {
 
             Object[] row = {
                     transaction.getTxHash(),
-                    transaction.getBlockTime(),
+                    ymdhms.format(new Date(transaction.getBlockTime())),
                     transactionType,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    transaction.getValue(),
+                    transaction.getValue()+"ATP",
                     transaction.getActualTxCost()
             };
             rows.add(row);
@@ -118,8 +124,8 @@ public class ExportServiceImpl implements ExportService {
         writer.writeRowsAndClose(rows);
         ContractDowload contractDowload = new ContractDowload();
         contractDowload.setData(baos.toByteArray());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        contractDowload.setFilename("contract-"+req.getAddress()+"-"+sdf.format(req.getDate())+".csv");
+        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+        contractDowload.setFilename("contract-"+req.getAddress()+"-"+ymd.format(req.getDate())+".csv");
         contractDowload.setLength(baos.size());
         return contractDowload;
     }
