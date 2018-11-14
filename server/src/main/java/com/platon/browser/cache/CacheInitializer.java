@@ -2,6 +2,7 @@ package com.platon.browser.cache;
 
 import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -12,7 +13,9 @@ import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
+import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.dto.transaction.TransactionItem;
@@ -23,22 +26,24 @@ import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.GeoUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 从数据库加载最新数据来初始化缓存
  */
 @Component
 public class CacheInitializer {
+
+    private final Logger logger = LoggerFactory.getLogger(CacheInitializer.class);
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -54,10 +59,43 @@ public class CacheInitializer {
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private ChainsConfig chainsConfig;
 
     // 交易TPS统计时间间隔, 单位：分钟
     @Value("${platon.transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
+
+    @PostConstruct
+    public void initCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
+            if(nodeInfoList.size()==0){
+                logger.info("节点缓存为空, 执行初始化...");
+                initNodeCache(chainId);
+            }
+            IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
+            if(indexInfo.getCurrentHeight()==0){
+                logger.info("指标缓存为空, 执行初始化...");
+                initIndexCache(chainId);
+            }
+            StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
+            if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
+                logger.info("统计缓存为空, 执行初始化...");
+                initStatisticCache(chainId);
+            }
+            BlockInit blockInit = cacheService.getBlockInit(chainId);
+            if(blockInit.getList().size()==0){
+                logger.info("区块缓存为空, 执行初始化...");
+                initBlockCache(chainId);
+            }
+            TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
+            if(transactionInit.getList().size()==0){
+                logger.info("交易缓存为空, 执行初始化...");
+                initTransactionCache(chainId);
+            }
+        });
+    }
 
     /**
      * 更新节点信息缓存
