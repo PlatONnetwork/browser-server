@@ -66,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
             bean.setTxHash(pendingTx.getHash());
             bean.setServerTime(serverTime);
             bean.setBlockTime(pendingTx.getTimestamp().getTime());
+            bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
             accTransactionList.add(bean);
         });
 
