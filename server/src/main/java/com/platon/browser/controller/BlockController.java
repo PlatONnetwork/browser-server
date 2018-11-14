@@ -6,7 +6,7 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
-import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockListReq;
@@ -73,7 +73,7 @@ public class BlockController  {
     @PostMapping("blockList")
     public JsonResp blockList (@Valid @RequestBody BlockListReq req) {
         req.buildPage();
-        List<BlockList> blockList = blockService.getBlockList(req);
+        List<BlockItem> blockList = blockService.getBlockList(req);
         return JsonResp.asList().addAll(blockList).pagination(req).build();
     }
 

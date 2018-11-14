@@ -12,7 +12,7 @@ public class BlockInfo {
 
     private String node;
 
-    private int transaction;
+    private long transaction;
 
     private String blockReward;
 }

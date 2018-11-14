@@ -9,7 +9,7 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
-import com.platon.browser.dto.block.BlockList;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
@@ -37,15 +37,15 @@ public class BlockServiceImpl implements BlockService {
     private TransactionMapper transactionMapper;
 
     @Override
-    public List<BlockList> getBlockList(BlockListReq req) {
+    public List<BlockItem> getBlockList(BlockListReq req) {
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid());
         condition.setOrderByClause("number desc");
         List<Block> blocks = blockMapper.selectByExample(condition);
-        List<BlockList> blockList = new ArrayList<>();
+        List<BlockItem> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
-            BlockList bean = new BlockList();
+            BlockItem bean = new BlockItem();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getNumber());
             bean.setServerTime(serverTime);

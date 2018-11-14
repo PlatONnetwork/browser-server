@@ -120,27 +120,27 @@ public class UpdateCacheTask {
             Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
             if(nodeInfoList.size()==0){
                 logger.info("节点缓存为空, 执行初始化...");
-                cacheInitializer.initNodeInfoList(chainId);
+                cacheInitializer.initNodeCache(chainId);
             }
             IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
             if(indexInfo.getCurrentHeight()==0){
                 logger.info("指标缓存为空, 执行初始化...");
-                cacheInitializer.initIndexInfo(chainId);
+                cacheInitializer.initIndexCache(chainId);
             }
             StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
             if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
                 logger.info("统计缓存为空, 执行初始化...");
-                cacheInitializer.initStatisticInfo(chainId);
+                cacheInitializer.initStatisticCache(chainId);
             }
             BlockInit blockInit = cacheService.getBlockInit(chainId);
             if(blockInit.getList().size()==0){
                 logger.info("区块缓存为空, 执行初始化...");
-                cacheInitializer.initBlockInfoList(chainId);
+                cacheInitializer.initBlockCache(chainId);
             }
             TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
             if(transactionInit.getList().size()==0){
                 logger.info("交易缓存为空, 执行初始化...");
-                cacheInitializer.initTransactionInfoList(chainId);
+                cacheInitializer.initTransactionCache(chainId);
             }
         });
     }

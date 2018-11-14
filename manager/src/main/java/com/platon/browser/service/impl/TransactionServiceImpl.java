@@ -54,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         // 查询交易所属的区块信息
         Map<Long, Block> map = new HashMap<>();
-        List<Long> blockNumberList = new ArrayList<>();
+        List<Long> blockNumberList = new LinkedList<>();
         if(transactions.size()>0){
             transactions.forEach(transaction -> blockNumberList.add(transaction.getBlockNumber()));
             BlockExample blockExample = new BlockExample();
