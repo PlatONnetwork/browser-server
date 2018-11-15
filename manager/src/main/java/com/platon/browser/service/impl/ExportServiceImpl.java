@@ -4,6 +4,7 @@ import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.ContractDowload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.ConTransactionItem;
+import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
@@ -59,6 +60,14 @@ public class ExportServiceImpl implements ExportService {
                 transactionType = "未知类型";
             }
 
+            String transactionStatus;
+            try{
+                TransactionStatusEnum status = TransactionStatusEnum.getEnum(transaction.getTxReceiptStatus());
+                transactionStatus = status.desc;
+            }catch (IllegalArgumentException iae){
+                transactionStatus = "未知状态";
+            }
+
             Object[] row = {
                     transaction.getTxHash(),
                     ymdhms.format(new Date(transaction.getBlockTime())),
@@ -66,7 +75,8 @@ public class ExportServiceImpl implements ExportService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()+"ATP"
+                    transaction.getActualTxCost()+"ATP",
+                    transactionStatus
             };
             rows.add(row);
         });
@@ -74,12 +84,12 @@ public class ExportServiceImpl implements ExportService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer outputWriter = new OutputStreamWriter(baos);
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders("交易哈希值", "确认时间", "类型", "发送方", "接收方","数额","交易费用");
+        writer.writeHeaders("交易哈希值", "确认时间", "类型", "发送方", "接收方","数额","交易费用","交易状态");
         writer.writeRowsAndClose(rows);
         AccountDowload accountDowload = new AccountDowload();
         accountDowload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getDate())+".csv");
+        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
     }
@@ -105,6 +115,14 @@ public class ExportServiceImpl implements ExportService {
                 transactionType = "未知类型";
             }
 
+            String transactionStatus;
+            try{
+                TransactionStatusEnum status = TransactionStatusEnum.getEnum(transaction.getTxReceiptStatus());
+                transactionStatus = status.desc;
+            }catch (IllegalArgumentException iae){
+                transactionStatus = "未知状态";
+            }
+
             Object[] row = {
                     transaction.getTxHash(),
                     ymdhms.format(new Date(transaction.getBlockTime())),
@@ -112,7 +130,8 @@ public class ExportServiceImpl implements ExportService {
                     transaction.getFrom(),
                     transaction.getTo(),
                     transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()+"ATP"
+                    transaction.getActualTxCost()+"ATP",
+                    transactionStatus
             };
             rows.add(row);
         });
@@ -125,7 +144,7 @@ public class ExportServiceImpl implements ExportService {
         ContractDowload contractDowload = new ContractDowload();
         contractDowload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        contractDowload.setFilename("contract-"+req.getAddress()+"-"+ymd.format(req.getDate())+".csv");
+        contractDowload.setFilename("contract-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
         contractDowload.setLength(baos.size());
         return contractDowload;
     }

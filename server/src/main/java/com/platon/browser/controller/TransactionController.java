@@ -16,6 +16,7 @@ import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.account.ContractDownloadReq;
 import com.platon.browser.req.transaction.*;
 import com.platon.browser.service.*;
+import com.platon.browser.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -460,23 +462,31 @@ public class TransactionController {
      * @apiUse CommonHeaderFiled
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
-     * @apiParam {String} date 数据起始日期
+     * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
-    @GetMapping("addressDownload")
-    public void addressDownload(@RequestParam String cid,@RequestParam String address, @RequestParam String date, HttpServletResponse response) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        AccountDownloadReq req = new AccountDownloadReq();
-        req.setCid(cid);
-        req.setAddress(address);
+    private Date getEndDate(String date){
         try {
-            req.setDate(sdf.parse(date));
+            SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date endDate = ymd.parse(date);
+            String ymdStr = ymd.format(endDate);
+            String ymdhmsStr = ymdStr+" 23:59:59";
+            return ymdhms.parse(ymdhmsStr);
         } catch (ParseException e) {
             e.printStackTrace();
             throw new ResponseException("日期格式错误！");
         }
+    }
+    @GetMapping("addressDownload")
+    public void addressDownload(@RequestParam String cid,@RequestParam String address, @RequestParam String date, HttpServletResponse response) {
+        AccountDownloadReq req = new AccountDownloadReq();
+        req.setCid(cid);
+        req.setAddress(address);
+        req.setStartDate(DateUtil.getYearFirstDate(new Date()));
+        req.setEndDate(getEndDate(date));
         AccountDowload accountDowload = exportService.exportAccountCsv(req);
         download(response,accountDowload.getFilename(),accountDowload.getLength(),accountDowload.getData());
     }
@@ -560,16 +570,11 @@ public class TransactionController {
      */
     @GetMapping("contractDownload")
     public void contractDownload(@RequestParam String cid,@RequestParam String address,@RequestParam String date, HttpServletResponse response) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         ContractDownloadReq req = new ContractDownloadReq();
         req.setCid(cid);
         req.setAddress(address);
-        try {
-            req.setDate(sdf.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new ResponseException("日期格式错误！");
-        }
+        req.setStartDate(DateUtil.getYearFirstDate(new Date()));
+        req.setEndDate(getEndDate(date));
         ContractDowload contractDowload = exportService.exportContractCsv(req);
         download(response,contractDowload.getFilename(),contractDowload.getLength(),contractDowload.getData());
     }

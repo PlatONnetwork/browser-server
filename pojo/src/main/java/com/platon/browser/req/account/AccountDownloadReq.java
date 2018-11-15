@@ -13,7 +13,8 @@ public class AccountDownloadReq {
     private String cid;
     @NotBlank(message = "账户地址不能为空！")
     private String address;
+    private Date startDate;
     @NotNull(message = "数据日期不能为空！")
     @Past(message = "数据日期必须小于等于当前日期！")
-    private Date date;
+    private Date endDate;
 }

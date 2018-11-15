@@ -128,11 +128,22 @@ public class TransactionServiceImpl implements TransactionService {
                 .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
         if(StringUtils.isNotBlank(req.getTxType())){
+            // 根据交易类型查询
             first.andTxTypeEqualTo(req.getTxType());
             second.andTxTypeEqualTo(req.getTxType());
         }
+        if(req.getStartDate()!=null){
+            // 根据交易生成起始时间查询
+            first.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+            second.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            // 根据交易生成结束时间查询
+            first.andTimestampLessThanOrEqualTo(req.getEndDate());
+            second.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         return transactions;
     }
@@ -150,11 +161,22 @@ public class TransactionServiceImpl implements TransactionService {
                 .andToEqualTo(req.getAddress())
                 .andTxTypeIn(Arrays.asList(types));
         if(StringUtils.isNotBlank(req.getTxType())){
+            // 根据交易类型查询
             first.andTxTypeEqualTo(req.getTxType());
             second.andTxTypeEqualTo(req.getTxType());
         }
+        if(req.getStartDate()!=null){
+            // 根据交易生成起始时间查询
+            first.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+            second.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            // 根据交易生成结束时间查询
+            first.andTimestampLessThanOrEqualTo(req.getEndDate());
+            second.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         return transactions;
     }
