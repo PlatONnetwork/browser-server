@@ -18,4 +18,6 @@ public class PendingTxDetail {
     private String energonPrice;
     private String inputData;
     private long expectTime;
+    private String receiveType;
+
 }

@@ -55,12 +55,12 @@ public class PendingTxServiceImpl implements PendingTxService {
         List<PendingTxItem> pendingTxList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         pendingTxes.forEach(transaction -> {
-            PendingTxItem pt = new PendingTxItem();
-            BeanUtils.copyProperties(transaction,pt);
-            pt.setTxHash(transaction.getHash());
-            pt.setTimestamp(transaction.getTimestamp().getTime());
-            pt.setServerTime(serverTime);
-            pendingTxList.add(pt);
+            PendingTxItem bean = new PendingTxItem();
+            BeanUtils.copyProperties(transaction,bean);
+            bean.setTxHash(transaction.getHash());
+            bean.setTimestamp(transaction.getTimestamp().getTime());
+            bean.setServerTime(serverTime);
+            pendingTxList.add(bean);
         });
         return pendingTxList;
     }

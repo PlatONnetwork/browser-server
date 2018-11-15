@@ -13,4 +13,5 @@ public class PendingTxItem {
     private String value;
     private String txType;
     private long serverTime;
+    private String receiveType;
 }

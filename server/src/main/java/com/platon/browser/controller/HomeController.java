@@ -287,7 +287,8 @@ public class HomeController {
      *      	    "blockHeight":5555, // 区块高度
      *      	    "transactionIndex": 33, // 交易在区块中位置
      *      	    "from":"ddddd",//交易发起方地址
-     *      	    "to":"aaaa", //交易接收方地址
+     *      	    "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
+     *                               // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
      *              "txType": "", // 交易类型
                         transfer ：转账
                         MPCtransaction ： MPC交易
@@ -296,7 +297,8 @@ public class HomeController {
                         transactionExecute ： 合约执行
                         authorization ： 权限
      *      	    "value": 3.6,//数额
-     *      	    "timestamp"：155788//交易时间
+     *      	    "timestamp"：155788,//交易时间
+     *      	    "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *           }
      *      ]
      *   }
