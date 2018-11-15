@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -365,8 +364,7 @@ public class HomeController {
     @PostMapping("/home/query")
     public BaseResp search(@Valid @RequestBody SearchParam param){
         try{
-            logger.debug(JSON.toJSONString(param));
-            Query query = searchService.findInfoByParam(param);
+            Query query = searchService.search(param);
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
             return resp;
         }catch (BusinessException be){

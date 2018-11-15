@@ -2,7 +2,6 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.service.AccountService;
@@ -29,26 +28,10 @@ public class AccountServiceImpl implements AccountService {
     private PendingTxService pendingTxService;
 
     @Override
-    public AccountDetail getAccountDetail(AccountDetailReq req) {
-        List<AccTransactionItem> accTransactionList = getTransactionList(req);
-
-        AccountDetail accountDetail = new AccountDetail();
-
-        // 大于20，则取前20条数据返回
-        if(accTransactionList.size()>20){
-            accountDetail.setTrades(accTransactionList.subList(0,20));
-        }else{
-            accountDetail.setTrades(accTransactionList);
-        }
-        return accountDetail;
-    }
-
-    @Override
     public List<AccTransactionItem> getTransactionList(AccountDetailReq req) {
+        // 取已完成交易
         req.buildPage();
         List<TransactionWithBLOBs> transactions = transactionService.getTransactionList(req);
-        req.buildPage();
-        List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
         long serverTime = System.currentTimeMillis();
         List<AccTransactionItem> accTransactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
@@ -61,6 +44,9 @@ public class AccountServiceImpl implements AccountService {
             accTransactionList.add(bean);
         });
 
+        // 取待处理交易
+        req.buildPage();
+        List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
         pendingTxes.forEach(pendingTx -> {
             AccTransactionItem bean = new AccTransactionItem();
             BeanUtils.copyProperties(pendingTx,bean);
@@ -72,13 +58,12 @@ public class AccountServiceImpl implements AccountService {
         });
 
         // 按时间倒排
-        Collections.sort(accTransactionList,(e1,e2)->{
-            long t1 = e1.getTimestamp().getTime(),t2 = e2.getTimestamp().getTime();
+        Collections.sort(accTransactionList,(c1,c2)->{
+            long t1 = c1.getTimestamp().getTime(),t2 = c2.getTimestamp().getTime();
             if(t1<t2) return 1;
             if(t1>t2) return -1;
             return 0;
         });
-
         return accTransactionList;
     }
 }

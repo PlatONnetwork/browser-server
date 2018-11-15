@@ -4,18 +4,18 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.ContractDetail;
-import com.platon.browser.dto.account.ContractDowload;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
-import com.platon.browser.req.account.ContractDetailReq;
-import com.platon.browser.req.account.ContractDownloadReq;
 import com.platon.browser.req.transaction.*;
-import com.platon.browser.service.*;
+import com.platon.browser.service.AccountService;
+import com.platon.browser.service.ExportService;
+import com.platon.browser.service.PendingTxService;
+import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,6 @@ public class TransactionController {
 
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private ContractService contractService;
 
     @Autowired
     private ExportService exportService;
@@ -96,7 +93,9 @@ public class TransactionController {
                         transactionExecute ： 合约执行
                         authorization ： 权限
      *           "serverTime": 1123123,//服务器时间
-     *           "failReason":""//失败原因
+     *           "failReason":"",//失败原因
+     *           "receiveType":"account" // to字段存储的账户类型：account-钱包地址，contract-合约地址，
+     *                                  // 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
      *           }
      *       ]
      * }
@@ -435,8 +434,15 @@ public class TransactionController {
     public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
         try{
             req.setPageSize(20);
-            AccountDetail accountDetail = accountService.getAccountDetail(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),accountDetail);
+            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
+            AddressDetail addressDetail = new AddressDetail();
+            if(transactionList.size()>20){
+                // 大于20，则取前20条数据返回
+                addressDetail.setTrades(transactionList.subList(0,20));
+            }else{
+                addressDetail.setTrades(transactionList);
+            }
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),addressDetail);
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
         }
@@ -467,28 +473,25 @@ public class TransactionController {
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
-    private Date getEndDate(String date){
-        try {
-            SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date endDate = ymd.parse(date);
-            String ymdStr = ymd.format(endDate);
-            String ymdhmsStr = ymdStr+" 23:59:59";
-            return ymdhms.parse(ymdhmsStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new ResponseException("日期格式错误！");
-        }
-    }
     @GetMapping("addressDownload")
     public void addressDownload(@RequestParam String cid,@RequestParam String address, @RequestParam String date, HttpServletResponse response) {
         AccountDownloadReq req = new AccountDownloadReq();
         req.setCid(cid);
         req.setAddress(address);
         req.setStartDate(DateUtil.getYearFirstDate(new Date()));
-        req.setEndDate(getEndDate(date));
-        AccountDowload accountDowload = exportService.exportAccountCsv(req);
-        download(response,accountDowload.getFilename(),accountDowload.getLength(),accountDowload.getData());
+        try {
+            SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date endDate = ymd.parse(date);
+            String ymdStr = ymd.format(endDate);
+            String ymdhmsStr = ymdStr+" 23:59:59";
+            req.setEndDate(ymdhms.parse(ymdhmsStr));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new ResponseException("日期格式错误！");
+        }
+        AccountDowload accountDownload = exportService.exportAccountCsv(req);
+        download(response,accountDownload.getFilename(),accountDownload.getLength(),accountDownload.getData());
     }
 
     /**
@@ -544,10 +547,17 @@ public class TransactionController {
      * }
      */
     @PostMapping("contractDetails")
-    public BaseResp contractDetails (@Valid @RequestBody ContractDetailReq req) {
+    public BaseResp contractDetails (@Valid @RequestBody AccountDetailReq req) {
         try{
-            req.setPageSize(Integer.MAX_VALUE);
-            ContractDetail contractDetail = contractService.getContractDetail(req);
+            req.setPageSize(20);
+            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
+            ContractDetail contractDetail = new ContractDetail();
+            if(transactionList.size()>20){
+                // 大于20，则取前20条数据返回
+                contractDetail.setTrades(transactionList.subList(0,20));
+            }else{
+                contractDetail.setTrades(transactionList);
+            }
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),contractDetail);
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
@@ -570,13 +580,7 @@ public class TransactionController {
      */
     @GetMapping("contractDownload")
     public void contractDownload(@RequestParam String cid,@RequestParam String address,@RequestParam String date, HttpServletResponse response) {
-        ContractDownloadReq req = new ContractDownloadReq();
-        req.setCid(cid);
-        req.setAddress(address);
-        req.setStartDate(DateUtil.getYearFirstDate(new Date()));
-        req.setEndDate(getEndDate(date));
-        ContractDowload contractDowload = exportService.exportContractCsv(req);
-        download(response,contractDowload.getFilename(),contractDowload.getLength(),contractDowload.getData());
+        addressDownload(cid,address,date,response);
     }
 
     /**

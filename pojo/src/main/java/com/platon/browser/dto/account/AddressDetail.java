@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AccountDetail {
+public class AddressDetail {
     private String balance;
     private int tradeCount;
     private String votePledge;

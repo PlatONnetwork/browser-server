@@ -7,5 +7,5 @@ public interface SearchService {
     /**
      * 搜索
      */
-    Query findInfoByParam(SearchParam param);
+    Query search(SearchParam param);
 }
