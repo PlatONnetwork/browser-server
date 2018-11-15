@@ -80,8 +80,9 @@ public class TransactionController {
      *           "txHash": "0x234234",//交易hash
      *           "blockHeight": "15566",//交易所在区块高度
      *           "blockTime": 18080899999,//出块时间
-     *           "from": "0x667766",//发送方
-     *           "to": "0x667766",//接收方
+     *           "from": "0x667766",//发送方, 必定是钱包地址
+     *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
+     *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
      *           "value": "222",//数额
      *           "actualTxCost": "22",//交易费用
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
