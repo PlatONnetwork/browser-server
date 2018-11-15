@@ -24,6 +24,8 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
             BlockExample condition = new BlockExample();
+            condition.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
             condition.setOrderByClause("timestamp desc");
             PageHelper.startPage(1, 1);
             List <Block> blocks = blockMapper.selectByExample(condition);
@@ -190,19 +193,18 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setEnergonLimit(transaction.getGas());
                 transactionDto.setEnergonUsed(receipt.getGasUsed());
                 transactionDto.setNonce(transaction.getNonce().toString());
-                transactionDto.setValue(transaction.getValue().toString());
-                transactionDto.setTxReceiptStatus(receipt.getStatus());
+                transactionDto.setValue(valueConversion(transaction.getValue()));
+                transactionDto.setTxReceiptStatus(null != receipt.getStatus() ? receipt.getStatus() : "0x0");
                 transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                 String input = transactionDto.getInput();
                 if (null != transaction.getTo()) {
                     EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                    if (!ethGetCode.getCode().equals("0x")) {
-                        transactionDto.setReceiveType("contract");
-                    } else {
+                    if ("0x".equals(ethGetCode.getCode())) {
                         transactionDto.setReceiveType("account");
+                    } else {
+                        transactionDto.setReceiveType("contract");
                     }
                 }
-                transactionDto.setReceiveType("contract");
                 String type = TransactionType.geTransactionTyep(input);
                 transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
@@ -226,16 +228,26 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     }
 
+    public String valueConversion(BigInteger value){
+        BigDecimal valueDiec = new BigDecimal(value.toString());
+        BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
+        return  conversionCoin.toString();
+    }
 
-
-/*    public static void main(String args[]){
-        TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setEnergonPrice(new BigInteger("12321321321321"));
-        transactionDto.setEnergonUsed(new BigInteger("12321321321"));
-        List<TransactionDto> list = new ArrayList <>();
-        list.add(transactionDto);
-        BlockSynchronizeJob blockSynchronizeJob = new BlockSynchronizeJob();
-        BigInteger a = blockSynchronizeJob.getGasInBlock(list);
+/*
+    public static void main(String args[]){
+        Web3j web3j = Web3jClient.getWeb3jClient();
+        try {
+            EthGetCode ethGetCode = web3j.ethGetCode("0x3809a998ac1c91f12d1d6643d5445cf7b6e036db", DefaultBlockParameterName.LATEST).send();
+            System.out.println(ethGetCode.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+      BigDecimal a = new BigDecimal(new BigInteger("0").toString());
+         BigDecimal bigDecimal = a.divide(new BigDecimal("1000000000000000000"));
+      System.out.println(bigDecimal);
+        BlockSynchronizeJob synchronizeJob = new BlockSynchronizeJob();
+        String a = synchronizeJob.valueConversion(new BigInteger("12000000000000000000"));
         System.out.println(a);
     }*/
 }
