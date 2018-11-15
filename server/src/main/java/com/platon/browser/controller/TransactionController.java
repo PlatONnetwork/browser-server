@@ -133,7 +133,8 @@ public class TransactionController {
      *           "blockHeight": "15566",//交易所在区块高度
      *           "confirmNum":444, // 区块确认数
      *           "from": "0x667766",//发送者
-     *           "to": "0x667766",//接收者
+     *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
+     *                        // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
      *           "txType": "", // 交易类型
                     transfer ：转账
                     MPCtransaction ： MPC交易
@@ -148,7 +149,8 @@ public class TransactionController {
      *           "energonPrice": "123",//能量价格
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
-     *           "failReason":""//失败原因
+     *           "failReason":"",//失败原因
+     *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *           }
      * }
      */

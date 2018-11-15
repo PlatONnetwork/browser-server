@@ -20,6 +20,7 @@ public class AccTransactionItem {
     private String txType;
     private long serverTime;
     private String failReason;
+    private String receiveType;
 
     @JsonIgnore
     private Date timestamp;

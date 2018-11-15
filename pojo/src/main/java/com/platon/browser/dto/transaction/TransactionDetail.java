@@ -20,4 +20,5 @@ public class TransactionDetail {
     private long expectTime;
     private String failReason;
     private long confirmNum;
+    private String receiveType;
 }
