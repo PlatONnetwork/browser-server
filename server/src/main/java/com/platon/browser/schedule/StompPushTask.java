@@ -66,7 +66,6 @@ public class StompPushTask {
 
             // 全量推送区块信息，1秒推送一次
             BlockInit blockInit = cacheService.getBlockInit(chainId);
-            logger.info("区块全量缓存有变更，推送STOMP消息...");
             BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
 
