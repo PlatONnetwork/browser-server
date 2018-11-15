@@ -94,7 +94,7 @@ public class TransactionController {
                         authorization ： 权限
      *           "serverTime": 1123123,//服务器时间
      *           "failReason":"",//失败原因
-     *           "receiveType":"account" // to字段存储的账户类型：account-钱包地址，contract-合约地址，
+     *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                  // 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
      *           }
      *       ]
