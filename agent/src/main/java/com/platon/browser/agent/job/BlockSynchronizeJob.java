@@ -205,7 +205,6 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                         transactionDto.setReceiveType("contract");
                     }
                 }
-                transactionDto.setReceiveType("contract");
                 String type = TransactionType.geTransactionTyep(input);
                 transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
