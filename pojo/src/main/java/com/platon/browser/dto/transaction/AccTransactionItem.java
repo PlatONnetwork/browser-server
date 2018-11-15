@@ -22,5 +22,5 @@ public class AccTransactionItem {
     private String failReason;
 
     @JsonIgnore
-    private Date createTime;
+    private Date timestamp;
 }

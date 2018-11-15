@@ -1,9 +1,14 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
-import com.platon.browser.dto.cache.*;
+import com.platon.browser.dto.cache.BlockInit;
+import com.platon.browser.dto.cache.LimitQueue;
+import com.platon.browser.dto.cache.NodeIncrement;
+import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.CacheService;
@@ -134,15 +139,23 @@ public class CacheServiceImpl implements CacheService {
                 changed=true;
             }else{
                 if(StringUtils.isNotBlank(indexInfo.getNode())){
+                    // 更新当前出块节点
                     index.setNode(indexInfo.getNode());
                     changed=true;
                 }
                 if(indexInfo.getCurrentHeight()!=0){
+                    // 更新当前区块高度
                     index.setCurrentHeight(indexInfo.getCurrentHeight());
                     changed=true;
                 }
                 if(indexInfo.getConsensusNodeAmount()!=0){
+                    // 更新共识节点数
                     index.setConsensusNodeAmount(index.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
+                    changed=true;
+                }
+                if(indexInfo.getCurrentTransaction()!=0){
+                    // 更新当前交易数
+                    index.setCurrentTransaction(index.getCurrentTransaction()+indexInfo.getCurrentTransaction());
                     changed=true;
                 }
             }

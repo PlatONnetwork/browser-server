@@ -128,11 +128,22 @@ public class TransactionServiceImpl implements TransactionService {
                 .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
         if(StringUtils.isNotBlank(req.getTxType())){
+            // 根据交易类型查询
             first.andTxTypeEqualTo(req.getTxType());
             second.andTxTypeEqualTo(req.getTxType());
         }
+        if(req.getStartDate()!=null){
+            // 根据交易生成起始时间查询
+            first.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+            second.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            // 根据交易生成结束时间查询
+            first.andTimestampLessThanOrEqualTo(req.getEndDate());
+            second.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         return transactions;
     }
@@ -150,11 +161,22 @@ public class TransactionServiceImpl implements TransactionService {
                 .andToEqualTo(req.getAddress())
                 .andTxTypeIn(Arrays.asList(types));
         if(StringUtils.isNotBlank(req.getTxType())){
+            // 根据交易类型查询
             first.andTxTypeEqualTo(req.getTxType());
             second.andTxTypeEqualTo(req.getTxType());
         }
+        if(req.getStartDate()!=null){
+            // 根据交易生成起始时间查询
+            first.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+            second.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            // 根据交易生成结束时间查询
+            first.andTimestampLessThanOrEqualTo(req.getEndDate());
+            second.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
         condition.or(second);
-        condition.setOrderByClause("create_time desc");
+        condition.setOrderByClause("timestamp desc");
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         return transactions;
     }
@@ -219,8 +241,9 @@ public class TransactionServiceImpl implements TransactionService {
             condition = new TransactionExample();
             condition.createCriteria()
                     .andChainIdEqualTo(transaction.getChainId())
-                    .andBlockNumberEqualTo(transaction.getBlockNumber()+step);
-            long prevOrNextCount = transactionMapper.countByExample(condition);
+                    .andTransactionIndexEqualTo(transaction.getTransactionIndex()+step);
+            List<Transaction> tmpTransactions = transactionMapper.selectByExample(condition);
+            long prevOrNextCount = tmpTransactions.size();
 
             switch (direction){
                 case PREV:
@@ -232,7 +255,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .andChainIdEqualTo(transaction.getChainId())
                                 .andNumberLessThan(transaction.getBlockNumber())
                                 .andTransactionNumberGreaterThan(0);
-                        long blockCount = blockMapper.countByExample(blockExample);
+                        // 取一条记录，避免影响性能
+                        PageHelper.startPage(1,1);
+                        List<Block> tmpBlocks = blockMapper.selectByExample(blockExample);
+                        long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果A记录前面不存在有交易记录的区块则认为A记录是第一条
                             transactionDetailNavigate.setFirst(true);
@@ -248,7 +274,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .andChainIdEqualTo(transaction.getChainId())
                                 .andNumberGreaterThan(transaction.getBlockNumber())
                                 .andTransactionNumberGreaterThan(0);
-                        long blockCount = blockMapper.countByExample(blockExample);
+                        // 取一条记录，避免影响性能
+                        PageHelper.startPage(1,1);
+                        List<Block> tmpBlocks = blockMapper.selectByExample(blockExample);
+                        long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果A记录后面不存在有交易记录的区块则认为A记录是最后一条
                             transactionDetailNavigate.setLast(true);
@@ -299,7 +328,10 @@ public class TransactionServiceImpl implements TransactionService {
                     .andChainIdEqualTo(currTransaction.getChainId())
                     .andNumberLessThan(prevOrNextBlockNumber)
                     .andTransactionNumberGreaterThan(0);
-                long blockCount = blockMapper.countByExample(blockExample);
+                // 取一条记录，避免影响性能
+                PageHelper.startPage(1,1);
+                List<Block> tmpBlocks = blockMapper.selectByExample(blockExample);
+                long blockCount = tmpBlocks.size();
                 if(blockCount==0){
                     // 如果前面不存在带有交易记录的块，则表示是第一条交易记录
                     transactionDetailNavigate.setFirst(true);
@@ -310,7 +342,10 @@ public class TransactionServiceImpl implements TransactionService {
                         .andChainIdEqualTo(currTransaction.getChainId())
                         .andNumberGreaterThan(prevOrNextBlockNumber)
                         .andTransactionNumberGreaterThan(0);
-                blockCount = blockMapper.countByExample(blockExample);
+                // 取一条记录，避免影响性能
+                PageHelper.startPage(1,1);
+                tmpBlocks = blockMapper.selectByExample(blockExample);
+                blockCount = tmpBlocks.size();
                 if(blockCount==0){
                     // 如果后面不存在带有交易记录的块，则表示是最后一条交易记录
                     transactionDetailNavigate.setLast(true);
@@ -328,7 +363,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .andChainIdEqualTo(currTransaction.getChainId())
                                 .andNumberGreaterThan(prevOrNextBlockNumber)
                                 .andTransactionNumberGreaterThan(0);
-                        long blockCount = blockMapper.countByExample(blockExample);
+                        // 取一条记录，避免影响性能
+                        PageHelper.startPage(1,1);
+                        List<Block> tmpBlocks = blockMapper.selectByExample(blockExample);
+                        long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果后面不存在带有交易记录的块，则表示是最后一条交易记录
                             transactionDetailNavigate.setLast(true);
@@ -342,7 +380,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .andChainIdEqualTo(currTransaction.getChainId())
                                 .andNumberLessThan(prevOrNextBlockNumber)
                                 .andTransactionNumberGreaterThan(0);
-                        blockCount = blockMapper.countByExample(blockExample);
+                        // 取一条记录，避免影响性能
+                        PageHelper.startPage(1,1);
+                        tmpBlocks = blockMapper.selectByExample(blockExample);
+                        blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果前面不存在带有交易记录的块，则表示是第一条交易记录
                             transactionDetailNavigate.setFirst(true);

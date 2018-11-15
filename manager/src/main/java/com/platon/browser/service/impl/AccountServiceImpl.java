@@ -56,6 +56,7 @@ public class AccountServiceImpl implements AccountService {
             BeanUtils.copyProperties(transaction,bean);
             bean.setTxHash(transaction.getHash());
             bean.setServerTime(serverTime);
+            // 交易生成的时间就是出块时间
             bean.setBlockTime(transaction.getTimestamp().getTime());
             accTransactionList.add(bean);
         });
@@ -65,13 +66,14 @@ public class AccountServiceImpl implements AccountService {
             BeanUtils.copyProperties(pendingTx,bean);
             bean.setTxHash(pendingTx.getHash());
             bean.setServerTime(serverTime);
-            bean.setBlockTime(pendingTx.getTimestamp().getTime());
+            bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
+            bean.setActualTxCost("0");
             accTransactionList.add(bean);
         });
 
         // 按时间倒排
         Collections.sort(accTransactionList,(e1,e2)->{
-            long t1 = e1.getCreateTime().getTime(),t2 = e2.getCreateTime().getTime();
+            long t1 = e1.getTimestamp().getTime(),t2 = e2.getTimestamp().getTime();
             if(t1<t2) return 1;
             if(t1>t2) return -1;
             return 0;
