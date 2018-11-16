@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 import org.web3j.protocol.core.methods.response.Transaction;
 import rx.Observable;
@@ -57,6 +59,14 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                     pendingTransactionDto.setHash(transaction.getHash());
                     pendingTransactionDto.setFrom(transaction.getFrom());
                     pendingTransactionDto.setTo(transaction.getTo());
+                    if (null != transaction.getTo()) {
+                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                        if ("0x".equals(ethGetCode.getCode())) {
+                            pendingTransactionDto.setReceiveType("account");
+                        } else {
+                            pendingTransactionDto.setReceiveType("contract");
+                        }
+                    }
                     pendingTransactionDto.setEnergonLimit(transaction.getGas());
                     pendingTransactionDto.setEnergonPrice(transaction.getGasPrice());
                     pendingTransactionDto.setNonce(transaction.getNonce().toString());

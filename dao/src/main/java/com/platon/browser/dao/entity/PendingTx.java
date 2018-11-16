@@ -29,6 +29,8 @@ public class PendingTx {
 
     private Date updateTime;
 
+    private String receiveType;
+
     private String input;
 
     public String getHash() {
@@ -127,6 +129,14 @@ public class PendingTx {
         this.updateTime = updateTime;
     }
 
+    public String getReceiveType() {
+        return receiveType;
+    }
+
+    public void setReceiveType(String receiveType) {
+        this.receiveType = receiveType == null ? null : receiveType.trim();
+    }
+
     public String getInput() {
         return input;
     }
@@ -155,6 +165,7 @@ public class PendingTx {
         value("value", "value", "VARCHAR", true),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        receiveType("receive_type", "receiveType", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true);
 
         /**

@@ -66,6 +66,11 @@ public class PendingTransactionDto {
      */
     private BigInteger energonPrice;
 
+    /**
+     *  交易接收者类型（to是合约还是账户）contract合约、 account账户
+     */
+    private String receiveType;
+
     public String getHash () {
         return hash;
     }
@@ -144,5 +149,13 @@ public class PendingTransactionDto {
 
     public void setEnergonPrice ( BigInteger energonPrice ) {
         this.energonPrice = energonPrice;
+    }
+
+    public String getReceiveType () {
+        return receiveType;
+    }
+
+    public void setReceiveType ( String receiveType ) {
+        this.receiveType = receiveType;
     }
 }
