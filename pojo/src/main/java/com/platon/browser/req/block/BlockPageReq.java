@@ -1,14 +1,14 @@
-package com.platon.browser.req.transaction;
+package com.platon.browser.req.block;
 
-import com.platon.browser.common.req.PageReq;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TransactionListReq extends PageReq {
+public class BlockPageReq {
     @NotBlank(message = "链ID不能为空！")
     private String cid;
-    private Long height;
+    private Integer pageNo = 1;
+    private Integer pageSize = 10;
 }

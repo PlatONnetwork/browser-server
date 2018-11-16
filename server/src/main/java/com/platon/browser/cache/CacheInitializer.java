@@ -9,6 +9,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
@@ -20,8 +21,8 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NodeType;
-import com.platon.browser.req.block.BlockListReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CacheService;
 import com.platon.browser.service.TransactionService;
@@ -264,16 +265,16 @@ public class CacheInitializer {
      */
     public void initBlockCache(String chainId){
 
-        BlockListReq req = new BlockListReq();
+        BlockPageReq req = new BlockPageReq();
         req.setCid(chainId);
         req.setPageSize(10);
-        req.buildPage();
-        List<BlockItem> blockItemList = blockService.getBlockList(req);
+        RespPage<BlockItem> page = blockService.getBlockPage(req);
+        List<BlockItem> items = page.getData();
         List<BlockInfo> blockInfos = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
-        for(int i=blockItemList.size()-1;i>=0;i--) {
-            BlockItem block = blockItemList.get(i);
+        for(int i=items.size()-1;i>=0;i--) {
+            BlockItem block = items.get(i);
             BlockInfo bean = new BlockInfo();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getHeight());
@@ -290,15 +291,15 @@ public class CacheInitializer {
      * 更新交易列表信息缓存
      */
     public void initTransactionCache(String chainId){
-        TransactionListReq req = new TransactionListReq();
+        TransactionPageReq req = new TransactionPageReq();
         req.setCid(chainId);
         req.setPageSize(10);
-        req.buildPage();
-        List<TransactionItem> transactionItemList = transactionService.getTransactionList(req);
+        RespPage<TransactionItem> page = transactionService.getTransactionPage(req);
         List<TransactionInfo> transactionInfos = new LinkedList<>();
         // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
-        for (int i=transactionItemList.size()-1;i>=0;i--){
-            TransactionItem transaction = transactionItemList.get(i);
+        List<TransactionItem> items = page.getData();
+        for (int i=items.size()-1;i>=0;i--){
+            TransactionItem transaction = items.get(i);
             TransactionInfo bean = new TransactionInfo();
             BeanUtils.copyProperties(transaction,bean);
             bean.setTxHash(transaction.getTxHash());

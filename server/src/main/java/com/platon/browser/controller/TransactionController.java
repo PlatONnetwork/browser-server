@@ -4,6 +4,7 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
@@ -101,10 +102,9 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public JsonResp transactionList (@Valid @RequestBody TransactionListReq req ) {
-        req.buildPage();
-        List<TransactionItem> transactionListList = transactionService.getTransactionList(req);
-        return JsonResp.asList().addAll(transactionListList).pagination(req).build();
+    public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionPageReq req ) {
+        RespPage<TransactionItem> page = transactionService.getTransactionPage(req);
+        return page;
     }
 
     /**
@@ -642,11 +642,10 @@ public class TransactionController {
      * }
      */
     @PostMapping("blockTransaction")
-    public JsonResp blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
-        TransactionListReq tlr = new TransactionListReq();
+    public RespPage<TransactionItem> blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
+        TransactionPageReq tlr = new TransactionPageReq();
         BeanUtils.copyProperties(req,tlr);
-        tlr.buildPage();
-        List<TransactionItem> transactionListList = transactionService.getTransactionList(tlr);
-        return JsonResp.asList().addAll(transactionListList).pagination(tlr).build();
+        RespPage<TransactionItem> page = transactionService.getTransactionPage(tlr);
+        return page;
     }
 }

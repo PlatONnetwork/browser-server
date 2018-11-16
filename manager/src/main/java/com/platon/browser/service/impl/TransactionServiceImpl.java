@@ -5,7 +5,9 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomTransactionMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
@@ -14,7 +16,7 @@ import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,19 +37,18 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private BlockMapper blockMapper;
 
+    @Autowired
+    private CustomTransactionMapper customTransactionMapper;
+
     @Override
-    public List<TransactionItem> getTransactionList(TransactionListReq req) {
-        TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria criteria = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid());
-        if(req.getHeight()!=null){
-            // 根据块高筛选
-            criteria.andBlockNumberEqualTo(req.getHeight());
-        }
-        // 交易记录先根据区块号倒排，再根据交易索引倒排
-        condition.setOrderByClause("block_number desc,transaction_index desc");
-        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-        List<TransactionItem> transactionList = new ArrayList<>();
+    public RespPage<TransactionItem> getTransactionPage(TransactionPageReq req) {
+        TransactionPage page = new TransactionPage();
+        BeanUtils.copyProperties(req,page);
+        int startPage = req.getPageNo()<=1?0:req.getPageNo()-1;
+        int offset = startPage*req.getPageSize();
+        page.setOffset(offset);
+        List<Transaction> transactions = customTransactionMapper.selectByPage(page);
+
         long serverTime = System.currentTimeMillis();
 
         // 查询交易所属的区块信息
@@ -62,6 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
             blocks.forEach(block->map.put(block.getNumber(),block));
         }
 
+        List<TransactionItem> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
             TransactionItem bean = new TransactionItem();
             BeanUtils.copyProperties(transaction,bean);
@@ -74,7 +76,26 @@ public class TransactionServiceImpl implements TransactionService {
             }
             transactionList.add(bean);
         });
-        return transactionList;
+
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria criteria = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid());
+        if(req.getHeight()!=null){
+            // 根据块高筛选
+            criteria.andBlockNumberEqualTo(req.getHeight());
+        }
+        // 交易记录先根据区块号倒排，再根据交易索引倒排
+        condition.setOrderByClause("block_number desc,transaction_index desc");
+        Long count = transactionMapper.countByExample(condition);
+        Long totalPages = count/req.getPageSize();
+        if(count%req.getPageSize()!=0){
+            totalPages+=1;
+        }
+        RespPage<TransactionItem> respPage = new RespPage<>();
+        respPage.setTotalCount(count.intValue());
+        respPage.setTotalPages(totalPages.intValue());
+        respPage.setData(transactionList);
+        return respPage;
     }
 
     @Override

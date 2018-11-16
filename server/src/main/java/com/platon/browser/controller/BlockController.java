@@ -1,23 +1,25 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
-import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.block.BlockListReq;
+import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * User: dongqile
@@ -71,10 +73,9 @@ public class BlockController  {
      * }
      */
     @PostMapping("blockList")
-    public JsonResp blockList (@Valid @RequestBody BlockListReq req) {
-        req.buildPage();
-        List<BlockItem> blockList = blockService.getBlockList(req);
-        return JsonResp.asList().addAll(blockList).pagination(req).build();
+    public RespPage<BlockItem> blockList (@Valid @RequestBody BlockPageReq req) {
+        RespPage<BlockItem> page = blockService.getBlockPage(req);
+        return page;
     }
 
 
