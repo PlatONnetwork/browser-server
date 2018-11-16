@@ -11,9 +11,7 @@ import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.TransactionErrorEnum;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionListReq;
@@ -115,7 +113,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * 通过账户信息获取交易列表
+     * 通过账户信息获取交易列表, 以太坊账户有两种类型：外部账户-钱包地址，内部账户-合约地址
      * @param req
      * @return
      */
@@ -127,39 +125,6 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionExample.Criteria second = condition.createCriteria()
                 .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
-        if(StringUtils.isNotBlank(req.getTxType())){
-            // 根据交易类型查询
-            first.andTxTypeEqualTo(req.getTxType());
-            second.andTxTypeEqualTo(req.getTxType());
-        }
-        if(req.getStartDate()!=null){
-            // 根据交易生成起始时间查询
-            first.andTimestampGreaterThanOrEqualTo(req.getStartDate());
-            second.andTimestampGreaterThanOrEqualTo(req.getStartDate());
-        }
-        if(req.getEndDate()!=null){
-            // 根据交易生成结束时间查询
-            first.andTimestampLessThanOrEqualTo(req.getEndDate());
-            second.andTimestampLessThanOrEqualTo(req.getEndDate());
-        }
-        condition.or(second);
-        condition.setOrderByClause("timestamp desc");
-        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-        return transactions;
-    }
-
-    @Override
-    public List<TransactionWithBLOBs> getContractList(ContractDetailReq req) {
-        String [] types = {TransactionTypeEnum.CONTRACT_CREATE.code,TransactionTypeEnum.TRANSACTION_EXECUTE.code};
-        TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria first = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid())
-                .andFromEqualTo(req.getAddress())
-                .andTxTypeIn(Arrays.asList(types));
-        TransactionExample.Criteria second = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid())
-                .andToEqualTo(req.getAddress())
-                .andTxTypeIn(Arrays.asList(types));
         if(StringUtils.isNotBlank(req.getTxType())){
             // 根据交易类型查询
             first.andTxTypeEqualTo(req.getTxType());

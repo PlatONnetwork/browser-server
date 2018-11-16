@@ -12,4 +12,5 @@ public class TransactionInfo {
     private int transactionIndex;
     private long timestamp;
     private String txType;
+    private String receiveType;
 }

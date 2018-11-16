@@ -16,6 +16,8 @@ public class TransactionItem {
     private String txType;
     private long serverTime;
     private String failReason;
+    // to字段存储的账户类型：account-钱包地址，contract-合约地址
+    private String receiveType;
 
     @JsonIgnore
     private long timestamp;

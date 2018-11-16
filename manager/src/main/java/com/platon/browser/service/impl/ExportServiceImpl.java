@@ -1,17 +1,12 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.dto.account.AccountDowload;
-import com.platon.browser.dto.account.ContractDowload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
-import com.platon.browser.dto.transaction.ConTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
-import com.platon.browser.req.account.ContractDetailReq;
-import com.platon.browser.req.account.ContractDownloadReq;
 import com.platon.browser.service.AccountService;
-import com.platon.browser.service.ContractService;
 import com.platon.browser.service.ExportService;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -36,15 +31,13 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private ContractService contractService;
-
     @Override
     public AccountDowload exportAccountCsv(AccountDownloadReq req) {
 
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         AccountDetailReq accountDetailReq = new AccountDetailReq();
+        // 一页取完所有数据
         accountDetailReq.setPageSize(Integer.MAX_VALUE);
         BeanUtils.copyProperties(req,accountDetailReq);
 
@@ -92,60 +85,5 @@ public class ExportServiceImpl implements ExportService {
         accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
-    }
-
-    @Override
-    public ContractDowload exportContractCsv(ContractDownloadReq req) {
-
-        SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        ContractDetailReq contractDetailReq = new ContractDetailReq();
-        contractDetailReq.setPageSize(Integer.MAX_VALUE);
-        BeanUtils.copyProperties(req,contractDetailReq);
-
-        List<ConTransactionItem> conTransactionList = contractService.getContractList(contractDetailReq);
-
-        List<Object[]> rows = new ArrayList<>();
-        conTransactionList.forEach(transaction->{
-            String transactionType;
-            try {
-                TransactionTypeEnum type = TransactionTypeEnum.getEnum(transaction.getTxType());
-                transactionType = type.desc;
-            }catch (IllegalArgumentException iae){
-                transactionType = "未知类型";
-            }
-
-            String transactionStatus;
-            try{
-                TransactionStatusEnum status = TransactionStatusEnum.getEnum(transaction.getTxReceiptStatus());
-                transactionStatus = status.desc;
-            }catch (IllegalArgumentException iae){
-                transactionStatus = "未知状态";
-            }
-
-            Object[] row = {
-                    transaction.getTxHash(),
-                    ymdhms.format(new Date(transaction.getBlockTime())),
-                    transactionType,
-                    transaction.getFrom(),
-                    transaction.getTo(),
-                    transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()+"ATP",
-                    transactionStatus
-            };
-            rows.add(row);
-        });
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer outputWriter = new OutputStreamWriter(baos);
-        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders("交易哈希值", "确认时间", "类型", "发送方", "接收方","数额","交易费用");
-        writer.writeRowsAndClose(rows);
-        ContractDowload contractDowload = new ContractDowload();
-        contractDowload.setData(baos.toByteArray());
-        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        contractDowload.setFilename("contract-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
-        contractDowload.setLength(baos.size());
-        return contractDowload;
     }
 }

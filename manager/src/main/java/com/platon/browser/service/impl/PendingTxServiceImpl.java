@@ -13,9 +13,7 @@ import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.TransactionErrorEnum;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.req.account.ContractDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxListReq;
@@ -28,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -58,12 +55,12 @@ public class PendingTxServiceImpl implements PendingTxService {
         List<PendingTxItem> pendingTxList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         pendingTxes.forEach(transaction -> {
-            PendingTxItem pt = new PendingTxItem();
-            BeanUtils.copyProperties(transaction,pt);
-            pt.setTxHash(transaction.getHash());
-            pt.setTimestamp(transaction.getTimestamp().getTime());
-            pt.setServerTime(serverTime);
-            pendingTxList.add(pt);
+            PendingTxItem bean = new PendingTxItem();
+            BeanUtils.copyProperties(transaction,bean);
+            bean.setTxHash(transaction.getHash());
+            bean.setTimestamp(transaction.getTimestamp().getTime());
+            bean.setServerTime(serverTime);
+            pendingTxList.add(bean);
         });
         return pendingTxList;
     }
@@ -129,33 +126,6 @@ public class PendingTxServiceImpl implements PendingTxService {
             // 根据交易生成结束时间查询
             first.andTimestampLessThanOrEqualTo(req.getEndDate());
             second.andTimestampLessThanOrEqualTo(req.getEndDate());
-        }
-        condition.or(second);
-        condition.setOrderByClause("timestamp desc");
-        List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(condition);
-        return pendingTxes;
-    }
-
-    /**
-     * 查询合约
-     * @param req
-     * @return
-     */
-    @Override
-    public List<PendingTx> getContractList(ContractDetailReq req) {
-        String [] types = {TransactionTypeEnum.CONTRACT_CREATE.code,TransactionTypeEnum.TRANSACTION_EXECUTE.code};
-        PendingTxExample condition = new PendingTxExample();
-        PendingTxExample.Criteria first = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid())
-                .andFromEqualTo(req.getAddress())
-                .andTxTypeIn(Arrays.asList(types));
-        PendingTxExample.Criteria second = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid())
-                .andToEqualTo(req.getAddress())
-                .andTxTypeIn(Arrays.asList(types));
-        if(StringUtils.isNotBlank(req.getTxType())){
-            first.andTxTypeEqualTo(req.getTxType());
-            second.andTxTypeEqualTo(req.getTxType());
         }
         condition.or(second);
         condition.setOrderByClause("timestamp desc");
