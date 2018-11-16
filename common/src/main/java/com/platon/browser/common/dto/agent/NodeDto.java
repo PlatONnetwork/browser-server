@@ -35,6 +35,31 @@ public class NodeDto {
      */
     private String  miner;
 
+    /**
+     * 节点状态
+     */
+    private int  netState;
+    /**
+     * 节点类型
+     */
+    private int  nodeType;
+
+    public int getNetState() {
+        return netState;
+    }
+
+    public void setNetState(int netState) {
+        this.netState = netState;
+    }
+
+    public int getNodeType() {
+        return nodeType;
+    }
+
+    public void setNodeType(int nodeType) {
+        this.nodeType = nodeType;
+    }
+
     public String getNodeId () {
         return nodeId;
     }
