@@ -76,7 +76,8 @@ public class SubscribeService {
 
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())){
             case NODE:
-                logger.debug("更新增量节点缓存: {}",msg);
+                logger.debug("[收到新节点消息]：{}",msg);
+                logger.debug("  |- 更新节点缓存...");
                 NodeDto nodeDto = JSON.parseObject(message.getStruct(), NodeDto.class);
                 NodeInfo nodeInfo = new NodeInfo();
                 BeanUtils.copyProperties(nodeDto,nodeInfo);
@@ -86,9 +87,21 @@ public class SubscribeService {
                 List<NodeInfo> nodeInfoList = new ArrayList<>();
                 nodeInfoList.add(nodeInfo);
                 cacheService.updateNodeCache(nodeInfoList,false,chainId);
+
+                logger.debug("  |- 更新指标信息中的共识节点个数...");
+                IndexInfo indexInfo = new IndexInfo();
+                indexInfo.setConsensusNodeAmount(0);
+                nodeInfoList.forEach(node -> {
+                    if(node.getNodeType()==1){
+                        // 共识节点, 数量加一
+                        indexInfo.setConsensusNodeAmount(indexInfo.getConsensusNodeAmount()+1);
+                    }
+                });
+                cacheService.updateIndexCache(indexInfo,false,chainId);
                 break;
             case BLOCK:
-                logger.debug("更新增量区块缓存: {}",msg);
+                logger.debug("[收到新区块消息]：{}",msg);
+                logger.debug("  |- 更新区块缓存...");
                 BlockDto blockDto = JSON.parseObject(message.getStruct(),BlockDto.class);
                 long highestNumber = highestBlockNumberMap.get(chainId);
                 if(blockDto.getNumber()<=highestNumber){
@@ -107,13 +120,13 @@ public class SubscribeService {
                 blockInfoList.add(blockInfo);
                 cacheService.updateBlockCache(blockInfoList,chainId);
 
-                logger.debug("整体更新指标缓存: {}",msg);
-                IndexInfo indexInfo = new IndexInfo();
+                logger.debug("  |- 更新指标信息中的当前块高和当前交易数...");
+                indexInfo = new IndexInfo();
                 indexInfo.setCurrentHeight(blockInfo.getHeight());
                 indexInfo.setCurrentTransaction(blockDto.getTransaction().size());
                 cacheService.updateIndexCache(indexInfo,false, chainId);
 
-                logger.debug("更新交易缓存: {}",msg);
+                logger.debug("  |- 更新交易缓存...");
                 List<TransactionDto> transactionDtos = blockDto.getTransaction();
 
                 // 对交易按交易索引正向排序
@@ -142,7 +155,7 @@ public class SubscribeService {
                     cacheService.updateTransactionCache(transactionInfos,chainId);
                 }
 
-                logger.debug("整体更新统计缓存: {}",msg);
+                logger.debug("  |- 更新统计缓存...");
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
                 statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp());
