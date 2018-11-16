@@ -1,7 +1,6 @@
 package com.platon.browser.message;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.NodeDto;
@@ -9,9 +8,7 @@ import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
@@ -37,31 +34,20 @@ public class SubscribeService {
 
     // 记录每条链上已处理的最高块编号，防止重复处理
     private final Map<String,Long> highestBlockNumberMap = new HashMap<>();
-
     @Autowired
     private CacheService cacheService;
-
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private BlockMapper blockMapper;
+    private StatisticMapper statisticMapper;
 
     @PostConstruct
     private void init(){
         // 从数据库加载最高块初始化每条链上的最高块编号标记
         chainsConfig.getChainIds().forEach(chainId->{
             logger.info("初始化链[{}]的最高块编号标记...",chainId);
-            BlockExample condition = new BlockExample();
-            condition.createCriteria().andChainIdEqualTo(chainId);
-            condition.setOrderByClause("number desc");
-            PageHelper.startPage(1,1);
-            List<Block> blocks = blockMapper.selectByExample(condition);
-            if(blocks.size()==0){
-                highestBlockNumberMap.put(chainId,0l);
-                return;
-            }
-            Block block = blocks.get(0);
-            highestBlockNumberMap.put(chainId,block.getNumber());
+            long maxBlockNumber = statisticMapper.maxBlockNumber(chainId);
+            highestBlockNumberMap.put(chainId,maxBlockNumber);
         });
     }
 
