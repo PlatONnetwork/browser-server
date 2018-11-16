@@ -33,8 +33,8 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public AccountDowload exportAccountCsv(AccountDownloadReq req) {
-
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
         AccountDetailReq accountDetailReq = new AccountDetailReq();
         // 一页取完所有数据

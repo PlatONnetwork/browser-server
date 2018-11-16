@@ -4,8 +4,8 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.AccountDowload;
+import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
@@ -16,7 +16,6 @@ import com.platon.browser.service.AccountService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
-import com.platon.browser.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -491,18 +490,17 @@ public class TransactionController {
         AccountDownloadReq req = new AccountDownloadReq();
         req.setCid(cid);
         req.setAddress(address);
-        req.setStartDate(DateUtil.getYearFirstDate(new Date()));
         try {
             SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date endDate = ymd.parse(date);
-            String ymdStr = ymd.format(endDate);
-            String ymdhmsStr = ymdStr+" 23:59:59";
-            req.setEndDate(ymdhms.parse(ymdhmsStr));
+            Date startDate = ymd.parse(date);
+            String startStr = ymd.format(startDate);
+            req.setStartDate(ymdhms.parse(startStr+" 00:00:00"));
         } catch (ParseException e) {
             e.printStackTrace();
             throw new ResponseException("日期格式错误！");
         }
+        req.setEndDate(new Date());
         AccountDowload accountDownload = exportService.exportAccountCsv(req);
         download(response,accountDownload.getFilename(),accountDownload.getLength(),accountDownload.getData());
     }
