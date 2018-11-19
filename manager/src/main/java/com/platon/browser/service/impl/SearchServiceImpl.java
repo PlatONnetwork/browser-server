@@ -179,7 +179,7 @@ public class SearchServiceImpl implements SearchService {
                 try{
                     PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
                     query.setType(pendingOrTransaction.getType());
-                    query.setStruct(pendingOrTransaction);
+                    query.setStruct(pendingOrTransaction.getPending());
                     return query;
                 }catch (BusinessException be2){
                     throw new BusinessException("输入的关键字查询不到任何内容！");
