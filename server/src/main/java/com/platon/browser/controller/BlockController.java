@@ -11,6 +11,7 @@ import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
+import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class BlockController  {
 
     @Autowired
     private BlockService blockService;
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
@@ -74,7 +77,8 @@ public class BlockController  {
      */
     @PostMapping("blockList")
     public RespPage<BlockItem> blockList (@Valid @RequestBody BlockPageReq req) {
-        RespPage<BlockItem> page = blockService.getBlockPage(req);
+//        RespPage<BlockItem> page = blockService.getBlockPage(req);
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 

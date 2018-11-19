@@ -12,7 +12,7 @@ import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.StompCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class StompPushTask {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-    private CacheService cacheService;
+    private StompCacheService cacheService;
     @Autowired
     private StatisticMapper statisticMapper;
     // 交易TPS统计时间间隔, 单位：分钟

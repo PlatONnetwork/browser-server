@@ -10,7 +10,7 @@ import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.StompCacheService;
 import com.platon.browser.service.SearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class HomeController {
     private ChainsConfig chainsConfig;
 
     @Autowired
-    private CacheService cacheService;
+    private StompCacheService cacheService;
 
     @Autowired
     private SearchService searchService;

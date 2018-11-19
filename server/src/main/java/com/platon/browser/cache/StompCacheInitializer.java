@@ -1,6 +1,6 @@
 package com.platon.browser.cache;
 
-import com.github.pagehelper.PageHelper;
+import com.alibaba.fastjson.JSON;
 import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
@@ -24,7 +24,8 @@ import com.platon.browser.enums.NodeType;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.StompCacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.GeoUtil;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -42,9 +44,9 @@ import java.util.*;
  * 从数据库加载最新数据来初始化缓存
  */
 @Component
-public class CacheInitializer {
+public class StompCacheInitializer {
 
-    private final Logger logger = LoggerFactory.getLogger(CacheInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(StompCacheInitializer.class);
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -55,42 +57,51 @@ public class CacheInitializer {
     @Autowired
     private StatisticMapper statisticMapper;
     @Autowired
-    private CacheService cacheService;
+    private StompCacheService stompCacheService;
+    @Autowired
+    private RedisCacheService redisCacheService;
     @Autowired
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
     @Autowired
     private ChainsConfig chainsConfig;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     // 交易TPS统计时间间隔, 单位：分钟
     @Value("${platon.transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
 
+    @Value("${platon.redis.block.cache.key}")
+    private String blockCacheKeyTemplate;
+    @Value("${platon.redis.transaction.cache.key}")
+    private String transactionCacheKeyTemplate;
+
     @PostConstruct
     public void initCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
+            Set<NodeInfo> nodeInfoList = stompCacheService.getNodeInfoSet(chainId);
             if(nodeInfoList.size()==0){
                 logger.info("节点缓存为空, 执行初始化...");
                 initNodeCache(chainId);
             }
-            IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
+            IndexInfo indexInfo = stompCacheService.getIndexInfo(chainId);
             if(indexInfo.getCurrentHeight()==0){
                 logger.info("指标缓存为空, 执行初始化...");
                 initIndexCache(chainId);
             }
-            StatisticInfo statisticInfo = cacheService.getStatisticInfo(chainId);
+            StatisticInfo statisticInfo = stompCacheService.getStatisticInfo(chainId);
             if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
                 logger.info("统计缓存为空, 执行初始化...");
                 initStatisticCache(chainId);
             }
-            BlockInit blockInit = cacheService.getBlockInit(chainId);
+            BlockInit blockInit = stompCacheService.getBlockInit(chainId);
             if(blockInit.getList().size()==0){
                 logger.info("区块缓存为空, 执行初始化...");
                 initBlockCache(chainId);
             }
-            TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
+            TransactionInit transactionInit = stompCacheService.getTransactionInit(chainId);
             if(transactionInit.getList().size()==0){
                 logger.info("交易缓存为空, 执行初始化...");
                 initTransactionCache(chainId);
@@ -114,7 +125,7 @@ public class CacheInitializer {
             bean.setLatitude(location.latitude);
             nodeInfoList.add(bean);
         });
-        cacheService.updateNodeCache(nodeInfoList,true,chainId);
+        stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
     }
 
     /**
@@ -122,18 +133,15 @@ public class CacheInitializer {
      */
     public void initIndexCache(String chainId){
         IndexInfo indexInfo = new IndexInfo();
-        // 取当前高度和出块节点
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(chainId);
-        blockExample.setOrderByClause("number desc");
-        PageHelper.startPage(1,1);
-        List<Block> blockList = blockMapper.selectByExample(blockExample);
-        if(blockList.size()==0){
+
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,1);
+
+        if(page.getData().size()==0){
             indexInfo.setNode("");
             indexInfo.setCurrentHeight(0);
         }else{
-            Block block = blockList.get(0);
-            indexInfo.setCurrentHeight(block.getNumber());
+            BlockItem block = page.getData().get(0);
+            indexInfo.setCurrentHeight(block.getHeight());
             indexInfo.setNode(block.getMiner());
         }
 
@@ -159,7 +167,7 @@ public class CacheInitializer {
         indexInfo.setProportion(0);
         indexInfo.setTicketPrice(0);
         indexInfo.setVoteAmount(0);
-        cacheService.updateIndexCache(indexInfo,true,chainId);
+        stompCacheService.updateIndexCache(indexInfo,true,chainId);
     }
 
     /**
@@ -167,38 +175,37 @@ public class CacheInitializer {
      */
     public void initStatisticCache(String chainId){
 
+        String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+        String transactionCacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+
         StatisticInfo statisticInfo = new StatisticInfo();
 
-        // 平均出块时长 = (最高块 - 第一个块)/最高块
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(chainId);
-        blockExample.setOrderByClause("number desc");
-        PageHelper.startPage(1,1);
-        List<Block> topList = blockMapper.selectByExample(blockExample);
-        if(topList.size()==1){
-            // 先从最高块向前回溯3600个块
-            blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId);
-            blockExample.setOrderByClause("number desc");
-            PageHelper.startPage(3600,1);
-            List<Block> bottomList = blockMapper.selectByExample(blockExample);
-            if(bottomList.size()==0){
-                // 从后向前累计不足3600个块，则取链上第一个块
-                blockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId);
-                blockExample.setOrderByClause("number asc");
-                PageHelper.startPage(1,1);
-                bottomList = blockMapper.selectByExample(blockExample);
-            }
-            Block top = topList.get(0);
-            statisticInfo.setHighestBlockNumber(top.getNumber());
-            statisticInfo.setHighestBlockTimestamp(top.getTimestamp().getTime());
-            Block bottom = bottomList.get(0);
-            statisticInfo.setLowestBlockNumber(bottom.getNumber());
-            statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
 
-            long avgTime = (top.getTimestamp().getTime()-bottom.getTimestamp().getTime())/top.getNumber();
-            statisticInfo.setAvgTime(avgTime);
+        RespPage<BlockItem> topPage = redisCacheService.getBlockPage(chainId,1,1);
+
+        List<BlockItem> topList = topPage.getData();
+        if(topList.size()==1){
+            BlockItem top = topList.get(0);
+            statisticInfo.setHighestBlockNumber(top.getHeight());
+            statisticInfo.setHighestBlockTimestamp(top.getTimestamp());
+
+            // 先从最高块向前回溯3600个块
+            Set<String> bottomBlockSet = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
+            if(bottomBlockSet.size()==0){
+                // 从后向前累计不足3600个块，则正向取链上第一个块
+                bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
+            }
+            if(bottomBlockSet.size()==0){
+                logger.error("找不到初始化统计信息需要的区块信息!!");
+            }
+            if(bottomBlockSet.size()>0){
+                Block bottom = JSON.parseObject(bottomBlockSet.iterator().next(),Block.class);
+                statisticInfo.setLowestBlockNumber(bottom.getNumber());
+                statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
+
+                long avgTime = (top.getTimestamp()-bottom.getTimestamp().getTime())/top.getHeight();
+                statisticInfo.setAvgTime(avgTime);
+            }
 
         }else{
             statisticInfo.setAvgTime(0l);
@@ -241,22 +248,18 @@ public class CacheInitializer {
         statisticInfo.setDayTransaction(count);
 
         // 获取最近100个区块
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("number desc");
-        PageHelper.startPage(1,100);
-        List<Block> blockList = blockMapper.selectByExample(condition);
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,100);
         LimitQueue<StatisticItem> limitQueue = new LimitQueue<>(100);
-        blockList.forEach(block->{
+        page.getData().forEach(block->{
             StatisticItem bean = new StatisticItem();
             BeanUtils.copyProperties(block,bean);
-            bean.setHeight(block.getNumber());
-            bean.setTime(block.getTimestamp().getTime());
+            bean.setHeight(block.getHeight());
+            bean.setTime(block.getTimestamp());
             limitQueue.offer(bean);
         });
         statisticInfo.setLimitQueue(limitQueue);
 
-        cacheService.updateStatisticCache(statisticInfo,true,chainId);
+        stompCacheService.updateStatisticCache(statisticInfo,true,chainId);
 
     }
 
@@ -284,7 +287,7 @@ public class CacheInitializer {
             bean.setServerTime(serverTime);
             blockInfos.add(bean);
         }
-        cacheService.updateBlockCache(blockInfos,chainId);
+        stompCacheService.updateBlockCache(blockInfos,chainId);
     }
 
     /**
@@ -307,6 +310,6 @@ public class CacheInitializer {
             bean.setTimestamp(transaction.getTimestamp());
             transactionInfos.add(bean);
         }
-        cacheService.updateTransactionCache(transactionInfos,chainId);
+        stompCacheService.updateTransactionCache(transactionInfos,chainId);
     }
 }

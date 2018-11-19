@@ -13,10 +13,7 @@ import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.transaction.*;
-import com.platon.browser.service.AccountService;
-import com.platon.browser.service.ExportService;
-import com.platon.browser.service.PendingTxService;
-import com.platon.browser.service.TransactionService;
+import com.platon.browser.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,6 +50,9 @@ public class TransactionController {
 
     @Autowired
     private ExportService exportService;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -103,7 +103,8 @@ public class TransactionController {
      */
     @PostMapping("transactionList")
     public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionPageReq req ) {
-        RespPage<TransactionItem> page = transactionService.getTransactionPage(req);
+//        RespPage<TransactionItem> page = transactionService.getTransactionPage(req);
+        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 
