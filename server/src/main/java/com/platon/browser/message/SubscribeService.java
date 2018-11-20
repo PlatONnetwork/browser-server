@@ -12,9 +12,11 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.RedisCacheService;
@@ -51,7 +53,12 @@ public class SubscribeService {
         // 从数据库加载最高块初始化每条链上的最高块编号标记
         chainsConfig.getChainIds().forEach(chainId->{
             logger.info("初始化链[{}]的最高块编号标记...",chainId);
-            long maxBlockNumber = statisticMapper.maxBlockNumber(chainId);
+            RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,1);
+            long maxBlockNumber = 0;
+            if(page.getData().size()>0){
+                BlockItem block = page.getData().get(0);
+                maxBlockNumber = block.getHeight();
+            }
             highestBlockNumberMap.put(chainId,maxBlockNumber);
         });
     }
@@ -99,11 +106,15 @@ public class SubscribeService {
                     logger.error("消息中的块号低于当前链最高块号【当前链ID:{},最高块号:{},消息块号:{}】",chainId,highestNumber,blockDto.getNumber());
                     return;
                 }
+
+                // 消息队列中的timestamp单位是秒，此处将其转换为毫秒
+                blockDto.setTimestamp(blockDto.getTimestamp()*1000);
+
                 BlockInfo blockInfo = new BlockInfo();
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
                 blockInfo.setNode(blockDto.getMiner());
-                blockInfo.setTimestamp(blockDto.getTimestamp()*1000);
+                blockInfo.setTimestamp(blockDto.getTimestamp());
                 blockInfo.setHeight(blockDto.getNumber());
                 blockInfo.setBlockReward(blockDto.getBlockReward());
                 blockInfo.setTransaction(blockDto.getTransaction().size());
@@ -112,9 +123,12 @@ public class SubscribeService {
                 stompCacheService.updateBlockCache(blockInfoList,chainId);
 
                 // 更新redis中的区块列表缓存
-                Block block = new Block();
-                BeanUtils.copyProperties(blockDto,block);
+                Block block = JSON.parseObject(message.getStruct(),Block.class);
                 block.setChainId(chainId);
+                Date date = new Date();
+                block.setTimestamp(new Date(blockDto.getTimestamp()));
+                block.setCreateTime(date);
+                block.setUpdateTime(date);
                 Set<Block> blockSet = new HashSet<>();
                 blockSet.add(block);
                 redisCacheService.updateBlockCache(chainId,blockSet);

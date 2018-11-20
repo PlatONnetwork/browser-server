@@ -196,6 +196,8 @@ public class StompCacheInitializer {
                 bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
             }
             if(bottomBlockSet.size()==0){
+                statisticInfo.setLowestBlockNumber(top.getHeight());
+                statisticInfo.setLowestBlockTimestamp(top.getTimestamp());
                 logger.error("找不到初始化统计信息需要的区块信息!!");
             }
             if(bottomBlockSet.size()>0){
@@ -271,7 +273,8 @@ public class StompCacheInitializer {
         BlockPageReq req = new BlockPageReq();
         req.setCid(chainId);
         req.setPageSize(10);
-        RespPage<BlockItem> page = blockService.getBlockPage(req);
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
+
         List<BlockItem> items = page.getData();
         List<BlockInfo> blockInfos = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
@@ -297,7 +300,7 @@ public class StompCacheInitializer {
         TransactionPageReq req = new TransactionPageReq();
         req.setCid(chainId);
         req.setPageSize(10);
-        RespPage<TransactionItem> page = transactionService.getTransactionPage(req);
+        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         List<TransactionInfo> transactionInfos = new LinkedList<>();
         // 由于查数据库的结果是按区块号和交易索引倒排，因此在更新缓存时需要更改为正排
         List<TransactionItem> items = page.getData();
