@@ -232,7 +232,11 @@ public class StompCacheServiceImpl implements StompCacheService {
                 if(statisticInfo.getHighestBlockNumber()!=null){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
-                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
+                    if(cache.getHighestBlockTimestamp()!=null&&cache.getLowestBlockTimestamp()!=null){
+                        cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
+                    }else{
+                        cache.setAvgTime(0l);
+                    }
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()!=null){
