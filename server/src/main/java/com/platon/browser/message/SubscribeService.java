@@ -187,12 +187,12 @@ public class SubscribeService {
                 statisticInfo.setHighestBlockNumber(block.getNumber());
                 statisticInfo.setHighestBlockTimestamp(block.getTimestamp().getTime());
                 statisticInfo.setBlockCount(1l);
-                statisticInfo.setDayTransaction(Long.valueOf(blockSet.size()));
+                statisticInfo.setDayTransaction(Long.valueOf(transactionSet.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();
                 StatisticItem statisticItem = new StatisticItem();
                 statisticItem.setHeight(block.getNumber());
                 statisticItem.setTime(block.getTimestamp().getTime());
-                statisticItem.setTransaction(Long.valueOf(blockSet.size()));
+                statisticItem.setTransaction(Long.valueOf(transactionSet.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);
