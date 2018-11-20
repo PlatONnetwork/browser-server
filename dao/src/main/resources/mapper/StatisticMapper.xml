@@ -35,4 +35,8 @@
       WHERE tr.`chain_id` = #{chainId}
     ) `tmp`;
   </select>
+
+  <select id="maxBlockNumber" parameterType="java.lang.String" resultType="java.lang.Long">
+    SELECT MAX(number) FROM block WHERE chain_id = #{chainId}
+  </select>
 </mapper>

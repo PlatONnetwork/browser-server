@@ -12,7 +12,9 @@ import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.StompCacheService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,12 @@ public class StompPushTask {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-    private CacheService cacheService;
+    private StompCacheService cacheService;
     @Autowired
     private StatisticMapper statisticMapper;
+    @Autowired
+    private I18nUtil i18n;
+
     // 交易TPS统计时间间隔, 单位：分钟
     @Value("${platon.transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
@@ -60,20 +65,20 @@ public class StompPushTask {
             NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
             if(nodeIncrement.isChanged()){
                 logger.info("节点增量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeIncrement.getIncrement());
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
             }
 
             // 全量推送区块信息，1秒推送一次
             BlockInit blockInit = cacheService.getBlockInit(chainId);
-            BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
+            BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockInit.getList());
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
 
             // 全量推送交易信息，1秒推送一次
             TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
             if(transactionInit.isChanged()){
                 logger.debug("交易全量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInit.getList());
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionInit.getList());
                 messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
             }
 
@@ -83,7 +88,7 @@ public class StompPushTask {
                 // 取地址数
                 long addressCount = statisticMapper.countAddress(chainId);
                 index.setAddressAmount(addressCount);
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
             }
 
@@ -111,7 +116,7 @@ public class StompPushTask {
                 }
                 statistic.setGraphData(graphData);
 
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
+                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
             }
         });

@@ -5,7 +5,9 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomTransactionMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
@@ -14,8 +16,10 @@ import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.TransactionService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,25 +33,24 @@ import java.util.*;
 public class TransactionServiceImpl implements TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
-
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private CustomTransactionMapper customTransactionMapper;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
-    public List<TransactionItem> getTransactionList(TransactionListReq req) {
-        TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria criteria = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid());
-        if(req.getHeight()!=null){
-            // 根据块高筛选
-            criteria.andBlockNumberEqualTo(req.getHeight());
-        }
-        // 交易记录先根据区块号倒排，再根据交易索引倒排
-        condition.setOrderByClause("block_number desc,transaction_index desc");
-        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-        List<TransactionItem> transactionList = new ArrayList<>();
+    public RespPage<TransactionItem> getTransactionPage(TransactionPageReq req) {
+        TransactionPage page = new TransactionPage();
+        BeanUtils.copyProperties(req,page);
+        int startPage = req.getPageNo()<=1?0:req.getPageNo()-1;
+        int offset = startPage*req.getPageSize();
+        page.setOffset(offset);
+        List<Transaction> transactions = customTransactionMapper.selectByPage(page);
+
         long serverTime = System.currentTimeMillis();
 
         // 查询交易所属的区块信息
@@ -62,6 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
             blocks.forEach(block->map.put(block.getNumber(),block));
         }
 
+        List<TransactionItem> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
             TransactionItem bean = new TransactionItem();
             BeanUtils.copyProperties(transaction,bean);
@@ -74,7 +78,26 @@ public class TransactionServiceImpl implements TransactionService {
             }
             transactionList.add(bean);
         });
-        return transactionList;
+
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria criteria = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid());
+        if(req.getHeight()!=null){
+            // 根据块高筛选
+            criteria.andBlockNumberEqualTo(req.getHeight());
+        }
+        // 交易记录先根据区块号倒排，再根据交易索引倒排
+        condition.setOrderByClause("block_number desc,transaction_index desc");
+        Long count = transactionMapper.countByExample(condition);
+        Long totalPages = count/req.getPageSize();
+        if(count%req.getPageSize()!=0){
+            totalPages+=1;
+        }
+        RespPage<TransactionItem> respPage = new RespPage<>();
+        respPage.setTotalCount(count.intValue());
+        respPage.setTotalPages(totalPages.intValue());
+        respPage.setData(transactionList);
+        return respPage;
     }
 
     @Override
@@ -84,11 +107,11 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(),i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
         }
         TransactionDetail transactionDetail = new TransactionDetail();
         TransactionWithBLOBs transaction = transactions.get(0);
@@ -160,11 +183,11 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = transactionMapper.selectByExample(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
         }
         Transaction currTransaction = transactions.get(0);
 
@@ -188,7 +211,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (transactionList.size()>1){
             // 同一区块出现多条交易索引相同的记录
             logger.error("duplicate transaction: transaction index {}",currTransaction.getTransactionIndex()+step);
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
         }
 
         TransactionDetailNavigate transactionDetailNavigate = new TransactionDetailNavigate();
@@ -277,7 +300,7 @@ public class TransactionServiceImpl implements TransactionService {
             if(blockList.size()==0){
                 // 查询无结果，则认为向前或向后浏览已经没有交易记录，直接抛异常结束
                 logger.error("no more transaction");
-                throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+                throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
             }
 
             // 取第一条记录，记为A区块，作为返回给客户端的数据
@@ -374,7 +397,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionList = transactionMapper.selectByExampleWithBLOBs(condition);
             if(transactionList.size()==0){
                 logger.error("no transaction found in block: {}",prevOrNextBlockNumber);
-                throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+                throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
             }
             TransactionWithBLOBs transaction = transactionList.get(0);
             BeanUtils.copyProperties(transaction,transactionDetailNavigate);

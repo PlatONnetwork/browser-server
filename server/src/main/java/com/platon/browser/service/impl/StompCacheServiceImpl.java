@@ -11,7 +11,7 @@ import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.StompCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +30,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 提供首页节点信息、指标信息、统计信息、区块信息、交易信息
  */
 @Service
-public class CacheServiceImpl implements CacheService {
+public class StompCacheServiceImpl implements StompCacheService {
 
     @Autowired
     private ChainsConfig chainsConfig;
 
-    private final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
     // 初始数据Map
     private Map<String,Set<NodeInfo>> nodeInitMap = new ConcurrentHashMap<>();

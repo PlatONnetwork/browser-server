@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * 进程缓存服务
  */
-public interface CacheService {
+public interface StompCacheService {
 
     // 取增量数据
     NodeIncrement getNodeIncrement(String chainId);

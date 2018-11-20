@@ -3,8 +3,11 @@ package com.platon.browser.controller;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +22,10 @@ import java.util.Map;
 @ControllerAdvice
 public class ValidateControllerAdvice {
     Logger logger= LoggerFactory.getLogger(ValidateControllerAdvice.class);
+
+    @Autowired
+    private I18nUtil i18n;
+
     /**
      * 捕获bean校验未通过异常
      */
@@ -31,7 +38,7 @@ public class ValidateControllerAdvice {
             msg.put(error.getField(),error.getDefaultMessage());
             logger.error(error.getField()+":"+error.getDefaultMessage());
         }
-        return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),RetEnum.RET_PARAM_VALLID.getName(),msg);
+        return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.REQUEST_INVALID_PARAM),msg);
     }
 
     /**
@@ -42,12 +49,13 @@ public class ValidateControllerAdvice {
     @ExceptionHandler(ResponseException.class)
     @ResponseBody
     public BaseResp responseExceptionHandler(ResponseException e) {
-        return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(),RetEnum.RET_SYS_EXCEPTION.getName(),e.getMessage());
+        return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(),e.getMessage(),e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public BaseResp notReadableHandler(HttpMessageNotReadableException e) {
-        return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),RetEnum.RET_PARAM_VALLID.getName(),null);
+        return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.REQUEST_INVALID_PARAM),null);
     }
+
 }

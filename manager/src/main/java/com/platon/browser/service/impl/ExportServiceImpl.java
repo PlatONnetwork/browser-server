@@ -8,6 +8,8 @@ import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.ExportService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.slf4j.Logger;
@@ -30,11 +32,13 @@ public class ExportServiceImpl implements ExportService {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
     public AccountDowload exportAccountCsv(AccountDownloadReq req) {
-
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
         AccountDetailReq accountDetailReq = new AccountDetailReq();
         // 一页取完所有数据
@@ -48,17 +52,17 @@ public class ExportServiceImpl implements ExportService {
             String transactionType;
             try {
                 TransactionTypeEnum type = TransactionTypeEnum.getEnum(transaction.getTxType());
-                transactionType = type.desc;
+                transactionType = i18n.i(I18nEnum.valueOf(type.name()));
             }catch (IllegalArgumentException iae){
-                transactionType = "未知类型";
+                transactionType = i18n.i(I18nEnum.UNKNOWN_TYPE);
             }
 
             String transactionStatus;
             try{
                 TransactionStatusEnum status = TransactionStatusEnum.getEnum(transaction.getTxReceiptStatus());
-                transactionStatus = status.desc;
+                transactionStatus = i18n.i(I18nEnum.valueOf(status.name()));
             }catch (IllegalArgumentException iae){
-                transactionStatus = "未知状态";
+                transactionStatus = i18n.i(I18nEnum.UNKNOWN_STATUS);
             }
 
             Object[] row = {
@@ -77,7 +81,16 @@ public class ExportServiceImpl implements ExportService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer outputWriter = new OutputStreamWriter(baos);
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders("交易哈希值", "确认时间", "类型", "发送方", "接收方","数额","交易费用","交易状态");
+        writer.writeHeaders(
+                i18n.i(I18nEnum.DOWNLOAD_CSV_HASH),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_TIME),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_TYPE),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_FROM),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_TO),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_VALUE),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_FEE),
+                i18n.i(I18nEnum.DOWNLOAD_CSV_STATUS)
+        );
         writer.writeRowsAndClose(rows);
         AccountDowload accountDowload = new AccountDowload();
         accountDowload.setData(baos.toByteArray());

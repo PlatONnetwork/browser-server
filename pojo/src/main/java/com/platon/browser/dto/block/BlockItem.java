@@ -7,7 +7,7 @@ public class BlockItem {
     private long height;
     private long timestamp;
     private long transaction;
-    private int size;
+    private Integer size;
     private String miner;
     private String energonUsed;
     private String energonLimit;

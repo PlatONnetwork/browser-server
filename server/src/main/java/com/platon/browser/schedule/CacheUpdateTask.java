@@ -5,7 +5,7 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.service.CacheService;
+import com.platon.browser.service.StompCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class CacheUpdateTask {
     // 保存每条链的上次TPS统计的时间戳
     private Map<String,Long> prevTimestampMap = new HashMap<>();
     @Autowired
-    private CacheService cacheService;
+    private StompCacheService cacheService;
     @Autowired
     private TransactionMapper transactionMapper;
 

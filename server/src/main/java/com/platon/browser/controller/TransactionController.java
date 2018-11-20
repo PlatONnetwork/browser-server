@@ -4,19 +4,19 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dto.account.AddressDetail;
+import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDowload;
+import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.transaction.*;
-import com.platon.browser.service.AccountService;
-import com.platon.browser.service.ExportService;
-import com.platon.browser.service.PendingTxService;
-import com.platon.browser.service.TransactionService;
-import com.platon.browser.util.DateUtil;
+import com.platon.browser.service.*;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -41,18 +41,20 @@ import java.util.List;
 public class TransactionController {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionController.class);
-
     @Autowired
-    private TransactionService transactionService;
-
+    private I18nUtil i18n;
     @Autowired
-    private PendingTxService pendingTxService;
-
-    @Autowired
-    private AccountService accountService;
-
+    private ChainsConfig chainsConfig;
     @Autowired
     private ExportService exportService;
+    @Autowired
+    private AccountService accountService;
+    @Autowired
+    private PendingTxService pendingTxService;
+    @Autowired
+    private RedisCacheService redisCacheService;
+    @Autowired
+    private TransactionService transactionService;
 
     /**
      * @api {post} transaction/transactionList a.交易列表
@@ -102,10 +104,12 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public JsonResp transactionList (@Valid @RequestBody TransactionListReq req ) {
-        req.buildPage();
-        List<TransactionItem> transactionListList = transactionService.getTransactionList(req);
-        return JsonResp.asList().addAll(transactionListList).pagination(req).build();
+    public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionPageReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
+        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        return page;
     }
 
     /**
@@ -156,11 +160,14 @@ public class TransactionController {
      */
     @PostMapping("transactionDetails")
     public BaseResp transactionDetails (@Valid @RequestBody TransactionDetailReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             TransactionDetail transactionDetail = transactionService.getTransactionDetail(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetail);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -213,11 +220,14 @@ public class TransactionController {
      */
     @PostMapping("transactionDetailNavigate")
     public BaseResp transactionDetailNavigate (@Valid @RequestBody TransactionDetailNavigateReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             TransactionDetailNavigate transactionDetailNavigate = transactionService.getTransactionDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionDetailNavigate);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailNavigate);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -267,7 +277,10 @@ public class TransactionController {
      * }
      */
     @PostMapping("pendingList")
-    public JsonResp pendingList (@Valid @RequestBody PendingTxListReq req ) {
+    public JsonResp pendingList (@Valid @RequestBody PendingTxListReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         req.buildPage();
         List<PendingTxItem> pendingTxList = pendingTxService.getTransactionList(req);
         return JsonResp.asList().addAll(pendingTxList).pagination(req).build();
@@ -326,11 +339,14 @@ public class TransactionController {
      */
     @PostMapping("pendingDetails")
     public BaseResp pendingDetails (@Valid @RequestBody PendingTxDetailReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingOrTransaction);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),pendingOrTransaction);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -445,6 +461,9 @@ public class TransactionController {
      */
     @PostMapping("addressDetails")
     public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             req.setPageSize(20);
             List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
@@ -455,9 +474,9 @@ public class TransactionController {
             }else{
                 addressDetail.setTrades(transactionList);
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),addressDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),addressDetail);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -469,7 +488,7 @@ public class TransactionController {
             response.getOutputStream().write(data);
         } catch (IOException e) {
             logger.error(e.getMessage());
-            throw new ResponseException("下载数据异常！");
+            throw new ResponseException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
     /**
@@ -491,18 +510,17 @@ public class TransactionController {
         AccountDownloadReq req = new AccountDownloadReq();
         req.setCid(cid);
         req.setAddress(address);
-        req.setStartDate(DateUtil.getYearFirstDate(new Date()));
         try {
             SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date endDate = ymd.parse(date);
-            String ymdStr = ymd.format(endDate);
-            String ymdhmsStr = ymdStr+" 23:59:59";
-            req.setEndDate(ymdhms.parse(ymdhmsStr));
+            Date startDate = ymd.parse(date);
+            String startStr = ymd.format(startDate);
+            req.setStartDate(ymdhms.parse(startStr+" 00:00:00"));
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new ResponseException("日期格式错误！");
+            throw new ResponseException(i18n.i(I18nEnum.FORMAT_DATE_ERROR));
         }
+        req.setEndDate(new Date());
         AccountDowload accountDownload = exportService.exportAccountCsv(req);
         download(response,accountDownload.getFilename(),accountDownload.getLength(),accountDownload.getData());
     }
@@ -563,6 +581,9 @@ public class TransactionController {
      */
     @PostMapping("contractDetails")
     public BaseResp contractDetails (@Valid @RequestBody AccountDetailReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             req.setPageSize(20);
             List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
@@ -573,9 +594,9 @@ public class TransactionController {
             }else{
                 contractDetail.setTrades(transactionList);
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),contractDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),contractDetail);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -644,11 +665,13 @@ public class TransactionController {
      * }
      */
     @PostMapping("blockTransaction")
-    public JsonResp blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
-        TransactionListReq tlr = new TransactionListReq();
+    public RespPage<TransactionItem> blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
+        TransactionPageReq tlr = new TransactionPageReq();
         BeanUtils.copyProperties(req,tlr);
-        tlr.buildPage();
-        List<TransactionItem> transactionListList = transactionService.getTransactionList(tlr);
-        return JsonResp.asList().addAll(transactionListList).pagination(tlr).build();
+        RespPage<TransactionItem> page = transactionService.getTransactionPage(tlr);
+        return page;
     }
 }

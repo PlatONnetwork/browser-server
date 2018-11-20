@@ -9,4 +9,5 @@ public interface StatisticMapper {
     long countTransactionBlock(@Param("chainId") String chainId);
     long countTransactionIn24Hours(@Param("chainId") String chainId);
     BigDecimal countAvgTransactionPerBlock(@Param("chainId") String chainId);
+    long maxBlockNumber(@Param("chainId") String chainId);
 }

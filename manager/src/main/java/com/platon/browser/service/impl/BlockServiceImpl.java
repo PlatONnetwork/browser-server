@@ -4,9 +4,12 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.BlockPage;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockItem;
@@ -14,8 +17,10 @@ import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.block.BlockListReq;
+import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -29,19 +34,23 @@ import java.util.List;
 public class BlockServiceImpl implements BlockService {
 
     private final Logger logger = LoggerFactory.getLogger(BlockServiceImpl.class);
-
     @Autowired
     private BlockMapper blockMapper;
-
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
-    public List<BlockItem> getBlockList(BlockListReq req) {
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid());
-        condition.setOrderByClause("number desc");
-        List<Block> blocks = blockMapper.selectByExample(condition);
+    public RespPage<BlockItem> getBlockPage(BlockPageReq req) {
+        BlockPage page = new BlockPage();
+        BeanUtils.copyProperties(req,page);
+        int startPage = req.getPageNo()<=1?0:req.getPageNo()-1;
+        int offset = startPage*req.getPageSize();
+        page.setOffset(offset);
+        List<Block> blocks = customBlockMapper.selectByPage(page);
         List<BlockItem> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
@@ -53,7 +62,19 @@ public class BlockServiceImpl implements BlockService {
             bean.setTransaction(block.getTransactionNumber());
             blockList.add(bean);
         });
-        return blockList;
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid());
+        condition.setOrderByClause("number desc");
+        Long count = blockMapper.countByExample(condition);
+        Long totalPages = count/req.getPageSize();
+        if(count%req.getPageSize()!=0){
+            totalPages+=1;
+        }
+        RespPage<BlockItem> respPage = new RespPage<>();
+        respPage.setTotalCount(count.intValue());
+        respPage.setTotalPages(totalPages.intValue());
+        respPage.setData(blockList);
+        return respPage;
     }
 
     @Override
@@ -63,11 +84,11 @@ public class BlockServiceImpl implements BlockService {
         List<Block> blocks = blockMapper.selectByExample(condition);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
             logger.error("invalid block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_NOT_EXIST));
         }
         BlockDetail blockDetail = new BlockDetail();
         Block block = blocks.get(0);
@@ -86,7 +107,7 @@ public class BlockServiceImpl implements BlockService {
         blocks = blockMapper.selectByExample(condition);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
             blockDetail.setTimeDiff(0);

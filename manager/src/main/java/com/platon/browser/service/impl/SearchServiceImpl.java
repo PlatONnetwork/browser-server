@@ -21,6 +21,8 @@ import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -50,6 +52,8 @@ public class SearchServiceImpl implements SearchService {
     private PendingTxService pendingTxService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
     public Query search ( SearchParam param ) {
@@ -66,7 +70,7 @@ public class SearchServiceImpl implements SearchService {
         if (!isNumber) {
             //为false则可能为区块交易hash或者为账户
             if(keyword.length()<=2)
-                throw new BusinessException("请输入长度大于2的查询关键字!");
+                throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
             if("0x".equals(keyword.substring(0, 2)) && keyword.length() == 42)
                 isAccountOrContract = true;
             else
@@ -179,10 +183,10 @@ public class SearchServiceImpl implements SearchService {
                 try{
                     PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
                     query.setType(pendingOrTransaction.getType());
-                    query.setStruct(pendingOrTransaction);
+                    query.setStruct(pendingOrTransaction.getPending());
                     return query;
                 }catch (BusinessException be2){
-                    throw new BusinessException("输入的关键字查询不到任何内容！");
+                    throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
                 }
             }
         }
@@ -198,10 +202,10 @@ public class SearchServiceImpl implements SearchService {
                 query.setType("block");
                 return query;
             }catch (BusinessException be){
-                throw new BusinessException("输入的关键字查询不到任何内容！");
+                throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
             }
         }
 
-        throw new BusinessException("输入的关键字查询不到任何内容！");
+        throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
     }
 }
