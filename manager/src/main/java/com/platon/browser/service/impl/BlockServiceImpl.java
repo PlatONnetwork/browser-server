@@ -94,6 +94,7 @@ public class BlockServiceImpl implements BlockService {
         Block block = blocks.get(0);
         BeanUtils.copyProperties(block,blockDetail);
         blockDetail.setHeight(block.getNumber());
+        blockDetail.setTransaction(block.getTransactionNumber());
         blockDetail.setTimestamp(block.getTimestamp().getTime());
 
         // 取上一个区块
