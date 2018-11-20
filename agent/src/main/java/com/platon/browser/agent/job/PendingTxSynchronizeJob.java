@@ -19,6 +19,7 @@ import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 import org.web3j.protocol.core.methods.response.Transaction;
 import rx.Observable;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +72,7 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                     pendingTransactionDto.setEnergonPrice(transaction.getGasPrice());
                     pendingTransactionDto.setNonce(transaction.getNonce().toString());
                     pendingTransactionDto.setTimestamp(new Date().getTime());
-                    pendingTransactionDto.setValue(transaction.getValue().toString());
+                    pendingTransactionDto.setValue(valueConversion(transaction.getValue()));
                     pendingTransactionDto.setInput(transaction.getInput());
                     String type = TransactionType.geTransactionTyep(!transaction.getInput().equals(null) ? transaction.getInput() : "0x");
                     pendingTransactionDto.setTxType(type);
@@ -88,4 +89,11 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
             log.info("PendingTxSynchrinizeJob-->{}", stopWatch.shortSummary());
         }
     }
+
+    public String valueConversion(BigInteger value){
+        BigDecimal valueDiec = new BigDecimal(value.toString());
+        BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
+        return  conversionCoin.toString();
+    }
+
 }
