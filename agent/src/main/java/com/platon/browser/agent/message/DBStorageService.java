@@ -161,6 +161,7 @@ public class DBStorageService {
                 pendingTx.setCreateTime(new Date());
                 pendingTx.setEnergonLimit(pendingTransactionDto.getEnergonLimit().toString());
                 pendingTx.setEnergonPrice(pendingTransactionDto.getEnergonPrice().toString());
+                pendingTx.setReceiveType(pendingTransactionDto.getReceiveType());
                 pendingTx.setEnergonUsed("pending");
                 pendingTx.setTimestamp(new Date(pendingTransactionDto.getTimestamp()));
                 pendingTx.setChainId(message.getChainId());

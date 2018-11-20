@@ -194,6 +194,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setEnergonUsed(receipt.getGasUsed());
                 transactionDto.setNonce(transaction.getNonce().toString());
                 transactionDto.setValue(valueConversion(transaction.getValue()));
+                //transactionDto.setInput(transaction.getInput());
                 transactionDto.setTxReceiptStatus(null != receipt.getStatus() ? receipt.getStatus() : "0x0");
                 transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                 String input = transactionDto.getInput();
@@ -204,6 +205,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     } else {
                         transactionDto.setReceiveType("contract");
                     }
+                }else{
+                    transactionDto.setTo("0x");
+                    transactionDto.setReceiveType("contract");
                 }
                 String type = TransactionType.geTransactionTyep(input);
                 transactionDto.setTxType(type);
@@ -234,20 +238,14 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         return  conversionCoin.toString();
     }
 
-/*
     public static void main(String args[]){
         Web3j web3j = Web3jClient.getWeb3jClient();
+
+        BlockSynchronizeJob synchronizeJob = new BlockSynchronizeJob();
         try {
-            EthGetCode ethGetCode = web3j.ethGetCode("0x3809a998ac1c91f12d1d6643d5445cf7b6e036db", DefaultBlockParameterName.LATEST).send();
-            System.out.println(ethGetCode.getCode());
-        } catch (IOException e) {
+            synchronizeJob.buildStruct(263136,web3j);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-      BigDecimal a = new BigDecimal(new BigInteger("0").toString());
-         BigDecimal bigDecimal = a.divide(new BigDecimal("1000000000000000000"));
-      System.out.println(bigDecimal);
-        BlockSynchronizeJob synchronizeJob = new BlockSynchronizeJob();
-        String a = synchronizeJob.valueConversion(new BigInteger("12000000000000000000"));
-        System.out.println(a);
-    }*/
+    }
 }
