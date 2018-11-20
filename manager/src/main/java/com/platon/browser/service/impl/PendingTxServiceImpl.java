@@ -18,6 +18,8 @@ import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxListReq;
 import com.platon.browser.service.PendingTxService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,8 @@ public class PendingTxServiceImpl implements PendingTxService {
     private PendingTxMapper pendingTxMapper;
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
     public List<PendingTxItem> getTransactionList(PendingTxListReq req) {
@@ -82,11 +86,11 @@ public class PendingTxServiceImpl implements PendingTxService {
         List<PendingTx> transactions = pendingTxMapper.selectByExampleWithBLOBs(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.PENDING_ERROR_DUPLICATE));
         }
         if(transactions.size()==0){
             logger.error("invalid transaction hash {}",req.getTxHash());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.PENDING_ERROR_NOT_EXIST));
         }
         PendingTxDetail pendingTxDetail = new PendingTxDetail();
         PendingTx transaction = transactions.get(0);
@@ -150,7 +154,7 @@ public class PendingTxServiceImpl implements PendingTxService {
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
         if(pendingTxes.size()==0){
             logger.error("no more pending transactions");
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), TransactionErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.PENDING_ERROR_NOT_EXIST));
         }
 
         PendingTx pendingTx = pendingTxes.get(0);

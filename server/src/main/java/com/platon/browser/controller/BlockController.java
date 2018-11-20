@@ -3,15 +3,19 @@ package com.platon.browser.controller;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +36,13 @@ import javax.validation.Valid;
 public class BlockController  {
 
     @Autowired
+    private I18nUtil i18n;
+    @Autowired
+    private ChainsConfig chainsConfig;
+    @Autowired
     private BlockService blockService;
     @Autowired
     private RedisCacheService redisCacheService;
-
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
     /**
@@ -77,7 +84,9 @@ public class BlockController  {
      */
     @PostMapping("blockList")
     public RespPage<BlockItem> blockList (@Valid @RequestBody BlockPageReq req) {
-//        RespPage<BlockItem> page = blockService.getBlockPage(req);
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         RespPage<BlockItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
@@ -118,11 +127,14 @@ public class BlockController  {
      */
     @PostMapping("blockDetails")
     public BaseResp blockDetails (@Valid @RequestBody BlockDetailReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             BlockDetail blockDetail = blockService.getBlockDetail(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetail);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 
@@ -164,11 +176,14 @@ public class BlockController  {
      */
     @PostMapping("blockDetailNavigate")
     public BaseResp blockDetailNavigate (@Valid @RequestBody BlockDetailNavigateReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
         try{
             BlockDetailNavigate blockDetailNavigate = blockService.getBlockDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockDetailNavigate);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailNavigate);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getMessage());
         }
     }
 }

@@ -19,6 +19,8 @@ import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -32,15 +34,14 @@ import java.util.List;
 public class BlockServiceImpl implements BlockService {
 
     private final Logger logger = LoggerFactory.getLogger(BlockServiceImpl.class);
-
     @Autowired
     private BlockMapper blockMapper;
-
     @Autowired
     private TransactionMapper transactionMapper;
-
     @Autowired
     private CustomBlockMapper customBlockMapper;
+    @Autowired
+    private I18nUtil i18n;
 
     @Override
     public RespPage<BlockItem> getBlockPage(BlockPageReq req) {
@@ -83,11 +84,11 @@ public class BlockServiceImpl implements BlockService {
         List<Block> blocks = blockMapper.selectByExample(condition);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
             logger.error("invalid block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.NOT_EXIST.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_NOT_EXIST));
         }
         BlockDetail blockDetail = new BlockDetail();
         Block block = blocks.get(0);
@@ -106,7 +107,7 @@ public class BlockServiceImpl implements BlockService {
         blocks = blockMapper.selectByExample(condition);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), BlockErrorEnum.DUPLICATE.desc);
+            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
             blockDetail.setTimeDiff(0);

@@ -10,6 +10,8 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,13 +38,13 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private long maxItemNum;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
-
-    @Autowired
-    private ChainsConfig chainsConfig;
-
+    private I18nUtil i18n;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private ChainsConfig chainsConfig;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     /**
      * 更新区块缓存
@@ -132,6 +134,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         RespPage<BlockItem> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         page.setTotalCount(size.intValue());
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){
@@ -175,6 +178,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         RespPage<TransactionItem> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         page.setTotalCount(size.intValue());
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){

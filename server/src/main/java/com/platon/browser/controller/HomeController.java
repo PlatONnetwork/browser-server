@@ -10,11 +10,14 @@ import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
-import com.platon.browser.service.StompCacheService;
+import com.platon.browser.util.I18nUtil;
 import com.platon.browser.service.SearchService;
+import com.platon.browser.service.StompCacheService;
+import com.platon.browser.util.I18nEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,15 +38,15 @@ import java.util.Set;
 public class HomeController {
 
     private static Logger logger = LoggerFactory.getLogger(HomeController.class);
-
+    @Autowired
+    private I18nUtil i18n;
     @Autowired
     private ChainsConfig chainsConfig;
-
+    @Autowired
+    private SearchService searchService;
     @Autowired
     private StompCacheService cacheService;
 
-    @Autowired
-    private SearchService searchService;
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
@@ -72,10 +75,10 @@ public class HomeController {
     public BaseResp nodeInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
         if(!chainsConfig.isValid(chainId)){
-            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
         Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeInfoList);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
         return resp;
     }
 
@@ -124,10 +127,10 @@ public class HomeController {
     public BaseResp indexInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
         if(!chainsConfig.isValid(chainId)){
-            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
         IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),indexInfo);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),indexInfo);
         return resp;
     }
 
@@ -176,7 +179,7 @@ public class HomeController {
     public BaseResp statisticInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
         if(!chainsConfig.isValid(chainId)){
-            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
         StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
 
@@ -202,7 +205,7 @@ public class HomeController {
         statistic.setGraphData(graphData);
 
 
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
         return resp;
     }
 
@@ -248,10 +251,10 @@ public class HomeController {
     public BaseResp blockInit(@DestinationVariable String chainId) {
         logger.debug("获取区块列表初始数据！");
         if(!chainsConfig.isValid(chainId)){
-            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
         BlockInit blockInit = cacheService.getBlockInit(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockInit.getList());
         return resp;
     }
 
@@ -307,10 +310,10 @@ public class HomeController {
     public BaseResp transactionInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
         if(!chainsConfig.isValid(chainId)){
-            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),"链ID错误！",null);
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
         TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInit.getList());
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionInit.getList());
         return resp;
     }
 
@@ -363,11 +366,14 @@ public class HomeController {
      */
 
 
+    @Autowired
+    private MessageSource messageSource;
+
     @PostMapping("/home/query")
     public BaseResp search(@Valid @RequestBody SearchParam param){
         try{
             Query query = searchService.search(param);
-            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),query);
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),query);
             return resp;
         }catch (BusinessException be){
             return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
