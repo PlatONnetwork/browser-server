@@ -10,15 +10,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Data
 public class StatisticInfo {
-    private Long avgTime;
+    private long avgTime;
 
-    private Long current;
+    private long current;
 
-    private Double maxTps;
+    private long maxTps;
 
     private BigDecimal avgTransaction;
 
-    private Long dayTransaction;
+    private long dayTransaction;
 
     private StatisticGraphData graphData;
 
@@ -27,17 +27,17 @@ public class StatisticInfo {
     @JsonIgnore
     private LimitQueue<StatisticItem> limitQueue;
     @JsonIgnore
-    private Long transactionCount;
+    private long transactionCount;
     @JsonIgnore
-    private Long blockCount;
+    private long blockCount;
     @JsonIgnore
-    private Long highestBlockNumber;
+    private long highestBlockNumber;
     @JsonIgnore
-    private Long lowestBlockNumber;
+    private long lowestBlockNumber;
     @JsonIgnore
-    private Long highestBlockTimestamp;
+    private long highestBlockTimestamp;
     @JsonIgnore
-    private Long lowestBlockTimestamp;
+    private long lowestBlockTimestamp;
 
     @JsonIgnore
     private boolean changed=false;
