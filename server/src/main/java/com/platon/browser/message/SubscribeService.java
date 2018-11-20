@@ -10,15 +10,12 @@ import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
-import com.platon.browser.dto.block.BlockInfo;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.GeoUtil;
@@ -43,8 +40,6 @@ public class SubscribeService {
     private StompCacheService stompCacheService;
     @Autowired
     private ChainsConfig chainsConfig;
-    @Autowired
-    private StatisticMapper statisticMapper;
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -110,7 +105,7 @@ public class SubscribeService {
                 // 消息队列中的timestamp单位是秒，此处将其转换为毫秒
                 blockDto.setTimestamp(blockDto.getTimestamp()*1000);
 
-                BlockInfo blockInfo = new BlockInfo();
+                /*BlockInfo blockInfo = new BlockInfo();
                 BeanUtils.copyProperties(blockDto,blockInfo);
                 blockInfo.setServerTime(System.currentTimeMillis());
                 blockInfo.setNode(blockDto.getMiner());
@@ -120,7 +115,7 @@ public class SubscribeService {
                 blockInfo.setTransaction(blockDto.getTransaction().size());
                 List<BlockInfo> blockInfoList = new ArrayList<>();
                 blockInfoList.add(blockInfo);
-                stompCacheService.updateBlockCache(blockInfoList,chainId);
+                stompCacheService.updateBlockCache(blockInfoList,chainId);*/
 
                 // 更新redis中的区块列表缓存
                 Block block = JSON.parseObject(message.getStruct(),Block.class);
@@ -135,7 +130,7 @@ public class SubscribeService {
 
                 logger.debug("  |- 更新指标信息中的当前块高和当前交易数...");
                 indexInfo = new IndexInfo();
-                indexInfo.setCurrentHeight(blockInfo.getHeight());
+                indexInfo.setCurrentHeight(block.getNumber());
                 indexInfo.setCurrentTransaction(blockDto.getTransaction().size());
                 stompCacheService.updateIndexCache(indexInfo,false, chainId);
 
@@ -152,10 +147,10 @@ public class SubscribeService {
                 });
 
                 Set<Transaction> transactionSet = new HashSet<>();
-                List<TransactionInfo> transactionInfos = new LinkedList<>();
+                //List<TransactionInfo> transactionInfos = new LinkedList<>();
                 if(transactionDtos.size()>0){
                     transactionDtos.forEach(transactionDto -> {
-                        TransactionInfo bean = new TransactionInfo();
+                        /*TransactionInfo bean = new TransactionInfo();
                         BeanUtils.copyProperties(transactionDto,bean);
                         bean.setTxHash(transactionDto.getHash());
                         bean.setTimestamp(transactionDto.getTimestamp());
@@ -164,29 +159,29 @@ public class SubscribeService {
                         bean.setTo(transactionDto.getTo());
                         bean.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
                         bean.setValue(transactionDto.getValue());
-                        transactionInfos.add(bean);
+                        transactionInfos.add(bean);*/
 
                         Transaction transaction = new Transaction();
                         BeanUtils.copyProperties(transactionDto,transaction);
                         transaction.setChainId(chainId);
                         transactionSet.add(transaction);
                     });
-                    stompCacheService.updateTransactionCache(transactionInfos,chainId);
+                    //stompCacheService.updateTransactionCache(transactionInfos,chainId);
                     // 更新redis中的交易列表缓存
                     redisCacheService.updateTransactionCache(chainId,transactionSet);
                 }
 
                 logger.debug("  |- 更新统计缓存...");
                 StatisticInfo statisticInfo = new StatisticInfo();
-                statisticInfo.setHighestBlockNumber(blockInfo.getHeight());
-                statisticInfo.setHighestBlockTimestamp(blockInfo.getTimestamp());
+                statisticInfo.setHighestBlockNumber(block.getNumber());
+                statisticInfo.setHighestBlockTimestamp(block.getTimestamp().getTime());
                 statisticInfo.setBlockCount(1l);
-                statisticInfo.setDayTransaction(Long.valueOf(transactionInfos.size()));
+                statisticInfo.setDayTransaction(Long.valueOf(blockSet.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();
                 StatisticItem statisticItem = new StatisticItem();
-                statisticItem.setHeight(blockInfo.getHeight());
-                statisticItem.setTime(blockInfo.getTimestamp());
-                statisticItem.setTransaction(Long.valueOf(transactionInfos.size()));
+                statisticItem.setHeight(block.getNumber());
+                statisticItem.setTime(block.getTimestamp().getTime());
+                statisticItem.setTransaction(Long.valueOf(blockSet.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);

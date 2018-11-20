@@ -2,15 +2,19 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,6 +38,8 @@ public class StompCacheServiceImpl implements StompCacheService {
 
     @Autowired
     private ChainsConfig chainsConfig;
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
@@ -263,7 +269,7 @@ public class StompCacheServiceImpl implements StompCacheService {
 
     @Override
     public BlockInit getBlockInit(String chainId) {
-        LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
+        /*LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
@@ -282,12 +288,24 @@ public class StompCacheServiceImpl implements StompCacheService {
             return blockInit;
         }finally {
             lock.readLock().unlock();
-        }
+        }*/
+
+        // 直接从缓存取最新的10条数据
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,10);
+        BlockInit blockInit = new BlockInit();
+        List<BlockInfo> blockInfoList = new LinkedList<>();
+        page.getData().forEach(blockItem -> {
+            BlockInfo bean = new BlockInfo();
+            blockInfoList.add(bean);
+            BeanUtils.copyProperties(blockItem,bean);
+        });
+        blockInit.setList(blockInfoList);
+        return blockInit;
     }
 
     @Override
     public void updateBlockCache(List<BlockInfo> blockInfos, String chainId) {
-        logger.debug("更新链【ID={}】的块列表缓存",chainId);
+        /*logger.debug("更新链【ID={}】的块列表缓存",chainId);
         LimitQueue<BlockInfo> init = blockInitMap.get(chainId);
         ReentrantReadWriteLock lock = init.getLock();
         lock.writeLock().lock();
@@ -296,12 +314,12 @@ public class StompCacheServiceImpl implements StompCacheService {
             init.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 
     @Override
     public TransactionInit getTransactionInit(String chainId) {
-        LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
+        /*LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
@@ -319,12 +337,24 @@ public class StompCacheServiceImpl implements StompCacheService {
             return transactionInit;
         }finally {
             lock.readLock().unlock();
-        }
+        }*/
+
+        // 直接从缓存取最新的10条数据
+        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(chainId,1,10);
+        TransactionInit transactionInit = new TransactionInit();
+        List<TransactionInfo> transactionInfoList = new LinkedList<>();
+        page.getData().forEach(transactionItem -> {
+            TransactionInfo bean = new TransactionInfo();
+            transactionInfoList.add(bean);
+            BeanUtils.copyProperties(transactionItem,bean);
+        });
+        transactionInit.setList(transactionInfoList);
+        return transactionInit;
     }
 
     @Override
     public void updateTransactionCache(List<TransactionInfo> transactionInfos, String chainId) {
-        logger.debug("更新链【ID={}】的交易列表缓存",chainId);
+       /* logger.debug("更新链【ID={}】的交易列表缓存",chainId);
         LimitQueue<TransactionInfo> init = transactionInitMap.get(chainId);
         ReentrantReadWriteLock lock = init.getLock();
         lock.writeLock().lock();
@@ -333,6 +363,6 @@ public class StompCacheServiceImpl implements StompCacheService {
             init.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 }
