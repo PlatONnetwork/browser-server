@@ -149,17 +149,17 @@ public class StompCacheServiceImpl implements StompCacheService {
                     index.setNode(indexInfo.getNode());
                     changed=true;
                 }
-                if(indexInfo.getCurrentHeight()!=0){
+                if(indexInfo.getCurrentHeight()>0){
                     // 更新当前区块高度
                     index.setCurrentHeight(indexInfo.getCurrentHeight());
                     changed=true;
                 }
-                if(indexInfo.getConsensusNodeAmount()!=0){
+                if(indexInfo.getConsensusNodeAmount()>0){
                     // 更新共识节点数
                     index.setConsensusNodeAmount(index.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
                     changed=true;
                 }
-                if(indexInfo.getCurrentTransaction()!=0){
+                if(indexInfo.getCurrentTransaction()>0){
                     // 更新当前交易数
                     index.setCurrentTransaction(index.getCurrentTransaction()+indexInfo.getCurrentTransaction());
                     changed=true;
@@ -207,39 +207,35 @@ public class StompCacheServiceImpl implements StompCacheService {
                 BeanUtils.copyProperties(statisticInfo,cache);
                 changed = true;
             }else{
-                if(statisticInfo.getCurrent()!=null){
+                if(statisticInfo.getCurrent()>0){
                     // 当前交易数
                     cache.setCurrent(statisticInfo.getCurrent());
                     changed = true;
                 }
-                if(statisticInfo.getMaxTps()!=null){
+                if(statisticInfo.getMaxTps()>0){
                     cache.setMaxTps(statisticInfo.getMaxTps());
                     changed = true;
                 }
 
-                if(statisticInfo.getBlockCount()!=null){
+                if(statisticInfo.getBlockCount()>0){
                     cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
                     changed = true;
                 }
-                if(statisticInfo.getTransactionCount()!=null){
+                if(statisticInfo.getTransactionCount()>0){
                     cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
                     changed = true;
                 }
-                if(statisticInfo.getBlockCount()!=null&&statisticInfo.getBlockCount()!=0&&statisticInfo.getTransactionCount()!=null){
+                if(statisticInfo.getBlockCount()>0&&statisticInfo.getBlockCount()>0&&statisticInfo.getTransactionCount()>0){
                     cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
                     changed = true;
                 }
-                if(statisticInfo.getHighestBlockNumber()!=null){
+                if(statisticInfo.getHighestBlockNumber()>0){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
-                    if(cache.getHighestBlockTimestamp()!=null&&cache.getLowestBlockTimestamp()!=null){
-                        cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
-                    }else{
-                        cache.setAvgTime(0l);
-                    }
+                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
                     changed = true;
                 }
-                if(statisticInfo.getDayTransaction()!=null){
+                if(statisticInfo.getDayTransaction()>0){
                     cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
                     changed = true;
                 }
