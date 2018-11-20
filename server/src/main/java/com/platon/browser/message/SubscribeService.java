@@ -164,6 +164,17 @@ public class SubscribeService {
                         Transaction transaction = new Transaction();
                         BeanUtils.copyProperties(transactionDto,transaction);
                         transaction.setChainId(chainId);
+                        transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
+                        transaction.setBlockNumber(transactionDto.getBlockNumber().longValue());
+                        transaction.setTimestamp(new Date(transactionDto.getTimestamp()*1000));
+                        transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
+                        transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
+                        transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
+                        transaction.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
+                        transaction.setTxReceiptStatus(Integer.valueOf(transactionDto.getTxReceiptStatus()));
+                        Date date1 =new Date();
+                        transaction.setCreateTime(date1);
+                        transaction.setUpdateTime(date1);
                         transactionSet.add(transaction);
                     });
                     //stompCacheService.updateTransactionCache(transactionInfos,chainId);
