@@ -92,7 +92,7 @@ public class StompCacheInitializer {
                 initIndexCache(chainId);
             }
             StatisticInfo statisticInfo = stompCacheService.getStatisticInfo(chainId);
-            if(statisticInfo.getLowestBlockNumber()==null||statisticInfo.getLowestBlockNumber()==0){
+            if(statisticInfo.getLowestBlockNumber()==0){
                 logger.info("统计缓存为空, 执行初始化...");
                 initStatisticCache(chainId);
             }
@@ -228,7 +228,7 @@ public class StompCacheInitializer {
         statisticInfo.setCurrent(Long.valueOf(currentCount));
         if(divisor!=0){
             BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-            statisticInfo.setMaxTps(transactionTps.doubleValue());
+            statisticInfo.setMaxTps(transactionTps.longValue());
         }
 
 
