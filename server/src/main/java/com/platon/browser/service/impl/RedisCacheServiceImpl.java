@@ -5,7 +5,9 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.transaction.TransactionItem;
@@ -41,6 +43,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private I18nUtil i18n;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
@@ -131,9 +135,15 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public RespPage<BlockItem> getBlockPage(String chainId,int pageNum,int pageSize){
+        RespPage<BlockItem> page = new RespPage<>();
+
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(chainId);
+        Long totalCount = blockMapper.countByExample(blockExample);
+        page.setTotalCount(totalCount.intValue());
+
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
-        RespPage<BlockItem> page = new RespPage<>();
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         page.setTotalCount(size.intValue());
         Long pageCount = size/pageSize;
@@ -176,10 +186,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public RespPage<TransactionItem> getTransactionPage(String chainId, int pageNum, int pageSize){
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
+
         RespPage<TransactionItem> page = new RespPage<>();
+
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(chainId);
+        Long totalCount = transactionMapper.countByExample(transactionExample);
+        page.setTotalCount(totalCount.intValue());
+
+        Long size = redisTemplate.opsForZSet().size(cacheKey);
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        page.setTotalCount(size.intValue());
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){
             pageCount+=1;
