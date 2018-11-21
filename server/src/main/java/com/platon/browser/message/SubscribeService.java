@@ -103,9 +103,6 @@ public class SubscribeService {
                     return;
                 }
 
-                // 消息队列中的timestamp单位是秒，此处将其转换为毫秒
-                blockDto.setTimestamp(blockDto.getTimestamp()*1000);
-
                 // 更新redis中的区块列表缓存
                 Block block = JSON.parseObject(message.getStruct(),Block.class);
                 block.setChainId(chainId);
@@ -143,7 +140,7 @@ public class SubscribeService {
                         transaction.setChainId(chainId);
                         transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
                         transaction.setBlockNumber(transactionDto.getBlockNumber().longValue());
-                        transaction.setTimestamp(new Date(transactionDto.getTimestamp()*1000));
+                        transaction.setTimestamp(new Date(transactionDto.getTimestamp()));
                         transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
                         transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
                         transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
