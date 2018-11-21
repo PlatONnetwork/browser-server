@@ -10,14 +10,14 @@ import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.query.Query;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.exception.ResponseException;
 import com.platon.browser.service.SearchService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -364,13 +364,11 @@ public class HomeController {
      *
      *   }
      */
-
-
-    @Autowired
-    private MessageSource messageSource;
-
     @PostMapping("/home/query")
     public BaseResp search(@Valid @RequestBody SearchParam param){
+        if(!chainsConfig.isValid(param.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,param.getCid()));
+        }
         try{
             Query query = searchService.search(param);
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),query);
