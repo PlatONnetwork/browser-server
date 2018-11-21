@@ -145,7 +145,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        page.setTotalCount(size.intValue());
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){
             pageCount+=1;
