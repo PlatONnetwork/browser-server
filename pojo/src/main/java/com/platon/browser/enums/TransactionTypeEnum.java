@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum  TransactionTypeEnum {
-    TRANSFER("transfer","转账"),
-    MPC_TRANSACTION("MPCtransaction","MPC交易"),
-    CONTRACT_CREATE("contractCreate","合约创建"),
-    VOTE("vote","投票"),
-    TRANSACTION_EXECUTE("transactionExecute","合约执行"),
-    AUTHORIZATION("authorization","权限");
+    TRANSACTION_TRANSFER("transfer","转账"),
+    TRANSACTION_MPC_TRANSACTION("MPCtransaction","MPC交易"),
+    TRANSACTION_CONTRACT_CREATE("contractCreate","合约创建"),
+    TRANSACTION_VOTE("vote","投票"),
+    TRANSACTION_TRANSACTION_EXECUTE("transactionExecute","合约执行"),
+    TRANSACTION_AUTHORIZATION("authorization","权限");
 
     public String code;
     public String desc;

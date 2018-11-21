@@ -4,6 +4,7 @@ public enum I18nEnum {
 
     // 通用
     SUCCESS,
+    PENDING,
     FAILURE,
     UNKNOWN_TYPE,
     UNKNOWN_STATUS,

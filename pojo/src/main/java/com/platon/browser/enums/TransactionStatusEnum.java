@@ -7,7 +7,7 @@ import java.util.Map;
 public enum TransactionStatusEnum {
     PENDING(-1,"待处理"),
     SUCCESS(1,"成功"),
-    FAIL(0,"失败");
+    FAILURE(0,"失败");
 
     public Integer code;
     public String desc;
