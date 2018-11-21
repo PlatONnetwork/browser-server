@@ -19,6 +19,7 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.GeoUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -171,7 +172,19 @@ public class SubscribeService {
                         transaction.setEnergonPrice(transactionDto.getEnergonPrice().toString());
                         transaction.setEnergonUsed(transactionDto.getEnergonUsed().toString());
                         transaction.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
-                        transaction.setTxReceiptStatus(Integer.valueOf(transactionDto.getTxReceiptStatus()));
+
+                        // 接收者状态：链上取回来的是十六进制字符串，需要转换为十进制整型
+                        String txReceiptStatus = transactionDto.getTxReceiptStatus();
+                        if(StringUtils.isNotBlank(txReceiptStatus)&&txReceiptStatus.startsWith("0x")&&txReceiptStatus.length()>2){
+                            try{
+                                int status = Integer.parseInt(txReceiptStatus.substring(2), 16);
+                                transaction.setTxReceiptStatus(status>0?1:0);
+                            }catch (Exception e){
+                                transaction.setTxReceiptStatus(0);
+                            }
+                        }else{
+                            transaction.setTxReceiptStatus(0);
+                        }
                         Date date1 =new Date();
                         transaction.setCreateTime(date1);
                         transaction.setUpdateTime(date1);
