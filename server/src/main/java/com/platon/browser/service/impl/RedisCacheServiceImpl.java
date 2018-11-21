@@ -140,10 +140,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BlockExample blockExample = new BlockExample();
         blockExample.createCriteria().andChainIdEqualTo(chainId);
         Long totalCount = blockMapper.countByExample(blockExample);
-        page.setTotalCount(totalCount.intValue());
+        page.setDisplayTotalCount(totalCount.intValue());
 
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
+        page.setTotalCount(size.intValue());
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){
@@ -191,9 +192,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(chainId);
         Long totalCount = transactionMapper.countByExample(transactionExample);
-        page.setTotalCount(totalCount.intValue());
+        page.setDisplayTotalCount(totalCount.intValue());
 
         Long size = redisTemplate.opsForZSet().size(cacheKey);
+        page.setTotalCount(size.intValue());
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
         Long pageCount = size/pageSize;
         if(size%pageSize!=0){
