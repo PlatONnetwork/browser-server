@@ -106,18 +106,6 @@ public class SubscribeService {
                 // 消息队列中的timestamp单位是秒，此处将其转换为毫秒
                 blockDto.setTimestamp(blockDto.getTimestamp()*1000);
 
-                /*BlockInfo blockInfo = new BlockInfo();
-                BeanUtils.copyProperties(blockDto,blockInfo);
-                blockInfo.setServerTime(System.currentTimeMillis());
-                blockInfo.setNode(blockDto.getMiner());
-                blockInfo.setTimestamp(blockDto.getTimestamp());
-                blockInfo.setHeight(blockDto.getNumber());
-                blockInfo.setBlockReward(blockDto.getBlockReward());
-                blockInfo.setTransaction(blockDto.getTransaction().size());
-                List<BlockInfo> blockInfoList = new ArrayList<>();
-                blockInfoList.add(blockInfo);
-                stompCacheService.updateBlockCache(blockInfoList,chainId);*/
-
                 // 更新redis中的区块列表缓存
                 Block block = JSON.parseObject(message.getStruct(),Block.class);
                 block.setChainId(chainId);
@@ -148,20 +136,8 @@ public class SubscribeService {
                 });
 
                 Set<Transaction> transactionSet = new HashSet<>();
-                //List<TransactionInfo> transactionInfos = new LinkedList<>();
                 if(transactionDtos.size()>0){
                     transactionDtos.forEach(transactionDto -> {
-                        /*TransactionInfo bean = new TransactionInfo();
-                        BeanUtils.copyProperties(transactionDto,bean);
-                        bean.setTxHash(transactionDto.getHash());
-                        bean.setTimestamp(transactionDto.getTimestamp());
-                        bean.setBlockHeight(transactionDto.getBlockNumber().longValue());
-                        bean.setFrom(transactionDto.getFrom());
-                        bean.setTo(transactionDto.getTo());
-                        bean.setTransactionIndex(transactionDto.getTransactionIndex().intValue());
-                        bean.setValue(transactionDto.getValue());
-                        transactionInfos.add(bean);*/
-
                         Transaction transaction = new Transaction();
                         BeanUtils.copyProperties(transactionDto,transaction);
                         transaction.setChainId(chainId);
