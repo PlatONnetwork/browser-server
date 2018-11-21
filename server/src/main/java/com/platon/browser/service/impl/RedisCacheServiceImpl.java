@@ -82,8 +82,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
 
         if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum-1)个
-            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum-1);
+            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
         }
     }
 
@@ -121,8 +121,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
 
         if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum-1)个
-            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum-1);
+            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
         }
     }
 
