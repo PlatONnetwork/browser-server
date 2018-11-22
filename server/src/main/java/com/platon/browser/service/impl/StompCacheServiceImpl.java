@@ -298,6 +298,7 @@ public class StompCacheServiceImpl implements StompCacheService {
             BlockInfo bean = new BlockInfo();
             blockInfoList.add(bean);
             BeanUtils.copyProperties(blockItem,bean);
+            bean.setNode(blockItem.getMiner());
         });
         blockInit.setList(blockInfoList);
         return blockInit;
