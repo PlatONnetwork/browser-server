@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -23,10 +22,8 @@ import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NodeType;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
-import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
-import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.GeoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +48,6 @@ public class StompCacheInitializer {
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
     private StatisticMapper statisticMapper;
@@ -60,10 +55,6 @@ public class StompCacheInitializer {
     private StompCacheService stompCacheService;
     @Autowired
     private RedisCacheService redisCacheService;
-    @Autowired
-    private BlockService blockService;
-    @Autowired
-    private TransactionService transactionService;
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
@@ -176,7 +167,6 @@ public class StompCacheInitializer {
     public void initStatisticCache(String chainId){
 
         String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        String transactionCacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
 
         StatisticInfo statisticInfo = new StatisticInfo();
 
