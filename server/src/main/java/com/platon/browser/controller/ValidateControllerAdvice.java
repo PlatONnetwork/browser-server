@@ -5,6 +5,7 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,16 @@ public class ValidateControllerAdvice {
     public BaseResp argumentNotValidHandler(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors=e.getBindingResult().getFieldErrors();
         Map<String,String> msg = new HashMap<>();
+        String errMsg = "";
         for (FieldError error:fieldErrors){
+            if(StringUtils.isBlank(errMsg)){
+                errMsg=error.getDefaultMessage();
+            }
             msg.put(error.getField(),error.getDefaultMessage());
             logger.error(error.getField()+":"+error.getDefaultMessage());
+        }
+        if(StringUtils.isNotBlank(errMsg)){
+            return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),errMsg,msg);
         }
         return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.REQUEST_INVALID_PARAM),msg);
     }

@@ -7,11 +7,11 @@ import javax.validation.constraints.Pattern;
 
 @Data
 public class TransactionDetailNavigateReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "交易Hash不能为空！")
+    @NotBlank(message = "{transaction.hash.notnull}")
     private String txHash;
-    @NotBlank(message = "浏览方向不能为空！")
-    @Pattern(regexp = "prev|next", message = "方向取值不合法！")
+    @NotBlank(message = "{navigate.direction.notnull}")
+    @Pattern(regexp = "prev|next", message = "{direction.illegal}")
     private String direction;
 }

@@ -15,12 +15,12 @@ import java.util.Date;
  */
 @Data
 public class AccountDownloadReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "账户地址不能为空！")
+    @NotBlank(message = "{address.notnull}")
     private String address;
     private Date startDate;
-    @NotNull(message = "数据日期不能为空！")
-    @Past(message = "数据日期必须小于等于当前日期！")
+    @NotNull(message = "{download.date.start.notnull}")
+    @Past(message = "{download.date.start.must.less.than.now}")
     private Date endDate;
 }

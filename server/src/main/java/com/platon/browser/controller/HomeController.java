@@ -4,13 +4,17 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.StatisticGraphData;
+import com.platon.browser.dto.StatisticInfo;
+import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.query.Query;
+import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.exception.ResponseException;
+import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.service.SearchService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
@@ -330,9 +334,9 @@ public class HomeController {
 
 
     /**
-     * @api {post} /home/query k.搜索
+     * @api {post} /home/search k.搜索
      * @apiVersion 1.0.0
-     * @apiName query
+     * @apiName search
      * @apiGroup home
      * @apiDescription 根据区块高度，区块hash，交易hash等查询信息
      * @apiParam {String} cid 链ID.
@@ -365,16 +369,15 @@ public class HomeController {
      *   }
      */
     @PostMapping("/home/query")
-    public BaseResp search(@Valid @RequestBody SearchParam param){
-        if(!chainsConfig.isValid(param.getCid())){
-            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,param.getCid()));
+    public BaseResp search(@Valid @RequestBody SearchReq req){
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            Query query = searchService.search(param);
-            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),query);
-            return resp;
+            SearchResult<?> result = searchService.search(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),result);
         }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
+            throw new ResponseException(be.getErrorMessage());
         }
     }
 }

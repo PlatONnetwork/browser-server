@@ -5,8 +5,8 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 public class TransactionDetailReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "交易Hash不能为空！")
+    @NotBlank(message = "{transaction.hash.notnull}")
     private String txHash;
 }
