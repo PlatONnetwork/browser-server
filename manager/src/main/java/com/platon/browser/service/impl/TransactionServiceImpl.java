@@ -9,10 +9,8 @@ import com.platon.browser.dao.mapper.CustomTransactionMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionDetailNavigate;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
@@ -102,9 +100,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetail getTransactionDetail(TransactionDetailReq req) {
-        TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
-        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
+        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
@@ -114,12 +112,12 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(),i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
         }
         TransactionDetail transactionDetail = new TransactionDetail();
-        TransactionWithBLOBs transaction = transactions.get(0);
-        BeanUtils.copyProperties(transaction,transactionDetail);
-        transactionDetail.setTxHash(transaction.getHash());
-        transactionDetail.setBlockHeight(transaction.getBlockNumber());
-        transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
-        transactionDetail.setInputData(transaction.getInput());
+        TransactionWithBLOBs currentTran = transactions.get(0);
+        BeanUtils.copyProperties(currentTran,transactionDetail);
+        transactionDetail.setTxHash(currentTran.getHash());
+        transactionDetail.setBlockHeight(currentTran.getBlockNumber());
+        transactionDetail.setTimestamp(currentTran.getTimestamp().getTime());
+        transactionDetail.setInputData(currentTran.getInput());
 
         // 计算区块确认数
         BlockExample blockExample = new BlockExample();
@@ -132,6 +130,54 @@ public class TransactionServiceImpl implements TransactionService {
         }
         Block block = blockList.get(0);
         transactionDetail.setConfirmNum(block.getNumber()-transactionDetail.getBlockHeight());
+
+
+        /** 设置first和last标识 **/
+        // 检查当前交易所在块是否有其它交易记录
+        transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(req.getCid())
+                .andBlockNumberEqualTo(currentTran.getBlockNumber())
+                .andHashNotEqualTo(currentTran.getHash());
+        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        /*transactionList.forEach(tran->{
+            if(tran.getTransactionIndex()<currentTran.getTransactionIndex()){
+                transactionDetail.setFirst(false);
+            }
+            if(tran.getTransactionIndex()>currentTran.getTransactionIndex()){
+                transactionDetail.setLast(false);
+            }
+        });*/
+
+        if(transactionList.size()==0){
+            // 当前交易所在块只有一笔交易数据，则需要跨块查找
+            /** 检查当前交易所在块前面是否有存在交易的块，用于设置first字段 **/
+            blockExample = new BlockExample();
+            blockExample.createCriteria()
+                    .andChainIdEqualTo(currentTran.getChainId())
+                    .andNumberLessThan(currentTran.getBlockNumber())
+                    .andTransactionNumberGreaterThan(0);
+            // 取一条记录，避免影响性能
+            PageHelper.startPage(1,1);
+            blockList = blockMapper.selectByExample(blockExample);
+            if(blockList.size()==0){
+                // 当前交易所在区块前面没有存在交易的区块，表示当前交易是第一条
+                transactionDetail.setFirst(true);
+            }
+
+            /** 检查当前交易所在块后面是否有存在交易的块，用于设置last字段 **/
+            blockExample = new BlockExample();
+            blockExample.createCriteria()
+                    .andChainIdEqualTo(currentTran.getChainId())
+                    .andNumberGreaterThan(currentTran.getBlockNumber())
+                    .andTransactionNumberGreaterThan(0);
+            // 取一条记录，避免影响性能
+            PageHelper.startPage(1,1);
+            blockList = blockMapper.selectByExample(blockExample);
+            if(blockList.size()==0){
+                // 当前交易所在区块后面没有存在交易的区块，表示当前交易是最后一条
+                transactionDetail.setLast(true);
+            }
+        }
         return transactionDetail;
     }
 
@@ -175,7 +221,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return
      */
     @Override
-    public TransactionDetailNavigate getTransactionDetailNavigate(TransactionDetailNavigateReq req) {
+    public TransactionDetail getTransactionDetailNavigate(TransactionDetailNavigateReq req) {
 
         // 根据当前交易hash查出当前交易信息
         TransactionExample condition = new TransactionExample();
@@ -214,16 +260,16 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
         }
 
-        TransactionDetailNavigate transactionDetailNavigate = new TransactionDetailNavigate();
+        TransactionDetail transactionDetail = new TransactionDetail();
 
         if(transactionList.size()==1){
             // 在当前区块找到前一条或下一条交易记录，记为A记录
             TransactionWithBLOBs transaction = transactionList.get(0);
-            BeanUtils.copyProperties(transaction,transactionDetailNavigate);
-            transactionDetailNavigate.setTxHash(transaction.getHash());
-            transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
-            transactionDetailNavigate.setInputData(transaction.getInput());
-            transactionDetailNavigate.setTimestamp(transaction.getTimestamp().getTime());
+            BeanUtils.copyProperties(transaction,transactionDetail);
+            transactionDetail.setTxHash(transaction.getHash());
+            transactionDetail.setBlockHeight(transaction.getBlockNumber());
+            transactionDetail.setInputData(transaction.getInput());
+            transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
 
             // 查询与A记录同块的前一条或后一条记录，前后由step的值决定：-1向前，1向后
             condition = new TransactionExample();
@@ -249,7 +295,7 @@ public class TransactionServiceImpl implements TransactionService {
                         long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果A记录前面不存在有交易记录的区块则认为A记录是第一条
-                            transactionDetailNavigate.setFirst(true);
+                            transactionDetail.setFirst(true);
                         }
                     }
                     break;
@@ -268,7 +314,7 @@ public class TransactionServiceImpl implements TransactionService {
                         long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果A记录后面不存在有交易记录的区块则认为A记录是最后一条
-                            transactionDetailNavigate.setLast(true);
+                            transactionDetail.setLast(true);
                         }
                     }
                     break;
@@ -322,7 +368,7 @@ public class TransactionServiceImpl implements TransactionService {
                 long blockCount = tmpBlocks.size();
                 if(blockCount==0){
                     // 如果前面不存在带有交易记录的块，则表示是第一条交易记录
-                    transactionDetailNavigate.setFirst(true);
+                    transactionDetail.setFirst(true);
                 }
                 // 查询后一个有交易记录的块
                 blockExample = new BlockExample();
@@ -336,7 +382,7 @@ public class TransactionServiceImpl implements TransactionService {
                 blockCount = tmpBlocks.size();
                 if(blockCount==0){
                     // 如果后面不存在带有交易记录的块，则表示是最后一条交易记录
-                    transactionDetailNavigate.setLast(true);
+                    transactionDetail.setLast(true);
                 }
             }
 
@@ -357,7 +403,7 @@ public class TransactionServiceImpl implements TransactionService {
                         long blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果后面不存在带有交易记录的块，则表示是最后一条交易记录
-                            transactionDetailNavigate.setLast(true);
+                            transactionDetail.setLast(true);
                         }
                         break;
                     case NEXT:
@@ -374,7 +420,7 @@ public class TransactionServiceImpl implements TransactionService {
                         blockCount = tmpBlocks.size();
                         if(blockCount==0){
                             // 如果前面不存在带有交易记录的块，则表示是第一条交易记录
-                            transactionDetailNavigate.setFirst(true);
+                            transactionDetail.setFirst(true);
                         }
                         break;
                 }
@@ -400,11 +446,11 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
             }
             TransactionWithBLOBs transaction = transactionList.get(0);
-            BeanUtils.copyProperties(transaction,transactionDetailNavigate);
-            transactionDetailNavigate.setTxHash(transaction.getHash());
-            transactionDetailNavigate.setBlockHeight(transaction.getBlockNumber());
-            transactionDetailNavigate.setInputData(transaction.getInput());
-            transactionDetailNavigate.setTimestamp(transaction.getTimestamp().getTime());
+            BeanUtils.copyProperties(transaction,transactionDetail);
+            transactionDetail.setTxHash(transaction.getHash());
+            transactionDetail.setBlockHeight(transaction.getBlockNumber());
+            transactionDetail.setInputData(transaction.getInput());
+            transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
         }
 
         // 取最高区块，用于计算区块确认数: 区块确认数 = 链上最高区块号-当前区块号
@@ -413,12 +459,12 @@ public class TransactionServiceImpl implements TransactionService {
         PageHelper.startPage(1,1);
         List<Block> blockList = blockMapper.selectByExample(blockExample);
         if(blockList.size()==0){
-            transactionDetailNavigate.setConfirmNum(0l);
-            return transactionDetailNavigate;
+            transactionDetail.setConfirmNum(0l);
+            return transactionDetail;
         }
         Block topBlock = blockList.get(0);
-        transactionDetailNavigate.setConfirmNum(topBlock.getNumber()-transactionDetailNavigate.getBlockHeight());
+        transactionDetail.setConfirmNum(topBlock.getNumber()-transactionDetail.getBlockHeight());
 
-        return transactionDetailNavigate;
+        return transactionDetail;
     }
 }

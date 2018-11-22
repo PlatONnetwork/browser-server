@@ -155,6 +155,8 @@ public class TransactionController {
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
      *           "failReason":"",//失败原因
+     *           "first":false, // 是否第一条记录
+     *           "last":true // 是否最后一条记录
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *           }
      * }
@@ -225,8 +227,8 @@ public class TransactionController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            TransactionDetailNavigate transactionDetailNavigate = transactionService.getTransactionDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailNavigate);
+            TransactionDetail transactionDetail = transactionService.getTransactionDetailNavigate(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }
