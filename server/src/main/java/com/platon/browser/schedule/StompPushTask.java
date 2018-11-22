@@ -93,6 +93,10 @@ public class StompPushTask {
             if(statistic.isChanged()){
                 logger.info("统计缓存有变更，推送STOMP消息...");
 
+                // 取24小时内的交易数
+                long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
+                statistic.setDayTransaction(dayTransactionCount);
+
                 LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
                 List<StatisticItem> itemList = limitQueue.list();
                 Collections.sort(itemList,(c1, c2)->{
