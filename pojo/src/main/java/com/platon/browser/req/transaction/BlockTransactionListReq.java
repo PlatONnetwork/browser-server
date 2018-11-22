@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BlockTransactionListReq extends PageReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotNull(message = "区块高度不能为空！")
+    @NotNull(message = "{block.height.notnull}")
     private Long height;
 }

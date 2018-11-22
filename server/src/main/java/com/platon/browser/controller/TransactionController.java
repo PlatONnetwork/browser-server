@@ -75,7 +75,8 @@ public class TransactionController {
      * {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
-     *      "totalCount":18,//总数
+     *      "displayTotalCount":18,//显示总数
+     *      "totalCount":18,// 小于等于500000记录的总数
      *      "totalPages":1,//总页数
      *      "data": [
      *           {

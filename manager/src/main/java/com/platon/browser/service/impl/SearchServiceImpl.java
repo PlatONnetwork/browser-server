@@ -8,11 +8,11 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.SearchParam;
+import com.platon.browser.dto.search.SearchResult;
+import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.query.Query;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.TransactionDetail;
@@ -56,7 +56,7 @@ public class SearchServiceImpl implements SearchService {
     private I18nUtil i18n;
 
     @Override
-    public Query search ( SearchParam param ) {
+    public SearchResult<?> search (SearchReq param ) {
         //以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x，【外部账户-钱包地址，内部账户-合约地址】
         //以太坊区块hash和交易hash都是0x打头长度33
         //1.判断是否是块高
@@ -77,7 +77,7 @@ public class SearchServiceImpl implements SearchService {
                 isTransactionOrBlock = true;
         }
 
-        Query query = new Query();
+        SearchResult<Object> result = new SearchResult<>();
 
         if (isAccountOrContract) {
             // 账户或合约
@@ -103,9 +103,9 @@ public class SearchServiceImpl implements SearchService {
                 List<AccTransactionItem> trades = accountService.getTransactionList(accountDetailReq);
                 AddressDetail detail = new AddressDetail();
                 detail.setTrades(trades);
-                query.setStruct(detail);
-                query.setType("account");
-                return query;
+                result.setStruct(detail);
+                result.setType("account");
+                return result;
             }
             if(transactionCount==0){
                 // from里是否有查询关键字的值, 需要进一步查询to字段是否有查询关键字的值
@@ -117,28 +117,28 @@ public class SearchServiceImpl implements SearchService {
                 List<Transaction> transactionList = transactionMapper.selectByExample(condition);
                 if(transactionList.size()==0){
                     // to不存在查询关键字的值，证明查询无结果，直接返回
-                    return query;
+                    return result;
                 }
                 // to存在查询关键字的值, 取出此记录，查看其receive_type字段的值来判定to字段存放的是钱包地址还是合约地址
                 Transaction transaction = transactionList.get(0);
                 List<AccTransactionItem> trades = accountService.getTransactionList(accountDetailReq);
-                query.setType(transaction.getReceiveType());
+                result.setType(transaction.getReceiveType());
                 if("account".equals(transaction.getReceiveType())){
                     // 存放的是账户地址
                     AddressDetail detail = new AddressDetail();
                     detail.setTrades(trades);
-                    query.setStruct(detail);
-                    return query;
+                    result.setStruct(detail);
+                    return result;
                 }
                 if("contract".equals(transaction.getReceiveType())){
                     // 存放的是合约地址
                     ContractDetail detail = new ContractDetail();
                     detail.setTrades(trades);
-                    query.setStruct(detail);
-                    return query;
+                    result.setStruct(detail);
+                    return result;
                 }
             }
-            return query;
+            return result;
         }
 
         if (isTransactionOrBlock) {
@@ -156,9 +156,9 @@ public class SearchServiceImpl implements SearchService {
             try{
                 // 此处调用如果查询不到交易记录会抛出BusinessException异常
                 TransactionDetail transactionDetail = transactionService.getTransactionDetail(transactionDetailReq);
-                query.setStruct(transactionDetail);
-                query.setType("transaction");
-                return query;
+                result.setStruct(transactionDetail);
+                result.setType("transaction");
+                return result;
             }catch (BusinessException be){
                 logger.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...",keyword,keyword);
                 BlockExample blockExample = new BlockExample();
@@ -171,9 +171,9 @@ public class SearchServiceImpl implements SearchService {
                     BeanUtils.copyProperties(block,blockDetail);
                     blockDetail.setHeight(block.getNumber());
                     blockDetail.setTimestamp(block.getTimestamp().getTime());
-                    query.setType("block");
-                    query.setStruct(blockDetail);
-                    return query;
+                    result.setType("block");
+                    result.setStruct(blockDetail);
+                    return result;
                 }
 
                 logger.info("在区块表查询不到Hash为[{}]的区块信息，尝试查询Hash为[{}]的待处理交易记录...",keyword,keyword);
@@ -182,9 +182,9 @@ public class SearchServiceImpl implements SearchService {
                 pendingTxDetailReq.setTxHash(keyword);
                 try{
                     PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
-                    query.setType(pendingOrTransaction.getType());
-                    query.setStruct(pendingOrTransaction.getPending());
-                    return query;
+                    result.setType(pendingOrTransaction.getType());
+                    result.setStruct(pendingOrTransaction.getPending());
+                    return result;
                 }catch (BusinessException be2){
                     throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
                 }
@@ -198,9 +198,9 @@ public class SearchServiceImpl implements SearchService {
             req.setHeight(Long.valueOf(keyword));
             try{
                 BlockDetail blockDetail = blockService.getBlockDetail(req);
-                query.setStruct(blockDetail);
-                query.setType("block");
-                return query;
+                result.setStruct(blockDetail);
+                result.setType("block");
+                return result;
             }catch (BusinessException be){
                 throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
             }

@@ -11,11 +11,11 @@ import javax.validation.constraints.Pattern;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class PendingTxDetailNavigateReq extends PageReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotNull(message = "数据索引不能为空！")
+    @NotNull(message = "{transaction.index.notnull}")
     private Integer index;
-    @NotBlank(message = "浏览方向不能为空！")
-    @Pattern(regexp = "prev|next", message = "方向取值不合法！")
+    @NotBlank(message = "{navigate.direction.notnull}")
+    @Pattern(regexp = "prev|next", message = "{direction.illegal}")
     private String direction;
 }

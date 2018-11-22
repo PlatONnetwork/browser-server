@@ -76,11 +76,8 @@ public class StompPushTask {
 
             // 全量推送交易信息，1秒推送一次
             TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
-            if(transactionInit.isChanged()){
-                logger.debug("交易全量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionInit.getList());
-                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
-            }
+            BaseResp transactionResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionInit.getList());
+            messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, transactionResp);
 
             IndexInfo index = cacheService.getIndexInfo(chainId);
             if(index.isChanged()){

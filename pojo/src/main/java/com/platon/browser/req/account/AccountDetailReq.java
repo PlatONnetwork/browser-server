@@ -16,9 +16,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AccountDetailReq extends PageReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "账户地址不能为空！")
+    @NotBlank(message = "{address.notnull}")
     private String address;
     private String txType;
     // 数据开始日期

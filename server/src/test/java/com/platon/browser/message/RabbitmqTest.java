@@ -93,7 +93,7 @@ public class RabbitmqTest {
                     transactionDto.setNonce(String.valueOf(System.currentTimeMillis()));
                     transactionDto.setInput("6545446474754654654654564");
                     transactionDto.setTimestamp(System.currentTimeMillis()+j);
-                    transactionDto.setTxType(TransactionTypeEnum.TRANSFER.code);
+                    transactionDto.setTxType(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
                     transactionDto.setTransactionIndex(BigInteger.valueOf(j));
                     transactionDto.setValue("23.25"+j);
                     transactionDtos.add(transactionDto);
@@ -111,7 +111,7 @@ public class RabbitmqTest {
                 pendingTransactionDto.setInput("242544354354534354");
                 pendingTransactionDto.setNonce(String.valueOf(System.currentTimeMillis()));
                 pendingTransactionDto.setTimestamp(System.currentTimeMillis());
-                pendingTransactionDto.setTxType(TransactionTypeEnum.TRANSFER.code);
+                pendingTransactionDto.setTxType(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
                 pendingTransactionDto.setValue("23.14"+i);
                 sender.send("1", MqMessageTypeEnum.PENDING.name().toLowerCase(), pendingTransactionDto);
             }

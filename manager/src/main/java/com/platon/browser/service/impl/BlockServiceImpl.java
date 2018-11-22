@@ -94,12 +94,8 @@ public class BlockServiceImpl implements BlockService {
         Block block = blocks.get(0);
         BeanUtils.copyProperties(block,blockDetail);
         blockDetail.setHeight(block.getNumber());
+        blockDetail.setTransaction(block.getTransactionNumber());
         blockDetail.setTimestamp(block.getTimestamp().getTime());
-
-        TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andBlockNumberEqualTo(block.getNumber());
-        long tradeCount = transactionMapper.countByExample(transactionExample);
-        blockDetail.setTransaction(tradeCount);
 
         // 取上一个区块
         condition = new BlockExample();

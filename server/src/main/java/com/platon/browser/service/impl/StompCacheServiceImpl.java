@@ -2,15 +2,19 @@ package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.StatisticItem;
 import com.platon.browser.dto.block.BlockInfo;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionInfo;
+import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,6 +38,8 @@ public class StompCacheServiceImpl implements StompCacheService {
 
     @Autowired
     private ChainsConfig chainsConfig;
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
@@ -143,17 +149,17 @@ public class StompCacheServiceImpl implements StompCacheService {
                     index.setNode(indexInfo.getNode());
                     changed=true;
                 }
-                if(indexInfo.getCurrentHeight()!=0){
+                if(indexInfo.getCurrentHeight()>0){
                     // 更新当前区块高度
                     index.setCurrentHeight(indexInfo.getCurrentHeight());
                     changed=true;
                 }
-                if(indexInfo.getConsensusNodeAmount()!=0){
+                if(indexInfo.getConsensusNodeAmount()>0){
                     // 更新共识节点数
                     index.setConsensusNodeAmount(index.getConsensusNodeAmount()+indexInfo.getConsensusNodeAmount());
                     changed=true;
                 }
-                if(indexInfo.getCurrentTransaction()!=0){
+                if(indexInfo.getCurrentTransaction()>0){
                     // 更新当前交易数
                     index.setCurrentTransaction(index.getCurrentTransaction()+indexInfo.getCurrentTransaction());
                     changed=true;
@@ -201,35 +207,35 @@ public class StompCacheServiceImpl implements StompCacheService {
                 BeanUtils.copyProperties(statisticInfo,cache);
                 changed = true;
             }else{
-                if(statisticInfo.getCurrent()!=null){
+                if(statisticInfo.getCurrent()>0){
                     // 当前交易数
                     cache.setCurrent(statisticInfo.getCurrent());
                     changed = true;
                 }
-                if(statisticInfo.getMaxTps()!=null){
+                if(statisticInfo.getMaxTps()>0){
                     cache.setMaxTps(statisticInfo.getMaxTps());
                     changed = true;
                 }
 
-                if(statisticInfo.getBlockCount()!=null){
+                if(statisticInfo.getBlockCount()>0){
                     cache.setBlockCount(cache.getBlockCount()+statisticInfo.getBlockCount());
                     changed = true;
                 }
-                if(statisticInfo.getTransactionCount()!=null){
+                if(statisticInfo.getTransactionCount()>0){
                     cache.setTransactionCount(cache.getTransactionCount()+statisticInfo.getTransactionCount());
                     changed = true;
                 }
-                if(statisticInfo.getBlockCount()!=null&&statisticInfo.getBlockCount()!=0&&statisticInfo.getTransactionCount()!=null){
+                if(statisticInfo.getBlockCount()>0&&statisticInfo.getBlockCount()>0&&statisticInfo.getTransactionCount()>0){
                     cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
                     changed = true;
                 }
-                if(statisticInfo.getHighestBlockNumber()!=null){
+                if(statisticInfo.getHighestBlockNumber()>0){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
                     cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
                     changed = true;
                 }
-                if(statisticInfo.getDayTransaction()!=null){
+                if(statisticInfo.getDayTransaction()>0){
                     cache.setDayTransaction(cache.getDayTransaction()+statisticInfo.getDayTransaction());
                     changed = true;
                 }
@@ -263,7 +269,7 @@ public class StompCacheServiceImpl implements StompCacheService {
 
     @Override
     public BlockInit getBlockInit(String chainId) {
-        LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
+        /*LimitQueue<BlockInfo> cache = blockInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
@@ -282,12 +288,24 @@ public class StompCacheServiceImpl implements StompCacheService {
             return blockInit;
         }finally {
             lock.readLock().unlock();
-        }
+        }*/
+
+        // 直接从缓存取最新的10条数据
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,10);
+        BlockInit blockInit = new BlockInit();
+        List<BlockInfo> blockInfoList = new LinkedList<>();
+        page.getData().forEach(blockItem -> {
+            BlockInfo bean = new BlockInfo();
+            blockInfoList.add(bean);
+            BeanUtils.copyProperties(blockItem,bean);
+        });
+        blockInit.setList(blockInfoList);
+        return blockInit;
     }
 
     @Override
     public void updateBlockCache(List<BlockInfo> blockInfos, String chainId) {
-        logger.debug("更新链【ID={}】的块列表缓存",chainId);
+        /*logger.debug("更新链【ID={}】的块列表缓存",chainId);
         LimitQueue<BlockInfo> init = blockInitMap.get(chainId);
         ReentrantReadWriteLock lock = init.getLock();
         lock.writeLock().lock();
@@ -296,12 +314,12 @@ public class StompCacheServiceImpl implements StompCacheService {
             init.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 
     @Override
     public TransactionInit getTransactionInit(String chainId) {
-        LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
+        /*LimitQueue<TransactionInfo> cache = transactionInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.readLock().lock();
         try{
@@ -319,12 +337,24 @@ public class StompCacheServiceImpl implements StompCacheService {
             return transactionInit;
         }finally {
             lock.readLock().unlock();
-        }
+        }*/
+
+        // 直接从缓存取最新的10条数据
+        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(chainId,1,10);
+        TransactionInit transactionInit = new TransactionInit();
+        List<TransactionInfo> transactionInfoList = new LinkedList<>();
+        page.getData().forEach(transactionItem -> {
+            TransactionInfo bean = new TransactionInfo();
+            transactionInfoList.add(bean);
+            BeanUtils.copyProperties(transactionItem,bean);
+        });
+        transactionInit.setList(transactionInfoList);
+        return transactionInit;
     }
 
     @Override
     public void updateTransactionCache(List<TransactionInfo> transactionInfos, String chainId) {
-        logger.debug("更新链【ID={}】的交易列表缓存",chainId);
+       /* logger.debug("更新链【ID={}】的交易列表缓存",chainId);
         LimitQueue<TransactionInfo> init = transactionInitMap.get(chainId);
         ReentrantReadWriteLock lock = init.getLock();
         lock.writeLock().lock();
@@ -333,6 +363,6 @@ public class StompCacheServiceImpl implements StompCacheService {
             init.setChanged(true);
         }finally {
             lock.writeLock().unlock();
-        }
+        }*/
     }
 }

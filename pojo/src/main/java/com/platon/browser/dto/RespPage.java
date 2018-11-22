@@ -12,6 +12,8 @@ public class RespPage<T> {
     private int code = 0;
     //总数
     private int totalCount;
+    //显示总数
+    private int displayTotalCount;
     //总页数
     private int totalPages;
     // 响应数据

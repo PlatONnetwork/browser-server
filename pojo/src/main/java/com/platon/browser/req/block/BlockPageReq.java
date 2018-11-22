@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BlockPageReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     private Integer pageNo = 1;
     private Integer pageSize = 10;

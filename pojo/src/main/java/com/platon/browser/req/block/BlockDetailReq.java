@@ -7,8 +7,8 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class BlockDetailReq {
-    @NotBlank(message = "链ID不能为空！")
+    @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotNull(message = "块高不能为空！")
+    @NotNull(message = "{block.height.notnull}")
     private Long height;
 }
