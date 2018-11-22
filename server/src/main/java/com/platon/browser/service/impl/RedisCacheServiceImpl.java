@@ -144,10 +144,18 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
-        page.setTotalCount(size.intValue());
+
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        Long pageCount = size/pageSize;
-        if(size%pageSize!=0){
+
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+
+        page.setTotalCount(pagingTotalCount.intValue());
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
         page.setTotalPages(pageCount.intValue());
@@ -197,8 +205,15 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         page.setTotalCount(size.intValue());
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        Long pageCount = size/pageSize;
-        if(size%pageSize!=0){
+
+
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
         page.setTotalPages(pageCount.intValue());
