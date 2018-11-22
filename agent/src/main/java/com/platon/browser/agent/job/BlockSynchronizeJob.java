@@ -60,7 +60,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     @Autowired
     private MQSender mqSender;
 
-    private static Long alreadyGetBlockNubmer = 0l;
+    private static Long alreadyGetBlockNubmer = 0L;
 
     private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
@@ -88,12 +88,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             }
             if (alreadyGetBlockNubmer == 0) {
                 //判断是否是首次
-                for (int i = 1; i < Long.valueOf(blockNumber); i++) {
+                for (int i = 1; i <= Long.valueOf(blockNumber); i++) {
                     try {
                         BlockDto newBlock = buildStruct(i, web3j);
                         //chainId获取
                         mqSender.send(ConfigConst.getChainId(), "block", newBlock);
-                        alreadyGetBlockNubmer = newBlock.getNumber().longValue();
+                        alreadyGetBlockNubmer = Long.valueOf(i);
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     } catch (Exception e) {
                         log.error("Synchronize block exception", e);
@@ -103,12 +103,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             } else {
                 if (Long.valueOf(blockNumber) > alreadyGetBlockNubmer) {
                     //链上块增长
-                    for (int i = alreadyGetBlockNubmer.intValue() + 1; i < Integer.parseInt(blockNumber); i++) {
+                    for (int i = alreadyGetBlockNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
                         try {
                             BlockDto newBlock = buildStruct(i, web3j);
                             //chainId获取
                             mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
-                            alreadyGetBlockNubmer = newBlock.getNumber().longValue();
+                            alreadyGetBlockNubmer = Long.valueOf(i);
                             log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                         } catch (Exception e) {
                             log.error("Synchronize block exception...", e);
@@ -205,7 +205,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     } else {
                         transactionDto.setReceiveType("contract");
                     }
-                }else{
+                } else {
                     transactionDto.setTo("0x");
                     transactionDto.setReceiveType("contract");
                 }
@@ -220,7 +220,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
         newBlock.setNonce(String.valueOf(ethBlock.getBlock().getNonce()));
         newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
-        newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+        if(String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10){
+            newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue() * 1000L);
+        }else {
+            newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+        }
         if (ethBlock.getBlock().getTransactions().size() > 0) {
             newBlock.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))));
         } else
@@ -232,20 +236,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     }
 
-    public String valueConversion(BigInteger value){
+    public String valueConversion ( BigInteger value ) {
         BigDecimal valueDiec = new BigDecimal(value.toString());
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
-        return  conversionCoin.toString();
+        return conversionCoin.toString();
     }
 
-    public static void main(String args[]){
-        Web3j web3j = Web3jClient.getWeb3jClient();
 
-        BlockSynchronizeJob synchronizeJob = new BlockSynchronizeJob();
-        try {
-            synchronizeJob.buildStruct(263136,web3j);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 }

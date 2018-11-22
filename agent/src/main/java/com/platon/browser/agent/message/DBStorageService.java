@@ -1,6 +1,7 @@
 package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -46,6 +48,9 @@ public class DBStorageService {
     public void receive ( String msg ) {
         logger.debug(msg);
         Message message = JSON.parseObject(msg, Message.class);
+        if (!message.getChainId().equals(ConfigConst.getChainId())) {
+            return;
+        }
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())) {
             case BLOCK:
                 logger.debug("STOMP区块信息入库: {}", msg);
@@ -56,13 +61,9 @@ public class DBStorageService {
                 try {
                     blockMapper.insertSelective(block);
                     logger.debug("block data insert...");
-                } catch (Exception e) {
-                    Block block1 = blockMapper.selectByPrimaryKey(block.getHash());
-                    if (!ObjectUtils.isEmpty(block1)) {
-                        blockMapper.updateByPrimaryKeySelective(block);
-                        logger.debug("block data repeat...,update data", e.getMessage());
-
-                    }
+                } catch (DuplicateKeyException e) {
+                    logger.debug("block data repeat...", e.getMessage());
+                    return;
                 }
 
                 //交易相关transaction
@@ -72,13 +73,8 @@ public class DBStorageService {
                         transactionMapper.batchInsert(transactionList);
                         logger.debug("transaction data insert...");
                     } catch (Exception e) {
-                        for (TransactionWithBLOBs transactionWithBLOBs : transactionList) {
-                            TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(transactionWithBLOBs.getHash());
-                            if (!ObjectUtils.isEmpty(transaction)) {
-                                transactionMapper.updateByPrimaryKeySelective(transaction);
-                                logger.debug("transaction data repeat...,update data", e.getMessage());
-                            }
-                        }
+                        logger.debug("transaction data repeat...,update data", e.getMessage());
+                        return;
                     }
                 }
                 break;
@@ -109,11 +105,7 @@ public class DBStorageService {
         try {
             BeanUtils.copyProperties(blockDto, block);
             block.setNumber(Long.valueOf(blockDto.getNumber()));
-            if (blockDto.getTimestamp() == 0) {
-                block.setTimestamp(new Date(3600));
-            } else {
-                block.setTimestamp(new Date(blockDto.getTimestamp() * 1000l));
-            }
+            block.setTimestamp(new Date(blockDto.getTimestamp()));
             block.setSize((int) blockDto.getSize());//考虑转换格式类型，高精度转低精度可能会导致数据失准
             block.setChainId(message.getChainId());
             block.setEnergonAverage(blockDto.getEnergonAverage().toString());
