@@ -230,23 +230,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long serverTime = System.currentTimeMillis();
 
 
-        // 查询交易所属的区块信息
-        List<Long> blockNumberList = new LinkedList<>();
+        // 把缓存中的字符串转换为交易实体
         List<Transaction> cacheItems = new LinkedList<>();
         cache.forEach(str->{
             Transaction transaction = JSON.parseObject(str,Transaction.class);
             cacheItems.add(transaction);
-            blockNumberList.add(transaction.getBlockNumber());
         });
-
-        Map<Long, Block> map = new HashMap<>();
-        if(blockNumberList.size()>0){
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId)
-                    .andNumberIn(blockNumberList);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
-            blocks.forEach(block->map.put(block.getNumber(),block));
-        }
 
         // 获取缓存中的交易信息
         cacheItems.forEach(transaction -> {
@@ -255,10 +244,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             bean.setTxHash(transaction.getHash());
             bean.setBlockHeight(transaction.getBlockNumber());
             bean.setServerTime(serverTime);
-            Block block = map.get(transaction.getBlockNumber());
-            if(block!=null){
-                bean.setBlockTime(block.getTimestamp().getTime());
-            }
+            // 交易时间就是出块时间
+            bean.setBlockTime(transaction.getTimestamp().getTime());
             transactions.add(bean);
         });
         page.setData(transactions);
