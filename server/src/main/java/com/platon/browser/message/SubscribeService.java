@@ -106,10 +106,10 @@ public class SubscribeService {
                 // 更新redis中的区块列表缓存
                 Block block = JSON.parseObject(message.getStruct(),Block.class);
                 block.setChainId(chainId);
-                Date date = new Date();
+                //Date date = new Date();
                 block.setTimestamp(new Date(blockDto.getTimestamp()));
-                block.setCreateTime(date);
-                block.setUpdateTime(date);
+                //block.setCreateTime(date);
+                //block.setUpdateTime(date);
                 Set<Block> blockSet = new HashSet<>();
                 blockSet.add(block);
                 redisCacheService.updateBlockCache(chainId,blockSet);
@@ -158,9 +158,9 @@ public class SubscribeService {
                         }else{
                             transaction.setTxReceiptStatus(0);
                         }
-                        Date date1 =new Date();
-                        transaction.setCreateTime(date1);
-                        transaction.setUpdateTime(date1);
+                        //Date date1 =new Date();
+                        //transaction.setCreateTime(date1);
+                        //transaction.setUpdateTime(date1);
                         transactionSet.add(transaction);
                     });
                     //stompCacheService.updateTransactionCache(transactionInfos,chainId);
