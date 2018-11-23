@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CacheUpdateTask {
+public class StompCacheUpdateTask {
 
-    private final Logger logger = LoggerFactory.getLogger(CacheUpdateTask.class);
+    private final Logger logger = LoggerFactory.getLogger(StompCacheUpdateTask.class);
 
     @Autowired
     private ChainsConfig chainsConfig;

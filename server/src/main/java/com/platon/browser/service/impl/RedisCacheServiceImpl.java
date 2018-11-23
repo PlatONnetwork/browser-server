@@ -107,8 +107,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long size = redisTemplate.opsForZSet().size(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
         items.forEach(item -> {
-            // 把交易所属区块号与交易索引号相加作为score
-            Long value = (item.getBlockNumber()+item.getTransactionIndex());
+            // 将数据库生成的sequence值作为score
+            Long value = item.getSequence();
             // 根据score来判断缓存中的记录是否已经存在
             Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,value,value);
             if(exist.size()==0){

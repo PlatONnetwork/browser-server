@@ -9,7 +9,6 @@ import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
@@ -19,7 +18,6 @@ import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.GeoUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -132,6 +130,9 @@ public class SubscribeService {
                     return 0;
                 });
 
+                /*
+                // 由于交易缓存排序缺少排序需要的唯一编号：需要由数据库为其产生sequence后再同步到redis缓存，才能做排序，所以更新redis缓存的
+                // 动作移动到RedisCacheUpdateTask任务中进行
                 Set<Transaction> transactionSet = new HashSet<>();
                 if(transactionDtos.size()>0){
                     transactionDtos.forEach(transactionDto -> {
@@ -166,19 +167,19 @@ public class SubscribeService {
                     //stompCacheService.updateTransactionCache(transactionInfos,chainId);
                     // 更新redis中的交易列表缓存
                     redisCacheService.updateTransactionCache(chainId,transactionSet);
-                }
+                }*/
 
                 logger.debug("  |- 更新统计缓存...");
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(block.getNumber());
                 statisticInfo.setHighestBlockTimestamp(block.getTimestamp().getTime());
                 statisticInfo.setBlockCount(1l);
-                statisticInfo.setDayTransaction(Long.valueOf(transactionSet.size()));
+                statisticInfo.setDayTransaction(Long.valueOf(transactionDtos.size()));
                 List<StatisticItem> statisticItems = new ArrayList<>();
                 StatisticItem statisticItem = new StatisticItem();
                 statisticItem.setHeight(block.getNumber());
                 statisticItem.setTime(block.getTimestamp().getTime());
-                statisticItem.setTransaction(Long.valueOf(transactionSet.size()));
+                statisticItem.setTransaction(Long.valueOf(transactionDtos.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);
