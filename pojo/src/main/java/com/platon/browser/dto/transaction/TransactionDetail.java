@@ -21,4 +21,8 @@ public class TransactionDetail {
     private String failReason;
     private long confirmNum;
     private String receiveType;
+    // 是否第一条
+    private boolean first;
+    // 是否最后一条
+    private boolean last;
 }

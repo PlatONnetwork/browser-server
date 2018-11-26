@@ -93,6 +93,10 @@ public class StompPushTask {
             if(statistic.isChanged()){
                 logger.info("统计缓存有变更，推送STOMP消息...");
 
+                // 取24小时内的交易数
+                long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
+                statistic.setDayTransaction(dayTransactionCount);
+
                 LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
                 List<StatisticItem> itemList = limitQueue.list();
                 Collections.sort(itemList,(c1, c2)->{
@@ -118,74 +122,4 @@ public class StompPushTask {
             }
         });
     }
-
-    /**
-     * 首页信息，1秒推送一次
-     */
-    /*@Scheduled(cron="0/1 * * * * ?")
-    public void push(){
-        chainsConfig.getChainIds().forEach(chainId -> {
-            // 增量推送节点信息，1秒推送一次
-            NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
-            if(nodeIncrement.isChanged()){
-                logger.info("节点增量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),nodeIncrement.getIncrement());
-                messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
-            }
-
-            // 全量推送区块信息，1秒推送一次
-            BlockInit blockInit = cacheService.getBlockInit(chainId);
-            if(blockInit.isChanged()){
-                logger.info("区块全量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),blockInit.getList());
-                messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, resp);
-            }
-
-            // 全量推送交易信息，1秒推送一次
-            TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
-            if(transactionInit.isChanged()){
-                logger.debug("交易全量缓存有变更，推送STOMP消息...");
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),transactionInit.getList());
-                messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, resp);
-            }
-
-            IndexInfo index = cacheService.getIndexInfo(chainId);
-            if(index.isChanged()){
-                logger.info("指标缓存有变更，推送STOMP消息...");
-                // 取地址数
-                long addressCount = statisticMapper.countAddress(chainId);
-                index.setAddressAmount(addressCount);
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),index);
-                messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
-            }
-
-            StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
-            if(statistic.isChanged()){
-                logger.info("统计缓存有变更，推送STOMP消息...");
-
-                LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
-                List<StatisticItem> itemList = limitQueue.list();
-                Collections.sort(itemList,(c1, c2)->{
-                    // 按区块高度正排
-                    if(c1.getHeight()>c2.getHeight()) return 1;
-                    if(c1.getHeight()<c2.getHeight()) return -1;
-                    return 0;
-                });
-
-                StatisticGraphData graphData = new StatisticGraphData();
-                for (int i=0;i<itemList.size();i++){
-                    StatisticItem item = itemList.get(i);
-                    if(i==0||i==itemList.size()-1) continue;
-                    StatisticItem prevItem = itemList.get(i-1);
-                    graphData.getX().add(item.getHeight());
-                    graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
-                    graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
-                }
-                statistic.setGraphData(graphData);
-
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),statistic);
-                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
-            }
-        });
-    }*/
 }

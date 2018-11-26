@@ -5,15 +5,12 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.BlockPage;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockItem;
-import com.platon.browser.enums.BlockErrorEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
@@ -79,9 +76,9 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public BlockDetail getBlockDetail(BlockDetailReq req) {
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight());
-        List<Block> blocks = blockMapper.selectByExample(condition);
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight());
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
@@ -91,26 +88,42 @@ public class BlockServiceImpl implements BlockService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_NOT_EXIST));
         }
         BlockDetail blockDetail = new BlockDetail();
-        Block block = blocks.get(0);
-        BeanUtils.copyProperties(block,blockDetail);
-        blockDetail.setHeight(block.getNumber());
-        blockDetail.setTransaction(block.getTransactionNumber());
-        blockDetail.setTimestamp(block.getTimestamp().getTime());
+        Block currentBlock = blocks.get(0);
+        BeanUtils.copyProperties(currentBlock,blockDetail);
+        blockDetail.setHeight(currentBlock.getNumber());
+        blockDetail.setTransaction(currentBlock.getTransactionNumber());
+        blockDetail.setTimestamp(currentBlock.getTimestamp().getTime());
 
         // 取上一个区块
-        condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight()-1);
-        blocks = blockMapper.selectByExample(condition);
+        blockExample = new BlockExample();
+        blockExample.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andNumberEqualTo(req.getHeight()-1);
+        blocks = blockMapper.selectByExample(blockExample);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
             blockDetail.setTimeDiff(0);
-            return blockDetail;
+            // 当前块没有上一个块证明这是第一个块, 设置first标识
+            blockDetail.setFirst(true);
+        }else{
+            Block prevBlock = blocks.get(0);
+            blockDetail.setTimeDiff(blockDetail.getTimestamp()-prevBlock.getTimestamp().getTime());
         }
-        block = blocks.get(0);
-        blockDetail.setTimeDiff(blockDetail.getTimestamp()-block.getTimestamp().getTime());
+
+        /** 设置last标识 **/
+        blockExample = new BlockExample();
+        blockExample.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andNumberEqualTo(req.getHeight()+1);
+        blocks = blockMapper.selectByExample(blockExample);
+        if(blocks.size()==0){
+            // 当前区块没有下一个块，则表示这是最后一个块，设置last标识
+            blockDetail.setLast(true);
+        }
+
         return blockDetail;
     }
 
@@ -120,10 +133,10 @@ public class BlockServiceImpl implements BlockService {
      * @return
      */
     @Override
-    public BlockDetailNavigate getBlockDetailNavigate(BlockDetailNavigateReq req) {
+    public BlockDetail getBlockDetailNavigate(BlockDetailNavigateReq req) {
         BlockDetailReq detailReq = new BlockDetailReq();
         BeanUtils.copyProperties(req,detailReq);
-
+        // 取得上一个或下一个块
         switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
             case PREV:
                 detailReq.setHeight(req.getHeight()-1);
@@ -132,31 +145,8 @@ public class BlockServiceImpl implements BlockService {
                 detailReq.setHeight(req.getHeight()+1);
                 break;
         }
-
-        /** 取得下一个块，记为A块 **/
         BlockDetail blockDetail = getBlockDetail(detailReq);
-        BlockDetailNavigate blockDetailNavigate = new BlockDetailNavigate();
-        BeanUtils.copyProperties(blockDetail,blockDetailNavigate);
-
-        /** 取A块的上一个块，用来决定first的值 **/
-        detailReq.setHeight(detailReq.getHeight()-1);
-        try {
-            getBlockDetail(detailReq);
-        }catch (BusinessException be){
-            logger.warn("已浏览至第一个区块！");
-            blockDetailNavigate.setFirst(true);
-        }
-
-        /** 取A块的下一个块，用来决定last的值 **/
-        detailReq.setHeight(detailReq.getHeight()+2);
-        try {
-            getBlockDetail(detailReq);
-        }catch (BusinessException be){
-            logger.warn("已浏览至最后一个区块！");
-            blockDetailNavigate.setLast(true);
-        }
-
-        return blockDetailNavigate;
+        return blockDetail;
     }
 
 }

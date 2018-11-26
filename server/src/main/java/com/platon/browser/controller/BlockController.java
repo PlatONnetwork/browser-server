@@ -6,7 +6,6 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockDetailNavigate;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
@@ -122,7 +121,9 @@ public class BlockController  {
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗
      *           "blockReward": "123123",//区块奖励
-     *           "extraData": "xxx"//附加数据
+     *           "extraData": "xxx",//附加数据
+     *           "first":false, // 是否第一条记录
+     *           "last":true // 是否最后一条记录
      *           }
      * }
      */
@@ -181,8 +182,8 @@ public class BlockController  {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            BlockDetailNavigate blockDetailNavigate = blockService.getBlockDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetailNavigate);
+            BlockDetail blockDetail = blockService.getBlockDetailNavigate(req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }

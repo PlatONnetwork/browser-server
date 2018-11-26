@@ -107,8 +107,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long size = redisTemplate.opsForZSet().size(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
         items.forEach(item -> {
-            // 把交易所属区块号与交易索引号相加作为score
-            Long value = (item.getBlockNumber()+item.getTransactionIndex());
+            // 将数据库生成的sequence值作为score
+            Long value = item.getSequence();
             // 根据score来判断缓存中的记录是否已经存在
             Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,value,value);
             if(exist.size()==0){
@@ -144,10 +144,18 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Long size = redisTemplate.opsForZSet().size(cacheKey);
-        page.setTotalCount(size.intValue());
+
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        Long pageCount = size/pageSize;
-        if(size%pageSize!=0){
+
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+
+        page.setTotalCount(pagingTotalCount.intValue());
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
         page.setTotalPages(pageCount.intValue());
@@ -197,8 +205,15 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         page.setTotalCount(size.intValue());
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-        Long pageCount = size/pageSize;
-        if(size%pageSize!=0){
+
+
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
             pageCount+=1;
         }
         page.setTotalPages(pageCount.intValue());
@@ -215,23 +230,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long serverTime = System.currentTimeMillis();
 
 
-        // 查询交易所属的区块信息
-        List<Long> blockNumberList = new LinkedList<>();
+        // 把缓存中的字符串转换为交易实体
         List<Transaction> cacheItems = new LinkedList<>();
         cache.forEach(str->{
             Transaction transaction = JSON.parseObject(str,Transaction.class);
             cacheItems.add(transaction);
-            blockNumberList.add(transaction.getBlockNumber());
         });
-
-        Map<Long, Block> map = new HashMap<>();
-        if(blockNumberList.size()>0){
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId)
-                    .andNumberIn(blockNumberList);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
-            blocks.forEach(block->map.put(block.getNumber(),block));
-        }
 
         // 获取缓存中的交易信息
         cacheItems.forEach(transaction -> {
@@ -240,10 +244,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             bean.setTxHash(transaction.getHash());
             bean.setBlockHeight(transaction.getBlockNumber());
             bean.setServerTime(serverTime);
-            Block block = map.get(transaction.getBlockNumber());
-            if(block!=null){
-                bean.setBlockTime(block.getTimestamp().getTime());
-            }
+            // 交易时间就是出块时间
+            bean.setBlockTime(transaction.getTimestamp().getTime());
             transactions.add(bean);
         });
         page.setData(transactions);
