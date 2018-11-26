@@ -234,7 +234,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
 
         // 设置浏览前后标识
-        //setupNavigateFlag(req.getCid(),transactionDetail);
+        setupNavigateFlag(req.getCid(),transactionDetail);
 
         return transactionDetail;
     }

@@ -166,45 +166,7 @@ public class StompCacheInitializer {
      * 更新交易统计信息缓存
      */
     public void initStatisticCache(String chainId){
-
-        String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-
         StatisticInfo statisticInfo = new StatisticInfo();
-
-
-        /*
-        RespPage<BlockItem> topPage = redisCacheService.getBlockPage(chainId,1,1);
-
-        List<BlockItem> topList = topPage.getData();
-        if(topList.size()==1){
-            BlockItem top = topList.get(0);
-            statisticInfo.setHighestBlockNumber(top.getHeight());
-            statisticInfo.setHighestBlockTimestamp(top.getTimestamp());
-
-            // 先从最高块向前回溯3600个块
-            Set<String> bottomBlockSet = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
-            if(bottomBlockSet.size()==0){
-                // 从后向前累计不足3600个块，则正向取链上第一个块
-                bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
-            }
-            if(bottomBlockSet.size()==0){
-                statisticInfo.setLowestBlockNumber(top.getHeight());
-                statisticInfo.setLowestBlockTimestamp(top.getTimestamp());
-                logger.error("找不到初始化统计信息需要的区块信息!!");
-            }
-            if(bottomBlockSet.size()>0){
-                Block bottom = JSON.parseObject(bottomBlockSet.iterator().next(),Block.class);
-                statisticInfo.setLowestBlockNumber(bottom.getNumber());
-                statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
-
-                long avgTime = (top.getTimestamp()-bottom.getTimestamp().getTime())/top.getHeight();
-                statisticInfo.setAvgTime(avgTime);
-            }
-
-        }else{
-            statisticInfo.setAvgTime(0l);
-        }
-        */
 
         // 取当前时间回溯五分钟的交易数统计TPS
         Date endDate = new Date();
