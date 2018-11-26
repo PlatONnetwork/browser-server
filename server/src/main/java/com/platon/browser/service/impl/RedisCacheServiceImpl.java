@@ -157,15 +157,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
 
-        // 取缓存中最新的块的块号作为总块数
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
-        if(cache.size()>0){
-            Block block = JSON.parseObject(cache.iterator().next(),Block.class);
-            page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
-        }else{
-            page.setDisplayTotalCount(0);
-        }
-
         Long size = redisTemplate.opsForZSet().size(cacheKey);
 
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
@@ -190,11 +181,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(pageSize<=0){
             pageSize=1;
         }
-        cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
         List<BlockItem> blocks = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
         cache.forEach(str -> {
             Block block = JSON.parseObject(str,Block.class);
+            if(page.getDisplayTotalCount()==0&&block.getNumber()!=null){
+                page.setDisplayTotalCount(block.getNumber().intValue());
+            }
             BlockItem bean = new BlockItem();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getNumber());
