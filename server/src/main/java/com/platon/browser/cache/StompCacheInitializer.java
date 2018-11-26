@@ -261,7 +261,7 @@ public class StompCacheInitializer {
                 statisticInfo.setAvgTime(BigDecimal.ZERO);
             }else{
                 long diff = top.getTimestamp()-bot.getTimestamp();
-                BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(bCount),4,RoundingMode.DOWN);
+                BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(bCount*1000),4,RoundingMode.DOWN);
                 statisticInfo.setAvgTime(avgTime);
                 statisticInfo.setLowestBlockTimestamp(bot.getTimestamp());
             }
