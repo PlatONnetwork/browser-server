@@ -52,26 +52,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
 
-    private Map<String,Integer> blockCountMap = new HashMap<>();
     private Map<String,Integer> transactionCountMap = new HashMap<>();
 
     @PostConstruct
     private void init(){
         chainsConfig.getChainIds().forEach(chainId->{
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId);
-            Long count = blockMapper.countByExample(blockExample);
-            blockCountMap.put(chainId,count.intValue());
-
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId);
-            count = transactionMapper.countByExample(transactionExample);
+            Long count = transactionMapper.countByExample(transactionExample);
             transactionCountMap.put(chainId,count.intValue());
         });
-    }
-
-    public void updateBlockCount(String chainId, int step){
-        blockCountMap.put(chainId,blockCountMap.get(chainId)+step);
     }
 
     public void updateTransactionCount(String chainId, int step){
@@ -165,9 +155,17 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public RespPage<BlockItem> getBlockPage(String chainId,int pageNum,int pageSize){
         RespPage<BlockItem> page = new RespPage<>();
 
-        page.setDisplayTotalCount(blockCountMap.get(chainId));
-
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+
+        // 取缓存中最新的块的块号作为总块数
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
+        if(cache.size()>0){
+            Block block = JSON.parseObject(cache.iterator().next(),Block.class);
+            page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
+        }else{
+            page.setDisplayTotalCount(0);
+        }
+
         Long size = redisTemplate.opsForZSet().size(cacheKey);
 
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
@@ -192,7 +190,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(pageSize<=0){
             pageSize=1;
         }
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
         List<BlockItem> blocks = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
         cache.forEach(str -> {

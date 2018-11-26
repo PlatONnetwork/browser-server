@@ -111,7 +111,6 @@ public class SubscribeService {
                 Set<Block> blockSet = new HashSet<>();
                 blockSet.add(block);
                 redisCacheService.updateBlockCache(chainId,blockSet);
-                redisCacheService.updateBlockCount(chainId,1);
 
                 logger.debug("  |- 更新指标信息中的当前块高和当前交易数...");
                 indexInfo = new IndexInfo();

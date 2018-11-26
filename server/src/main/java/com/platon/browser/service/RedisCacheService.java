@@ -9,7 +9,6 @@ import com.platon.browser.dto.transaction.TransactionItem;
 import java.util.Set;
 
 public interface RedisCacheService {
-    void updateBlockCount(String chainId, int step);
     void updateTransactionCount(String chainId, int step);
     void updateBlockCache(String chainId, Set<Block> items);
     void updateTransactionCache(String chainId, Set<Transaction> items);
