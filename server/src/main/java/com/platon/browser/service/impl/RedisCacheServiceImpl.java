@@ -186,9 +186,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long serverTime = System.currentTimeMillis();
         cache.forEach(str -> {
             Block block = JSON.parseObject(str,Block.class);
-            if(page.getDisplayTotalCount()==0&&block.getNumber()!=null){
-                page.setDisplayTotalCount(block.getNumber().intValue());
-            }
             BlockItem bean = new BlockItem();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getNumber());
@@ -198,6 +195,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             blocks.add(bean);
         });
         page.setData(blocks);
+
+        // 设置总记录大小
+        cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
+        if(cache.size()>0){
+            Block block = JSON.parseObject(cache.iterator().next(),Block.class);
+            page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
+        }else{
+            page.setDisplayTotalCount(0);
+        }
+
         return page;
     }
 
