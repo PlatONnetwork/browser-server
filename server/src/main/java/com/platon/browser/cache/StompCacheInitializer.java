@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -171,6 +172,7 @@ public class StompCacheInitializer {
         StatisticInfo statisticInfo = new StatisticInfo();
 
 
+        /*
         RespPage<BlockItem> topPage = redisCacheService.getBlockPage(chainId,1,1);
 
         List<BlockItem> topList = topPage.getData();
@@ -202,6 +204,7 @@ public class StompCacheInitializer {
         }else{
             statisticInfo.setAvgTime(0l);
         }
+        */
 
         // 取当前时间回溯五分钟的交易数统计TPS
         Date endDate = new Date();
@@ -231,9 +234,39 @@ public class StompCacheInitializer {
         long blockCount = statisticMapper.countTransactionBlock(chainId);
         statisticInfo.setBlockCount(blockCount);
 
-        // 计算平均区块交易数
-        BigDecimal avgTransactionCount = statisticMapper.countAvgTransactionPerBlock(chainId);
-        statisticInfo.setAvgTransaction(avgTransactionCount);
+        // 平均区块交易数=统计最近3600个区块的平均交易数
+        // 取最近3600个区块，平均出块时长=(最高块出块时间-最低块出块时间)/实际块数量
+        RespPage<BlockItem> blockPage = redisCacheService.getBlockPage(chainId,1,3600);
+        int bCount = 0, tCount = 0;
+        if(blockPage.getData()==null||blockPage.getData().size()==0){
+            // 设置平均区块交易数
+            statisticInfo.setAvgTransaction(BigDecimal.ZERO);
+            // 设置平均出块时长
+            statisticInfo.setAvgTime(BigDecimal.ZERO);
+        }else{
+            // 设置平均区块交易数
+            List<BlockItem> blockItems = blockPage.getData();
+            for (BlockItem item : blockItems){
+                tCount+=item.getTransaction();
+            }
+            bCount=blockItems.size();
+            if(bCount==0) bCount=1;
+            BigDecimal avgTransaction = new BigDecimal(tCount).divide(new BigDecimal(bCount),4, RoundingMode.DOWN);
+            statisticInfo.setAvgTransaction(avgTransaction);
+
+            // 设置平均出块时长
+            BlockItem top = blockItems.get(0);
+            BlockItem bot = blockItems.get(blockItems.size()-1);
+            if(top==bot) {
+                statisticInfo.setAvgTime(BigDecimal.ZERO);
+            }else{
+                long diff = top.getTimestamp()-bot.getTimestamp();
+                BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(bCount),4,RoundingMode.DOWN);
+                statisticInfo.setAvgTime(avgTime);
+                statisticInfo.setLowestBlockTimestamp(bot.getTimestamp());
+            }
+        }
+
 
         // 过去24小时交易笔数
         long count = statisticMapper.countTransactionIn24Hours(chainId);

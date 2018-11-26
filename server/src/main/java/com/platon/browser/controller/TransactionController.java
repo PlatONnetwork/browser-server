@@ -1,14 +1,18 @@
 package com.platon.browser.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDowload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
@@ -168,6 +172,7 @@ public class TransactionController {
         }
         try{
             TransactionDetail transactionDetail = transactionService.getTransactionDetail(req);
+            setupConfirmNum(transactionDetail,req.getCid());
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
@@ -228,10 +233,23 @@ public class TransactionController {
         }
         try{
             TransactionDetail transactionDetail = transactionService.getTransactionDetailNavigate(req);
+            setupConfirmNum(transactionDetail,req.getCid());
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }
+    }
+
+    private void setupConfirmNum(TransactionDetail transactionDetail,String chainId){
+        // 设置区块确认数
+        // 为加快速度，从缓存获取
+        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,1);
+        if(page.getData()==null||page.getData().size()==0){
+            transactionDetail.setConfirmNum(0l);
+            return;
+        }
+        BlockItem block = page.getData().get(0);
+        transactionDetail.setConfirmNum(block.getHeight()-transactionDetail.getBlockHeight());
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Data
 public class StatisticInfo {
-    private long avgTime;
+    private BigDecimal avgTime;
 
     private long current;
 

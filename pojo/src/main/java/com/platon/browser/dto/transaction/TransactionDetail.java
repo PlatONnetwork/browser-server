@@ -1,5 +1,6 @@
 package com.platon.browser.dto.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
@@ -25,4 +26,6 @@ public class TransactionDetail {
     private boolean first;
     // 是否最后一条
     private boolean last;
+    @JsonIgnore
+    private Long sequence;
 }

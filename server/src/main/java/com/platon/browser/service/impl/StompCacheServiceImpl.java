@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -232,13 +233,15 @@ public class StompCacheServiceImpl implements StompCacheService {
                     changed = true;
                 }
                 if(statisticInfo.getBlockCount()>0&&statisticInfo.getBlockCount()>0&&statisticInfo.getTransactionCount()>0){
-                    cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
+//                    cache.setAvgTransaction(BigDecimal.valueOf(cache.getTransactionCount()/cache.getBlockCount()));
                     changed = true;
                 }
                 if(statisticInfo.getHighestBlockNumber()>0){
-                    cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
+                    /*cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
-                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/cache.getHighestBlockNumber());
+                    long diff = cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp();
+                    BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(cache.getHighestBlockNumber()),4, RoundingMode.DOWN);
+                    cache.setAvgTime(avgTime);*/
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()>0){
