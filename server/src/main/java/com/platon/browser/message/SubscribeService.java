@@ -111,6 +111,7 @@ public class SubscribeService {
                 Set<Block> blockSet = new HashSet<>();
                 blockSet.add(block);
                 redisCacheService.updateBlockCache(chainId,blockSet);
+                redisCacheService.updateBlockCount(chainId,1);
 
                 logger.debug("  |- 更新指标信息中的当前块高和当前交易数...");
                 indexInfo = new IndexInfo();
@@ -168,6 +169,10 @@ public class SubscribeService {
                     // 更新redis中的交易列表缓存
                     redisCacheService.updateTransactionCache(chainId,transactionSet);
                 }*/
+
+                if(transactionDtos.size()>0){
+                    redisCacheService.updateTransactionCount(chainId,transactionDtos.size());
+                }
 
                 logger.debug("  |- 更新统计缓存...");
                 StatisticInfo statisticInfo = new StatisticInfo();
