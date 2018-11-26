@@ -72,7 +72,7 @@ public class DBStorageService {
                     try {
                         transactionMapper.batchInsert(transactionList);
                         logger.debug("transaction data insert...");
-                    } catch (Exception e) {
+                    } catch (DuplicateKeyException e) {
                         logger.debug("transaction data repeat...,update data", e.getMessage());
                         return;
                     }
@@ -84,16 +84,13 @@ public class DBStorageService {
                 //获取信息中pending交易列表
                 List <PendingTransactionDto> list = JSON.parseArray(message.getStruct(), PendingTransactionDto.class);
                 List <PendingTx> pendingTxes = buidPendingTx(list, message);
-                try {
-                    pendingTxMapper.batchInsert(pendingTxes);
-                    logger.debug("pendingtransaction data insert...");
-                } catch (Exception e) {
-                    for (PendingTx pendingTx : pendingTxes) {
-                        PendingTx pending = pendingTxMapper.selectByPrimaryKey(pendingTx.getHash());
-                        if (!ObjectUtils.isEmpty(pending)) {
-                            pendingTxMapper.updateByPrimaryKeySelective(pendingTx);
-                            logger.debug("pendingtransaction data repeat...,update data", e.getMessage());
-                        }
+                for (PendingTx pendingTx : pendingTxes) {
+                    try {
+                        pendingTxMapper.insert(pendingTx);
+                        logger.debug("pendingtransaction data insert...");
+                    } catch (DuplicateKeyException e) {
+                        logger.debug("pendingtransaction data repeat...", e.getMessage(),pendingTx.getHash());
+                        continue;
                     }
                 }
                 break;
