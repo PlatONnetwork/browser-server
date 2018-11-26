@@ -13,17 +13,20 @@ import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import jnr.ffi.annotations.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
+import org.web3j.abi.datatypes.Int;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -60,9 +63,26 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     @Autowired
     private MQSender mqSender;
 
-    private static Long alreadyGetBlockNubmer = 0l;
+    private static Long maxNubmer = 0L;
 
     private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
+
+    @PostConstruct
+    public void init(){
+        ConfigConst.loadConfigPath();
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
+        condition.setOrderByClause("timestamp desc");
+        PageHelper.startPage(1, 1);
+        List <Block> blocks = blockMapper.selectByExample(condition);
+        // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
+        // 2、如果查询不到则从0开始
+        if(blocks.size()==0){
+            maxNubmer = 0L;
+        }else {
+            maxNubmer = blocks.get(0).getNumber();
+        }
+    }
 
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
@@ -78,48 +98,21 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
-            BlockExample condition = new BlockExample();
-            condition.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
-            condition.setOrderByClause("timestamp desc");
-            PageHelper.startPage(1, 1);
-            List <Block> blocks = blockMapper.selectByExample(condition);
-            if (blocks.size() > 0) {
-                alreadyGetBlockNubmer = blocks.get(0).getNumber();
-            }
-            if (alreadyGetBlockNubmer == 0) {
-                //判断是否是首次
-                for (int i = 1; i < Long.valueOf(blockNumber); i++) {
-                    try {
-                        BlockDto newBlock = buildStruct(i, web3j);
-                        //chainId获取
+
+            for(int i = maxNubmer.intValue() + 1 ; i <= Integer.parseInt(blockNumber); i ++){
+                try {
+                    BlockDto newBlock = buildStruct(i, web3j);
+                    //chainId获取
+                    if(newBlock.getNumber() > maxNubmer.intValue()){
                         mqSender.send(ConfigConst.getChainId(), "block", newBlock);
-                        alreadyGetBlockNubmer = newBlock.getNumber().longValue();
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
-                    } catch (Exception e) {
-                        log.error("Synchronize block exception", e);
-                        throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                     }
-                }
-            } else {
-                if (Long.valueOf(blockNumber) > alreadyGetBlockNubmer) {
-                    //链上块增长
-                    for (int i = alreadyGetBlockNubmer.intValue() + 1; i < Integer.parseInt(blockNumber); i++) {
-                        try {
-                            BlockDto newBlock = buildStruct(i, web3j);
-                            //chainId获取
-                            mqSender.send(ConfigConst.getChainId(), "BLOCK", newBlock);
-                            alreadyGetBlockNubmer = newBlock.getNumber().longValue();
-                            log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
-                        } catch (Exception e) {
-                            log.error("Synchronize block exception...", e);
-                            throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
-                        }
-                    }
-                } else if (Long.valueOf(blockNumber) < alreadyGetBlockNubmer || Long.valueOf(blockNumber) == alreadyGetBlockNubmer) {
-                    //链上块无增长
-                    log.info("Blockchain blockinfo is newest...");
+                } catch (Exception e) {
+                    log.error("Synchronize block exception", e);
+                    throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                 }
             }
+            maxNubmer = Long.valueOf(blockNumber);
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
@@ -194,6 +187,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setEnergonUsed(receipt.getGasUsed());
                 transactionDto.setNonce(transaction.getNonce().toString());
                 transactionDto.setValue(valueConversion(transaction.getValue()));
+                if(String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10){
+                    transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue() * 1000L);
+                }else {
+                    transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+                }
                 //transactionDto.setInput(transaction.getInput());
                 transactionDto.setTxReceiptStatus(null != receipt.getStatus() ? receipt.getStatus() : "0x0");
                 transactionDto.setActualTxCoast(receipt.getGasUsed().multiply(transaction.getGasPrice()));
@@ -205,7 +203,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     } else {
                         transactionDto.setReceiveType("contract");
                     }
-                }else{
+                } else {
                     transactionDto.setTo("0x");
                     transactionDto.setReceiveType("contract");
                 }
@@ -220,7 +218,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
         newBlock.setNonce(String.valueOf(ethBlock.getBlock().getNonce()));
         newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
-        newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+        if(String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10){
+            newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue() * 1000L);
+        }else {
+            newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
+        }
         if (ethBlock.getBlock().getTransactions().size() > 0) {
             newBlock.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))));
         } else
@@ -232,20 +234,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     }
 
-    public String valueConversion(BigInteger value){
+    public String valueConversion ( BigInteger value ) {
         BigDecimal valueDiec = new BigDecimal(value.toString());
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
-        return  conversionCoin.toString();
+        return conversionCoin.toString();
     }
 
-    public static void main(String args[]){
-        Web3j web3j = Web3jClient.getWeb3jClient();
 
-        BlockSynchronizeJob synchronizeJob = new BlockSynchronizeJob();
-        try {
-            synchronizeJob.buildStruct(263136,web3j);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 }
