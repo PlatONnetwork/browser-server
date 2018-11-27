@@ -70,6 +70,7 @@ public class NodeController {
      *      "data": [
      *           {
      *           "ranking": 1,// 排名
+     *           "logo":"", // 节点LOGO，具体形式待定
      *           "name": "node-1",// 账户名称
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "countryCode":"CN", // 国家代码
