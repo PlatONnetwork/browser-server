@@ -1,5 +1,6 @@
 package com.platon.browser.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -10,7 +11,7 @@ import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeItem;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.node.NodeBlockListReq;
+import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodeListReq;
 import com.platon.browser.service.ExportService;
@@ -88,6 +89,8 @@ public class NodeController {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
+        // 取200条记录
+        PageHelper.startPage(1,200);
         List<NodeItem> nodes = nodeService.getNodeItemList(req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
     }
@@ -177,11 +180,13 @@ public class NodeController {
      * }
      */
     @PostMapping("blockList")
-    public BaseResp blockList (@Valid @RequestBody NodeBlockListReq req) {
+    public BaseResp blockList (@Valid @RequestBody BlockListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
+            // 取20条最新记录
+            PageHelper.startPage(1,20);
             List<BlockItem> blocks = nodeService.getBlockList(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){

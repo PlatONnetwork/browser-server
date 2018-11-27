@@ -1,9 +1,11 @@
 package com.platon.browser.cache;
 
-import com.alibaba.fastjson.JSON;
 import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -115,6 +117,8 @@ public class StompCacheInitializer {
             Location location = GeoUtil.getLocation(node.getIp());
             bean.setLongitude(location.longitude);
             bean.setLatitude(location.latitude);
+            bean.setNodeType(node.getType());
+            bean.setNetState(node.getNodeStatus());
             nodeInfoList.add(bean);
         });
         stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
@@ -147,7 +151,7 @@ public class StompCacheInitializer {
         // 取共识节点数
         NodeExample nodeExample = new NodeExample();
         nodeExample.createCriteria().andChainIdEqualTo(chainId)
-                .andNodeTypeEqualTo(NodeType.CONSENSUS.code);
+                .andTypeEqualTo(NodeType.CONSENSUS.code);
         long nodeCount = nodeMapper.countByExample(nodeExample);
         indexInfo.setConsensusNodeAmount(nodeCount);
 

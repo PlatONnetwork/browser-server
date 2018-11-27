@@ -4,21 +4,21 @@ import lombok.Data;
 
 @Data
 public class NodeDetail {
-    private int height;
-
-    private long timestamp;
-
-    private int transaction;
-
-    private int size;
-
-    private String miner;
-
-    private int energonUsed;
-
-    private int energonAverage;
-
-    private double blockReward;
-
-    private long serverTime;
+    private String name;
+    private String location;
+    private long joinTime;
+    private String deposit;
+    private double rewardRatio;
+    private int ranking;
+    private String profitAmount;
+    private int verifyCount;
+    private long blockCount;
+    private double avgBlockTime;
+    private String rewardAmount;
+    private String nodeAddress;
+    private String publicKey;
+    private String wallet;
+    private String intro;
+    private String orgName;
+    private String orgWebsite;
 }

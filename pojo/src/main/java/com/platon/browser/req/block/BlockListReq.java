@@ -1,4 +1,4 @@
-package com.platon.browser.req.node;
+package com.platon.browser.req.block;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NodeBlockListReq {
+public class BlockListReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     @NotNull(message = "{node.address.notnull}")

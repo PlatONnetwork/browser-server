@@ -7,7 +7,7 @@ public class NodeItem {
     private int ranking;
     private String name;
     private int electionStatus;
-    private String country;
+    private String countryCode;
     private String location;
     private String deposit;
     private long blockCount;

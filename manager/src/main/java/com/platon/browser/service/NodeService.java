@@ -4,7 +4,7 @@ import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.node.NodeItem;
-import com.platon.browser.req.node.NodeBlockListReq;
+import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodeListReq;
 
@@ -18,5 +18,5 @@ public interface NodeService {
 
     NodeDetail getNodeDetail(NodeDetailReq req);
 
-    List<BlockItem> getBlockList(NodeBlockListReq req);
+    List<BlockItem> getBlockList(BlockListReq req);
 }
