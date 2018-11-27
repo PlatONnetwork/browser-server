@@ -201,7 +201,7 @@ public class NodeController {
     }
 
     /**
-     * @api {get} node/blockDownload?cid=:cid&address=:address&date=:date j.导出节点区块详情
+     * @api {get} node/blockDownload?cid=:cid&address=:address&date=:date d.导出节点区块详情
      * @apiVersion 1.0.0
      * @apiName blockDownload
      * @apiGroup node
