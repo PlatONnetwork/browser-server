@@ -35,7 +35,7 @@ public class AddNodeTest {
         int a = 108 * 256 * 256 + 1 * 256 + 5;
         int b = 145 * 256 * 256 + 110 * 256 + 35;
 
-        for(int i=0;i<10;i++){
+        for(int i=10;i<30;i++){
             int c = new Random().nextInt(b - a) + a;
             String ip = "192." + (c / (256 * 256)) + "." + ((c / 256) % 256) + "." + (c % 256);
             logger.info("IP: {}",ip);
@@ -75,7 +75,7 @@ public class AddNodeTest {
 
             node.setJoinTime(new Date());
             node.setName("node-00"+i);
-            node.setNodeAddress("http://mainnet.abc.cn:1033"+i);
+            node.setPort(8800+i);
             node.setOrgName("platon");
             node.setOrgWebsite("https://www.platon.network");
             node.setProfitAmount("3343.2323"+i);
@@ -83,7 +83,7 @@ public class AddNodeTest {
             node.setPublicKey("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dcc8DEf"+i);
             node.setRanking(i);
             node.setRewardRatio(0.01);
-            node.setVerifyCount(6433l);
+            node.setVerifyCount(6433l+i);
             node.setWallet("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf"+i);
             node.setUpdateTime(new Date());
             nodeMapper.insert(node);
