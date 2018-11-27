@@ -59,7 +59,7 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "keyword": "node-1"// 节点账户名称(可选)
+     *      "keyword": "node-1"// 节点账户名称(可选)，用于节点列表的筛选
      * }
      *
      * @apiSuccessExample {json} Success-Response:
