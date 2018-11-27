@@ -1,6 +1,6 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.dto.account.AccountDowload;
+import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
@@ -36,7 +36,7 @@ public class ExportServiceImpl implements ExportService {
     private I18nUtil i18n;
 
     @Override
-    public AccountDowload exportAccountCsv(AccountDownloadReq req) {
+    public AccountDownload exportAccountCsv(AccountDownloadReq req) {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
@@ -92,7 +92,7 @@ public class ExportServiceImpl implements ExportService {
                 i18n.i(I18nEnum.DOWNLOAD_CSV_STATUS)
         );
         writer.writeRowsAndClose(rows);
-        AccountDowload accountDowload = new AccountDowload();
+        AccountDownload accountDowload = new AccountDownload();
         accountDowload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
         accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");

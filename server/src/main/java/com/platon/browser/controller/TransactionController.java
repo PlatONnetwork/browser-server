@@ -1,15 +1,12 @@
 package com.platon.browser.controller;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.account.AccountDowload;
+import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockItem;
@@ -542,7 +539,7 @@ public class TransactionController {
             throw new ResponseException(i18n.i(I18nEnum.FORMAT_DATE_ERROR));
         }
         req.setEndDate(new Date());
-        AccountDowload accountDownload = exportService.exportAccountCsv(req);
+        AccountDownload accountDownload = exportService.exportAccountCsv(req);
         download(response,accountDownload.getFilename(),accountDownload.getLength(),accountDownload.getData());
     }
 
