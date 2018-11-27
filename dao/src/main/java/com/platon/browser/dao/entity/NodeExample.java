@@ -1615,73 +1615,63 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressIsNull() {
-            addCriterion("node_address is null");
+        public Criteria andPortIsNull() {
+            addCriterion("port is null");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressIsNotNull() {
-            addCriterion("node_address is not null");
+        public Criteria andPortIsNotNull() {
+            addCriterion("port is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressEqualTo(String value) {
-            addCriterion("node_address =", value, "nodeAddress");
+        public Criteria andPortEqualTo(Integer value) {
+            addCriterion("port =", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressNotEqualTo(String value) {
-            addCriterion("node_address <>", value, "nodeAddress");
+        public Criteria andPortNotEqualTo(Integer value) {
+            addCriterion("port <>", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressGreaterThan(String value) {
-            addCriterion("node_address >", value, "nodeAddress");
+        public Criteria andPortGreaterThan(Integer value) {
+            addCriterion("port >", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressGreaterThanOrEqualTo(String value) {
-            addCriterion("node_address >=", value, "nodeAddress");
+        public Criteria andPortGreaterThanOrEqualTo(Integer value) {
+            addCriterion("port >=", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressLessThan(String value) {
-            addCriterion("node_address <", value, "nodeAddress");
+        public Criteria andPortLessThan(Integer value) {
+            addCriterion("port <", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressLessThanOrEqualTo(String value) {
-            addCriterion("node_address <=", value, "nodeAddress");
+        public Criteria andPortLessThanOrEqualTo(Integer value) {
+            addCriterion("port <=", value, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressLike(String value) {
-            addCriterion("node_address like", value, "nodeAddress");
+        public Criteria andPortIn(List<Integer> values) {
+            addCriterion("port in", values, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressNotLike(String value) {
-            addCriterion("node_address not like", value, "nodeAddress");
+        public Criteria andPortNotIn(List<Integer> values) {
+            addCriterion("port not in", values, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressIn(List<String> values) {
-            addCriterion("node_address in", values, "nodeAddress");
+        public Criteria andPortBetween(Integer value1, Integer value2) {
+            addCriterion("port between", value1, value2, "port");
             return (Criteria) this;
         }
 
-        public Criteria andNodeAddressNotIn(List<String> values) {
-            addCriterion("node_address not in", values, "nodeAddress");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeAddressBetween(String value1, String value2) {
-            addCriterion("node_address between", value1, value2, "nodeAddress");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeAddressNotBetween(String value1, String value2) {
-            addCriterion("node_address not between", value1, value2, "nodeAddress");
+        public Criteria andPortNotBetween(Integer value1, Integer value2) {
+            addCriterion("port not between", value1, value2, "port");
             return (Criteria) this;
         }
     }

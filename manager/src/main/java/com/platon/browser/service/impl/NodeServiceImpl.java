@@ -4,10 +4,8 @@ import com.maxmind.geoip.Location;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeDetail;
@@ -22,7 +20,6 @@ import com.platon.browser.service.NodeService;
 import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
-import com.sun.tools.javac.file.Locations;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +105,7 @@ public class NodeServiceImpl implements NodeService {
         Node currentNode = list.get(0);
         BeanUtils.copyProperties(currentNode,nodeDetail);
         nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
+        nodeDetail.setNodeAddress(currentNode.getIp()+":"+currentNode.getPort());
 
         try{
             Location location = GeoUtil.getLocation(currentNode.getIp());
