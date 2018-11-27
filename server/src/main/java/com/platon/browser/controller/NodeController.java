@@ -72,7 +72,7 @@ public class NodeController {
      *           "ranking": 1,// 排名
      *           "name": "node-1",// 账户名称
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
-     *           "country":"china", // 国家
+     *           "countryCode":"CN", // 国家代码
      *           "location": "中国广东深圳",// 地理位置
      *           "deposit": "1.254555555", // 质押金，单位-ATP
      *           "blockCount": 252125,// 产生的总区块数
