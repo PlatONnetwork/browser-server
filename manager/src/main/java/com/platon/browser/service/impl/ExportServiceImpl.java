@@ -1,11 +1,13 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
+import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.I18nEnum;
@@ -98,5 +100,10 @@ public class ExportServiceImpl implements ExportService {
         accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
         accountDowload.setLength(baos.size());
         return accountDowload;
+    }
+
+    @Override
+    public BlockDownload exportNodeBlockCsv(BlockDownloadReq req) {
+        return null;
     }
 }
