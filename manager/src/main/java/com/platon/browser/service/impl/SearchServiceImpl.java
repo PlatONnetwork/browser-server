@@ -1,6 +1,7 @@
 package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.maxmind.geoip.Location;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
@@ -21,8 +22,10 @@ import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
+import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -216,8 +219,21 @@ public class SearchServiceImpl implements SearchService {
             NodeDetail nodeDetail = new NodeDetail();
             BeanUtils.copyProperties(node,nodeDetail);
             nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
+            nodeDetail.setJoinTime(node.getJoinTime().getTime());
+            try {
+                Location location= GeoUtil.getLocation(node.getIp());
+                if(StringUtils.isNotBlank(location.countryName)){
+                    nodeDetail.setLocation(location.countryName);
+                }
+                if(StringUtils.isNotBlank(location.city)){
+                    nodeDetail.setLocation(nodeDetail.getLocation()+" "+location.city);
+                }
+            }catch (Exception e){
+                nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
+            }
             result.setType("node");
             result.setStruct(nodeDetail);
+            return result;
         }
 
         if(isNumber){
