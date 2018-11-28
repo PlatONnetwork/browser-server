@@ -68,16 +68,20 @@ public class SearchServiceImpl implements SearchService {
         param.setParameter(param.getParameter().trim());
         String chainId = param.getCid();
         String keyword = param.getParameter();
-        boolean isAccountOrContract = false, isTransactionOrBlock = false;
+        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodePublicKey=false;
         boolean isNumber=keyword.matches("[0-9]+");
         if (!isNumber) {
             //为false则可能为区块交易hash或者为账户
             if(keyword.length()<=2)
                 throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
-            if("0x".equals(keyword.substring(0, 2)) && keyword.length() == 42)
-                isAccountOrContract = true;
-            else
+            if("0x".equals(keyword.substring(0, 2))){
+                if(keyword.length() == 42)
+                    isAccountOrContract = true;
+                if(keyword.length() == 130)
+                    isNodePublicKey = true;
+            } else {
                 isTransactionOrBlock = true;
+            }
         }
 
         SearchResult<Object> result = new SearchResult<>();
