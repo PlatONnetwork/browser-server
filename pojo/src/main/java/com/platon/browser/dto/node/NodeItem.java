@@ -10,7 +10,7 @@ public class NodeItem {
     private String countryCode;
     private String location;
     private String deposit;
-    private long blockCount;
+    private int blockCount;
     private double rewardRatio;
     private String address;
 }
