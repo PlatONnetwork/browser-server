@@ -105,7 +105,7 @@ public class NodeServiceImpl implements NodeService {
         Node currentNode = list.get(0);
         BeanUtils.copyProperties(currentNode,nodeDetail);
         nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
-        nodeDetail.setNodeAddress(currentNode.getIp()+":"+currentNode.getPort());
+        nodeDetail.setNodeUrl(currentNode.getIp()+":"+currentNode.getPort());
 
         try{
             Location location = GeoUtil.getLocation(currentNode.getIp());

@@ -125,7 +125,7 @@ public class NodeController {
      *           "blockCount": 252125,// 累计出块数
      *           "avgBlockTime": 1.312, // 平均出块时长,单位-秒
      *           "rewardAmount": "0.12425451222222",// 累计分红，单位-ATP
-     *           "nodeAddress":"http://mainnet.abc.cn:10332", // 节点地址
+     *           "nodeUrl":"http://mainnet.abc.cn:10332", // 节点URL地址
      *           "publicKey":"0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DE", // 节点公钥
      *           "wallet":"0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4", // 节点钱包
      *           "intro":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // 节点简介

@@ -15,7 +15,7 @@ public class NodeDetail {
     private long blockCount;
     private double avgBlockTime;
     private String rewardAmount;
-    private String nodeAddress;
+    private String nodeUrl;
     private String publicKey;
     private String wallet;
     private String intro;
