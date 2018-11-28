@@ -2,7 +2,6 @@ package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.block.BlockDownload;
@@ -12,7 +11,6 @@ import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.ExportService;
@@ -104,19 +102,20 @@ public class ExportServiceImpl implements ExportService {
                 i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
         );
         writer.writeRowsAndClose(rows);
-        AccountDownload accountDowload = new AccountDownload();
-        accountDowload.setData(baos.toByteArray());
+        AccountDownload accountDownload = new AccountDownload();
+        accountDownload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
-        accountDowload.setLength(baos.size());
-        return accountDowload;
+        accountDownload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
+        accountDownload.setLength(baos.size());
+        return accountDownload;
     }
 
     @Override
     public BlockDownload exportNodeBlockCsv(BlockDownloadReq req) {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
-        PageHelper.startPage(1,3600);
+        // 限制最多导出6万条记录
+        PageHelper.startPage(1,60000);
         List<Block> blockList = blockService.getBlockList(req);
 
         List<Object[]> rows = new ArrayList<>();
