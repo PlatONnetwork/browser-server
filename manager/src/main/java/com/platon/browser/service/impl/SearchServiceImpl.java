@@ -7,6 +7,7 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.req.search.SearchReq;
@@ -52,6 +53,8 @@ public class SearchServiceImpl implements SearchService {
     private PendingTxService pendingTxService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private NodeMapper nodeMapper;
     @Autowired
     private I18nUtil i18n;
 

@@ -6,6 +6,8 @@ import lombok.Data;
 public class NodeDetail {
     private String address;
     private String name;
+    private String logo;
+    private Integer electionStatus;
     private String location;
     private long joinTime;
     private String deposit;

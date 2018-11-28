@@ -116,6 +116,8 @@ public class NodeController {
      *      "data": {
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
      *           "name": "node-1",// 账户名称
+     *           "logo":"", // 节点LOGO，具体形式待定
+     *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "location": "中国广东深圳",// 所属区域
      *           "joinTime": 199880011,//块高
      *           "deposit": "1.254555555", // 质押金，单位-ATP
