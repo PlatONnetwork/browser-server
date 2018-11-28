@@ -119,7 +119,7 @@ public class NodeController {
      *           "logo":"", // 节点LOGO，具体形式待定
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "location": "中国广东深圳",// 所属区域
-     *           "joinTime": 199880011,//块高
+     *           "joinTime": 199880011,// 加入时间，单位-毫秒
      *           "deposit": "1.254555555", // 质押金，单位-ATP
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "ranking": 1,// 质押排名
