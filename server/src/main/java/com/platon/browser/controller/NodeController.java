@@ -114,6 +114,7 @@ public class NodeController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
+     *           "address": "0xsfjl34jfljsl435kd", // 节点地址
      *           "name": "node-1",// 账户名称
      *           "location": "中国广东深圳",// 所属区域
      *           "joinTime": 199880011,//块高
