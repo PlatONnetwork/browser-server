@@ -38,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andBlockNumberEqualTo(req.getHeight());
-        condition.setOrderByClause("timestamp desc");
+        condition.setOrderByClause("sequence desc");
         List<Transaction> transactions = transactionMapper.selectByExample(condition);
 
         long serverTime = System.currentTimeMillis();
