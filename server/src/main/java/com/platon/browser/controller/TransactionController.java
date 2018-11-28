@@ -106,7 +106,7 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionPageReq req) {
+    public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
@@ -683,13 +683,14 @@ public class TransactionController {
      * }
      */
     @PostMapping("blockTransaction")
-    public RespPage<TransactionItem> blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
+    public JsonResp blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        TransactionPageReq tlr = new TransactionPageReq();
+        TransactionListReq tlr = new TransactionListReq();
         BeanUtils.copyProperties(req,tlr);
-        RespPage<TransactionItem> page = transactionService.getTransactionPage(tlr);
-        return page;
+        tlr.buildPage();
+        List<TransactionItem> transactions = transactionService.getTransactionByBlockNumber(tlr);
+        return JsonResp.asList().addAll(transactions).pagination(tlr).build();
     }
 }

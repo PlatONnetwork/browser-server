@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TransactionPageReq extends PageReq {
+public class TransactionListReq extends PageReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     private Long height;

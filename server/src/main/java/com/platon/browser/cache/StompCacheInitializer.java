@@ -23,7 +23,7 @@ import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NodeType;
 import com.platon.browser.req.block.BlockPageReq;
-import com.platon.browser.req.transaction.TransactionPageReq;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.GeoUtil;
@@ -286,7 +286,7 @@ public class StompCacheInitializer {
      * 更新交易列表信息缓存
      */
     public void initTransactionCache(String chainId){
-        TransactionPageReq req = new TransactionPageReq();
+        TransactionListReq req = new TransactionListReq();
         req.setCid(chainId);
         req.setPageSize(10);
         RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
