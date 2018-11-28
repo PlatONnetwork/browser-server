@@ -1,14 +1,13 @@
 package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.dto.account.AddressDetail;
@@ -196,6 +195,29 @@ public class SearchServiceImpl implements SearchService {
                     throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
                 }
             }
+        }
+
+        if(isNodePublicKey){
+            // 根据节点公钥查询节点详情
+            NodeExample nodeExample = new NodeExample();
+            nodeExample.createCriteria()
+                    .andChainIdEqualTo(chainId)
+                    .andPublicKeyEqualTo(keyword);
+            List<Node> nodes = nodeMapper.selectByExample(nodeExample);
+            if (nodes.size()>1){
+                logger.error("duplicate node: node address {}",keyword);
+                throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
+            }
+            if(nodes.size()==0){
+                logger.error("invalid node address {}",keyword);
+                throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
+            }
+            Node node = nodes.get(0);
+            NodeDetail nodeDetail = new NodeDetail();
+            BeanUtils.copyProperties(node,nodeDetail);
+            nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
+            result.setType("node");
+            result.setStruct(nodeDetail);
         }
 
         if(isNumber){

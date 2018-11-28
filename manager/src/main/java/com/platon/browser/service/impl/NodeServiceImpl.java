@@ -91,21 +91,21 @@ public class NodeServiceImpl implements NodeService {
         NodeExample condition = new NodeExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid())
             .andAddressEqualTo(req.getAddress());
-        List<Node> list = nodeMapper.selectByExample(condition);
-        if (list.size()>1){
+        List<Node> nodes = nodeMapper.selectByExample(condition);
+        if (nodes.size()>1){
             logger.error("duplicate node: node address {}",req.getAddress());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
         }
-        if(list.size()==0){
+        if(nodes.size()==0){
             logger.error("invalid node address {}",req.getAddress());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
 
         NodeDetail nodeDetail = new NodeDetail();
-        Node currentNode = list.get(0);
+        Node currentNode = nodes.get(0);
         BeanUtils.copyProperties(currentNode,nodeDetail);
         nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
-        nodeDetail.setNodeUrl(currentNode.getIp()+":"+currentNode.getPort());
+        nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());
 
         try{
             Location location = GeoUtil.getLocation(currentNode.getIp());
