@@ -1,5 +1,6 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
@@ -10,14 +11,14 @@ import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
+import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.req.block.BlockDetailNavigateReq;
-import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.req.block.*;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -147,6 +149,24 @@ public class BlockServiceImpl implements BlockService {
         }
         BlockDetail blockDetail = getBlockDetail(detailReq);
         return blockDetail;
+    }
+
+    @Override
+    public List<Block> getBlockList(BlockDownloadReq req) {
+        BlockExample condition = new BlockExample();
+        BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(StringUtils.isNotBlank(req.getAddress())){
+            criteria.andMinerEqualTo(req.getAddress());
+        }
+        if(req.getStartDate()!=null){
+            criteria.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            criteria.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
+        condition.setOrderByClause("number desc");
+        List<Block> blocks = blockMapper.selectByExample(condition);
+        return blocks;
     }
 
 }

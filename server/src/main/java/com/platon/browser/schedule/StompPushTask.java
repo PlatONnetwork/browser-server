@@ -4,14 +4,13 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.StatisticMapper;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.StatisticGraphData;
-import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.StatisticItem;
+import com.platon.browser.dto.*;
+import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
 import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -24,6 +23,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,8 @@ public class StompPushTask {
     private StompCacheService cacheService;
     @Autowired
     private StatisticMapper statisticMapper;
+    @Autowired
+    private RedisCacheService redisCacheService;
     @Autowired
     private I18nUtil i18n;
 
@@ -116,6 +119,44 @@ public class StompPushTask {
                     graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
                 }
                 statistic.setGraphData(graphData);
+
+
+
+
+                // 平均区块交易数=统计最近3600个区块的平均交易数
+                // 取最近3600个区块，平均出块时长=(最高块出块时间-最低块出块时间)/实际块数量
+                RespPage<BlockItem> blockPage = redisCacheService.getBlockPage(chainId,1,3600);
+                int bCount = 0, tCount = 0;
+                if(blockPage.getData()==null||blockPage.getData().size()==0){
+                    // 设置平均区块交易数
+                    statistic.setAvgTransaction(BigDecimal.ZERO);
+                    // 设置平均出块时长
+                    statistic.setAvgTime(BigDecimal.ZERO);
+                }else{
+                    // 设置平均区块交易数
+                    List<BlockItem> blockItems = blockPage.getData();
+                    for (BlockItem item : blockItems){
+                        tCount+=item.getTransaction();
+                    }
+                    bCount=blockItems.size();
+                    if(bCount==0) bCount=1;
+                    BigDecimal avgTransaction = new BigDecimal(tCount).divide(new BigDecimal(bCount),4, RoundingMode.DOWN);
+                    statistic.setAvgTransaction(avgTransaction);
+
+                    // 设置平均出块时长
+                    BlockItem top = blockItems.get(0);
+                    BlockItem bot = blockItems.get(blockItems.size()-1);
+                    if(top==bot) {
+                        statistic.setAvgTime(BigDecimal.ZERO);
+                    }else{
+                        long diff = top.getTimestamp()-bot.getTimestamp();
+                        BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(bCount*1000),4,RoundingMode.DOWN);
+                        statistic.setAvgTime(avgTime);
+                        statistic.setLowestBlockTimestamp(bot.getTimestamp());
+                    }
+                }
+
+
 
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
                 messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);

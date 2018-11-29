@@ -24,6 +24,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.print.DocFlavor;
 import java.util.*;
 
 
@@ -49,6 +51,22 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private ChainsConfig chainsConfig;
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+
+    private Map<String,Integer> transactionCountMap = new HashMap<>();
+
+    @PostConstruct
+    private void init(){
+        chainsConfig.getChainIds().forEach(chainId->{
+            TransactionExample transactionExample = new TransactionExample();
+            transactionExample.createCriteria().andChainIdEqualTo(chainId);
+            Long count = transactionMapper.countByExample(transactionExample);
+            transactionCountMap.put(chainId,count.intValue());
+        });
+    }
+
+    public void updateTransactionCount(String chainId, int step){
+        transactionCountMap.put(chainId,transactionCountMap.get(chainId)+step);
+    }
 
     /**
      * 更新区块缓存
@@ -137,12 +155,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public RespPage<BlockItem> getBlockPage(String chainId,int pageNum,int pageSize){
         RespPage<BlockItem> page = new RespPage<>();
 
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(chainId);
-        Long totalCount = blockMapper.countByExample(blockExample);
-        page.setDisplayTotalCount(totalCount.intValue());
-
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+
         Long size = redisTemplate.opsForZSet().size(cacheKey);
 
         page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
@@ -181,6 +195,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             blocks.add(bean);
         });
         page.setData(blocks);
+
+        // 设置总记录大小
+        cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
+        if(cache.size()>0){
+            Block block = JSON.parseObject(cache.iterator().next(),Block.class);
+            page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
+        }else{
+            page.setDisplayTotalCount(0);
+        }
+
         return page;
     }
 
@@ -197,10 +221,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         RespPage<TransactionItem> page = new RespPage<>();
 
-        TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andChainIdEqualTo(chainId);
-        Long totalCount = transactionMapper.countByExample(transactionExample);
-        page.setDisplayTotalCount(totalCount.intValue());
+        page.setDisplayTotalCount(transactionCountMap.get(chainId));
 
         Long size = redisTemplate.opsForZSet().size(cacheKey);
         page.setTotalCount(size.intValue());

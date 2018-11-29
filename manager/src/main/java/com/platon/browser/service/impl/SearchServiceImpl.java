@@ -1,13 +1,14 @@
 package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.maxmind.geoip.Location;
+import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.dto.account.AddressDetail;
@@ -21,8 +22,10 @@ import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
+import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,6 +56,8 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private AccountService accountService;
     @Autowired
+    private NodeMapper nodeMapper;
+    @Autowired
     private I18nUtil i18n;
 
     @Override
@@ -65,16 +70,20 @@ public class SearchServiceImpl implements SearchService {
         param.setParameter(param.getParameter().trim());
         String chainId = param.getCid();
         String keyword = param.getParameter();
-        boolean isAccountOrContract = false, isTransactionOrBlock = false;
+        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodePublicKey=false;
         boolean isNumber=keyword.matches("[0-9]+");
         if (!isNumber) {
             //为false则可能为区块交易hash或者为账户
             if(keyword.length()<=2)
                 throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
-            if("0x".equals(keyword.substring(0, 2)) && keyword.length() == 42)
-                isAccountOrContract = true;
-            else
+            if("0x".equals(keyword.substring(0, 2))){
+                if(keyword.length() == 42)
+                    isAccountOrContract = true;
+                if(keyword.length() == 130)
+                    isNodePublicKey = true;
+            } else {
                 isTransactionOrBlock = true;
+            }
         }
 
         SearchResult<Object> result = new SearchResult<>();
@@ -189,6 +198,42 @@ public class SearchServiceImpl implements SearchService {
                     throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
                 }
             }
+        }
+
+        if(isNodePublicKey){
+            // 根据节点公钥查询节点详情
+            NodeExample nodeExample = new NodeExample();
+            nodeExample.createCriteria()
+                    .andChainIdEqualTo(chainId)
+                    .andPublicKeyEqualTo(keyword);
+            List<Node> nodes = nodeMapper.selectByExample(nodeExample);
+            if (nodes.size()>1){
+                logger.error("duplicate node: node address {}",keyword);
+                throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
+            }
+            if(nodes.size()==0){
+                logger.error("invalid node address {}",keyword);
+                throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
+            }
+            Node node = nodes.get(0);
+            NodeDetail nodeDetail = new NodeDetail();
+            BeanUtils.copyProperties(node,nodeDetail);
+            nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
+            nodeDetail.setJoinTime(node.getJoinTime().getTime());
+            try {
+                Location location= GeoUtil.getLocation(node.getIp());
+                if(StringUtils.isNotBlank(location.countryName)){
+                    nodeDetail.setLocation(location.countryName);
+                }
+                if(StringUtils.isNotBlank(location.city)){
+                    nodeDetail.setLocation(nodeDetail.getLocation()+" "+location.city);
+                }
+            }catch (Exception e){
+                nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
+            }
+            result.setType("node");
+            result.setStruct(nodeDetail);
+            return result;
         }
 
         if(isNumber){

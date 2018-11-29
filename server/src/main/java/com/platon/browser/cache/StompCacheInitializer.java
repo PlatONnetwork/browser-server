@@ -1,9 +1,11 @@
 package com.platon.browser.cache;
 
-import com.alibaba.fastjson.JSON;
 import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -21,7 +23,7 @@ import com.platon.browser.dto.transaction.TransactionInfo;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.enums.NodeType;
 import com.platon.browser.req.block.BlockPageReq;
-import com.platon.browser.req.transaction.TransactionPageReq;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.GeoUtil;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -114,6 +117,8 @@ public class StompCacheInitializer {
             Location location = GeoUtil.getLocation(node.getIp());
             bean.setLongitude(location.longitude);
             bean.setLatitude(location.latitude);
+            bean.setNodeType(node.getType());
+            bean.setNetState(node.getNodeStatus());
             nodeInfoList.add(bean);
         });
         stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
@@ -146,7 +151,7 @@ public class StompCacheInitializer {
         // 取共识节点数
         NodeExample nodeExample = new NodeExample();
         nodeExample.createCriteria().andChainIdEqualTo(chainId)
-                .andNodeTypeEqualTo(NodeType.CONSENSUS.code);
+                .andTypeEqualTo(NodeType.CONSENSUS.code);
         long nodeCount = nodeMapper.countByExample(nodeExample);
         indexInfo.setConsensusNodeAmount(nodeCount);
 
@@ -165,43 +170,7 @@ public class StompCacheInitializer {
      * 更新交易统计信息缓存
      */
     public void initStatisticCache(String chainId){
-
-        String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-
         StatisticInfo statisticInfo = new StatisticInfo();
-
-
-        RespPage<BlockItem> topPage = redisCacheService.getBlockPage(chainId,1,1);
-
-        List<BlockItem> topList = topPage.getData();
-        if(topList.size()==1){
-            BlockItem top = topList.get(0);
-            statisticInfo.setHighestBlockNumber(top.getHeight());
-            statisticInfo.setHighestBlockTimestamp(top.getTimestamp());
-
-            // 先从最高块向前回溯3600个块
-            Set<String> bottomBlockSet = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
-            if(bottomBlockSet.size()==0){
-                // 从后向前累计不足3600个块，则正向取链上第一个块
-                bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
-            }
-            if(bottomBlockSet.size()==0){
-                statisticInfo.setLowestBlockNumber(top.getHeight());
-                statisticInfo.setLowestBlockTimestamp(top.getTimestamp());
-                logger.error("找不到初始化统计信息需要的区块信息!!");
-            }
-            if(bottomBlockSet.size()>0){
-                Block bottom = JSON.parseObject(bottomBlockSet.iterator().next(),Block.class);
-                statisticInfo.setLowestBlockNumber(bottom.getNumber());
-                statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
-
-                long avgTime = (top.getTimestamp()-bottom.getTimestamp().getTime())/top.getHeight();
-                statisticInfo.setAvgTime(avgTime);
-            }
-
-        }else{
-            statisticInfo.setAvgTime(0l);
-        }
 
         // 取当前时间回溯五分钟的交易数统计TPS
         Date endDate = new Date();
@@ -231,9 +200,39 @@ public class StompCacheInitializer {
         long blockCount = statisticMapper.countTransactionBlock(chainId);
         statisticInfo.setBlockCount(blockCount);
 
-        // 计算平均区块交易数
-        BigDecimal avgTransactionCount = statisticMapper.countAvgTransactionPerBlock(chainId);
-        statisticInfo.setAvgTransaction(avgTransactionCount);
+        // 平均区块交易数=统计最近3600个区块的平均交易数
+        // 取最近3600个区块，平均出块时长=(最高块出块时间-最低块出块时间)/实际块数量
+        RespPage<BlockItem> blockPage = redisCacheService.getBlockPage(chainId,1,3600);
+        int bCount = 0, tCount = 0;
+        if(blockPage.getData()==null||blockPage.getData().size()==0){
+            // 设置平均区块交易数
+            statisticInfo.setAvgTransaction(BigDecimal.ZERO);
+            // 设置平均出块时长
+            statisticInfo.setAvgTime(BigDecimal.ZERO);
+        }else{
+            // 设置平均区块交易数
+            List<BlockItem> blockItems = blockPage.getData();
+            for (BlockItem item : blockItems){
+                tCount+=item.getTransaction();
+            }
+            bCount=blockItems.size();
+            if(bCount==0) bCount=1;
+            BigDecimal avgTransaction = new BigDecimal(tCount).divide(new BigDecimal(bCount),4, RoundingMode.DOWN);
+            statisticInfo.setAvgTransaction(avgTransaction);
+
+            // 设置平均出块时长
+            BlockItem top = blockItems.get(0);
+            BlockItem bot = blockItems.get(blockItems.size()-1);
+            if(top==bot) {
+                statisticInfo.setAvgTime(BigDecimal.ZERO);
+            }else{
+                long diff = top.getTimestamp()-bot.getTimestamp();
+                BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(bCount*1000),4,RoundingMode.DOWN);
+                statisticInfo.setAvgTime(avgTime);
+                statisticInfo.setLowestBlockTimestamp(bot.getTimestamp());
+            }
+        }
+
 
         // 过去24小时交易笔数
         long count = statisticMapper.countTransactionIn24Hours(chainId);
@@ -287,7 +286,7 @@ public class StompCacheInitializer {
      * 更新交易列表信息缓存
      */
     public void initTransactionCache(String chainId){
-        TransactionPageReq req = new TransactionPageReq();
+        TransactionListReq req = new TransactionListReq();
         req.setCid(chainId);
         req.setPageSize(10);
         RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());

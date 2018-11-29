@@ -1,12 +1,18 @@
 package com.platon.browser.service.impl;
 
-import com.platon.browser.dto.account.AccountDowload;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
+import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.service.AccountService;
+import com.platon.browser.service.BlockService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -33,10 +39,14 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private AccountService accountService;
     @Autowired
+    private BlockService blockService;
+    @Autowired
+    private BlockMapper blockMapper;
+    @Autowired
     private I18nUtil i18n;
 
     @Override
-    public AccountDowload exportAccountCsv(AccountDownloadReq req) {
+    public AccountDownload exportAccountCsv(AccountDownloadReq req) {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
@@ -82,21 +92,58 @@ public class ExportServiceImpl implements ExportService {
         Writer outputWriter = new OutputStreamWriter(baos);
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         writer.writeHeaders(
-                i18n.i(I18nEnum.DOWNLOAD_CSV_HASH),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_TIME),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_TYPE),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_FROM),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_TO),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_VALUE),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_FEE),
-                i18n.i(I18nEnum.DOWNLOAD_CSV_STATUS)
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
         );
         writer.writeRowsAndClose(rows);
-        AccountDowload accountDowload = new AccountDowload();
-        accountDowload.setData(baos.toByteArray());
+        AccountDownload accountDownload = new AccountDownload();
+        accountDownload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        accountDowload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
-        accountDowload.setLength(baos.size());
-        return accountDowload;
+        accountDownload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
+        accountDownload.setLength(baos.size());
+        return accountDownload;
+    }
+
+    @Override
+    public BlockDownload exportNodeBlockCsv(BlockDownloadReq req) {
+        SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
+        // 限制最多导出6万条记录
+        PageHelper.startPage(1,60000);
+        List<Block> blockList = blockService.getBlockList(req);
+
+        List<Object[]> rows = new ArrayList<>();
+        blockList.forEach(block->{
+            Object[] row = {
+                    block.getNumber(),
+                    ymdhms.format(block.getTimestamp()),
+                    block.getTransactionNumber(),
+                    block.getBlockReward()
+            };
+            rows.add(row);
+        });
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer outputWriter = new OutputStreamWriter(baos);
+        CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+        writer.writeHeaders(
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD)
+        );
+        writer.writeRowsAndClose(rows);
+        BlockDownload blockDownload = new BlockDownload();
+        blockDownload.setData(baos.toByteArray());
+        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+        blockDownload.setFilename("block-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
+        blockDownload.setLength(baos.size());
+        return blockDownload;
     }
 }

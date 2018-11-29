@@ -5,54 +5,60 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Node {
-    private String nodeId;
-
-    private String nodeName;
-
-    private String nodeAddress;
-
-    private Integer netState;
+    private String id;
 
     private String ip;
 
-    private Integer nodeType;
+    private String name;
+
+    private Integer type;
+
+    private String intro;
+
+    private String publicKey;
+
+    private String wallet;
+
+    private String address;
+
+    private Integer nodeStatus;
+
+    private Integer electionStatus;
+
+    private String deposit;
+
+    private Integer ranking;
+
+    private String orgName;
+
+    private String orgWebsite;
 
     private String chainId;
+
+    private Integer blockCount;
+
+    private Date joinTime;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public String getNodeId() {
-        return nodeId;
+    private Double rewardRatio;
+
+    private Long verifyCount;
+
+    private String rewardAmount;
+
+    private String profitAmount;
+
+    private Integer port;
+
+    public String getId() {
+        return id;
     }
 
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId == null ? null : nodeId.trim();
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName == null ? null : nodeName.trim();
-    }
-
-    public String getNodeAddress() {
-        return nodeAddress;
-    }
-
-    public void setNodeAddress(String nodeAddress) {
-        this.nodeAddress = nodeAddress == null ? null : nodeAddress.trim();
-    }
-
-    public Integer getNetState() {
-        return netState;
-    }
-
-    public void setNetState(Integer netState) {
-        this.netState = netState;
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
     }
 
     public String getIp() {
@@ -63,12 +69,100 @@ public class Node {
         this.ip = ip == null ? null : ip.trim();
     }
 
-    public Integer getNodeType() {
-        return nodeType;
+    public String getName() {
+        return name;
     }
 
-    public void setNodeType(Integer nodeType) {
-        this.nodeType = nodeType;
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro == null ? null : intro.trim();
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey == null ? null : publicKey.trim();
+    }
+
+    public String getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(String wallet) {
+        this.wallet = wallet == null ? null : wallet.trim();
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
+    }
+
+    public Integer getNodeStatus() {
+        return nodeStatus;
+    }
+
+    public void setNodeStatus(Integer nodeStatus) {
+        this.nodeStatus = nodeStatus;
+    }
+
+    public Integer getElectionStatus() {
+        return electionStatus;
+    }
+
+    public void setElectionStatus(Integer electionStatus) {
+        this.electionStatus = electionStatus;
+    }
+
+    public String getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(String deposit) {
+        this.deposit = deposit == null ? null : deposit.trim();
+    }
+
+    public Integer getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(Integer ranking) {
+        this.ranking = ranking;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName == null ? null : orgName.trim();
+    }
+
+    public String getOrgWebsite() {
+        return orgWebsite;
+    }
+
+    public void setOrgWebsite(String orgWebsite) {
+        this.orgWebsite = orgWebsite == null ? null : orgWebsite.trim();
     }
 
     public String getChainId() {
@@ -77,6 +171,22 @@ public class Node {
 
     public void setChainId(String chainId) {
         this.chainId = chainId == null ? null : chainId.trim();
+    }
+
+    public Integer getBlockCount() {
+        return blockCount;
+    }
+
+    public void setBlockCount(Integer blockCount) {
+        this.blockCount = blockCount;
+    }
+
+    public Date getJoinTime() {
+        return joinTime;
+    }
+
+    public void setJoinTime(Date joinTime) {
+        this.joinTime = joinTime;
     }
 
     public Date getCreateTime() {
@@ -95,6 +205,46 @@ public class Node {
         this.updateTime = updateTime;
     }
 
+    public Double getRewardRatio() {
+        return rewardRatio;
+    }
+
+    public void setRewardRatio(Double rewardRatio) {
+        this.rewardRatio = rewardRatio;
+    }
+
+    public Long getVerifyCount() {
+        return verifyCount;
+    }
+
+    public void setVerifyCount(Long verifyCount) {
+        this.verifyCount = verifyCount;
+    }
+
+    public String getRewardAmount() {
+        return rewardAmount;
+    }
+
+    public void setRewardAmount(String rewardAmount) {
+        this.rewardAmount = rewardAmount == null ? null : rewardAmount.trim();
+    }
+
+    public String getProfitAmount() {
+        return profitAmount;
+    }
+
+    public void setProfitAmount(String profitAmount) {
+        this.profitAmount = profitAmount == null ? null : profitAmount.trim();
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
     /**
      * This enum was generated by MyBatis Generator.
      * This enum corresponds to the database table node
@@ -103,15 +253,30 @@ public class Node {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        nodeId("node_id", "nodeId", "VARCHAR", false),
-        nodeName("node_name", "nodeName", "VARCHAR", false),
-        nodeAddress("node_address", "nodeAddress", "VARCHAR", false),
-        netState("net_state", "netState", "INTEGER", false),
+        id("id", "id", "VARCHAR", false),
         ip("ip", "ip", "VARCHAR", false),
-        nodeType("node_type", "nodeType", "INTEGER", false),
+        name("name", "name", "VARCHAR", true),
+        type("type", "type", "INTEGER", true),
+        intro("intro", "intro", "VARCHAR", false),
+        publicKey("public_key", "publicKey", "VARCHAR", false),
+        wallet("wallet", "wallet", "VARCHAR", false),
+        address("address", "address", "VARCHAR", false),
+        nodeStatus("node_status", "nodeStatus", "INTEGER", false),
+        electionStatus("election status", "electionStatus", "INTEGER", true),
+        deposit("deposit", "deposit", "VARCHAR", false),
+        ranking("ranking", "ranking", "INTEGER", false),
+        orgName("org_name", "orgName", "VARCHAR", false),
+        orgWebsite("org_website", "orgWebsite", "VARCHAR", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
+        blockCount("block_count", "blockCount", "INTEGER", false),
+        joinTime("join_time", "joinTime", "TIMESTAMP", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false);
+        updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
+        verifyCount("verify_count", "verifyCount", "BIGINT", false),
+        rewardAmount("reward_amount", "rewardAmount", "VARCHAR", false),
+        profitAmount("profit_amount", "profitAmount", "VARCHAR", false),
+        port("port", "port", "INTEGER", false);
 
         /**
          * This field was generated by MyBatis Generator.

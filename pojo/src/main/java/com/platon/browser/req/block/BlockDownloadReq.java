@@ -1,4 +1,4 @@
-package com.platon.browser.req.account;
+package com.platon.browser.req.block;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
@@ -8,16 +8,13 @@ import javax.validation.constraints.Past;
 import java.util.Date;
 
 /**
- * 账户详情下载请求对象
- * 账户有两种类型：
- * 1、外部账户：钱包地址
- * 2、内部账户：合约地址
+ * 节点区块详情下载请求对象
  */
 @Data
-public class AccountDownloadReq {
+public class BlockDownloadReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "{account.address.notnull}")
+    @NotBlank(message = "{node.address.notnull}")
     private String address;
     private Date startDate;
     @NotNull(message = "{download.date.start.notnull}")

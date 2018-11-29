@@ -169,6 +169,10 @@ public class SubscribeService {
                     redisCacheService.updateTransactionCache(chainId,transactionSet);
                 }*/
 
+                if(transactionDtos.size()>0){
+                    redisCacheService.updateTransactionCount(chainId,transactionDtos.size());
+                }
+
                 logger.debug("  |- 更新统计缓存...");
                 StatisticInfo statisticInfo = new StatisticInfo();
                 statisticInfo.setHighestBlockNumber(block.getNumber());
