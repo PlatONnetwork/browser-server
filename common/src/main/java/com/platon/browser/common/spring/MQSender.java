@@ -29,6 +29,11 @@ public class MQSender {
             logger.info("消息：{}发送失败，应答码：{},原因：{}，交换机：{}, 路由器：{}",
                     correlationId,replyCode,replyText,exchange,routingKey);
         }));
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if(!ack){
+                logger.info("消息发送失败，原因：{}",cause);
+            }
+        });
     }
 
     /**
