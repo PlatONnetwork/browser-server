@@ -60,6 +60,7 @@ public class DBStorageService {
                 Block block = bulidBlock(blockDto, message);
                 try {
                     blockMapper.insertSelective(block);
+                    logger.debug("block number :" + block.getNumber());
                     logger.debug("block data insert...");
                 } catch (DuplicateKeyException e) {
                     logger.debug("block data repeat...", e.getMessage());
