@@ -101,7 +101,7 @@
 
 	<build>
 		<finalName>browser-agent</finalName>
-		<resources>
+		<!--<resources>
 			<resource>
 				<directory>src/main/resources/${package.environment}/</directory>
 			</resource>
@@ -112,7 +112,7 @@
 					<include>**/*.jar</include>
 				</includes>
 			</resource>
-		</resources>
+		</resources>-->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -144,7 +144,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
+				<!--<configuration>
 					<webResources>
 						<resource>
 							<directory>../lib</directory>
@@ -154,7 +154,7 @@
 							</includes>
 						</resource>
 					</webResources>
-				</configuration>
+				</configuration>-->
 			</plugin>
 		</plugins>
 	</build>
