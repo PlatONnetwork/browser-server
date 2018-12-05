@@ -1094,6 +1094,66 @@ public class NodeRankingExample {
             addCriterion("reward_ratio not between", value1, value2, "rewardRatio");
             return (Criteria) this;
         }
+
+        public Criteria andRankingIsNull() {
+            addCriterion("ranking is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingIsNotNull() {
+            addCriterion("ranking is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingEqualTo(Integer value) {
+            addCriterion("ranking =", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingNotEqualTo(Integer value) {
+            addCriterion("ranking <>", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingGreaterThan(Integer value) {
+            addCriterion("ranking >", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingGreaterThanOrEqualTo(Integer value) {
+            addCriterion("ranking >=", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingLessThan(Integer value) {
+            addCriterion("ranking <", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingLessThanOrEqualTo(Integer value) {
+            addCriterion("ranking <=", value, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingIn(List<Integer> values) {
+            addCriterion("ranking in", values, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingNotIn(List<Integer> values) {
+            addCriterion("ranking not in", values, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingBetween(Integer value1, Integer value2) {
+            addCriterion("ranking between", value1, value2, "ranking");
+            return (Criteria) this;
+        }
+
+        public Criteria andRankingNotBetween(Integer value1, Integer value2) {
+            addCriterion("ranking not between", value1, value2, "ranking");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

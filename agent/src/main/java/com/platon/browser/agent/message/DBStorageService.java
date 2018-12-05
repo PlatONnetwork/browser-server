@@ -102,21 +102,34 @@ public class DBStorageService {
                 logger.debug("STOMP节点信息入库: {}", msg);
                 //获取队列中的节点数据
                 List <CandidateDto> candidateDtoList = JSON.parseArray(message.getStruct(), CandidateDto.class);
-                List <Node> nodeList = buildNodeInfo(candidateDtoList, message);
-                //更新排名表
-                List<NodeRanking> nodeRankingList = new ArrayList <>();
-                nodeRankingMapper.deleteByExample(new NodeRankingExample());
-                for(int i = 0; i < nodeList.size(); i++){
-                    NodeRanking nodeRanking = new NodeRanking();
-                    nodeRankingList.add(nodeRanking);
+                List <NodeRanking> nodeRankings = buildNodeInfo(candidateDtoList, message);
+                //delete noderangking table
+                NodeRankingExample nodeRankingExample = new NodeRankingExample();
+                nodeRankingExample.createCriteria().andChainIdEqualTo(message.getChainId());
+                nodeRankingMapper.deleteByExample(nodeRankingExample);
+                //insert noderangking table
+                nodeRankingMapper.batchInsert(nodeRankings);
+
+                List<Node> nodeList = new ArrayList <>();
+                nodeRankings.forEach(nodeRanking -> {
+                    Node node = new Node();
+                    node.setId(nodeRanking.getId());
+                    node.setIp(nodeRanking.getIp());
+                    node.setProt(nodeRanking.getPort());
+                    node.setChainId(nodeRanking.getChainId());
+                    node.setNodeStatus(ping(nodeRanking.getIp()));
+                    nodeList.add(node);
+                });
+
+                for(Node node : nodeList){
+                    try{
+                        nodeMapper.insert(node);
+                        logger.debug("node data insert...");
+                    }catch (DuplicateKeyException e){
+                        logger.debug("pendingtransaction data repeat...", e.getMessage(), node.getId());
+                        continue;
+                    }
                 }
-                nodeRankingMapper.batchInsert(nodeRankingList);
-
-                //获取数据库节点存量列表
-                List<Node> nodes = nodeMapper.selectByExample(new NodeExample());
-                //TODO: 只有每轮250块出完才会对节点验证次数+1
-
-
                 break;
         }
     }
@@ -184,29 +197,30 @@ public class DBStorageService {
         return pendingTxes;
     }
 
-    private List <Node> buildNodeInfo ( List <CandidateDto> list, Message message ) {
-        List <Node> nodeList = new ArrayList <>();
-        list.forEach(candidateDto -> {
-            NodeRanking node = new NodeRanking();
-            node.setChainId(message.getChainId());
-            node.setIp(candidateDto.getHost());
-            node.setId(candidateDto.getCandidateId());
-            node.setPort(Integer.valueOf(candidateDto.getPort()));
-            node.setAddress(candidateDto.getOwner());
-            node.setUpdateTime(new Date());
-            node.setCreateTime(new Date());
-            CandidateDetailDto candidateDetailDto = null;
-            if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
-                candidateDetailDto = buildDetail(candidateDto.getExtra());
+    private List <NodeRanking> buildNodeInfo ( List <CandidateDto> list, Message message ) {
+        List <NodeRanking> nodeList = new ArrayList <>();
+            for(int i = 0; i < list.size(); i++){
+                NodeRanking nodeRanking = new NodeRanking();
+                nodeRanking.setChainId(message.getChainId());
+                nodeRanking.setIp(list.get(i).getHost());
+                nodeRanking.setId(list.get(i).getCandidateId());
+                nodeRanking.setPort(Integer.valueOf(list.get(i).getPort()));
+                nodeRanking.setAddress(list.get(i).getOwner());
+                nodeRanking.setUpdateTime(new Date());
+                nodeRanking.setCreateTime(new Date());
+                CandidateDetailDto candidateDetailDto = null;
+                if (list.get(i).getExtra().length() > 0 && null != list.get(i).getExtra()) {
+                    candidateDetailDto = buildDetail(list.get(i).getExtra());
+                }
+                nodeRanking.setName(candidateDetailDto.getNodeName());
+                nodeRanking.setDeposit(candidateDetailDto.getNodeDiscription());
+                nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
+                nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
+                nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
+                nodeRanking.setRewardRatio((double) list.get(i).getFee() / 10000);
+                nodeRanking.setRanking(i+1);
             }
-            node.setName(candidateDetailDto.getNodeName());
-            node.setDeposit(candidateDetailDto.getNodeDiscription());
-            node.setJoinTime(new Date(candidateDetailDto.getTime()));
-            node.setOrgName(candidateDetailDto.getNodeDepartment());
-            node.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
-            node.setRewardRatio((double) candidateDto.getFee() / 10000);
-            /*node.setNodeStatus(ping(candidateDto.getHost()));*/
-        });
+
         return nodeList;
     }
 

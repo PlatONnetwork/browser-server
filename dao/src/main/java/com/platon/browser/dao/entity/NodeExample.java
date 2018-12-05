@@ -314,6 +314,66 @@ public class NodeExample {
             return (Criteria) this;
         }
 
+        public Criteria andProtIsNull() {
+            addCriterion("prot is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtIsNotNull() {
+            addCriterion("prot is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtEqualTo(Integer value) {
+            addCriterion("prot =", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtNotEqualTo(Integer value) {
+            addCriterion("prot <>", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtGreaterThan(Integer value) {
+            addCriterion("prot >", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtGreaterThanOrEqualTo(Integer value) {
+            addCriterion("prot >=", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtLessThan(Integer value) {
+            addCriterion("prot <", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtLessThanOrEqualTo(Integer value) {
+            addCriterion("prot <=", value, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtIn(List<Integer> values) {
+            addCriterion("prot in", values, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtNotIn(List<Integer> values) {
+            addCriterion("prot not in", values, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtBetween(Integer value1, Integer value2) {
+            addCriterion("prot between", value1, value2, "prot");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtNotBetween(Integer value1, Integer value2) {
+            addCriterion("prot not between", value1, value2, "prot");
+            return (Criteria) this;
+        }
+
         public Criteria andNodeStatusIsNull() {
             addCriterion("node_status is null");
             return (Criteria) this;
