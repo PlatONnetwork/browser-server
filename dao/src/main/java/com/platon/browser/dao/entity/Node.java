@@ -15,10 +15,6 @@ public class Node {
 
     private String intro;
 
-    private String publicKey;
-
-    private String wallet;
-
     private String address;
 
     private Integer nodeStatus;
@@ -27,15 +23,11 @@ public class Node {
 
     private String deposit;
 
-    private Integer ranking;
-
     private String orgName;
 
     private String orgWebsite;
 
     private String chainId;
-
-    private Integer blockCount;
 
     private Date joinTime;
 
@@ -45,11 +37,11 @@ public class Node {
 
     private Double rewardRatio;
 
-    private Long verifyCount;
-
     private String rewardAmount;
 
     private String profitAmount;
+
+    private Long verifyCount;
 
     private Integer port;
 
@@ -93,22 +85,6 @@ public class Node {
         this.intro = intro == null ? null : intro.trim();
     }
 
-    public String getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey == null ? null : publicKey.trim();
-    }
-
-    public String getWallet() {
-        return wallet;
-    }
-
-    public void setWallet(String wallet) {
-        this.wallet = wallet == null ? null : wallet.trim();
-    }
-
     public String getAddress() {
         return address;
     }
@@ -141,14 +117,6 @@ public class Node {
         this.deposit = deposit == null ? null : deposit.trim();
     }
 
-    public Integer getRanking() {
-        return ranking;
-    }
-
-    public void setRanking(Integer ranking) {
-        this.ranking = ranking;
-    }
-
     public String getOrgName() {
         return orgName;
     }
@@ -171,14 +139,6 @@ public class Node {
 
     public void setChainId(String chainId) {
         this.chainId = chainId == null ? null : chainId.trim();
-    }
-
-    public Integer getBlockCount() {
-        return blockCount;
-    }
-
-    public void setBlockCount(Integer blockCount) {
-        this.blockCount = blockCount;
     }
 
     public Date getJoinTime() {
@@ -213,14 +173,6 @@ public class Node {
         this.rewardRatio = rewardRatio;
     }
 
-    public Long getVerifyCount() {
-        return verifyCount;
-    }
-
-    public void setVerifyCount(Long verifyCount) {
-        this.verifyCount = verifyCount;
-    }
-
     public String getRewardAmount() {
         return rewardAmount;
     }
@@ -235,6 +187,14 @@ public class Node {
 
     public void setProfitAmount(String profitAmount) {
         this.profitAmount = profitAmount == null ? null : profitAmount.trim();
+    }
+
+    public Long getVerifyCount() {
+        return verifyCount;
+    }
+
+    public void setVerifyCount(Long verifyCount) {
+        this.verifyCount = verifyCount;
     }
 
     public Integer getPort() {
@@ -258,24 +218,20 @@ public class Node {
         name("name", "name", "VARCHAR", true),
         type("type", "type", "INTEGER", true),
         intro("intro", "intro", "VARCHAR", false),
-        publicKey("public_key", "publicKey", "VARCHAR", false),
-        wallet("wallet", "wallet", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
         nodeStatus("node_status", "nodeStatus", "INTEGER", false),
         electionStatus("election status", "electionStatus", "INTEGER", true),
         deposit("deposit", "deposit", "VARCHAR", false),
-        ranking("ranking", "ranking", "INTEGER", false),
         orgName("org_name", "orgName", "VARCHAR", false),
         orgWebsite("org_website", "orgWebsite", "VARCHAR", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
-        blockCount("block_count", "blockCount", "INTEGER", false),
         joinTime("join_time", "joinTime", "TIMESTAMP", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
-        verifyCount("verify_count", "verifyCount", "BIGINT", false),
         rewardAmount("reward_amount", "rewardAmount", "VARCHAR", false),
         profitAmount("profit_amount", "profitAmount", "VARCHAR", false),
+        verifyCount("verify_count", "verifyCount", "BIGINT", false),
         port("port", "port", "INTEGER", false);
 
         /**

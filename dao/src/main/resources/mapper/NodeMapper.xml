@@ -7,24 +7,20 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="intro" jdbcType="VARCHAR" property="intro" />
-    <result column="public_key" jdbcType="VARCHAR" property="publicKey" />
-    <result column="wallet" jdbcType="VARCHAR" property="wallet" />
     <result column="address" jdbcType="VARCHAR" property="address" />
     <result column="node_status" jdbcType="INTEGER" property="nodeStatus" />
     <result column="election status" jdbcType="INTEGER" property="electionStatus" />
     <result column="deposit" jdbcType="VARCHAR" property="deposit" />
-    <result column="ranking" jdbcType="INTEGER" property="ranking" />
     <result column="org_name" jdbcType="VARCHAR" property="orgName" />
     <result column="org_website" jdbcType="VARCHAR" property="orgWebsite" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
-    <result column="block_count" jdbcType="INTEGER" property="blockCount" />
     <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
-    <result column="verify_count" jdbcType="BIGINT" property="verifyCount" />
     <result column="reward_amount" jdbcType="VARCHAR" property="rewardAmount" />
     <result column="profit_amount" jdbcType="VARCHAR" property="profitAmount" />
+    <result column="verify_count" jdbcType="BIGINT" property="verifyCount" />
     <result column="port" jdbcType="INTEGER" property="port" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -86,9 +82,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, ip, `name`, `type`, intro, public_key, wallet, address, node_status, `election status`, 
-    deposit, ranking, org_name, org_website, chain_id, block_count, join_time, create_time, 
-    update_time, reward_ratio, verify_count, reward_amount, profit_amount, port
+    id, ip, `name`, `type`, intro, address, node_status, `election status`, deposit, 
+    org_name, org_website, chain_id, join_time, create_time, update_time, reward_ratio, 
+    reward_amount, profit_amount, verify_count, port
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
     select
@@ -122,23 +118,19 @@
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Node">
     insert into node (id, ip, `name`, 
-      `type`, intro, public_key, 
-      wallet, address, node_status, 
-      `election status`, deposit, ranking, 
+      `type`, intro, address, 
+      node_status, `election status`, deposit, 
       org_name, org_website, chain_id, 
-      block_count, join_time, create_time, 
-      update_time, reward_ratio, verify_count, 
-      reward_amount, profit_amount, port
-      )
+      join_time, create_time, update_time, 
+      reward_ratio, reward_amount, profit_amount, 
+      verify_count, port)
     values (#{id,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{type,jdbcType=INTEGER}, #{intro,jdbcType=VARCHAR}, #{publicKey,jdbcType=VARCHAR}, 
-      #{wallet,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{nodeStatus,jdbcType=INTEGER}, 
-      #{electionStatus,jdbcType=INTEGER}, #{deposit,jdbcType=VARCHAR}, #{ranking,jdbcType=INTEGER}, 
+      #{type,jdbcType=INTEGER}, #{intro,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{nodeStatus,jdbcType=INTEGER}, #{electionStatus,jdbcType=INTEGER}, #{deposit,jdbcType=VARCHAR}, 
       #{orgName,jdbcType=VARCHAR}, #{orgWebsite,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, 
-      #{blockCount,jdbcType=INTEGER}, #{joinTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{rewardRatio,jdbcType=DOUBLE}, #{verifyCount,jdbcType=BIGINT}, 
-      #{rewardAmount,jdbcType=VARCHAR}, #{profitAmount,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}
-      )
+      #{joinTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{rewardRatio,jdbcType=DOUBLE}, #{rewardAmount,jdbcType=VARCHAR}, #{profitAmount,jdbcType=VARCHAR}, 
+      #{verifyCount,jdbcType=BIGINT}, #{port,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -158,12 +150,6 @@
       <if test="intro != null">
         intro,
       </if>
-      <if test="publicKey != null">
-        public_key,
-      </if>
-      <if test="wallet != null">
-        wallet,
-      </if>
       <if test="address != null">
         address,
       </if>
@@ -176,9 +162,6 @@
       <if test="deposit != null">
         deposit,
       </if>
-      <if test="ranking != null">
-        ranking,
-      </if>
       <if test="orgName != null">
         org_name,
       </if>
@@ -187,9 +170,6 @@
       </if>
       <if test="chainId != null">
         chain_id,
-      </if>
-      <if test="blockCount != null">
-        block_count,
       </if>
       <if test="joinTime != null">
         join_time,
@@ -203,14 +183,14 @@
       <if test="rewardRatio != null">
         reward_ratio,
       </if>
-      <if test="verifyCount != null">
-        verify_count,
-      </if>
       <if test="rewardAmount != null">
         reward_amount,
       </if>
       <if test="profitAmount != null">
         profit_amount,
+      </if>
+      <if test="verifyCount != null">
+        verify_count,
       </if>
       <if test="port != null">
         port,
@@ -232,12 +212,6 @@
       <if test="intro != null">
         #{intro,jdbcType=VARCHAR},
       </if>
-      <if test="publicKey != null">
-        #{publicKey,jdbcType=VARCHAR},
-      </if>
-      <if test="wallet != null">
-        #{wallet,jdbcType=VARCHAR},
-      </if>
       <if test="address != null">
         #{address,jdbcType=VARCHAR},
       </if>
@@ -250,9 +224,6 @@
       <if test="deposit != null">
         #{deposit,jdbcType=VARCHAR},
       </if>
-      <if test="ranking != null">
-        #{ranking,jdbcType=INTEGER},
-      </if>
       <if test="orgName != null">
         #{orgName,jdbcType=VARCHAR},
       </if>
@@ -261,9 +232,6 @@
       </if>
       <if test="chainId != null">
         #{chainId,jdbcType=VARCHAR},
-      </if>
-      <if test="blockCount != null">
-        #{blockCount,jdbcType=INTEGER},
       </if>
       <if test="joinTime != null">
         #{joinTime,jdbcType=TIMESTAMP},
@@ -277,14 +245,14 @@
       <if test="rewardRatio != null">
         #{rewardRatio,jdbcType=DOUBLE},
       </if>
-      <if test="verifyCount != null">
-        #{verifyCount,jdbcType=BIGINT},
-      </if>
       <if test="rewardAmount != null">
         #{rewardAmount,jdbcType=VARCHAR},
       </if>
       <if test="profitAmount != null">
         #{profitAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyCount != null">
+        #{verifyCount,jdbcType=BIGINT},
       </if>
       <if test="port != null">
         #{port,jdbcType=INTEGER},
@@ -315,12 +283,6 @@
       <if test="record.intro != null">
         intro = #{record.intro,jdbcType=VARCHAR},
       </if>
-      <if test="record.publicKey != null">
-        public_key = #{record.publicKey,jdbcType=VARCHAR},
-      </if>
-      <if test="record.wallet != null">
-        wallet = #{record.wallet,jdbcType=VARCHAR},
-      </if>
       <if test="record.address != null">
         address = #{record.address,jdbcType=VARCHAR},
       </if>
@@ -333,9 +295,6 @@
       <if test="record.deposit != null">
         deposit = #{record.deposit,jdbcType=VARCHAR},
       </if>
-      <if test="record.ranking != null">
-        ranking = #{record.ranking,jdbcType=INTEGER},
-      </if>
       <if test="record.orgName != null">
         org_name = #{record.orgName,jdbcType=VARCHAR},
       </if>
@@ -344,9 +303,6 @@
       </if>
       <if test="record.chainId != null">
         chain_id = #{record.chainId,jdbcType=VARCHAR},
-      </if>
-      <if test="record.blockCount != null">
-        block_count = #{record.blockCount,jdbcType=INTEGER},
       </if>
       <if test="record.joinTime != null">
         join_time = #{record.joinTime,jdbcType=TIMESTAMP},
@@ -360,14 +316,14 @@
       <if test="record.rewardRatio != null">
         reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
       </if>
-      <if test="record.verifyCount != null">
-        verify_count = #{record.verifyCount,jdbcType=BIGINT},
-      </if>
       <if test="record.rewardAmount != null">
         reward_amount = #{record.rewardAmount,jdbcType=VARCHAR},
       </if>
       <if test="record.profitAmount != null">
         profit_amount = #{record.profitAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifyCount != null">
+        verify_count = #{record.verifyCount,jdbcType=BIGINT},
       </if>
       <if test="record.port != null">
         port = #{record.port,jdbcType=INTEGER},
@@ -384,24 +340,20 @@
       `name` = #{record.name,jdbcType=VARCHAR},
       `type` = #{record.type,jdbcType=INTEGER},
       intro = #{record.intro,jdbcType=VARCHAR},
-      public_key = #{record.publicKey,jdbcType=VARCHAR},
-      wallet = #{record.wallet,jdbcType=VARCHAR},
       address = #{record.address,jdbcType=VARCHAR},
       node_status = #{record.nodeStatus,jdbcType=INTEGER},
       `election status` = #{record.electionStatus,jdbcType=INTEGER},
       deposit = #{record.deposit,jdbcType=VARCHAR},
-      ranking = #{record.ranking,jdbcType=INTEGER},
       org_name = #{record.orgName,jdbcType=VARCHAR},
       org_website = #{record.orgWebsite,jdbcType=VARCHAR},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
-      block_count = #{record.blockCount,jdbcType=INTEGER},
       join_time = #{record.joinTime,jdbcType=TIMESTAMP},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
-      verify_count = #{record.verifyCount,jdbcType=BIGINT},
       reward_amount = #{record.rewardAmount,jdbcType=VARCHAR},
       profit_amount = #{record.profitAmount,jdbcType=VARCHAR},
+      verify_count = #{record.verifyCount,jdbcType=BIGINT},
       port = #{record.port,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -422,12 +374,6 @@
       <if test="intro != null">
         intro = #{intro,jdbcType=VARCHAR},
       </if>
-      <if test="publicKey != null">
-        public_key = #{publicKey,jdbcType=VARCHAR},
-      </if>
-      <if test="wallet != null">
-        wallet = #{wallet,jdbcType=VARCHAR},
-      </if>
       <if test="address != null">
         address = #{address,jdbcType=VARCHAR},
       </if>
@@ -440,9 +386,6 @@
       <if test="deposit != null">
         deposit = #{deposit,jdbcType=VARCHAR},
       </if>
-      <if test="ranking != null">
-        ranking = #{ranking,jdbcType=INTEGER},
-      </if>
       <if test="orgName != null">
         org_name = #{orgName,jdbcType=VARCHAR},
       </if>
@@ -451,9 +394,6 @@
       </if>
       <if test="chainId != null">
         chain_id = #{chainId,jdbcType=VARCHAR},
-      </if>
-      <if test="blockCount != null">
-        block_count = #{blockCount,jdbcType=INTEGER},
       </if>
       <if test="joinTime != null">
         join_time = #{joinTime,jdbcType=TIMESTAMP},
@@ -467,14 +407,14 @@
       <if test="rewardRatio != null">
         reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
       </if>
-      <if test="verifyCount != null">
-        verify_count = #{verifyCount,jdbcType=BIGINT},
-      </if>
       <if test="rewardAmount != null">
         reward_amount = #{rewardAmount,jdbcType=VARCHAR},
       </if>
       <if test="profitAmount != null">
         profit_amount = #{profitAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyCount != null">
+        verify_count = #{verifyCount,jdbcType=BIGINT},
       </if>
       <if test="port != null">
         port = #{port,jdbcType=INTEGER},
@@ -488,24 +428,20 @@
       `name` = #{name,jdbcType=VARCHAR},
       `type` = #{type,jdbcType=INTEGER},
       intro = #{intro,jdbcType=VARCHAR},
-      public_key = #{publicKey,jdbcType=VARCHAR},
-      wallet = #{wallet,jdbcType=VARCHAR},
       address = #{address,jdbcType=VARCHAR},
       node_status = #{nodeStatus,jdbcType=INTEGER},
       `election status` = #{electionStatus,jdbcType=INTEGER},
       deposit = #{deposit,jdbcType=VARCHAR},
-      ranking = #{ranking,jdbcType=INTEGER},
       org_name = #{orgName,jdbcType=VARCHAR},
       org_website = #{orgWebsite,jdbcType=VARCHAR},
       chain_id = #{chainId,jdbcType=VARCHAR},
-      block_count = #{blockCount,jdbcType=INTEGER},
       join_time = #{joinTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
-      verify_count = #{verifyCount,jdbcType=BIGINT},
       reward_amount = #{rewardAmount,jdbcType=VARCHAR},
       profit_amount = #{profitAmount,jdbcType=VARCHAR},
+      verify_count = #{verifyCount,jdbcType=BIGINT},
       port = #{port,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -516,20 +452,18 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into node
-    (id, ip, `name`, `type`, intro, public_key, wallet, address, node_status, `election status`, 
-      deposit, ranking, org_name, org_website, chain_id, block_count, join_time, create_time, 
-      update_time, reward_ratio, verify_count, reward_amount, profit_amount, port)
+    (id, ip, `name`, `type`, intro, address, node_status, `election status`, deposit, 
+      org_name, org_website, chain_id, join_time, create_time, update_time, reward_ratio, 
+      reward_amount, profit_amount, verify_count, port)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
-        #{item.type,jdbcType=INTEGER}, #{item.intro,jdbcType=VARCHAR}, #{item.publicKey,jdbcType=VARCHAR}, 
-        #{item.wallet,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.nodeStatus,jdbcType=INTEGER}, 
-        #{item.electionStatus,jdbcType=INTEGER}, #{item.deposit,jdbcType=VARCHAR}, #{item.ranking,jdbcType=INTEGER}, 
+        #{item.type,jdbcType=INTEGER}, #{item.intro,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
+        #{item.nodeStatus,jdbcType=INTEGER}, #{item.electionStatus,jdbcType=INTEGER}, #{item.deposit,jdbcType=VARCHAR}, 
         #{item.orgName,jdbcType=VARCHAR}, #{item.orgWebsite,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, 
-        #{item.blockCount,jdbcType=INTEGER}, #{item.joinTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardRatio,jdbcType=DOUBLE}, #{item.verifyCount,jdbcType=BIGINT}, 
-        #{item.rewardAmount,jdbcType=VARCHAR}, #{item.profitAmount,jdbcType=VARCHAR}, #{item.port,jdbcType=INTEGER}
-        )
+        #{item.joinTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.rewardRatio,jdbcType=DOUBLE}, #{item.rewardAmount,jdbcType=VARCHAR}, #{item.profitAmount,jdbcType=VARCHAR}, 
+        #{item.verifyCount,jdbcType=BIGINT}, #{item.port,jdbcType=INTEGER})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -562,12 +496,6 @@
         <if test="'intro'.toString() == column.value">
           #{item.intro,jdbcType=VARCHAR}
         </if>
-        <if test="'public_key'.toString() == column.value">
-          #{item.publicKey,jdbcType=VARCHAR}
-        </if>
-        <if test="'wallet'.toString() == column.value">
-          #{item.wallet,jdbcType=VARCHAR}
-        </if>
         <if test="'address'.toString() == column.value">
           #{item.address,jdbcType=VARCHAR}
         </if>
@@ -580,9 +508,6 @@
         <if test="'deposit'.toString() == column.value">
           #{item.deposit,jdbcType=VARCHAR}
         </if>
-        <if test="'ranking'.toString() == column.value">
-          #{item.ranking,jdbcType=INTEGER}
-        </if>
         <if test="'org_name'.toString() == column.value">
           #{item.orgName,jdbcType=VARCHAR}
         </if>
@@ -591,9 +516,6 @@
         </if>
         <if test="'chain_id'.toString() == column.value">
           #{item.chainId,jdbcType=VARCHAR}
-        </if>
-        <if test="'block_count'.toString() == column.value">
-          #{item.blockCount,jdbcType=INTEGER}
         </if>
         <if test="'join_time'.toString() == column.value">
           #{item.joinTime,jdbcType=TIMESTAMP}
@@ -607,14 +529,14 @@
         <if test="'reward_ratio'.toString() == column.value">
           #{item.rewardRatio,jdbcType=DOUBLE}
         </if>
-        <if test="'verify_count'.toString() == column.value">
-          #{item.verifyCount,jdbcType=BIGINT}
-        </if>
         <if test="'reward_amount'.toString() == column.value">
           #{item.rewardAmount,jdbcType=VARCHAR}
         </if>
         <if test="'profit_amount'.toString() == column.value">
           #{item.profitAmount,jdbcType=VARCHAR}
+        </if>
+        <if test="'verify_count'.toString() == column.value">
+          #{item.verifyCount,jdbcType=BIGINT}
         </if>
         <if test="'port'.toString() == column.value">
           #{item.port,jdbcType=INTEGER}
@@ -623,4 +545,6 @@
       )
     </foreach>
   </insert>
+
+
 </mapper>

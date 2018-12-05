@@ -3,7 +3,7 @@ package com.platon.browser.message;
 import com.alibaba.fastjson.JSON;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.dto.agent.BlockDto;
-import com.platon.browser.common.dto.agent.NodeDto;
+import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
@@ -70,10 +70,10 @@ public class SubscribeService {
             case NODE:
                 logger.debug("[收到新节点消息]：{}",msg);
                 logger.debug("  |- 更新节点缓存...");
-                NodeDto nodeDto = JSON.parseObject(message.getStruct(), NodeDto.class);
+                CandidateDto nodeDto = JSON.parseObject(message.getStruct(), CandidateDto.class);
                 NodeInfo nodeInfo = new NodeInfo();
                 BeanUtils.copyProperties(nodeDto,nodeInfo);
-                Location location = GeoUtil.getLocation(nodeDto.getIp());
+                Location location = GeoUtil.getLocation(nodeDto.getHost());
                 nodeInfo.setLatitude(location.latitude);
                 nodeInfo.setLongitude(location.longitude);
                 List<NodeInfo> nodeInfoList = new ArrayList<>();

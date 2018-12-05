@@ -43,31 +43,35 @@
                              targetProject="../dao/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
-
-        <!--<table tableName="T_FEE_AGTBILL" domainObjectName="FeeAgentBill"
+ <!--       <table tableName="T_FEE_AGTBILL" domainObjectName="FeeAgentBill"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"/>-->
+               selectByExampleQueryId="false"/>&ndash;&gt;
 
-        <!-- <table tableName="block" domainObjectName="Block">
+         <table tableName="block" domainObjectName="Block">
              <columnRenamingRule searchString="^D_"
                                  replaceString=""/>
-        </table>-->
-        <!--<table tableName="pending_tx" domainObjectName="PendingTx">
+        </table>
+        <table tableName="pending_tx" domainObjectName="PendingTx">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
                                             replaceString=""/>&ndash;&gt;
         </table>-->
-        <!--<table tableName="node" domainObjectName="Node">
+        <table tableName="node" domainObjectName="Node">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>-->
+        </table>
 
+        <table tableName="node_ranking" domainObjectName="NodeRanking">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+<!--
         <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
 
-        <!--<table tableName="address_count" domainObjectName="AddressCount"
+        <table tableName="address_count" domainObjectName="AddressCount"
                enableUpdateByExample="false"
                enableDeleteByExample="false" enableInsert="false"
                enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
