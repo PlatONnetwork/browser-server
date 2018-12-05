@@ -1,18 +1,13 @@
 package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.common.constant.ConfigConst;
-import com.platon.browser.common.dto.agent.BlockDto;
-import com.platon.browser.common.dto.agent.PendingTransactionDto;
-import com.platon.browser.common.dto.agent.TransactionDto;
+import com.platon.browser.common.dto.agent.*;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.PendingTx;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.PendingTxMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -20,8 +15,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +39,12 @@ public class DBStorageService {
 
     @Autowired
     private PendingTxMapper pendingTxMapper;
+
+    @Autowired
+    private NodeRankingMapper nodeRankingMapper;
+
+    @Autowired
+    private NodeMapper nodeMapper;
 
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
@@ -90,10 +92,32 @@ public class DBStorageService {
                         pendingTxMapper.insert(pendingTx);
                         logger.debug("pendingtransaction data insert...");
                     } catch (DuplicateKeyException e) {
-                        logger.debug("pendingtransaction data repeat...", e.getMessage(),pendingTx.getHash());
+                        logger.debug("pendingtransaction data repeat...", e.getMessage(), pendingTx.getHash());
                         continue;
                     }
                 }
+                break;
+
+            case NODE:
+                logger.debug("STOMP节点信息入库: {}", msg);
+                //获取队列中的节点数据
+                List <CandidateDto> candidateDtoList = JSON.parseArray(message.getStruct(), CandidateDto.class);
+                List <Node> nodeList = buildNodeInfo(candidateDtoList, message);
+                //更新排名表
+                List<NodeRanking> nodeRankingList = new ArrayList <>();
+                nodeRankingMapper.deleteByExample(new NodeRankingExample());
+                nodeList.forEach(node -> {
+                    NodeRanking nodeRanking = new NodeRanking();
+                    nodeRanking.setNodeId(node.getId());
+                    nodeRankingList.add(nodeRanking);
+                });
+                nodeRankingMapper.batchInsert(nodeRankingList);
+
+                //获取数据库节点存量列表
+                List<Node> nodes = nodeMapper.selectByExample(new NodeExample());
+                //TODO:
+
+
                 break;
         }
     }
@@ -159,6 +183,55 @@ public class DBStorageService {
             }
         }
         return pendingTxes;
+    }
+
+    private List <Node> buildNodeInfo ( List <CandidateDto> list, Message message ) {
+        List <Node> nodeList = new ArrayList <>();
+        list.forEach(candidateDto -> {
+            Node node = new Node();
+            node.setChainId(message.getChainId());
+            node.setIp(candidateDto.getHost());
+            node.setId(candidateDto.getCandidateId());
+            node.setPort(Integer.valueOf(candidateDto.getPort()));
+            node.setAddress(candidateDto.getOwner());
+            node.setUpdateTime(new Date());
+            node.setCreateTime(new Date());
+            CandidateDetailDto candidateDetailDto = null;
+            if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
+                candidateDetailDto = buildDetail(candidateDto.getExtra());
+            }
+            node.setName(candidateDetailDto.getNodeName());
+            node.setDeposit(candidateDetailDto.getNodeDiscription());
+            node.setJoinTime(new Date(candidateDetailDto.getTime()));
+            node.setOrgName(candidateDetailDto.getNodeDepartment());
+            node.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
+            node.setRewardRatio((double) candidateDto.getFee() / 10000);
+            node.setNodeStatus(ping(candidateDto.getHost()));
+        });
+        return nodeList;
+    }
+
+    private CandidateDetailDto buildDetail ( String extra ) {
+        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(extra, CandidateDetailDto.class);
+        return candidateDetailDto;
+    }
+
+    private int ping ( String ip ) {
+        InetAddress address = null;
+        int timeOut = 3000;
+        try {
+            address = InetAddress.getByAddress(ip.getBytes());
+            if (address.isReachable(timeOut)) {
+                //success
+                return 1;
+            } else {
+                //fail
+                return 2;
+            }
+        } catch (Exception e) {
+            logger.error("Link node exception!...", e.getMessage());
+            return 2;
+        }
     }
 
 }

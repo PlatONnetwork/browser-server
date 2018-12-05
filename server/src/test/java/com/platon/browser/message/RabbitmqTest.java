@@ -2,7 +2,7 @@ package com.platon.browser.message;
 
 import com.platon.browser.ServiceApplication;
 import com.platon.browser.common.dto.agent.BlockDto;
-import com.platon.browser.common.dto.agent.NodeDto;
+import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
@@ -53,7 +53,7 @@ public class RabbitmqTest {
         while (true){
             int i = r.nextInt(100);
             if(i%2 == 0){
-                NodeDto node = new NodeDto();
+                CandidateDto node = new CandidateDto();
                 node.setMiner("node-miner-"+i);
                 node.setIp("14.215.177.39");
                 node.setNodeName("node-name-"+i);

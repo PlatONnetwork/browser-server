@@ -8,6 +8,7 @@ import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
+import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
@@ -105,7 +106,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     BlockDto newBlock = buildStruct(i, web3j);
                     //chainId获取
                     if(newBlock.getNumber() > maxNubmer.intValue()){
-                        mqSender.send(ConfigConst.getChainId(), "block", newBlock);
+                        mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.BLOCK.name(), newBlock);
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     }
                 } catch (Exception e) {

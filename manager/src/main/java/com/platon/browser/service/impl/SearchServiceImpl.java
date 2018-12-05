@@ -205,7 +205,7 @@ public class SearchServiceImpl implements SearchService {
             NodeExample nodeExample = new NodeExample();
             nodeExample.createCriteria()
                     .andChainIdEqualTo(chainId)
-                    .andPublicKeyEqualTo(keyword);
+                    .andIdEqualTo(keyword);
             List<Node> nodes = nodeMapper.selectByExample(nodeExample);
             if (nodes.size()>1){
                 logger.error("duplicate node: node address {}",keyword);

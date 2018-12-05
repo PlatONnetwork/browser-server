@@ -6,6 +6,7 @@ import com.platon.browser.common.client.Web3jClient;
 import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
+import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.common.util.TransactionType;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                     pendingTransactionDto.setTxType(type);
                     pendingTransactionDtoList.add(pendingTransactionDto);
                 }
-                mqSender.send(ConfigConst.getChainId(), "PENDING", pendingTransactionDtoList);
+                mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.PENDING.name(), pendingTransactionDtoList);
             }
             log.info("newest pendingtx is null");
         }catch (Exception e){

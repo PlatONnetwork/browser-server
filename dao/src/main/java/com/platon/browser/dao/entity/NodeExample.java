@@ -445,146 +445,6 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andPublicKeyIsNull() {
-            addCriterion("public_key is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyIsNotNull() {
-            addCriterion("public_key is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyEqualTo(String value) {
-            addCriterion("public_key =", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyNotEqualTo(String value) {
-            addCriterion("public_key <>", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyGreaterThan(String value) {
-            addCriterion("public_key >", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyGreaterThanOrEqualTo(String value) {
-            addCriterion("public_key >=", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyLessThan(String value) {
-            addCriterion("public_key <", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyLessThanOrEqualTo(String value) {
-            addCriterion("public_key <=", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyLike(String value) {
-            addCriterion("public_key like", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyNotLike(String value) {
-            addCriterion("public_key not like", value, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyIn(List<String> values) {
-            addCriterion("public_key in", values, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyNotIn(List<String> values) {
-            addCriterion("public_key not in", values, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyBetween(String value1, String value2) {
-            addCriterion("public_key between", value1, value2, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andPublicKeyNotBetween(String value1, String value2) {
-            addCriterion("public_key not between", value1, value2, "publicKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletIsNull() {
-            addCriterion("wallet is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletIsNotNull() {
-            addCriterion("wallet is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletEqualTo(String value) {
-            addCriterion("wallet =", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletNotEqualTo(String value) {
-            addCriterion("wallet <>", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletGreaterThan(String value) {
-            addCriterion("wallet >", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletGreaterThanOrEqualTo(String value) {
-            addCriterion("wallet >=", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletLessThan(String value) {
-            addCriterion("wallet <", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletLessThanOrEqualTo(String value) {
-            addCriterion("wallet <=", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletLike(String value) {
-            addCriterion("wallet like", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletNotLike(String value) {
-            addCriterion("wallet not like", value, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletIn(List<String> values) {
-            addCriterion("wallet in", values, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletNotIn(List<String> values) {
-            addCriterion("wallet not in", values, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletBetween(String value1, String value2) {
-            addCriterion("wallet between", value1, value2, "wallet");
-            return (Criteria) this;
-        }
-
-        public Criteria andWalletNotBetween(String value1, String value2) {
-            addCriterion("wallet not between", value1, value2, "wallet");
-            return (Criteria) this;
-        }
-
         public Criteria andAddressIsNull() {
             addCriterion("address is null");
             return (Criteria) this;
@@ -845,66 +705,6 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andRankingIsNull() {
-            addCriterion("ranking is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingIsNotNull() {
-            addCriterion("ranking is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingEqualTo(Integer value) {
-            addCriterion("ranking =", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingNotEqualTo(Integer value) {
-            addCriterion("ranking <>", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingGreaterThan(Integer value) {
-            addCriterion("ranking >", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingGreaterThanOrEqualTo(Integer value) {
-            addCriterion("ranking >=", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingLessThan(Integer value) {
-            addCriterion("ranking <", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingLessThanOrEqualTo(Integer value) {
-            addCriterion("ranking <=", value, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingIn(List<Integer> values) {
-            addCriterion("ranking in", values, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingNotIn(List<Integer> values) {
-            addCriterion("ranking not in", values, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingBetween(Integer value1, Integer value2) {
-            addCriterion("ranking between", value1, value2, "ranking");
-            return (Criteria) this;
-        }
-
-        public Criteria andRankingNotBetween(Integer value1, Integer value2) {
-            addCriterion("ranking not between", value1, value2, "ranking");
-            return (Criteria) this;
-        }
-
         public Criteria andOrgNameIsNull() {
             addCriterion("org_name is null");
             return (Criteria) this;
@@ -1112,66 +912,6 @@ public class NodeExample {
 
         public Criteria andChainIdNotBetween(String value1, String value2) {
             addCriterion("chain_id not between", value1, value2, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountIsNull() {
-            addCriterion("block_count is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountIsNotNull() {
-            addCriterion("block_count is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountEqualTo(Integer value) {
-            addCriterion("block_count =", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountNotEqualTo(Integer value) {
-            addCriterion("block_count <>", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountGreaterThan(Integer value) {
-            addCriterion("block_count >", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountGreaterThanOrEqualTo(Integer value) {
-            addCriterion("block_count >=", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountLessThan(Integer value) {
-            addCriterion("block_count <", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountLessThanOrEqualTo(Integer value) {
-            addCriterion("block_count <=", value, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountIn(List<Integer> values) {
-            addCriterion("block_count in", values, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountNotIn(List<Integer> values) {
-            addCriterion("block_count not in", values, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountBetween(Integer value1, Integer value2) {
-            addCriterion("block_count between", value1, value2, "blockCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockCountNotBetween(Integer value1, Integer value2) {
-            addCriterion("block_count not between", value1, value2, "blockCount");
             return (Criteria) this;
         }
 
@@ -1415,66 +1155,6 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andVerifyCountIsNull() {
-            addCriterion("verify_count is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountIsNotNull() {
-            addCriterion("verify_count is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountEqualTo(Long value) {
-            addCriterion("verify_count =", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountNotEqualTo(Long value) {
-            addCriterion("verify_count <>", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountGreaterThan(Long value) {
-            addCriterion("verify_count >", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountGreaterThanOrEqualTo(Long value) {
-            addCriterion("verify_count >=", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountLessThan(Long value) {
-            addCriterion("verify_count <", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountLessThanOrEqualTo(Long value) {
-            addCriterion("verify_count <=", value, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountIn(List<Long> values) {
-            addCriterion("verify_count in", values, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountNotIn(List<Long> values) {
-            addCriterion("verify_count not in", values, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountBetween(Long value1, Long value2) {
-            addCriterion("verify_count between", value1, value2, "verifyCount");
-            return (Criteria) this;
-        }
-
-        public Criteria andVerifyCountNotBetween(Long value1, Long value2) {
-            addCriterion("verify_count not between", value1, value2, "verifyCount");
-            return (Criteria) this;
-        }
-
         public Criteria andRewardAmountIsNull() {
             addCriterion("reward_amount is null");
             return (Criteria) this;
@@ -1612,6 +1292,66 @@ public class NodeExample {
 
         public Criteria andProfitAmountNotBetween(String value1, String value2) {
             addCriterion("profit_amount not between", value1, value2, "profitAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountIsNull() {
+            addCriterion("verify_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountIsNotNull() {
+            addCriterion("verify_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountEqualTo(Long value) {
+            addCriterion("verify_count =", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountNotEqualTo(Long value) {
+            addCriterion("verify_count <>", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountGreaterThan(Long value) {
+            addCriterion("verify_count >", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountGreaterThanOrEqualTo(Long value) {
+            addCriterion("verify_count >=", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountLessThan(Long value) {
+            addCriterion("verify_count <", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountLessThanOrEqualTo(Long value) {
+            addCriterion("verify_count <=", value, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountIn(List<Long> values) {
+            addCriterion("verify_count in", values, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountNotIn(List<Long> values) {
+            addCriterion("verify_count not in", values, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountBetween(Long value1, Long value2) {
+            addCriterion("verify_count between", value1, value2, "verifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andVerifyCountNotBetween(Long value1, Long value2) {
+            addCriterion("verify_count not between", value1, value2, "verifyCount");
             return (Criteria) this;
         }
 
