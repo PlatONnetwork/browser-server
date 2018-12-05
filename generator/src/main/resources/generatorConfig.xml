@@ -65,6 +65,11 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
+
+        <table tableName="statistics" domainObjectName="Statistics">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 <!--
         <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"

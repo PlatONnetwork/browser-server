@@ -2,8 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.NodeRankingMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.NodeRanking">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="port" jdbcType="INTEGER" property="port" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="deposit" jdbcType="VARCHAR" property="deposit" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="org_website" jdbcType="VARCHAR" property="orgWebsite" />
+    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
+    <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -64,7 +77,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, node_id
+    id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, chain_id, 
+    join_time, create_time, update_time, reward_ratio
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeRankingExample" resultMap="BaseResultMap">
     select
@@ -80,15 +94,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from node_ranking
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from node_ranking
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.NodeRankingExample">
     delete from node_ranking
@@ -97,8 +111,18 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.NodeRanking">
-    insert into node_ranking (id, node_id)
-    values (#{id,jdbcType=INTEGER}, #{nodeId,jdbcType=VARCHAR})
+    insert into node_ranking (id, ip, port, 
+      `name`, `type`, intro, 
+      address, deposit, org_name, 
+      org_website, chain_id, join_time, 
+      create_time, update_time, reward_ratio
+      )
+    values (#{id,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{intro,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{deposit,jdbcType=VARCHAR}, #{orgName,jdbcType=VARCHAR}, 
+      #{orgWebsite,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardRatio,jdbcType=DOUBLE}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NodeRanking">
     insert into node_ranking
@@ -106,16 +130,94 @@
       <if test="id != null">
         id,
       </if>
-      <if test="nodeId != null">
-        node_id,
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="port != null">
+        port,
+      </if>
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="intro != null">
+        intro,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="deposit != null">
+        deposit,
+      </if>
+      <if test="orgName != null">
+        org_name,
+      </if>
+      <if test="orgWebsite != null">
+        org_website,
+      </if>
+      <if test="chainId != null">
+        chain_id,
+      </if>
+      <if test="joinTime != null">
+        join_time,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="rewardRatio != null">
+        reward_ratio,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=VARCHAR},
       </if>
-      <if test="nodeId != null">
-        #{nodeId,jdbcType=VARCHAR},
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null">
+        #{port,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="intro != null">
+        #{intro,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="deposit != null">
+        #{deposit,jdbcType=VARCHAR},
+      </if>
+      <if test="orgName != null">
+        #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgWebsite != null">
+        #{orgWebsite,jdbcType=VARCHAR},
+      </if>
+      <if test="chainId != null">
+        #{chainId,jdbcType=VARCHAR},
+      </if>
+      <if test="joinTime != null">
+        #{joinTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rewardRatio != null">
+        #{rewardRatio,jdbcType=DOUBLE},
       </if>
     </trim>
   </insert>
@@ -129,10 +231,49 @@
     update node_ranking
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+        id = #{record.id,jdbcType=VARCHAR},
       </if>
-      <if test="record.nodeId != null">
-        node_id = #{record.nodeId,jdbcType=VARCHAR},
+      <if test="record.ip != null">
+        ip = #{record.ip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.port != null">
+        port = #{record.port,jdbcType=INTEGER},
+      </if>
+      <if test="record.name != null">
+        `name` = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.intro != null">
+        intro = #{record.intro,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null">
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deposit != null">
+        deposit = #{record.deposit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.orgName != null">
+        org_name = #{record.orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.orgWebsite != null">
+        org_website = #{record.orgWebsite,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chainId != null">
+        chain_id = #{record.chainId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.joinTime != null">
+        join_time = #{record.joinTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.rewardRatio != null">
+        reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
       </if>
     </set>
     <if test="_parameter != null">
@@ -141,8 +282,21 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update node_ranking
-    set id = #{record.id,jdbcType=INTEGER},
-      node_id = #{record.nodeId,jdbcType=VARCHAR}
+    set id = #{record.id,jdbcType=VARCHAR},
+      ip = #{record.ip,jdbcType=VARCHAR},
+      port = #{record.port,jdbcType=INTEGER},
+      `name` = #{record.name,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=INTEGER},
+      intro = #{record.intro,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      deposit = #{record.deposit,jdbcType=VARCHAR},
+      org_name = #{record.orgName,jdbcType=VARCHAR},
+      org_website = #{record.orgWebsite,jdbcType=VARCHAR},
+      chain_id = #{record.chainId,jdbcType=VARCHAR},
+      join_time = #{record.joinTime,jdbcType=TIMESTAMP},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -150,16 +304,68 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.NodeRanking">
     update node_ranking
     <set>
-      <if test="nodeId != null">
-        node_id = #{nodeId,jdbcType=VARCHAR},
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null">
+        port = #{port,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="intro != null">
+        intro = #{intro,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="deposit != null">
+        deposit = #{deposit,jdbcType=VARCHAR},
+      </if>
+      <if test="orgName != null">
+        org_name = #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgWebsite != null">
+        org_website = #{orgWebsite,jdbcType=VARCHAR},
+      </if>
+      <if test="chainId != null">
+        chain_id = #{chainId,jdbcType=VARCHAR},
+      </if>
+      <if test="joinTime != null">
+        join_time = #{joinTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rewardRatio != null">
+        reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.NodeRanking">
     update node_ranking
-    set node_id = #{nodeId,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    set ip = #{ip,jdbcType=VARCHAR},
+      port = #{port,jdbcType=INTEGER},
+      `name` = #{name,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
+      intro = #{intro,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      deposit = #{deposit,jdbcType=VARCHAR},
+      org_name = #{orgName,jdbcType=VARCHAR},
+      org_website = #{orgWebsite,jdbcType=VARCHAR},
+      chain_id = #{chainId,jdbcType=VARCHAR},
+      join_time = #{joinTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      reward_ratio = #{rewardRatio,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -168,10 +374,16 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into node_ranking
-    (id, node_id)
+    (id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, chain_id, 
+      join_time, create_time, update_time, reward_ratio)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=INTEGER}, #{item.nodeId,jdbcType=VARCHAR})
+      (#{item.id,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, #{item.port,jdbcType=INTEGER}, 
+        #{item.name,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.intro,jdbcType=VARCHAR}, 
+        #{item.address,jdbcType=VARCHAR}, #{item.deposit,jdbcType=VARCHAR}, #{item.orgName,jdbcType=VARCHAR}, 
+        #{item.orgWebsite,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardRatio,jdbcType=DOUBLE}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -190,10 +402,49 @@
       (
       <foreach collection="selective" item="column" separator=",">
         <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=INTEGER}
+          #{item.id,jdbcType=VARCHAR}
         </if>
-        <if test="'node_id'.toString() == column.value">
-          #{item.nodeId,jdbcType=VARCHAR}
+        <if test="'ip'.toString() == column.value">
+          #{item.ip,jdbcType=VARCHAR}
+        </if>
+        <if test="'port'.toString() == column.value">
+          #{item.port,jdbcType=INTEGER}
+        </if>
+        <if test="'name'.toString() == column.value">
+          #{item.name,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=INTEGER}
+        </if>
+        <if test="'intro'.toString() == column.value">
+          #{item.intro,jdbcType=VARCHAR}
+        </if>
+        <if test="'address'.toString() == column.value">
+          #{item.address,jdbcType=VARCHAR}
+        </if>
+        <if test="'deposit'.toString() == column.value">
+          #{item.deposit,jdbcType=VARCHAR}
+        </if>
+        <if test="'org_name'.toString() == column.value">
+          #{item.orgName,jdbcType=VARCHAR}
+        </if>
+        <if test="'org_website'.toString() == column.value">
+          #{item.orgWebsite,jdbcType=VARCHAR}
+        </if>
+        <if test="'chain_id'.toString() == column.value">
+          #{item.chainId,jdbcType=VARCHAR}
+        </if>
+        <if test="'join_time'.toString() == column.value">
+          #{item.joinTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'reward_ratio'.toString() == column.value">
+          #{item.rewardRatio,jdbcType=DOUBLE}
         </if>
       </foreach>
       )

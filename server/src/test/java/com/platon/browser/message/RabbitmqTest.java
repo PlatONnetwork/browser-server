@@ -54,11 +54,11 @@ public class RabbitmqTest {
             int i = r.nextInt(100);
             if(i%2 == 0){
                 CandidateDto node = new CandidateDto();
-                node.setMiner("node-miner-"+i);
+             /*   node.setMiner("node-miner-"+i);
                 node.setIp("14.215.177.39");
                 node.setNodeName("node-name-"+i);
                 node.setNodeId("node-id-"+i);
-                node.setNodeAddress("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf"+i);
+                node.setNodeAddress("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf"+i);*/
                 sender.send("1", MqMessageTypeEnum.NODE.name().toLowerCase(), node);
             }
             if (i % 3 == 0) {

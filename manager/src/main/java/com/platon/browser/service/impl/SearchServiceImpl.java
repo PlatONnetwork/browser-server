@@ -218,8 +218,8 @@ public class SearchServiceImpl implements SearchService {
             Node node = nodes.get(0);
             NodeDetail nodeDetail = new NodeDetail();
             BeanUtils.copyProperties(node,nodeDetail);
-            nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
-            nodeDetail.setJoinTime(node.getJoinTime().getTime());
+           /* nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
+            nodeDetail.setJoinTime(node.getJoinTime().getTime());*/
             try {
                 Location location= GeoUtil.getLocation(node.getIp());
                 if(StringUtils.isNotBlank(location.countryName)){

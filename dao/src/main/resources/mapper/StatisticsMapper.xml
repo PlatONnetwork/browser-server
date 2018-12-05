@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.dao.mapper.NodeMapper">
-  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Node">
-    <id column="id" jdbcType="VARCHAR" property="id" />
+<mapper namespace="com.platon.browser.dao.mapper.StatisticsMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Statistics">
+    <id column="id" jdbcType="INTEGER" property="id" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
-    <result column="ip" jdbcType="VARCHAR" property="ip" />
-    <result column="node_status" jdbcType="INTEGER" property="nodeStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,15 +69,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, chain_id, ip, node_status
+    id, chain_id, create_time, update_time, `type`, `value`, node_id
   </sql>
-  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.StatisticsExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from node
+    from statistics
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -82,30 +85,32 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from node
-    where id = #{id,jdbcType=VARCHAR}
+    from statistics
+    where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from node
-    where id = #{id,jdbcType=VARCHAR}
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from statistics
+    where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.NodeExample">
-    delete from node
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.StatisticsExample">
+    delete from statistics
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.platon.browser.dao.entity.Node">
-    insert into node (id, chain_id, ip, 
-      node_status)
-    values (#{id,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, 
-      #{nodeStatus,jdbcType=INTEGER})
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.Statistics">
+    insert into statistics (id, chain_id, create_time, 
+      update_time, `type`, `value`, 
+      node_id)
+    values (#{id,jdbcType=INTEGER}, #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, 
+      #{nodeId,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
-    insert into node
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Statistics">
+    insert into statistics
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -113,48 +118,75 @@
       <if test="chainId != null">
         chain_id,
       </if>
-      <if test="ip != null">
-        ip,
+      <if test="createTime != null">
+        create_time,
       </if>
-      <if test="nodeStatus != null">
-        node_status,
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="value != null">
+        `value`,
+      </if>
+      <if test="nodeId != null">
+        node_id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=VARCHAR},
+        #{id,jdbcType=INTEGER},
       </if>
       <if test="chainId != null">
         #{chainId,jdbcType=VARCHAR},
       </if>
-      <if test="ip != null">
-        #{ip,jdbcType=VARCHAR},
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="nodeStatus != null">
-        #{nodeStatus,jdbcType=INTEGER},
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultType="java.lang.Long">
-    select count(*) from node
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.StatisticsExample" resultType="java.lang.Long">
+    select count(*) from statistics
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update node
+    update statistics
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=VARCHAR},
+        id = #{record.id,jdbcType=INTEGER},
       </if>
       <if test="record.chainId != null">
         chain_id = #{record.chainId,jdbcType=VARCHAR},
       </if>
-      <if test="record.ip != null">
-        ip = #{record.ip,jdbcType=VARCHAR},
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.nodeStatus != null">
-        node_status = #{record.nodeStatus,jdbcType=INTEGER},
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.value != null">
+        `value` = #{record.value,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -162,36 +194,51 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update node
-    set id = #{record.id,jdbcType=VARCHAR},
+    update statistics
+    set id = #{record.id,jdbcType=INTEGER},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
-      ip = #{record.ip,jdbcType=VARCHAR},
-      node_status = #{record.nodeStatus,jdbcType=INTEGER}
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      `type` = #{record.type,jdbcType=VARCHAR},
+      `value` = #{record.value,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Node">
-    update node
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Statistics">
+    update statistics
     <set>
       <if test="chainId != null">
         chain_id = #{chainId,jdbcType=VARCHAR},
       </if>
-      <if test="ip != null">
-        ip = #{ip,jdbcType=VARCHAR},
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="nodeStatus != null">
-        node_status = #{nodeStatus,jdbcType=INTEGER},
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        `value` = #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Node">
-    update node
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Statistics">
+    update statistics
     set chain_id = #{chainId,jdbcType=VARCHAR},
-      ip = #{ip,jdbcType=VARCHAR},
-      node_status = #{nodeStatus,jdbcType=INTEGER}
-    where id = #{id,jdbcType=VARCHAR}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      `type` = #{type,jdbcType=VARCHAR},
+      `value` = #{value,jdbcType=VARCHAR},
+      node_id = #{nodeId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -199,12 +246,13 @@
       This element is automatically generated by MyBatis Generator, do not modify.
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
-    insert into node
-    (id, chain_id, ip, node_status)
+    insert into statistics
+    (id, chain_id, create_time, update_time, `type`, `value`, node_id)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, 
-        #{item.nodeStatus,jdbcType=INTEGER})
+      (#{item.id,jdbcType=INTEGER}, #{item.chainId,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.type,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, 
+        #{item.nodeId,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -213,7 +261,7 @@
       This element is automatically generated by MyBatis Generator, do not modify.
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
-    insert into node (
+    insert into statistics (
     <foreach collection="selective" item="column" separator=",">
       ${column.escapedColumnName}
     </foreach>
@@ -223,20 +271,28 @@
       (
       <foreach collection="selective" item="column" separator=",">
         <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=VARCHAR}
+          #{item.id,jdbcType=INTEGER}
         </if>
         <if test="'chain_id'.toString() == column.value">
           #{item.chainId,jdbcType=VARCHAR}
         </if>
-        <if test="'ip'.toString() == column.value">
-          #{item.ip,jdbcType=VARCHAR}
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'node_status'.toString() == column.value">
-          #{item.nodeStatus,jdbcType=INTEGER}
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
+        </if>
+        <if test="'value'.toString() == column.value">
+          #{item.value,jdbcType=VARCHAR}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
-
 </mapper>

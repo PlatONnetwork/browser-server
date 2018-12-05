@@ -106,16 +106,15 @@ public class DBStorageService {
                 //更新排名表
                 List<NodeRanking> nodeRankingList = new ArrayList <>();
                 nodeRankingMapper.deleteByExample(new NodeRankingExample());
-                nodeList.forEach(node -> {
+                for(int i = 0; i < nodeList.size(); i++){
                     NodeRanking nodeRanking = new NodeRanking();
-                    nodeRanking.setNodeId(node.getId());
                     nodeRankingList.add(nodeRanking);
-                });
+                }
                 nodeRankingMapper.batchInsert(nodeRankingList);
 
                 //获取数据库节点存量列表
                 List<Node> nodes = nodeMapper.selectByExample(new NodeExample());
-                //TODO:
+                //TODO: 只有每轮250块出完才会对节点验证次数+1
 
 
                 break;
@@ -188,7 +187,7 @@ public class DBStorageService {
     private List <Node> buildNodeInfo ( List <CandidateDto> list, Message message ) {
         List <Node> nodeList = new ArrayList <>();
         list.forEach(candidateDto -> {
-            Node node = new Node();
+            NodeRanking node = new NodeRanking();
             node.setChainId(message.getChainId());
             node.setIp(candidateDto.getHost());
             node.setId(candidateDto.getCandidateId());
@@ -206,7 +205,7 @@ public class DBStorageService {
             node.setOrgName(candidateDetailDto.getNodeDepartment());
             node.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
             node.setRewardRatio((double) candidateDto.getFee() / 10000);
-            node.setNodeStatus(ping(candidateDto.getHost()));
+            /*node.setNodeStatus(ping(candidateDto.getHost()));*/
         });
         return nodeList;
     }

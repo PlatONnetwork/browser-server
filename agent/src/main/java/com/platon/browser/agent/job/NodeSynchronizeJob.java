@@ -14,6 +14,8 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.tx.gas.DefaultGasProvider;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -21,9 +23,9 @@ import java.util.List;
  * Date: 2018/10/25
  * Time: 18:07
  */
-public class NodeSynchronizeJob extends AbstractTaskJob{
+public class NodeSynchronizeJob extends AbstractTaskJob {
 
-    private final static  String contratAddress  = "0x1000000000000000000000000000000000000001";
+    private final static String contratAddress = "0x1000000000000000000000000000000000000001";
 
 
     @Autowired
@@ -36,18 +38,43 @@ public class NodeSynchronizeJob extends AbstractTaskJob{
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-        Credentials credentials = null;
+            Credentials credentials = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
-            CandidateConstract candidateConstract = CandidateConstract.load(contratAddress,web3j,credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+            List <CandidateDto> candidateDtoList = new ArrayList <>();
+
+            CandidateConstract candidateConstract = CandidateConstract.load(contratAddress, web3j, credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+            //nodeInfo rangking 1-200
             String nodeInfoList = candidateConstract.CandidateList().send();
-            if(nodeInfoList.length() > 0 && null != nodeInfoList){
-                logger.info("node info :",nodeInfoList);
-                List<CandidateDto> candidateDtoList = JSON.parseArray(nodeInfoList, CandidateDto.class);
-                mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.NODE.name(),candidateDtoList);
-                logger.info("node info ");
+
+            //nodeInfo rangking 1-25
+            String verfiersList = candidateConstract.VerifiersList().send();
+            if (verfiersList.length() > 0 && null != verfiersList) {
+                logger.info("verfiersList info :", verfiersList);
+                List <CandidateDto> verfiersDtoList = JSON.parseArray(verfiersList, CandidateDto.class);
+                candidateDtoList.addAll(verfiersDtoList);
             }
+            if (nodeInfoList.length() > 0 && null != nodeInfoList) {
+                logger.info("nodeInfoList info :", verfiersList);
+                List <CandidateDto> nodeInfoDtoList = JSON.parseArray(nodeInfoList, CandidateDto.class);
+                //delete repeat element
+                for (int i = 0; i < nodeInfoDtoList.size(); i++) {
+                    for (int j = 0; j < candidateDtoList.size(); i++) {
+                        if (nodeInfoDtoList.get(i).getCandidateId().equals(candidateDtoList.get(0).getCandidateId())) {
+                            nodeInfoDtoList.remove(i);
+                            i--;
+                        }
+                    }
+                }
+                //nodeInfoList delete repeat element surplus 26-200 element
+                for (CandidateDto candidateDto : nodeInfoDtoList) {
+                    candidateDtoList.add(candidateDto);
+                    logger.info("CandidateDto info : ", candidateDto, "CandidateID：{" ,candidateDto.getCandidateId(),"}，CandidateID：{",candidateDto.getDeposit(),"}，CandidateBlockNum :{",candidateDto.getBlockNumber(),"}");
+                }
+            }
+            mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.NODE.name(),candidateDtoList);
+
         } catch (Exception e) {
-            logger.error("Synchronize node info exception!...",e.getMessage());
+            logger.error("Synchronize node info exception!...", e.getMessage());
         }
     }
 
