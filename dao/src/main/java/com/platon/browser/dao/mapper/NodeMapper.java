@@ -2,6 +2,7 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.NodeKey;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +11,7 @@ public interface NodeMapper {
 
     int deleteByExample(NodeExample example);
 
-    int deleteByPrimaryKey(String id);
+    int deleteByPrimaryKey(NodeKey key);
 
     int insert(Node record);
 
@@ -18,7 +19,7 @@ public interface NodeMapper {
 
     List<Node> selectByExample(NodeExample example);
 
-    Node selectByPrimaryKey(String id);
+    Node selectByPrimaryKey(NodeKey key);
 
     int updateByExampleSelective(@Param("record") Node record, @Param("example") NodeExample example);
 

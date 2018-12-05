@@ -3,8 +3,9 @@
 <mapper namespace="com.platon.browser.dao.mapper.NodeMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Node">
     <id column="id" jdbcType="VARCHAR" property="id" />
-    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
+    <id column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="prot" jdbcType="INTEGER" property="prot" />
     <result column="node_status" jdbcType="INTEGER" property="nodeStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -66,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, chain_id, ip, node_status
+    id, chain_id, ip, prot, node_status
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
     select
@@ -82,15 +83,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.NodeKey" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from node
     where id = #{id,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.NodeKey">
     delete from node
     where id = #{id,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.NodeExample">
     delete from node
@@ -100,9 +103,9 @@
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Node">
     insert into node (id, chain_id, ip, 
-      node_status)
+      prot, node_status)
     values (#{id,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, 
-      #{nodeStatus,jdbcType=INTEGER})
+      #{prot,jdbcType=INTEGER}, #{nodeStatus,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -115,6 +118,9 @@
       </if>
       <if test="ip != null">
         ip,
+      </if>
+      <if test="prot != null">
+        prot,
       </if>
       <if test="nodeStatus != null">
         node_status,
@@ -129,6 +135,9 @@
       </if>
       <if test="ip != null">
         #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="prot != null">
+        #{prot,jdbcType=INTEGER},
       </if>
       <if test="nodeStatus != null">
         #{nodeStatus,jdbcType=INTEGER},
@@ -153,6 +162,9 @@
       <if test="record.ip != null">
         ip = #{record.ip,jdbcType=VARCHAR},
       </if>
+      <if test="record.prot != null">
+        prot = #{record.prot,jdbcType=INTEGER},
+      </if>
       <if test="record.nodeStatus != null">
         node_status = #{record.nodeStatus,jdbcType=INTEGER},
       </if>
@@ -166,6 +178,7 @@
     set id = #{record.id,jdbcType=VARCHAR},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       ip = #{record.ip,jdbcType=VARCHAR},
+      prot = #{record.prot,jdbcType=INTEGER},
       node_status = #{record.nodeStatus,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -174,24 +187,26 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Node">
     update node
     <set>
-      <if test="chainId != null">
-        chain_id = #{chainId,jdbcType=VARCHAR},
-      </if>
       <if test="ip != null">
         ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="prot != null">
+        prot = #{prot,jdbcType=INTEGER},
       </if>
       <if test="nodeStatus != null">
         node_status = #{nodeStatus,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Node">
     update node
-    set chain_id = #{chainId,jdbcType=VARCHAR},
-      ip = #{ip,jdbcType=VARCHAR},
+    set ip = #{ip,jdbcType=VARCHAR},
+      prot = #{prot,jdbcType=INTEGER},
       node_status = #{nodeStatus,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -200,11 +215,11 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into node
-    (id, chain_id, ip, node_status)
+    (id, chain_id, ip, prot, node_status)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, 
-        #{item.nodeStatus,jdbcType=INTEGER})
+        #{item.prot,jdbcType=INTEGER}, #{item.nodeStatus,jdbcType=INTEGER})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -231,6 +246,9 @@
         <if test="'ip'.toString() == column.value">
           #{item.ip,jdbcType=VARCHAR}
         </if>
+        <if test="'prot'.toString() == column.value">
+          #{item.prot,jdbcType=INTEGER}
+        </if>
         <if test="'node_status'.toString() == column.value">
           #{item.nodeStatus,jdbcType=INTEGER}
         </if>
@@ -238,5 +256,6 @@
       )
     </foreach>
   </insert>
+
 
 </mapper>

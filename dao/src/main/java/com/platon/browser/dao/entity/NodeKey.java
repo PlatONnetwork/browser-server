@@ -3,35 +3,25 @@ package com.platon.browser.dao.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Node extends NodeKey {
-    private String ip;
+public class NodeKey {
+    private String id;
 
-    private Integer prot;
+    private String chainId;
 
-    private Integer nodeStatus;
-
-    public String getIp() {
-        return ip;
+    public String getId() {
+        return id;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip == null ? null : ip.trim();
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
     }
 
-    public Integer getProt() {
-        return prot;
+    public String getChainId() {
+        return chainId;
     }
 
-    public void setProt(Integer prot) {
-        this.prot = prot;
-    }
-
-    public Integer getNodeStatus() {
-        return nodeStatus;
-    }
-
-    public void setNodeStatus(Integer nodeStatus) {
-        this.nodeStatus = nodeStatus;
+    public void setChainId(String chainId) {
+        this.chainId = chainId == null ? null : chainId.trim();
     }
 
     /**
