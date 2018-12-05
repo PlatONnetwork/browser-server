@@ -117,7 +117,7 @@ public class StompCacheInitializer {
             Location location = GeoUtil.getLocation(node.getIp());
             bean.setLongitude(location.longitude);
             bean.setLatitude(location.latitude);
-            bean.setNodeType(node.getType());
+            /*bean.setNodeType(node.getType());*/
             bean.setNetState(node.getNodeStatus());
             nodeInfoList.add(bean);
         });
@@ -150,8 +150,8 @@ public class StompCacheInitializer {
 
         // 取共识节点数
         NodeExample nodeExample = new NodeExample();
-        nodeExample.createCriteria().andChainIdEqualTo(chainId)
-                .andTypeEqualTo(NodeType.CONSENSUS.code);
+        /*nodeExample.createCriteria().andChainIdEqualTo(chainId)
+                .andTypeEqualTo(NodeType.CONSENSUS.code);*/
         long nodeCount = nodeMapper.countByExample(nodeExample);
         indexInfo.setConsensusNodeAmount(nodeCount);
 

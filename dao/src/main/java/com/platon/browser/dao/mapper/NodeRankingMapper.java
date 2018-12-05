@@ -10,7 +10,7 @@ public interface NodeRankingMapper {
 
     int deleteByExample(NodeRankingExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(String id);
 
     int insert(NodeRanking record);
 
@@ -18,7 +18,7 @@ public interface NodeRankingMapper {
 
     List<NodeRanking> selectByExample(NodeRankingExample example);
 
-    NodeRanking selectByPrimaryKey(Integer id);
+    NodeRanking selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("record") NodeRanking record, @Param("example") NodeRankingExample example);
 

@@ -58,7 +58,7 @@ public class AddNodeTest {
                 }
             }
 
-            node.setId("0000"+i);
+           /* node.setId("0000"+i);
             node.setAddress("00011"+i);
             node.setBlockCount(456+i);
             node.setChainId("100");
@@ -85,7 +85,7 @@ public class AddNodeTest {
             node.setRewardRatio(0.01);
             node.setVerifyCount(6433l+i);
             node.setWallet("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf"+i);
-            node.setUpdateTime(new Date());
+            node.setUpdateTime(new Date());*/
             nodeMapper.insert(node);
         }
     }

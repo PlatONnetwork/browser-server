@@ -26,9 +26,9 @@ public class RabbitmqTest {
             int i = r.nextInt(10);
             Node node = new Node();
             node.setChainId("chainId");
-            node.setCreateTime(new Date());
+            /*node.setCreateTime(new Date());*/
             node.setIp("192.168.1.1"+i);
-            node.setName("dddddd");
+            /*node.setName("dddddd");*/
 
             sender.send("chain-0001","block",node);
             try {

@@ -59,10 +59,10 @@ public class NodeServiceImpl implements NodeService {
     public List<NodeItem> getNodeItemList(NodeListReq req) {
         NodeExample condition = new NodeExample();
         NodeExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
-        if(StringUtils.isNotBlank(req.getKeyword())){
+       /* if(StringUtils.isNotBlank(req.getKeyword())){
             // 根据账户名称查询
             criteria.andNameEqualTo(req.getKeyword());
-        }
+        }*/
         condition.setOrderByClause("ranking asc");
         List<Node> list = nodeMapper.selectByExample(condition);
         List<NodeItem> itemList = new LinkedList<>();
@@ -89,8 +89,8 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public NodeDetail getNodeDetail(NodeDetailReq req) {
         NodeExample condition = new NodeExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid())
-            .andAddressEqualTo(req.getAddress());
+       /* condition.createCriteria().andChainIdEqualTo(req.getCid())
+            .andAddressEqualTo(req.getAddress());*/
         List<Node> nodes = nodeMapper.selectByExample(condition);
         if (nodes.size()>1){
             logger.error("duplicate node: node address {}",req.getAddress());
@@ -104,8 +104,8 @@ public class NodeServiceImpl implements NodeService {
         NodeDetail nodeDetail = new NodeDetail();
         Node currentNode = nodes.get(0);
         BeanUtils.copyProperties(currentNode,nodeDetail);
-        nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
-        nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());
+       /* nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
+        nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());*/
 
         try{
             Location location = GeoUtil.getLocation(currentNode.getIp());
