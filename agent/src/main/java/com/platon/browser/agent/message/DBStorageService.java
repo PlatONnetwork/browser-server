@@ -6,6 +6,7 @@ import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.*;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
+import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.datatypes.Int;
 
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * User: dongqile
@@ -47,6 +50,9 @@ public class DBStorageService {
 
     @Autowired
     private NodeMapper nodeMapper;
+
+    @Autowired
+    private StatisticsMapper statisticsMapper;
 
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
@@ -127,6 +133,7 @@ public class DBStorageService {
                 for(Node node : nodeList){
                     try{
                         nodeMapper.insert(node);
+                        statisticeInfoInsert(node,message);
                         logger.debug("node data insert...");
                     }catch (DuplicateKeyException e){
                         logger.debug("pendingtransaction data repeat...", e.getMessage(), node.getId());
@@ -257,6 +264,33 @@ public class DBStorageService {
         } catch (Exception e) {
             logger.error("Link node exception!...", e.getMessage());
             return 2;
+        }
+    }
+
+    private void statisticeInfoInsert(Node node,Message message){
+        try{
+            Statistics blockReawrd = new Statistics();
+            blockReawrd.setChainId(message.getChainId());
+            blockReawrd.setCreateTime(new Date());
+            blockReawrd.setUpdateTime(new Date());
+            blockReawrd.setNodeId(node.getId());
+            blockReawrd.setValue("");
+            blockReawrd.setType(StatisticsEnum.block_reward.name());
+            statisticsMapper.insert(blockReawrd);
+            Statistics blockCount  = new Statistics();
+            BeanUtils.copyProperties(blockReawrd,blockCount);
+            blockCount.setType(StatisticsEnum.block_count.name());
+            statisticsMapper.insert(blockCount);
+            Statistics rewardAmount = new Statistics();
+            BeanUtils.copyProperties(blockReawrd,rewardAmount);
+            rewardAmount.setType(StatisticsEnum.reward_amount.name());
+            statisticsMapper.insert(rewardAmount);
+            Statistics profitAmount = new Statistics();
+            BeanUtils.copyProperties(blockReawrd,profitAmount);
+            profitAmount.setType(StatisticsEnum.profit_amount.name());
+            statisticsMapper.insert(profitAmount);
+        }catch (DuplicateKeyException e){
+            logger.error("insert nodeStatistice exception!...", e.getMessage());
         }
     }
 

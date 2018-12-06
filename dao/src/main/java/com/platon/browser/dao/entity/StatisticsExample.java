@@ -235,6 +235,66 @@ public class StatisticsExample {
             return (Criteria) this;
         }
 
+        public Criteria andNumberIsNull() {
+            addCriterion("`number` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberIsNotNull() {
+            addCriterion("`number` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberEqualTo(Long value) {
+            addCriterion("`number` =", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotEqualTo(Long value) {
+            addCriterion("`number` <>", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberGreaterThan(Long value) {
+            addCriterion("`number` >", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("`number` >=", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberLessThan(Long value) {
+            addCriterion("`number` <", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberLessThanOrEqualTo(Long value) {
+            addCriterion("`number` <=", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberIn(List<Long> values) {
+            addCriterion("`number` in", values, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotIn(List<Long> values) {
+            addCriterion("`number` not in", values, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberBetween(Long value1, Long value2) {
+            addCriterion("`number` between", value1, value2, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotBetween(Long value1, Long value2) {
+            addCriterion("`number` not between", value1, value2, "number");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
