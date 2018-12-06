@@ -314,63 +314,133 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andProtIsNull() {
-            addCriterion("prot is null");
+        public Criteria andAddressIsNull() {
+            addCriterion("address is null");
             return (Criteria) this;
         }
 
-        public Criteria andProtIsNotNull() {
-            addCriterion("prot is not null");
+        public Criteria andAddressIsNotNull() {
+            addCriterion("address is not null");
             return (Criteria) this;
         }
 
-        public Criteria andProtEqualTo(Integer value) {
-            addCriterion("prot =", value, "prot");
+        public Criteria andAddressEqualTo(String value) {
+            addCriterion("address =", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtNotEqualTo(Integer value) {
-            addCriterion("prot <>", value, "prot");
+        public Criteria andAddressNotEqualTo(String value) {
+            addCriterion("address <>", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtGreaterThan(Integer value) {
-            addCriterion("prot >", value, "prot");
+        public Criteria andAddressGreaterThan(String value) {
+            addCriterion("address >", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtGreaterThanOrEqualTo(Integer value) {
-            addCriterion("prot >=", value, "prot");
+        public Criteria andAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("address >=", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtLessThan(Integer value) {
-            addCriterion("prot <", value, "prot");
+        public Criteria andAddressLessThan(String value) {
+            addCriterion("address <", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtLessThanOrEqualTo(Integer value) {
-            addCriterion("prot <=", value, "prot");
+        public Criteria andAddressLessThanOrEqualTo(String value) {
+            addCriterion("address <=", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtIn(List<Integer> values) {
-            addCriterion("prot in", values, "prot");
+        public Criteria andAddressLike(String value) {
+            addCriterion("address like", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtNotIn(List<Integer> values) {
-            addCriterion("prot not in", values, "prot");
+        public Criteria andAddressNotLike(String value) {
+            addCriterion("address not like", value, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtBetween(Integer value1, Integer value2) {
-            addCriterion("prot between", value1, value2, "prot");
+        public Criteria andAddressIn(List<String> values) {
+            addCriterion("address in", values, "address");
             return (Criteria) this;
         }
 
-        public Criteria andProtNotBetween(Integer value1, Integer value2) {
-            addCriterion("prot not between", value1, value2, "prot");
+        public Criteria andAddressNotIn(List<String> values) {
+            addCriterion("address not in", values, "address");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddressBetween(String value1, String value2) {
+            addCriterion("address between", value1, value2, "address");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddressNotBetween(String value1, String value2) {
+            addCriterion("address not between", value1, value2, "address");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortIsNull() {
+            addCriterion("port is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortIsNotNull() {
+            addCriterion("port is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortEqualTo(Integer value) {
+            addCriterion("port =", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortNotEqualTo(Integer value) {
+            addCriterion("port <>", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortGreaterThan(Integer value) {
+            addCriterion("port >", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortGreaterThanOrEqualTo(Integer value) {
+            addCriterion("port >=", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortLessThan(Integer value) {
+            addCriterion("port <", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortLessThanOrEqualTo(Integer value) {
+            addCriterion("port <=", value, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortIn(List<Integer> values) {
+            addCriterion("port in", values, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortNotIn(List<Integer> values) {
+            addCriterion("port not in", values, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortBetween(Integer value1, Integer value2) {
+            addCriterion("port between", value1, value2, "port");
+            return (Criteria) this;
+        }
+
+        public Criteria andPortNotBetween(Integer value1, Integer value2) {
+            addCriterion("port not between", value1, value2, "port");
             return (Criteria) this;
         }
 

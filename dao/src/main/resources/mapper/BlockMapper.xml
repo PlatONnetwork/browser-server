@@ -12,12 +12,13 @@
     <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
     <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
     <result column="energon_average" jdbcType="VARCHAR" property="energonAverage" />
+    <result column="transaction_number" jdbcType="INTEGER" property="transactionNumber" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="transaction_number" jdbcType="INTEGER" property="transactionNumber" />
+    <result column="actual_tx_cost_sum" jdbcType="VARCHAR" property="actualTxCostSum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -79,7 +80,8 @@
   </sql>
   <sql id="Base_Column_List">
     hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit, 
-    energon_average, `timestamp`, block_reward, chain_id, create_time, update_time, transaction_number
+    energon_average, transaction_number, `timestamp`, block_reward, chain_id, create_time, 
+    update_time, actual_tx_cost_sum
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -115,15 +117,15 @@
     insert into block (hash, `number`, parent_hash, 
       nonce, miner, extra_data, 
       `size`, energon_used, energon_limit, 
-      energon_average, `timestamp`, block_reward, 
-      chain_id, create_time, update_time, 
-      transaction_number)
+      energon_average, transaction_number, `timestamp`, 
+      block_reward, chain_id, create_time, 
+      update_time, actual_tx_cost_sum)
     values (#{hash,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, #{parentHash,jdbcType=VARCHAR}, 
       #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, #{extraData,jdbcType=VARCHAR}, 
       #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, 
-      #{energonAverage,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, 
-      #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{transactionNumber,jdbcType=INTEGER})
+      #{energonAverage,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=INTEGER}, #{timestamp,jdbcType=TIMESTAMP}, 
+      #{blockReward,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
     insert into block
@@ -158,6 +160,9 @@
       <if test="energonAverage != null">
         energon_average,
       </if>
+      <if test="transactionNumber != null">
+        transaction_number,
+      </if>
       <if test="timestamp != null">
         `timestamp`,
       </if>
@@ -173,8 +178,8 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="transactionNumber != null">
-        transaction_number,
+      <if test="actualTxCostSum != null">
+        actual_tx_cost_sum,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -208,6 +213,9 @@
       <if test="energonAverage != null">
         #{energonAverage,jdbcType=VARCHAR},
       </if>
+      <if test="transactionNumber != null">
+        #{transactionNumber,jdbcType=INTEGER},
+      </if>
       <if test="timestamp != null">
         #{timestamp,jdbcType=TIMESTAMP},
       </if>
@@ -223,8 +231,8 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="transactionNumber != null">
-        #{transactionNumber,jdbcType=INTEGER},
+      <if test="actualTxCostSum != null">
+        #{actualTxCostSum,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -267,6 +275,9 @@
       <if test="record.energonAverage != null">
         energon_average = #{record.energonAverage,jdbcType=VARCHAR},
       </if>
+      <if test="record.transactionNumber != null">
+        transaction_number = #{record.transactionNumber,jdbcType=INTEGER},
+      </if>
       <if test="record.timestamp != null">
         `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       </if>
@@ -282,8 +293,8 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.transactionNumber != null">
-        transaction_number = #{record.transactionNumber,jdbcType=INTEGER},
+      <if test="record.actualTxCostSum != null">
+        actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -302,12 +313,13 @@
       energon_used = #{record.energonUsed,jdbcType=VARCHAR},
       energon_limit = #{record.energonLimit,jdbcType=VARCHAR},
       energon_average = #{record.energonAverage,jdbcType=VARCHAR},
+      transaction_number = #{record.transactionNumber,jdbcType=INTEGER},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       block_reward = #{record.blockReward,jdbcType=VARCHAR},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      transaction_number = #{record.transactionNumber,jdbcType=INTEGER}
+      actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -342,6 +354,9 @@
       <if test="energonAverage != null">
         energon_average = #{energonAverage,jdbcType=VARCHAR},
       </if>
+      <if test="transactionNumber != null">
+        transaction_number = #{transactionNumber,jdbcType=INTEGER},
+      </if>
       <if test="timestamp != null">
         `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       </if>
@@ -357,8 +372,8 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="transactionNumber != null">
-        transaction_number = #{transactionNumber,jdbcType=INTEGER},
+      <if test="actualTxCostSum != null">
+        actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR},
       </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
@@ -374,12 +389,13 @@
       energon_used = #{energonUsed,jdbcType=VARCHAR},
       energon_limit = #{energonLimit,jdbcType=VARCHAR},
       energon_average = #{energonAverage,jdbcType=VARCHAR},
+      transaction_number = #{transactionNumber,jdbcType=INTEGER},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       block_reward = #{blockReward,jdbcType=VARCHAR},
       chain_id = #{chainId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      transaction_number = #{transactionNumber,jdbcType=INTEGER}
+      actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -390,16 +406,16 @@
     -->
     insert into block
     (hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit, 
-      energon_average, `timestamp`, block_reward, chain_id, create_time, update_time, 
-      transaction_number)
+      energon_average, transaction_number, `timestamp`, block_reward, chain_id, create_time, 
+      update_time, actual_tx_cost_sum)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, #{item.parentHash,jdbcType=VARCHAR}, 
         #{item.nonce,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, #{item.extraData,jdbcType=VARCHAR}, 
         #{item.size,jdbcType=INTEGER}, #{item.energonUsed,jdbcType=VARCHAR}, #{item.energonLimit,jdbcType=VARCHAR}, 
-        #{item.energonAverage,jdbcType=VARCHAR}, #{item.timestamp,jdbcType=TIMESTAMP}, 
-        #{item.blockReward,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.transactionNumber,jdbcType=INTEGER}
+        #{item.energonAverage,jdbcType=VARCHAR}, #{item.transactionNumber,jdbcType=INTEGER}, 
+        #{item.timestamp,jdbcType=TIMESTAMP}, #{item.blockReward,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.actualTxCostSum,jdbcType=VARCHAR}
         )
     </foreach>
   </insert>
@@ -448,6 +464,9 @@
         <if test="'energon_average'.toString() == column.value">
           #{item.energonAverage,jdbcType=VARCHAR}
         </if>
+        <if test="'transaction_number'.toString() == column.value">
+          #{item.transactionNumber,jdbcType=INTEGER}
+        </if>
         <if test="'timestamp'.toString() == column.value">
           #{item.timestamp,jdbcType=TIMESTAMP}
         </if>
@@ -463,12 +482,13 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'transaction_number'.toString() == column.value">
-          #{item.transactionNumber,jdbcType=INTEGER}
+        <if test="'actual_tx_cost_sum'.toString() == column.value">
+          #{item.actualTxCostSum,jdbcType=VARCHAR}
         </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 
 </mapper>

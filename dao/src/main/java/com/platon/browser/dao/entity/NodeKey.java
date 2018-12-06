@@ -35,7 +35,8 @@ public class NodeKey {
         id("id", "id", "VARCHAR", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
         ip("ip", "ip", "VARCHAR", false),
-        prot("prot", "prot", "INTEGER", false),
+        address("address", "address", "VARCHAR", false),
+        port("port", "port", "INTEGER", false),
         nodeStatus("node_status", "nodeStatus", "INTEGER", false);
 
         /**
