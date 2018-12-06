@@ -6,15 +6,12 @@ import com.platon.browser.common.dto.agent.StaticticsDto;
 import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomStaticticeMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dao.mapper.StatisticsMapper;
-import jnr.ffi.annotations.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
-import sun.security.krb5.Config;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -33,13 +30,10 @@ public class StatisticsJob extends AbstractTaskJob {
     private static Logger logger = LoggerFactory.getLogger(StatisticsJob.class);
 
     @Autowired
-    private NodeMapper nodeMapper;
-
-    @Autowired
     private BlockMapper blockMapper;
 
     @Autowired
-    private CustomStaticticeMapper customStaticticeMapper;
+    private CustomStatisticsMapper customStatisticsMapper;
 
     @Autowired
     private StatisticsMapper statisticsMapper;
@@ -50,7 +44,10 @@ public class StatisticsJob extends AbstractTaskJob {
         stopWatch.start();
         try {
             List <Statistics> list = new ArrayList <>();
-            List <StaticticsDto> nodeList = customStaticticeMapper.selectNodeInfo(ConfigConst.getChainId());
+            StatisticsExample statisticsExample = new StatisticsExample();
+            statisticsExample.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
+            statisticsMapper.deleteByExample(statisticsExample);
+            List <StaticticsDto> nodeList = customStatisticsMapper.selectNodeInfo(ConfigConst.getChainId());
             if (nodeList.size() > 0 && null != nodeList) {
                 BlockExample blockExample = new BlockExample();
                 blockExample.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());

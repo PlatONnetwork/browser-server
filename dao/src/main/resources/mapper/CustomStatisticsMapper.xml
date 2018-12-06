@@ -39,4 +39,16 @@
   <select id="maxBlockNumber" parameterType="java.lang.String" resultType="java.lang.Long">
     SELECT MAX(number) FROM block WHERE chain_id = #{chainId}
   </select>
+  <select id="selectNodeInfo"  resultType="com.platon.browser.common.dto.agent.StaticticsDto">
+    SELECT
+    n.chain_id as chainId,
+    n.id as id,
+    n.port as port,
+    n.node_status as nodeStatus,
+    n.address as address,
+    nr.reward_ratio as rewardRatio
+    FROM `node` n
+    LEFT JOIN `node_ranking` nr ON  nr.id = n.id
+    WHERE n.`chain_id`= #{chainId}
+  </select>
 </mapper>
