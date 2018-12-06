@@ -3,7 +3,6 @@ package com.platon.browser.schedule;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;

@@ -6,7 +6,9 @@ import java.util.Arrays;
 public class Node extends NodeKey {
     private String ip;
 
-    private Integer prot;
+    private String address;
+
+    private Integer port;
 
     private Integer nodeStatus;
 
@@ -18,12 +20,20 @@ public class Node extends NodeKey {
         this.ip = ip == null ? null : ip.trim();
     }
 
-    public Integer getProt() {
-        return prot;
+    public String getAddress() {
+        return address;
     }
 
-    public void setProt(Integer prot) {
-        this.prot = prot;
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     public Integer getNodeStatus() {
@@ -45,7 +55,8 @@ public class Node extends NodeKey {
         id("id", "id", "VARCHAR", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
         ip("ip", "ip", "VARCHAR", false),
-        prot("prot", "prot", "INTEGER", false),
+        address("address", "address", "VARCHAR", false),
+        port("port", "port", "INTEGER", false),
         nodeStatus("node_status", "nodeStatus", "INTEGER", false);
 
         /**

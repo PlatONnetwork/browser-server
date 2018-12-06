@@ -15,7 +15,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
+import org.web3j.abi.datatypes.Int;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -115,9 +117,10 @@ public class DBStorageService {
                     Node node = new Node();
                     node.setId(nodeRanking.getId());
                     node.setIp(nodeRanking.getIp());
-                    node.setProt(nodeRanking.getPort());
+                    node.setPort(nodeRanking.getPort());
                     node.setChainId(nodeRanking.getChainId());
                     node.setNodeStatus(ping(nodeRanking.getIp()));
+                    node.setAddress(nodeRanking.getAddress());
                     nodeList.add(node);
                 });
 
@@ -148,6 +151,16 @@ public class DBStorageService {
             block.setTransactionNumber(blockDto.getTransactionNumber());
             block.setCreateTime(new Date());
             block.setUpdateTime(new Date());
+            List<TransactionDto> transactionDtos = blockDto.getTransaction();
+            if(transactionDtos.size() > 0 && null != transactionDtos){
+                BigInteger sum = new BigInteger("0");
+                for(TransactionDto transactionDto : transactionDtos){
+                    sum = sum.add(transactionDto.getActualTxCoast());
+                }
+                block.setActualTxCostSum(sum.toString());
+            }else {
+                block.setActualTxCostSum("");
+            }
         } catch (Exception e) {
             logger.error("数据转化异常", e.getMessage());
         }

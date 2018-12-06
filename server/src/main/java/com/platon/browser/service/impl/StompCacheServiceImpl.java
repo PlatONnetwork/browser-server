@@ -1,7 +1,6 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
@@ -25,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
