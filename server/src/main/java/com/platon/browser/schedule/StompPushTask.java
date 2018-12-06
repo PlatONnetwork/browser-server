@@ -3,6 +3,7 @@ package com.platon.browser.schedule;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;
@@ -42,7 +43,7 @@ public class StompPushTask {
     @Autowired
     private StompCacheService cacheService;
     @Autowired
-    private StatisticMapper statisticMapper;
+    private CustomStatisticsMapper customStatisticsMapper;
     @Autowired
     private RedisCacheService redisCacheService;
     @Autowired
@@ -85,7 +86,7 @@ public class StompPushTask {
             if(index.isChanged()){
                 logger.info("指标缓存有变更，推送STOMP消息...");
                 // 取地址数
-                long addressCount = statisticMapper.countAddress(chainId);
+                long addressCount = customStatisticsMapper.countAddress(chainId);
                 index.setAddressAmount(addressCount);
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
@@ -96,7 +97,7 @@ public class StompPushTask {
                 logger.info("统计缓存有变更，推送STOMP消息...");
 
                 // 取24小时内的交易数
-                long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
+                long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
                 statistic.setDayTransaction(dayTransactionCount);
 
                 LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();

@@ -6,6 +6,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
@@ -51,7 +52,7 @@ public class StompCacheInitializer {
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
-    private StatisticMapper statisticMapper;
+    private CustomStatisticsMapper customStatisticsMapper;
     @Autowired
     private StompCacheService stompCacheService;
     @Autowired
@@ -154,7 +155,7 @@ public class StompCacheInitializer {
         indexInfo.setConsensusNodeAmount(nodeCount);
 
         // 取地址数
-        long addressCount = statisticMapper.countAddress(chainId);
+        long addressCount = customStatisticsMapper.countAddress(chainId);
         indexInfo.setAddressAmount(addressCount);
 
         // 未知如何获取相关数据，暂时设置为0 -- 2018/10/30
@@ -195,7 +196,7 @@ public class StompCacheInitializer {
         long currentTransactionCount = transactionMapper.countByExample(transactionExample);
         statisticInfo.setTransactionCount(currentTransactionCount);
         // 有交易的所有区块数
-        long blockCount = statisticMapper.countTransactionBlock(chainId);
+        long blockCount = customStatisticsMapper.countTransactionBlock(chainId);
         statisticInfo.setBlockCount(blockCount);
 
         // 平均区块交易数=统计最近3600个区块的平均交易数
@@ -233,7 +234,7 @@ public class StompCacheInitializer {
 
 
         // 过去24小时交易笔数
-        long count = statisticMapper.countTransactionIn24Hours(chainId);
+        long count = customStatisticsMapper.countTransactionIn24Hours(chainId);
         statisticInfo.setDayTransaction(count);
 
         // 获取最近100个区块

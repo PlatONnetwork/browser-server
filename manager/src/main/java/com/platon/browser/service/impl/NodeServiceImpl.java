@@ -3,10 +3,9 @@ package com.platon.browser.service.impl;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeInfo;
@@ -39,6 +38,8 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
+    private NodeRankingMapper nodeRankingMapper;
+    @Autowired
     private BlockService blockService;
     @Autowired
     private I18nUtil i18n;
@@ -57,14 +58,14 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public List<NodeItem> getNodeItemList(NodeListReq req) {
-        NodeExample condition = new NodeExample();
-        NodeExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
-       /* if(StringUtils.isNotBlank(req.getKeyword())){
+        NodeRankingExample condition = new NodeRankingExample();
+        NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(StringUtils.isNotBlank(req.getKeyword())){
             // 根据账户名称查询
             criteria.andNameEqualTo(req.getKeyword());
-        }*/
+        }
         condition.setOrderByClause("ranking asc");
-        List<Node> list = nodeMapper.selectByExample(condition);
+        List<NodeRanking> list = nodeRankingMapper.selectByExample(condition);
         List<NodeItem> itemList = new LinkedList<>();
         list.forEach(node -> {
             NodeItem bean = new NodeItem();
@@ -88,10 +89,10 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeDetail getNodeDetail(NodeDetailReq req) {
-        NodeExample condition = new NodeExample();
-       /* condition.createCriteria().andChainIdEqualTo(req.getCid())
-            .andAddressEqualTo(req.getAddress());*/
-        List<Node> nodes = nodeMapper.selectByExample(condition);
+        NodeRankingExample condition = new NodeRankingExample();
+        condition.createCriteria().andChainIdEqualTo(req.getCid())
+            .andAddressEqualTo(req.getAddress());
+        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if (nodes.size()>1){
             logger.error("duplicate node: node address {}",req.getAddress());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
@@ -102,10 +103,10 @@ public class NodeServiceImpl implements NodeService {
         }
 
         NodeDetail nodeDetail = new NodeDetail();
-        Node currentNode = nodes.get(0);
+        NodeRanking currentNode = nodes.get(0);
         BeanUtils.copyProperties(currentNode,nodeDetail);
-       /* nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
-        nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());*/
+        nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
+        nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());
 
         try{
             Location location = GeoUtil.getLocation(currentNode.getIp());

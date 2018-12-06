@@ -1,6 +1,7 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticInfo;
@@ -40,7 +41,7 @@ public class StompCacheServiceImpl implements StompCacheService {
     @Autowired
     private RedisCacheService redisCacheService;
     @Autowired
-    private StatisticMapper statisticMapper;
+    private CustomStatisticsMapper customStatisticsMapper;
 
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
@@ -181,7 +182,7 @@ public class StompCacheServiceImpl implements StompCacheService {
         try{
             StatisticInfo copy = new StatisticInfo();
             BeanUtils.copyProperties(cache,copy);
-            long count = statisticMapper.countTransactionIn24Hours(chainId);
+            long count = customStatisticsMapper.countTransactionIn24Hours(chainId);
             copy.setDayTransaction(count);
 
             List<StatisticItem> itemList = cache.getLimitQueue().list();

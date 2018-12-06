@@ -1,13 +1,8 @@
 package com.platon.browser;
 
-import com.github.pagehelper.PageHelper;
 import com.maxmind.geoip.Location;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.req.block.BlockListReq;
-import com.platon.browser.service.BlockService;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.util.GeoUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 
 @RunWith(SpringRunner.class)
@@ -27,7 +21,7 @@ public class AddNodeTest {
     private static final Logger logger = LoggerFactory.getLogger(AddNodeTest.class);
 
     @Autowired
-    private NodeMapper nodeMapper;
+    private NodeRankingMapper nodeRankingMapper;
 
     @Test
     public void insertNode(){
@@ -35,12 +29,12 @@ public class AddNodeTest {
         int a = 108 * 256 * 256 + 1 * 256 + 5;
         int b = 145 * 256 * 256 + 110 * 256 + 35;
 
-        for(int i=10;i<30;i++){
+        for(int i=10;i<100;i++){
             int c = new Random().nextInt(b - a) + a;
             String ip = "192." + (c / (256 * 256)) + "." + ((c / 256) % 256) + "." + (c % 256);
             logger.info("IP: {}",ip);
 
-            Node node = new Node();
+            NodeRanking node = new NodeRanking();
             while (true){
                 try {
                     Location location = GeoUtil.getLocation(ip);
@@ -58,10 +52,10 @@ public class AddNodeTest {
                 }
             }
 
-           /* node.setId("0000"+i);
+            node.setRanking(i);
+            node.setId("0000"+i);
             node.setAddress("00011"+i);
-            node.setBlockCount(456+i);
-            node.setChainId("100");
+            node.setChainId("1");
             if(i%2==0){
                 node.setType(2);
             }else{
@@ -69,8 +63,6 @@ public class AddNodeTest {
             }
             node.setCreateTime(new Date());
             node.setDeposit("3343543.6454534"+i);
-            node.setElectionStatus(1);
-            node.setNodeStatus(1);
             node.setIntro("my node "+i);
 
             node.setJoinTime(new Date());
@@ -78,15 +70,9 @@ public class AddNodeTest {
             node.setPort(8800+i);
             node.setOrgName("platon");
             node.setOrgWebsite("https://www.platon.network");
-            node.setProfitAmount("3343.2323"+i);
-            node.setRewardAmount("33.334434"+i);
-            node.setPublicKey("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4dcc8DEf"+i);
-            node.setRanking(i);
             node.setRewardRatio(0.01);
-            node.setVerifyCount(6433l+i);
-            node.setWallet("0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf"+i);
-            node.setUpdateTime(new Date());*/
-            nodeMapper.insert(node);
+            node.setUpdateTime(new Date());
+            nodeRankingMapper.insert(node);
         }
     }
 
