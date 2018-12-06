@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Statistics">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
+    <result column="number" jdbcType="BIGINT" property="number" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="type" jdbcType="VARCHAR" property="type" />
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, chain_id, create_time, update_time, `type`, `value`, node_id
+    id, chain_id, `number`, create_time, update_time, `type`, `value`, node_id
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.StatisticsExample" resultMap="BaseResultMap">
     select
@@ -102,12 +103,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Statistics">
-    insert into statistics (id, chain_id, create_time, 
-      update_time, `type`, `value`, 
-      node_id)
-    values (#{id,jdbcType=INTEGER}, #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, 
-      #{nodeId,jdbcType=VARCHAR})
+    insert into statistics (id, chain_id, `number`, 
+      create_time, update_time, `type`, 
+      `value`, node_id)
+    values (#{id,jdbcType=INTEGER}, #{chainId,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR}, 
+      #{value,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Statistics">
     insert into statistics
@@ -117,6 +118,9 @@
       </if>
       <if test="chainId != null">
         chain_id,
+      </if>
+      <if test="number != null">
+        `number`,
       </if>
       <if test="createTime != null">
         create_time,
@@ -140,6 +144,9 @@
       </if>
       <if test="chainId != null">
         #{chainId,jdbcType=VARCHAR},
+      </if>
+      <if test="number != null">
+        #{number,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -173,6 +180,9 @@
       <if test="record.chainId != null">
         chain_id = #{record.chainId,jdbcType=VARCHAR},
       </if>
+      <if test="record.number != null">
+        `number` = #{record.number,jdbcType=BIGINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -197,6 +207,7 @@
     update statistics
     set id = #{record.id,jdbcType=INTEGER},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
+      `number` = #{record.number,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       `type` = #{record.type,jdbcType=VARCHAR},
@@ -211,6 +222,9 @@
     <set>
       <if test="chainId != null">
         chain_id = #{chainId,jdbcType=VARCHAR},
+      </if>
+      <if test="number != null">
+        `number` = #{number,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -233,6 +247,7 @@
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Statistics">
     update statistics
     set chain_id = #{chainId,jdbcType=VARCHAR},
+      `number` = #{number,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       `type` = #{type,jdbcType=VARCHAR},
@@ -247,12 +262,12 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into statistics
-    (id, chain_id, create_time, update_time, `type`, `value`, node_id)
+    (id, chain_id, `number`, create_time, update_time, `type`, `value`, node_id)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=INTEGER}, #{item.chainId,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.type,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, 
-        #{item.nodeId,jdbcType=VARCHAR})
+      (#{item.id,jdbcType=INTEGER}, #{item.chainId,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.type,jdbcType=VARCHAR}, 
+        #{item.value,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -275,6 +290,9 @@
         </if>
         <if test="'chain_id'.toString() == column.value">
           #{item.chainId,jdbcType=VARCHAR}
+        </if>
+        <if test="'number'.toString() == column.value">
+          #{item.number,jdbcType=BIGINT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
