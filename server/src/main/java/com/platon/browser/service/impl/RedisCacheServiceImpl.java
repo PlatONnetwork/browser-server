@@ -1,6 +1,7 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.fartherp.framework.common.util.IPUtils;
 import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
@@ -14,6 +15,7 @@ import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.util.IPUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.print.DocFlavor;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Component
@@ -292,7 +297,19 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         nodeList.forEach(node -> {
             NodeInfo bean = new NodeInfo();
             BeanUtils.copyProperties(node,bean);
-            Location location = GeoUtil.getLocation(node.getIp());
+
+            String ip = node.getIp();
+            if(!IPUtil.isIPv4Address(ip)){
+                try {
+                    ip = InetAddress.getByName(ip).getHostAddress();
+                } catch (UnknownHostException e) {
+                    ip = "";
+                    e.printStackTrace();
+                }
+            }
+
+
+            Location location = GeoUtil.getLocation(ip);
             if(location!=null){
                 bean.setLongitude(location.longitude);
                 bean.setLatitude(location.latitude);
