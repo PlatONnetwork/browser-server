@@ -103,10 +103,10 @@ public class StompCacheInitializer {
     }
 
     /**
-     * 更新节点信息缓存
+     * 更新节点信息缓存            ----          已使用redis缓存代替
      */
     public void initNodeCache(String chainId){
-        NodeExample condition = new NodeExample();
+        /*NodeExample condition = new NodeExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         List<Node> nodeList = nodeMapper.selectByExample(condition);
         List<NodeInfo> nodeInfoList = new ArrayList<>();
@@ -121,7 +121,7 @@ public class StompCacheInitializer {
             nodeInfoList.add(bean);
         });
         // platon.redis.node.cache.key=platon:agent:chain_{}:nodes
-        stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
+        stompCacheService.updateNodeCache(nodeInfoList,true,chainId);*/
     }
 
     /**

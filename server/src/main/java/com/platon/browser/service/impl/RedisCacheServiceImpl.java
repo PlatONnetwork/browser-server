@@ -293,8 +293,15 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             NodeInfo bean = new NodeInfo();
             BeanUtils.copyProperties(node,bean);
             Location location = GeoUtil.getLocation(node.getIp());
-            bean.setLongitude(location.longitude);
-            bean.setLatitude(location.latitude);
+            if(location!=null){
+                bean.setLongitude(location.longitude);
+                bean.setLatitude(location.latitude);
+            }else{
+                // 默认设置为深圳的经纬度
+                bean.setLongitude(114.06667f);
+                bean.setLatitude(22.61667f);
+            }
+
             bean.setNodeType(1);
             bean.setNetState(node.getNodeStatus());
             nodeInfoList.add(bean);
