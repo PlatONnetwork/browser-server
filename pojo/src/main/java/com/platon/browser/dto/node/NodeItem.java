@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class NodeItem {
+    private String id;
     private int ranking;
     private String name;
     private int electionStatus;

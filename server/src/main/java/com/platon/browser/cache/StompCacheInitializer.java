@@ -120,6 +120,7 @@ public class StompCacheInitializer {
             bean.setNetState(node.getNodeStatus());
             nodeInfoList.add(bean);
         });
+        // platon.redis.node.cache.key=platon:agent:chain_{}:nodes
         stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
     }
 
