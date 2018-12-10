@@ -37,6 +37,7 @@ public class NodeKey {
         ip("ip", "ip", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
         port("port", "port", "INTEGER", false),
+        rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
         nodeStatus("node_status", "nodeStatus", "INTEGER", false);
 
         /**

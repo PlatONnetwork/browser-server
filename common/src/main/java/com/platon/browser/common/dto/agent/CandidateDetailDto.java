@@ -28,7 +28,7 @@ public class CandidateDetailDto {
     private String officialWebsite;
 
     /**
-     * URL
+     * 节点logo
      */
     private String nodePortrait;
 
@@ -42,10 +42,6 @@ public class CandidateDetailDto {
      */
     private String owner;
 
-    /**
-     * 节点logo
-     */
-    private String url;
 
     public String getNodeName () {
         return nodeName;
@@ -103,11 +99,4 @@ public class CandidateDetailDto {
         this.owner = owner;
     }
 
-    public String getUrl () {
-        return url;
-    }
-
-    public void setUrl ( String url ) {
-        this.url = url;
-    }
 }

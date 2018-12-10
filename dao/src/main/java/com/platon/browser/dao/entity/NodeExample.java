@@ -444,6 +444,66 @@ public class NodeExample {
             return (Criteria) this;
         }
 
+        public Criteria andRewardRatioIsNull() {
+            addCriterion("reward_ratio is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioIsNotNull() {
+            addCriterion("reward_ratio is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioEqualTo(Double value) {
+            addCriterion("reward_ratio =", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotEqualTo(Double value) {
+            addCriterion("reward_ratio <>", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioGreaterThan(Double value) {
+            addCriterion("reward_ratio >", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioGreaterThanOrEqualTo(Double value) {
+            addCriterion("reward_ratio >=", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioLessThan(Double value) {
+            addCriterion("reward_ratio <", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioLessThanOrEqualTo(Double value) {
+            addCriterion("reward_ratio <=", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioIn(List<Double> values) {
+            addCriterion("reward_ratio in", values, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotIn(List<Double> values) {
+            addCriterion("reward_ratio not in", values, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioBetween(Double value1, Double value2) {
+            addCriterion("reward_ratio between", value1, value2, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotBetween(Double value1, Double value2) {
+            addCriterion("reward_ratio not between", value1, value2, "rewardRatio");
+            return (Criteria) this;
+        }
+
         public Criteria andNodeStatusIsNull() {
             addCriterion("node_status is null");
             return (Criteria) this;
