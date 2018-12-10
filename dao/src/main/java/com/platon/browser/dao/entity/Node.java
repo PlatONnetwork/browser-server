@@ -10,6 +10,8 @@ public class Node extends NodeKey {
 
     private Integer port;
 
+    private Double rewardRatio;
+
     private Integer nodeStatus;
 
     public String getIp() {
@@ -36,6 +38,14 @@ public class Node extends NodeKey {
         this.port = port;
     }
 
+    public Double getRewardRatio() {
+        return rewardRatio;
+    }
+
+    public void setRewardRatio(Double rewardRatio) {
+        this.rewardRatio = rewardRatio;
+    }
+
     public Integer getNodeStatus() {
         return nodeStatus;
     }
@@ -57,6 +67,7 @@ public class Node extends NodeKey {
         ip("ip", "ip", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
         port("port", "port", "INTEGER", false),
+        rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
         nodeStatus("node_status", "nodeStatus", "INTEGER", false);
 
         /**

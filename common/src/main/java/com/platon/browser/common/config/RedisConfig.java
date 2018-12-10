@@ -1,4 +1,4 @@
-package com.platon.browser.config;
+package com.platon.browser.common.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

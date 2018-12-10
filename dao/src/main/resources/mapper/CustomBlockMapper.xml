@@ -33,4 +33,13 @@
     ]]>
     ORDER BY `number` DESC LIMIT #{page.pageSize};
   </select>
+
+  <select id="selectBlockByNumber" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM block
+    WHERE `chain_id`=#{chainId}
+    AND `number` >= #{start}
+    AND `number` &lt;= #{end}
+  </select>
 </mapper>
