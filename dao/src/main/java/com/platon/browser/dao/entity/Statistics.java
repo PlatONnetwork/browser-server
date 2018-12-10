@@ -9,7 +9,7 @@ public class Statistics {
 
     private String chainId;
 
-    private Long number;
+    private String address;
 
     private Date createTime;
 
@@ -37,12 +37,12 @@ public class Statistics {
         this.chainId = chainId == null ? null : chainId.trim();
     }
 
-    public Long getNumber() {
-        return number;
+    public String getAddress() {
+        return address;
     }
 
-    public void setNumber(Long number) {
-        this.number = number;
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
     }
 
     public Date getCreateTime() {
@@ -95,7 +95,7 @@ public class Statistics {
     public enum Column {
         id("id", "id", "INTEGER", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
-        number("number", "number", "BIGINT", true),
+        address("address", "address", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         type("type", "type", "VARCHAR", true),

@@ -61,19 +61,22 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
-        <table tableName="node" domainObjectName="Node">
+
+                <table tableName="node" domainObjectName="Node">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
+        <table tableName="statistics" domainObjectName="Statistics">
+        <columnRenamingRule searchString="^D_"
+                            replaceString=""/>
+    </table>-->
+
         <table tableName="node_ranking" domainObjectName="NodeRanking">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>-->
-
-        <table tableName="statistics" domainObjectName="Statistics">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
         </table>
+
+
 <!--
         <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"

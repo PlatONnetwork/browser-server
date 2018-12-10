@@ -19,8 +19,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.datatypes.Int;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,6 +61,7 @@ public class DBStorageService {
     public void receive ( String msg ) {
         logger.debug(msg);
         Message message = JSON.parseObject(msg, Message.class);
+        String a = message.getChainId();
         if (!message.getChainId().equals(ConfigConst.getChainId())) {
             return;
         }
@@ -116,9 +120,17 @@ public class DBStorageService {
                 nodeRankingExample.createCriteria().andChainIdEqualTo(message.getChainId());
                 nodeRankingMapper.deleteByExample(nodeRankingExample);
                 //insert noderangking table
-                nodeRankingMapper.batchInsert(nodeRankings);
+                for(NodeRanking nodeRanking : nodeRankings){
+                    try {
+                        nodeRankingMapper.insert(nodeRanking);
+                        logger.debug("nodeRanking data insert...");
+                    }catch (DuplicateKeyException e){
+                        logger.debug("nodeRanking data repeat...", e.getMessage(), nodeRanking.getId());
+                        continue;
+                    }
+                }
 
-                List<Node> nodeList = new ArrayList <>();
+                List <Node> nodeList = new ArrayList <>();
                 nodeRankings.forEach(nodeRanking -> {
                     Node node = new Node();
                     node.setId(nodeRanking.getId());
@@ -127,16 +139,17 @@ public class DBStorageService {
                     node.setChainId(nodeRanking.getChainId());
                     node.setNodeStatus(ping(nodeRanking.getIp()));
                     node.setAddress(nodeRanking.getAddress());
+                    node.setRewardRatio(nodeRanking.getRewardRatio());
                     nodeList.add(node);
                 });
 
-                for(Node node : nodeList){
-                    try{
+                for (Node node : nodeList) {
+                    try {
                         nodeMapper.insert(node);
-                        statisticeInfoInsert(node,message);
+                        statisticeInfoInsert(node, message);
                         logger.debug("node data insert...");
-                    }catch (DuplicateKeyException e){
-                        logger.debug("pendingtransaction data repeat...", e.getMessage(), node.getId());
+                    } catch (DuplicateKeyException e) {
+                        logger.debug("node data repeat...", e.getMessage(), node.getId());
                         continue;
                     }
                 }
@@ -158,14 +171,15 @@ public class DBStorageService {
             block.setTransactionNumber(blockDto.getTransactionNumber());
             block.setCreateTime(new Date());
             block.setUpdateTime(new Date());
-            List<TransactionDto> transactionDtos = blockDto.getTransaction();
-            if(transactionDtos.size() > 0 && null != transactionDtos){
+            /*block.setBlockReward("");*/
+            List <TransactionDto> transactionDtos = blockDto.getTransaction();
+            if (transactionDtos.size() > 0 && null != transactionDtos) {
                 BigInteger sum = new BigInteger("0");
-                for(TransactionDto transactionDto : transactionDtos){
+                for (TransactionDto transactionDto : transactionDtos) {
                     sum = sum.add(transactionDto.getActualTxCoast());
                 }
                 block.setActualTxCostSum(sum.toString());
-            }else {
+            } else {
                 block.setActualTxCostSum("");
             }
         } catch (Exception e) {
@@ -219,33 +233,37 @@ public class DBStorageService {
 
     private List <NodeRanking> buildNodeInfo ( List <CandidateDto> list, Message message ) {
         List <NodeRanking> nodeList = new ArrayList <>();
-            for(int i = 0; i < list.size(); i++){
-                NodeRanking nodeRanking = new NodeRanking();
-                nodeRanking.setChainId(message.getChainId());
-                nodeRanking.setIp(list.get(i).getHost());
-                nodeRanking.setId(list.get(i).getCandidateId());
-                nodeRanking.setPort(Integer.valueOf(list.get(i).getPort()));
-                nodeRanking.setAddress(list.get(i).getOwner());
-                nodeRanking.setUpdateTime(new Date());
-                nodeRanking.setCreateTime(new Date());
-                CandidateDetailDto candidateDetailDto = null;
-                if (list.get(i).getExtra().length() > 0 && null != list.get(i).getExtra()) {
-                    candidateDetailDto = buildDetail(list.get(i).getExtra());
-                }
-                nodeRanking.setName(candidateDetailDto.getNodeName());
-                nodeRanking.setDeposit(candidateDetailDto.getNodeDiscription());
-                nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
-                nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
-                nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
-                nodeRanking.setRewardRatio((double) list.get(i).getFee() / 10000);
-                nodeRanking.setRanking(i+1);
+        for (int i = 0; i < list.size(); i++) {
+            NodeRanking nodeRanking = new NodeRanking();
+            nodeRanking.setChainId(message.getChainId());
+            nodeRanking.setIp(list.get(i).getHost());
+            nodeRanking.setId(list.get(i).getCandidateId());
+            nodeRanking.setPort(Integer.valueOf(list.get(i).getPort()));
+            nodeRanking.setAddress(list.get(i).getOwner());
+            nodeRanking.setUpdateTime(new Date());
+            nodeRanking.setCreateTime(new Date());
+            CandidateDetailDto candidateDetailDto = null;
+            if (list.get(i).getExtra().length() > 0 && null != list.get(i).getExtra()) {
+                candidateDetailDto = buildDetail(list.get(i).getExtra());
             }
+            nodeRanking.setName(candidateDetailDto.getNodeName());
+            nodeRanking.setDeposit(candidateDetailDto.getNodeDiscription());
+            nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
+            nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
+            nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
+            nodeRanking.setRewardRatio((double) list.get(i).getFee() / 10000);
+            nodeRanking.setUrl(candidateDetailDto.getNodePortrait() != null ?  candidateDetailDto.getNodePortrait() : "test");
+            nodeRanking.setRanking(i + 1);
+            nodeRanking.setType(1);
+            nodeList.add(nodeRanking);
+        }
 
         return nodeList;
     }
 
     private CandidateDetailDto buildDetail ( String extra ) {
-        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(extra, CandidateDetailDto.class);
+        String data = hexStringToString(extra.substring(2, extra.length()));
+        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(data, CandidateDetailDto.class);
         return candidateDetailDto;
     }
 
@@ -253,7 +271,7 @@ public class DBStorageService {
         InetAddress address = null;
         int timeOut = 3000;
         try {
-            address = InetAddress.getByAddress(ip.getBytes());
+            address = InetAddress.getByName(ip);
             if (address.isReachable(timeOut)) {
                 //success
                 return 1;
@@ -267,8 +285,8 @@ public class DBStorageService {
         }
     }
 
-    private void statisticeInfoInsert(Node node,Message message){
-        try{
+    private void statisticeInfoInsert ( Node node, Message message ) {
+        try {
             Statistics blockReawrd = new Statistics();
             blockReawrd.setChainId(message.getChainId());
             blockReawrd.setCreateTime(new Date());
@@ -277,21 +295,45 @@ public class DBStorageService {
             blockReawrd.setValue("");
             blockReawrd.setType(StatisticsEnum.block_reward.name());
             statisticsMapper.insert(blockReawrd);
-            Statistics blockCount  = new Statistics();
-            BeanUtils.copyProperties(blockReawrd,blockCount);
+            Statistics blockCount = new Statistics();
+            BeanUtils.copyProperties(blockReawrd, blockCount);
             blockCount.setType(StatisticsEnum.block_count.name());
             statisticsMapper.insert(blockCount);
             Statistics rewardAmount = new Statistics();
-            BeanUtils.copyProperties(blockReawrd,rewardAmount);
+            BeanUtils.copyProperties(blockReawrd, rewardAmount);
             rewardAmount.setType(StatisticsEnum.reward_amount.name());
             statisticsMapper.insert(rewardAmount);
             Statistics profitAmount = new Statistics();
-            BeanUtils.copyProperties(blockReawrd,profitAmount);
+            BeanUtils.copyProperties(blockReawrd, profitAmount);
             profitAmount.setType(StatisticsEnum.profit_amount.name());
             statisticsMapper.insert(profitAmount);
-        }catch (DuplicateKeyException e){
+        } catch (DuplicateKeyException e) {
             logger.error("insert nodeStatistice exception!...", e.getMessage());
         }
     }
 
+
+
+    public static String hexStringToString(String s) {
+        if (s == null || s.equals("")) {
+            return null;
+        }
+        s = s.replace(" ", "");
+        byte[] baKeyword = new byte[s.length() / 2];
+        for (int i = 0; i < baKeyword.length; i++) {
+            try {
+                baKeyword[i] = (byte) (0xff & Integer.parseInt(
+                        s.substring(i * 2, i * 2 + 2), 16));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            s = new String(baKeyword, "UTF-8");
+            new String();
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return s;
+    }
 }
