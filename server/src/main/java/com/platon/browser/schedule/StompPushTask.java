@@ -8,8 +8,8 @@ import com.platon.browser.dto.*;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.cache.BlockInit;
 import com.platon.browser.dto.cache.LimitQueue;
-import com.platon.browser.dto.cache.NodeIncrement;
 import com.platon.browser.dto.cache.TransactionInit;
+import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
@@ -64,13 +64,18 @@ public class StompPushTask {
     @Scheduled(cron="0/1 * * * * ?")
     public void push(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            // 增量推送节点信息，1秒推送一次
+            /*// 增量推送节点信息，1秒推送一次
             NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
             if(nodeIncrement.isChanged()){
                 logger.info("节点增量缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
-            }
+            }*/
+
+            // 从redis缓存获取节点信息，全量推送节点信息
+            List<NodeInfo> nodeCache = redisCacheService.getNodeList(chainId);
+            BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeCache);
+            messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
 
             // 全量推送区块信息，1秒推送一次
             BlockInit blockInit = cacheService.getBlockInit(chainId);

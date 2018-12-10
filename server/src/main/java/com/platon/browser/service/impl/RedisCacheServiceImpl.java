@@ -1,19 +1,20 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.node.NodeInfo;
 import com.platon.browser.dto.transaction.TransactionItem;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +41,9 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String transactionCacheKeyTemplate;
     @Value("${platon.redis.cache.max_item_num}")
     private long maxItemNum;
+
+    @Value("${platon.redis.node.cache.key}")
+    private String nodeCacheKeyTemplate;
 
     @Autowired
     private I18nUtil i18n;
@@ -272,4 +276,31 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         page.setData(transactions);
         return page;
     }
+
+    @Override
+    public List<NodeInfo> getNodeList(String chainId) {
+        List<NodeInfo> nodeInfoList = new LinkedList<>();
+
+        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
+        String cacheData = redisTemplate.opsForValue().get(cacheKey);
+
+        if(StringUtils.isBlank(cacheData)){
+            return nodeInfoList;
+        }
+
+        List<Node> nodeList = JSON.parseArray(cacheData,Node.class);
+        nodeList.forEach(node -> {
+            NodeInfo bean = new NodeInfo();
+            BeanUtils.copyProperties(node,bean);
+            Location location = GeoUtil.getLocation(node.getIp());
+            bean.setLongitude(location.longitude);
+            bean.setLatitude(location.latitude);
+            bean.setNodeType(1);
+            bean.setNetState(node.getNodeStatus());
+            nodeInfoList.add(bean);
+        });
+        return nodeInfoList;
+    }
+
+
 }

@@ -26,9 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class NodeServiceImpl implements NodeService {
@@ -82,6 +80,25 @@ public class NodeServiceImpl implements NodeService {
             }catch (Exception e){
                 bean.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
             }
+
+            // 根据排名设置节点竞选状态
+            // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
+            /**
+             * 前25：验证节点
+             * 前26-100：候选节点
+             * 101-200：备选节点
+             * **/
+            int electionStatus = 1;
+            int ranking = node.getRanking();
+            // 前25：验证节点
+            if(ranking<25) electionStatus = 3;
+            // 前26-100：候选节点
+            if(25<=ranking && ranking<100) electionStatus = 1;
+            // 101-200：备选节点
+            if(ranking>=100) electionStatus = 4;
+
+            bean.setElectionStatus(electionStatus);
+
             itemList.add(bean);
         });
         return itemList;
