@@ -1,11 +1,14 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.druid.support.spring.stat.annotation.Stat;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.enums.RetEnum;
+import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.dao.mapper.StatisticsMapper;
 import com.platon.browser.dto.block.BlockItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeInfo;
@@ -41,6 +44,8 @@ public class NodeServiceImpl implements NodeService {
     private BlockService blockService;
     @Autowired
     private I18nUtil i18n;
+    @Autowired
+    private StatisticsMapper statisticsMapper;
 
     @Override
     public List<NodeInfo> getNodeInfoList() {
@@ -54,6 +59,58 @@ public class NodeServiceImpl implements NodeService {
         return nodeInfoList;
     }
 
+    /**
+     * 对统计信息按StatisticsEnum分类
+     * @param statisticsList
+     * @return
+     */
+    private Map<StatisticsEnum,Map<String,String>> classifyStatistic(List<Statistics> statisticsList){
+        Map<StatisticsEnum,Map<String,String>> map = new HashMap<>();
+        //   |-- 按节点分类统计指标信息
+        // 累计分红
+        Map<String,String> rewardAmountMap = new HashMap<>();
+        map.put(StatisticsEnum.reward_amount,rewardAmountMap);
+        // 累计收益
+        Map<String,String> profitAmountMap = new HashMap<>();
+        map.put(StatisticsEnum.profit_amount,profitAmountMap);
+        // 节点验证次数
+        Map<String,String> verifyCountMap = new HashMap<>();
+        map.put(StatisticsEnum.verify_count,verifyCountMap);
+        // 已出块数
+        Map<String,String> blockCountMap = new HashMap<>();
+        map.put(StatisticsEnum.block_count,blockCountMap);
+        // 区块累计奖励
+        Map<String,String> blockRewardMap = new HashMap<>();
+        map.put(StatisticsEnum.block_reward,blockRewardMap);
+        statisticsList.forEach(statistics -> {
+            try {
+                StatisticsEnum senum = StatisticsEnum.getEnum(statistics.getType());
+                switch (senum){
+                    case reward_amount:
+                        rewardAmountMap.put(statistics.getNodeId(),statistics.getValue());
+                        break;
+                    case profit_amount:
+                        profitAmountMap.put(statistics.getNodeId(),statistics.getValue());
+                        break;
+                    case verify_count:
+                        verifyCountMap.put(statistics.getNodeId(),statistics.getValue());
+                        break;
+                    case block_count:
+                        blockCountMap.put(statistics.getNodeId(),statistics.getValue());
+                        break;
+                    case block_reward:
+                        blockRewardMap.put(statistics.getNodeId(),statistics.getValue());
+                        break;
+                }
+            }catch (Exception e){
+                // 枚举获取出现异常
+                logger.error("统计类型异常：{}",statistics.getType());
+                return;
+            }
+        });
+        return map;
+    }
+
     @Override
     public List<NodeItem> getNodeItemList(NodeListReq req) {
         NodeRankingExample condition = new NodeRankingExample();
@@ -64,6 +121,18 @@ public class NodeServiceImpl implements NodeService {
         }
         condition.setOrderByClause("ranking asc");
         List<NodeRanking> list = nodeRankingMapper.selectByExample(condition);
+
+        // 批量查询节点的统计信息
+        List<String> nodeIdList = new ArrayList<>();
+        list.forEach(node->nodeIdList.add(node.getId()));
+        StatisticsExample statisticsExample = new StatisticsExample();
+        statisticsExample.createCriteria().andChainIdEqualTo(req.getCid())
+                .andTypeEqualTo(StatisticsEnum.block_count.name())
+                .andNodeIdIn(nodeIdList);
+        List<Statistics> statisticsList = statisticsMapper.selectByExample(statisticsExample);
+        Map<StatisticsEnum,Map<String,String>> statisticsMap = classifyStatistic(statisticsList);
+        Map<String,String> blockCountMap = statisticsMap.get(StatisticsEnum.block_count);
+
         List<NodeItem> itemList = new LinkedList<>();
         list.forEach(node -> {
             NodeItem bean = new NodeItem();
@@ -99,6 +168,11 @@ public class NodeServiceImpl implements NodeService {
 
             bean.setElectionStatus(electionStatus);
 
+            // 设置统计信息
+            String blockCountStr = blockCountMap.get(node.getId());
+            int blockCount = Integer.valueOf(blockCountStr);
+            bean.setBlockCount(blockCount);
+
             itemList.add(bean);
         });
         return itemList;
@@ -125,13 +199,41 @@ public class NodeServiceImpl implements NodeService {
         nodeDetail.setJoinTime(currentNode.getJoinTime().getTime());
         nodeDetail.setNodeUrl("http://"+currentNode.getIp()+":"+currentNode.getPort());
 
-        try{
-            Location location = GeoUtil.getLocation(currentNode.getIp());
-            nodeDetail.setLocation(location.countryName+" "+location.city);
-        }catch (Exception e){
-            nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
+        // 设置统计信息
+        // 批量查询节点的统计信息
+        StatisticsExample statisticsExample = new StatisticsExample();
+        statisticsExample.createCriteria().andChainIdEqualTo(req.getCid()).andNodeIdEqualTo(currentNode.getId());
+        List<Statistics> statisticsList = statisticsMapper.selectByExample(statisticsExample);
+        Map<StatisticsEnum,Map<String,String>> statisticsMap = classifyStatistic(statisticsList);
+        // 累计分红
+        Map<String,String> rewardAmountMap = statisticsMap.get(StatisticsEnum.reward_amount);
+        // 累计收益
+        Map<String,String> profitAmountMap = statisticsMap.get(StatisticsEnum.profit_amount);
+        // 节点验证次数
+        Map<String,String> verifyCountMap = statisticsMap.get(StatisticsEnum.verify_count);
+        // 已出块数
+        Map<String,String> blockCountMap = statisticsMap.get(StatisticsEnum.block_count);
+
+        String blockCountStr = blockCountMap.get(currentNode.getId());
+        if(StringUtils.isNotBlank(blockCountStr)){
+            nodeDetail.setBlockCount(Integer.valueOf(blockCountStr));
+        }else{
+            nodeDetail.setBlockCount(0);
         }
 
+        String rewardAmountStr = rewardAmountMap.get(currentNode.getId());
+        nodeDetail.setRewardAmount(rewardAmountStr);
+        String profitAmountStr = profitAmountMap.get(currentNode.getId());
+        nodeDetail.setProfitAmount(profitAmountStr);
+        String verifyCountStr = verifyCountMap.get(currentNode.getId());
+        if(StringUtils.isNotBlank(verifyCountStr)){
+            nodeDetail.setVerifyCount(Integer.valueOf(verifyCountStr));
+        }else{
+            nodeDetail.setVerifyCount(0);
+        }
+
+
+        // 设置地理位置信息
         try {
             Location location = GeoUtil.getLocation(currentNode.getIp());
             if(StringUtils.isNotBlank(location.countryName)){
