@@ -1,6 +1,5 @@
 package com.platon.browser.service.impl;
 
-import com.alibaba.druid.support.spring.stat.annotation.Stat;
 import com.maxmind.geoip.Location;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.StatisticsEnum;
