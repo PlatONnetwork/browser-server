@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServiceApplication.class, value = "spring.profiles.active=dev")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
 public class AddNodeTest {
     private static final Logger logger = LoggerFactory.getLogger(AddNodeTest.class);
 
