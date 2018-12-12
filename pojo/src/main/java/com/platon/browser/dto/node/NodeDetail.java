@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class NodeDetail {
+    private String id;
     private String address;
     private String name;
     private String logo;

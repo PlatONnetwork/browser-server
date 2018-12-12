@@ -7,9 +7,11 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.search.SearchResult;
+import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
@@ -56,9 +58,12 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private NodeMapper nodeMapper;
+    private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private I18nUtil i18n;
+
+    @Autowired
+    private NodeService nodeService;
 
     @Override
     public SearchResult<?> search (SearchReq param ) {
@@ -201,36 +206,10 @@ public class SearchServiceImpl implements SearchService {
         }
 
         if(isNodePublicKey){
-            // 根据节点公钥查询节点详情
-            NodeExample nodeExample = new NodeExample();
-            nodeExample.createCriteria()
-                    .andChainIdEqualTo(chainId)
-                    .andIdEqualTo(keyword);
-            List<Node> nodes = nodeMapper.selectByExample(nodeExample);
-            if (nodes.size()>1){
-                logger.error("duplicate node: node address {}",keyword);
-                throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
-            }
-            if(nodes.size()==0){
-                logger.error("invalid node address {}",keyword);
-                throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
-            }
-            Node node = nodes.get(0);
-            NodeDetail nodeDetail = new NodeDetail();
-            BeanUtils.copyProperties(node,nodeDetail);
-           /* nodeDetail.setNodeUrl("http://"+node.getIp()+":"+node.getPort());
-            nodeDetail.setJoinTime(node.getJoinTime().getTime());*/
-            try {
-                Location location= GeoUtil.getLocation(node.getIp());
-                if(StringUtils.isNotBlank(location.countryName)){
-                    nodeDetail.setLocation(location.countryName);
-                }
-                if(StringUtils.isNotBlank(location.city)){
-                    nodeDetail.setLocation(nodeDetail.getLocation()+" "+location.city);
-                }
-            }catch (Exception e){
-                nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
-            }
+            NodeDetailReq nodeDetailReq = new NodeDetailReq();
+            nodeDetailReq.setCid(chainId);
+            nodeDetailReq.setId(keyword);
+            NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq);
             result.setType("node");
             result.setStruct(nodeDetail);
             return result;
