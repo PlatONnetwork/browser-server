@@ -2,8 +2,7 @@ package com.platon.browser.agent.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.platon.browser.common.base.AppException;
-import com.platon.browser.common.client.Web3jClient;
-import com.platon.browser.common.constant.ConfigConst;
+import com.platon.browser.agent.client.Web3jClient;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
@@ -12,13 +11,13 @@ import com.platon.browser.common.util.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 import org.web3j.protocol.core.methods.response.Transaction;
-import rx.Observable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -42,6 +41,9 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
      */
 
     private static Logger log = LoggerFactory.getLogger(PendingTxSynchronizeJob.class);
+
+    @Value("${chain.id}")
+    private String chainId;
 
     @Autowired
     private MQSender mqSender;
@@ -79,7 +81,7 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                     pendingTransactionDto.setTxType(type);
                     pendingTransactionDtoList.add(pendingTransactionDto);
                 }
-                mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.PENDING.name(), pendingTransactionDtoList);
+                mqSender.send(chainId, MqMessageTypeEnum.PENDING.name(), pendingTransactionDtoList);
             }
             log.info("newest pendingtx is null");
         }catch (Exception e){

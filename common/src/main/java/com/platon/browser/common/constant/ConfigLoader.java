@@ -17,7 +17,8 @@ public abstract class ConfigLoader {
 
     private  static Properties properties;
 
-    public static void loadConfigPath(){
+
+    static void loadConfigPath(){
         properties = new Properties();
         InputStream in = null;
         try {

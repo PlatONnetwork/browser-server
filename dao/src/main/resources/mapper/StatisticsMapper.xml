@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.StatisticsMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Statistics">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="address" jdbcType="VARCHAR" property="address" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -86,15 +86,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from statistics
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from statistics
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.StatisticsExample">
     delete from statistics
@@ -106,7 +106,7 @@
     insert into statistics (id, chain_id, address, 
       create_time, update_time, `type`, 
       `value`, node_id)
-    values (#{id,jdbcType=INTEGER}, #{chainId,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{chainId,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR}, 
       #{value,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR})
   </insert>
@@ -140,7 +140,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="chainId != null">
         #{chainId,jdbcType=VARCHAR},
@@ -175,7 +175,7 @@
     update statistics
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+        id = #{record.id,jdbcType=BIGINT},
       </if>
       <if test="record.chainId != null">
         chain_id = #{record.chainId,jdbcType=VARCHAR},
@@ -205,7 +205,7 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update statistics
-    set id = #{record.id,jdbcType=INTEGER},
+    set id = #{record.id,jdbcType=BIGINT},
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       address = #{record.address,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -242,7 +242,7 @@
         node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Statistics">
     update statistics
@@ -253,7 +253,7 @@
       `type` = #{type,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
       node_id = #{nodeId,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -265,7 +265,7 @@
     (id, chain_id, address, create_time, update_time, `type`, `value`, node_id)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=INTEGER}, #{item.chainId,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
+      (#{item.id,jdbcType=BIGINT}, #{item.chainId,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.type,jdbcType=VARCHAR}, 
         #{item.value,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR})
     </foreach>
@@ -286,7 +286,7 @@
       (
       <foreach collection="selective" item="column" separator=",">
         <if test="'id'.toString() == column.value">
-          #{item.id,jdbcType=INTEGER}
+          #{item.id,jdbcType=BIGINT}
         </if>
         <if test="'chain_id'.toString() == column.value">
           #{item.chainId,jdbcType=VARCHAR}
@@ -313,6 +313,7 @@
       )
     </foreach>
   </insert>
+
 
 
 </mapper>

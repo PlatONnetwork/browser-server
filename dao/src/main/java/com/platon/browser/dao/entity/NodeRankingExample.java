@@ -1155,6 +1155,66 @@ public class NodeRankingExample {
             return (Criteria) this;
         }
 
+        public Criteria andElectionStatusIsNull() {
+            addCriterion("election_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusIsNotNull() {
+            addCriterion("election_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusEqualTo(Integer value) {
+            addCriterion("election_status =", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusNotEqualTo(Integer value) {
+            addCriterion("election_status <>", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusGreaterThan(Integer value) {
+            addCriterion("election_status >", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("election_status >=", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusLessThan(Integer value) {
+            addCriterion("election_status <", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("election_status <=", value, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusIn(List<Integer> values) {
+            addCriterion("election_status in", values, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusNotIn(List<Integer> values) {
+            addCriterion("election_status not in", values, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusBetween(Integer value1, Integer value2) {
+            addCriterion("election_status between", value1, value2, "electionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andElectionStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("election_status not between", value1, value2, "electionStatus");
+            return (Criteria) this;
+        }
+
         public Criteria andUrlIsNull() {
             addCriterion("url is null");
             return (Criteria) this;

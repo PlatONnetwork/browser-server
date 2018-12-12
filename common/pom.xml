@@ -109,39 +109,4 @@
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 	</dependencies>
-
-	<profiles>
-	<profile>
-		<id>dev</id>
-		<properties>
-			<package.environment>dev</package.environment>
-		</properties>
-		<activation>
-			<activeByDefault>true</activeByDefault>
-		</activation>
-		<build>
-			<resources>
-				<resource>
-					<directory>src/main/resources/dev</directory>
-				</resource>
-			</resources>
-		</build>
-	</profile>
-	<profile>
-		<id>test</id>
-		<properties>
-			<package.environment>test</package.environment>
-		</properties>
-		<activation>
-			<activeByDefault>false</activeByDefault>
-		</activation>
-		<build>
-			<resources>
-				<resource>
-					<directory>src/main/resources/test</directory>
-				</resource>
-			</resources>
-		</build>
-	</profile>
-	</profiles>
 </project>

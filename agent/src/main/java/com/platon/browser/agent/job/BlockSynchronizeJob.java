@@ -2,9 +2,8 @@ package com.platon.browser.agent.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.agent.client.Web3jClient;
 import com.platon.browser.common.base.AppException;
-import com.platon.browser.common.client.Web3jClient;
-import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
@@ -14,13 +13,12 @@ import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import jnr.ffi.annotations.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
-import org.web3j.abi.datatypes.Int;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -28,13 +26,11 @@ import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
@@ -59,6 +55,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Logger log = LoggerFactory.getLogger(BlockSynchronizeJob.class);
 
+    @Value("${chain.id}")
+    private String chainId;
+
     @Autowired
     private BlockMapper blockMapper;
 
@@ -71,9 +70,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     @PostConstruct
     public void init(){
-        ConfigConst.loadConfigPath();
         BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
+        condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("timestamp desc");
         PageHelper.startPage(1, 1);
         List <Block> blocks = blockMapper.selectByExample(condition);
@@ -106,7 +104,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     BlockDto newBlock = buildStruct(i, web3j);
                     //chainId获取
                     if(newBlock.getNumber() > maxNubmer.intValue()){
-                        mqSender.send(ConfigConst.getChainId(), MqMessageTypeEnum.BLOCK.name(), newBlock);
+                        log.info("ChainId : {}，{}，{}，{}" , chainId ,"---------------------", i ,"-----------------------");
+                        mqSender.send(chainId, MqMessageTypeEnum.BLOCK.name(), newBlock);
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     }
                 } catch (Exception e) {

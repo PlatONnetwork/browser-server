@@ -12,16 +12,18 @@
     <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
     <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
     <result column="energon_average" jdbcType="VARCHAR" property="energonAverage" />
+    <result column="transaction_number" jdbcType="INTEGER" property="transactionNumber" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="transaction_number" jdbcType="INTEGER" property="transactionNumber" />
+    <result column="actual_tx_cost_sum" jdbcType="VARCHAR" property="actualTxCostSum" />
   </resultMap>
   <sql id="Base_Column_List">
-    `hash`, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit,
-    energon_average, `timestamp`, block_reward, chain_id, create_time, update_time, transaction_number
+    hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit,
+    energon_average, transaction_number, `timestamp`, block_reward, chain_id, create_time,
+    update_time, actual_tx_cost_sum
   </sql>
   <select id="selectByPage" parameterType="com.platon.browser.dao.entity.BlockPage" resultMap="BaseResultMap">
     SELECT

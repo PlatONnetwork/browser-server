@@ -10,7 +10,7 @@ public interface StatisticsMapper {
 
     int deleteByExample(StatisticsExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(Long id);
 
     int insert(Statistics record);
 
@@ -18,7 +18,7 @@ public interface StatisticsMapper {
 
     List<Statistics> selectByExample(StatisticsExample example);
 
-    Statistics selectByPrimaryKey(Integer id);
+    Statistics selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") Statistics record, @Param("example") StatisticsExample example);
 

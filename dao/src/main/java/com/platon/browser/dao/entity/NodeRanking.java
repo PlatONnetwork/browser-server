@@ -37,6 +37,8 @@ public class NodeRanking {
 
     private Integer ranking;
 
+    private Integer electionStatus;
+
     private String url;
 
     public String getId() {
@@ -167,6 +169,14 @@ public class NodeRanking {
         this.ranking = ranking;
     }
 
+    public Integer getElectionStatus() {
+        return electionStatus;
+    }
+
+    public void setElectionStatus(Integer electionStatus) {
+        this.electionStatus = electionStatus;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -199,6 +209,7 @@ public class NodeRanking {
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
         ranking("ranking", "ranking", "INTEGER", false),
+        electionStatus("election_status", "electionStatus", "INTEGER", false),
         url("url", "url", "VARCHAR", false);
 
         /**
