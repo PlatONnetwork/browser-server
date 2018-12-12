@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,6 +46,8 @@ public class NodeServiceImpl implements NodeService {
     private I18nUtil i18n;
     @Autowired
     private StatisticsMapper statisticsMapper;
+    @Value("${platon.image.server.url}")
+    private String imageServerUrl;
 
     @Override
     public List<NodeInfo> getNodeInfoList() {
@@ -175,6 +178,9 @@ public class NodeServiceImpl implements NodeService {
             }
             bean.setBlockCount(blockCount);
 
+            // 设置logo url
+            bean.setLogo(imageServerUrl+node.getUrl());
+
             itemList.add(bean);
         });
         return itemList;
@@ -247,6 +253,14 @@ public class NodeServiceImpl implements NodeService {
         }catch (Exception e){
             nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
         }
+
+        // 公钥就是节点ID
+        nodeDetail.setPublicKey(currentNode.getId());
+        // 钱包就是address
+        nodeDetail.setWallet(currentNode.getAddress());
+
+        // 设置logo url
+        nodeDetail.setLogo(imageServerUrl+currentNode.getUrl());
 
         return nodeDetail;
     }

@@ -6,6 +6,7 @@ import lombok.Data;
 public class NodeItem {
     private String id;
     private int ranking;
+    private String logo;
     private String name;
     private int electionStatus;
     private String countryCode;
