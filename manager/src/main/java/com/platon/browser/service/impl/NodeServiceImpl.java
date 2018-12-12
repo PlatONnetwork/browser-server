@@ -224,9 +224,9 @@ public class NodeServiceImpl implements NodeService {
         }
 
         String rewardAmountStr = rewardAmountMap.get(currentNode.getId());
-        nodeDetail.setRewardAmount(rewardAmountStr);
+        nodeDetail.setRewardAmount(StringUtils.isBlank(rewardAmountStr)?"0":rewardAmountStr);
         String profitAmountStr = profitAmountMap.get(currentNode.getId());
-        nodeDetail.setProfitAmount(profitAmountStr);
+        nodeDetail.setProfitAmount(StringUtils.isBlank(profitAmountStr)?"0":profitAmountStr);
         String verifyCountStr = verifyCountMap.get(currentNode.getId());
         if(StringUtils.isNotBlank(verifyCountStr)){
             nodeDetail.setVerifyCount(Integer.valueOf(verifyCountStr));
