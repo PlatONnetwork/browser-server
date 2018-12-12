@@ -169,7 +169,10 @@ public class NodeServiceImpl implements NodeService {
 
             // 设置统计信息
             String blockCountStr = blockCountMap.get(node.getId());
-            int blockCount = Integer.valueOf(blockCountStr);
+            int blockCount = 0;
+            if(StringUtils.isNotBlank(blockCountStr)){
+                blockCount = Integer.valueOf(blockCountStr);
+            }
             bean.setBlockCount(blockCount);
 
             itemList.add(bean);
