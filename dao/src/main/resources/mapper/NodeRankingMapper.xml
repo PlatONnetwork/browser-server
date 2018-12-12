@@ -18,6 +18,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
     <result column="ranking" jdbcType="INTEGER" property="ranking" />
+    <result column="election_status" jdbcType="INTEGER" property="electionStatus" />
     <result column="url" jdbcType="VARCHAR" property="url" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -80,7 +81,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, chain_id, 
-    join_time, create_time, update_time, reward_ratio, ranking, url
+    join_time, create_time, update_time, reward_ratio, ranking, election_status, url
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeRankingExample" resultMap="BaseResultMap">
     select
@@ -118,13 +119,15 @@
       address, deposit, org_name, 
       org_website, chain_id, join_time, 
       create_time, update_time, reward_ratio, 
-      ranking, url)
+      ranking, election_status, url
+      )
     values (#{id,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, 
       #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{intro,jdbcType=VARCHAR}, 
       #{address,jdbcType=VARCHAR}, #{deposit,jdbcType=VARCHAR}, #{orgName,jdbcType=VARCHAR}, 
       #{orgWebsite,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardRatio,jdbcType=DOUBLE}, 
-      #{ranking,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR})
+      #{ranking,jdbcType=INTEGER}, #{electionStatus,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NodeRanking">
     insert into node_ranking
@@ -176,6 +179,9 @@
       </if>
       <if test="ranking != null">
         ranking,
+      </if>
+      <if test="electionStatus != null">
+        election_status,
       </if>
       <if test="url != null">
         url,
@@ -229,6 +235,9 @@
       </if>
       <if test="ranking != null">
         #{ranking,jdbcType=INTEGER},
+      </if>
+      <if test="electionStatus != null">
+        #{electionStatus,jdbcType=INTEGER},
       </if>
       <if test="url != null">
         #{url,jdbcType=VARCHAR},
@@ -292,6 +301,9 @@
       <if test="record.ranking != null">
         ranking = #{record.ranking,jdbcType=INTEGER},
       </if>
+      <if test="record.electionStatus != null">
+        election_status = #{record.electionStatus,jdbcType=INTEGER},
+      </if>
       <if test="record.url != null">
         url = #{record.url,jdbcType=VARCHAR},
       </if>
@@ -318,6 +330,7 @@
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
       ranking = #{record.ranking,jdbcType=INTEGER},
+      election_status = #{record.electionStatus,jdbcType=INTEGER},
       url = #{record.url,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -371,6 +384,9 @@
       <if test="ranking != null">
         ranking = #{ranking,jdbcType=INTEGER},
       </if>
+      <if test="electionStatus != null">
+        election_status = #{electionStatus,jdbcType=INTEGER},
+      </if>
       <if test="url != null">
         url = #{url,jdbcType=VARCHAR},
       </if>
@@ -394,6 +410,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
       ranking = #{ranking,jdbcType=INTEGER},
+      election_status = #{electionStatus,jdbcType=INTEGER},
       url = #{url,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -405,7 +422,8 @@
     -->
     insert into node_ranking
     (id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, chain_id, 
-      join_time, create_time, update_time, reward_ratio, ranking, url)
+      join_time, create_time, update_time, reward_ratio, ranking, election_status, url
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, #{item.port,jdbcType=INTEGER}, 
@@ -413,7 +431,8 @@
         #{item.address,jdbcType=VARCHAR}, #{item.deposit,jdbcType=VARCHAR}, #{item.orgName,jdbcType=VARCHAR}, 
         #{item.orgWebsite,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardRatio,jdbcType=DOUBLE}, 
-        #{item.ranking,jdbcType=INTEGER}, #{item.url,jdbcType=VARCHAR})
+        #{item.ranking,jdbcType=INTEGER}, #{item.electionStatus,jdbcType=INTEGER}, #{item.url,jdbcType=VARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -479,6 +498,9 @@
         <if test="'ranking'.toString() == column.value">
           #{item.ranking,jdbcType=INTEGER}
         </if>
+        <if test="'election_status'.toString() == column.value">
+          #{item.electionStatus,jdbcType=INTEGER}
+        </if>
         <if test="'url'.toString() == column.value">
           #{item.url,jdbcType=VARCHAR}
         </if>
@@ -486,5 +508,6 @@
       )
     </foreach>
   </insert>
+
 
 </mapper>

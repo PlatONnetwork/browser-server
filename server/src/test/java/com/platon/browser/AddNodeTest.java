@@ -1,11 +1,11 @@
 package com.platon.browser;
 
-import com.maxmind.geoip.Location;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeRanking;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.util.GeoUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-import java.util.Random;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= ServiceApplication.class, value = "spring.profiles.active=dev")
@@ -27,7 +26,10 @@ public class AddNodeTest {
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
 
-    @Test
+    @Autowired
+    private BlockMapper blockMapper;
+
+/*    @Test
     public void insertNode(){
 
         int a = 108 * 256 * 256 + 1 * 256 + 5;
@@ -88,8 +90,13 @@ public class AddNodeTest {
             nodeMapper.insert(node);
             nodeRankingMapper.insert(nodeRanking);
         }
+    }*/
+
+    @Test
+    public void testBlock(){
+        PageHelper.startPage(1,10);
+        List<Block> block  = blockMapper.selectByExample(new BlockExample());
+        System.out.println(block.size());
     }
-
-
 
 }

@@ -1,3 +1,0 @@
-# Auto Configure
-org.springframework.context.ApplicationContextInitializer=\
-  com.platon.browser.common.spring.BeanLocatorInitializer

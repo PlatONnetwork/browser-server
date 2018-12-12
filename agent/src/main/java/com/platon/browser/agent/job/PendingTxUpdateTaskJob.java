@@ -2,7 +2,6 @@ package com.platon.browser.agent.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.platon.browser.common.base.AppException;
-import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.PendingTxExample;
@@ -13,9 +12,9 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
-import java.math.BigInteger;
 import java.util.List;
 
 
@@ -41,6 +40,9 @@ public class PendingTxUpdateTaskJob extends AbstractTaskJob {
     @Autowired
     private PendingTxMapper pendingTxMapper;
 
+    @Value("${chain.id}")
+    private String chainId;
+
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
         StopWatch stopWatch = new StopWatch();
@@ -51,7 +53,7 @@ public class PendingTxUpdateTaskJob extends AbstractTaskJob {
             if (pendingTxeList.size() > 0) {
                 for (PendingTx pendingTx : pendingTxeList) {
                     TransactionExample transactionExample = new TransactionExample();
-                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(ConfigConst.getChainId());
+                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(chainId);
                     List <Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
                     if (transactionList.size() == 1) {
                         pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());

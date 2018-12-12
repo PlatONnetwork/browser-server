@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Statistics {
-    private Integer id;
+    private Long id;
 
     private String chainId;
 
@@ -21,11 +21,11 @@ public class Statistics {
 
     private String nodeId;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -93,7 +93,7 @@ public class Statistics {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        id("id", "id", "INTEGER", false),
+        id("id", "id", "BIGINT", false),
         chainId("chain_id", "chainId", "VARCHAR", false),
         address("address", "address", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),

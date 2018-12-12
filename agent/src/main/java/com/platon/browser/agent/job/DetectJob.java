@@ -2,7 +2,6 @@ package com.platon.browser.agent.job;
 
 import com.alibaba.fastjson.JSON;
 import com.dangdang.ddframe.job.api.ShardingContext;
-import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -25,6 +24,10 @@ public class DetectJob extends AbstractTaskJob {
 
     private static Logger logger = LoggerFactory.getLogger(DetectJob.class);
 
+
+    @Value("${chain.id}")
+    private String chainId;
+
     @Autowired
     private NodeMapper nodeMapper;
 
@@ -39,9 +42,8 @@ public class DetectJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-            ConfigConst.loadConfigPath();
             NodeExample nodeExample = new NodeExample();
-            nodeExample.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
+            nodeExample.createCriteria().andChainIdEqualTo(chainId);
             List <Node> nodeList = nodeMapper.selectByExample(nodeExample);
             if (nodeList.size() > 0) {
                 logger.debug("detect node!..");
@@ -58,7 +60,7 @@ public class DetectJob extends AbstractTaskJob {
                     logger.debug("update DB succ!...");
                 });
             }
-            updateRedisInfo(nodeList, ConfigConst.getChainId());
+            updateRedisInfo(nodeList, chainId);
         } catch (Exception e) {
             logger.error("DetectJob is accomplish!...",e.getMessage());
         } finally {

@@ -1,21 +1,21 @@
 package com.platon.browser.agent.job;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
-import com.platon.browser.common.constant.ConfigConst;
-import com.platon.browser.common.dto.agent.StaticticsDto;
 import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StatisticsMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -31,6 +31,10 @@ public class StatisticsJob extends AbstractTaskJob {
 
     private static final long offset = 100000L;
 
+    @Value("${chain.id}")
+    private String chainId;
+
+
     @Autowired
     private BlockMapper blockMapper;
 
@@ -43,116 +47,147 @@ public class StatisticsJob extends AbstractTaskJob {
     @Autowired
     private RedisTemplate <String, String> redisTemplate;
 
-    @Autowired
-    private CustomBlockMapper customBlockMapper;
+    @Value("${platon.redis.number.cache.key}")
+    private String statisticNumber;
 
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-            ConfigConst.loadConfigPath();
-            String number = redisTemplate.opsForValue().get(ConfigConst.getChainId());
+            //get statistic number by redis
+            String cacheKey = statisticNumber.replace("{}",chainId);
+            String number = redisTemplate.opsForValue().get(cacheKey);
             logger.debug("Redis number : [",number,"]");
+            //get NodeList
             Map <String, Double> nodeRewardMap = new HashMap <>();
             NodeExample nodeExample = new NodeExample();
-            nodeExample.createCriteria().andChainIdEqualTo(ConfigConst.getChainId());
+            nodeExample.createCriteria().andChainIdEqualTo(chainId);
             List <Node> nodeList = nodeMapper.selectByExample(nodeExample);
+            //get node reward
             for (Node node : nodeList) {
                 nodeRewardMap.put(node.getAddress(), node.getRewardRatio());
             }
+            //build four type map statistic info (key(miner) -> value(typeValue))
             Map <String, String> blockCountMap = new HashMap <>();
             Map <String, String> blockRewardMap = new HashMap <>();
             Map <String, String> rewardAmountMap = new HashMap <>();
             Map <String, String> profitAmountMap = new HashMap <>();
-            List <Block> blocks = new ArrayList <>();
-            if (number == null) {
-                //if on redis number is null,that mean first init
-                blocks = customBlockMapper.selectBlockByNumber(ConfigConst.getChainId(), 0L, 0L + offset);
-            } else {
-                //else that mean initialized ,than get offset
-                blocks = customBlockMapper.selectBlockByNumber(ConfigConst.getChainId(), Long.valueOf(number), Long.valueOf(number) + offset);
+
+            //get blockList (from:startoffset to:endoffset)
+            long startOffset = 0, endOffset = offset;
+            if (number != null) {
+                startOffset = Long.valueOf(number);
+                endOffset = Long.valueOf(number) + offset;
             }
+
+            List <Block> blocks = new ArrayList <>();
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId)
+                    .andNumberGreaterThanOrEqualTo(startOffset)
+                    .andNumberLessThanOrEqualTo(endOffset);
+            blocks = blockMapper.selectByExample(blockExample);
+
+            //blockinfo is null ,return
             if(blocks.size() < 0){
                 logger.error("block info is null!...");
                 return;
             }
+            //statistic block info put Corresponding map
             for (Block block : blocks) {
                 Long count = 0L;
                 count = count + 1;
+                //blockCount
                 blockCountMap.put(block.getMiner(), String.valueOf(count));
 
-                BigInteger sum = new BigInteger("0");
-                sum = sum.add(new BigInteger(block.getBlockReward()));
+                BigDecimal sum = new BigDecimal("0");
+                sum = sum.add(new BigDecimal(block.getBlockReward()));
+                //blockReward
                 blockRewardMap.put(block.getMiner(), sum.toString());
 
-                BigInteger dividend = new BigInteger("0");
+                BigDecimal dividend = new BigDecimal("0");
                 Double rewardRatio = nodeRewardMap.get(block.getMiner());
-                if (rewardRatio.equals(null)) {
+                //nodeReward
+                //get blockRewar ,if blockReward is null ,set rewardRatio is 1
+                if (StringUtils.isEmpty(rewardRatio)) {
                     rewardRatio = 1D;
                 }
-                dividend = dividend.add(new BigInteger(block.getActualTxCostSum())).multiply(new BigInteger(String.valueOf(1 - rewardRatio)));
+                dividend = dividend.add(new BigDecimal(block.getActualTxCostSum())).multiply(new BigDecimal(String.valueOf(1 - rewardRatio)));
                 rewardAmountMap.put(block.getMiner(), dividend.toString());
 
-                BigInteger cumulative = new BigInteger("0");
-                cumulative = cumulative.add(new BigInteger(block.getBlockReward()).multiply(new BigInteger(String.valueOf(rewardRatio))));
+                //profitAmount
+                BigDecimal cumulative = new BigDecimal("0");
+                cumulative = cumulative.add(new BigDecimal(block.getBlockReward()).multiply(new BigDecimal(String.valueOf(rewardRatio))));
                 profitAmountMap.put(block.getMiner(), cumulative.toString());
+                number = number +1;
             }
+            //map key put address List
             Set <String> blockCountMinerList = blockCountMap.keySet();
             List <String> addressList = new ArrayList <>();
             addressList.addAll(blockCountMinerList);
 
+            //condition is addressList and chain ,select table statistic info
             StatisticsExample condition = new StatisticsExample();
-            condition.createCriteria().andChainIdEqualTo(ConfigConst.getChainId())
+            condition.createCriteria().andChainIdEqualTo(chainId)
                     .andAddressIn(addressList);
             List <Statistics> statisticsList = statisticsMapper.selectByExample(condition);
-            if(statisticsList.size() < 0){
+            if(statisticsList.size() <= 0){
+                //select result is null ,return and set number
+                String newOffset = number;
+                logger.debug("Redis number : [",newOffset,"]");
+                redisTemplate.opsForValue().set(cacheKey, newOffset);
                 logger.error("statistic info is null!...");
                 return;
             }
             for (Statistics statistics : statisticsList) {
+                //if no null ,
                 switch (StatisticsEnum.valueOf(statistics.getType())) {
                     case profit_amount:
                         String newProfitAmount = profitAmountMap.get(statistics.getAddress());
-                        BigInteger A = new BigInteger(statistics.getValue());
-                        BigInteger B = new BigInteger(newProfitAmount);
+                        BigDecimal A = new BigDecimal(statistics.getValue());
+                        BigDecimal B = new BigDecimal(newProfitAmount);
                         statistics.setValue(A.add(B).toString());
                         break;
                     case block_reward:
                         String newReward = blockRewardMap.get(statistics.getAddress());
-                        BigInteger C = new BigInteger(statistics.getValue());
-                        BigInteger D = new BigInteger(newReward);
+                        BigDecimal C = new BigDecimal(statistics.getValue());
+                        BigDecimal D = new BigDecimal(newReward);
                         statistics.setValue(C.add(D).toString());
                         break;
                     case block_count:
                         String newCount = blockCountMap.get(statistics.getAddress());
-                        BigInteger E = new BigInteger(statistics.getValue());
-                        BigInteger F = new BigInteger(newCount);
+                        BigDecimal E = new BigDecimal(statistics.getValue());
+                        BigDecimal F = new BigDecimal(newCount);
                         statistics.setValue(E.add(F).toString());
                         break;
                     case reward_amount:
                         String newRewardAmount = rewardAmountMap.get(statistics.getAddress());
-                        BigInteger G = new BigInteger(statistics.getValue());
-                        BigInteger H = new BigInteger(newRewardAmount);
+                        BigDecimal G = new BigDecimal(statistics.getValue());
+                        BigDecimal H = new BigDecimal(newRewardAmount);
                         statistics.setValue(G.add(H).toString());
                         break;
                 }
             }
             for (Statistics statistics : statisticsList) {
+                //update stockValue
                 statisticsMapper.updateByPrimaryKey(statistics);
                 //TODO: 查看，记得删除
                 String  statisticsString  = JSON.toJSONString(statistics);
+
+                //update redis number value
                 logger.debug("statistic info :{ " , statisticsString ," }");
+                String newOffset = number;
+                logger.debug("Redis number : [",newOffset,"]");
+                redisTemplate.opsForValue().set(cacheKey, newOffset);
+                logger.debug("StaticticsJob : [ nodeInfo statistic succ!... ]");
             }
-            String newOffset = String.valueOf(Long.valueOf(number) + offset);
-            logger.debug("Redis number : [",newOffset,"]");
-            redisTemplate.opsForValue().set(ConfigConst.getChainId(), newOffset);
-            logger.debug("StaticticsJob : [ nodeInfo statistic succ!... ]");
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("StaticticsJob Exception!...", e.getMessage());
         } finally {
             stopWatch.stop();
         }
     }
+
 
 }
