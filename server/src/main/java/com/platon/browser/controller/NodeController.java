@@ -145,7 +145,7 @@ public class NodeController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            NodeDetail detail = nodeService.getNodeDetail(req);
+            NodeDetail detail = nodeService.getNodeDetail(req,false);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),detail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());

@@ -174,17 +174,21 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public NodeDetail getNodeDetail(NodeDetailReq req) {
+    public NodeDetail getNodeDetail(NodeDetailReq req, boolean byName) {
         NodeRankingExample condition = new NodeRankingExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid())
-            .andIdEqualTo(req.getId());
+        NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(byName){
+            criteria.andNameEqualTo(req.getId());
+        }else{
+            criteria.andIdEqualTo(req.getId());
+        }
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if (nodes.size()>1){
-            logger.error("duplicate node: node id {}",req.getId());
+            logger.error("duplicate node: node {} {}",byName?"name":"id",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
         }
         if(nodes.size()==0){
-            logger.error("invalid node id {}",req.getId());
+            logger.error("invalid node {} {}",byName?"name":"id",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
 
