@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,6 +46,8 @@ public class NodeServiceImpl implements NodeService {
     private I18nUtil i18n;
     @Autowired
     private StatisticsMapper statisticsMapper;
+    @Value("${platon.image.server.url}")
+    private String imageServerUrl;
 
     @Override
     public List<NodeInfo> getNodeInfoList() {
@@ -121,6 +124,12 @@ public class NodeServiceImpl implements NodeService {
         condition.setOrderByClause("ranking asc");
         List<NodeRanking> list = nodeRankingMapper.selectByExample(condition);
 
+        List<NodeItem> itemList = new LinkedList<>();
+
+        if(list.size()==0){
+            return itemList;
+        }
+
         // 批量查询节点的统计信息
         List<String> nodeIdList = new ArrayList<>();
         list.forEach(node->nodeIdList.add(node.getId()));
@@ -132,7 +141,6 @@ public class NodeServiceImpl implements NodeService {
         Map<StatisticsEnum,Map<String,String>> statisticsMap = classifyStatistic(statisticsList);
         Map<String,String> blockCountMap = statisticsMap.get(StatisticsEnum.block_count);
 
-        List<NodeItem> itemList = new LinkedList<>();
         list.forEach(node -> {
             NodeItem bean = new NodeItem();
             BeanUtils.copyProperties(node,bean);
@@ -149,28 +157,16 @@ public class NodeServiceImpl implements NodeService {
                 bean.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
             }
 
-            // 根据排名设置节点竞选状态
-            // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
-            /**
-             * 前25：验证节点
-             * 前26-100：候选节点
-             * 101-200：备选节点
-             * **/
-            int electionStatus = 1;
-            int ranking = node.getRanking();
-            // 前25：验证节点
-            if(ranking<25) electionStatus = 3;
-            // 前26-100：候选节点
-            if(25<=ranking && ranking<100) electionStatus = 1;
-            // 101-200：备选节点
-            if(ranking>=100) electionStatus = 4;
-
-            bean.setElectionStatus(electionStatus);
-
             // 设置统计信息
             String blockCountStr = blockCountMap.get(node.getId());
-            int blockCount = Integer.valueOf(blockCountStr);
+            int blockCount = 0;
+            if(StringUtils.isNotBlank(blockCountStr)){
+                blockCount = Integer.valueOf(blockCountStr);
+            }
             bean.setBlockCount(blockCount);
+
+            // 设置logo url
+            bean.setLogo(imageServerUrl+node.getUrl());
 
             itemList.add(bean);
         });
@@ -181,14 +177,14 @@ public class NodeServiceImpl implements NodeService {
     public NodeDetail getNodeDetail(NodeDetailReq req) {
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid())
-            .andAddressEqualTo(req.getAddress());
+            .andIdEqualTo(req.getId());
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if (nodes.size()>1){
-            logger.error("duplicate node: node address {}",req.getAddress());
+            logger.error("duplicate node: node id {}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
         }
         if(nodes.size()==0){
-            logger.error("invalid node address {}",req.getAddress());
+            logger.error("invalid node id {}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
 
@@ -221,9 +217,9 @@ public class NodeServiceImpl implements NodeService {
         }
 
         String rewardAmountStr = rewardAmountMap.get(currentNode.getId());
-        nodeDetail.setRewardAmount(rewardAmountStr);
+        nodeDetail.setRewardAmount(StringUtils.isBlank(rewardAmountStr)?"0":rewardAmountStr);
         String profitAmountStr = profitAmountMap.get(currentNode.getId());
-        nodeDetail.setProfitAmount(profitAmountStr);
+        nodeDetail.setProfitAmount(StringUtils.isBlank(profitAmountStr)?"0":profitAmountStr);
         String verifyCountStr = verifyCountMap.get(currentNode.getId());
         if(StringUtils.isNotBlank(verifyCountStr)){
             nodeDetail.setVerifyCount(Integer.valueOf(verifyCountStr));
@@ -244,6 +240,14 @@ public class NodeServiceImpl implements NodeService {
         }catch (Exception e){
             nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
         }
+
+        // 公钥就是节点ID
+        nodeDetail.setPublicKey(currentNode.getId());
+        // 钱包就是address
+        nodeDetail.setWallet(currentNode.getAddress());
+
+        // 设置logo url
+        nodeDetail.setLogo(imageServerUrl+currentNode.getUrl());
 
         return nodeDetail;
     }

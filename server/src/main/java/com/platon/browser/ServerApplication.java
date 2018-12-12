@@ -11,14 +11,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /*@ImportResource(locations={"classpath:spring/spring-redis.xml","classpath:juweb-sdk-client.xml","classpath:spring-ice-broker.xml"})*/
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
 @EnableScheduling
-public class ServiceApplication extends SpringBootServletInitializer {
+public class ServerApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ServiceApplication.class, args);
+		SpringApplication.run(ServerApplication.class, args);
 	}
 	
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(ServiceApplication.class);
+        return builder.sources(ServerApplication.class);
     }
 }

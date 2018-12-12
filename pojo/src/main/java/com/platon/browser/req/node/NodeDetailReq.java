@@ -9,6 +9,6 @@ import javax.validation.constraints.NotNull;
 public class NodeDetailReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotNull(message = "{node.address.notnull}")
-    private String address;
+    @NotNull(message = "{node.id.notnull}")
+    private String id;
 }
