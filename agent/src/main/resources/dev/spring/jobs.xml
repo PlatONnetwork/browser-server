@@ -35,17 +35,19 @@
 
     <job:simple id="nodeSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.NodeSynchronizeJob"
                 registry-center-ref="regCenter"
-                cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=nodeSynchronizeJob$"
+                cron="*/5 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=nodeSynchronizeJob$"
                 overwrite="true"
                 failover="true" misfire="true" description="节点统计"/>
-     <job:simple id="statisticsJob${netInfo}" class="com.platon.browser.agent.job.StatisticsJob"
-              registry-center-ref="regCenter"
-              cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsJob"
-              overwrite="true"
-              failover="true" misfire="true" description="统计任务"/>
-<job:simple id="detectJob${netInfo}" class="com.platon.browser.agent.job.DetectJob"
-              registry-center-ref="regCenter"
-              cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=detectJob"
-              overwrite="true"
-              failover="true" misfire="true" description="探测节点任务"/>
+
+    <job:simple id="statisticsJob${netInfo}" class="com.platon.browser.agent.job.StatisticsJob"
+                registry-center-ref="regCenter"
+                cron="0 0/5 * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsJob"
+                overwrite="true"
+                failover="true" misfire="true" description="统计任务"/>
+
+    <job:simple id="detectJob${netInfo}" class="com.platon.browser.agent.job.DetectJob"
+                registry-center-ref="regCenter"
+                cron="0 0/3 * * * ?" sharding-total-count="1" sharding-item-parameters="0=detectJob"
+                overwrite="true"
+                failover="true" misfire="true" description="探测节点任务"/>
 </beans>

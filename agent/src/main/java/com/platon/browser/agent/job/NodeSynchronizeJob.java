@@ -236,7 +236,7 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
 
     private int ping ( String ip ) {
         InetAddress address = null;
-        int timeOut = 3000;
+        int timeOut = 2000;
         try {
             address = InetAddress.getByName(ip);
             if (address.isReachable(timeOut)) {
