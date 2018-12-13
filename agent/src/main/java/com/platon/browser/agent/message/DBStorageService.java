@@ -1,7 +1,6 @@
 package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.constant.ConfigConst;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
@@ -18,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,11 +43,15 @@ public class DBStorageService {
     @Autowired
     private PendingTxMapper pendingTxMapper;
 
+
+    @Value("${chain.id}")
+    private String chainId;
+
     @RabbitListener(queues = "#{platonQueue.name}")
     public void receive ( String msg ) {
         logger.debug(msg);
         Message message = JSON.parseObject(msg, Message.class);
-        if (!message.getChainId().equals(ConfigConst.getChainId())) {
+        if (!message.getChainId().equals(chainId)) {
             return;
         }
         switch (MqMessageTypeEnum.valueOf(message.getType().toUpperCase())) {
