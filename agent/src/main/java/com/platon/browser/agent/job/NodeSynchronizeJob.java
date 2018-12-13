@@ -3,8 +3,8 @@ package com.platon.browser.agent.job;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
-import com.platon.browser.agent.contract.CandidateConstract;
 import com.platon.browser.agent.client.Web3jClient;
+import com.platon.browser.agent.contract.CandidateConstract;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.enums.StatisticsEnum;
@@ -176,7 +176,8 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
                 candidateDetailDto = buildDetail(list.get(i).getExtra());
             }
             nodeRanking.setName(candidateDetailDto.getNodeName());
-            nodeRanking.setDeposit(candidateDetailDto.getNodeDiscription());
+            nodeRanking.setDeposit(list.get(i).getDeposit().toString());
+            nodeRanking.setIntro(candidateDetailDto.getNodeDiscription());
             nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
             nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
             nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
