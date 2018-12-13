@@ -74,12 +74,12 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
             //call contract function get  nodeInfo rangking 1-25 from blockchain
             String verfiersList = candidateConstract.VerifiersList().send();
             if (verfiersList.length() > 0 && null != verfiersList) {
-                logger.info("verfiersList info :", verfiersList);
+                logger.debug("verfiersList info :", verfiersList);
                 List <CandidateDto> verfiersDtoList = JSON.parseArray(verfiersList, CandidateDto.class);
                 candidateDtoList.addAll(verfiersDtoList);
             }
             if (nodeInfoList.length() > 0 && null != nodeInfoList) {
-                logger.info("nodeInfoList info :", verfiersList);
+                logger.debug("nodeInfoList info :", verfiersList);
                 List <CandidateDto> nodeInfoDtoList = JSON.parseArray(nodeInfoList, CandidateDto.class);
                 //add no-repeat element
                 for (int i = 0; i < nodeInfoDtoList.size(); i++) {
@@ -153,7 +153,6 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("Synchronize node info exception!...", e.getMessage());
         }
 
@@ -265,22 +264,22 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
             blockReawrd.setAddress(node.getAddress());
             blockReawrd.setType(StatisticsEnum.block_reward.name());
             list.add(blockReawrd);
-            logger.info("blockReawrd :", JSON.toJSONString(blockReawrd));
+            logger.debug("blockReawrd :", JSON.toJSONString(blockReawrd));
             Statistics blockCount = new Statistics();
             BeanUtils.copyProperties(blockReawrd, blockCount);
             blockCount.setType(StatisticsEnum.block_count.name());
             list.add(blockCount);
-            logger.info("blockCount :", JSON.toJSONString(blockCount));
+            logger.debug("blockCount :", JSON.toJSONString(blockCount));
             Statistics rewardAmount = new Statistics();
             BeanUtils.copyProperties(blockReawrd, rewardAmount);
             rewardAmount.setType(StatisticsEnum.reward_amount.name());
             list.add(rewardAmount);
-            logger.info("rewardAmount :", JSON.toJSONString(rewardAmount));
+            logger.debug("rewardAmount :", JSON.toJSONString(rewardAmount));
             Statistics profitAmount = new Statistics();
             BeanUtils.copyProperties(blockReawrd, profitAmount);
             profitAmount.setType(StatisticsEnum.profit_amount.name());
             list.add(profitAmount);
-            logger.info("profitAmount :", JSON.toJSONString(profitAmount));
+            logger.debug("profitAmount :", JSON.toJSONString(profitAmount));
         } catch (DuplicateKeyException e) {
             logger.error("build nodeStatistice exception!...", e.getMessage());
             return Collections.emptyList();
