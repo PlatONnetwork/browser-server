@@ -104,7 +104,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     BlockDto newBlock = buildStruct(i, web3j);
                     //chainId获取
                     if(newBlock.getNumber() > maxNubmer.intValue()){
-                        log.info("ChainId : {}，{}，{}，{}" , chainId ,"---------------------", i ,"-----------------------");
+                        //log.info("ChainId : {}，{}，{}，{}" , chainId ,"---------------------", i ,"-----------------------");
                         mqSender.send(chainId, MqMessageTypeEnum.BLOCK.name(), newBlock);
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     }
