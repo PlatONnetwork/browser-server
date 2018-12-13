@@ -75,7 +75,7 @@ public class SearchServiceImpl implements SearchService {
         param.setParameter(param.getParameter().trim());
         String chainId = param.getCid();
         String keyword = param.getParameter();
-        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodePublicKey=false;
+        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodePublicKeyOrName=false;
         boolean isNumber=keyword.matches("[0-9]+");
         if (!isNumber) {
             //为false则可能为区块交易hash或者为账户
@@ -84,12 +84,15 @@ public class SearchServiceImpl implements SearchService {
             if("0x".equals(keyword.substring(0, 2))){
                 if(keyword.length() == 42)
                     isAccountOrContract = true;
-                if(keyword.length() == 130)
-                    isNodePublicKey = true;
             } else {
-                isTransactionOrBlock = true;
+                if(keyword.length() == 128){
+                    isNodePublicKeyOrName = true;
+                }else{
+                    isTransactionOrBlock = true;
+                }
             }
         }
+
 
         SearchResult<Object> result = new SearchResult<>();
 
@@ -205,14 +208,23 @@ public class SearchServiceImpl implements SearchService {
             }
         }
 
-        if(isNodePublicKey){
+        if(isNodePublicKeyOrName){
             NodeDetailReq nodeDetailReq = new NodeDetailReq();
             nodeDetailReq.setCid(chainId);
             nodeDetailReq.setId(keyword);
-            NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq);
-            result.setType("node");
-            result.setStruct(nodeDetail);
-            return result;
+            try{
+                // 先根据节点ID查
+                NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq, false);
+                result.setType("node");
+                result.setStruct(nodeDetail);
+                return result;
+            }catch (BusinessException be){
+                // 再根据节点名称查
+                NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq, true);
+                result.setType("node");
+                result.setStruct(nodeDetail);
+                return result;
+            }
         }
 
         if(isNumber){

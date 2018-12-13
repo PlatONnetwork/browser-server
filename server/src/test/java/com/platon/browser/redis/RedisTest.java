@@ -2,7 +2,7 @@ package com.platon.browser.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.ServiceApplication;
+import com.platon.browser.ServerApplication;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServiceApplication.class)
+@SpringBootTest(classes= ServerApplication.class)
 public class RedisTest {
 
     @Autowired

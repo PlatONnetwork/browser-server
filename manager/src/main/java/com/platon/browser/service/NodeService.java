@@ -16,7 +16,7 @@ public interface NodeService {
 
     List<NodeItem> getNodeItemList(NodeListReq req);
 
-    NodeDetail getNodeDetail(NodeDetailReq req);
+    NodeDetail getNodeDetail(NodeDetailReq req, boolean byName);
 
     List<BlockItem> getBlockList(BlockListReq req);
 }
