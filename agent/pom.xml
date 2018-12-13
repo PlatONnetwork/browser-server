@@ -83,6 +83,9 @@
 			<id>test</id>
 			<properties>
 				<package.environment>test</package.environment>
+				<activation>
+					<activeByDefault>false</activeByDefault>
+				</activation>
 			</properties>
 		</profile>
 		<profile>
