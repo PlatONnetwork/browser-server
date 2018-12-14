@@ -103,7 +103,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     //chainId获取
                     if(newBlock.getNumber() > maxNubmer.intValue()){
                         mqSender.send(chainId, "block", newBlock);
-                        log.info("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
+                        log.info("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", chainId =" + chainId +"}");
                     }
                 } catch (Exception e) {
                     log.error("Synchronize block exception", e);
