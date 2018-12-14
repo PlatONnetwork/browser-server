@@ -57,7 +57,12 @@ public class StatisticsJob extends AbstractTaskJob {
         try {
             //get statistic number by redis
             String cacheKey = statisticNumber.replace("{}",chainId);
-            String number = redisTemplate.opsForValue().get(cacheKey);
+            String numberStr = redisTemplate.opsForValue().get(cacheKey);
+            long number = 0;
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(numberStr)){
+                number = Long.valueOf(numberStr);
+            }
+
             logger.debug("Redis number : [",number,"]");
             //get NodeList
             Map <String, Double> nodeRewardMap = new HashMap <>();
@@ -76,7 +81,7 @@ public class StatisticsJob extends AbstractTaskJob {
 
             //get blockList (from:startoffset to:endoffset)
             long startOffset = 0, endOffset = offset;
-            if (number != null) {
+            if (number != 0) {
                 startOffset = Long.valueOf(number);
                 endOffset = Long.valueOf(number) + offset;
             }
@@ -133,7 +138,7 @@ public class StatisticsJob extends AbstractTaskJob {
             List <Statistics> statisticsList = statisticsMapper.selectByExample(condition);
             if(statisticsList.size() <= 0){
                 //select result is null ,return and set number
-                String newOffset = number;
+                String newOffset = String.valueOf(number);
                 logger.debug("Redis number : [",newOffset,"]");
                 redisTemplate.opsForValue().set(cacheKey, newOffset);
                 logger.error("statistic info is null!...");
@@ -176,7 +181,7 @@ public class StatisticsJob extends AbstractTaskJob {
 
                 //update redis number value
                 logger.debug("statistic info :{ " , statisticsString ," }");
-                String newOffset = number;
+                String newOffset = String.valueOf(number);
                 logger.debug("Redis number : [",newOffset,"]");
                 redisTemplate.opsForValue().set(cacheKey, newOffset);
                 logger.debug("StaticticsJob : [ nodeInfo statistic succ!... ]");
