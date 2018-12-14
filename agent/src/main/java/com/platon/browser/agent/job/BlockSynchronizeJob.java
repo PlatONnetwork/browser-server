@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
@@ -109,6 +110,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     log.error("Synchronize block exception", e);
                     throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                 }
+                TimeUnit.MILLISECONDS.sleep(100);
             }
             maxNubmer = Long.valueOf(blockNumber);
         } catch (Exception e) {
