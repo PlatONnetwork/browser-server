@@ -32,7 +32,6 @@ import java.util.List;
  * Time: 18:28
  */
 @Component
-@Order(1)
 public class DBStorageService {
     private final Logger logger = LoggerFactory.getLogger(DBStorageService.class);
 

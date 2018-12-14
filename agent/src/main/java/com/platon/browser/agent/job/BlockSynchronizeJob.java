@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -32,13 +31,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
  * Date: 2018/10/24
  * Time: 17:28
  */
-@Order(2)
 public class BlockSynchronizeJob extends AbstractTaskJob {
 
     /**
@@ -68,6 +67,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Long maxNubmer = 0L;
 
+    private static boolean isFirstRun = true;
+
     private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
     @PostConstruct
@@ -88,9 +89,14 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
+            if(isFirstRun){
+                TimeUnit.SECONDS.sleep(30l);
+                isFirstRun = false;
+            }
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {
