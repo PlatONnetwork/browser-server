@@ -62,7 +62,7 @@ public class DBStorageService {
                 //构建dto结构，转存数据库结构
                 //区块相关block
                 Block block = bulidBlock(blockDto, message);
-                logger.info("DBStorageService :{ DB blockNumber = " + block.getNumber()  + "}");
+                logger.debug("DBStorageService :{ DB blockNumber = " + block.getNumber()  + "}");
                 try {
                     blockMapper.insertSelective(block);
                     logger.debug("block data insert...");
