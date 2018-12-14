@@ -30,12 +30,14 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
  * Date: 2018/10/24
  * Time: 17:28
  */
+
 public class BlockSynchronizeJob extends AbstractTaskJob {
 
     /**
@@ -66,6 +68,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     private String chainId;
 
 
+    private static boolean isFirstRun = true;
+
+
     @PostConstruct
     public void init(){
         BlockExample condition = new BlockExample();
@@ -87,6 +92,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
+            if(isFirstRun){
+                TimeUnit.SECONDS.sleep(30l);
+                isFirstRun = false;
+            }
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {
@@ -103,12 +112,13 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     //chainId获取
                     if(newBlock.getNumber() > maxNubmer.intValue()){
                         mqSender.send(chainId, "block", newBlock);
-                        log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
+                        log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", chainId =" + chainId +"}");
                     }
                 } catch (Exception e) {
                     log.error("Synchronize block exception", e);
                     throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
                 }
+                TimeUnit.MILLISECONDS.sleep(100);
             }
             maxNubmer = Long.valueOf(blockNumber);
         } catch (Exception e) {

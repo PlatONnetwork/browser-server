@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -29,6 +30,7 @@ import java.util.List;
  * Date: 2018/10/25
  * Time: 18:07
  */
+@DependsOn("dBStorageService")
 public class PendingTxSynchronizeJob extends AbstractTaskJob{
 
     /**

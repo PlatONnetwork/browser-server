@@ -2,6 +2,8 @@ package com.platon.browser.common.spring;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.mq.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ public class MQSender {
 
     @Autowired
     private FanoutExchange fanout;
+
+    private final Logger logger = LoggerFactory.getLogger(MQSender.class);
+
 
     /**
      * 发送消息
@@ -31,6 +36,9 @@ public class MQSender {
      * @param struct 消息具体结构 json字符串
      */
     public void send(String chainId,String type, Object struct) {
+        if(chainId.equals(null)){
+            logger.error("chainId is null!...");
+        }
         Message message = new Message();
         message.setChainId(chainId);
         message.setType(type);
