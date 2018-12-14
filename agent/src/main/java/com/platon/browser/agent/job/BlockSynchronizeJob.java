@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
  * Date: 2018/10/24
  * Time: 17:28
  */
+@DependsOn("dBStorageService")
 public class BlockSynchronizeJob extends AbstractTaskJob {
 
     /**
