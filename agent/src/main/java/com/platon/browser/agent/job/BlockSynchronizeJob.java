@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -38,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * Date: 2018/10/24
  * Time: 17:28
  */
-@DependsOn("dBStorageService")
+
 public class BlockSynchronizeJob extends AbstractTaskJob {
 
     /**
@@ -69,6 +68,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     private String chainId;
 
 
+    private static boolean isFirstRun = true;
+
+
     @PostConstruct
     public void init(){
         BlockExample condition = new BlockExample();
@@ -90,6 +92,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
+            if(isFirstRun){
+                TimeUnit.SECONDS.sleep(30l);
+                isFirstRun = false;
+            }
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {
