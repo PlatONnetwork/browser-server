@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -38,7 +38,7 @@ import java.util.Optional;
  * Date: 2018/10/24
  * Time: 17:28
  */
-@DependsOn("dBStorageService")
+@Order(2)
 public class BlockSynchronizeJob extends AbstractTaskJob {
 
     /**
@@ -242,7 +242,5 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
         return conversionCoin.toString();
     }
-
-
 
 }
