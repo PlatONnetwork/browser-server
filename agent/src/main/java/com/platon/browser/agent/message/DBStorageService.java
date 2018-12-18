@@ -16,8 +16,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
@@ -44,16 +42,6 @@ public class DBStorageService {
     @Autowired
     private PendingTxMapper pendingTxMapper;
 
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-
-    @Autowired
-    private NodeMapper nodeMapper;
-
-    @Autowired
-    private StatisticsMapper statisticsMapper;
-
-
     @Value("${chain.id}")
     private String chainId;
 
@@ -71,7 +59,7 @@ public class DBStorageService {
                 //构建dto结构，转存数据库结构
                 //区块相关block
                 Block block = bulidBlock(blockDto, message);
-                logger.debug("DBStorageService :{ DB blockNumber = " + block.getNumber() + "}");
+                logger.debug("DBStorageService :{ DB blockNumber = " + block.getNumber()  + "}");
                 try {
                     blockMapper.insertSelective(block);
                     logger.debug("block number :" + block.getNumber());
@@ -109,7 +97,6 @@ public class DBStorageService {
                     }
                 }
                 break;
-
         }
     }
 

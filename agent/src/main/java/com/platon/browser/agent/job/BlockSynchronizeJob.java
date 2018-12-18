@@ -56,8 +56,6 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Logger log = LoggerFactory.getLogger(BlockSynchronizeJob.class);
 
-    @Value("${chain.id}")
-    private String chainId;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -67,7 +65,11 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Long maxNubmer = 0L;
 
+    @Value("${chain.id}")
+    private String chainId;
+
     private static boolean isFirstRun = true;
+
 
     private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
@@ -248,5 +250,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
         return conversionCoin.toString();
     }
+
+
 
 }
