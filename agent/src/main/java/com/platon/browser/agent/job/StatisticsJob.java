@@ -45,7 +45,7 @@ public class StatisticsJob extends AbstractTaskJob {
     private StatisticsMapper statisticsMapper;
 
     @Autowired
-    private RedisTemplate <String, String> redisTemplate;
+    private RedisTemplate <String, Object> redisTemplate;
 
     @Value("${platon.redis.number.cache.key}")
     private String statisticNumber;
@@ -57,7 +57,12 @@ public class StatisticsJob extends AbstractTaskJob {
         try {
             //get statistic number by redis
             String cacheKey = statisticNumber.replace("{}",chainId);
-            String number = redisTemplate.opsForValue().get(cacheKey);
+            Object numberObject = redisTemplate.opsForValue().get(cacheKey);
+            long number = 0;
+            if(null != numberObject){
+                number = (long)numberObject;
+            }
+
             logger.debug("Redis number : [",number,"]");
             //get NodeList
             Map <String, Double> nodeRewardMap = new HashMap <>();
@@ -76,9 +81,9 @@ public class StatisticsJob extends AbstractTaskJob {
 
             //get blockList (from:startoffset to:endoffset)
             long startOffset = 0, endOffset = offset;
-            if (number != null) {
-                startOffset = Long.valueOf(number);
-                endOffset = Long.valueOf(number) + offset;
+            if (number != 0) {
+                startOffset = number;
+                endOffset = number + offset;
             }
 
             List <Block> blocks = new ArrayList <>();
@@ -133,7 +138,7 @@ public class StatisticsJob extends AbstractTaskJob {
             List <Statistics> statisticsList = statisticsMapper.selectByExample(condition);
             if(statisticsList.size() <= 0){
                 //select result is null ,return and set number
-                String newOffset = number;
+                long newOffset =  number;
                 logger.debug("Redis number : [",newOffset,"]");
                 redisTemplate.opsForValue().set(cacheKey, newOffset);
                 logger.error("statistic info is null!...");
@@ -176,7 +181,7 @@ public class StatisticsJob extends AbstractTaskJob {
 
                 //update redis number value
                 logger.debug("statistic info :{ " , statisticsString ," }");
-                String newOffset = number;
+                long newOffset =  number;
                 logger.debug("Redis number : [",newOffset,"]");
                 redisTemplate.opsForValue().set(cacheKey, newOffset);
                 logger.debug("StaticticsJob : [ nodeInfo statistic succ!... ]");

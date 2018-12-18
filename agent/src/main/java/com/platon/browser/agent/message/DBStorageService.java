@@ -1,10 +1,14 @@
 package com.platon.browser.agent.message;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.dto.agent.*;
+import com.platon.browser.common.dto.agent.BlockDto;
+import com.platon.browser.common.dto.agent.PendingTransactionDto;
+import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.dto.mq.Message;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

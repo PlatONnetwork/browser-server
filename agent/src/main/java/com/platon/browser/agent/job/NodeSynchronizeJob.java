@@ -15,6 +15,7 @@ import com.platon.browser.dao.mapper.StatisticsMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -35,6 +36,7 @@ import java.util.List;
  * Date: 2018/10/25
  * Time: 18:07
  */
+@DependsOn("dBStorageService")
 public class NodeSynchronizeJob extends AbstractTaskJob {
 
     private final static String contratAddress = "0x1000000000000000000000000000000000000001";

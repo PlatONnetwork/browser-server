@@ -68,9 +68,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     @Value("${chain.id}")
     private String chainId;
 
-
     private static boolean isFirstRun = true;
 
+
+    private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
 
     @PostConstruct
     public void init(){
@@ -90,6 +91,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     @Override
     protected void doJob ( ShardingContext shardingContext ) {
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
