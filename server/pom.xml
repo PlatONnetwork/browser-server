@@ -85,18 +85,18 @@
 	</dependencies>
    	<profiles>
         <profile>
-            <id>dev</id>
+            <id>1</id>
             <properties>
-                <package.environment>dev</package.environment>
+                <package.environment>1</package.environment>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
         <profile>
-            <id>test</id>
+            <id>2</id>
             <properties>
-                <package.environment>test</package.environment>
+                <package.environment>2</package.environment>
             </properties>
         </profile>
         <profile>
