@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
@@ -55,8 +56,6 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Logger log = LoggerFactory.getLogger(BlockSynchronizeJob.class);
 
-    @Value("${chain.id}")
-    private String chainId;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -66,7 +65,12 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static Long maxNubmer = 0L;
 
-    private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
+    @Value("${chain.id}")
+    private String chainId;
+
+
+    private static boolean isFirstRun = true;
+
 
     @PostConstruct
     public void init(){
@@ -89,6 +93,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
+            if(isFirstRun){
+                TimeUnit.SECONDS.sleep(30l);
+                isFirstRun = false;
+            }
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = Web3jClient.getWeb3jClient();
             try {

@@ -37,7 +37,7 @@ public class MQSender {
      */
     public void send(String chainId,String type, Object struct) {
         if(StringUtils.isBlank(chainId)){
-            logger.info("CHAIN ID : {}", chainId);
+            logger.debug("CHAIN ID : {}", chainId);
         }
         Message message = new Message();
         message.setChainId(chainId);
