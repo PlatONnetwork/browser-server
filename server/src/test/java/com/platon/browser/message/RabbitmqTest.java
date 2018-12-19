@@ -1,6 +1,6 @@
 package com.platon.browser.message;
 
-import com.platon.browser.ServiceApplication;
+import com.platon.browser.ServerApplication;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.NodeDto;
 import com.platon.browser.common.dto.agent.PendingTransactionDto;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServiceApplication.class)
+@SpringBootTest(classes= ServerApplication.class)
 public class RabbitmqTest {
 
     @Autowired
