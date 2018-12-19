@@ -46,7 +46,7 @@ public class SubscribeService {
     private void init(){
         // 从数据库加载最高块初始化每条链上的最高块编号标记
         chainsConfig.getChainIds().forEach(chainId->{
-            logger.info("初始化链[{}]的最高块编号标记...",chainId);
+            logger.debug("初始化链[{}]的最高块编号标记...",chainId);
             RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,1);
             long maxBlockNumber = 0;
             if(page.getData().size()>0){

@@ -89,7 +89,7 @@ public class StompPushTask {
 
             IndexInfo index = cacheService.getIndexInfo(chainId);
             if(index.isChanged()){
-                logger.info("指标缓存有变更，推送STOMP消息...");
+                logger.debug("指标缓存有变更，推送STOMP消息...");
                 // 取地址数
                 long addressCount = customStatisticsMapper.countAddress(chainId);
                 index.setAddressAmount(addressCount);
@@ -99,7 +99,7 @@ public class StompPushTask {
 
             StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
             if(statistic.isChanged()){
-                logger.info("统计缓存有变更，推送STOMP消息...");
+                logger.debug("统计缓存有变更，推送STOMP消息...");
 
                 // 取24小时内的交易数
                 long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
