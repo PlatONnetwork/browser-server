@@ -1,6 +1,6 @@
 package com.platon.browser.amqp;
 
-import com.platon.browser.ServiceApplication;
+import com.platon.browser.ServerApplication;
 import com.platon.browser.common.spring.MQSender;
 import com.platon.browser.dao.entity.Node;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Random;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServiceApplication.class, value = "spring.profiles.active=dev")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
 public class RabbitmqTest {
 
     @Autowired
