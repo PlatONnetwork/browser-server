@@ -60,7 +60,7 @@ public class StatisticsJob extends AbstractTaskJob {
             Object numberObject = redisTemplate.opsForValue().get(cacheKey);
             long number = 0;
             if(null != numberObject){
-                number = (long)numberObject;
+                number = Long.valueOf(String.valueOf(numberObject)).longValue();
             }
 
             logger.debug("Redis number : [",number,"]");
