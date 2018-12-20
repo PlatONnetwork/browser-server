@@ -5,6 +5,7 @@ import com.platon.browser.ServerApplication;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.util.GeoUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -44,6 +45,10 @@ public class NodeTest {
                     logger.info("dma code：{}", location.dma_code);
                     logger.info("area code：{}", location.area_code);
                     logger.info("country code：{}", location.countryCode);
+                    node.setNodeName(location.countryName.replace(" ",""));
+                    if(StringUtils.isNotBlank(location.city)){
+                        node.setNodeName(node.getNodeName()+"."+location.city.replace(" ",""));
+                    }
                     node.setIp(ip);
                     break;
                 }catch (Exception e){}
@@ -53,7 +58,6 @@ public class NodeTest {
             node.setNetState(1);
             node.setNodeAddress("0x493301712671ada506ba6ca7891f436d2918582"+i);
             node.setNodeId("0x493301712671ada506ba6ca7891f436d2918582"+i);
-            node.setNodeName("node-"+i);
             node.setUpdateTime(new Date());
             node.setNodeType(1);
             nodeMapper.insert(node);
