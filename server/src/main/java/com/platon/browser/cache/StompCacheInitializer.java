@@ -200,6 +200,9 @@ public class StompCacheInitializer {
             }
 
         }else{
+            // 没有块的情况下，设置最低块时间戳为当前时间
+            statisticInfo.setLowestBlockNumber(1);
+            statisticInfo.setLowestBlockTimestamp(System.currentTimeMillis());
             statisticInfo.setAvgTime(0l);
         }
 
