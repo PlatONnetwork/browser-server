@@ -1,6 +1,8 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
@@ -22,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -43,6 +47,10 @@ public class StompCacheServiceImpl implements StompCacheService {
     private RedisCacheService redisCacheService;
     @Autowired
     private StatisticMapper statisticMapper;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+    @Value("${platon.redis.block.cache.key}")
+    private String blockCacheKeyTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
@@ -238,6 +246,22 @@ public class StompCacheServiceImpl implements StompCacheService {
                 if(statisticInfo.getHighestBlockNumber()>0){
                     cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
+
+                    String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+                    // 先从最高块向前回溯3600个块
+                    Set<String> bottomBlockSet = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
+                    if(bottomBlockSet.size()==0){
+                        // 从后向前累计不足3600个块，则正向取链上第一个块
+                        bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
+                    }
+                    if(bottomBlockSet.size()==0){
+                        cache.setLowestBlockNumber(1);
+                        cache.setLowestBlockTimestamp(System.currentTimeMillis());
+                    }else {
+                        Block bottom = JSON.parseObject(bottomBlockSet.iterator().next(),Block.class);
+                        cache.setLowestBlockNumber(bottom.getNumber());
+                        cache.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
+                    }
                     cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/(cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/1000);
                     changed = true;
                 }
