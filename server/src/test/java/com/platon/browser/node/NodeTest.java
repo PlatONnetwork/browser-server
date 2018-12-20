@@ -47,7 +47,7 @@ public class NodeTest {
                     logger.info("country code：{}", location.countryCode);
                     node.setNodeName(location.countryName.replace(" ",""));
                     if(StringUtils.isNotBlank(location.city)){
-                        node.setNodeName(node.getNodeName()+"."+location.city);
+                        node.setNodeName(node.getNodeName()+"."+location.city.replace(" ",""));
                     }
                     node.setIp(ip);
                     break;
