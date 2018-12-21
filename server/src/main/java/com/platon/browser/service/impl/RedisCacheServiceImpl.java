@@ -1,10 +1,13 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.fartherp.framework.common.util.IPUtils;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.Location;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
@@ -28,11 +31,9 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.print.DocFlavor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 @Component
@@ -309,10 +310,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             }
 
 
-            Location location = GeoUtil.getLocation(ip);
-            if(location!=null){
-                bean.setLongitude(location.longitude);
-                bean.setLatitude(location.latitude);
+            CityResponse response = GeoUtil.getResponse(ip);
+            if(response!=null){
+                Location location = response.getLocation();
+                bean.setLongitude(location.getLongitude().floatValue());
+                bean.setLatitude(location.getLatitude().floatValue());
             }else{
                 // 默认设置为深圳的经纬度
                 bean.setLongitude(114.06667f);
