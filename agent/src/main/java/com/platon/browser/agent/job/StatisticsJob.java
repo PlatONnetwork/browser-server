@@ -129,8 +129,13 @@ public class StatisticsJob extends AbstractTaskJob {
             //map key put address List
             Set <String> blockCountMinerList = blockCountMap.keySet();
             List <String> addressList = new ArrayList <>();
+            if(addressList.size() <= 0){
+                long newOffset =  number;
+                setRedisTemplate(cacheKey, newOffset);
+                logger.error("addressList info is null!...");
+                return;
+            }
             addressList.addAll(blockCountMinerList);
-
             //condition is addressList and chain ,select table statistic info
             StatisticsExample condition = new StatisticsExample();
             condition.createCriteria().andChainIdEqualTo(chainId)
@@ -139,8 +144,7 @@ public class StatisticsJob extends AbstractTaskJob {
             if(statisticsList.size() <= 0){
                 //select result is null ,return and set number
                 long newOffset =  number;
-                logger.debug("Redis number : [",newOffset,"]");
-                redisTemplate.opsForValue().set(cacheKey, newOffset);
+                setRedisTemplate(cacheKey, newOffset);
                 logger.error("statistic info is null!...");
                 return;
             }
@@ -182,8 +186,7 @@ public class StatisticsJob extends AbstractTaskJob {
                 //update redis number value
                 logger.debug("statistic info :{ " , statisticsString ," }");
                 long newOffset =  number;
-                logger.debug("Redis number : [",newOffset,"]");
-                redisTemplate.opsForValue().set(cacheKey, newOffset);
+                setRedisTemplate(cacheKey, newOffset);
                 logger.debug("StaticticsJob : [ nodeInfo statistic succ!... ]");
             }
         } catch (Exception e) {
@@ -194,5 +197,13 @@ public class StatisticsJob extends AbstractTaskJob {
         }
     }
 
-
+    private void setRedisTemplate(String cacheKey,long newOffset){
+        try {
+            redisTemplate.opsForValue().set(cacheKey, newOffset);
+            logger.debug("Redis number : [",newOffset,"]");
+            logger.debug("StaticticdJob set redisValue succ!");
+        }catch (Exception e){
+            logger.error("StaticticdJob set redisValue fail!",e.getMessage());
+        }
+    }
 }
