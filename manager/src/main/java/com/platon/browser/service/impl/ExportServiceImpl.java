@@ -71,8 +71,8 @@ public class ExportServiceImpl implements ExportService {
                     transactionType,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    transaction.getValue()+"ATP",
-                    transaction.getActualTxCost()+"ATP",
+                    transaction.getValue()+"Energon",
+                    transaction.getActualTxCost()+"Energon",
                     transactionStatus
             };
             rows.add(row);
