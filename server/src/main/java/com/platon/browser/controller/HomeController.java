@@ -8,7 +8,10 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticGraphData;
 import com.platon.browser.dto.StatisticInfo;
@@ -63,6 +66,8 @@ public class HomeController {
 
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -425,6 +430,35 @@ public class HomeController {
             if(size>500000){
                 // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
                 redisTemplate.opsForZSet().removeRange(cacheKey,0,size-500000);
+            }
+        });
+
+        chainsConfig.getChainIds().forEach(chainId->{
+            String cacheKey = "platon:server:chain_" + chainId + ":transactions";
+            TransactionExample condition = new TransactionExample();
+            condition.createCriteria().andChainIdEqualTo(chainId);
+            condition.setOrderByClause("block_number desc,transaction_index desc");
+            for(int i=0;i<500;i++){
+                PageHelper.startPage(i+1,1000);
+                List<Transaction> transactionList = transactionMapper.selectByExample(condition);
+                if(transactionList.size()==0) break;
+
+                Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+                transactionList.forEach(transaction -> {
+                    Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,transaction.getSequence(),transaction.getSequence());
+                    if(exist.size()==0){
+                        // 在缓存中不存在的才放入缓存
+                        tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(transaction),transaction.getSequence().doubleValue()));
+                    }
+                });
+                if(tupleSet.size()>0){
+                    redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+                }
+            }
+            long size = redisTemplate.opsForZSet().size(cacheKey);
+            if(size>500000){
+                // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+                long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-500000);
             }
         });
         return "success";
