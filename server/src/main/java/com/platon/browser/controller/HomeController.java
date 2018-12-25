@@ -32,9 +32,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -396,7 +394,7 @@ public class HomeController {
         }
     }
 
-    @PostMapping("/initCache")
+    @GetMapping("/initCache")
     public String initCache(){
         chainsConfig.getChainIds().forEach(chainId->{
             String cacheKey = "platon:server:chain_"+chainId+":blocks";;
