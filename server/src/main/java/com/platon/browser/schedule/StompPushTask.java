@@ -64,7 +64,7 @@ public class StompPushTask {
             // 增量推送节点信息，1秒推送一次
             NodeIncrement nodeIncrement = cacheService.getNodeIncrement(chainId);
             if(nodeIncrement.isChanged()){
-                logger.info("节点增量缓存有变更，推送STOMP消息...");
+                logger.debug("节点增量缓存有变更，推送STOMP消息...");
                 BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeIncrement.getIncrement());
                 messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, resp);
             }
@@ -81,7 +81,7 @@ public class StompPushTask {
 
             IndexInfo index = cacheService.getIndexInfo(chainId);
             if(index.isChanged()){
-                logger.info("指标缓存有变更，推送STOMP消息...");
+                logger.debug("指标缓存有变更，推送STOMP消息...");
                 // 取地址数
                 long addressCount = statisticMapper.countAddress(chainId);
                 index.setAddressAmount(addressCount);
@@ -91,7 +91,7 @@ public class StompPushTask {
 
             StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
             if(statistic.isChanged()){
-                logger.info("统计缓存有变更，推送STOMP消息...");
+                logger.debug("统计缓存有变更，推送STOMP消息...");
 
                 // 取24小时内的交易数
                 long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
