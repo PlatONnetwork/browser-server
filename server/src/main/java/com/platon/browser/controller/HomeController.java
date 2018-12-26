@@ -472,7 +472,10 @@ public class HomeController {
     private StompCacheInitializer cacheInitializer;
     @GetMapping("/refreshStompCache")
     public String refreshStompCache(){
-        cacheInitializer.initCache();
+        chainsConfig.getChainIds().forEach(chainId->{
+            cacheInitializer.initNodeCache(chainId);
+            cacheInitializer.initIndexCache(chainId);
+        });
         return "success";
     }
 }
