@@ -131,6 +131,7 @@ public class DBStorageService {
             transaction.setActualTxCost(transactionDto.getActualTxCoast().toString());
             transaction.setBlockNumber(Long.valueOf(transactionDto.getBlockNumber().toString()));
             transaction.setChainId(message.getChainId());
+            transaction.setTimestamp(new Date(transactionDto.getTimestamp()));
             transaction.setCreateTime(new Date());
             transaction.setUpdateTime(new Date());
             transaction.setEnergonLimit(transactionDto.getEnergonLimit().toString());
