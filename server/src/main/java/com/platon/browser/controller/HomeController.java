@@ -2,6 +2,7 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.cache.StompCacheInitializer;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -35,7 +36,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -399,8 +403,8 @@ public class HomeController {
         }
     }
 
-    @GetMapping("/initCache")
-    public String initCache(){
+    @GetMapping("/refreshRedisCache")
+    public String refreshRedisCache(){
         chainsConfig.getChainIds().forEach(chainId->{
             String cacheKey = "platon:server:chain_"+chainId+":blocks";;
 
@@ -461,6 +465,14 @@ public class HomeController {
                 long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-500000);
             }
         });
+        return "success";
+    }
+
+    @Autowired
+    private StompCacheInitializer cacheInitializer;
+    @GetMapping("/refreshStompCache")
+    public String refreshStompCache(){
+        cacheInitializer.initCache();
         return "success";
     }
 }
