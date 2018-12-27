@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,14 +66,16 @@ public class ExportServiceImpl implements ExportService {
                 transactionStatus = i18n.i(I18nEnum.UNKNOWN_STATUS);
             }
 
+            BigDecimal txCost = new BigDecimal(transaction.getActualTxCost());
+            txCost = txCost.divide(new BigDecimal("1000000000000000000"));
             Object[] row = {
                     transaction.getTxHash(),
                     ymdhms.format(new Date(transaction.getBlockTime())),
                     transactionType,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    transaction.getValue()+"E",
-                    transaction.getActualTxCost()+"",
+                    transaction.getValue()+"Energon",
+                    txCost.toString()+"Energon",
                     transactionStatus
             };
             rows.add(row);
