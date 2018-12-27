@@ -1,7 +1,8 @@
 package com.platon.browser.cache;
 
 import com.alibaba.fastjson.JSON;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -111,9 +112,17 @@ public class StompCacheInitializer {
         nodeList.forEach(node -> {
             NodeInfo bean = new NodeInfo();
             BeanUtils.copyProperties(node,bean);
-            Location location = GeoUtil.getLocation(node.getIp());
-            bean.setLongitude(location.longitude);
-            bean.setLatitude(location.latitude);
+
+            CityResponse response = GeoUtil.getResponse(node.getIp());
+            if(response!=null){
+                Location location = response.getLocation();
+                bean.setLatitude(location.getLatitude().floatValue());
+                bean.setLongitude(location.getLongitude().floatValue());
+            }else{
+                // 默认设置为深圳的经纬度
+                bean.setLongitude(114.06667f);
+                bean.setLatitude(22.61667f);
+            }
             nodeInfoList.add(bean);
         });
         stompCacheService.updateNodeCache(nodeInfoList,true,chainId);
