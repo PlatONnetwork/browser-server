@@ -61,7 +61,7 @@ public class StompCacheUpdateTask {
 
             StatisticInfo statisticInfo = new StatisticInfo();
 
-            logger.info("统计链【ID={}】交易TPS",chainId);
+            logger.debug("统计链【ID={}】交易TPS",chainId);
 
             // 默认取上一次统计时间作为查询交易记录的开始时间
             Date startDate = new Date(prevTimestamp);
