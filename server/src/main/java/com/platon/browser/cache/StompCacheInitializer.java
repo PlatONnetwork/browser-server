@@ -204,7 +204,11 @@ public class StompCacheInitializer {
                 statisticInfo.setLowestBlockNumber(bottom.getNumber());
                 statisticInfo.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
 
-                long avgTime = (top.getTimestamp()-bottom.getTimestamp().getTime())/(top.getHeight()-bottom.getNumber())/1000;
+                long divider = top.getHeight()-bottom.getNumber();
+                if(divider==0){
+                    divider=1;
+                }
+                long avgTime = (top.getTimestamp()-bottom.getTimestamp().getTime())/divider/1000;
                 statisticInfo.setAvgTime(avgTime);
             }
 
