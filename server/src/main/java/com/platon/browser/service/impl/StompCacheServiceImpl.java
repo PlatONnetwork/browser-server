@@ -262,7 +262,11 @@ public class StompCacheServiceImpl implements StompCacheService {
                         cache.setLowestBlockNumber(bottom.getNumber());
                         cache.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
                     }
-                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/(cache.getHighestBlockNumber()-cache.getLowestBlockNumber())/1000);
+                    long divider = cache.getHighestBlockNumber()-cache.getLowestBlockNumber();
+                    if(divider==0){
+                        divider=1;
+                    }
+                    cache.setAvgTime((cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/divider/1000);
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()>0){
