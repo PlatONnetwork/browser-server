@@ -1,28 +1,25 @@
 package com.platon.browser.node;
 
-import com.maxmind.geoip.Location;
-import com.platon.browser.ServerApplication;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.util.GeoUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.Random;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=1")
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=1")
 public class NodeTest {
     private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
 
-    @Autowired
+    //@Autowired
     private NodeMapper nodeMapper;
 
     @Test
@@ -37,7 +34,7 @@ public class NodeTest {
                     }
                     logger.info("IP: {}",ip);
 
-                    Location location = GeoUtil.getLocation(ip);
+                   /* Location location = GeoUtil.getLocation("3.121.115.180");
                     logger.info("国家：{}", location.countryName);
                     logger.info("城市：{}", location.city);
                     logger.info("纬度：{}", location.latitude);
@@ -48,7 +45,7 @@ public class NodeTest {
                     node.setNodeName(location.countryName.replace(" ",""));
                     if(StringUtils.isNotBlank(location.city)){
                         node.setNodeName(node.getNodeName()+"."+location.city.replace(" ",""));
-                    }
+                    }*/
                     node.setIp(ip);
                     break;
                 }catch (Exception e){}
@@ -60,7 +57,7 @@ public class NodeTest {
             node.setNodeId("0x493301712671ada506ba6ca7891f436d2918582"+i);
             node.setUpdateTime(new Date());
             node.setNodeType(1);
-            nodeMapper.insert(node);
+            //nodeMapper.insert(node);
         }
     }
 
@@ -111,10 +108,19 @@ public class NodeTest {
     }
 
     public static void main(String[] args) {
-        int count = 100000;
-        for (int i = 0; i < count; i++) {
-            String randomIp = getChinaRandomIp();
-            System.err.println(randomIp);
+
+        CityResponse response = GeoUtil.getResponse("3.121.115.180");
+        if(response!=null){
+            Country country = response.getCountry();
+            City city = response.getCity();
+            Location location = response.getLocation();
+            logger.info("国家：{}", country.getName());
+            logger.info("城市：{}", city.getName());
+            logger.info("纬度：{}", location.getLatitude());
+            logger.info("经度：{}", location.getLongitude());
+            logger.info("dma code：{}", country.getIsoCode());
+            logger.info("area code：{}", location.getMetroCode());
+            logger.info("country code：{}", country.getIsoCode());
         }
     }
 

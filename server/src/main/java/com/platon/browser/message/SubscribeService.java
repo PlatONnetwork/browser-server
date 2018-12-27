@@ -1,7 +1,8 @@
 package com.platon.browser.message;
 
 import com.alibaba.fastjson.JSON;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.Location;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.NodeDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
@@ -73,9 +74,16 @@ public class SubscribeService {
                 NodeDto nodeDto = JSON.parseObject(message.getStruct(), NodeDto.class);
                 NodeInfo nodeInfo = new NodeInfo();
                 BeanUtils.copyProperties(nodeDto,nodeInfo);
-                Location location = GeoUtil.getLocation(nodeDto.getIp());
-                nodeInfo.setLatitude(location.latitude);
-                nodeInfo.setLongitude(location.longitude);
+                CityResponse response = GeoUtil.getResponse(nodeDto.getIp());
+                if(response!=null){
+                    Location location = response.getLocation();
+                    nodeInfo.setLatitude(location.getLatitude().floatValue());
+                    nodeInfo.setLongitude(location.getLongitude().floatValue());
+                }else{
+                    // 默认设置为深圳的经纬度
+                    nodeInfo.setLongitude(114.06667f);
+                    nodeInfo.setLatitude(22.61667f);
+                }
                 List<NodeInfo> nodeInfoList = new ArrayList<>();
                 nodeInfoList.add(nodeInfo);
                 stompCacheService.updateNodeCache(nodeInfoList,false,chainId);
