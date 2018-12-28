@@ -226,12 +226,14 @@ public class StompCacheServiceImpl implements StompCacheService {
         StatisticInfo cache = statisticInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.writeLock().lock();
+
+        String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+
         try{
             boolean changed = false;
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
 
-                String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
                 String maxtps = redisTemplate.opsForValue().get(cacheKey);
                 long maxtpsLong = 0;
                 if(StringUtils.isNotBlank(maxtps)){
@@ -311,6 +313,17 @@ public class StompCacheServiceImpl implements StompCacheService {
                 }
             }
             cache.setChanged(changed);
+
+            // 更新最大TPS
+            String oldMaxtpsStr = redisTemplate.opsForValue().get(cacheKey);
+            long oldMaxtpsLong = 0;
+            if(StringUtils.isNotBlank(oldMaxtpsStr)){
+                oldMaxtpsLong = Long.valueOf(oldMaxtpsStr);
+            }
+            if(oldMaxtpsLong<statisticInfo.getCurrent()){
+                redisTemplate.opsForValue().set(cacheKey,String.valueOf(statisticInfo.getCurrent()));
+            }
+
         }finally {
             lock.writeLock().unlock();
         }
