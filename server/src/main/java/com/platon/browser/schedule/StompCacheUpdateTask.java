@@ -39,6 +39,8 @@ public class StompCacheUpdateTask {
     @Value("${platon.transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
 
+    private BigDecimal maxTps=BigDecimal.ZERO;
+
     @PostConstruct
     public void init(){
         chainsConfig.getChainIds().forEach(chainId -> prevTimestampMap.put(chainId,0l));
@@ -83,10 +85,13 @@ public class StompCacheUpdateTask {
             List<Transaction> transactionList = transactionMapper.selectByExample(condition);
             int transactionCount = transactionList.size();
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
-            statisticInfo.setCurrent(Long.valueOf(transactionCount));
+
             if(divisor!=0){
                 BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-                statisticInfo.setMaxTps(transactionTps.longValue());
+                statisticInfo.setCurrent(transactionTps.doubleValue());
+                if(maxTps.compareTo(transactionTps)<0){
+                    statisticInfo.setMaxTps(transactionTps.doubleValue());
+                }
             }
             cacheService.updateStatisticCache(statisticInfo,false,chainId);
 

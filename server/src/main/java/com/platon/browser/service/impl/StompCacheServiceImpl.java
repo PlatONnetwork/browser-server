@@ -222,7 +222,7 @@ public class StompCacheServiceImpl implements StompCacheService {
                 changed = true;
             }else{
                 if(statisticInfo.getCurrent()>0){
-                    // 当前交易数
+                    // 当前TPS
                     cache.setCurrent(statisticInfo.getCurrent());
                     changed = true;
                 }
