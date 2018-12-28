@@ -233,6 +233,9 @@ public class StompCacheServiceImpl implements StompCacheService {
 
                 String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
                 String maxtps = redisTemplate.opsForValue().get(cacheKey);
+
+                redisTemplate.opsForValue().set(cacheKey,String.valueOf(900));
+
                 long maxtpsLong = 0;
                 if(StringUtils.isNotBlank(maxtps)){
                     maxtpsLong = Long.valueOf(maxtps);
@@ -241,15 +244,6 @@ public class StompCacheServiceImpl implements StompCacheService {
 
                 changed = true;
             }else{
-                // 当前TPS
-                cache.setCurrent(statisticInfo.getCurrent());
-                if(statisticInfo.getMaxTps()>cache.getMaxTps()){
-                    cache.setMaxTps(statisticInfo.getMaxTps());
-                    String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
-                    redisTemplate.opsForValue().set(cacheKey,String.valueOf(cache.getMaxTps()));
-                }
-                changed = true;
-
                 if(statisticInfo.getCurrent()==-1){
                     cache.setCurrent(0);
                     changed = true;

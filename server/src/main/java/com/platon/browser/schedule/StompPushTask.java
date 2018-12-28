@@ -3,6 +3,9 @@ package com.platon.browser.schedule;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StatisticMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticGraphData;
@@ -15,19 +18,18 @@ import com.platon.browser.dto.cache.TransactionInit;
 import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class StompPushTask {
@@ -45,6 +47,15 @@ public class StompPushTask {
     private StatisticMapper statisticMapper;
     @Autowired
     private I18nUtil i18n;
+
+    @Autowired
+    private BlockMapper blockMapper;
+
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+
+    @Value("${platon.redis.maxtps.cache.key}")
+    private String maxtpsCacheKeyTemplate;
 
     // 交易TPS统计时间间隔, 单位：分钟
     @Value("${platon.transaction.tps.statistic.interval}")
@@ -90,6 +101,39 @@ public class StompPushTask {
             }
 
             StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
+
+            // 当前TPS
+            long endStamp = statistic.getHighestBlockTimestamp();
+            Date endDate = new Date(endStamp);
+            long startStamp = statistic.getHighestBlockTimestamp()-1000;
+            Date startDate = new Date(startStamp);
+
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId)
+                    .andTimestampBetween(startDate,endDate);
+            List<Block> blockList=blockMapper.selectByExample(blockExample);
+
+            statistic.setCurrent(0);
+            if(blockList.size()>0){
+                blockList.forEach(block -> {
+                    statistic.setCurrent(statistic.getCurrent()+block.getTransactionNumber());
+                });
+            }
+
+            // 最大TPS
+            String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+            String maxtpsStr = redisTemplate.opsForValue().get(cacheKey);
+            long maxtpsLong = 0;
+            if(StringUtils.isNotBlank(maxtpsStr)){
+                maxtpsLong = Long.valueOf(maxtpsStr);
+            }
+            statistic.setMaxTps(maxtpsLong);
+            if(maxtpsLong<statistic.getCurrent()){
+                statistic.setMaxTps(statistic.getCurrent());
+                redisTemplate.opsForValue().set(cacheKey,String.valueOf(statistic.getCurrent()));
+            }
+
+
             if(statistic.isChanged()){
                 logger.debug("统计缓存有变更，推送STOMP消息...");
 
