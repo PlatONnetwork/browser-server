@@ -87,7 +87,7 @@ public class StompCacheUpdateTask {
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
 
             if(divisor!=0){
-                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),1,BigDecimal.ROUND_HALF_UP);
+                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
 
                 if(transactionTps.compareTo(BigDecimal.ONE)>0){
                     // 大于1取整

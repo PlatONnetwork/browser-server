@@ -232,7 +232,7 @@ public class StompCacheInitializer {
         statisticInfo.setTransactionCount(Long.valueOf(currentCount));
 
         if(divisor!=0){
-            BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),1,BigDecimal.ROUND_HALF_UP);
+            BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
 
             if(transactionTps.compareTo(BigDecimal.ONE)>0){
                 // 大于1取整
