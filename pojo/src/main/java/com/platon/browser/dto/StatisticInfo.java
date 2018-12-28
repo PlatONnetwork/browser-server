@@ -12,9 +12,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class StatisticInfo {
     private long avgTime;
 
-    private long current;
+    private double current;
 
-    private long maxTps;
+    private double maxTps;
 
     private BigDecimal avgTransaction;
 

@@ -230,13 +230,12 @@ public class StompCacheInitializer {
         List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
         int currentCount = transactionList.size();
         statisticInfo.setTransactionCount(Long.valueOf(currentCount));
-        // 当前交易数
-        statisticInfo.setCurrent(Long.valueOf(currentCount));
+
         if(divisor!=0){
             BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-            statisticInfo.setMaxTps(transactionTps.longValue());
+            statisticInfo.setCurrent(transactionTps.doubleValue());
+            statisticInfo.setMaxTps(transactionTps.doubleValue());
         }
-
 
         // 总交易数
         transactionExample = new TransactionExample();
