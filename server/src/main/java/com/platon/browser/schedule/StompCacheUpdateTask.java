@@ -49,7 +49,7 @@ public class StompCacheUpdateTask {
     /**
      * 更新交易TPS
      */
-    @Scheduled(cron="${platon.transaction.tps.statistic.cron}")
+    /*@Scheduled(cron="${platon.transaction.tps.statistic.cron}")
     public void updateTransactionTps(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 当前链的上次统计时间戳
@@ -116,6 +116,6 @@ public class StompCacheUpdateTask {
             // 更新统计时间戳
             prevTimestampMap.put(chainId,currentTimestamp);
         });
-    }
+    }*/
 
 }

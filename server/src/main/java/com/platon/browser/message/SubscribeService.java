@@ -190,6 +190,9 @@ public class SubscribeService {
                 statisticItem.setTransaction(Long.valueOf(transactionDtos.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
+                statisticInfo.setTransactionCount(transactionDtos.size());
+                statisticInfo.setCurrent(transactionDtos.size());
+
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);
 
                 // 更新最高块号
