@@ -1,8 +1,6 @@
 package com.platon.browser.cache;
 
-import com.maxmind.geoip.Location;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
@@ -25,7 +23,6 @@ import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StompCacheService;
-import com.platon.browser.util.GeoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
