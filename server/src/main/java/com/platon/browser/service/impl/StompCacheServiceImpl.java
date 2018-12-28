@@ -52,6 +52,9 @@ public class StompCacheServiceImpl implements StompCacheService {
     @Value("${platon.redis.block.cache.key}")
     private String blockCacheKeyTemplate;
 
+    @Value("${platon.redis.maxtps.cache.key}")
+    private String maxtpsCacheKeyTemplate;
+
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
     // 初始数据Map
@@ -77,6 +80,14 @@ public class StompCacheServiceImpl implements StompCacheService {
 
             // 初始化增量Map
             nodeIncrementMap.put(chainId,new NodeIncrement());
+
+            String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+            String maxtps = redisTemplate.opsForValue().get(cacheKey);
+            long maxtpsLong = 0;
+            if(StringUtils.isNotBlank(maxtps)){
+                maxtpsLong = Long.valueOf(maxtps);
+                statisticInfo.setMaxTps(maxtpsLong);
+            }
         });
     }
 
@@ -219,6 +230,15 @@ public class StompCacheServiceImpl implements StompCacheService {
             boolean changed = false;
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
+
+                String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+                String maxtps = redisTemplate.opsForValue().get(cacheKey);
+                long maxtpsLong = 0;
+                if(StringUtils.isNotBlank(maxtps)){
+                    maxtpsLong = Long.valueOf(maxtps);
+                }
+                cache.setMaxTps(maxtpsLong);
+
                 changed = true;
             }else{
                 if(statisticInfo.getCurrent()>0){
@@ -226,6 +246,8 @@ public class StompCacheServiceImpl implements StompCacheService {
                     cache.setCurrent(statisticInfo.getCurrent());
                     if(statisticInfo.getMaxTps()>cache.getMaxTps()){
                         cache.setMaxTps(statisticInfo.getMaxTps());
+                        String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+                        redisTemplate.opsForValue().set(cacheKey,String.valueOf(cache.getMaxTps()));
                     }
                     changed = true;
                 }
