@@ -87,10 +87,10 @@ public class StompCacheUpdateTask {
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
 
             if(divisor!=0){
-                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-                statisticInfo.setCurrent(transactionTps.doubleValue());
+                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),1,BigDecimal.ROUND_HALF_UP);
+                statisticInfo.setCurrent(transactionTps.longValue());
                 if(maxTps.compareTo(transactionTps)<0){
-                    statisticInfo.setMaxTps(transactionTps.doubleValue());
+                    statisticInfo.setMaxTps(transactionTps.longValue());
                 }
             }
             cacheService.updateStatisticCache(statisticInfo,false,chainId);
