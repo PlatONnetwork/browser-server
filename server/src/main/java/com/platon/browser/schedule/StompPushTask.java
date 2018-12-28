@@ -29,6 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -100,6 +101,8 @@ public class StompPushTask {
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
             }
 
+
+            // 推送统计数据
             StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
 
             // 当前TPS
@@ -133,37 +136,36 @@ public class StompPushTask {
                 redisTemplate.opsForValue().set(cacheKey,String.valueOf(statistic.getCurrent()));
             }
 
+            // 最新3600个块的平均区块交易数
+            BigDecimal avgBlockTrans = statisticMapper.countAvgTransactionPerBlock(chainId);
+            statistic.setAvgTransaction(avgBlockTrans);
 
-            if(statistic.isChanged()){
-                logger.debug("统计缓存有变更，推送STOMP消息...");
+            // 取24小时内的交易数
+            long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
+            statistic.setDayTransaction(dayTransactionCount);
 
-                // 取24小时内的交易数
-                long dayTransactionCount = statisticMapper.countTransactionIn24Hours(chainId);
-                statistic.setDayTransaction(dayTransactionCount);
+            LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
+            List<StatisticItem> itemList = limitQueue.list();
+            Collections.sort(itemList,(c1, c2)->{
+                // 按区块高度正排
+                if(c1.getHeight()>c2.getHeight()) return 1;
+                if(c1.getHeight()<c2.getHeight()) return -1;
+                return 0;
+            });
 
-                LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
-                List<StatisticItem> itemList = limitQueue.list();
-                Collections.sort(itemList,(c1, c2)->{
-                    // 按区块高度正排
-                    if(c1.getHeight()>c2.getHeight()) return 1;
-                    if(c1.getHeight()<c2.getHeight()) return -1;
-                    return 0;
-                });
-
-                StatisticGraphData graphData = new StatisticGraphData();
-                for (int i=0;i<itemList.size();i++){
-                    StatisticItem item = itemList.get(i);
-                    if(i==0||i==itemList.size()-1) continue;
-                    StatisticItem prevItem = itemList.get(i-1);
-                    graphData.getX().add(item.getHeight());
-                    graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
-                    graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
-                }
-                statistic.setGraphData(graphData);
-
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
-                messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
+            StatisticGraphData graphData = new StatisticGraphData();
+            for (int i=0;i<itemList.size();i++){
+                StatisticItem item = itemList.get(i);
+                if(i==0||i==itemList.size()-1) continue;
+                StatisticItem prevItem = itemList.get(i-1);
+                graphData.getX().add(item.getHeight());
+                graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
+                graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
             }
+            statistic.setGraphData(graphData);
+
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
+            messagingTemplate.convertAndSend("/topic/statistic/new?cid="+chainId, resp);
         });
     }
 }

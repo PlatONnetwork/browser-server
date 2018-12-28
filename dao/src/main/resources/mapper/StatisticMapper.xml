@@ -18,13 +18,7 @@
   </select>
 
   <select id="countAvgTransactionPerBlock" parameterType="java.lang.String" resultType="java.math.BigDecimal">
-    SELECT SUM(`tmp`.`transaction_count`) / COUNT(0)
-    FROM (
-      SELECT COUNT(0) AS `transaction_count`
-      FROM `transaction` `tr`
-      WHERE tr.`chain_id` = #{chainId}
-      GROUP BY `tr`.`block_number`
-    ) `tmp`
+    SELECT SUM(bl.`transaction_number`)/3600 FROM block bl WHERE bl.`chain_id`=#{chainId} ORDER BY bl.`number` DESC LIMIT 3600;
   </select>
 
   <select id="countTransactionBlock" parameterType="java.lang.String" resultType="java.lang.Long">
