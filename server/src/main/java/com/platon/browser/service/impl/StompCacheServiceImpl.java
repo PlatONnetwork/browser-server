@@ -241,16 +241,15 @@ public class StompCacheServiceImpl implements StompCacheService {
 
                 changed = true;
             }else{
-                if(statisticInfo.getCurrent()>0){
-                    // 当前TPS
-                    cache.setCurrent(statisticInfo.getCurrent());
-                    if(statisticInfo.getMaxTps()>cache.getMaxTps()){
-                        cache.setMaxTps(statisticInfo.getMaxTps());
-                        String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
-                        redisTemplate.opsForValue().set(cacheKey,String.valueOf(cache.getMaxTps()));
-                    }
-                    changed = true;
+                // 当前TPS
+                cache.setCurrent(statisticInfo.getCurrent());
+                if(statisticInfo.getMaxTps()>cache.getMaxTps()){
+                    cache.setMaxTps(statisticInfo.getMaxTps());
+                    String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+                    redisTemplate.opsForValue().set(cacheKey,String.valueOf(cache.getMaxTps()));
                 }
+                changed = true;
+
                 if(statisticInfo.getCurrent()==-1){
                     cache.setCurrent(0);
                     changed = true;
