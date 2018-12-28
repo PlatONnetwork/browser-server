@@ -226,6 +226,10 @@ public class StompCacheServiceImpl implements StompCacheService {
                     cache.setCurrent(statisticInfo.getCurrent());
                     changed = true;
                 }
+                if(statisticInfo.getCurrent()==-1){
+                    cache.setCurrent(0);
+                    changed = true;
+                }
                 if(statisticInfo.getMaxTps()>0){
                     cache.setMaxTps(statisticInfo.getMaxTps());
                     changed = true;

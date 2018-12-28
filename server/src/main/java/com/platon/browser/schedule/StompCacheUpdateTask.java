@@ -86,26 +86,31 @@ public class StompCacheUpdateTask {
             int transactionCount = transactionList.size();
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
 
-            if(divisor!=0){
-                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
+            if(transactionCount>0){
+                if(divisor!=0){
+                    BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
 
-                if(transactionTps.compareTo(BigDecimal.ONE)>0){
-                    // 大于1取整
-                    statisticInfo.setCurrent(transactionTps.longValue());
-                    if(maxTps.compareTo(transactionTps)<0){
-                        statisticInfo.setMaxTps(transactionTps.longValue());
-                        maxTps = transactionTps;
+                    if(transactionTps.compareTo(BigDecimal.ONE)>0){
+                        // 大于1取整
+                        statisticInfo.setCurrent(transactionTps.longValue());
+                        if(maxTps.compareTo(transactionTps)<0){
+                            statisticInfo.setMaxTps(transactionTps.longValue());
+                            maxTps = transactionTps;
+                        }
+                    }
+                    if(transactionTps.compareTo(BigDecimal.ZERO)>0&&transactionTps.compareTo(BigDecimal.ONE)<0){
+                        // 大于0且小于1,默认取1
+                        statisticInfo.setCurrent(1);
+                        if(maxTps.compareTo(BigDecimal.ONE)<0){
+                            maxTps = BigDecimal.ONE;
+                            statisticInfo.setMaxTps(1);
+                        }
                     }
                 }
-                if(transactionTps.compareTo(BigDecimal.ZERO)>0&&transactionTps.compareTo(BigDecimal.ONE)<0){
-                    // 大于0且小于1,默认取1
-                    statisticInfo.setCurrent(1);
-                    if(maxTps.compareTo(BigDecimal.ONE)<0){
-                        maxTps = BigDecimal.ONE;
-                        statisticInfo.setMaxTps(1);
-                    }
-                }
+            } else{
+                statisticInfo.setCurrent(-1);
             }
+
             cacheService.updateStatisticCache(statisticInfo,false,chainId);
 
             // 更新统计时间戳
