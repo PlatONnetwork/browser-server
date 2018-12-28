@@ -233,8 +233,17 @@ public class StompCacheInitializer {
 
         if(divisor!=0){
             BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),1,BigDecimal.ROUND_HALF_UP);
-            statisticInfo.setCurrent(transactionTps.longValue());
-            statisticInfo.setMaxTps(transactionTps.longValue());
+
+            if(transactionTps.compareTo(BigDecimal.ONE)>0){
+                // 大于1取整
+                statisticInfo.setCurrent(transactionTps.longValue());
+                statisticInfo.setMaxTps(transactionTps.longValue());
+            }
+            if(transactionTps.compareTo(BigDecimal.ZERO)>0&&transactionTps.compareTo(BigDecimal.ONE)<0){
+                // 大于0且小于1,默认取1
+                statisticInfo.setCurrent(1);
+                statisticInfo.setMaxTps(1);
+            }
         }
 
         // 总交易数
