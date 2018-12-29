@@ -47,7 +47,6 @@ public class StompCacheServiceImpl implements StompCacheService {
     private RedisCacheService redisCacheService;
     @Autowired
     private CustomStatisticsMapper customStatisticsMapper;
-
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     @Value("${platon.redis.block.cache.key}")

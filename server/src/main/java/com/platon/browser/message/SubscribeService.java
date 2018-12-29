@@ -85,7 +85,6 @@ public class SubscribeService {
                     nodeInfo.setLongitude(114.06667f);
                     nodeInfo.setLatitude(22.61667f);
                 }
-
                 List<NodeInfo> nodeInfoList = new ArrayList<>();
                 nodeInfoList.add(nodeInfo);
                 stompCacheService.updateNodeCache(nodeInfoList,false,chainId);
@@ -196,6 +195,9 @@ public class SubscribeService {
                 statisticItem.setTransaction(Long.valueOf(transactionDtos.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
+                statisticInfo.setTransactionCount(transactionDtos.size());
+                statisticInfo.setCurrent(transactionDtos.size());
+
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);
 
                 // 更新最高块号

@@ -39,6 +39,8 @@ public class StompCacheUpdateTask {
     @Value("${platon.transaction.tps.statistic.interval}")
     private int transactionTpsStatisticInterval;
 
+    private BigDecimal maxTps=BigDecimal.ZERO;
+
     @PostConstruct
     public void init(){
         chainsConfig.getChainIds().forEach(chainId -> prevTimestampMap.put(chainId,0l));
@@ -47,7 +49,7 @@ public class StompCacheUpdateTask {
     /**
      * 更新交易TPS
      */
-    @Scheduled(cron="${platon.transaction.tps.statistic.cron}")
+    /*@Scheduled(cron="${platon.transaction.tps.statistic.cron}")
     public void updateTransactionTps(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 当前链的上次统计时间戳
@@ -83,16 +85,37 @@ public class StompCacheUpdateTask {
             List<Transaction> transactionList = transactionMapper.selectByExample(condition);
             int transactionCount = transactionList.size();
             statisticInfo.setTransactionCount(Long.valueOf(transactionCount));
-            statisticInfo.setCurrent(Long.valueOf(transactionCount));
-            if(divisor!=0){
-                BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-                statisticInfo.setMaxTps(transactionTps.longValue());
+
+            if(transactionCount>0){
+                if(divisor!=0){
+                    BigDecimal transactionTps = BigDecimal.valueOf(transactionCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
+
+                    if(transactionTps.compareTo(BigDecimal.ONE)>0){
+                        // 大于1取整
+                        statisticInfo.setCurrent(transactionTps.longValue());
+                        if(maxTps.compareTo(transactionTps)<0){
+                            statisticInfo.setMaxTps(transactionTps.longValue());
+                            maxTps = transactionTps;
+                        }
+                    }
+                    if(transactionTps.compareTo(BigDecimal.ZERO)>0&&transactionTps.compareTo(BigDecimal.ONE)<0){
+                        // 大于0且小于1,默认取1
+                        statisticInfo.setCurrent(1);
+                        if(maxTps.compareTo(BigDecimal.ONE)<0){
+                            maxTps = BigDecimal.ONE;
+                            statisticInfo.setMaxTps(1);
+                        }
+                    }
+                }
+            } else{
+                statisticInfo.setCurrent(-1);
             }
+
             cacheService.updateStatisticCache(statisticInfo,false,chainId);
 
             // 更新统计时间戳
             prevTimestampMap.put(chainId,currentTimestamp);
         });
-    }
+    }*/
 
 }

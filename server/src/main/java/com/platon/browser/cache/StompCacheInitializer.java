@@ -1,6 +1,7 @@
 package com.platon.browser.cache;
 
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
@@ -110,11 +111,17 @@ public class StompCacheInitializer {
         nodeList.forEach(node -> {
             NodeInfo bean = new NodeInfo();
             BeanUtils.copyProperties(node,bean);
-            Location location = GeoUtil.getLocation(node.getIp());
-            bean.setLongitude(location.longitude);
-            bean.setLatitude(location.latitude);
-            bean.setNodeType(1);
-            bean.setNetState(node.getNodeStatus());
+
+            CityResponse response = GeoUtil.getResponse(node.getIp());
+            if(response!=null){
+                Location location = response.getLocation();
+                bean.setLatitude(location.getLatitude().floatValue());
+                bean.setLongitude(location.getLongitude().floatValue());
+            }else{
+                // 默认设置为深圳的经纬度
+                bean.setLongitude(114.06667f);
+                bean.setLatitude(22.61667f);
+            }
             nodeInfoList.add(bean);
         });
         // platon.redis.node.cache.key=platon:agent:chain_{}:nodes
@@ -180,13 +187,25 @@ public class StompCacheInitializer {
         List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
         int currentCount = transactionList.size();
         statisticInfo.setTransactionCount(Long.valueOf(currentCount));
-        // 当前交易数
-        statisticInfo.setCurrent(Long.valueOf(currentCount));
-        if(divisor!=0){
-            BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),4,BigDecimal.ROUND_DOWN);
-            statisticInfo.setMaxTps(transactionTps.longValue());
-        }
 
+        if(currentCount>0){
+            if(divisor!=0){
+                BigDecimal transactionTps = BigDecimal.valueOf(currentCount).divide(BigDecimal.valueOf(divisor),15,BigDecimal.ROUND_HALF_UP);
+
+                if(transactionTps.compareTo(BigDecimal.ONE)>0){
+                    // 大于1取整
+                    statisticInfo.setCurrent(transactionTps.longValue());
+                    statisticInfo.setMaxTps(transactionTps.longValue());
+                }
+                if(transactionTps.compareTo(BigDecimal.ZERO)>0&&transactionTps.compareTo(BigDecimal.ONE)<0){
+                    // 大于0且小于1,默认取1
+                    statisticInfo.setCurrent(1);
+                    statisticInfo.setMaxTps(1);
+                }
+            }
+        } else{
+            statisticInfo.setCurrent(-1);
+        }
 
         // 总交易数
         transactionExample = new TransactionExample();
