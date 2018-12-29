@@ -1,6 +1,8 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.RespPage;
@@ -22,9 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,6 +47,13 @@ public class StompCacheServiceImpl implements StompCacheService {
     private RedisCacheService redisCacheService;
     @Autowired
     private CustomStatisticsMapper customStatisticsMapper;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+    @Value("${platon.redis.block.cache.key}")
+    private String blockCacheKeyTemplate;
+
+    @Value("${platon.redis.maxtps.cache.key}")
+    private String maxtpsCacheKeyTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(StompCacheServiceImpl.class);
 
@@ -68,6 +80,14 @@ public class StompCacheServiceImpl implements StompCacheService {
 
             // 初始化增量Map
             nodeIncrementMap.put(chainId,new NodeIncrement());
+
+            String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+            String maxtps = redisTemplate.opsForValue().get(cacheKey);
+            long maxtpsLong = 0;
+            if(StringUtils.isNotBlank(maxtps)){
+                maxtpsLong = Long.valueOf(maxtps);
+                statisticInfo.setMaxTps(maxtpsLong);
+            }
         });
     }
 
@@ -206,19 +226,25 @@ public class StompCacheServiceImpl implements StompCacheService {
         StatisticInfo cache = statisticInitMap.get(chainId);
         ReentrantReadWriteLock lock = cache.getLock();
         lock.writeLock().lock();
+
+        String cacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+
         try{
             boolean changed = false;
             if(override){
                 BeanUtils.copyProperties(statisticInfo,cache);
+
+                String maxtps = redisTemplate.opsForValue().get(cacheKey);
+                long maxtpsLong = 0;
+                if(StringUtils.isNotBlank(maxtps)){
+                    maxtpsLong = Long.valueOf(maxtps);
+                }
+                cache.setMaxTps(maxtpsLong);
+
                 changed = true;
             }else{
-                if(statisticInfo.getCurrent()>0){
-                    // 当前交易数
-                    cache.setCurrent(statisticInfo.getCurrent());
-                    changed = true;
-                }
-                if(statisticInfo.getMaxTps()>0){
-                    cache.setMaxTps(statisticInfo.getMaxTps());
+                if(statisticInfo.getCurrent()==-1){
+                    cache.setCurrent(0);
                     changed = true;
                 }
 
@@ -235,11 +261,30 @@ public class StompCacheServiceImpl implements StompCacheService {
                     changed = true;
                 }
                 if(statisticInfo.getHighestBlockNumber()>0){
-                    /*cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
+                    cache.setHighestBlockNumber(statisticInfo.getHighestBlockNumber());
                     cache.setHighestBlockTimestamp(statisticInfo.getHighestBlockTimestamp());
-                    long diff = cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp();
-                    BigDecimal avgTime = new BigDecimal(diff).divide(new BigDecimal(cache.getHighestBlockNumber()),4, RoundingMode.DOWN);
-                    cache.setAvgTime(avgTime);*/
+
+                    String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+                    // 先从最高块向前回溯3600个块
+                    Set<String> bottomBlockSet = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
+                    if(bottomBlockSet.size()==0){
+                        // 从后向前累计不足3600个块，则正向取链上第一个块
+                        bottomBlockSet = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
+                    }
+                    if(bottomBlockSet.size()==0){
+                        cache.setLowestBlockNumber(1);
+                        cache.setLowestBlockTimestamp(System.currentTimeMillis());
+                    }else {
+                        Block bottom = JSON.parseObject(bottomBlockSet.iterator().next(),Block.class);
+                        cache.setLowestBlockNumber(bottom.getNumber());
+                        cache.setLowestBlockTimestamp(bottom.getTimestamp().getTime());
+                    }
+                    long divider = cache.getHighestBlockNumber()-cache.getLowestBlockNumber();
+                    if(divider==0){
+                        divider=1;
+                    }
+                    double res = (cache.getHighestBlockTimestamp()-cache.getLowestBlockTimestamp())/divider/1000;
+                    cache.setAvgTime(BigDecimal.valueOf(res));
                     changed = true;
                 }
                 if(statisticInfo.getDayTransaction()>0){
@@ -269,6 +314,17 @@ public class StompCacheServiceImpl implements StompCacheService {
                 }
             }
             cache.setChanged(changed);
+
+            // 更新最大TPS
+            String oldMaxtpsStr = redisTemplate.opsForValue().get(cacheKey);
+            long oldMaxtpsLong = 0;
+            if(StringUtils.isNotBlank(oldMaxtpsStr)){
+                oldMaxtpsLong = Long.valueOf(oldMaxtpsStr);
+            }
+            if(oldMaxtpsLong<statisticInfo.getCurrent()){
+                redisTemplate.opsForValue().set(cacheKey,String.valueOf(statisticInfo.getCurrent()));
+            }
+
         }finally {
             lock.writeLock().unlock();
         }

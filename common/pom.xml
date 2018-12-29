@@ -31,9 +31,9 @@
 		</dependency>
 		<!-- web3j -->
 		<dependency>
-			<groupId>com.platon.web3j</groupId>
+			<groupId>com.platon.client</groupId>
 			<artifactId>core</artifactId>
-			<version>0.2.2</version>
+			<version>0.2.0</version>
 		</dependency>
 
 		<dependency>

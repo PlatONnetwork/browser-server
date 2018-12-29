@@ -1,6 +1,8 @@
 package com.platon.browser.service.impl;
 
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -145,13 +147,15 @@ public class NodeServiceImpl implements NodeService {
             NodeItem bean = new NodeItem();
             BeanUtils.copyProperties(node,bean);
             try {
-                Location location=GeoUtil.getLocation(node.getIp());
-                bean.setCountryCode(location.countryCode);
-                if(StringUtils.isNotBlank(location.countryName)){
-                    bean.setLocation(location.countryName);
+                CityResponse response = GeoUtil.getResponse(node.getIp());
+                Country country = response.getCountry();
+                bean.setCountryCode(country.getIsoCode());
+                if(StringUtils.isNotBlank(country.getName())){
+                    bean.setLocation(country.getName());
                 }
-                if(StringUtils.isNotBlank(location.city)){
-                    bean.setLocation(bean.getLocation()+" "+location.city);
+                City city = response.getCity();
+                if(StringUtils.isNotBlank(city.getName())){
+                    bean.setLocation(bean.getLocation()+" "+city.getName());
                 }
             }catch (Exception e){
                 bean.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
@@ -234,12 +238,14 @@ public class NodeServiceImpl implements NodeService {
 
         // 设置地理位置信息
         try {
-            Location location = GeoUtil.getLocation(currentNode.getIp());
-            if(StringUtils.isNotBlank(location.countryName)){
-                nodeDetail.setLocation(location.countryName);
+            CityResponse response = GeoUtil.getResponse(currentNode.getIp());
+            Country country = response.getCountry();
+            if(StringUtils.isNotBlank(country.getName())){
+                nodeDetail.setLocation(country.getName());
             }
-            if(StringUtils.isNotBlank(location.city)){
-                nodeDetail.setLocation(nodeDetail.getLocation()+" "+location.city);
+            City city = response.getCity();
+            if(StringUtils.isNotBlank(city.getName())){
+                nodeDetail.setLocation(nodeDetail.getLocation()+" "+city.getName());
             }
         }catch (Exception e){
             nodeDetail.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));

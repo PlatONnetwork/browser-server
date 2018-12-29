@@ -1,7 +1,8 @@
 package com.platon.browser.message;
 
 import com.alibaba.fastjson.JSON;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.Location;
 import com.platon.browser.common.dto.agent.BlockDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.dto.agent.TransactionDto;
@@ -73,9 +74,17 @@ public class SubscribeService {
                 CandidateDto nodeDto = JSON.parseObject(message.getStruct(), CandidateDto.class);
                 NodeInfo nodeInfo = new NodeInfo();
                 BeanUtils.copyProperties(nodeDto,nodeInfo);
-                Location location = GeoUtil.getLocation(nodeDto.getHost());
-                nodeInfo.setLatitude(location.latitude);
-                nodeInfo.setLongitude(location.longitude);
+
+                CityResponse response = GeoUtil.getResponse(nodeDto.getHost());
+                if(response!=null){
+                    Location location = response.getLocation();
+                    nodeInfo.setLatitude(location.getLatitude().floatValue());
+                    nodeInfo.setLongitude(location.getLongitude().floatValue());
+                }else{
+                    // 默认设置为深圳的经纬度
+                    nodeInfo.setLongitude(114.06667f);
+                    nodeInfo.setLatitude(22.61667f);
+                }
                 List<NodeInfo> nodeInfoList = new ArrayList<>();
                 nodeInfoList.add(nodeInfo);
                 stompCacheService.updateNodeCache(nodeInfoList,false,chainId);
@@ -186,6 +195,9 @@ public class SubscribeService {
                 statisticItem.setTransaction(Long.valueOf(transactionDtos.size()));
                 statisticItems.add(statisticItem);
                 statisticInfo.setBlockStatisticList(statisticItems);
+                statisticInfo.setTransactionCount(transactionDtos.size());
+                statisticInfo.setCurrent(transactionDtos.size());
+
                 stompCacheService.updateStatisticCache(statisticInfo,false,chainId);
 
                 // 更新最高块号

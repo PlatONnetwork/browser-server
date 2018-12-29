@@ -19,7 +19,6 @@ import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.junit4.SpringRunner;
-import redis.clients.jedis.exceptions.JedisDataException;
 
 import java.util.HashSet;
 import java.util.List;
