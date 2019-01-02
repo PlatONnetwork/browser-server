@@ -2,6 +2,9 @@ package com.platon.browser.common.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
+import org.web3j.abi.PlatOnTypeDecoder;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Int64;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -26,8 +29,9 @@ public class TransactionType {
                 RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
                 String typecode = Hex.toHexString(rlpString.getBytes());
                 byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+                Type result = PlatOnTypeDecoder.decode(hexByte, Int64.class);
                 //todo:置换web3j jar包platon版本
-                switch (type) {
+                switch (result.getValue().toString()) {
                     case "0":
                         //主币交易转账
                         type = "transfer";
@@ -40,9 +44,9 @@ public class TransactionType {
                         //合约调用
                         type = "transactionExecute";
                         break;
-                    case "3":
+                    case "1000":
                         //投票
-                        type = "vote";
+                        type = "voteTicket";
                         break;
                     case "4":
                         //权限
@@ -52,6 +56,15 @@ public class TransactionType {
                         //MPC交易
                         type = "MPCtransaction";
                         break;
+                    case "1001":
+                        //竞选质押
+                        type = "candidateDeposit";
+                    case "1002":
+                        //减持质押
+                        type = "candidateApplyWithdraw";
+                    case "1003":
+                        //提取质押
+                        type = "candidateWithdraw";
                 }
                 return type;
             }
@@ -60,6 +73,17 @@ public class TransactionType {
             return type = "transfer";
         }
 
+    }
+    public static void main(String args[]){
+        String input = "0x";
+        RlpList rlpList = RlpDecoder.decode(Hex.decode("c9880000000000000000"));
+        List <RlpType> rlpTypes = rlpList.getValues();
+        RlpList rlpList1 = (RlpList) rlpTypes.get(0);
+        RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
+        String typecode = Hex.toHexString(rlpString.getBytes());
+        byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+        Type result = PlatOnTypeDecoder.decode(hexByte, Int64.class);
+        System.out.println(result.getValue());
     }
 
 }

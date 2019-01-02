@@ -72,6 +72,8 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                         } else {
                             pendingTransactionDto.setReceiveType("contract");
                         }
+                    }else {
+                        pendingTransactionDto.setTo("0x");
                     }
                     pendingTransactionDto.setEnergonLimit(transaction.getGas());
                     pendingTransactionDto.setEnergonPrice(transaction.getGasPrice());

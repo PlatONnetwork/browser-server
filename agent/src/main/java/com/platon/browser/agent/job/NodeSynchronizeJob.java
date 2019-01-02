@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.platon.browser.agent.client.Web3jClient;
-import com.platon.browser.agent.contract.CandidateConstract;
+import com.platon.browser.agent.contract.CandidateContract;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.enums.StatisticsEnum;
@@ -68,13 +68,13 @@ public class NodeSynchronizeJob extends AbstractTaskJob {
             Web3j web3j = Web3jClient.getWeb3jClient();
             List <CandidateDto> candidateDtoList = new ArrayList <>();
             //build contract
-            CandidateConstract candidateConstract = CandidateConstract.load("0x1000000000000000000000000000000000000001", web3j,
+            CandidateContract candidateContract = CandidateContract.load("","0x1000000000000000000000000000000000000001", web3j,
                     credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
             //call contract function get nodeInfo rangking 1-200 from blockchain
-            String nodeInfoList = candidateConstract.CandidateList().send();
+            String nodeInfoList = candidateContract.CandidateList().send();
 
             //call contract function get  nodeInfo rangking 1-25 from blockchain
-            String verfiersList = candidateConstract.VerifiersList().send();
+            String verfiersList = candidateContract.VerifiersList().send();
             if (verfiersList.length() > 0 && null != verfiersList) {
                 logger.debug("verfiersList info :", verfiersList);
                 List <CandidateDto> verfiersDtoList = JSON.parseArray(verfiersList, CandidateDto.class);
