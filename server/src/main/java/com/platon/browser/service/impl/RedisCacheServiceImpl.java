@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -277,6 +278,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             bean.setServerTime(serverTime);
             // 交易时间就是出块时间
             bean.setBlockTime(transaction.getTimestamp().getTime());
+
+            BigDecimal txCost = new BigDecimal(transaction.getActualTxCost());
+            txCost = txCost.divide(new BigDecimal("1000000000000000000"));
+            bean.setActualTxCost(String.valueOf(txCost));
+
             transactions.add(bean);
         });
         page.setData(transactions);

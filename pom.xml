@@ -35,6 +35,10 @@
   </properties>
 	<repositories>
 		<repository>
+			<id>juzix</id>
+			<url>http://sdk.juzix.net/content/repositories/releases/</url>
+		</repository>
+		<repository>
 			<id>aliyun</id>
 			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
 		</repository>
@@ -58,6 +62,7 @@
             <id>shanghhai</id>
             <url>http://192.168.10.40:8081/nexus/content/groups/public/</url>
         </repository>
+
 	</repositories>
   
 	<dependencyManagement>
