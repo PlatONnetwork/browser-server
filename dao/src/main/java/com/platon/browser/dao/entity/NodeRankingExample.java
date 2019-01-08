@@ -115,63 +115,123 @@ public class NodeRankingExample {
             return (Criteria) this;
         }
 
-        public Criteria andIdEqualTo(String value) {
+        public Criteria andIdEqualTo(Long value) {
             addCriterion("id =", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotEqualTo(String value) {
+        public Criteria andIdNotEqualTo(Long value) {
             addCriterion("id <>", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThan(String value) {
+        public Criteria andIdGreaterThan(Long value) {
             addCriterion("id >", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThanOrEqualTo(String value) {
+        public Criteria andIdGreaterThanOrEqualTo(Long value) {
             addCriterion("id >=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThan(String value) {
+        public Criteria andIdLessThan(Long value) {
             addCriterion("id <", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThanOrEqualTo(String value) {
+        public Criteria andIdLessThanOrEqualTo(Long value) {
             addCriterion("id <=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLike(String value) {
-            addCriterion("id like", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdNotLike(String value) {
-            addCriterion("id not like", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdIn(List<String> values) {
+        public Criteria andIdIn(List<Long> values) {
             addCriterion("id in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotIn(List<String> values) {
+        public Criteria andIdNotIn(List<Long> values) {
             addCriterion("id not in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdBetween(String value1, String value2) {
+        public Criteria andIdBetween(Long value1, Long value2) {
             addCriterion("id between", value1, value2, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotBetween(String value1, String value2) {
+        public Criteria andIdNotBetween(Long value1, Long value2) {
             addCriterion("id not between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIsNull() {
+            addCriterion("node_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIsNotNull() {
+            addCriterion("node_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdEqualTo(String value) {
+            addCriterion("node_id =", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotEqualTo(String value) {
+            addCriterion("node_id <>", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdGreaterThan(String value) {
+            addCriterion("node_id >", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdGreaterThanOrEqualTo(String value) {
+            addCriterion("node_id >=", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLessThan(String value) {
+            addCriterion("node_id <", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLessThanOrEqualTo(String value) {
+            addCriterion("node_id <=", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLike(String value) {
+            addCriterion("node_id like", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotLike(String value) {
+            addCriterion("node_id not like", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIn(List<String> values) {
+            addCriterion("node_id in", values, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotIn(List<String> values) {
+            addCriterion("node_id not in", values, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdBetween(String value1, String value2) {
+            addCriterion("node_id between", value1, value2, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotBetween(String value1, String value2) {
+            addCriterion("node_id not between", value1, value2, "nodeId");
             return (Criteria) this;
         }
 
@@ -1215,6 +1275,66 @@ public class NodeRankingExample {
             return (Criteria) this;
         }
 
+        public Criteria andIsValidIsNull() {
+            addCriterion("is_valid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidIsNotNull() {
+            addCriterion("is_valid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidEqualTo(Integer value) {
+            addCriterion("is_valid =", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidNotEqualTo(Integer value) {
+            addCriterion("is_valid <>", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidGreaterThan(Integer value) {
+            addCriterion("is_valid >", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidGreaterThanOrEqualTo(Integer value) {
+            addCriterion("is_valid >=", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidLessThan(Integer value) {
+            addCriterion("is_valid <", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidLessThanOrEqualTo(Integer value) {
+            addCriterion("is_valid <=", value, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidIn(List<Integer> values) {
+            addCriterion("is_valid in", values, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidNotIn(List<Integer> values) {
+            addCriterion("is_valid not in", values, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidBetween(Integer value1, Integer value2) {
+            addCriterion("is_valid between", value1, value2, "isValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsValidNotBetween(Integer value1, Integer value2) {
+            addCriterion("is_valid not between", value1, value2, "isValid");
+            return (Criteria) this;
+        }
+
         public Criteria andUrlIsNull() {
             addCriterion("url is null");
             return (Criteria) this;
@@ -1282,6 +1402,186 @@ public class NodeRankingExample {
 
         public Criteria andUrlNotBetween(String value1, String value2) {
             addCriterion("url not between", value1, value2, "url");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberIsNull() {
+            addCriterion("begin_number is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberIsNotNull() {
+            addCriterion("begin_number is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberEqualTo(Long value) {
+            addCriterion("begin_number =", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberNotEqualTo(Long value) {
+            addCriterion("begin_number <>", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberGreaterThan(Long value) {
+            addCriterion("begin_number >", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("begin_number >=", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberLessThan(Long value) {
+            addCriterion("begin_number <", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberLessThanOrEqualTo(Long value) {
+            addCriterion("begin_number <=", value, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberIn(List<Long> values) {
+            addCriterion("begin_number in", values, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberNotIn(List<Long> values) {
+            addCriterion("begin_number not in", values, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberBetween(Long value1, Long value2) {
+            addCriterion("begin_number between", value1, value2, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBeginNumberNotBetween(Long value1, Long value2) {
+            addCriterion("begin_number not between", value1, value2, "beginNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberIsNull() {
+            addCriterion("end_number is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberIsNotNull() {
+            addCriterion("end_number is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberEqualTo(Long value) {
+            addCriterion("end_number =", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberNotEqualTo(Long value) {
+            addCriterion("end_number <>", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberGreaterThan(Long value) {
+            addCriterion("end_number >", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("end_number >=", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberLessThan(Long value) {
+            addCriterion("end_number <", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberLessThanOrEqualTo(Long value) {
+            addCriterion("end_number <=", value, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberIn(List<Long> values) {
+            addCriterion("end_number in", values, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberNotIn(List<Long> values) {
+            addCriterion("end_number not in", values, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberBetween(Long value1, Long value2) {
+            addCriterion("end_number between", value1, value2, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNumberNotBetween(Long value1, Long value2) {
+            addCriterion("end_number not between", value1, value2, "endNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountIsNull() {
+            addCriterion("block_count is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountIsNotNull() {
+            addCriterion("block_count is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountEqualTo(Long value) {
+            addCriterion("block_count =", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountNotEqualTo(Long value) {
+            addCriterion("block_count <>", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountGreaterThan(Long value) {
+            addCriterion("block_count >", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountGreaterThanOrEqualTo(Long value) {
+            addCriterion("block_count >=", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountLessThan(Long value) {
+            addCriterion("block_count <", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountLessThanOrEqualTo(Long value) {
+            addCriterion("block_count <=", value, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountIn(List<Long> values) {
+            addCriterion("block_count in", values, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountNotIn(List<Long> values) {
+            addCriterion("block_count not in", values, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountBetween(Long value1, Long value2) {
+            addCriterion("block_count between", value1, value2, "blockCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCountNotBetween(Long value1, Long value2) {
+            addCriterion("block_count not between", value1, value2, "blockCount");
             return (Criteria) this;
         }
     }

@@ -24,7 +24,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
@@ -48,10 +48,10 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-<!--        <table tableName="block" domainObjectName="Block">
+        <table tableName="block" domainObjectName="Block">
              <columnRenamingRule searchString="^D_"
                                  replaceString=""/>
-        </table>-->
+        </table>
 
 <!--          <table tableName="pending_tx" domainObjectName="PendingTx">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
@@ -72,9 +72,9 @@
     </table>-->
 
          <table tableName="node_ranking" domainObjectName="NodeRanking">
-             <columnRenamingRule searchString="^D_"
-                                 replaceString=""/>
-         </table>
+        <columnRenamingRule searchString="^D_"
+                            replaceString=""/>
+    </table>
 
 
 

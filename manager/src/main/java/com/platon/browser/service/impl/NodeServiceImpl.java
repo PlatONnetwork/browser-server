@@ -134,7 +134,7 @@ public class NodeServiceImpl implements NodeService {
 
         // 批量查询节点的统计信息
         List<String> nodeIdList = new ArrayList<>();
-        list.forEach(node->nodeIdList.add(node.getId()));
+        list.forEach(node->nodeIdList.add(node.getNodeId()));
         StatisticsExample statisticsExample = new StatisticsExample();
         statisticsExample.createCriteria().andChainIdEqualTo(req.getCid())
                 .andTypeEqualTo(StatisticsEnum.block_count.name())
@@ -184,7 +184,7 @@ public class NodeServiceImpl implements NodeService {
         if(byName){
             criteria.andNameEqualTo(req.getId());
         }else{
-            criteria.andIdEqualTo(req.getId());
+           // criteria.andIdEqualTo(req.getId().toString());
         }
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if (nodes.size()>1){
@@ -205,7 +205,7 @@ public class NodeServiceImpl implements NodeService {
         // 设置统计信息
         // 批量查询节点的统计信息
         StatisticsExample statisticsExample = new StatisticsExample();
-        statisticsExample.createCriteria().andChainIdEqualTo(req.getCid()).andNodeIdEqualTo(currentNode.getId());
+        statisticsExample.createCriteria().andChainIdEqualTo(req.getCid()).andNodeIdEqualTo(currentNode.getNodeId());
         List<Statistics> statisticsList = statisticsMapper.selectByExample(statisticsExample);
         Map<StatisticsEnum,Map<String,String>> statisticsMap = classifyStatistic(statisticsList);
         // 累计分红
@@ -252,7 +252,7 @@ public class NodeServiceImpl implements NodeService {
         }
 
         // 公钥就是节点ID
-        nodeDetail.setPublicKey(currentNode.getId());
+        nodeDetail.setPublicKey(currentNode.getNodeId());
         // 钱包就是address
         nodeDetail.setWallet(currentNode.getAddress());
 

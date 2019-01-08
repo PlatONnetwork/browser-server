@@ -175,6 +175,76 @@ public class BlockExample {
             return (Criteria) this;
         }
 
+        public Criteria andChainIdIsNull() {
+            addCriterion("chain_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdIsNotNull() {
+            addCriterion("chain_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdEqualTo(String value) {
+            addCriterion("chain_id =", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotEqualTo(String value) {
+            addCriterion("chain_id <>", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdGreaterThan(String value) {
+            addCriterion("chain_id >", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdGreaterThanOrEqualTo(String value) {
+            addCriterion("chain_id >=", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLessThan(String value) {
+            addCriterion("chain_id <", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLessThanOrEqualTo(String value) {
+            addCriterion("chain_id <=", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLike(String value) {
+            addCriterion("chain_id like", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotLike(String value) {
+            addCriterion("chain_id not like", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdIn(List<String> values) {
+            addCriterion("chain_id in", values, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotIn(List<String> values) {
+            addCriterion("chain_id not in", values, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdBetween(String value1, String value2) {
+            addCriterion("chain_id between", value1, value2, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotBetween(String value1, String value2) {
+            addCriterion("chain_id not between", value1, value2, "chainId");
+            return (Criteria) this;
+        }
+
         public Criteria andNumberIsNull() {
             addCriterion("`number` is null");
             return (Criteria) this;
@@ -975,76 +1045,6 @@ public class BlockExample {
             return (Criteria) this;
         }
 
-        public Criteria andChainIdIsNull() {
-            addCriterion("chain_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdIsNotNull() {
-            addCriterion("chain_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdEqualTo(String value) {
-            addCriterion("chain_id =", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdNotEqualTo(String value) {
-            addCriterion("chain_id <>", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdGreaterThan(String value) {
-            addCriterion("chain_id >", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdGreaterThanOrEqualTo(String value) {
-            addCriterion("chain_id >=", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdLessThan(String value) {
-            addCriterion("chain_id <", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdLessThanOrEqualTo(String value) {
-            addCriterion("chain_id <=", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdLike(String value) {
-            addCriterion("chain_id like", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdNotLike(String value) {
-            addCriterion("chain_id not like", value, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdIn(List<String> values) {
-            addCriterion("chain_id in", values, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdNotIn(List<String> values) {
-            addCriterion("chain_id not in", values, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdBetween(String value1, String value2) {
-            addCriterion("chain_id between", value1, value2, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andChainIdNotBetween(String value1, String value2) {
-            addCriterion("chain_id not between", value1, value2, "chainId");
-            return (Criteria) this;
-        }
-
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
@@ -1232,6 +1232,186 @@ public class BlockExample {
 
         public Criteria andActualTxCostSumNotBetween(String value1, String value2) {
             addCriterion("actual_tx_cost_sum not between", value1, value2, "actualTxCostSum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountIsNull() {
+            addCriterion("block_vote_amount is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountIsNotNull() {
+            addCriterion("block_vote_amount is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountEqualTo(Long value) {
+            addCriterion("block_vote_amount =", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountNotEqualTo(Long value) {
+            addCriterion("block_vote_amount <>", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountGreaterThan(Long value) {
+            addCriterion("block_vote_amount >", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountGreaterThanOrEqualTo(Long value) {
+            addCriterion("block_vote_amount >=", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountLessThan(Long value) {
+            addCriterion("block_vote_amount <", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountLessThanOrEqualTo(Long value) {
+            addCriterion("block_vote_amount <=", value, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountIn(List<Long> values) {
+            addCriterion("block_vote_amount in", values, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountNotIn(List<Long> values) {
+            addCriterion("block_vote_amount not in", values, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountBetween(Long value1, Long value2) {
+            addCriterion("block_vote_amount between", value1, value2, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteAmountNotBetween(Long value1, Long value2) {
+            addCriterion("block_vote_amount not between", value1, value2, "blockVoteAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberIsNull() {
+            addCriterion("block_vote_number is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberIsNotNull() {
+            addCriterion("block_vote_number is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberEqualTo(Long value) {
+            addCriterion("block_vote_number =", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberNotEqualTo(Long value) {
+            addCriterion("block_vote_number <>", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberGreaterThan(Long value) {
+            addCriterion("block_vote_number >", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("block_vote_number >=", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberLessThan(Long value) {
+            addCriterion("block_vote_number <", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberLessThanOrEqualTo(Long value) {
+            addCriterion("block_vote_number <=", value, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberIn(List<Long> values) {
+            addCriterion("block_vote_number in", values, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberNotIn(List<Long> values) {
+            addCriterion("block_vote_number not in", values, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberBetween(Long value1, Long value2) {
+            addCriterion("block_vote_number between", value1, value2, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockVoteNumberNotBetween(Long value1, Long value2) {
+            addCriterion("block_vote_number not between", value1, value2, "blockVoteNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountIsNull() {
+            addCriterion("block_campaign_amount is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountIsNotNull() {
+            addCriterion("block_campaign_amount is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountEqualTo(Long value) {
+            addCriterion("block_campaign_amount =", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountNotEqualTo(Long value) {
+            addCriterion("block_campaign_amount <>", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountGreaterThan(Long value) {
+            addCriterion("block_campaign_amount >", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountGreaterThanOrEqualTo(Long value) {
+            addCriterion("block_campaign_amount >=", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountLessThan(Long value) {
+            addCriterion("block_campaign_amount <", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountLessThanOrEqualTo(Long value) {
+            addCriterion("block_campaign_amount <=", value, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountIn(List<Long> values) {
+            addCriterion("block_campaign_amount in", values, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountNotIn(List<Long> values) {
+            addCriterion("block_campaign_amount not in", values, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountBetween(Long value1, Long value2) {
+            addCriterion("block_campaign_amount between", value1, value2, "blockCampaignAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockCampaignAmountNotBetween(Long value1, Long value2) {
+            addCriterion("block_campaign_amount not between", value1, value2, "blockCampaignAmount");
             return (Criteria) this;
         }
     }

@@ -3,6 +3,7 @@
 <mapper namespace="com.platon.browser.dao.mapper.BlockMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Block">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
+    <id column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="number" jdbcType="BIGINT" property="number" />
     <result column="parent_hash" jdbcType="VARCHAR" property="parentHash" />
     <result column="nonce" jdbcType="VARCHAR" property="nonce" />
@@ -15,10 +16,12 @@
     <result column="transaction_number" jdbcType="INTEGER" property="transactionNumber" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
-    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="actual_tx_cost_sum" jdbcType="VARCHAR" property="actualTxCostSum" />
+    <result column="block_vote_amount" jdbcType="BIGINT" property="blockVoteAmount" />
+    <result column="block_vote_number" jdbcType="BIGINT" property="blockVoteNumber" />
+    <result column="block_campaign_amount" jdbcType="BIGINT" property="blockCampaignAmount" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -79,9 +82,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit, 
-    energon_average, transaction_number, `timestamp`, block_reward, chain_id, create_time, 
-    update_time, actual_tx_cost_sum
+    hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
+    energon_limit, energon_average, transaction_number, `timestamp`, block_reward, create_time, 
+    update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, block_campaign_amount
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -97,15 +100,17 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.BlockKey" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from block
     where hash = #{hash,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.BlockKey">
     delete from block
     where hash = #{hash,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.BlockExample">
     delete from block
@@ -114,24 +119,29 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Block">
-    insert into block (hash, `number`, parent_hash, 
-      nonce, miner, extra_data, 
-      `size`, energon_used, energon_limit, 
-      energon_average, transaction_number, `timestamp`, 
-      block_reward, chain_id, create_time, 
-      update_time, actual_tx_cost_sum)
-    values (#{hash,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, #{parentHash,jdbcType=VARCHAR}, 
-      #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, #{extraData,jdbcType=VARCHAR}, 
-      #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, 
-      #{energonAverage,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=INTEGER}, #{timestamp,jdbcType=TIMESTAMP}, 
-      #{blockReward,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR})
+    insert into block (hash, chain_id, `number`, 
+      parent_hash, nonce, miner, 
+      extra_data, `size`, energon_used, 
+      energon_limit, energon_average, transaction_number, 
+      `timestamp`, block_reward, create_time, 
+      update_time, actual_tx_cost_sum, block_vote_amount, 
+      block_vote_number, block_campaign_amount)
+    values (#{hash,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, 
+      #{parentHash,jdbcType=VARCHAR}, #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, 
+      #{extraData,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, 
+      #{energonLimit,jdbcType=VARCHAR}, #{energonAverage,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=INTEGER}, 
+      #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR}, #{blockVoteAmount,jdbcType=BIGINT}, 
+      #{blockVoteNumber,jdbcType=BIGINT}, #{blockCampaignAmount,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
     insert into block
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="hash != null">
         hash,
+      </if>
+      <if test="chainId != null">
+        chain_id,
       </if>
       <if test="number != null">
         `number`,
@@ -169,9 +179,6 @@
       <if test="blockReward != null">
         block_reward,
       </if>
-      <if test="chainId != null">
-        chain_id,
-      </if>
       <if test="createTime != null">
         create_time,
       </if>
@@ -181,10 +188,22 @@
       <if test="actualTxCostSum != null">
         actual_tx_cost_sum,
       </if>
+      <if test="blockVoteAmount != null">
+        block_vote_amount,
+      </if>
+      <if test="blockVoteNumber != null">
+        block_vote_number,
+      </if>
+      <if test="blockCampaignAmount != null">
+        block_campaign_amount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="chainId != null">
+        #{chainId,jdbcType=VARCHAR},
       </if>
       <if test="number != null">
         #{number,jdbcType=BIGINT},
@@ -222,9 +241,6 @@
       <if test="blockReward != null">
         #{blockReward,jdbcType=VARCHAR},
       </if>
-      <if test="chainId != null">
-        #{chainId,jdbcType=VARCHAR},
-      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -233,6 +249,15 @@
       </if>
       <if test="actualTxCostSum != null">
         #{actualTxCostSum,jdbcType=VARCHAR},
+      </if>
+      <if test="blockVoteAmount != null">
+        #{blockVoteAmount,jdbcType=BIGINT},
+      </if>
+      <if test="blockVoteNumber != null">
+        #{blockVoteNumber,jdbcType=BIGINT},
+      </if>
+      <if test="blockCampaignAmount != null">
+        #{blockCampaignAmount,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -247,6 +272,9 @@
     <set>
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chainId != null">
+        chain_id = #{record.chainId,jdbcType=VARCHAR},
       </if>
       <if test="record.number != null">
         `number` = #{record.number,jdbcType=BIGINT},
@@ -284,9 +312,6 @@
       <if test="record.blockReward != null">
         block_reward = #{record.blockReward,jdbcType=VARCHAR},
       </if>
-      <if test="record.chainId != null">
-        chain_id = #{record.chainId,jdbcType=VARCHAR},
-      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -296,6 +321,15 @@
       <if test="record.actualTxCostSum != null">
         actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR},
       </if>
+      <if test="record.blockVoteAmount != null">
+        block_vote_amount = #{record.blockVoteAmount,jdbcType=BIGINT},
+      </if>
+      <if test="record.blockVoteNumber != null">
+        block_vote_number = #{record.blockVoteNumber,jdbcType=BIGINT},
+      </if>
+      <if test="record.blockCampaignAmount != null">
+        block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -304,6 +338,7 @@
   <update id="updateByExample" parameterType="map">
     update block
     set hash = #{record.hash,jdbcType=VARCHAR},
+      chain_id = #{record.chainId,jdbcType=VARCHAR},
       `number` = #{record.number,jdbcType=BIGINT},
       parent_hash = #{record.parentHash,jdbcType=VARCHAR},
       nonce = #{record.nonce,jdbcType=VARCHAR},
@@ -316,10 +351,12 @@
       transaction_number = #{record.transactionNumber,jdbcType=INTEGER},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       block_reward = #{record.blockReward,jdbcType=VARCHAR},
-      chain_id = #{record.chainId,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR}
+      actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR},
+      block_vote_amount = #{record.blockVoteAmount,jdbcType=BIGINT},
+      block_vote_number = #{record.blockVoteNumber,jdbcType=BIGINT},
+      block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -363,9 +400,6 @@
       <if test="blockReward != null">
         block_reward = #{blockReward,jdbcType=VARCHAR},
       </if>
-      <if test="chainId != null">
-        chain_id = #{chainId,jdbcType=VARCHAR},
-      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -375,8 +409,18 @@
       <if test="actualTxCostSum != null">
         actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR},
       </if>
+      <if test="blockVoteAmount != null">
+        block_vote_amount = #{blockVoteAmount,jdbcType=BIGINT},
+      </if>
+      <if test="blockVoteNumber != null">
+        block_vote_number = #{blockVoteNumber,jdbcType=BIGINT},
+      </if>
+      <if test="blockCampaignAmount != null">
+        block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Block">
     update block
@@ -392,11 +436,14 @@
       transaction_number = #{transactionNumber,jdbcType=INTEGER},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       block_reward = #{blockReward,jdbcType=VARCHAR},
-      chain_id = #{chainId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR}
+      actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR},
+      block_vote_amount = #{blockVoteAmount,jdbcType=BIGINT},
+      block_vote_number = #{blockVoteNumber,jdbcType=BIGINT},
+      block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT}
     where hash = #{hash,jdbcType=VARCHAR}
+      and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -405,17 +452,20 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into block
-    (hash, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, energon_limit, 
-      energon_average, transaction_number, `timestamp`, block_reward, chain_id, create_time, 
-      update_time, actual_tx_cost_sum)
+    (hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
+      energon_limit, energon_average, transaction_number, `timestamp`, block_reward, 
+      create_time, update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, 
+      block_campaign_amount)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, #{item.parentHash,jdbcType=VARCHAR}, 
-        #{item.nonce,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, #{item.extraData,jdbcType=VARCHAR}, 
-        #{item.size,jdbcType=INTEGER}, #{item.energonUsed,jdbcType=VARCHAR}, #{item.energonLimit,jdbcType=VARCHAR}, 
-        #{item.energonAverage,jdbcType=VARCHAR}, #{item.transactionNumber,jdbcType=INTEGER}, 
-        #{item.timestamp,jdbcType=TIMESTAMP}, #{item.blockReward,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.actualTxCostSum,jdbcType=VARCHAR}
+      (#{item.hash,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, 
+        #{item.parentHash,jdbcType=VARCHAR}, #{item.nonce,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, 
+        #{item.extraData,jdbcType=VARCHAR}, #{item.size,jdbcType=INTEGER}, #{item.energonUsed,jdbcType=VARCHAR}, 
+        #{item.energonLimit,jdbcType=VARCHAR}, #{item.energonAverage,jdbcType=VARCHAR}, 
+        #{item.transactionNumber,jdbcType=INTEGER}, #{item.timestamp,jdbcType=TIMESTAMP}, 
+        #{item.blockReward,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.actualTxCostSum,jdbcType=VARCHAR}, #{item.blockVoteAmount,jdbcType=BIGINT}, 
+        #{item.blockVoteNumber,jdbcType=BIGINT}, #{item.blockCampaignAmount,jdbcType=BIGINT}
         )
     </foreach>
   </insert>
@@ -436,6 +486,9 @@
       <foreach collection="selective" item="column" separator=",">
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'chain_id'.toString() == column.value">
+          #{item.chainId,jdbcType=VARCHAR}
         </if>
         <if test="'number'.toString() == column.value">
           #{item.number,jdbcType=BIGINT}
@@ -473,9 +526,6 @@
         <if test="'block_reward'.toString() == column.value">
           #{item.blockReward,jdbcType=VARCHAR}
         </if>
-        <if test="'chain_id'.toString() == column.value">
-          #{item.chainId,jdbcType=VARCHAR}
-        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
@@ -484,6 +534,15 @@
         </if>
         <if test="'actual_tx_cost_sum'.toString() == column.value">
           #{item.actualTxCostSum,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_vote_amount'.toString() == column.value">
+          #{item.blockVoteAmount,jdbcType=BIGINT}
+        </if>
+        <if test="'block_vote_number'.toString() == column.value">
+          #{item.blockVoteNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'block_campaign_amount'.toString() == column.value">
+          #{item.blockCampaignAmount,jdbcType=BIGINT}
         </if>
       </foreach>
       )

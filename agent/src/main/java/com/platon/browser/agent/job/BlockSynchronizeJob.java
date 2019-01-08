@@ -24,8 +24,10 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -70,11 +72,8 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
 
     private static boolean isFirstRun = true;
 
-
-    private static final String WEB3_PROPER = "classpath:web3j.properties.xml";
-
     @PostConstruct
-    public void init(){
+    public void init () {
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("timestamp desc");
@@ -82,11 +81,14 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         List <Block> blocks = blockMapper.selectByExample(condition);
         // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
         // 2、如果查询不到则从0开始
-        if(blocks.size()==0){
+        if (blocks.size() == 0) {
             maxNubmer = 0L;
-        }else {
+        } else {
             maxNubmer = blocks.get(0).getNumber();
         }
+
+
+
     }
 
     @Override
@@ -95,7 +97,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-            if(isFirstRun){
+            if (isFirstRun) {
                 TimeUnit.SECONDS.sleep(30l);
                 isFirstRun = false;
             }
@@ -109,12 +111,13 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
 
-            for(int i = maxNubmer.intValue() + 1 ; i <= Integer.parseInt(blockNumber); i ++){
+            for (int i = maxNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
                 try {
-                    BlockDto newBlock = buildStruct(i, web3j);
+                    BlockDto newBlock = buildStruct2(i, web3j);
                     //chainId获取
-                    if(newBlock.getNumber() > maxNubmer.intValue()){
+                    if (newBlock.getNumber() > maxNubmer.intValue()) {
                         //log.info("ChainId : {}，{}，{}，{}" , chainId ,"---------------------", i ,"-----------------------");
+                        //TODO:delete rabbitmq , insert data into redis
                         mqSender.send(chainId, MqMessageTypeEnum.BLOCK.name(), newBlock);
                         log.debug("BlockSynchronizeJob :{ DB blockNumber = " + newBlock.getNumber() + ", blockchain blockNumber =" + blockNumber + "}");
                     }
@@ -167,7 +170,7 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         return String.valueOf(blockReward);
     }
 
-    private BlockDto buildStruct ( int i, Web3j web3j ) throws Exception {
+    private BlockDto buildStruct2 ( int i, Web3j web3j ) throws Exception {
         DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(i)));
         EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
         //交易相关
@@ -198,9 +201,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                 transactionDto.setEnergonUsed(receipt.getGasUsed());
                 transactionDto.setNonce(transaction.getNonce().toString());
                 transactionDto.setValue(valueConversion(transaction.getValue()));
-                if(String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10){
+                if (String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10) {
                     transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue() * 1000L);
-                }else {
+                } else {
                     transactionDto.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
                 }
                 //transactionDto.setInput(transaction.getInput());
@@ -229,9 +232,9 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
         newBlock.setEnergonLimit(ethBlock.getBlock().getGasLimit());
         newBlock.setNonce(String.valueOf(ethBlock.getBlock().getNonce()));
         newBlock.setNumber(ethBlock.getBlock().getNumber().intValue());
-        if(String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10){
+        if (String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10) {
             newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue() * 1000L);
-        }else {
+        } else {
             newBlock.setTimestamp(ethBlock.getBlock().getTimestamp().longValue());
         }
         if (ethBlock.getBlock().getTransactions().size() > 0) {
@@ -252,5 +255,17 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
     }
 
 
+    public static void main ( String args[] ) {
+        try {
+            Web3j web3j = Web3j.build(new HttpService("http://10.10.8.209:6789"));
+            EthTransaction ethTransaction = web3j.ethGetTransactionByHash("0xc3cdc8e512373b042bf7afcbfee3723c64ce8ea29e58e74d5bc885cb17643409").send();
+            Optional <Transaction> value = ethTransaction.getTransaction();
+            Transaction transaction = value.get();
+            System.out.println(transaction.getInput());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
