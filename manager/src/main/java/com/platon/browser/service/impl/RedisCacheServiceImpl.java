@@ -31,9 +31,9 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -48,7 +48,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String transactionCacheKeyTemplate;
     @Value("${platon.redis.cache.max_item_num}")
     private long maxItemNum;
-
     @Value("${platon.redis.node.cache.key}")
     private String nodeCacheKeyTemplate;
 
