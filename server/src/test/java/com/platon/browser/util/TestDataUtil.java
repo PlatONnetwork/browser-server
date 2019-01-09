@@ -147,6 +147,7 @@ public class TestDataUtil {
                 bean.setTimestamp(new Date(block.getTimestamp().longValue()));
                 bean.setChainId(chainId);
                 bean.setTransactionNumber(block.getTransactions().size());
+                bean.setBlockReward("0.265");
                 data.add(bean);
             }
         });

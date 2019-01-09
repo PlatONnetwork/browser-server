@@ -56,12 +56,9 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
     private I18nUtil i18n;
-/*
     @Autowired
-    private NodeService nodeService;*/
+    private NodeService nodeService;
 
     @Override
     public SearchResult<?> search (SearchReq param ) {
@@ -206,7 +203,7 @@ public class SearchServiceImpl implements SearchService {
             }
         }
 
-        /*if(isNodePublicKeyOrName){
+        if(isNodePublicKeyOrName){
             NodeDetailReq nodeDetailReq = new NodeDetailReq();
             nodeDetailReq.setCid(chainId);
             nodeDetailReq.setId(keyword);
@@ -223,7 +220,7 @@ public class SearchServiceImpl implements SearchService {
                 result.setStruct(nodeDetail);
                 return result;
             }
-        }*/
+        }
 
         if(isNumber){
             // 如果查询关键字是纯数字，则查询区块信息返回

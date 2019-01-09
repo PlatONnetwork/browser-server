@@ -12,7 +12,6 @@ import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.enums.TransactionErrorEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;

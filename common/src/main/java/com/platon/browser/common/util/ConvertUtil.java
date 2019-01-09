@@ -1,8 +1,10 @@
 package com.platon.browser.common.util;
 
+import java.math.BigInteger;
+
 public class ConvertUtil {
-    public static Integer hexToInt(String hexStr){
-        hexStr=hexStr.replace("0x","");
-        return Integer.valueOf(hexStr,16);
+    public static BigInteger hexToBigInteger(String hexStr){
+        hexStr = hexStr.replace("0x","");
+        return new BigInteger(hexStr,16);
     }
 }

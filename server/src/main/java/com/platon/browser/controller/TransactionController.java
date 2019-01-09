@@ -9,7 +9,7 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
-import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.account.AccountDetailReq;
@@ -106,11 +106,11 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public RespPage<TransactionItem> transactionList (@Valid @RequestBody TransactionListReq req) {
+    public RespPage<TransactionListItem> transactionList (@Valid @RequestBody TransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        RespPage<TransactionItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<TransactionListItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 
@@ -240,12 +240,12 @@ public class TransactionController {
     private void setupConfirmNum(TransactionDetail transactionDetail,String chainId){
         // 设置区块确认数
         // 为加快速度，从缓存获取
-        RespPage<BlockItem> page = redisCacheService.getBlockPage(chainId,1,1);
+        RespPage<BlockListItem> page = redisCacheService.getBlockPage(chainId,1,1);
         if(page.getData()==null||page.getData().size()==0){
             transactionDetail.setConfirmNum(0l);
             return;
         }
-        BlockItem block = page.getData().get(0);
+        BlockListItem block = page.getData().get(0);
         transactionDetail.setConfirmNum(block.getHeight()-transactionDetail.getBlockHeight());
     }
 
@@ -690,7 +690,7 @@ public class TransactionController {
         TransactionListReq tlr = new TransactionListReq();
         BeanUtils.copyProperties(req,tlr);
         tlr.buildPage();
-        List<TransactionItem> transactions = transactionService.getTransactionByBlockNumber(tlr);
+        List<TransactionListItem> transactions = transactionService.getTransactionByBlockNumber(tlr);
         return JsonResp.asList().addAll(transactions).pagination(tlr).build();
     }
 }

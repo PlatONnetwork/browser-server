@@ -1,28 +1,24 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockItem;
-import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.dto.StatisticPushItem;
+import com.platon.browser.dto.block.BlockListItem;
+import com.platon.browser.dto.block.BlockPushItem;
+import com.platon.browser.dto.node.NodePushItem;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
-import com.platon.browser.util.IPUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.DefaultTypedTuple;
@@ -31,9 +27,6 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 
 
@@ -53,8 +46,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
     @Autowired
     private I18nUtil i18n;
-    @Autowired
-    private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
@@ -76,6 +67,21 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
     public void updateTransactionCount(String chainId, int step){
         transactionCountMap.put(chainId,transactionCountMap.get(chainId)+step);
+    }
+
+
+    private boolean validateParam(String chainId,Collection items){
+        if (!chainsConfig.getChainIds().contains(chainId)){
+            // 非法链ID
+            logger.error("Invalid Chain ID: {}", chainId);
+            return false;
+        }
+        if(items.size()==0){
+            // 无更新内容
+            logger.error("Empty Content");
+            return false;
+        }
+        return true;
     }
 
     private static class CachePageInfo<T>{
@@ -115,41 +121,45 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return cpi;
     }
 
+
+    private <T> void updateCache(String cacheKey,Collection<T> items){
+        long size = redisTemplate.opsForZSet().size(cacheKey);
+        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+        items.forEach(item -> {
+            Long startOffset=0l,endOffset=0l,score=0l;
+            if(item instanceof Block){
+                Block bl = (Block)item;
+                startOffset = endOffset = score = bl.getNumber();
+            }
+            if(item instanceof Transaction){
+                Transaction tr = (Transaction)item;
+                startOffset = endOffset = score = tr.getSequence();
+            }
+            // 根据score来判断缓存中的记录是否已经存在
+            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
+            if(exist.size()==0){
+                // 在缓存中不存在的才放入缓存
+                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));
+            }
+        });
+        if(tupleSet.size()>0){
+            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+        }
+        if(size>maxItemNum){
+            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+            redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
+        }
+    }
+
     /**
      * 更新区块缓存
      * @param chainId
      */
     @Override
     public void updateBlockCache(String chainId, Set<Block> items){
-        if (!chainsConfig.getChainIds().contains(chainId)){
-            // 非法链ID
-            logger.error("Invalid Chain ID: {}", chainId);
-            return;
-        }
-        if(items.size()==0){
-            // 无更新内容
-            logger.error("Empty Content");
-            return;
-        }
+        if(!validateParam(chainId,items))return;
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        long size = redisTemplate.opsForZSet().size(cacheKey);
-        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        items.forEach(item -> {
-            // 根据score来判断缓存中的记录是否已经存在
-            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,item.getNumber(),item.getNumber());
-            if(exist.size()==0){
-                // 在缓存中不存在的才放入缓存
-                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getNumber().doubleValue()));
-            }
-        });
-        if(tupleSet.size()>0){
-            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
-        }
-
-        if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
-            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
-        }
+        updateCache(cacheKey,items);
     }
 
     /**
@@ -158,37 +168,9 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public void updateTransactionCache(String chainId, Set<Transaction> items){
-        if (!chainsConfig.getChainIds().contains(chainId)){
-            // 非法链ID
-            logger.error("Invalid Chain ID: {}", chainId);
-            return;
-        }
-        if(items.size()==0){
-            // 无更新内容
-            logger.error("Empty Content");
-            return;
-        }
+        if(!validateParam(chainId,items))return;
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        long size = redisTemplate.opsForZSet().size(cacheKey);
-        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        items.forEach(item -> {
-            // 将数据库生成的sequence值作为score
-            Long value = item.getSequence();
-            // 根据score来判断缓存中的记录是否已经存在
-            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,value,value);
-            if(exist.size()==0){
-                // 在缓存中不存在的才放入缓存
-                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),value.doubleValue()));
-            }
-        });
-        if(tupleSet.size()>0){
-            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
-        }
-
-        if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
-            long count = redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
-        }
+        updateCache(cacheKey,items);
     }
 
     /**
@@ -199,15 +181,15 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @return
      */
     @Override
-    public RespPage<BlockItem> getBlockPage(String chainId,int pageNum,int pageSize){
+    public RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize){
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        CachePageInfo<BlockItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize,BlockItem.class);
-        RespPage<BlockItem> page = cpi.page;
-        List<BlockItem> blocks = new LinkedList<>();
+        CachePageInfo<BlockListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, BlockListItem.class);
+        RespPage<BlockListItem> page = cpi.page;
+        List<BlockListItem> blocks = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
         cpi.data.forEach(str -> {
             Block initData = JSON.parseObject(str,Block.class);
-            BlockItem bean = new BlockItem();
+            BlockListItem bean = new BlockListItem();
             bean.init(initData);
             bean.setServerTime(serverTime);
             blocks.add(bean);
@@ -225,6 +207,56 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     /**
+     * 获取区块推送数据
+     * @param chainId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public List<BlockPushItem> getBlockPushData(String chainId, int pageNum, int pageSize){
+        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        List<BlockPushItem> returnData = new LinkedList<>();
+        cache.forEach(str -> {
+            Block initData = JSON.parseObject(str,Block.class);
+            BlockPushItem bean = new BlockPushItem();
+            bean.init(initData);
+            returnData.add(bean);
+        });
+        return returnData;
+    }
+
+    /**
+     * 获取统计推送数据
+     * @param chainId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public List<StatisticPushItem> getStatisticPushData(String chainId, int pageNum, int pageSize){
+        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        List<StatisticPushItem> returnData = new LinkedList<>();
+        cache.forEach(str -> {
+            Block initData = JSON.parseObject(str,Block.class);
+            StatisticPushItem bean = new StatisticPushItem();
+            bean.init(initData);
+            returnData.add(bean);
+        });
+
+        Collections.sort(returnData,(c1, c2)->{
+            // 按区块高度正排
+            if(c1.getHeight()>c2.getHeight()) return 1;
+            if(c1.getHeight()<c2.getHeight()) return -1;
+            return 0;
+        });
+
+        return returnData;
+    }
+
+    /**
      * 根据页数和每页大小获取交易的缓存分页
      * @param chainId
      * @param pageNum
@@ -232,14 +264,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @return
      */
     @Override
-    public RespPage<TransactionItem> getTransactionPage(String chainId, int pageNum, int pageSize){
+    public RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize){
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        CachePageInfo<TransactionItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize,TransactionItem.class);
-        RespPage<TransactionItem> page = cpi.page;
-        List<TransactionItem> transactions = new LinkedList<>();
+        CachePageInfo<TransactionListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, TransactionListItem.class);
+        RespPage<TransactionListItem> page = cpi.page;
+        List<TransactionListItem> transactions = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
         cpi.data.forEach(str->{
-            TransactionItem bean = new TransactionItem();
+            TransactionListItem bean = new TransactionListItem();
             Transaction transaction = JSON.parseObject(str,Transaction.class);
             bean.init(transaction);
             bean.setServerTime(serverTime);
@@ -252,18 +284,30 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return page;
     }
 
+    /**
+     * 获取区块推送数据
+     * @param chainId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public List<TransactionPushItem> getTransactionPushData(String chainId, int pageNum, int pageSize){
+        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        List<TransactionPushItem> returnData = new LinkedList<>();
+        cache.forEach(str -> {
+            Transaction initData = JSON.parseObject(str,Transaction.class);
+            TransactionPushItem bean = new TransactionPushItem();
+            bean.init(initData);
+            returnData.add(bean);
+        });
+        return returnData;
+    }
+
     @Override
     public void updateNodeCache(String chainId, Set<NodeRanking> items) {
-        if (!chainsConfig.getChainIds().contains(chainId)){
-            // 非法链ID
-            logger.error("Invalid Chain ID: {}", chainId);
-            return;
-        }
-        if(items.size()==0){
-            // 无更新内容
-            logger.error("Empty Content");
-            return;
-        }
+        if(!validateParam(chainId,items))return;
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
@@ -274,8 +318,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     @Override
-    public List<NodeInfo> getNodeList(String chainId) {
-        List<NodeInfo> nodeInfoList = new LinkedList<>();
+    public List<NodePushItem> getNodeList(String chainId) {
+        List<NodePushItem> nodeInfoList = new LinkedList<>();
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
         if(cacheData.size()==0){
@@ -283,11 +327,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
         cacheData.forEach(nodeStr -> {
             NodeRanking initData = JSON.parseObject(nodeStr,NodeRanking.class);
-            NodeInfo bean = new NodeInfo();
+            NodePushItem bean = new NodePushItem();
             bean.init(initData);
             nodeInfoList.add(bean);
         });
         return nodeInfoList;
     }
-
 }

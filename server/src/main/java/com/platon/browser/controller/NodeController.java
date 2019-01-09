@@ -6,9 +6,9 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.block.BlockDownload;
-import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
-import com.platon.browser.dto.node.NodeItem;
+import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
@@ -92,7 +92,7 @@ public class NodeController {
         }
         // 取200条记录
         PageHelper.startPage(1,200);
-        List<NodeItem> nodes = nodeService.getNodeItemList(req);
+        List<NodeListItem> nodes = nodeService.getNodeItemList(req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
     }
 
@@ -192,7 +192,7 @@ public class NodeController {
         try{
             // 取20条最新记录
             PageHelper.startPage(1,20);
-            List<BlockItem> blocks = nodeService.getBlockList(req);
+            List<BlockListItem> blocks = nodeService.getBlockList(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());

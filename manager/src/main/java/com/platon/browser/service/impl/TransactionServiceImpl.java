@@ -6,7 +6,7 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
     private I18nUtil i18n;
 
     @Override
-    public List<TransactionItem> getTransactionByBlockNumber(TransactionListReq req) {
+    public List<TransactionListItem> getTransactionByBlockNumber(TransactionListReq req) {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andBlockNumberEqualTo(req.getHeight());
@@ -42,9 +42,9 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = transactionMapper.selectByExample(condition);
 
         long serverTime = System.currentTimeMillis();
-        List<TransactionItem> transactionList = new ArrayList<>();
+        List<TransactionListItem> transactionList = new ArrayList<>();
         transactions.forEach(transaction -> {
-            TransactionItem bean = new TransactionItem();
+            TransactionListItem bean = new TransactionListItem();
             BeanUtils.copyProperties(transaction,bean);
             bean.setTxHash(transaction.getHash());
             bean.setBlockHeight(transaction.getBlockNumber());

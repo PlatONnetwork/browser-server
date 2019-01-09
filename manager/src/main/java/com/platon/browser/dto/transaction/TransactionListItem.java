@@ -9,7 +9,7 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 
 @Data
-public class TransactionItem {
+public class TransactionListItem {
     private String txHash;
     private Long blockHeight;
     private Long blockTime;
@@ -28,7 +28,6 @@ public class TransactionItem {
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());
-        this.setServerTime(serverTime);
         // 交易时间就是出块时间
         this.setBlockTime(initData.getTimestamp().getTime());
         BigDecimal txCost = new BigDecimal(initData.getActualTxCost());

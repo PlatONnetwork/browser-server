@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 @Data
-public class BlockItem {
+public class BlockListItem {
     private long height;
     private long timestamp;
     private long transaction;

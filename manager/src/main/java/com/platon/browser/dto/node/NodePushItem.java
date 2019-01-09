@@ -2,7 +2,6 @@ package com.platon.browser.dto.node;
 
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.Location;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.IPUtil;
@@ -17,7 +16,7 @@ import java.net.UnknownHostException;
  * 节点信息
  */
 @Data
-public class NodeInfo {
+public class NodePushItem {
     private Float longitude;
     private Float latitude;
     private Integer nodeType;
@@ -55,7 +54,7 @@ public class NodeInfo {
     }
 
     public boolean equals(Object obj) {
-        NodeInfo nodeInfo = (NodeInfo)obj;
+        NodePushItem nodeInfo = (NodePushItem)obj;
         if(this==obj || (this.latitude==nodeInfo.latitude&&this.longitude==nodeInfo.longitude))
             return true;
         return false;

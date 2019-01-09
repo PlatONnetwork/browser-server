@@ -2,8 +2,8 @@ package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockItem;
-import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.block.BlockPushItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.util.TestDataUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,9 +30,14 @@ public class RedisCacheServiceBlockTest extends RedisCacheServiceBaseTest{
         Set<Block> data = TestDataUtil.generateBlock(chainId);
         redisTemplate.delete(blockCacheKey);
         redisCacheService.updateBlockCache(chainId,data);
-        RespPage<BlockItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
+        RespPage<BlockListItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
         Assert.assertEquals(data.size(),cache.getData().size());
     }
 
+    @Test
+    public void getBlockPushData(){
+        List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
+        Assert.assertEquals(10,blocks.size());
+    }
 
 }

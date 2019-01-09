@@ -2,7 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.transaction.TransactionItem;
+import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.util.TestDataUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class RedisCacheServiceTransactionTest extends RedisCacheServiceBaseTest{
         Set<Transaction> data = TestDataUtil.generateTransaction(chainId);
         redisTemplate.delete(transactionCacheKey);
         redisCacheService.updateTransactionCache(chainId,data);
-        RespPage<TransactionItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
+        RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
         Assert.assertEquals(data.size(),cache.getData().size());
     }
 }

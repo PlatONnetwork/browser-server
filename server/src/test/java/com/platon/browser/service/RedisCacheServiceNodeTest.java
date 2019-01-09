@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dto.node.NodeInfo;
+import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.util.TestDataUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class RedisCacheServiceNodeTest extends RedisCacheServiceBaseTest{
     public void getNodeCache(){
         Set<NodeRanking> nodes = TestDataUtil.generateNode(chainId);
         redisCacheService.updateNodeCache(chainId,nodes);
-        List<NodeInfo> nodeInfoList = redisCacheService.getNodeList(chainId);
+        List<NodePushItem> nodeInfoList = redisCacheService.getNodeList(chainId);
         Assert.assertEquals(nodes.size(),nodeInfoList.size());
     }
 }
