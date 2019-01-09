@@ -1,8 +1,33 @@
 package com.platon.browser.util;
 
+import com.github.fartherp.framework.common.extension.ConcurrentHashSet;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
+import com.maxmind.geoip2.record.Subdivision;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.service.RedisCacheServiceNodeTest;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.http.HttpService;
+import rx.Subscription;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class TestDataUtil {
+    private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
+    public final static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:6788"));
 
     public static String getForeignRandomIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;
@@ -11,7 +36,6 @@ public class TestDataUtil {
         String ip = "192." + (c / (256 * 256)) + "." + ((c / 256) % 256) + "." + (c % 256);
         return ip;
     }
-
 
     public static String getChinaRandomIp() {
 
@@ -48,4 +72,92 @@ public class TestDataUtil {
 
         return x;
     }
+
+
+    public static Set<NodeRanking> generateNode(String chainId){
+        Set<NodeRanking> nodes = new HashSet<>();
+
+        for(int i=0;i<200;i++){
+            NodeRanking node = new NodeRanking();
+            node.setChainId(chainId);
+            while (true){
+                try {
+                    String ip = TestDataUtil.getForeignRandomIp();
+                    if(i%2==0){
+                        ip = TestDataUtil.getChinaRandomIp();
+                    }
+                    logger.info("IP: {}",ip);
+
+                    CityResponse response = GeoUtil.getResponse(ip);
+                    Location location = response.getLocation();
+                    Country country = response.getCountry();
+                    Subdivision subdivision = response.getMostSpecificSubdivision();
+                    City city = response.getCity();
+                    logger.info("国家：{}", country.getName());
+                    logger.info("城市：{}", city.getName());
+                    logger.info("纬度：{}", location.getLatitude());
+                    logger.info("经度：{}", location.getLongitude());
+                    logger.info("dma code：{}", country.getIsoCode());
+                    logger.info("area code：{}", subdivision.getIsoCode());
+                    logger.info("country code：{}", country.getIsoCode());
+                    node.setIntro(country.getName().replace(" ",""));
+                    if(StringUtils.isNotBlank(city.getName())){
+                        node.setIntro(node.getIntro()+"."+city.getName().replace(" ",""));
+                    }
+                    node.setIp(ip);
+                    break;
+                }catch (Exception e){}
+            }
+            node.setChainId("1");
+            node.setCreateTime(new Date());
+            node.setElectionStatus(1);
+            node.setAddress("0x493301712671ada506ba6ca7891f436d2918582"+i);
+            node.setNodeId("0x493301712671ada506ba6ca7891f436d2918582"+i);
+            node.setUpdateTime(new Date());
+            node.setOrgName("platon");
+            node.setOrgWebsite("https://www.platon.network/");
+            node.setDeposit("87854");
+            node.setPort(808+i);
+            node.setJoinTime(new Date());
+            node.setType(1);
+            node.setRanking(i);
+            node.setIsValid(1);
+            node.setBeginNumber(1l);
+            node.setEndNumber(199l);
+            node.setBlockCount(55l);
+            node.setUrl("https://www.platon.network/");
+
+            nodes.add(node);
+        }
+        return nodes;
+    }
+
+    public static Set<Block> generateBlock(String chainId){
+        Set<Block> data = new ConcurrentHashSet<>();
+        BigInteger currentHeight = BigInteger.valueOf(1);
+        Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
+        .subscribe(eblock -> {
+            EthBlock.Block block = eblock.getBlock();
+            if (block!=null){
+                Block bean = new Block();
+                BeanUtils.copyProperties(block,bean);
+                bean.setNumber(block.getNumber().longValue());
+                bean.setTimestamp(new Date(block.getTimestamp().longValue()));
+                bean.setChainId(chainId);
+                bean.setTransactionNumber(block.getTransactions().size());
+                data.add(bean);
+            }
+        });
+
+        while (true){
+            if(data.size()==100){
+                subscription.unsubscribe();
+                break;
+            }
+        }
+        return data;
+    }
+
+
+
 }

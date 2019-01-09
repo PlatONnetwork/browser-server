@@ -312,14 +312,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public List<NodeInfo> getNodeList(String chainId) {
         List<NodeInfo> nodeInfoList = new LinkedList<>();
-
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
 
+        Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
         if(cacheData.size()==0){
             return nodeInfoList;
         }
-
         cacheData.forEach(nodeStr -> {
             NodeRanking node = JSON.parseObject(nodeStr,NodeRanking.class);
             NodeInfo bean = new NodeInfo();
