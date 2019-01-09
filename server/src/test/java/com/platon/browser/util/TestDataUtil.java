@@ -87,7 +87,7 @@ public class TestDataUtil {
                     if(i%2==0){
                         ip = TestDataUtil.getChinaRandomIp();
                     }
-                    logger.info("IP: {}",ip);
+                    //logger.info("IP: {}",ip);
 
                     CityResponse response = GeoUtil.getResponse(ip);
                     Location location = response.getLocation();
