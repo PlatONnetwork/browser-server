@@ -6,8 +6,10 @@ import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 import com.maxmind.geoip2.record.Subdivision;
+import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.service.RedisCacheServiceNodeTest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -159,5 +161,30 @@ public class TestDataUtil {
     }
 
 
+    public static Set<Transaction> generateTransaction(String chainId) {
+        Set<Transaction> data = new ConcurrentHashSet<>();
+        BigInteger currentHeight = BigInteger.valueOf(1);
+        Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
+                .subscribe(transaction -> {
+                    Transaction bean = new Transaction();
+                    BeanUtils.copyProperties(transaction,bean);
 
+                    bean.setChainId(chainId);
+
+                    BigInteger value = ConvertUtil.hexToBigInteger(transaction.getValue().toString());
+                    bean.setValue(value.toString());
+                    bean.setSequence(Long.valueOf(data.size()));
+                    bean.setTimestamp(new Date(System.currentTimeMillis()));
+                    bean.setActualTxCost("0.23566");
+                    data.add(bean);
+                });
+
+        while (true){
+            if(data.size()==15){
+                subscription.unsubscribe();
+                break;
+            }
+        }
+        return data;
+    }
 }

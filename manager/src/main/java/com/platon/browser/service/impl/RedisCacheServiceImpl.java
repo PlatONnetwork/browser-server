@@ -78,6 +78,43 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         transactionCountMap.put(chainId,transactionCountMap.get(chainId)+step);
     }
 
+    private static class CachePageInfo<T>{
+        Set<String> data;
+        RespPage<T> page;
+    }
+
+    private <T> CachePageInfo getCachePageInfo(String cacheKey,int pageNum,int pageSize,T target){
+        RespPage<T> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
+
+        CachePageInfo<T> cpi = new CachePageInfo<>();
+        Long size = redisTemplate.opsForZSet().size(cacheKey);
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+        page.setTotalCount(pagingTotalCount.intValue());
+
+        Long pageCount = pagingTotalCount/pageSize;
+        if(pagingTotalCount%pageSize!=0){
+            pageCount+=1;
+        }
+        page.setTotalPages(pageCount.intValue());
+
+        // Redis的缓存分页从索引0开始
+        if(pageNum<=0){
+            pageNum=1;
+        }
+        if(pageSize<=0){
+            pageSize=1;
+        }
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        cpi.data = cache;
+        cpi.page = page;
+        return cpi;
+    }
+
     /**
      * 更新区块缓存
      * @param chainId
@@ -163,58 +200,27 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public RespPage<BlockItem> getBlockPage(String chainId,int pageNum,int pageSize){
-        RespPage<BlockItem> page = new RespPage<>();
-
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
-
-        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-
-        Long pagingTotalCount = size;
-        if(pagingTotalCount>maxItemNum){
-            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
-            pagingTotalCount = maxItemNum;
-        }
-
-        page.setTotalCount(pagingTotalCount.intValue());
-        Long pageCount = pagingTotalCount/pageSize;
-        if(pagingTotalCount%pageSize!=0){
-            pageCount+=1;
-        }
-        page.setTotalPages(pageCount.intValue());
-
-        // Redis的缓存分页从索引0开始
-        if(pageNum<=0){
-            pageNum=1;
-        }
-        if(pageSize<=0){
-            pageSize=1;
-        }
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        CachePageInfo<BlockItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize,BlockItem.class);
+        RespPage<BlockItem> page = cpi.page;
         List<BlockItem> blocks = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
-        cache.forEach(str -> {
-            Block block = JSON.parseObject(str,Block.class);
+        cpi.data.forEach(str -> {
+            Block initData = JSON.parseObject(str,Block.class);
             BlockItem bean = new BlockItem();
-            BeanUtils.copyProperties(block,bean);
-            bean.setHeight(block.getNumber());
+            bean.init(initData);
             bean.setServerTime(serverTime);
-            bean.setTimestamp(block.getTimestamp().getTime());
-            bean.setTransaction(block.getTransactionNumber());
             blocks.add(bean);
         });
         page.setData(blocks);
-
         // 设置总记录大小
-        cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
         if(cache.size()>0){
             Block block = JSON.parseObject(cache.iterator().next(),Block.class);
             page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
         }else{
             page.setDisplayTotalCount(0);
         }
-
         return page;
     }
 
@@ -228,63 +234,21 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public RespPage<TransactionItem> getTransactionPage(String chainId, int pageNum, int pageSize){
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-
-        RespPage<TransactionItem> page = new RespPage<>();
-
-        page.setDisplayTotalCount(transactionCountMap.get(chainId));
-
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
-        page.setTotalCount(size.intValue());
-        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-
-
-        Long pagingTotalCount = size;
-        if(pagingTotalCount>maxItemNum){
-            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
-            pagingTotalCount = maxItemNum;
-        }
-        Long pageCount = pagingTotalCount/pageSize;
-        if(pagingTotalCount%pageSize!=0){
-            pageCount+=1;
-        }
-        page.setTotalPages(pageCount.intValue());
-
-        // Redis的缓存分页从索引0开始
-        if(pageNum<=0){
-            pageNum=1;
-        }
-        if(pageSize<=0){
-            pageSize=1;
-        }
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        CachePageInfo<TransactionItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize,TransactionItem.class);
+        RespPage<TransactionItem> page = cpi.page;
         List<TransactionItem> transactions = new LinkedList<>();
         long serverTime = System.currentTimeMillis();
-
-
-        // 把缓存中的字符串转换为交易实体
-        List<Transaction> cacheItems = new LinkedList<>();
-        cache.forEach(str->{
-            Transaction transaction = JSON.parseObject(str,Transaction.class);
-            cacheItems.add(transaction);
-        });
-
-        // 获取缓存中的交易信息
-        cacheItems.forEach(transaction -> {
+        cpi.data.forEach(str->{
             TransactionItem bean = new TransactionItem();
-            BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setBlockHeight(transaction.getBlockNumber());
+            Transaction transaction = JSON.parseObject(str,Transaction.class);
+            bean.init(transaction);
             bean.setServerTime(serverTime);
-            // 交易时间就是出块时间
-            bean.setBlockTime(transaction.getTimestamp().getTime());
-
-            BigDecimal txCost = new BigDecimal(transaction.getActualTxCost());
-            txCost = txCost.divide(new BigDecimal("1000000000000000000"));
-            bean.setActualTxCost(String.valueOf(txCost));
-
             transactions.add(bean);
         });
         page.setData(transactions);
+        // 设置总记录大小
+        Long displayCount = transactionMapper.countByExample(new TransactionExample());
+        page.setDisplayTotalCount(displayCount.intValue());
         return page;
     }
 
@@ -313,39 +277,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public List<NodeInfo> getNodeList(String chainId) {
         List<NodeInfo> nodeInfoList = new LinkedList<>();
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-
         Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
         if(cacheData.size()==0){
             return nodeInfoList;
         }
         cacheData.forEach(nodeStr -> {
-            NodeRanking node = JSON.parseObject(nodeStr,NodeRanking.class);
+            NodeRanking initData = JSON.parseObject(nodeStr,NodeRanking.class);
             NodeInfo bean = new NodeInfo();
-            BeanUtils.copyProperties(node,bean);
-
-            String ip = node.getIp();
-            if(!IPUtil.isIPv4Address(ip)){
-                try {
-                    ip = InetAddress.getByName(ip).getHostAddress();
-                } catch (UnknownHostException e) {
-                    ip = "";
-                    e.printStackTrace();
-                }
-            }
-
-            CityResponse response = GeoUtil.getResponse(ip);
-            if(response!=null){
-                Location location = response.getLocation();
-                bean.setLongitude(location.getLongitude().floatValue());
-                bean.setLatitude(location.getLatitude().floatValue());
-            }else{
-                // 默认设置为深圳的经纬度
-                bean.setLongitude(114.06667f);
-                bean.setLatitude(22.61667f);
-            }
-
-            bean.setNodeType(1);
-            bean.setNetState(node.getIsValid());
+            bean.init(initData);
             nodeInfoList.add(bean);
         });
         return nodeInfoList;

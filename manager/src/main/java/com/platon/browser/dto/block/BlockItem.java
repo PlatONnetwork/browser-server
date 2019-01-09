@@ -1,6 +1,8 @@
 package com.platon.browser.dto.block;
 
+import com.platon.browser.dao.entity.Block;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
 public class BlockItem {
@@ -14,4 +16,11 @@ public class BlockItem {
     private String energonAverage;
     private String blockReward;
     private long serverTime;
+
+    public void init(Block initData){
+        BeanUtils.copyProperties(initData,this);
+        this.setHeight(initData.getNumber());
+        this.setTimestamp(initData.getTimestamp().getTime());
+        this.setTransaction(initData.getTransactionNumber());
+    }
 }
