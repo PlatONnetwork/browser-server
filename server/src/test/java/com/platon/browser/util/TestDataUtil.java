@@ -94,13 +94,13 @@ public class TestDataUtil {
                     Country country = response.getCountry();
                     Subdivision subdivision = response.getMostSpecificSubdivision();
                     City city = response.getCity();
-                    logger.info("国家：{}", country.getName());
+                    /*logger.info("国家：{}", country.getName());
                     logger.info("城市：{}", city.getName());
                     logger.info("纬度：{}", location.getLatitude());
                     logger.info("经度：{}", location.getLongitude());
                     logger.info("dma code：{}", country.getIsoCode());
                     logger.info("area code：{}", subdivision.getIsoCode());
-                    logger.info("country code：{}", country.getIsoCode());
+                    logger.info("country code：{}", country.getIsoCode());*/
                     node.setIntro(country.getName().replace(" ",""));
                     if(StringUtils.isNotBlank(city.getName())){
                         node.setIntro(node.getIntro()+"."+city.getName().replace(" ",""));
