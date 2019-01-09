@@ -10,7 +10,6 @@ import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.service.RedisCacheServiceNodeTest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
