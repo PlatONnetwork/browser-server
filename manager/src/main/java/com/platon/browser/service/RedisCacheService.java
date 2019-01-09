@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockItem;
@@ -17,4 +18,5 @@ public interface RedisCacheService {
     RespPage<BlockItem> getBlockPage(String chainId, int pageNum, int pageSize);
     RespPage<TransactionItem> getTransactionPage(String chainId, int pageNum, int pageSize);
     List<NodeInfo> getNodeList(String chainId);
+    void updateNodeCache(String chainId, Set<NodeRanking> items);
 }

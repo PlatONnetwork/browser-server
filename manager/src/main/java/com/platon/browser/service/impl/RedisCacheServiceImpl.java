@@ -5,7 +5,7 @@ import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.Location;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -42,13 +42,13 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
     private final Logger logger = LoggerFactory.getLogger(RedisCacheServiceImpl.class);
 
-    @Value("${platon.redis.block.cache.key}")
+    @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
-    @Value("${platon.redis.transaction.cache.key}")
+    @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
-    @Value("${platon.redis.cache.max_item_num}")
+    @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
-    @Value("${platon.redis.node.cache.key}")
+    @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
 
     @Autowired
@@ -289,18 +289,39 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     @Override
+    public void updateNodeCache(String chainId, Set<NodeRanking> items) {
+        if (!chainsConfig.getChainIds().contains(chainId)){
+            // 非法链ID
+            logger.error("Invalid Chain ID: {}", chainId);
+            return;
+        }
+        if(items.size()==0){
+            // 无更新内容
+            logger.error("Empty Content");
+            return;
+        }
+        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+        items.forEach(item -> tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getRanking().doubleValue())));
+        if(tupleSet.size()>0){
+            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+        }
+    }
+
+    @Override
     public List<NodeInfo> getNodeList(String chainId) {
         List<NodeInfo> nodeInfoList = new LinkedList<>();
 
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        String cacheData = redisTemplate.opsForValue().get(cacheKey);
+        Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
 
-        if(StringUtils.isBlank(cacheData)){
+        if(cacheData.size()==0){
             return nodeInfoList;
         }
 
-        List<Node> nodeList = JSON.parseArray(cacheData,Node.class);
-        nodeList.forEach(node -> {
+        cacheData.forEach(nodeStr -> {
+            NodeRanking node = JSON.parseObject(nodeStr,NodeRanking.class);
             NodeInfo bean = new NodeInfo();
             BeanUtils.copyProperties(node,bean);
 
@@ -314,7 +335,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
                 }
             }
 
-
             CityResponse response = GeoUtil.getResponse(ip);
             if(response!=null){
                 Location location = response.getLocation();
@@ -327,11 +347,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             }
 
             bean.setNodeType(1);
-            bean.setNetState(node.getNodeStatus());
+            bean.setNetState(node.getIsValid());
             nodeInfoList.add(bean);
         });
         return nodeInfoList;
     }
-
 
 }
