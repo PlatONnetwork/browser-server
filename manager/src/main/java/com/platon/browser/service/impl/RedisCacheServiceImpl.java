@@ -26,7 +26,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 
@@ -52,23 +51,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private ChainsConfig chainsConfig;
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
-
-    private Map<String,Integer> transactionCountMap = new HashMap<>();
-
-    @PostConstruct
-    private void init(){
-        chainsConfig.getChainIds().forEach(chainId->{
-            TransactionExample transactionExample = new TransactionExample();
-            transactionExample.createCriteria().andChainIdEqualTo(chainId);
-            Long count = transactionMapper.countByExample(transactionExample);
-            transactionCountMap.put(chainId,count.intValue());
-        });
-    }
-
-    public void updateTransactionCount(String chainId, int step){
-        transactionCountMap.put(chainId,transactionCountMap.get(chainId)+step);
-    }
-
 
     private boolean validateParam(String chainId,Collection items){
         if (!chainsConfig.getChainIds().contains(chainId)){

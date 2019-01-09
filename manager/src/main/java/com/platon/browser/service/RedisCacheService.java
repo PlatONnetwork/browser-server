@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface RedisCacheService {
-    void updateTransactionCount(String chainId, int step);
     void updateBlockCache(String chainId, Set<Block> items);
     void updateTransactionCache(String chainId, Set<Transaction> items);
     RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize);
