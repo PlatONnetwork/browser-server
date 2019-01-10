@@ -6,7 +6,7 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
@@ -83,11 +83,11 @@ public class BlockController  {
      * }
      */
     @PostMapping("blockList")
-    public RespPage<BlockItem> blockList (@Valid @RequestBody BlockPageReq req) {
+    public RespPage<BlockListItem> blockList (@Valid @RequestBody BlockPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        RespPage<BlockItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<BlockListItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 

@@ -7,13 +7,12 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.StatisticsMapper;
-import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
-import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.node.NodeItem;
+import com.platon.browser.dto.node.NodePushItem;
+import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
@@ -39,8 +38,6 @@ public class NodeServiceImpl implements NodeService {
     private final Logger logger = LoggerFactory.getLogger(NodeServiceImpl.class);
 
     @Autowired
-    private NodeMapper nodeMapper;
-    @Autowired
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private BlockService blockService;
@@ -52,11 +49,11 @@ public class NodeServiceImpl implements NodeService {
     private String imageServerUrl;
 
     @Override
-    public List<NodeInfo> getNodeInfoList() {
-        List<Node> nodeList = nodeMapper.selectByExample(new NodeExample());
-        List<NodeInfo> nodeInfoList = new ArrayList<>();
+    public List<NodePushItem> getNodeInfoList() {
+        List<NodeRanking> nodeList = nodeRankingMapper.selectByExample(new NodeRankingExample());
+        List<NodePushItem> nodeInfoList = new ArrayList<>();
         nodeList.forEach(node -> {
-            NodeInfo nodeInfo = new NodeInfo();
+            NodePushItem nodeInfo = new NodePushItem();
             nodeInfoList.add(nodeInfo);
             BeanUtils.copyProperties(node,nodeInfo);
         });
@@ -116,7 +113,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<NodeItem> getNodeItemList(NodeListReq req) {
+    public List<NodeListItem> getNodeItemList(NodeListReq req) {
         NodeRankingExample condition = new NodeRankingExample();
         NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
         if(StringUtils.isNotBlank(req.getKeyword())){
@@ -126,7 +123,7 @@ public class NodeServiceImpl implements NodeService {
         condition.setOrderByClause("ranking asc");
         List<NodeRanking> list = nodeRankingMapper.selectByExample(condition);
 
-        List<NodeItem> itemList = new LinkedList<>();
+        List<NodeListItem> itemList = new LinkedList<>();
 
         if(list.size()==0){
             return itemList;
@@ -144,7 +141,7 @@ public class NodeServiceImpl implements NodeService {
         Map<String,String> blockCountMap = statisticsMap.get(StatisticsEnum.block_count);
 
         list.forEach(node -> {
-            NodeItem bean = new NodeItem();
+            NodeListItem bean = new NodeListItem();
             BeanUtils.copyProperties(node,bean);
             try {
                 CityResponse response = GeoUtil.getResponse(node.getIp());
@@ -263,13 +260,13 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<BlockItem> getBlockList(BlockListReq req) {
+    public List<BlockListItem> getBlockList(BlockListReq req) {
         BlockDownloadReq downloadReq = new BlockDownloadReq();
         BeanUtils.copyProperties(req,downloadReq);
         List<Block> blocks = blockService.getBlockList(downloadReq);
-        List<BlockItem> blockItemList = new LinkedList<>();
+        List<BlockListItem> blockItemList = new LinkedList<>();
         blocks.forEach(block -> {
-            BlockItem bean = new BlockItem();
+            BlockListItem bean = new BlockListItem();
             BeanUtils.copyProperties(block,bean);
             bean.setTimestamp(block.getTimestamp().getTime());
             bean.setHeight(block.getNumber());

@@ -56,10 +56,7 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
     private I18nUtil i18n;
-
     @Autowired
     private NodeService nodeService;
 

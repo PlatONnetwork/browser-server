@@ -2,10 +2,8 @@ package com.platon.browser.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.cache.StompCacheInitializer;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
-import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
@@ -14,18 +12,12 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.StatisticGraphData;
 import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.StatisticItem;
-import com.platon.browser.dto.cache.BlockInit;
-import com.platon.browser.dto.cache.LimitQueue;
-import com.platon.browser.dto.cache.TransactionInit;
-import com.platon.browser.dto.node.NodeInfo;
-import com.platon.browser.dto.search.SearchResult;
-import com.platon.browser.exception.ResponseException;
-import com.platon.browser.req.search.SearchReq;
+import com.platon.browser.dto.block.BlockPushItem;
+import com.platon.browser.dto.node.NodePushItem;
+import com.platon.browser.dto.transaction.TransactionPushItem;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.SearchService;
-import com.platon.browser.service.StompCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -37,12 +29,8 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,11 +50,12 @@ public class HomeController {
     private ChainsConfig chainsConfig;
     @Autowired
     private SearchService searchService;
-    @Autowired
-    private StompCacheService cacheService;
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -103,7 +92,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        Set<NodeInfo> nodeInfoList = cacheService.getNodeInfoSet(chainId);
+        List<NodePushItem> nodeInfoList = redisCacheService.getNodeList(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
         return resp;
     }
@@ -155,7 +144,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
+//        IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
+        IndexInfo indexInfo = new IndexInfo();
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),indexInfo);
         return resp;
     }
@@ -207,11 +197,13 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
+//        StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
+        StatisticInfo statistic = new StatisticInfo();
 
+/*
 
-        LimitQueue<StatisticItem> limitQueue = statistic.getLimitQueue();
-        List<StatisticItem> itemList = limitQueue.list();
+        LimitQueue<StatisticPushItem> limitQueue = statistic.getLimitQueue();
+        List<StatisticPushItem> itemList = limitQueue.list();
         Collections.sort(itemList,(c1, c2)->{
             // 按区块高度正排
             if(c1.getHeight()>c2.getHeight()) return 1;
@@ -221,14 +213,15 @@ public class HomeController {
 
         StatisticGraphData graphData = new StatisticGraphData();
         for (int i=0;i<itemList.size();i++){
-            StatisticItem item = itemList.get(i);
+            StatisticPushItem item = itemList.get(i);
             if(i==0||i==itemList.size()-1) continue;
-            StatisticItem prevItem = itemList.get(i-1);
+            StatisticPushItem prevItem = itemList.get(i-1);
             graphData.getX().add(item.getHeight());
             graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
             graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
         }
         statistic.setGraphData(graphData);
+*/
 
 
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
@@ -279,8 +272,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        BlockInit blockInit = cacheService.getBlockInit(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockInit.getList());
+        List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         return resp;
     }
 
@@ -338,8 +331,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        TransactionInit transactionInit = cacheService.getTransactionInit(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionInit.getList());
+        List<TransactionPushItem> transactions = redisCacheService.getTransactionPushData(chainId,1,10);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
         return resp;
     }
 
@@ -420,14 +413,4 @@ public class HomeController {
         return "success";
     }
 
-    @Autowired
-    private StompCacheInitializer cacheInitializer;
-    @GetMapping("/refreshStompCache")
-    public String refreshStompCache(){
-        chainsConfig.getChainIds().forEach(chainId->{
-            cacheInitializer.initNodeCache(chainId);
-            cacheInitializer.initIndexCache(chainId);
-        });
-        return "success";
-    }
 }

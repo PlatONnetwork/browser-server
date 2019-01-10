@@ -1,7 +1,6 @@
 package com.platon.browser.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platon.browser.dto.cache.LimitQueue;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -23,9 +22,7 @@ public class StatisticInfo {
     private StatisticGraphData graphData;
 
     @JsonIgnore
-    private List<StatisticItem> blockStatisticList;
-    @JsonIgnore
-    private LimitQueue<StatisticItem> limitQueue;
+    private List<StatisticPushItem> blockStatisticList;
     @JsonIgnore
     private long transactionCount;
     @JsonIgnore

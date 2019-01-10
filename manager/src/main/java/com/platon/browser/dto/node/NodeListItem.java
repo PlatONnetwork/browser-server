@@ -1,9 +1,11 @@
 package com.platon.browser.dto.node;
 
+import com.platon.browser.dao.entity.NodeRanking;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
-public class NodeItem {
+public class NodeListItem {
     private String id;
     private int ranking;
     private String logo;
@@ -15,4 +17,7 @@ public class NodeItem {
     private int blockCount;
     private double rewardRatio;
     private String address;
+    public void init(NodeRanking initData){
+        BeanUtils.copyProperties(initData,this);
+    }
 }

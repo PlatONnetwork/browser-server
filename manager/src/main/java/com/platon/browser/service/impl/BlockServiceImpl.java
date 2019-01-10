@@ -1,6 +1,5 @@
 package com.platon.browser.service.impl;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
@@ -11,8 +10,7 @@ import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockDownload;
-import com.platon.browser.dto.block.BlockItem;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.*;
 import com.platon.browser.service.BlockService;
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -43,17 +40,17 @@ public class BlockServiceImpl implements BlockService {
     private I18nUtil i18n;
 
     @Override
-    public RespPage<BlockItem> getBlockPage(BlockPageReq req) {
+    public RespPage<BlockListItem> getBlockPage(BlockPageReq req) {
         BlockPage page = new BlockPage();
         BeanUtils.copyProperties(req,page);
         int startPage = req.getPageNo()<=1?0:req.getPageNo()-1;
         int offset = startPage*req.getPageSize();
         page.setOffset(offset);
         List<Block> blocks = customBlockMapper.selectByPage(page);
-        List<BlockItem> blockList = new ArrayList<>();
+        List<BlockListItem> blockList = new ArrayList<>();
         long serverTime = System.currentTimeMillis();
         blocks.forEach(block -> {
-            BlockItem bean = new BlockItem();
+            BlockListItem bean = new BlockListItem();
             BeanUtils.copyProperties(block,bean);
             bean.setHeight(block.getNumber());
             bean.setServerTime(serverTime);
@@ -69,7 +66,7 @@ public class BlockServiceImpl implements BlockService {
         if(count%req.getPageSize()!=0){
             totalPages+=1;
         }
-        RespPage<BlockItem> respPage = new RespPage<>();
+        RespPage<BlockListItem> respPage = new RespPage<>();
         respPage.setTotalCount(count.intValue());
         respPage.setTotalPages(totalPages.intValue());
         respPage.setData(blockList);
