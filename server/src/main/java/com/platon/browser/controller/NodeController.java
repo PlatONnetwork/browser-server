@@ -89,13 +89,11 @@ public class NodeController {
      * }
      */
     @PostMapping("list")
-    public RespPage<NodeListItem> getPage (@Valid @RequestBody NodeListReq req) {
+    public RespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        NodePageReq pageReq = new NodePageReq();
-        BeanUtils.copyProperties(req,pageReq);
-        RespPage<NodeListItem> returnData = nodeService.getPage(pageReq);
+        RespPage<NodeListItem> returnData = nodeService.getPage(req);
         return returnData;
     }
 

@@ -77,7 +77,7 @@ public class NodeControllerTest {
     }
 
     @Test
-    public void list() throws Exception{
+    public void getPage() throws Exception{
         NodePageReq req = new NodePageReq();
         req.setCid(chainId);
         sendRequest("/node/list",req);
