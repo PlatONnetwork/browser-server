@@ -288,31 +288,33 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     @Override
-    public void updateNodeCache(String chainId, Set<NodeRanking> items) {
+    public void updateNodePushCache(String chainId, Set<NodeRanking> items) {
         if(!validateParam(chainId,items))return;
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        items.forEach(item -> tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getRanking().doubleValue())));
+        items.forEach(initData -> {
+            NodePushItem bean = new NodePushItem();
+            bean.init(initData);
+            tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(bean),initData.getRanking().doubleValue()));
+        });
         if(tupleSet.size()>0){
             redisTemplate.opsForZSet().add(cacheKey, tupleSet);
         }
     }
 
     @Override
-    public List<NodePushItem> getNodeList(String chainId) {
-        List<NodePushItem> nodeInfoList = new LinkedList<>();
+    public List<NodePushItem> getNodePushData(String chainId) {
+        List<NodePushItem> returnData = new LinkedList<>();
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
         if(cacheData.size()==0){
-            return nodeInfoList;
+            return returnData;
         }
         cacheData.forEach(nodeStr -> {
-            NodeRanking initData = JSON.parseObject(nodeStr,NodeRanking.class);
-            NodePushItem bean = new NodePushItem();
-            bean.init(initData);
-            nodeInfoList.add(bean);
+            NodePushItem bean = JSON.parseObject(nodeStr,NodePushItem.class);
+            returnData.add(bean);
         });
-        return nodeInfoList;
+        return returnData;
     }
 }

@@ -10,5 +10,5 @@ public class NodeDetailReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     @NotNull(message = "{node.id.notnull}")
-    private String id;
+    private Long id;
 }

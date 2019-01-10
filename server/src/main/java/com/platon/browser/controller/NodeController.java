@@ -5,6 +5,7 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
@@ -14,12 +15,14 @@ import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodeListReq;
+import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,14 +89,14 @@ public class NodeController {
      * }
      */
     @PostMapping("list")
-    public BaseResp list (@Valid @RequestBody NodeListReq req) {
+    public RespPage<NodeListItem> list (@Valid @RequestBody NodeListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        // 取200条记录
-        PageHelper.startPage(1,200);
-        List<NodeListItem> nodes = nodeService.getNodeItemList(req);
-        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
+        NodePageReq pageReq = new NodePageReq();
+        BeanUtils.copyProperties(req,pageReq);
+        RespPage<NodeListItem> returnData = nodeService.list(pageReq);
+        return returnData;
     }
 
 
@@ -145,7 +148,7 @@ public class NodeController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            NodeDetail detail = nodeService.getNodeDetail(req,false);
+            NodeDetail detail = nodeService.detail(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),detail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
@@ -192,7 +195,7 @@ public class NodeController {
         try{
             // 取20条最新记录
             PageHelper.startPage(1,20);
-            List<BlockListItem> blocks = nodeService.getBlockList(req);
+            List<BlockListItem> blocks = nodeService.listBlock(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());

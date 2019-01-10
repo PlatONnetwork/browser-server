@@ -16,8 +16,8 @@ import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
+import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.service.SearchService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -49,9 +49,6 @@ public class HomeController {
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private SearchService searchService;
-
-    @Autowired
     private RedisTemplate<String,String> redisTemplate;
 
     @Autowired
@@ -61,6 +58,9 @@ public class HomeController {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
+
+    @Autowired
+    private NodeService nodeService;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -92,7 +92,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<NodePushItem> nodeInfoList = redisCacheService.getNodeList(chainId);
+        List<NodePushItem> nodeInfoList = nodeService.getPushData (chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
         return resp;
     }

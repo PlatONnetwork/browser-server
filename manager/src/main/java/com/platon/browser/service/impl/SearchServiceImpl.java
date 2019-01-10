@@ -9,10 +9,12 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.node.NodeDetail;
+import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.PendingOrTransaction;
@@ -20,6 +22,8 @@ import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.node.NodeDetailReq;
+import com.platon.browser.req.node.NodeListReq;
+import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
@@ -70,21 +74,27 @@ public class SearchServiceImpl implements SearchService {
         param.setParameter(param.getParameter().trim());
         String chainId = param.getCid();
         String keyword = param.getParameter();
-        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodePublicKeyOrName=false;
+        boolean isAccountOrContract = false, isTransactionOrBlock = false, isNodeIdOrName=false;
         boolean isNumber=keyword.matches("[0-9]+");
         if (!isNumber) {
             //为false则可能为区块交易hash或者为账户
             if(keyword.length()<=2)
                 throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_TOO_SHORT));
-            if("0x".equals(keyword.substring(0, 2))){
-                if(keyword.length() == 42)
+            if(keyword.startsWith("0x")){
+                if(keyword.length() == 42){
+                    // 合约或账户地址
                     isAccountOrContract = true;
-            } else {
-                if(keyword.length() == 128){
-                    isNodePublicKeyOrName = true;
-                }else{
+                }
+                if(keyword.length() == 130){
+                    // 节点Id或名称
+                    isNodeIdOrName = true;
+                }
+                if(keyword.length() == 66){
                     isTransactionOrBlock = true;
                 }
+            }else{
+                // 非0x开头，则默认查询节点信息
+                isNodeIdOrName = true;
             }
         }
 
@@ -203,24 +213,20 @@ public class SearchServiceImpl implements SearchService {
             }
         }
 
-        if(isNodePublicKeyOrName){
-            NodeDetailReq nodeDetailReq = new NodeDetailReq();
-            nodeDetailReq.setCid(chainId);
-            nodeDetailReq.setId(keyword);
-            try{
-                // 先根据节点ID查
-                NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq, false);
+        if(isNodeIdOrName){
+            // 查询节点
+            NodePageReq req = new NodePageReq();
+            req.setCid(chainId);
+            req.setKeyword(keyword);
+            req.setIsValid(1);
+            RespPage<NodeListItem> nodes = nodeService.list(req);
+            if(nodes.getData().size()>0){
                 result.setType("node");
-                result.setStruct(nodeDetail);
-                return result;
-            }catch (BusinessException be){
-                // 再根据节点名称查
-                NodeDetail nodeDetail = nodeService.getNodeDetail(nodeDetailReq, true);
-                result.setType("node");
-                result.setStruct(nodeDetail);
-                return result;
+                result.setStruct(nodes.getData().get(0));
             }
+            return result;
         }
+
 
         if(isNumber){
             // 如果查询关键字是纯数字，则查询区块信息返回

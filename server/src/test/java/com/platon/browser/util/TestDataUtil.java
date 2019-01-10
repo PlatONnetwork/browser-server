@@ -10,6 +10,7 @@ import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +21,14 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.http.HttpService;
 import rx.Subscription;
 
+import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class TestDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
-    public final static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:6788"));
+    public final static Web3j web3j = Web3j.build(new HttpService("http://10.10.8.209:6789"));
 
     public static String getForeignRandomIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;
@@ -75,8 +75,8 @@ public class TestDataUtil {
     }
 
 
-    public static Set<NodeRanking> generateNode(String chainId){
-        Set<NodeRanking> nodes = new HashSet<>();
+    public static List<NodeRanking> generateNode(String chainId){
+        List<NodeRanking> nodes = new ArrayList<>();
 
         for(int i=0;i<200;i++){
             NodeRanking node = new NodeRanking();
@@ -133,7 +133,7 @@ public class TestDataUtil {
         return nodes;
     }
 
-    public static Set<Block> generateBlock(String chainId){
+    public static List<Block> generateBlock(String chainId){
         Set<Block> data = new ConcurrentHashSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
@@ -142,31 +142,43 @@ public class TestDataUtil {
             if (block!=null){
                 Block bean = new Block();
                 BeanUtils.copyProperties(block,bean);
+
                 bean.setNumber(block.getNumber().longValue());
                 bean.setTimestamp(new Date(block.getTimestamp().longValue()));
                 bean.setChainId(chainId);
                 bean.setTransactionNumber(block.getTransactions().size());
                 bean.setBlockReward("0.265");
+
+                bean.setNonce(block.getNonce().toString());
+                bean.setSize(block.getSize().intValue());
+                bean.setEnergonUsed(block.getGasUsed().toString());
+                bean.setEnergonLimit(block.getGasLimit().toString());
+                bean.setEnergonAverage("0.2365");
+                bean.setActualTxCostSum("33434");
+                bean.setBlockCampaignAmount(3333l);
+                bean.setBlockVoteAmount(3333l);
+                bean.setBlockVoteNumber(432l);
+
                 data.add(bean);
             }
         });
 
-        while (true){
-            if(data.size()==100){
-                subscription.unsubscribe();
-                break;
-            }
+        try {
+            TimeUnit.SECONDS.sleep(2);
+            subscription.unsubscribe();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return data;
+        List<Block> blocks = new ArrayList<>(data);
+        return blocks;
     }
 
-
-    public static Set<Transaction> generateTransaction(String chainId) {
-        Set<Transaction> data = new ConcurrentHashSet<>();
+    public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId) {
+        Set<TransactionWithBLOBs> data = new ConcurrentHashSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
                 .subscribe(transaction -> {
-                    Transaction bean = new Transaction();
+                    TransactionWithBLOBs bean = new TransactionWithBLOBs();
                     BeanUtils.copyProperties(transaction,bean);
 
                     bean.setChainId(chainId);
@@ -176,15 +188,44 @@ public class TestDataUtil {
                     bean.setSequence(Long.valueOf(data.size()));
                     bean.setTimestamp(new Date(System.currentTimeMillis()));
                     bean.setActualTxCost("0.23566");
+                    try {
+                        EthBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
+                        bean.setBlockNumber(eblock.getBlock().getNumber().longValue());
+                        bean.setEnergonLimit(eblock.getBlock().getGasLimit().toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    bean.setEnergonUsed(transaction.getGas().toString());
+                    bean.setInput("33434");
+                    bean.setFailReason("4545433");
+                    bean.setTxType("transfer");
+                    bean.setEnergonPrice(transaction.getGasPrice().toString());
+                    bean.setNonce(transaction.getNonce().toString());
+                    bean.setTransactionIndex(transaction.getTransactionIndex().intValue());
+                    bean.setTxReceiptStatus(1);
+                    bean.setReceiveType("account");
+
                     data.add(bean);
                 });
 
-        while (true){
-            if(data.size()==15){
-                subscription.unsubscribe();
-                break;
-            }
+        try {
+            TimeUnit.SECONDS.sleep(2);
+            subscription.unsubscribe();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return data;
+        List<TransactionWithBLOBs> transactions = new ArrayList<>(data);
+        return transactions;
+    }
+
+    public static List<Transaction> generateTransaction(String chainId) {
+        List<TransactionWithBLOBs> data = generateTransactionWithBLOB(chainId);
+        List<Transaction> set = new ArrayList<>();
+        data.forEach(e->{
+            Transaction bean = new Transaction();
+            BeanUtils.copyProperties(e,bean);
+            set.add(bean);
+        });
+        return set;
     }
 }

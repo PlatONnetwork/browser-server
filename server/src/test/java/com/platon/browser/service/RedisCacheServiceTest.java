@@ -1,4 +1,4 @@
-package com.platon.browser.service.impl;
+package com.platon.browser.service;
 
 import com.platon.browser.ServerApplication;
 import com.platon.browser.dao.entity.Block;
@@ -9,7 +9,6 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.TestDataUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,14 +22,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=1")
-public class RedisCacheServiceImplTest {
+public class RedisCacheServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisCacheServiceImplTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisCacheServiceTest.class);
     @Autowired
     protected RedisCacheService redisCacheService;
     @Autowired
@@ -61,17 +61,17 @@ public class RedisCacheServiceImplTest {
     /*************节点****************/
     @Test
     public void updateNodeCache(){
-        Set<NodeRanking> nodes = TestDataUtil.generateNode(chainId);
-        redisCacheService.updateNodeCache(chainId,nodes);
+        Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+        redisCacheService.updateNodePushCache(chainId,nodes);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(nodeCacheKey,0,-1);
         Assert.assertEquals(nodes.size(),cache.size());
     }
 
     @Test
     public void getNodeCache(){
-        Set<NodeRanking> nodes = TestDataUtil.generateNode(chainId);
-        redisCacheService.updateNodeCache(chainId,nodes);
-        List<NodePushItem> nodeInfoList = redisCacheService.getNodeList(chainId);
+        Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+        redisCacheService.updateNodePushCache(chainId,nodes);
+        List<NodePushItem> nodeInfoList = redisCacheService.getNodePushData(chainId);
         Assert.assertEquals(nodes.size(),nodeInfoList.size());
     }
 
@@ -79,7 +79,7 @@ public class RedisCacheServiceImplTest {
     /*************区块****************/
     @Test
     public void updateBlockCache(){
-        Set<Block> data = TestDataUtil.generateBlock(chainId);
+        Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
         redisTemplate.delete(blockCacheKey);
         redisCacheService.updateBlockCache(chainId,data);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(blockCacheKey,0,-1);
@@ -88,7 +88,7 @@ public class RedisCacheServiceImplTest {
 
     @Test
     public void getBlockCache(){
-        Set<Block> data = TestDataUtil.generateBlock(chainId);
+        Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
         redisTemplate.delete(blockCacheKey);
         redisCacheService.updateBlockCache(chainId,data);
         RespPage<BlockListItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
@@ -106,7 +106,7 @@ public class RedisCacheServiceImplTest {
 
     @Test
     public void updateTransactionCache(){
-        Set<Transaction> data = TestDataUtil.generateTransaction(chainId);
+        Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
         redisTemplate.delete(transactionCacheKey);
         redisCacheService.updateTransactionCache(chainId,data);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(transactionCacheKey,0,-1);
@@ -115,7 +115,7 @@ public class RedisCacheServiceImplTest {
 
     @Test
     public void getTransactionCache(){
-        Set<Transaction> data = TestDataUtil.generateTransaction(chainId);
+        Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
         redisTemplate.delete(transactionCacheKey);
         redisCacheService.updateTransactionCache(chainId,data);
         RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
