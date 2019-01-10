@@ -9,7 +9,6 @@ import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.spring.MQSender;
-import com.platon.browser.common.util.TransactionType;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -221,9 +220,10 @@ public class BlockSynchronizeJob extends AbstractTaskJob {
                     transactionDto.setTo("0x");
                     transactionDto.setReceiveType("contract");
                 }
-                String type = TransactionType.geTransactionTyep(input);
-                transactionDto.setTxType(type);
+               // String type = TransactionType.geTransactionTyep(input);
+                //transactionDto.setTxType(type);
                 transactionDtolist.add(transactionDto);
+
             }
         }
         BlockDto newBlock = new BlockDto();

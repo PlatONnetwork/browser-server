@@ -7,7 +7,6 @@ import com.platon.browser.common.dto.agent.PendingTransactionDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.enums.MqMessageTypeEnum;
 import com.platon.browser.common.spring.MQSender;
-import com.platon.browser.common.util.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,8 +80,8 @@ public class PendingTxSynchronizeJob extends AbstractTaskJob{
                     pendingTransactionDto.setTimestamp(new Date().getTime());
                     pendingTransactionDto.setValue(valueConversion(transaction.getValue()));
                     pendingTransactionDto.setInput(transaction.getInput());
-                    String type = TransactionType.geTransactionTyep(!transaction.getInput().equals(null) ? transaction.getInput() : "0x");
-                    pendingTransactionDto.setTxType(type);
+         /*           String type = TransactionType.geTransactionTyep(!transaction.getInput().equals(null) ? transaction.getInput() : "0x");
+                    pendingTransactionDto.setTxType(type);*/
                     pendingTransactionDtoList.add(pendingTransactionDto);
                 }
                 mqSender.send(chainId, MqMessageTypeEnum.PENDING.name(), pendingTransactionDtoList);

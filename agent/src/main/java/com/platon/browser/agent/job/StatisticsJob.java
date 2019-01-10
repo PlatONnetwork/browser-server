@@ -55,7 +55,7 @@ public class StatisticsJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         try {
-            //get statistic number by redis
+            //get statistic number in redis
             String cacheKey = statisticNumber.replace("{}",chainId);
             Object numberObject = redisTemplate.opsForValue().get(cacheKey);
             long number = 0;
