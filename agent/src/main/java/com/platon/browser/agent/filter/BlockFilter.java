@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.TicketContract;
@@ -56,22 +55,20 @@ public class BlockFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    @Autowired
-    private RedisTemplate <String, String> redisTemplate;
 
-    public boolean BlockFilter ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
+    public Block BlockFilter ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
         log.debug("[into BlockFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildBlockStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        boolean res = build(ethBlock,transactionReceiptList,transactionsList);
-        return res;
+        Block block = build(ethBlock,transactionReceiptList,transactionsList);
+        return block;
     }
 
 
 
 
     @Transactional
-    public boolean build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) {
+    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) {
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
@@ -116,7 +113,7 @@ public class BlockFilter {
                 Set <Block> set = new HashSet <>();
                 set.add(block);
                 redisCacheService.updateBlockCache(chainId, set);
-                return true;
+                return block;
             }
             for (Transaction transaction : transactionsList) {
                 for (TransactionReceipt transactionReceipt : transactionReceiptList) {
@@ -150,7 +147,7 @@ public class BlockFilter {
             //insert struct<block> into redis
             redisCacheService.updateBlockCache(chainId, set);
         }
-        return true;
+        return block;
     }
 
     private String getBlockReward ( String number ) {

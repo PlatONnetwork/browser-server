@@ -21,7 +21,9 @@ public enum ErrorCodeEnum {
     BLOCKCHAIN_ERROR(6,"同步链信息异常"),
     TX_ERROR(7,"同步交易信息异常"),
     PENDINGTX_ERROR(8,"同步pending交易异常"),
-    PENDINGTX_REPEAT(9,"pengding交易更新异常");
+    PENDINGTX_REPEAT(9,"pengding交易更新异常"),
+    NODE_ERROR(10,"同步节点信息异常"),
+    STOMP_ERROR(11,"推送统计信息异常");
 
 
 	

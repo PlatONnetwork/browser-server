@@ -3,9 +3,11 @@ package com.platon.browser.agent.job;
 import com.alibaba.fastjson.JSON;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.platon.browser.common.enums.StatisticsEnum;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Statistics;
+import com.platon.browser.dao.entity.StatisticsExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StatisticsMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +40,8 @@ public class StatisticsJob extends AbstractTaskJob {
     @Autowired
     private BlockMapper blockMapper;
 
-    @Autowired
-    private NodeMapper nodeMapper;
+  /*  @Autowired
+    private NodeMapper nodeMapper;*/
 
     @Autowired
     private StatisticsMapper statisticsMapper;
@@ -66,13 +68,13 @@ public class StatisticsJob extends AbstractTaskJob {
             logger.debug("Redis number : [",number,"]");
             //get NodeList
             Map <String, Double> nodeRewardMap = new HashMap <>();
-            NodeExample nodeExample = new NodeExample();
+/*            NodeExample nodeExample = new NodeExample();
             nodeExample.createCriteria().andChainIdEqualTo(chainId);
             List <Node> nodeList = nodeMapper.selectByExample(nodeExample);
             //get node reward
             for (Node node : nodeList) {
                 nodeRewardMap.put(node.getAddress(), node.getRewardRatio());
-            }
+            }*/
             //build four type map statistic info (key(miner) -> value(typeValue))
             Map <String, String> blockCountMap = new HashMap <>();
             Map <String, String> blockRewardMap = new HashMap <>();

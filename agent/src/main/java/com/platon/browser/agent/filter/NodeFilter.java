@@ -15,11 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +43,16 @@ public class NodeFilter {
     @Autowired
     private StatisticsMapper statisticsMapper;
 
-    public boolean NodeFilter ( String nodeInfoList, long blockNumber , EthBlock ethBlock ) throws Exception{
+    public List<NodeRanking> NodeFilter ( String nodeInfoList, long blockNumber , EthBlock ethBlock ) throws Exception{
+        log.debug("[into NodeFilter !!!...]");
+        log.debug("[blockChain chainId is ]: " + chainId);
+        log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
+        List<NodeRanking> list = buid(nodeInfoList,blockNumber ,  ethBlock);
+        return list;
+    }
+
+    @Transactional
+    public List<NodeRanking> buid(String nodeInfoList, long blockNumber , EthBlock ethBlock)throws Exception{
         if (StringUtils.isNotBlank(nodeInfoList)) {
             //list is cadidate struct on PlatON
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
@@ -117,12 +128,14 @@ public class NodeFilter {
                 }
                 currentBlockOwner(updateList,publicKey);
                 nodeRankingMapper.batchInsert(updateList);
+                return updateList;
             }
             currentBlockOwner(nodeList,publicKey);
             nodeRankingMapper.batchInsert(nodeList);
+            return nodeList;
 
         }
-        return false;
+        return Collections.emptyList();
     }
 
     private CandidateDetailDto buildDetail ( String extra ) {

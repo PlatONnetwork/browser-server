@@ -1,35 +1,18 @@
 package com.platon.browser.agent.job;
 
-import com.alibaba.fastjson.JSON;
-import com.dangdang.ddframe.job.api.ShardingContext;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.NodeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.StopWatch;
-
-import java.net.InetAddress;
-import java.util.List;
-
 /**
  * User: dongqile
  * Date: 2018/12/7
  * Time: 13:54
  */
-public class DetectJob extends AbstractTaskJob {
+public class DetectJob {
 
-    private static Logger logger = LoggerFactory.getLogger(DetectJob.class);
+    /*private static Logger logger = LoggerFactory.getLogger(DetectJob.class);
 
 
     @Value("${chain.id}")
     private String chainId;
 
-    @Autowired
-    private NodeMapper nodeMapper;
 
     @Value("${platon.redis.node.cache.key}")
     private String nodeCacheKeyTemplate;
@@ -95,5 +78,5 @@ public class DetectJob extends AbstractTaskJob {
         } catch (Exception e) {
             logger.debug("update DB succ but update redis infomation fail!...");
         }
-    }
+    }*/
 }
