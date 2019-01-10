@@ -93,6 +93,53 @@ public class NodeController {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
+        req.setIsValid(1);
+        req.setPageSize(200);
+        RespPage<NodeListItem> returnData = nodeService.getPage(req);
+        return returnData;
+    }
+
+    /**
+     * @api {post} node/list a.历史节点列表
+     * @apiVersion 1.0.0
+     * @apiName list
+     * @apiGroup node
+     * @apiDescription 节点列表
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "cid":"", // 链ID (必填)
+     *      "keyword": "node-1"// 节点账户名称(可选)，用于节点列表的筛选
+     * }
+     *
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "data": [
+     *           {
+     *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 节点ID
+     *           "ranking": 1,// 排名
+     *           "logo":"", // 节点LOGO，具体形式待定
+     *           "name": "node-1",// 账户名称
+     *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
+     *           "countryCode":"CN", // 国家代码
+     *           "location": "中国广东深圳",// 地理位置
+     *           "deposit": "1.254555555", // 质押金，单位-ATP
+     *           "blockCount": 252125,// 产生的总区块数
+     *           "rewardRatio": 0.02,// 分红比例:小数
+     *           "address": "0xsfjl34jfljsl435kd", // 节点地址
+     *           }
+     *       ]
+     * }
+     */
+    @PostMapping("history")
+    public RespPage<NodeListItem> getHistory (@Valid @RequestBody NodePageReq req) {
+        if(!chainsConfig.isValid(req.getCid())){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
+        req.setIsValid(0);
         RespPage<NodeListItem> returnData = nodeService.getPage(req);
         return returnData;
     }

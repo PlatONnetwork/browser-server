@@ -28,6 +28,7 @@ public class NodeListItem {
     private Integer blockCount;
     private Double rewardRatio;
     private String address;
+    private Integer isValid;
     public void init(NodeRanking initData) throws UnknownLocationException {
         BeanUtils.copyProperties(initData,this);
         try {

@@ -81,23 +81,13 @@ public class NodeControllerTest {
         NodePageReq req = new NodePageReq();
         req.setCid(chainId);
         sendRequest("/node/list",req);
+    }
 
-        req.setIsValid(0);
-        sendRequest("/node/list",req);
-
-        req.setIsValid(1);
-        sendRequest("/node/list",req);
-
-        req.setNodeType(1);
-        sendRequest("/node/list",req);
-
-        req.setIsValid(null);
-        req.setIsValid(1);
-        sendRequest("/node/list",req);
-
-        req.setKeyword("aaa");
-        sendRequest("/node/list",req);
-
+    @Test
+    public void getHistory() throws Exception{
+        NodePageReq req = new NodePageReq();
+        req.setCid(chainId);
+        sendRequest("/node/history",req);
     }
 
     @Test
