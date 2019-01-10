@@ -5,13 +5,17 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -32,6 +36,14 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionMapper transactionMapper;
     @Autowired
     private I18nUtil i18n;
+    @Autowired
+    private RedisCacheService redisCacheService;
+
+    @Override
+    public RespPage<TransactionListItem> getPage(TransactionListReq req) {
+        RespPage<TransactionListItem> returnData = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        return returnData;
+    }
 
     @Override
     public List<TransactionListItem> getTransactionByBlockNumber(TransactionListReq req) {
@@ -54,7 +66,6 @@ public class TransactionServiceImpl implements TransactionService {
         });
         return transactionList;
     }
-
 
     private TransactionDetail loadDetail(TransactionDetailReq req){
         TransactionExample condition = new TransactionExample();
@@ -101,7 +112,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionDetail getTransactionDetail(TransactionDetailReq req) {
+    public TransactionDetail getDetail(TransactionDetailReq req) {
 
         // 取得当前交易详情
         TransactionDetail transactionDetail = loadDetail(req);
@@ -117,7 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return
      */
     @Override
-    public List<TransactionWithBLOBs> getTransactionList(AccountDetailReq req) {
+    public List<TransactionWithBLOBs> getList(AccountDetailReq req) {
         TransactionExample condition = new TransactionExample();
         TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andFromEqualTo(req.getAddress());

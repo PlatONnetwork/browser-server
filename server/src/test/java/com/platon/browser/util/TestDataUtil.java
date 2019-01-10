@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
-    public final static Web3j web3j = Web3j.build(new HttpService("http://10.10.8.209:6789"));
+    public final static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:6788"));
 
     public static String getForeignRandomIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;

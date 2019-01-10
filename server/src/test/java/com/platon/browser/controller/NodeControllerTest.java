@@ -6,12 +6,15 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.node.NodeListItem;
+import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
+import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.TestDataUtil;
+import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +37,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.Node;
 import java.util.List;
 
@@ -53,6 +57,8 @@ public class NodeControllerTest {
     private NodeService nodeService;
     @Autowired
     WebApplicationContext context;
+    @Autowired
+    HttpServletResponse response;
 
     protected String chainId = "1";
 
@@ -61,15 +67,37 @@ public class NodeControllerTest {
         mockMvc =MockMvcBuilders.webAppContextSetup(this.context).build();
     }
 
-    @Test
-    public void list() throws Exception{
-        NodePageReq data = new NodePageReq();
-        data.setCid(chainId);
-        mockMvc.perform(post("/node/list")
-                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(data))
-                .accept(MediaType.APPLICATION_JSON))
+    private void sendRequest(String url, Object req) throws Exception {
+        MockHttpServletRequestBuilder builder = post(url)
+                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(req))
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    public void list() throws Exception{
+        NodePageReq req = new NodePageReq();
+        req.setCid(chainId);
+        sendRequest("/node/list",req);
+
+        req.setIsValid(0);
+        sendRequest("/node/list",req);
+
+        req.setIsValid(1);
+        sendRequest("/node/list",req);
+
+        req.setNodeType(1);
+        sendRequest("/node/list",req);
+
+        req.setIsValid(null);
+        req.setIsValid(1);
+        sendRequest("/node/list",req);
+
+        req.setKeyword("aaa");
+        sendRequest("/node/list",req);
+
     }
 
     @Test
@@ -82,11 +110,7 @@ public class NodeControllerTest {
         NodeDetailReq req = new NodeDetailReq();
         req.setCid(chainId);
         req.setId(node.getId());
-        mockMvc.perform(post("/node/detail")
-                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(req))
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(print());
+        sendRequest("/node/detail",req);
     }
 
     @Test
@@ -96,13 +120,30 @@ public class NodeControllerTest {
             Assert.fail("No data in the database.");
             return;
         }
-
         BlockListReq req = new BlockListReq();
         req.setCid(chainId);
         req.setAddress(node.getAddress());
-        mockMvc.perform(post("/node/blockList")
-                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(req))
-                .accept(MediaType.APPLICATION_JSON))
+        sendRequest("/node/blockList",req);
+    }
+
+    @Test
+    public void blockDownload() throws Exception{
+        NodeListItem node = getOneNode();
+        if(node==null){
+            Assert.fail("No data in the database.");
+            return;
+        }
+
+        BlockDownloadReq req = new BlockDownloadReq();
+        req.setCid(chainId);
+        req.setAddress(node.getAddress());
+
+
+        mockMvc.perform(get("/node/blockDownload")
+                .param("cid",chainId)
+                .param("address",node.getAddress())
+                .param("date","2018-01-01")
+                )
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -112,7 +153,7 @@ public class NodeControllerTest {
         req.setCid(chainId);
         req.setPageNo(1);
         req.setPageSize(1);
-        RespPage<NodeListItem> nodes = nodeService.list(req);
+        RespPage<NodeListItem> nodes = nodeService.getPage(req);
         if(nodes.getData().size()>0){
             return nodes.getData().get(0);
         }else{

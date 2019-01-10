@@ -177,7 +177,7 @@ public class SearchServiceImpl implements SearchService {
             transactionDetailReq.setTxHash(keyword);
             try{
                 // 此处调用如果查询不到交易记录会抛出BusinessException异常
-                TransactionDetail transactionDetail = transactionService.getTransactionDetail(transactionDetailReq);
+                TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
                 result.setStruct(transactionDetail);
                 result.setType("transaction");
                 return result;
@@ -203,7 +203,7 @@ public class SearchServiceImpl implements SearchService {
                 pendingTxDetailReq.setCid(chainId);
                 pendingTxDetailReq.setTxHash(keyword);
                 try{
-                    PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(pendingTxDetailReq);
+                    PendingOrTransaction pendingOrTransaction = pendingTxService.getDetail(pendingTxDetailReq);
                     result.setType(pendingOrTransaction.getType());
                     result.setStruct(pendingOrTransaction.getPending());
                     return result;
@@ -219,7 +219,7 @@ public class SearchServiceImpl implements SearchService {
             req.setCid(chainId);
             req.setKeyword(keyword);
             req.setIsValid(1);
-            RespPage<NodeListItem> nodes = nodeService.list(req);
+            RespPage<NodeListItem> nodes = nodeService.getPage(req);
             if(nodes.getData().size()>0){
                 result.setType("node");
                 result.setStruct(nodes.getData().get(0));
@@ -234,7 +234,7 @@ public class SearchServiceImpl implements SearchService {
             req.setCid(chainId);
             req.setHeight(Long.valueOf(keyword));
             try{
-                BlockDetail blockDetail = blockService.getBlockDetail(req);
+                BlockDetail blockDetail = blockService.getDetail(req);
                 result.setStruct(blockDetail);
                 result.setType("block");
                 return result;

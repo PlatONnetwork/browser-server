@@ -89,13 +89,13 @@ public class NodeController {
      * }
      */
     @PostMapping("list")
-    public RespPage<NodeListItem> list (@Valid @RequestBody NodeListReq req) {
+    public RespPage<NodeListItem> getPage (@Valid @RequestBody NodeListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         NodePageReq pageReq = new NodePageReq();
         BeanUtils.copyProperties(req,pageReq);
-        RespPage<NodeListItem> returnData = nodeService.list(pageReq);
+        RespPage<NodeListItem> returnData = nodeService.getPage(pageReq);
         return returnData;
     }
 
@@ -143,12 +143,12 @@ public class NodeController {
      * }
      */
     @PostMapping("detail")
-    public BaseResp detail (@Valid @RequestBody NodeDetailReq req) {
+    public BaseResp getDetail (@Valid @RequestBody NodeDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            NodeDetail detail = nodeService.detail(req);
+            NodeDetail detail = nodeService.getDetail(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),detail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
@@ -195,7 +195,7 @@ public class NodeController {
         try{
             // 取20条最新记录
             PageHelper.startPage(1,20);
-            List<BlockListItem> blocks = nodeService.listBlock(req);
+            List<BlockListItem> blocks = nodeService.getBlockList(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());

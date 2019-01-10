@@ -9,9 +9,9 @@ import com.platon.browser.req.block.*;
 import java.util.List;
 
 public interface BlockService {
-    RespPage<BlockListItem> getBlockPage(BlockPageReq req);
-    BlockDetail getBlockDetail(BlockDetailReq req);
+    RespPage<BlockListItem> getPage(BlockPageReq req);
+    BlockDetail getDetail(BlockDetailReq req);
 
-    BlockDetail getBlockDetailNavigate(BlockDetailNavigateReq req);
-    List<Block> getBlockList(BlockDownloadReq req);
+    BlockDetail getDetailNavigate(BlockDetailNavigateReq req);
+    List<Block> getList(BlockDownloadReq req);
 }

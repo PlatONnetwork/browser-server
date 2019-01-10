@@ -83,7 +83,7 @@ public class NodeServiceTest {
         req.setKeyword("777");
        /* req.setIsValid(1);
         req.setNodeType(1);*/
-        RespPage<NodeListItem> data = nodeService.list(req);
+        RespPage<NodeListItem> data = nodeService.getPage(req);
         Assert.assertTrue(data.getData().size()>=0);
     }
 
@@ -92,7 +92,7 @@ public class NodeServiceTest {
         NodeDetailReq req = new NodeDetailReq();
         req.setCid(chainId);
         req.setId(60l);
-        NodeDetail data = nodeService.detail(req);
+        NodeDetail data = nodeService.getDetail(req);
         Assert.assertNotNull(data);
     }
 

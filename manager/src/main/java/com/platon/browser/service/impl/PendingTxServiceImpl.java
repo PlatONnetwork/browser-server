@@ -69,7 +69,7 @@ public class PendingTxServiceImpl implements PendingTxService {
     }
 
     @Override
-    public PendingOrTransaction getTransactionDetail(PendingTxDetailReq req) {
+    public PendingOrTransaction getDetail(PendingTxDetailReq req) {
         PendingOrTransaction pot = new PendingOrTransaction();
         // 先根据交易Hash查询交易表
         TransactionExample transactionExample = new TransactionExample();

@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface NodeService {
-    RespPage<NodeListItem> list(NodePageReq req);
-    NodeDetail detail(NodeDetailReq req);
+    RespPage<NodeListItem> getPage(NodePageReq req);
+    NodeDetail getDetail(NodeDetailReq req);
     void updatePushData(String chainId, Set<NodeRanking> data);
     List<NodePushItem> getPushData(String chainId);
 
-    List<BlockListItem> listBlock(BlockListReq req);
+    List<BlockListItem> getBlockList(BlockListReq req);
 }

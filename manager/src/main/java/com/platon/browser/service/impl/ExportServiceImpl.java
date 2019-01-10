@@ -119,7 +119,7 @@ public class ExportServiceImpl implements ExportService {
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
         // 限制最多导出6万条记录
         PageHelper.startPage(1,60000);
-        List<Block> blockList = blockService.getBlockList(req);
+        List<Block> blockList = blockService.getList(req);
 
         List<Object[]> rows = new ArrayList<>();
         blockList.forEach(block->{

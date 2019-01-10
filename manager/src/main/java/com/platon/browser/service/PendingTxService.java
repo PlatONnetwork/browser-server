@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface PendingTxService {
     List<PendingTxItem> getTransactionList(PendingTxListReq req);
-    PendingOrTransaction getTransactionDetail(PendingTxDetailReq req);
+    PendingOrTransaction getDetail(PendingTxDetailReq req);
     List<PendingTx> getTransactionList(AccountDetailReq req);
     PendingTxDetailNavigate getPendingTxDetailNavigate(PendingTxDetailNavigateReq req);
 }

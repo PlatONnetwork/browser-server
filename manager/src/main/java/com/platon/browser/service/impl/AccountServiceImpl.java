@@ -31,7 +31,7 @@ public class AccountServiceImpl implements AccountService {
     public List<AccTransactionItem> getTransactionList(AccountDetailReq req) {
         // 取已完成交易
         req.buildPage();
-        List<TransactionWithBLOBs> transactions = transactionService.getTransactionList(req);
+        List<TransactionWithBLOBs> transactions = transactionService.getList(req);
         long serverTime = System.currentTimeMillis();
         List<AccTransactionItem> accTransactionList = new ArrayList<>();
         transactions.forEach(transaction -> {

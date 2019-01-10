@@ -133,7 +133,7 @@ public class BlockController  {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            BlockDetail blockDetail = blockService.getBlockDetail(req);
+            BlockDetail blockDetail = blockService.getDetail(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
@@ -182,7 +182,7 @@ public class BlockController  {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            BlockDetail blockDetail = blockService.getBlockDetailNavigate(req);
+            BlockDetail blockDetail = blockService.getDetailNavigate(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blockDetail);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());

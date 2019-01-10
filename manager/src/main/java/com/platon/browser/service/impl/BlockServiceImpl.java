@@ -14,6 +14,7 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.*;
 import com.platon.browser.service.BlockService;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -39,8 +40,15 @@ public class BlockServiceImpl implements BlockService {
     @Autowired
     private I18nUtil i18n;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     @Override
-    public RespPage<BlockListItem> getBlockPage(BlockPageReq req) {
+    public RespPage<BlockListItem> getPage(BlockPageReq req) {
+        RespPage<BlockListItem> returnData = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        return returnData;
+
+        /*
         BlockPage page = new BlockPage();
         BeanUtils.copyProperties(req,page);
         int startPage = req.getPageNo()<=1?0:req.getPageNo()-1;
@@ -70,11 +78,11 @@ public class BlockServiceImpl implements BlockService {
         respPage.setTotalCount(count.intValue());
         respPage.setTotalPages(totalPages.intValue());
         respPage.setData(blockList);
-        return respPage;
+        return respPage;*/
     }
 
     @Override
-    public BlockDetail getBlockDetail(BlockDetailReq req) {
+    public BlockDetail getDetail(BlockDetailReq req) {
         BlockExample blockExample = new BlockExample();
         blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight());
         List<Block> blocks = blockMapper.selectByExample(blockExample);
@@ -132,7 +140,7 @@ public class BlockServiceImpl implements BlockService {
      * @return
      */
     @Override
-    public BlockDetail getBlockDetailNavigate(BlockDetailNavigateReq req) {
+    public BlockDetail getDetailNavigate(BlockDetailNavigateReq req) {
         BlockDetailReq detailReq = new BlockDetailReq();
         BeanUtils.copyProperties(req,detailReq);
         // 取得上一个或下一个块
@@ -144,12 +152,12 @@ public class BlockServiceImpl implements BlockService {
                 detailReq.setHeight(req.getHeight()+1);
                 break;
         }
-        BlockDetail blockDetail = getBlockDetail(detailReq);
+        BlockDetail blockDetail = getDetail(detailReq);
         return blockDetail;
     }
 
     @Override
-    public List<Block> getBlockList(BlockDownloadReq req) {
+    public List<Block> getList(BlockDownloadReq req) {
         BlockExample condition = new BlockExample();
         BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
         if(StringUtils.isNotBlank(req.getAddress())){

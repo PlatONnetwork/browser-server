@@ -53,7 +53,7 @@ public class NodeServiceImpl implements NodeService {
     private RedisCacheServiceImpl redisCacheService;
 
     @Override
-    public RespPage<NodeListItem> list(NodePageReq req) {
+    public RespPage<NodeListItem> getPage(NodePageReq req) {
         NodeRankingExample condition = new NodeRankingExample();
         NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
         if(StringUtils.isNotBlank(req.getKeyword())){
@@ -178,7 +178,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public NodeDetail detail(NodeDetailReq req) {
+    public NodeDetail getDetail(NodeDetailReq req) {
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria()
                 .andChainIdEqualTo(req.getCid())
@@ -239,10 +239,10 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<BlockListItem> listBlock(BlockListReq req) {
+    public List<BlockListItem> getBlockList(BlockListReq req) {
         BlockDownloadReq downloadReq = new BlockDownloadReq();
         BeanUtils.copyProperties(req,downloadReq);
-        List<Block> blocks = blockService.getBlockList(downloadReq);
+        List<Block> blocks = blockService.getList(downloadReq);
         List<BlockListItem> returnData = new LinkedList<>();
         blocks.forEach(initData -> {
             BlockListItem bean = new BlockListItem();

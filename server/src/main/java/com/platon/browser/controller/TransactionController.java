@@ -106,7 +106,7 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public RespPage<TransactionListItem> transactionList (@Valid @RequestBody TransactionListReq req) {
+    public RespPage<TransactionListItem> getPage (@Valid @RequestBody TransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
@@ -163,12 +163,12 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionDetails")
-    public BaseResp transactionDetails (@Valid @RequestBody TransactionDetailReq req) {
+    public BaseResp getDetail (@Valid @RequestBody TransactionDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            TransactionDetail transactionDetail = transactionService.getTransactionDetail(req);
+            TransactionDetail transactionDetail = transactionService.getDetail(req);
             setupConfirmNum(transactionDetail,req.getCid());
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetail);
         }catch (BusinessException be){
@@ -361,7 +361,7 @@ public class TransactionController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            PendingOrTransaction pendingOrTransaction = pendingTxService.getTransactionDetail(req);
+            PendingOrTransaction pendingOrTransaction = pendingTxService.getDetail(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),pendingOrTransaction);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
