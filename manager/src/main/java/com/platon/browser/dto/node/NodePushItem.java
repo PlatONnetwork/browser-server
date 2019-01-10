@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
  */
 @Data
 public class NodePushItem {
+    private String ip;
     private Float longitude;
     private Float latitude;
     private Integer nodeType;
@@ -44,7 +45,8 @@ public class NodePushItem {
             this.setLatitude(22.61667f);
         }
         this.setNodeType(1);
-        this.setNetState(initData.getIsValid());
+
+        this.setNetState(1);
     }
 
     public int hashCode() {

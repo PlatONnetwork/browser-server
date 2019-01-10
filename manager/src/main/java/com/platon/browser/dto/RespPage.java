@@ -11,11 +11,11 @@ public class RespPage<T> {
     //成功（0），失败则由相关失败码
     private int code = 0;
     //总数
-    private int totalCount;
+    private long totalCount;
     //显示总数
-    private int displayTotalCount;
+    private long displayTotalCount;
     //总页数
-    private int totalPages;
+    private long totalPages;
     // 响应数据
     private List<T> data;
 }

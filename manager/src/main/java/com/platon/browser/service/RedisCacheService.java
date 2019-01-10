@@ -21,7 +21,7 @@ public interface RedisCacheService {
     List<BlockPushItem> getBlockPushData(String chainId, int pageNum, int pageSize);
     RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize);
     List<TransactionPushItem> getTransactionPushData(String chainId, int pageNum, int pageSize);
-    List<NodePushItem> getNodeList(String chainId);
-    void updateNodeCache(String chainId, Set<NodeRanking> items);
+    List<NodePushItem> getNodePushData(String chainId);
+    void updateNodePushCache(String chainId, Set<NodeRanking> items);
     List<StatisticPushItem> getStatisticPushData(String chainId, int pageNum, int pageSize);
 }

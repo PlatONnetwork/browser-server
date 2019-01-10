@@ -16,6 +16,7 @@ import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.NodeType;
+import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -61,6 +62,9 @@ public class StompPushTask {
     @Autowired
     private TransactionMapper transactionMapper;
 
+    @Autowired
+    private NodeService nodeService;
+
     /**
      * 推送节点信息
      */
@@ -68,7 +72,7 @@ public class StompPushTask {
     public void pushNode(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
-            List<NodePushItem> nodeCache = redisCacheService.getNodeList(chainId);
+            List<NodePushItem> nodeCache = nodeService.getPushData(chainId);
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeCache);
             messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
         });
@@ -91,7 +95,7 @@ public class StompPushTask {
             }
 
             /*************设置共识节点数*************/
-            List<NodePushItem> nodes = redisCacheService.getNodeList(chainId);
+            List<NodePushItem> nodes = nodeService.getPushData(chainId);
             int consensusCount = 0;
             for (NodePushItem node:nodes){
                 switch (NodeType.getEnum(node.getNodeType())){
