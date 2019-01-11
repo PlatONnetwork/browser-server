@@ -28,8 +28,7 @@ public class TransactionAnalysis {
     public static AnalysisResult analysis ( String input , boolean onlyType) {
         AnalysisResult analysisResult = new AnalysisResult();
         if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
-            input.replace("0x", "");
-            RlpList rlpList = RlpDecoder.decode(Hex.decode(input));
+            RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
             List <RlpType> rlpTypes = rlpList.getValues();
             RlpList rlpList1 = (RlpList) rlpTypes.get(0);
             if(onlyType){
@@ -48,7 +47,7 @@ public class TransactionAnalysis {
                 switch (i) {
                     case 0:
                         Type transactionType = PlatOnTypeDecoder.decode(hexByte, Uint64.class);
-                        analysisResult.setType(transactionType.toString());
+                        analysisResult.setType(transactionType.getValue().toString());
                         break;
                     case 1:
                         Type functionName = PlatOnTypeDecoder.decode(hexByte, Utf8String.class);
@@ -113,9 +112,11 @@ public class TransactionAnalysis {
                     //提取质押
                     typeName = "candidateWithdraw";
                     break;
+                default:
+                    return typeName = "unknown";
             }
         }
-        return typeName = "unknown";
+        return typeName;
     }
 
 

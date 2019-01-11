@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -26,6 +27,7 @@ import java.util.List;
  * Date: 2019/1/9
  * Time: 17:08
  */
+@Component
 public class PendingFilter {
 
     private static Logger log = LoggerFactory.getLogger(PendingFilter.class);
@@ -40,7 +42,7 @@ public class PendingFilter {
     private Web3jClient web3jClient;
 
     public boolean PendingFilter (EthPendingTransactions ethPendingTransactions)throws  Exception {
-        Web3j web3j = Web3jClient.getWeb3jClient();
+        Web3j web3j = web3jClient.getWeb3jClient();
         List <Transaction> list = ethPendingTransactions.getTransactions();
         List <PendingTx> pendingTxes = new ArrayList <>();
         if (!list.equals(null) && list.size() > 0) {

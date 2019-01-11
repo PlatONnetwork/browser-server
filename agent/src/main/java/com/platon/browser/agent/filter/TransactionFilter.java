@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.agent.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.service.RedisCacheService;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -26,6 +28,7 @@ import java.util.*;
  * Date: 2019/1/7
  * Time: 14:28
  */
+@Component
 public class TransactionFilter {
 
     private static Logger log = LoggerFactory.getLogger(TransactionFilter.class);
@@ -33,7 +36,7 @@ public class TransactionFilter {
     @Value("${chain.id}")
     private String chainId;
 
-    @Value("${platon.redis.transaction.cache.key}")
+    @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
 
     @Autowired
@@ -45,20 +48,22 @@ public class TransactionFilter {
     public boolean TransactionFilter( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
-        Web3j web3j = Web3jClient.getWeb3jClient();
-        boolean res = build(transactionReceiptList,transactionsList,web3j, time);
+        boolean res = build(transactionReceiptList,transactionsList, time);
         return res;
     }
 
     @Transactional
-    public boolean build( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , Web3j web3j, long time)throws Exception{
+    public boolean build( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
+        Web3j web3j = Web3jClient.getWeb3jClient();
         //build database struct<Transaction>
         List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
         Set<com.platon.browser.dao.entity.Transaction> transactionSet = new HashSet <>();
         //for loop transaction & transactionReceipt build database struct on PlatON
+        List<String> txHashes = new ArrayList <>();
         for(Transaction transaction : transactionsList){
             for(TransactionReceipt transactionReceipt : transactionReceiptList){
                 if(transaction.getHash().equals(transactionReceipt.getTransactionHash())){
+                    txHashes.add(transaction.getHash());
                     com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
                     TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
                     transactionWithBLOBs.setHash(transaction.getHash());
@@ -103,7 +108,7 @@ public class TransactionFilter {
                     String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
                     transactionWithBLOBs.setTxType(type);
                     String txinfo = JSON.toJSONString(analysisResult);
-                    transactionWithBLOBs.setInput(txinfo);
+                    transactionWithBLOBs.setTxInfo(txinfo);
                     transactionWithBLOBsList.add(transactionWithBLOBs);
                     BeanUtils.copyProperties(transactionWithBLOBs,transactions);
                     transactionSet.add(transactions);
@@ -113,7 +118,12 @@ public class TransactionFilter {
         //insert list into database
         transactionMapper.batchInsert(transactionWithBLOBsList);
         //insert list into redis
-        redisCacheService.updateTransactionCache(chainId,transactionSet);
+        if(txHashes.size()>0){
+            TransactionExample condition = new TransactionExample();
+            condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHashes);
+            List<com.platon.browser.dao.entity.Transaction> transactionList = transactionMapper.selectByExample(condition);
+            redisCacheService.updateTransactionCache(chainId,new HashSet <>(transactionList));
+        }
         return true;
     }
 

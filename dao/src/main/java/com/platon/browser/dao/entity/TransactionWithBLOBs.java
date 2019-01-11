@@ -51,6 +51,7 @@ public class TransactionWithBLOBs extends Transaction {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         receiveType("receive_type", "receiveType", "VARCHAR", false),
+        txInfo("tx_info", "txInfo", "VARCHAR", false),
         sequence("sequence", "sequence", "BIGINT", true),
         input("input", "input", "LONGVARCHAR", true),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false);

@@ -44,7 +44,7 @@ public class NodePushItem {
             this.setLongitude(114.06667f);
             this.setLatitude(22.61667f);
         }
-        this.setNodeType(1);
+        this.setNodeType(initData.getType());
 
         this.setNetState(1);
     }

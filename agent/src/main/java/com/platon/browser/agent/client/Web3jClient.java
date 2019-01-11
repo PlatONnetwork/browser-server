@@ -52,7 +52,7 @@ public class Web3jClient {
                 String path = resource.getPath();
                 Credentials credentials = null;
                 credentials = WalletUtils.loadCredentials("88888888", path);
-                ticketContract = TicketContract.load("", "0x1000000000000000000000000000000000000002", web3j,
+                ticketContract = TicketContract.load(web3j,
                         credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,7 +72,7 @@ public class Web3jClient {
                 String path = resource.getPath();
                 Credentials credentials = null;
                 credentials = WalletUtils.loadCredentials("88888888", path);
-                candidateContract = candidateContract.load("", "0x1000000000000000000000000000000000000001", web3j,
+                candidateContract = candidateContract.load(web3j,
                         credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
             } catch (IOException e) {
                 e.printStackTrace();

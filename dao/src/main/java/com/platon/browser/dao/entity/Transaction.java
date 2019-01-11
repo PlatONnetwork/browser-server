@@ -43,6 +43,8 @@ public class Transaction {
 
     private String receiveType;
 
+    private String txInfo;
+
     private Long sequence;
 
     public String getHash() {
@@ -197,6 +199,14 @@ public class Transaction {
         this.receiveType = receiveType == null ? null : receiveType.trim();
     }
 
+    public String getTxInfo() {
+        return txInfo;
+    }
+
+    public void setTxInfo(String txInfo) {
+        this.txInfo = txInfo == null ? null : txInfo.trim();
+    }
+
     public Long getSequence() {
         return sequence;
     }
@@ -232,6 +242,7 @@ public class Transaction {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         receiveType("receive_type", "receiveType", "VARCHAR", false),
+        txInfo("tx_info", "txInfo", "VARCHAR", false),
         sequence("sequence", "sequence", "BIGINT", true),
         input("input", "input", "LONGVARCHAR", true),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false);

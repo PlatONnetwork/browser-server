@@ -1375,6 +1375,76 @@ public class TransactionExample {
             return (Criteria) this;
         }
 
+        public Criteria andTxInfoIsNull() {
+            addCriterion("tx_info is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoIsNotNull() {
+            addCriterion("tx_info is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoEqualTo(String value) {
+            addCriterion("tx_info =", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoNotEqualTo(String value) {
+            addCriterion("tx_info <>", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoGreaterThan(String value) {
+            addCriterion("tx_info >", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoGreaterThanOrEqualTo(String value) {
+            addCriterion("tx_info >=", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoLessThan(String value) {
+            addCriterion("tx_info <", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoLessThanOrEqualTo(String value) {
+            addCriterion("tx_info <=", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoLike(String value) {
+            addCriterion("tx_info like", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoNotLike(String value) {
+            addCriterion("tx_info not like", value, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoIn(List<String> values) {
+            addCriterion("tx_info in", values, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoNotIn(List<String> values) {
+            addCriterion("tx_info not in", values, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoBetween(String value1, String value2) {
+            addCriterion("tx_info between", value1, value2, "txInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTxInfoNotBetween(String value1, String value2) {
+            addCriterion("tx_info not between", value1, value2, "txInfo");
+            return (Criteria) this;
+        }
+
         public Criteria andSequenceIsNull() {
             addCriterion("`sequence` is null");
             return (Criteria) this;

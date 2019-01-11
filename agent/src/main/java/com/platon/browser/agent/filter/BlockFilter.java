@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.TicketContract;
@@ -21,6 +22,7 @@ import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.AsciiUtil;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -33,6 +35,7 @@ import java.util.Set;
  * Date: 2019/1/7
  * Time: 14:27
  */
+@Component
 public class BlockFilter {
 
     private static Logger log = LoggerFactory.getLogger(BlockFilter.class);
@@ -46,10 +49,10 @@ public class BlockFilter {
     @Value("${chain.id}")
     private String chainId;
 
-    @Value("${platon.redis.block.cache.key}")
+    @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
 
-    @Value("${platon.redis.cache.max_item_num}")
+    @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
 
     @Autowired
@@ -85,6 +88,7 @@ public class BlockFilter {
             if (ethBlock.getBlock().getTransactions().size() <= 0) {
                 block.setEnergonAverage(BigInteger.ZERO.toString());
             }
+            block.setHash(ethBlock.getBlock().getHash());
             block.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))).toString());
             block.setEnergonLimit(ethBlock.getBlock().getGasLimit().toString());
             block.setEnergonUsed(ethBlock.getBlock().getGasUsed().toString());
@@ -95,7 +99,8 @@ public class BlockFilter {
             block.setExtraData(ethBlock.getBlock().getExtraData());
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
-            block.setBlockReward(getBlockReward(ethBlock.getBlock().getNumber().toString()));
+            String rewardWei = getBlockReward(ethBlock.getBlock().getNumber().toString());
+            block.setBlockReward(valueConversion(new BigInteger(rewardWei)));
             //actuakTxCostSum
             BigInteger sum = new BigInteger("0");
             //blockVoteAmount
@@ -150,17 +155,17 @@ public class BlockFilter {
         return block;
     }
 
-    private String getBlockReward ( String number ) {
+    private static  String getBlockReward ( String number ) {
         //ATP trasnfrom ADP
         BigDecimal rate = BigDecimal.valueOf(10L).pow(18);
         BigDecimal height = new BigDecimal(number);
-        BigDecimal blockSumOnYear = BigDecimal.valueOf(24).multiply(BigDecimal.valueOf(3600)).multiply(BigDecimal.valueOf(356));
+        BigDecimal blockSumOnYear = BigDecimal.valueOf(24).multiply(BigDecimal.valueOf(3600)).multiply(BigDecimal.valueOf(365));
         BigDecimal definiteValue = new BigDecimal("1.025");
         BigDecimal base = BigDecimal.valueOf(100000000L);
         BigDecimal wheel = height.divide(blockSumOnYear, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
         if (wheel.intValue() == 0) {
             //one period block
-            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear);
+            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear,0, java.math.BigDecimal.ROUND_HALF_DOWN);
             return result.setScale(0).toString();
         }
         BigDecimal thisRound = base.multiply(rate).multiply(definiteValue.pow(wheel.intValue()));
@@ -171,17 +176,23 @@ public class BlockFilter {
 
 
 
+    public String valueConversion(BigInteger value){
+        BigDecimal valueDiec = new BigDecimal(value.toString());
+        BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
+        return  conversionCoin.toString();
+    }
 
-    public static void main ( String[] args ) {
+    public static  void main ( String[] args ) {
         BigInteger reward = BigInteger.ZERO;
-        BigDecimal hight = new BigDecimal("31536000");
+        BigDecimal hight = new BigDecimal("1");
+        String a = getBlockReward("0");
         BigDecimal y = BigDecimal.valueOf(24).multiply(BigDecimal.valueOf(3600)).multiply(BigDecimal.valueOf(356));
         BigDecimal wheel = hight.divide(y, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
 
 
         BigDecimal definiteValue = new BigDecimal("1.025");
-        BigDecimal a = definiteValue.pow(wheel.intValue());
-        BigDecimal res = BigDecimal.valueOf(1000000000l).multiply(a);
+        //BigDecimal a = definiteValue.pow(wheel.intValue());
+        //BigDecimal res = BigDecimal.valueOf(1000000000l).multiply(a);
         //System.out.println(res.setScale(0));
         BigDecimal ab = BigDecimal.valueOf(25000000L).divide(y, 5);
         BigDecimal abc = BigDecimal.valueOf(10L).pow(18);

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.Set;
  * Date: 2019/1/10
  * Time: 11:28
  */
+@Component
 public class StompPushFilter {
 
     private static Logger log = LoggerFactory.getLogger(StompPushFilter.class);

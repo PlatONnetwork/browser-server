@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * Date: 2018/10/30
  * Time: 18:28
  */
-@Component
+//@Component
 public class DBStorageService {
     /*private final Logger logger = LoggerFactory.getLogger(DBStorageService.class);
 

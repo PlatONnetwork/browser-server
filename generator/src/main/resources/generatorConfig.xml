@@ -48,10 +48,10 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-        <table tableName="block" domainObjectName="Block">
+<!--        <table tableName="block" domainObjectName="Block">
              <columnRenamingRule searchString="^D_"
                                  replaceString=""/>
-        </table>
+        </table>-->
 
 <!--          <table tableName="pending_tx" domainObjectName="PendingTx">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
@@ -78,19 +78,19 @@
 
 
 
-        <!--  <table tableName="transaction" domainObjectName="Transaction">
+ <!--       <table tableName="transaction" domainObjectName="Transaction">
               <columnRenamingRule searchString="^D_"
                                   replaceString=""/>
-          </table>
-
-          <table tableName="address_count" domainObjectName="AddressCount"
-                 enableUpdateByExample="false"
-                 enableDeleteByExample="false" enableInsert="false"
-                 enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
-                 enableUpdateByPrimaryKey="false" enableSelectByExample="false"
-                 selectByExampleQueryId="false">
-              &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                  replaceString=""/>&ndash;&gt;
           </table>-->
+
+        <!--  <table tableName="address_count" domainObjectName="AddressCount"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false" enableInsert="false"
+               enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
+               enableUpdateByPrimaryKey="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            &lt;!&ndash;<columnRenamingRule searchString="^D_"
+                                replaceString=""/>&ndash;&gt;
+        </table>-->
     </context>
 </generatorConfiguration>
