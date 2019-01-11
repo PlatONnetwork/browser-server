@@ -113,7 +113,7 @@ public class TestDataUtil {
             node.setCreateTime(new Date());
             node.setElectionStatus(1);
             node.setAddress("0x493301712671ada506ba6ca7891f436d2918582"+i);
-            node.setNodeId("0x493301712671ada506ba6ca7891f436d2918582"+i);
+            node.setNodeId("0x1f3a8672348ff6b789e416762ad53e69063138b8eb4d8780101658f24b2369f1a8e09499226b467d8bc0c4e03e1dc903df857eeb3c67733d21b6aaee2840e429");
             node.setUpdateTime(new Date());
             node.setOrgName("platon");
             node.setOrgWebsite("https://www.platon.network/");

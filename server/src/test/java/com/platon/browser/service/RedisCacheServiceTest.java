@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.ServerApplication;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
@@ -17,20 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=1")
-public class RedisCacheServiceTest {
-
+public class RedisCacheServiceTest extends ServiceTestBase {
     private static final Logger logger = LoggerFactory.getLogger(RedisCacheServiceTest.class);
+
     @Autowired
     protected RedisCacheService redisCacheService;
     @Autowired
@@ -38,87 +33,111 @@ public class RedisCacheServiceTest {
 
     @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
-    protected String blockCacheKey;
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
-    protected String transactionCacheKey;
     @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
-    protected String nodeCacheKey;
     @Value("${platon.redis.key.max-item}")
     protected long maxItemNum;
 
-    protected String chainId = "1";
+    public static class CacheKey {
+        public CacheKey(String blockKey,String transactionKey,String nodeKey){
+            this.blockKey = blockKey;
+            this.transactionKey = transactionKey;
+            this.nodeKey = nodeKey;
+        }
+        public String blockKey;
+        public String transactionKey;
+        public String nodeKey;
+    }
+
+    protected Map<String,CacheKey> chainIdToCacheKeyMap = new HashMap<>();
 
     @PostConstruct
     private void init(){
-        blockCacheKey=blockCacheKeyTemplate.replace("{}",chainId);
-        transactionCacheKey=transactionCacheKeyTemplate.replace("{}",chainId);
-        nodeCacheKey=nodeCacheKeyTemplate.replace("{}",chainId);
+        chainsConfig.getChainIds().forEach(chainId -> {
+            chainIdToCacheKeyMap.put(chainId,new CacheKey(
+                    blockCacheKeyTemplate.replace("{}",chainId),
+                    transactionCacheKeyTemplate.replace("{}",chainId),
+                    nodeCacheKeyTemplate.replace("{}",chainId)
+            ));
+        });
     }
-
 
     /*************节点****************/
     @Test
     public void updateNodeCache(){
-        Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
-        redisCacheService.updateNodePushCache(chainId,nodes);
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(nodeCacheKey,0,-1);
-        Assert.assertEquals(nodes.size(),cache.size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+            redisCacheService.updateNodePushCache(chainId,nodes);
+            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).nodeKey,0,-1);
+            Assert.assertEquals(nodes.size(),cache.size());
+        });
     }
 
     @Test
     public void getNodeCache(){
-        Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
-        redisCacheService.updateNodePushCache(chainId,nodes);
-        List<NodePushItem> nodeInfoList = redisCacheService.getNodePushData(chainId);
-        Assert.assertEquals(nodes.size(),nodeInfoList.size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+            redisCacheService.updateNodePushCache(chainId,nodes);
+            List<NodePushItem> nodeInfoList = redisCacheService.getNodePushData(chainId);
+            Assert.assertEquals(nodes.size(),nodeInfoList.size());
+        });
     }
 
 
     /*************区块****************/
     @Test
     public void updateBlockCache(){
-        Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
-        redisTemplate.delete(blockCacheKey);
-        redisCacheService.updateBlockCache(chainId,data);
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(blockCacheKey,0,-1);
-        Assert.assertEquals(data.size(),cache.size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
+            redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).blockKey);
+            redisCacheService.updateBlockCache(chainId,data);
+            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).blockKey,0,-1);
+            Assert.assertEquals(data.size(),cache.size());
+        });
     }
 
     @Test
     public void getBlockCache(){
-        Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
-        redisTemplate.delete(blockCacheKey);
-        redisCacheService.updateBlockCache(chainId,data);
-        RespPage<BlockListItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
-        Assert.assertEquals(data.size(),cache.getData().size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
+            redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).blockKey);
+            redisCacheService.updateBlockCache(chainId,data);
+            RespPage<BlockListItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
+            Assert.assertEquals(data.size(),cache.getData().size());
+        });
     }
 
     @Test
     public void getBlockPushData(){
-        List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
-        Assert.assertEquals(10,blocks.size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
+            Assert.assertEquals(10,blocks.size());
+        });
     }
 
 
     /***************交易****************/
-
     @Test
     public void updateTransactionCache(){
-        Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
-        redisTemplate.delete(transactionCacheKey);
-        redisCacheService.updateTransactionCache(chainId,data);
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(transactionCacheKey,0,-1);
-        Assert.assertEquals(data.size(),cache.size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
+            redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).transactionKey);
+            redisCacheService.updateTransactionCache(chainId,data);
+            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).transactionKey,0,-1);
+            Assert.assertEquals(data.size(),cache.size());
+        });
     }
 
     @Test
     public void getTransactionCache(){
-        Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
-        redisTemplate.delete(transactionCacheKey);
-        redisCacheService.updateTransactionCache(chainId,data);
-        RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
-        Assert.assertEquals(data.size(),cache.getData().size());
+        chainsConfig.getChainIds().forEach(chainId -> {
+            Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
+            redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).transactionKey);
+            redisCacheService.updateTransactionCache(chainId,data);
+            RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
+            Assert.assertEquals(data.size(),cache.getData().size());
+        });
     }
 }

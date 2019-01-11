@@ -1,0 +1,64 @@
+package com.platon.browser;
+
+import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.block.BlockListItem;
+import com.platon.browser.dto.node.NodeListItem;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.req.node.NodePageReq;
+import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.service.BlockService;
+import com.platon.browser.service.NodeService;
+import com.platon.browser.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
+public class TestBase {
+    @Autowired
+    protected ChainsConfig chainsConfig;
+    @Autowired
+    private NodeService nodeService;
+    @Autowired
+    private BlockService blockService;
+    @Autowired
+    private TransactionService transactionService;
+
+    protected NodeListItem getOneNode(String chainId){
+        NodePageReq req = new NodePageReq();
+        req.setCid(chainId);
+        req.setPageNo(1);
+        req.setPageSize(1);
+        RespPage<NodeListItem> nodes = nodeService.getPage(req);
+        if(nodes.getData().size()>0){
+            return nodes.getData().get(0);
+        }else{
+            return null;
+        }
+    }
+
+    protected BlockListItem getOneBlock(String chainId){
+        BlockPageReq req = new BlockPageReq();
+        req.setCid(chainId);
+        req.setPageSize(1);
+        req.setPageSize(1);
+        RespPage<BlockListItem> data = blockService.getPage(req);
+        if(data.getData().size()==0){
+            return null;
+        }
+        return data.getData().get(0);
+    }
+
+    protected TransactionListItem getOneTransaction(String chainId){
+        TransactionListReq req = new TransactionListReq();
+        req.setCid(chainId);
+        req.setPageSize(1);
+        req.setPageSize(1);
+        RespPage<TransactionListItem> data = transactionService.getPage(req);
+        if(data.getData().size()==0){
+            return null;
+        }
+        return data.getData().get(0);
+    }
+}

@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 @Data
 public class BlockListItem {
     private long height;
+    private String hash;
     private long timestamp;
     private long transaction;
     private Integer size;

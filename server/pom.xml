@@ -83,48 +83,12 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 	</dependencies>
-   	<profiles>
-        <profile>
-            <id>1</id>
-            <properties>
-                <package.environment>1</package.environment>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>2</id>
-            <properties>
-                <package.environment>2</package.environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>staging</id>
-            <properties>
-                <package.environment>staging</package.environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>production</id>
-            <properties>
-                <package.environment>production</package.environment>
-            </properties>
-        </profile>
-    </profiles>
 
 	<build>
 		<finalName>browser-server</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources/${package.environment}/</directory>
-			</resource>
-			<resource>
-				<directory>${project.basedir}/../lib</directory>
-				<targetPath>WEB-INF/lib/</targetPath>
-				<includes>
-					<include>**/*.jar</include>
-				</includes>
 			</resource>
 		</resources>
 		<plugins>
@@ -154,21 +118,6 @@
 						<!-- 打包本地jar包 -->
 					</compilerArguments>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-				  <webResources>
-					<resource>
-					  <directory>../lib</directory>
-					  <targetPath>WEB-INF/lib/</targetPath>
-					   <includes>
-						 <include>**/*.jar</include>
-					   </includes>
-					 </resource>
-				   </webResources>
-				 </configuration>
 			</plugin>
 		</plugins>
 	</build>

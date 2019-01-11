@@ -1,0 +1,42 @@
+# ***************************开发配置**************************** #
+#服务器配置
+server:
+  port: 8080
+#Spring应用配置
+spring:
+  redis:
+    cluster:
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+#数据源配置
+datasource:
+  url: jdbc:mysql://localhost:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  username: root
+  password: root
+#日志配置
+logging:
+  level:
+    org:
+      springframework:
+        boot: debug
+        web: debug
+        jdbc: debug
+        dao: debug
+        transaction: debug
+      mybatis: debug
+    com.platon.browser.dao: debug
+
+platon:
+  # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
+  chains: MAIN_NET:1
+  # 区块列表缓存和交易列表缓存配置
+  redis:
+    key:
+      node: browser:chain_{}:nodes-dev
+      block: browser:chain_{}:blocks-dev
+      transaction: browser:chain_{}:transactions-dev
+      maxtps: browser:chain_{}:maxtps-dev
+      max-item: 500000
+  # 图片服务器地址
+  image:
+    server:
+      url: http://192.168.9.86:8082/
