@@ -5,7 +5,7 @@ server:
 #Spring应用配置
 spring:
   profiles:
-    active: prod
+    active: test
   application:
     name: browser-server
   #国际化配置
