@@ -36,19 +36,23 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
     @Value("${platon.redis.key.node}")
+    private String pushNodeCacheKeyTemplate;
+    @Value("${platon.redis.key.push-node}")
     private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.max-item}")
     protected long maxItemNum;
 
     public static class CacheKey {
-        public CacheKey(String blockKey,String transactionKey,String nodeKey){
+        public CacheKey(String blockKey,String transactionKey,String nodeKey,String pushNodeKey){
             this.blockKey = blockKey;
             this.transactionKey = transactionKey;
             this.nodeKey = nodeKey;
+            this.pushNodeKey = pushNodeKey;
         }
         public String blockKey;
         public String transactionKey;
         public String nodeKey;
+        public String pushNodeKey;
     }
 
     protected Map<String,CacheKey> chainIdToCacheKeyMap = new HashMap<>();
@@ -59,24 +63,25 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             chainIdToCacheKeyMap.put(chainId,new CacheKey(
                     blockCacheKeyTemplate.replace("{}",chainId),
                     transactionCacheKeyTemplate.replace("{}",chainId),
-                    nodeCacheKeyTemplate.replace("{}",chainId)
+                    nodeCacheKeyTemplate.replace("{}",chainId),
+                    pushNodeCacheKeyTemplate.replace("{}",chainId)
             ));
         });
     }
 
     /*************节点****************/
     @Test
-    public void updateNodeCache(){
+    public void updateNodePushCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
             Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
             redisCacheService.updateNodePushCache(chainId,nodes);
-            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).nodeKey,0,-1);
+            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).pushNodeKey,0,-1);
             Assert.assertEquals(nodes.size(),cache.size());
         });
     }
 
     @Test
-    public void getNodeCache(){
+    public void getNodePushCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
             Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
             redisCacheService.updateNodePushCache(chainId,nodes);

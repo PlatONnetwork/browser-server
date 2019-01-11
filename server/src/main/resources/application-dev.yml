@@ -32,10 +32,11 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:dev:chain_{}:nodes-dev
-      block: browser:dev:chain_{}:blocks-dev
-      transaction: browser:dev:chain_{}:transactions-dev
-      maxtps: browser:dev:chain_{}:maxtps-dev
+      node: browser:dev:chain_{}:nodes
+      push-node: browser:dev:chain_{}:pushnodes
+      block: browser:dev:chain_{}:blocks
+      transaction: browser:dev:chain_{}:transactions
+      maxtps: browser:dev:chain_{}:maxtps
       max-item: 500000
   # 图片服务器地址
   image:

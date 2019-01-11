@@ -48,7 +48,7 @@ public class NodeFilterTest {
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(78302L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList().send();
-            nodeFilter.buid(nodeInfoList,ethBlock.getBlock().getNumber().longValue(),ethBlock);
+            //nodeFilter.buid(nodeInfoList,ethBlock.getBlock().getNumber().longValue(),ethBlock);
         }catch (Exception e) {
             e.printStackTrace();
         }

@@ -72,7 +72,7 @@ public class StompPushFilterTest {
                 list2.add(receipt);
             }
             Block block = blockFilter.build(ethBlock,list2,list1);
-            List<NodeRanking> list3 = nodeFilter.buid(nodeInfoList,block.getNumber(),ethBlock);
+            //List<NodeRanking> list3 = nodeFilter.buid(nodeInfoList,block.getNumber(),ethBlock);
 
         }catch (Exception e ){
             e.printStackTrace();

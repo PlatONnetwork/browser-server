@@ -12,8 +12,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URL;
+import java.io.*;
 
 /**
  * User: dongqile
@@ -40,6 +39,22 @@ public class Web3jClient {
         web3j = Web3j.build(new HttpService(nodeIp));
     }
 
+    private Credentials loadCredentials() throws IOException, CipherException {
+        InputStream in = Web3jClient.class.getClassLoader().getResource("platonbrowser.json").openStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        File file = new File(System.getProperty("user.dir")+"/tmp");
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+        String line;
+        while ((line = br.readLine())!=null){
+            bw.write(line);
+        }
+        bw.flush();
+        bw.close();
+        br.close();
+        Credentials credentials = WalletUtils.loadCredentials("88888888", file);
+        return credentials;
+    }
+
     public static Web3j getWeb3jClient () {
         return web3j;
     }
@@ -48,12 +63,7 @@ public class Web3jClient {
         Web3j web3j = Web3jClient.getWeb3jClient();
         if (ticketContract == null) {
             try {
-                URL resource = Web3jClient.class.getClassLoader().getResource("platonbrowser.json");
-                String path = resource.getPath();
-                Credentials credentials = null;
-                credentials = WalletUtils.loadCredentials("88888888", path);
-                ticketContract = TicketContract.load(web3j,
-                        credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+                ticketContract = TicketContract.load(web3j,loadCredentials(), DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (CipherException e) {
@@ -68,12 +78,7 @@ public class Web3jClient {
         Web3j web3j = Web3jClient.getWeb3jClient();
         if (candidateContract == null) {
             try {
-                URL resource = Web3jClient.class.getClassLoader().getResource("platonbrowser.json");
-                String path = resource.getPath();
-                Credentials credentials = null;
-                credentials = WalletUtils.loadCredentials("88888888", path);
-                candidateContract = candidateContract.load(web3j,
-                        credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+                candidateContract = candidateContract.load(web3j,loadCredentials(), DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (CipherException e) {

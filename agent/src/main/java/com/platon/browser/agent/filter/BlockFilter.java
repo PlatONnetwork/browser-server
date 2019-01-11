@@ -40,8 +40,7 @@ public class BlockFilter {
 
     private static Logger log = LoggerFactory.getLogger(BlockFilter.class);
 
-    @Autowired
-    private BlockMapper blockMapper;
+
 
     @Autowired
     private Web3jClient web3jClient;
@@ -54,6 +53,9 @@ public class BlockFilter {
 
     @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
+
+    @Autowired
+    private BlockMapper blockMapper;
 
     @Autowired
     private RedisCacheService redisCacheService;
