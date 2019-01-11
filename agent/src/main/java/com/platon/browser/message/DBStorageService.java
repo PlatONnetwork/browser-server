@@ -1,6 +1,4 @@
-package com.platon.browser.agent.message;
-
-import org.springframework.stereotype.Component;
+package com.platon.browser.message;
 
 /**
  * User: dongqile

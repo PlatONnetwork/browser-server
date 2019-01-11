@@ -1,9 +1,8 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.agent.SpringbootApplication;
-import com.platon.browser.agent.client.Web3jClient;
-import com.platon.browser.agent.filter.TransactionFilter;
-import lombok.AllArgsConstructor;
+import com.platon.browser.SpringbootApplication;
+import com.platon.browser.client.Web3jClient;
+import com.platon.browser.filter.TransactionFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

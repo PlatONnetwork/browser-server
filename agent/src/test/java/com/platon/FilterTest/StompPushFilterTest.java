@@ -1,13 +1,11 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.agent.SpringbootApplication;
-import com.platon.browser.agent.client.Web3jClient;
-import com.platon.browser.agent.filter.BlockFilter;
-import com.platon.browser.agent.filter.NodeFilter;
-import com.platon.browser.agent.filter.StompPushFilter;
-import com.platon.browser.common.dto.agent.StompPushDto;
+import com.platon.browser.SpringbootApplication;
+import com.platon.browser.client.Web3jClient;
+import com.platon.browser.filter.BlockFilter;
+import com.platon.browser.filter.NodeFilter;
+import com.platon.browser.filter.StompPushFilter;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

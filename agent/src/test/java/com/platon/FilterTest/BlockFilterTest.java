@@ -1,24 +1,21 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.agent.SpringbootApplication;
-import com.platon.browser.agent.client.Web3jClient;
-import com.platon.browser.agent.filter.BlockFilter;
+import com.platon.browser.SpringbootApplication;
+import com.platon.browser.client.Web3jClient;
+import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.dao.entity.Block;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
-import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

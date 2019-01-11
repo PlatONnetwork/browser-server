@@ -1,9 +1,8 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.agent.SpringbootApplication;
-import com.platon.browser.agent.client.Web3jClient;
-import com.platon.browser.agent.filter.PendingFilter;
-import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.SpringbootApplication;
+import com.platon.browser.client.Web3jClient;
+import com.platon.browser.filter.PendingFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

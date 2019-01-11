@@ -1,32 +1,25 @@
-package com.platon.browser.agent.filter;
+package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
-import com.platon.browser.common.enums.StatisticsEnum;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.entity.Statistics;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.dao.mapper.StatisticsMapper;
 import com.platon.browser.service.RedisCacheService;
-import jnr.ffi.annotations.In;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.util.*;
 
 /**

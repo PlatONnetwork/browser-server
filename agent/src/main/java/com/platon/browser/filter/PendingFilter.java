@@ -1,6 +1,6 @@
-package com.platon.browser.agent.filter;
+package com.platon.browser.filter;
 
-import com.platon.browser.agent.client.Web3jClient;
+import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.PendingTx;

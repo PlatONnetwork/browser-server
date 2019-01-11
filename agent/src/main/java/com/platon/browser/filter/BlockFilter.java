@@ -1,8 +1,8 @@
-package com.platon.browser.agent.filter;
+package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.platon.browser.agent.client.Web3jClient;
+import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
@@ -22,7 +22,6 @@ import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.AsciiUtil;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
