@@ -1,0 +1,50 @@
+# ***************************开发配置**************************** #
+#服务器配置
+server.port: 9090
+#Spring应用配置
+spring.redis.cluster.nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+#数据源配置
+datasource:
+  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  username: platon
+  password: platon
+#日志配置
+logging:
+  file: ./agent-test.log
+  level:
+    org:
+      springframework:
+        boot: debug
+        web: debug
+        jdbc: debug
+        dao: debug
+        transaction: debug
+      mybatis: debug
+    com.platon.browser.dao: debug
+#Elastic job日志存储位置
+log.eljob.path: ./logs
+
+platon:
+  # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
+  chains: MAIN_NET:1
+  # 区块列表缓存和交易列表缓存配置
+  redis:
+    key:
+      node: browser:dev:chain_{}:nodes
+      push-node: browser:dev:chain_{}:pushnodes
+      block: browser:dev:chain_{}:blocks
+      transaction: browser:dev:chain_{}:transactions
+      maxtps: browser:dev:chain_{}:maxtps
+      max-item: 500000
+      number: browser:dev:chain_{}:number
+      staticstics: browser:dev:chain_{}:staticstics
+  # 图片服务器地址
+  image.server.url: http://192.168.9.86:8082/
+
+#Web3j配置
+node.ip: http://192.168.9.76:7794
+chain.id: 1
+# Zookeeper注册中心配置
+regCenter:
+  serverList: 192.168.9.191:2181
+  namespace: browser_job_0.4.0

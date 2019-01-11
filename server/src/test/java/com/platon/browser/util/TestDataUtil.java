@@ -1,6 +1,5 @@
 package com.platon.browser.util;
 
-import com.github.fartherp.framework.common.extension.ConcurrentHashSet;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
@@ -134,7 +133,7 @@ public class TestDataUtil {
     }
 
     public static List<Block> generateBlock(String chainId){
-        Set<Block> data = new ConcurrentHashSet<>();
+        Set<Block> data = new HashSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
         .subscribe(eblock -> {
@@ -174,7 +173,7 @@ public class TestDataUtil {
     }
 
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId) {
-        Set<TransactionWithBLOBs> data = new ConcurrentHashSet<>();
+        Set<TransactionWithBLOBs> data = new HashSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
                 .subscribe(transaction -> {
