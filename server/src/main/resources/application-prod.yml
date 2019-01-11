@@ -1,17 +1,17 @@
 # ***************************生产配置**************************** #
 #服务器配置
 server:
-  port: 8080
+  port: 10001
 #Spring应用配置
 spring:
   redis:
     cluster:
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+      nodes: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
 #数据源配置
 datasource:
-  url: jdbc:mysql://localhost:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  url: jdbc:mysql://52.187.38.88:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: root
-  password: root
+  password: Juzhenyuan_123
 #日志配置
 logging:
   file: ./server-prod.log
@@ -32,10 +32,10 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:chain_{}:nodes-dev
-      block: browser:chain_{}:blocks-dev
-      transaction: browser:chain_{}:transactions-dev
-      maxtps: browser:chain_{}:maxtps-dev
+      node: browser:prod:chain_{}:nodes
+      block: browser:prod:chain_{}:blocks
+      transaction: browser:prod:chain_{}:transactions
+      maxtps: browser:prod:chain_{}:maxtps
       max-item: 500000
   # 图片服务器地址
   image:

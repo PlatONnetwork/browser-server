@@ -1,7 +1,7 @@
 # ***************************测试配置**************************** #
 #服务器配置
 server:
-  port: 8080
+  port: 10001
 #Spring应用配置
 spring:
   redis:
@@ -32,10 +32,10 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:chain_{}:nodes-dev
-      block: browser:chain_{}:blocks-dev
-      transaction: browser:chain_{}:transactions-dev
-      maxtps: browser:chain_{}:maxtps-dev
+      node: browser:test:chain_{}:nodes-dev
+      block: browser:test:chain_{}:blocks-dev
+      transaction: browser:test:chain_{}:transactions-dev
+      maxtps: browser:test:chain_{}:maxtps-dev
       max-item: 500000
   # 图片服务器地址
   image:
