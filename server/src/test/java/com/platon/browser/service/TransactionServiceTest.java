@@ -9,7 +9,5 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class TransactionServiceTest extends ServiceTestBase {
     private static final Logger logger = LoggerFactory.getLogger(TransactionServiceTest.class);
-    @Autowired
-    private TransactionService transactionService;
 
 }

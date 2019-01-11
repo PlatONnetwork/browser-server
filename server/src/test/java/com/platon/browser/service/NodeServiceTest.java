@@ -22,8 +22,6 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 public class NodeServiceTest extends ServiceTestBase {
     private static final Logger logger = LoggerFactory.getLogger(NodeServiceTest.class);
-    @Autowired
-    private NodeService nodeService;
 
     /*************节点****************/
     @Test
@@ -53,7 +51,7 @@ public class NodeServiceTest extends ServiceTestBase {
     @Test
     public void getPushData(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            List<NodePushItem> data = nodeService.getPushData(chainId);
+            List<NodePushItem> data = nodeService.getPushCache(chainId);
             Assert.assertTrue(data.size()>=0);
         });
     }
