@@ -13,39 +13,39 @@
     <reg:zookeeper id="regCenter" server-lists="${regCenter.serverList}" namespace="${regCenter.namespace}"
                    base-sleep-time-milliseconds="1000"
                    max-sleep-time-milliseconds="3000" max-retries="3"/>
-    <!--<job:simple id="blockSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.BlockSynchronizeJob"
+ <!--   <job:simple id="blockSynchronizeJob${netInfo}" class="com.platon.browser.job.BlockSynchronizeJob"
                 registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=blockSynchronizeJob"
                 overwrite="true"
                 failover="true" misfire="true" description="同步区块信息任务"/>
 
-    <job:simple id="pendingTxSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.PendingTxSynchronizeJob"
+    <job:simple id="pendingTxSynchronizeJob${netInfo}" class="com.platon.browser.job.PendingTxSynchronizeJob"
                 registry-center-ref="regCenter"
                 cron="*/15 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxSynchronizeJob"
                 overwrite="true"
                 failover="true" misfire="true" description="挂起交易信息任务"/>
 
 
-    <job:simple id="pendingTxUpdateTaskJob${netInfo}" class="com.platon.browser.agent.job.PendingTxUpdateTaskJob"
+    <job:simple id="pendingTxUpdateTaskJob${netInfo}" class="com.platon.browser.job.PendingTxUpdateTaskJob"
                 registry-center-ref="regCenter"
                 cron="*/30 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxUpdateTaskJob"
                 overwrite="true"
                 failover="true" misfire="true" description="挂起交易同步任务"/>
 
 
-    <job:simple id="nodeSynchronizeJob${netInfo}" class="com.platon.browser.agent.job.NodeSynchronizeJob"
+    <job:simple id="nodeSynchronizeJob${netInfo}" class="com.platon.browser.job.NodeSynchronizeJob"
                 registry-center-ref="regCenter"
                 cron="*/5 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=nodeSynchronizeJob$"
                 overwrite="true"
                 failover="true" misfire="true" description="节点统计"/>
 
-    <job:simple id="statisticsJob${netInfo}" class="com.platon.browser.agent.job.StatisticsJob"
+    <job:simple id="statisticsJob${netInfo}" class="com.platon.browser.job.StatisticsJob"
                 registry-center-ref="regCenter"
                 cron="0 0/5 * * * ?" sharding-total-count="1" sharding-item-parameters="0=statisticsJob"
                 overwrite="true"
                 failover="true" misfire="true" description="统计任务"/>
 
-    <job:simple id="detectJob${netInfo}" class="com.platon.browser.agent.job.DetectJob"
+    <job:simple id="detectJob${netInfo}" class="com.platon.browser.job.DetectJob"
                 registry-center-ref="regCenter"
                 cron="0 0/3 * * * ?" sharding-total-count="1" sharding-item-parameters="0=detectJob"
                 overwrite="true"

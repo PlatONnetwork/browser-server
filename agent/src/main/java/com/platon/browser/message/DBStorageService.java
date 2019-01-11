@@ -1,13 +1,11 @@
-package com.platon.browser.agent.message;
-
-import org.springframework.stereotype.Component;
+package com.platon.browser.message;
 
 /**
  * User: dongqile
  * Date: 2018/10/30
  * Time: 18:28
  */
-@Component
+//@Component
 public class DBStorageService {
     /*private final Logger logger = LoggerFactory.getLogger(DBStorageService.class);
 

@@ -1,4 +1,4 @@
-package com.platon.browser.agent.filter;
+package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -8,28 +8,26 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.dao.mapper.StatisticsMapper;
+import com.platon.browser.service.RedisCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigInteger;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: dongqile
  * Date: 2019/1/8
  * Time: 15:10
  */
+@Component
 public class NodeFilter {
 
     private static Logger log = LoggerFactory.getLogger(NodeFilter.class);
@@ -41,18 +39,18 @@ public class NodeFilter {
     private NodeRankingMapper nodeRankingMapper;
 
     @Autowired
-    private StatisticsMapper statisticsMapper;
+    private RedisCacheService redisCacheService;
 
-    public List<NodeRanking> NodeFilter ( String nodeInfoList, long blockNumber , EthBlock ethBlock ) throws Exception{
+    public List <NodeRanking> NodeFilter ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        List<NodeRanking> list = buid(nodeInfoList,blockNumber ,  ethBlock);
+        List <NodeRanking> list = buid(nodeInfoList, blockNumber, ethBlock, blockReward);
         return list;
     }
 
     @Transactional
-    public List<NodeRanking> buid(String nodeInfoList, long blockNumber , EthBlock ethBlock)throws Exception{
+    public List <NodeRanking> buid ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
         if (StringUtils.isNotBlank(nodeInfoList)) {
             //list is cadidate struct on PlatON
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
@@ -72,8 +70,13 @@ public class NodeFilter {
                 nodeRanking.setUpdateTime(new Date());
                 nodeRanking.setCreateTime(new Date());
                 CandidateDetailDto candidateDetailDto = null;
+                //todo:测试兼容
                 if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
-                    candidateDetailDto = buildDetail(candidateDto.getExtra());
+                    if (isNo16(candidateDto.getExtra())) {
+                        candidateDetailDto = buildDetail(candidateDto.getExtra());
+                    } else {
+                        candidateDetailDto = JSONObject.parseObject(candidateDto.getExtra(), CandidateDetailDto.class);
+                    }
                 }
                 nodeRanking.setName(candidateDetailDto.getNodeName());
                 nodeRanking.setDeposit(candidateDto.getDeposit().toString());
@@ -81,6 +84,7 @@ public class NodeFilter {
                 nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
                 nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
                 nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
+                nodeRanking.setBlockReward(blockReward);
                 nodeRanking.setRewardRatio((double) candidateDto.getFee() / 10000);
                 nodeRanking.setUrl(candidateDetailDto.getNodePortrait() != null ? candidateDetailDto.getNodePortrait() : "test");
                 nodeRanking.setRanking(i);
@@ -101,7 +105,7 @@ public class NodeFilter {
                 nodeList.add(nodeRanking);
             }
             //calulate this block publickey
-            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock,BigInteger.valueOf(blockNumber));
+            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock, BigInteger.valueOf(blockNumber));
 
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
@@ -126,25 +130,25 @@ public class NodeFilter {
                         //更新列表
                     }
                 }
-                currentBlockOwner(updateList,publicKey);
+                currentBlockOwner(updateList, publicKey);
+                dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
                 nodeRankingMapper.batchInsert(updateList);
+                Set <NodeRanking> nodes = new HashSet <>(updateList);
+                redisCacheService.updateNodePushCache(chainId, nodes);
                 return updateList;
             }
-            currentBlockOwner(nodeList,publicKey);
+            currentBlockOwner(nodeList, publicKey);
+            dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
             nodeRankingMapper.batchInsert(nodeList);
+            Set <NodeRanking> nodes = new HashSet <>(nodeList);
+            redisCacheService.updateNodePushCache(chainId, nodes);
             return nodeList;
 
         }
         return Collections.emptyList();
     }
 
-    private CandidateDetailDto buildDetail ( String extra ) {
-        String data = hexStringToString(extra.substring(2, extra.length()));
-        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(data, CandidateDetailDto.class);
-        return candidateDetailDto;
-    }
-
-    public static String hexStringToString ( String s ) {
+    public static String hexStringToString ( String s ) throws Exception {
         if (s == null || s.equals("")) {
             return null;
         }
@@ -167,37 +171,53 @@ public class NodeFilter {
         return s;
     }
 
-    private int ping ( String ip ) {
-        InetAddress address = null;
-        int timeOut = 2000;
-        try {
-            address = InetAddress.getByName(ip);
-            if (address.isReachable(timeOut)) {
-                //success
-                return 1;
-            } else {
-                //fail
-                return 2;
-            }
-        } catch (Exception e) {
-            log.error("Link node exception!...", e.getMessage());
-            return 2;
+    private CandidateDetailDto buildDetail ( String extra ) throws Exception {
+        String data = hexStringToString(extra.substring(2, extra.length()));
+        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(data, CandidateDetailDto.class);
+        return candidateDetailDto;
+    }
+
+    private boolean isNo16 ( String a ) throws Exception {
+        String regex = "^[A-Fa-f0-9]+$";
+        if (a.matches(regex)) {
+            System.out.println(a.toUpperCase() + "是16进制数");
+            return true;
+        } else {
+            System.out.println(a.toUpperCase() + "不是16进制数");
+            return false;
         }
     }
 
+
     //Increase the number of blocks according to the ownership
-    private List <NodeRanking> currentBlockOwner(List <NodeRanking> list, BigInteger publicKey){
-        for(NodeRanking nodeRanking : list){
-            if(publicKey.equals(new BigInteger(nodeRanking.getNodeId()))){
+    private List <NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
+        for (NodeRanking nodeRanking : list) {
+            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId()))) {
                 long count = nodeRanking.getBlockCount();
-                count = count +1;
+                count = count + 1;
                 nodeRanking.setBlockCount(count);
+                nodeRanking.getRewardRatio();
+
             }
         }
         return list;
     }
 
-
+    private List <NodeRanking> dateStatistics( List <NodeRanking> list, BigInteger publicKey, String blockReward ) throws Exception {
+        for (NodeRanking nodeRanking : list) {
+            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId()))) {
+                BigInteger sum = new BigInteger(nodeRanking.getBlockReward());
+                BigInteger reward = new BigInteger(blockReward);
+                sum = sum.add(reward);
+                nodeRanking.setBlockReward(sum.toString());
+                BigInteger rate = new BigInteger(String.valueOf( 1 - nodeRanking.getRewardRatio()));
+                nodeRanking.setRewardRatio(sum.multiply(rate).doubleValue());
+                BigInteger fee = new BigInteger(String.valueOf(nodeRanking.getRewardRatio()));
+                nodeRanking.setProfitAmount(sum.multiply(fee).toString());
+            }
+        }
+        return list;
+    }
 
 
 }

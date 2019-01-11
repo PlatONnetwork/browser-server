@@ -1,4 +1,4 @@
-package com.platon.browser.agent.client;
+package com.platon.browser.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

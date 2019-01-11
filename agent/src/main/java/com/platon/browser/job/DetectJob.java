@@ -1,4 +1,4 @@
-package com.platon.browser.agent.job;
+package com.platon.browser.job;
 
 /**
  * User: dongqile

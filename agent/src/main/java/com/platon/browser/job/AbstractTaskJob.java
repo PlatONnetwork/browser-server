@@ -1,4 +1,4 @@
-package com.platon.browser.agent.job;
+package com.platon.browser.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;

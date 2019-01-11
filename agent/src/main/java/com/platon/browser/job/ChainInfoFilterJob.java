@@ -1,8 +1,8 @@
-package com.platon.browser.agent.job;
+package com.platon.browser.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.agent.client.Web3jClient;
+import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.dao.entity.Block;
