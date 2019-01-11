@@ -33,6 +33,7 @@ public class TransactionListItem {
         BigDecimal txCost = new BigDecimal(initData.getActualTxCost());
         txCost=Convert.fromWei(txCost, Convert.Unit.ETHER);
         this.setActualTxCost(String.valueOf(txCost));
+        this.setServerTime(System.currentTimeMillis());
     }
 
     @JsonIgnore

@@ -7,7 +7,7 @@ import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.node.NodePageReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.TransactionService;
@@ -51,7 +51,7 @@ public class TestBase {
     }
 
     protected TransactionListItem getOneTransaction(String chainId){
-        TransactionListReq req = new TransactionListReq();
+        TransactionPageReq req = new TransactionPageReq();
         req.setCid(chainId);
         req.setPageSize(1);
         req.setPageSize(1);

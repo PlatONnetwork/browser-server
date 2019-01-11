@@ -120,8 +120,13 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<NodePushItem> getPushData(String chainId) {
-        List<NodePushItem> returnData = redisCacheService.getNodePushData(chainId);
+    public void clearPushCache(String chainId) {
+        redisCacheService.clearNodePushCache(chainId);
+    }
+
+    @Override
+    public List<NodePushItem> getPushCache(String chainId) {
+        List<NodePushItem> returnData = redisCacheService.getNodePushCache(chainId);
         return returnData;
     }
 

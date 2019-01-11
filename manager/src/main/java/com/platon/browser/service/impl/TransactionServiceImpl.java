@@ -1,20 +1,21 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.I18nEnum;
@@ -26,7 +27,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -40,31 +43,29 @@ public class TransactionServiceImpl implements TransactionService {
     private RedisCacheService redisCacheService;
 
     @Override
-    public RespPage<TransactionListItem> getPage(TransactionListReq req) {
+    public RespPage<TransactionListItem> getPage(TransactionPageReq req) {
         RespPage<TransactionListItem> returnData = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return returnData;
     }
 
     @Override
-    public List<TransactionListItem> getTransactionByBlockNumber(TransactionListReq req) {
+    public RespPage<TransactionListItem> getPageByBlockNumber(TransactionPageReq req) {
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andBlockNumberEqualTo(req.getHeight());
         condition.setOrderByClause("sequence desc");
-        List<Transaction> transactions = transactionMapper.selectByExample(condition);
 
-        long serverTime = System.currentTimeMillis();
-        List<TransactionListItem> transactionList = new ArrayList<>();
-        transactions.forEach(transaction -> {
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        List<Transaction> transactions = transactionMapper.selectByExample(condition);
+        List<TransactionListItem> data = new ArrayList<>();
+        transactions.forEach(initData -> {
             TransactionListItem bean = new TransactionListItem();
-            BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setBlockHeight(transaction.getBlockNumber());
-            bean.setServerTime(serverTime);
-            bean.setBlockTime(transaction.getTimestamp().getTime());
-            transactionList.add(bean);
+            bean.init(initData);
+            data.add(bean);
         });
-        return transactionList;
+        RespPage<TransactionListItem> returnData = new RespPage<>();
+        returnData.init(page,data);
+        return returnData;
     }
 
     private TransactionDetail loadDetail(TransactionDetailReq req){
@@ -203,4 +204,15 @@ public class TransactionServiceImpl implements TransactionService {
 
         return transactionDetail;
     }
+
+    @Override
+    public void clearCache(String chainId) {
+        redisCacheService.clearTransactionCache(chainId);
+    }
+
+    @Override
+    public void updateCache(String chainId,Set<Transaction> data) {
+        redisCacheService.updateTransactionCache(chainId,data);
+    }
+
 }

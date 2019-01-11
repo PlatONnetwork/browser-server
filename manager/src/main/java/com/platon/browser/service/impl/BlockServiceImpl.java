@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class BlockServiceImpl implements BlockService {
@@ -173,5 +174,16 @@ public class BlockServiceImpl implements BlockService {
         List<Block> blocks = blockMapper.selectByExample(condition);
         return blocks;
     }
+
+    @Override
+    public void clearCache(String chainId) {
+        redisCacheService.clearBlockCache(chainId);
+    }
+
+    @Override
+    public void updateCache(String chainId,Set<Block> data) {
+        redisCacheService.updateBlockCache(chainId,data);
+    }
+
 
 }

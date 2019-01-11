@@ -92,7 +92,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<NodePushItem> nodeInfoList = nodeService.getPushData (chainId);
+        List<NodePushItem> nodeInfoList = nodeService.getPushCache(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
         return resp;
     }
@@ -272,7 +272,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
+        List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         return resp;
     }
@@ -331,7 +331,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<TransactionPushItem> transactions = redisCacheService.getTransactionPushData(chainId,1,10);
+        List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
         return resp;
     }

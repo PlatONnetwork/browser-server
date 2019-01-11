@@ -18,7 +18,7 @@ public interface NodeService {
     RespPage<NodeListItem> getPage(NodePageReq req);
     NodeDetail getDetail(NodeDetailReq req);
     void updatePushData(String chainId, Set<NodeRanking> data);
-    List<NodePushItem> getPushData(String chainId);
-
+    void clearPushCache(String chainId);
+    List<NodePushItem> getPushCache(String chainId);
     List<BlockListItem> getBlockList(BlockListReq req);
 }

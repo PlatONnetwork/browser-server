@@ -66,6 +66,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return true;
     }
 
+    @Override
+    public void clearNodePushCache(String chainId) {
+        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+    }
+
     private static class CachePageInfo<T>{
         Set<String> data;
         RespPage<T> page;
@@ -133,6 +139,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
     }
 
+    @Override
+    public void clearBlockCache(String chainId) {
+        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+    }
+
     /**
      * 更新区块缓存
      * @param chainId
@@ -142,6 +154,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(!validateParam(chainId,items))return;
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         updateCache(cacheKey,items);
+    }
+
+    @Override
+    public void clearTransactionCache(String chainId) {
+        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
     }
 
     /**
@@ -196,7 +214,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @return
      */
     @Override
-    public List<BlockPushItem> getBlockPushData(String chainId, int pageNum, int pageSize){
+    public List<BlockPushItem> getBlockPushCache(String chainId, int pageNum, int pageSize){
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
         List<BlockPushItem> returnData = new LinkedList<>();
@@ -217,7 +235,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @return
      */
     @Override
-    public List<StatisticPushItem> getStatisticPushData(String chainId, int pageNum, int pageSize){
+    public List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize){
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
         List<StatisticPushItem> returnData = new LinkedList<>();
@@ -274,7 +292,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @return
      */
     @Override
-    public List<TransactionPushItem> getTransactionPushData(String chainId, int pageNum, int pageSize){
+    public List<TransactionPushItem> getTransactionPushCache(String chainId, int pageNum, int pageSize){
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
         Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
         List<TransactionPushItem> returnData = new LinkedList<>();
@@ -304,7 +322,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     @Override
-    public List<NodePushItem> getNodePushData(String chainId) {
+    public List<NodePushItem> getNodePushCache(String chainId) {
         List<NodePushItem> returnData = new LinkedList<>();
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);

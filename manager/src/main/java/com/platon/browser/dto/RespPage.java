@@ -1,5 +1,6 @@
 package com.platon.browser.dto;
 
+import com.github.pagehelper.Page;
 import lombok.Data;
 
 import java.util.List;
@@ -18,4 +19,11 @@ public class RespPage<T> {
     private long totalPages;
     // 响应数据
     private List<T> data;
+
+    public void init(Page page, List<T> data){
+        this.setTotalCount(page.getTotal());
+        this.setTotalPages(page.getPages());
+        this.setDisplayTotalCount(page.getTotal());
+        this.setData(data);
+    }
 }

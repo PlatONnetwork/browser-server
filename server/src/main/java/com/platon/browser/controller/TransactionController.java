@@ -5,6 +5,7 @@ import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.TransactionPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;
@@ -106,7 +107,7 @@ public class TransactionController {
      * }
      */
     @PostMapping("transactionList")
-    public RespPage<TransactionListItem> getPage (@Valid @RequestBody TransactionListReq req) {
+    public RespPage<TransactionListItem> getPage (@Valid @RequestBody TransactionPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
@@ -295,13 +296,12 @@ public class TransactionController {
      * }
      */
     @PostMapping("pendingList")
-    public JsonResp pendingList (@Valid @RequestBody PendingTxListReq req) {
+    public RespPage<PendingTxItem> pendingList (@Valid @RequestBody PendingTxPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        req.buildPage();
-        List<PendingTxItem> pendingTxList = pendingTxService.getTransactionList(req);
-        return JsonResp.asList().addAll(pendingTxList).pagination(req).build();
+        RespPage<PendingTxItem> returnData = pendingTxService.getTransactionList(req);
+        return returnData;
     }
 
 
@@ -683,14 +683,13 @@ public class TransactionController {
      * }
      */
     @PostMapping("blockTransaction")
-    public JsonResp blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
+    public RespPage<TransactionListItem> blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        TransactionListReq tlr = new TransactionListReq();
+        TransactionPageReq tlr = new TransactionPageReq();
         BeanUtils.copyProperties(req,tlr);
-        tlr.buildPage();
-        List<TransactionListItem> transactions = transactionService.getTransactionByBlockNumber(tlr);
-        return JsonResp.asList().addAll(transactions).pagination(tlr).build();
+        RespPage<TransactionListItem> returnData = transactionService.getPageByBlockNumber(tlr);
+        return returnData;
     }
 }

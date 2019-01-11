@@ -15,13 +15,16 @@ import java.util.List;
 import java.util.Set;
 
 public interface RedisCacheService {
+    void clearBlockCache(String chainId);
     void updateBlockCache(String chainId, Set<Block> items);
+    void clearTransactionCache(String chainId);
     void updateTransactionCache(String chainId, Set<Transaction> items);
     RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize);
-    List<BlockPushItem> getBlockPushData(String chainId, int pageNum, int pageSize);
+    List<BlockPushItem> getBlockPushCache(String chainId, int pageNum, int pageSize);
     RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize);
-    List<TransactionPushItem> getTransactionPushData(String chainId, int pageNum, int pageSize);
-    List<NodePushItem> getNodePushData(String chainId);
+    List<TransactionPushItem> getTransactionPushCache(String chainId, int pageNum, int pageSize);
+    void clearNodePushCache(String chainId);
+    List<NodePushItem> getNodePushCache(String chainId);
     void updateNodePushCache(String chainId, Set<NodeRanking> items);
-    List<StatisticPushItem> getStatisticPushData(String chainId, int pageNum, int pageSize);
+    List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
 }

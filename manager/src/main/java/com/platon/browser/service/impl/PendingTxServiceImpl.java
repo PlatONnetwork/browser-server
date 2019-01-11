@@ -1,5 +1,7 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.PendingTx;
@@ -7,6 +9,7 @@ import com.platon.browser.dao.entity.PendingTxExample;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.PendingTxDetail;
 import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
@@ -15,7 +18,7 @@ import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
-import com.platon.browser.req.transaction.PendingTxListReq;
+import com.platon.browser.req.transaction.PendingTxPageReq;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -42,7 +45,7 @@ public class PendingTxServiceImpl implements PendingTxService {
     private I18nUtil i18n;
 
     @Override
-    public List<PendingTxItem> getTransactionList(PendingTxListReq req) {
+    public RespPage<PendingTxItem> getTransactionList(PendingTxPageReq req) {
         PendingTxExample condition = new PendingTxExample();
         condition.setOrderByClause("timestamp desc");
         if(StringUtils.isBlank(req.getAddress())){
@@ -53,19 +56,18 @@ public class PendingTxServiceImpl implements PendingTxService {
             PendingTxExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress());
             condition.or(criteria);
         }
-
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
-        List<PendingTxItem> pendingTxList = new ArrayList<>();
-        long serverTime = System.currentTimeMillis();
-        pendingTxes.forEach(transaction -> {
+        List<PendingTxItem> data = new ArrayList<>();
+        pendingTxes.forEach(initData -> {
             PendingTxItem bean = new PendingTxItem();
-            BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setTimestamp(transaction.getTimestamp().getTime());
-            bean.setServerTime(serverTime);
-            pendingTxList.add(bean);
+            bean.init(initData);
+            data.add(bean);
         });
-        return pendingTxList;
+
+        RespPage<PendingTxItem> returnData = new RespPage<>();
+        returnData.init(page,data);
+        return returnData;
     }
 
     @Override

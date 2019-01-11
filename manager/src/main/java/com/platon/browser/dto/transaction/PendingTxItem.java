@@ -1,6 +1,8 @@
 package com.platon.browser.dto.transaction;
 
+import com.platon.browser.dao.entity.PendingTx;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
 public class PendingTxItem {
@@ -14,4 +16,11 @@ public class PendingTxItem {
     private String txType;
     private long serverTime;
     private String receiveType;
+
+    public void init(PendingTx initData){
+        BeanUtils.copyProperties(initData,this);
+        this.setTxHash(initData.getHash());
+        this.setTimestamp(initData.getTimestamp().getTime());
+        this.setServerTime(System.currentTimeMillis());
+    }
 }

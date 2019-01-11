@@ -6,6 +6,7 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.util.TestDataUtil;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
@@ -57,6 +58,12 @@ public class ServiceTestBase extends TestBase {
             con.createCriteria().andChainIdEqualTo(chainId);
             transactionMapper.deleteByExample(con);
             List<TransactionWithBLOBs> data = TestDataUtil.generateTransactionWithBLOB(chainId);
+
+            if(data.size()==0){
+                Assert.fail("No transaction data!");
+                return;
+            }
+
             transactionMapper.batchInsert(data);
 
             transactionService.clearCache(chainId);

@@ -72,7 +72,7 @@ public class StompPushTask {
     public void pushNode(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
-            List<NodePushItem> nodeCache = nodeService.getPushData(chainId);
+            List<NodePushItem> nodeCache = nodeService.getPushCache(chainId);
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeCache);
             messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
         });
@@ -95,7 +95,7 @@ public class StompPushTask {
             }
 
             /*************设置共识节点数*************/
-            List<NodePushItem> nodes = nodeService.getPushData(chainId);
+            List<NodePushItem> nodes = nodeService.getPushCache(chainId);
             int consensusCount = 0;
             for (NodePushItem node:nodes){
                 switch (NodeType.getEnum(node.getNodeType())){
@@ -199,7 +199,7 @@ public class StompPushTask {
             statistic.setDayTransaction(dayTransactionCount);
 
             /************** 组装图表数据 ************/
-            List<StatisticPushItem> items = redisCacheService.getStatisticPushData(chainId,1,50);
+            List<StatisticPushItem> items = redisCacheService.getStatisticPushCache(chainId,1,50);
             StatisticGraphData graphData = new StatisticGraphData();
             for (int i=0;i<items.size();i++){
                 StatisticPushItem item = items.get(i);
@@ -223,12 +223,12 @@ public class StompPushTask {
     public void pushBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 全量推送区块信息
-            List<BlockPushItem> blocks = redisCacheService.getBlockPushData(chainId,1,10);
+            List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
             BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
 
             // 全量推送交易信息
-            List<TransactionPushItem> transactions = redisCacheService.getTransactionPushData(chainId,1,10);
+            List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
             BaseResp transactionResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
             messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, transactionResp);
         });

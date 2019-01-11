@@ -24,6 +24,8 @@ public class SearchServiceTest extends ServiceTestBase {
     public void searchNode(){
         // 搜索节点
         chainsConfig.getChainIds().forEach(chainId -> {
+            initNodeRankingTable();
+
             SearchReq req = new SearchReq();
             req.setCid(chainId);
             NodeListItem node = getOneNode(chainId);
@@ -37,6 +39,8 @@ public class SearchServiceTest extends ServiceTestBase {
     @Test
     public void searchBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
+            initBlockTable();
+
             SearchReq req = new SearchReq();
             req.setCid(chainId);
 
@@ -54,6 +58,8 @@ public class SearchServiceTest extends ServiceTestBase {
     @Test
     public void searchTransaction(){
         chainsConfig.getChainIds().forEach(chainId -> {
+            initTransactionTable();
+
             SearchReq req = new SearchReq();
             req.setCid(chainId);
 

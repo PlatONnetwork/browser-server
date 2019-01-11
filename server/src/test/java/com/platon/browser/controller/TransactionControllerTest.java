@@ -1,9 +1,10 @@
 package com.platon.browser.controller;
 
+import com.platon.browser.dao.entity.TransactionPage;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.transaction.TransactionListReq;
+import com.platon.browser.req.transaction.TransactionPageReq;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ public class TransactionControllerTest extends ControllerTestBase {
     public void getPage() {
         chainsConfig.getChainIds().forEach(chainId->{
             try {
-                TransactionListReq req = new TransactionListReq();
+                TransactionPageReq req = new TransactionPageReq();
                 req.setCid(chainId);
                 sendPost("/transaction/transactionList",req);
 
