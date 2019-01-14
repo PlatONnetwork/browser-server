@@ -1,23 +1,16 @@
 # ***************************通用配置**************************** #
 #服务器配置
-server:
-  context-path: /browser-server
+server.context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles:
-    active: test
-  application:
-    name: browser-server
+  profiles.active: test
+  application.name: browser-server
   #国际化配置
-  messages:
-      basename: messages
+  messages.basename: messages
   #Redis集群配置
   redis:
     database: 0
-    cluster:
-      max-redirects: 3
+    cluster.max-redirects: 3
 #数据源配置
-datasource:
-  driverClassName: com.mysql.jdbc.Driver
-jdbc:
-  validationQuery: SELECT 1
+datasource.driverClassName: com.mysql.jdbc.Driver
+jdbc.validationQuery: SELECT 1
