@@ -9,6 +9,7 @@ import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.util.GeoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -70,24 +72,37 @@ public class NodeFilter {
                 nodeRanking.setUpdateTime(new Date());
                 nodeRanking.setCreateTime(new Date());
                 CandidateDetailDto candidateDetailDto = null;
-                //todo:测试兼容
-                if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
-                    if (isNo16(candidateDto.getExtra())) {
-                        candidateDetailDto = buildDetail(candidateDto.getExtra());
-                    } else {
+                try{
+                    if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
                         candidateDetailDto = JSONObject.parseObject(candidateDto.getExtra(), CandidateDetailDto.class);
+                        nodeRanking.setName(candidateDetailDto.getNodeName());
+                        nodeRanking.setIntro(candidateDetailDto.getNodeDiscription());
+                        nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
+                        nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
+                        nodeRanking.setUrl(candidateDetailDto.getNodePortrait() != null ? candidateDetailDto.getNodePortrait() : "test");
                     }
+                }catch (Exception e){
+                    nodeRanking.setName("");
+                    nodeRanking.setIntro("");
+                    nodeRanking.setOrgName("");
+                    nodeRanking.setOrgWebsite("");
+                    nodeRanking.setUrl("");
+                    log.error("Extra Date error: " + candidateDto.getExtra() + ",NodeId : " +  nodeRanking.getNodeId() );
                 }
-                nodeRanking.setName(candidateDetailDto.getNodeName());
+                nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
                 nodeRanking.setDeposit(candidateDto.getDeposit().toString());
-                nodeRanking.setIntro(candidateDetailDto.getNodeDiscription());
-                nodeRanking.setJoinTime(new Date(candidateDetailDto.getTime()));
-                nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
-                nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
                 nodeRanking.setBlockReward(blockReward);
-                nodeRanking.setRewardRatio((double) candidateDto.getFee() / 10000);
-                nodeRanking.setUrl(candidateDetailDto.getNodePortrait() != null ? candidateDetailDto.getNodePortrait() : "test");
+                nodeRanking.setRewardRatio(BigDecimal.valueOf(candidateDto.getFee()).divide(BigDecimal.valueOf(10000),4,BigDecimal.ROUND_FLOOR).doubleValue());
+
                 nodeRanking.setRanking(i);
+                nodeRanking.setBlockCount(1L);
+                BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
+                nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
+                nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
+
+                GeoUtil.IpLocation ipLocation = GeoUtil.getIpLocation(nodeRanking.getIp());
+                BeanUtils.copyProperties(ipLocation,nodeRanking);
+
                 i = i++;
                 nodeRanking.setType(1);
                 // Set the node election status according to the ranking
@@ -118,6 +133,7 @@ public class NodeFilter {
                             BeanUtils.copyProperties(chainData, nodeRanking);
                             nodeRanking.setId(dbData.getId());
                             nodeRanking.setBeginNumber(dbData.getBeginNumber());
+                            nodeRanking.setJoinTime(dbData.getJoinTime());
                             updateList.add(nodeRanking);
                         }
                         NodeRanking nodeRanking = new NodeRanking();
@@ -142,57 +158,17 @@ public class NodeFilter {
             nodeRankingMapper.batchInsert(nodeList);
             Set <NodeRanking> nodes = new HashSet <>(nodeList);
             redisCacheService.updateNodePushCache(chainId, nodes);
+
             return nodeList;
 
         }
         return Collections.emptyList();
     }
 
-    public static String hexStringToString ( String s ) throws Exception {
-        if (s == null || s.equals("")) {
-            return null;
-        }
-        s = s.replace(" ", "");
-        byte[] baKeyword = new byte[s.length() / 2];
-        for (int i = 0; i < baKeyword.length; i++) {
-            try {
-                baKeyword[i] = (byte) (0xff & Integer.parseInt(
-                        s.substring(i * 2, i * 2 + 2), 16));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            s = new String(baKeyword, "UTF-8");
-            new String();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return s;
-    }
-
-    private CandidateDetailDto buildDetail ( String extra ) throws Exception {
-        String data = hexStringToString(extra.substring(2, extra.length()));
-        CandidateDetailDto candidateDetailDto = JSONObject.parseObject(data, CandidateDetailDto.class);
-        return candidateDetailDto;
-    }
-
-    private boolean isNo16 ( String a ) throws Exception {
-        String regex = "^[A-Fa-f0-9]+$";
-        if (a.matches(regex)) {
-            System.out.println(a.toUpperCase() + "是16进制数");
-            return true;
-        } else {
-            System.out.println(a.toUpperCase() + "不是16进制数");
-            return false;
-        }
-    }
-
-
     //Increase the number of blocks according to the ownership
     private List <NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
         for (NodeRanking nodeRanking : list) {
-            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId()))) {
+            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x",""), 16))) {
                 long count = nodeRanking.getBlockCount();
                 count = count + 1;
                 nodeRanking.setBlockCount(count);
@@ -205,14 +181,14 @@ public class NodeFilter {
 
     private List <NodeRanking> dateStatistics( List <NodeRanking> list, BigInteger publicKey, String blockReward ) throws Exception {
         for (NodeRanking nodeRanking : list) {
-            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId()))) {
-                BigInteger sum = new BigInteger(nodeRanking.getBlockReward());
-                BigInteger reward = new BigInteger(blockReward);
+            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x",""), 16))) {
+                BigDecimal sum = new BigDecimal(nodeRanking.getBlockReward());
+                BigDecimal reward = new BigDecimal(blockReward);
                 sum = sum.add(reward);
                 nodeRanking.setBlockReward(sum.toString());
-                BigInteger rate = new BigInteger(String.valueOf( 1 - nodeRanking.getRewardRatio()));
+                BigDecimal rate = new BigDecimal(String.valueOf( 1 - nodeRanking.getRewardRatio()));
                 nodeRanking.setRewardRatio(sum.multiply(rate).doubleValue());
-                BigInteger fee = new BigInteger(String.valueOf(nodeRanking.getRewardRatio()));
+                BigDecimal fee = new BigDecimal(String.valueOf(nodeRanking.getRewardRatio()));
                 nodeRanking.setProfitAmount(sum.multiply(fee).toString());
             }
         }

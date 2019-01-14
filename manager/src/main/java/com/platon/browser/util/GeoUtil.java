@@ -3,61 +3,28 @@ package com.platon.browser.util;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
-import com.maxmind.geoip2.record.Subdivision;
-import com.platon.browser.exception.UnknownLocationException;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 
 public class GeoUtil {
-    private final static Logger logger = LoggerFactory.getLogger(GeoUtil.class);
-
-    @Data
-    public static class IpLocation {
-        private String ip;
-        private String countryCode;
-        private String location;
-        private String longitude;
-        private String latitude;
-    }
-
-    public static IpLocation getIpLocation(String ip){
-        IpLocation il = new IpLocation();
-        il.setIp(ip);
-        try{
-            CityResponse response = GeoUtil.getResponse(ip);
-            if(response!=null){
-                Location location = response.getLocation();
-                if(location!=null){
-                    il.setLatitude(String.valueOf(location.getLatitude()));
-                    il.setLongitude(String.valueOf(location.getLongitude()));
-                }
-                Country country = response.getCountry();
-                if(country!=null){
-                    il.setCountryCode(country.getIsoCode());
-                    il.setLocation(country.getName());
-                }
-
-                City city = response.getCity();
-                if(city!=null){
-                    if(StringUtils.isNotBlank(city.getName())){
-                        il.setLocation(il.getLocation()+" "+city.getName());
-                    }
-                }
+    private final static Logger logger = Logger.getLogger(GeoUtil.class);
+    /*public static Location getLocation(String ip){
+        Location location=null;
+        if(ipCheck(ip)){
+            try {
+                String path = LookupService.class.getClassLoader().getResource("GeoLiteCity.dat").getPath();
+                LookupService service = new LookupService(path, LookupService.GEOIP_MEMORY_CACHE);
+                location = service.getLocation(ip);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }catch (Exception ex){
-            logger.error("Cant't resolve ip location: {}", ip);
         }
-        return il;
-    }
+        return location;
+    }*/
 
     public static CityResponse getResponse(String ip){
         CityResponse response=null;
