@@ -10,7 +10,7 @@ datasource:
   password: platon
 #日志配置
 logging:
-  file: ./agent-dev-1.log
+  file: ./browser-agent-dev-1.log
   level:
     org:
       springframework:

@@ -10,7 +10,7 @@ datasource:
   password: root
 #日志配置
 logging:
-  file: ./server-dev.log
+  file: ./browser-server-dev.log
   level:
     org:
       springframework:

@@ -10,7 +10,7 @@ datasource:
   password: platon
 #日志配置
 logging:
-  file: ./server-test.log
+  file: ./browser-server-test.log
   level:
     org:
       springframework:
