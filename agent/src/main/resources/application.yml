@@ -1,24 +1,17 @@
 # ***************************通用配置**************************** #
 #服务器配置
-server:
-  context-path: /browser-agent
+server.context-path: /browser-agent
 #Spring应用配置
 spring:
-  profiles:
-    active: dev-1
-  application:
-    name: browser-agent
+  profiles.active: dev-1
+  application.name: browser-agent
   #Redis集群配置
   redis:
     database: 0
-    cluster:
-      max-redirects: 3
+    cluster.max-redirects: 3
 #数据源配置
-datasource:
-  driverClassName: com.mysql.jdbc.Driver
-jdbc:
-  validationQuery: SELECT 1
+datasource.driverClassName: com.mysql.jdbc.Driver
+jdbc.validationQuery: SELECT 1
 #Web3j配置
 node.type: eth
-
 netInfo: v0.4.0
