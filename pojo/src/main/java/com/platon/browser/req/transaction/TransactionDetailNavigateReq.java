@@ -1,7 +1,7 @@
 package com.platon.browser.req.transaction;
 
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Pattern;
 

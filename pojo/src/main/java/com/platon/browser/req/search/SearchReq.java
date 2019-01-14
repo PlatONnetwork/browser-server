@@ -1,7 +1,7 @@
 package com.platon.browser.req.search;
 
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 public class SearchReq {
