@@ -39,6 +39,4 @@ platon:
       maxtps: browser:dev:chain_{}:maxtps
       max-item: 500000
   # 图片服务器地址
-  image:
-    server:
-      url: http://192.168.9.86:8082/
+  image.server.url: http://192.168.9.86:8082/
