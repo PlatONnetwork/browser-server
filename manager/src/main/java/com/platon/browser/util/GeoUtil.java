@@ -6,8 +6,6 @@ import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
-import com.maxmind.geoip2.record.Subdivision;
-import com.platon.browser.exception.UnknownLocationException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,6 +30,7 @@ public class GeoUtil {
     public static IpLocation getIpLocation(String ip){
         IpLocation il = new IpLocation();
         il.setIp(ip);
+
         try{
             CityResponse response = GeoUtil.getResponse(ip);
             if(response!=null){
@@ -54,8 +53,15 @@ public class GeoUtil {
                 }
             }
         }catch (Exception ex){
+            // ip不合法，直接返回默认数据
+            il.setCountryCode("0");
+            il.setLocation("");
+            il.setLocation("");
+            il.setLatitude("0");
+            il.setLongitude("0");
             logger.error("Cant't resolve ip location: {}", ip);
         }
+
         return il;
     }
 
@@ -89,4 +95,5 @@ public class GeoUtil {
         logger.error("IP地址不合法！");
         throw new RuntimeException("IP地址不合法！");
     }
+
 }

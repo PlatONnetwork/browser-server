@@ -34,5 +34,7 @@ platon:
       transaction: browser:prod:chain{}:transactions
       maxtps: browser:prod:chain{}:maxtps
       max-item: 500000
+      number: browser:0.4.0:prod:chain{}:number
+      staticstics: browser:0.4.0:prod:chain{}:staticstics
   # 图片服务器地址
   image.server.url: http://192.168.9.86:8082/
