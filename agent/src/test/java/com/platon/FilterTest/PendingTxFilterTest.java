@@ -35,7 +35,7 @@ public class PendingTxFilterTest {
         try {
             Web3j web3j = web3jClient.getWeb3jClient();
             EthPendingTransactions ethPendingTransactions = web3j.ethPendingTx().send();
-            pendingFilter.PendingFilter(ethPendingTransactions);
+            pendingFilter.pendingTxAnalysis(ethPendingTransactions);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -54,7 +54,7 @@ public class StompPushFilter {
     @Autowired
     private RedisTemplate<String, String> redisTemplate2;
 
-    public boolean StompPushFliter( Block block ,List<NodeRanking> nodeRankings){
+    public boolean stompPush( Block block ,List<NodeRanking> nodeRankings){
         StompPushDto stompPushDto = new StompPushDto();
         String stompDtoCacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         Object stompDto = redisTemplate.opsForValue().get(stompDtoCacheKey);

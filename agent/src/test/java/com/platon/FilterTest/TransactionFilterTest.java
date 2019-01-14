@@ -56,7 +56,7 @@ public class TransactionFilterTest {
                 list2.add(receipt);
             }
             long time = ethBlock.getBlock().getTimestamp().longValue();
-            boolean res = transactionFilter.TransactionFilter(list2,list1,time);
+            boolean res = transactionFilter.transactionAnalysis(list2,list1,time);
         }catch (Exception e){
             e.printStackTrace();
         }
