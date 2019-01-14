@@ -99,7 +99,7 @@ public class BlockFilter {
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
             String rewardWei = getBlockReward(ethBlock.getBlock().getNumber().toString());
-            block.setBlockReward(valueConversion(new BigInteger(rewardWei)));
+            block.setBlockReward(rewardWei);
             //actuakTxCostSum
             BigInteger sum = new BigInteger("0");
             //blockVoteAmount
@@ -180,5 +180,6 @@ public class BlockFilter {
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
         return conversionCoin.toString();
     }
+
 
 }

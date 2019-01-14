@@ -70,7 +70,7 @@ public class NodeFilterTest {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.blockAnalysis(ethBlock,list2,list1);
+          Block block = blockFilter.blockAnalysis(ethBlock,list2,list1);
             nodeFilter.build(nodeInfoList,ethBlock.getBlock().getNumber().longValue(),ethBlock,block.getBlockReward());
         }catch (Exception e) {
             e.printStackTrace();
