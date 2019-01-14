@@ -1,15 +1,11 @@
 package com.platon.browser.util;
 
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
-import com.maxmind.geoip2.record.Subdivision;
 import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import io.netty.util.internal.ConcurrentSet;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
-    public final static Web3j web3j = Web3j.build(new HttpService("http://10.10.8.209:6789"));
+    public final static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:8793"));
 
     public static String getForeignRandomIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;
@@ -86,24 +82,16 @@ public class TestDataUtil {
                     if(i%2==0){
                         ip = TestDataUtil.getChinaRandomIp();
                     }
-                    //logger.info("IP: {}",ip);
 
-                    CityResponse response = GeoUtil.getResponse(ip);
-                    Location location = response.getLocation();
-                    Country country = response.getCountry();
-                    Subdivision subdivision = response.getMostSpecificSubdivision();
-                    City city = response.getCity();
-                    /*logger.info("国家：{}", country.getName());
-                    logger.info("城市：{}", city.getName());
-                    logger.info("纬度：{}", location.getLatitude());
-                    logger.info("经度：{}", location.getLongitude());
-                    logger.info("dma code：{}", country.getIsoCode());
-                    logger.info("area code：{}", subdivision.getIsoCode());
-                    logger.info("country code：{}", country.getIsoCode());*/
-                    node.setIntro(country.getName().replace(" ",""));
-                    if(StringUtils.isNotBlank(city.getName())){
-                        node.setIntro(node.getIntro()+"."+city.getName().replace(" ",""));
+                    GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
+                    if(StringUtils.isBlank(location.getCountryCode())){
+                        continue;
                     }
+                    node.setIntro(location.getLocation());
+                    node.setCountryCode(location.getCountryCode());
+                    node.setLatitude(location.getLatitude());
+                    node.setLongitude(location.getLongitude());
+                    node.setLocation(location.getLocation());
                     node.setIp(ip);
                     break;
                 }catch (Exception e){}
@@ -133,7 +121,7 @@ public class TestDataUtil {
     }
 
     public static List<Block> generateBlock(String chainId){
-        Set<Block> data = new HashSet<>();
+        Set<Block> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
         .subscribe(eblock -> {
@@ -173,7 +161,7 @@ public class TestDataUtil {
     }
 
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId) {
-        Set<TransactionWithBLOBs> data = new HashSet<>();
+        Set<TransactionWithBLOBs> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
                 .subscribe(transaction -> {
@@ -203,6 +191,8 @@ public class TestDataUtil {
                     bean.setTransactionIndex(transaction.getTransactionIndex().intValue());
                     bean.setTxReceiptStatus(1);
                     bean.setReceiveType("account");
+
+                    bean.setTxInfo("{\"type\":\"1\",\"functionName\":\"getData\"}");
 
                     data.add(bean);
                 });

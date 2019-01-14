@@ -1,11 +1,11 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomStatisticsMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticPushItem;
@@ -17,6 +17,7 @@ import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -42,6 +44,18 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private long maxItemNum;
     @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
+
+    @Value("${platon.redis.key.staticstics}")
+    private String staticsticsCacheKeyTemplate;
+
+    @Value("${platon.redis.key.maxtps}")
+    private String maxtpsCacheKeyTemplate;
+
+    @Autowired
+    private BlockMapper blockMapper;
+
+    @Autowired
+    private CustomStatisticsMapper customStatisticsMapper;
 
     @Autowired
     private I18nUtil i18n;
@@ -335,4 +349,106 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         });
         return returnData;
     }
+
+    @Override
+    public boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings){
+        StatisticsCache cache = new StatisticsCache();
+
+        /************* 设置当前块高、出块节点*************/
+        cache.setMiner(block.getMiner());
+        cache.setCurrentHeight(block.getNumber());
+
+        /************* 设置交易笔数***********/
+        cache.setTransactionCount(block.getTransactionNumber());
+
+
+        /************* 设置地址数*************/
+        long addressCount = customStatisticsMapper.countAddress(chainId);
+        cache.setAddressCount(addressCount);
+
+        /************* 设置共识节点数*************/
+        cache.setConsensusCount(nodeRankings.size());
+
+        /************** 计算24小时内的交易数 ************/
+        long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
+        cache.setDayTransaction(dayTransactionCount);
+
+        /************** 计算平均区块交易数 ************/
+        BigDecimal avgBlockTrans = customStatisticsMapper.countAvgTransactionPerBlock(chainId);
+        cache.setAvgTransaction(avgBlockTrans);
+
+        /************** 计算平均出块时长 *************/
+        String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
+        Set<String> oldest = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
+        Set<String> newest = redisTemplate.opsForZSet().reverseRange(blockCacheKey,0,0);
+        if(oldest.size()==0){
+            // 总共不足3600个块，则正向取第一个
+            oldest = redisTemplate.opsForZSet().range(blockCacheKey,0,0);
+        }
+        long highestBlockTimestamp=0,lowestBlockTimestamp=0,highestBlockNumber = 1, lowestBlockNumber = 0;
+        if(oldest.size()!=0){
+            Block oldestBlock = JSON.parseObject(oldest.iterator().next(),Block.class);
+            lowestBlockNumber=oldestBlock.getNumber();
+            lowestBlockTimestamp=oldestBlock.getTimestamp().getTime();
+        }
+        if(newest.size()!=0){
+            Block newestBlock = JSON.parseObject(newest.iterator().next(),Block.class);
+            highestBlockNumber=newestBlock.getNumber();
+            highestBlockTimestamp=newestBlock.getTimestamp().getTime();
+        }
+
+        long divider = highestBlockNumber-lowestBlockNumber;
+        if(divider==0){
+            divider=1;
+        }
+        divider = divider*1000;
+        BigDecimal avgTime=BigDecimal.valueOf(highestBlockTimestamp-lowestBlockTimestamp).divide(BigDecimal.valueOf(divider),4,BigDecimal.ROUND_HALF_UP);
+        cache.setAvgTime(avgTime);
+
+        /************** 计算最大TPS ************/
+        String maxtpsCacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
+        String maxtpsStr = redisTemplate.opsForValue().get(maxtpsCacheKey);
+        long maxtpsLong = 0;
+        if(StringUtils.isNotBlank(maxtpsStr)){
+            maxtpsLong = Long.valueOf(maxtpsStr);
+        }
+        cache.setMaxTps(maxtpsLong);
+        if(maxtpsLong<cache.getCurrent()){
+            cache.setMaxTps(cache.getCurrent());
+            redisTemplate.opsForValue().set(maxtpsCacheKey,String.valueOf(cache.getMaxTps()));
+        }
+
+
+        /************** 计算当前TPS ************/
+        Date endDate = new Date(block.getTimestamp().getTime());
+        Date startDate = new Date(block.getTimestamp().getTime()-1000);
+
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
+        List<Block> blockList=blockMapper.selectByExample(blockExample);
+
+        cache.setCurrent(0);
+        if(blockList.size()>0){
+            blockList.forEach(blocks -> cache.setCurrent(cache.getCurrent()+block.getTransactionNumber()));
+        }
+
+        String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.opsForValue().set(cacheKey,JSON.toJSONString(cache));
+        return true;
+    }
+
+    @Override
+    public StatisticsCache getStatisticsCache(String chainId){
+        String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
+        String cacheStr = redisTemplate.opsForValue().get(cacheKey);
+        StatisticsCache cache = null;
+        if(StringUtils.isNotBlank(cacheStr)){
+            cache = JSON.parseObject(cacheStr,StatisticsCache.class);
+        }
+        if(cache==null){
+            return new StatisticsCache();
+        }
+        return cache;
+    }
+
 }
