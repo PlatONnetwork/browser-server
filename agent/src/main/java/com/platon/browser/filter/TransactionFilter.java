@@ -45,7 +45,7 @@ public class TransactionFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    public boolean TransactionFilter( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
+    public boolean transactionAnalysis( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         boolean res = build(transactionReceiptList,transactionsList, time);

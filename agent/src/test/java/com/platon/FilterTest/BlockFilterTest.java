@@ -81,7 +81,7 @@ public class BlockFilterTest {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.BlockFilter(ethBlock,list2,list1);
+            Block block = blockFilter.blockAnalysis(ethBlock,list2,list1);
 
         }catch (Exception e){
             e.printStackTrace();

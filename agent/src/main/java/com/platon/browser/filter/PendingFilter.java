@@ -41,7 +41,7 @@ public class PendingFilter {
     @Autowired
     private Web3jClient web3jClient;
 
-    public boolean PendingFilter (EthPendingTransactions ethPendingTransactions)throws  Exception {
+    public boolean pendingTxAnalysis (EthPendingTransactions ethPendingTransactions)throws  Exception {
         Web3j web3j = web3jClient.getWeb3jClient();
         List <Transaction> list = ethPendingTransactions.getTransactions();
         List <PendingTx> pendingTxes = new ArrayList <>();

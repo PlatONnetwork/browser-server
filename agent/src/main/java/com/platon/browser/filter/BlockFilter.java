@@ -40,7 +40,6 @@ public class BlockFilter {
     private static Logger log = LoggerFactory.getLogger(BlockFilter.class);
 
 
-
     @Autowired
     private Web3jClient web3jClient;
 
@@ -60,19 +59,17 @@ public class BlockFilter {
     private RedisCacheService redisCacheService;
 
 
-    public Block BlockFilter ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
+    public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
         log.debug("[into BlockFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildBlockStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        Block block = build(ethBlock,transactionReceiptList,transactionsList);
+        Block block = build(ethBlock, transactionReceiptList, transactionsList);
         return block;
     }
 
 
-
-
     @Transactional
-    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) {
+    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
@@ -88,9 +85,10 @@ public class BlockFilter {
             block.setChainId(chainId);
             if (ethBlock.getBlock().getTransactions().size() <= 0) {
                 block.setEnergonAverage(BigInteger.ZERO.toString());
+            }else {
+                block.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))).toString());
             }
             block.setHash(ethBlock.getBlock().getHash());
-            block.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))).toString());
             block.setEnergonLimit(ethBlock.getBlock().getGasLimit().toString());
             block.setEnergonUsed(ethBlock.getBlock().getGasUsed().toString());
             block.setTransactionNumber(ethBlock.getBlock().getTransactions().size() > 0 ? ethBlock.getBlock().getTransactions().size() : new Integer(0));
@@ -108,7 +106,7 @@ public class BlockFilter {
             BigInteger voteAmount = new BigInteger("0");
             //blockCampaignAmount
             BigInteger campaignAmount = new BigInteger("0");
-            if (transactionsList.size() < 0 && transactionReceiptList.size() < 0) {
+            if (transactionsList.size() <= 0 && transactionReceiptList.size() <= 0) {
                 block.setActualTxCostSum("0");
                 block.setBlockVoteAmount(0L);
                 block.setBlockCampaignAmount(0L);
@@ -119,14 +117,15 @@ public class BlockFilter {
                 Set <Block> set = new HashSet <>();
                 set.add(block);
                 redisCacheService.updateBlockCache(chainId, set);
+                blockMapper.insert(block);
                 return block;
             }
             for (Transaction transaction : transactionsList) {
                 for (TransactionReceipt transactionReceipt : transactionReceiptList) {
                     if (transaction.getHash().equals(transactionReceipt.getTransactionHash())) {
                         sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
-                        AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),true);
-                        String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
+                        AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
+                        String type = TransactionAnalysis.getTypeName(analysisResult.getType());
                         if ("voteTicket".equals(type)) {
                             voteAmount.add(BigInteger.ONE);
                             //get tickVoteContract vote event
@@ -156,7 +155,7 @@ public class BlockFilter {
         return block;
     }
 
-    private static  String getBlockReward ( String number ) {
+    private static String getBlockReward ( String number ) {
         //ATP trasnfrom ADP
         BigDecimal rate = BigDecimal.valueOf(10L).pow(18);
         BigDecimal height = new BigDecimal(number);
@@ -166,7 +165,7 @@ public class BlockFilter {
         BigDecimal wheel = height.divide(blockSumOnYear, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
         if (wheel.intValue() == 0) {
             //one period block
-            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear,0, java.math.BigDecimal.ROUND_HALF_DOWN);
+            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
             return result.setScale(0).toString();
         }
         BigDecimal thisRound = base.multiply(rate).multiply(definiteValue.pow(wheel.intValue()));
@@ -176,29 +175,10 @@ public class BlockFilter {
     }
 
 
-
-    public String valueConversion(BigInteger value){
+    public String valueConversion ( BigInteger value ) {
         BigDecimal valueDiec = new BigDecimal(value.toString());
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
-        return  conversionCoin.toString();
+        return conversionCoin.toString();
     }
 
-    public static  void main ( String[] args ) {
-        BigInteger reward = BigInteger.ZERO;
-        BigDecimal hight = new BigDecimal("1");
-        String a = getBlockReward("0");
-        BigDecimal y = BigDecimal.valueOf(24).multiply(BigDecimal.valueOf(3600)).multiply(BigDecimal.valueOf(356));
-        BigDecimal wheel = hight.divide(y, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
-
-
-        BigDecimal definiteValue = new BigDecimal("1.025");
-        //BigDecimal a = definiteValue.pow(wheel.intValue());
-        //BigDecimal res = BigDecimal.valueOf(1000000000l).multiply(a);
-        //System.out.println(res.setScale(0));
-        BigDecimal ab = BigDecimal.valueOf(25000000L).divide(y, 5);
-        BigDecimal abc = BigDecimal.valueOf(10L).pow(18);
-
-        System.out.println(BigDecimal.valueOf(25000000L).multiply(abc).divide(y, 0));
-        int count = AsciiUtil.toAscii("/n");
-    }
 }

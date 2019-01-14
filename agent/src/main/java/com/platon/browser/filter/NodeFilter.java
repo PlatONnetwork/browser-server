@@ -41,16 +41,16 @@ public class NodeFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    public List <NodeRanking> NodeFilter ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
+    public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        List <NodeRanking> list = buid(nodeInfoList, blockNumber, ethBlock, blockReward);
+        List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward);
         return list;
     }
 
     @Transactional
-    public List <NodeRanking> buid ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
+    public List <NodeRanking> build ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
         if (StringUtils.isNotBlank(nodeInfoList)) {
             //list is cadidate struct on PlatON
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);

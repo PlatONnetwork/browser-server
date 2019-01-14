@@ -8,6 +8,7 @@ datasource:
   url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: platon
   password: platon
+
 #日志配置
 logging:
   file: ./agent-dev-1.log
@@ -42,7 +43,7 @@ platon:
   image.server.url: http://192.168.9.86:8082/
 
 #Web3j配置
-node.ip: http://192.168.9.76:7794
+node.ip: http://192.168.9.76:8793
 chain.id: 1
 # Zookeeper注册中心配置
 regCenter:
