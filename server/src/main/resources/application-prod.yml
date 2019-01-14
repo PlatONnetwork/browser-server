@@ -28,11 +28,11 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:prod:chain_{}:nodes
-      push-node: browser:prod:chain_{}:pushnodes
-      block: browser:prod:chain_{}:blocks
-      transaction: browser:prod:chain_{}:transactions
-      maxtps: browser:prod:chain_{}:maxtps
+      node: browser:prod:chain{}:nodes
+      push-node: browser:prod:chain{}:pushnodes
+      block: browser:prod:chain{}:blocks
+      transaction: browser:prod:chain{}:transactions
+      maxtps: browser:prod:chain{}:maxtps
       max-item: 500000
   # 图片服务器地址
   image.server.url: http://192.168.9.86:8082/
