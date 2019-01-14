@@ -1,12 +1,13 @@
 package com.platon.browser.service;
 
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticPushItem;
-import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.block.BlockListItem;
+import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
@@ -27,4 +28,6 @@ public interface RedisCacheService {
     List<NodePushItem> getNodePushCache(String chainId);
     void updateNodePushCache(String chainId, Set<NodeRanking> items);
     List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
+    boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings);
+    StatisticsCache getStatisticsCache(String chainId);
 }

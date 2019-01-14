@@ -2,10 +2,11 @@ package com.platon.FilterTest;
 
 import com.platon.browser.SpringbootApplication;
 import com.platon.browser.client.Web3jClient;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.NodeFilter;
 import com.platon.browser.filter.StompPushFilter;
-import com.platon.browser.dao.entity.Block;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import java.util.Optional;
  * Time: 15:45
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=1")
+@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=test-1")
 public class StompPushFilterTest {
 
     private static Logger logger = LoggerFactory.getLogger(StompPushFilterTest.class);
@@ -70,7 +71,8 @@ public class StompPushFilterTest {
                 list2.add(receipt);
             }
             Block block = blockFilter.build(ethBlock,list2,list1);
-            //List<NodeRanking> list3 = nodeFilter.buid(nodeInfoList,block.getNumber(),ethBlock);
+            List<NodeRanking> list3 = nodeFilter.nodeAnalysis(nodeInfoList,block.getNumber(),ethBlock,block.getBlockReward());
+            stompPushFilter.stompPush(block,list3);
 
         }catch (Exception e ){
             e.printStackTrace();
