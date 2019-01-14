@@ -14,7 +14,7 @@ import com.platon.browser.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=test")
 public class TestBase {
     @Autowired
     protected ChainsConfig chainsConfig;
