@@ -33,6 +33,12 @@ public class ServiceTestBase extends TestBase {
             con.createCriteria().andChainIdEqualTo(chainId);
             nodeRankingMapper.deleteByExample(con);
             List<NodeRanking> data = TestDataUtil.generateNode(chainId);
+
+            if(data.size()==0){
+                Assert.fail("No node data!");
+                return;
+            }
+
             nodeRankingMapper.batchInsert(data);
 
             nodeService.updatePushData(chainId,new HashSet<>(data));
@@ -45,6 +51,12 @@ public class ServiceTestBase extends TestBase {
             con.createCriteria().andChainIdEqualTo(chainId);
             blockMapper.deleteByExample(con);
             List<Block> data = TestDataUtil.generateBlock(chainId);
+
+            if(data.size()==0){
+                Assert.fail("No block data!");
+                return;
+            }
+
             blockMapper.batchInsert(data);
 
             blockService.clearCache(chainId);
