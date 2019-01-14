@@ -1,16 +1,10 @@
 package com.platon.browser.util;
 
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
-import com.maxmind.geoip2.record.Subdivision;
 import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -86,24 +80,13 @@ public class TestDataUtil {
                     if(i%2==0){
                         ip = TestDataUtil.getChinaRandomIp();
                     }
-                    //logger.info("IP: {}",ip);
 
-                    CityResponse response = GeoUtil.getResponse(ip);
-                    Location location = response.getLocation();
-                    Country country = response.getCountry();
-                    Subdivision subdivision = response.getMostSpecificSubdivision();
-                    City city = response.getCity();
-                    /*logger.info("国家：{}", country.getName());
-                    logger.info("城市：{}", city.getName());
-                    logger.info("纬度：{}", location.getLatitude());
-                    logger.info("经度：{}", location.getLongitude());
-                    logger.info("dma code：{}", country.getIsoCode());
-                    logger.info("area code：{}", subdivision.getIsoCode());
-                    logger.info("country code：{}", country.getIsoCode());*/
-                    node.setIntro(country.getName().replace(" ",""));
-                    if(StringUtils.isNotBlank(city.getName())){
-                        node.setIntro(node.getIntro()+"."+city.getName().replace(" ",""));
-                    }
+                    GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
+
+                    node.setIntro(location.getLocation());
+                    node.setCountryCode(location.getCountryCode());
+                    node.setLatitude(location.getLatitude());
+                    node.setLongitude(location.getLongitude());
                     node.setIp(ip);
                     break;
                 }catch (Exception e){}
