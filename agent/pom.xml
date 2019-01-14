@@ -78,7 +78,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>browser-agent-${project.version}</finalName>
+		<finalName>browser-agent</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
