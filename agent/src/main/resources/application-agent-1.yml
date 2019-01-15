@@ -5,13 +5,13 @@ server.port: 9040
 spring.redis.cluster.nodes: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 #数据源配置
 datasource:
-  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: platon
   password: platon
 
 #日志配置
 logging:
-  file: ./browser-agent-dev-1.log
+  file: ./browser-agent-agent-1.log
   level:
     org:
       springframework:
@@ -31,14 +31,14 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:0.4.0:dev:chain{}:nodes
-      push-node: browser:0.4.0:dev:chain{}:pushnodes
-      block: browser:0.4.0:dev:chain{}:blocks
-      transaction: browser:0.4.0:dev:chain{}:transactions
-      maxtps: browser:0.4.0:dev:chain{}:maxtps
+      node: browser:0.4.0:agent:chain{}:nodes
+      push-node: browser:0.4.0:agent:chain{}:pushnodes
+      block: browser:0.4.0:agent:chain{}:blocks
+      transaction: browser:0.4.0:agent:chain{}:transactions
+      maxtps: browser:0.4.0:agent:chain{}:maxtps
       max-item: 500000
-      number: browser:0.4.0:dev:chain{}:number
-      staticstics: browser:0.4.0:dev:chain{}:staticstics
+      number: browser:0.4.0:agent:chain{}:number
+      staticstics: browser:0.4.0:agent:chain{}:staticstics
   # 图片服务器地址
   image.server.url: http://192.168.9.86:8082/
 
