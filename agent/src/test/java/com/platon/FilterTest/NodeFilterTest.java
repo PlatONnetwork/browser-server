@@ -37,9 +37,9 @@ public class NodeFilterTest extends TestBase {
         try{
             CandidateContract candidateContract = web3jClient.getCandidateContract();
             Web3j web3j = Web3jClient.getWeb3jClient();
-            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1600L)));
+            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
-            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(1600L))).send();
+            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(1L))).send();
             logger.info("--------------------------");
             logger.info("{nodeInfoList}: "+ nodeInfoList);
             logger.info("--------------------------");

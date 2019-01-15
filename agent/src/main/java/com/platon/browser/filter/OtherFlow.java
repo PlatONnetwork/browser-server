@@ -59,7 +59,9 @@ public class OtherFlow {
         }
 
         try {
-            stompPushFilter.stompPush(block, nodeRankings);
+            if(null != nodeRankings && nodeRankings.size() > 0 ){
+                stompPushFilter.stompPush(block, nodeRankings);
+            }
         } catch (Exception e) {
             log.error("Stomp Filter exception", e);
             log.error("push redis exception", e.getMessage());

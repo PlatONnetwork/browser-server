@@ -86,7 +86,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
         log.debug("ChainInfoFilterJob-->{},begin data analysis!!!...");
 
         try {
-            log.info("----------------------------------------"+ new Date()  +"--------------------------------------------------");
+            //log.info("----------------------------------------"+ new Date()  +"--------------------------------------------------");
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = web3jClient.getWeb3jClient();
             try {
@@ -121,10 +121,14 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 EthPendingTransactions ethPendingTransactions = web3j.ethPendingTx().send();
 
                 Map<String,Object> threadMap = new HashMap <>();
-                String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(i))).send();
-                if(!"0x".equals(nodeInfoList)){
+                String nodeInfoList = null;
+                try{
+                    nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(i))).send();
                     threadMap.put("nodeInfoList",nodeInfoList);
+                }catch (Exception e){
+                    log.debug("nodeInfoList is null !!!...",e.getMessage());
                 }
+
                 threadMap.put("ethBlock",ethBlock);
                 threadMap.put("transactionReceiptList",transactionReceiptList);
                 threadMap.put("transactionList",transactionList);
@@ -134,7 +138,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 otherFlow.doFilter();
                 maxNubmer =Long.valueOf(blockNumber);
 
-                log.info("++++++++++++++++++++++++++++++++++++++++++++++++"+ new Date()  +"+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                //log.info("++++++++++++++++++++++++++++++++++++++++++++++++"+ new Date()  +"+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             }
         } catch (Exception e) {
             log.error(e.getMessage());
