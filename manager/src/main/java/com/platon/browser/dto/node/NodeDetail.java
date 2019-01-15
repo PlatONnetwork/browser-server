@@ -1,14 +1,7 @@
 package com.platon.browser.dto.node;
 
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
 import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.exception.UnknownLocationException;
-import com.platon.browser.util.GeoUtil;
-import com.platon.browser.util.I18nEnum;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 @Data
@@ -35,7 +28,7 @@ public class NodeDetail {
     private String orgName;
     private String orgWebsite;
 
-    public void init(NodeRanking initData) throws UnknownLocationException {
+    public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);
         this.setJoinTime(initData.getJoinTime().getTime());
         this.setNodeUrl("http://"+initData.getIp()+":"+initData.getPort());
@@ -43,20 +36,6 @@ public class NodeDetail {
         this.setPublicKey(initData.getNodeId());
         // 钱包就是address
         this.setWallet(initData.getAddress());
-
-        // 设置地理位置信息
-        try {
-            CityResponse response = GeoUtil.getResponse(initData.getIp());
-            Country country = response.getCountry();
-            if(StringUtils.isNotBlank(country.getName())){
-                this.setLocation(country.getName());
-            }
-            City city = response.getCity();
-            if(StringUtils.isNotBlank(city.getName())){
-                this.setLocation(this.getLocation()+" "+city.getName());
-            }
-        }catch (Exception e){
-            throw new UnknownLocationException(I18nEnum.UNKNOWN_LOCATION.name());
-        }
+        this.setLogo(initData.getUrl());
     }
 }

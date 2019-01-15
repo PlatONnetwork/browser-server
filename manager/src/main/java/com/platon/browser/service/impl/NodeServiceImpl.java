@@ -13,7 +13,6 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
-import com.platon.browser.exception.UnknownLocationException;
 import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
@@ -84,11 +83,7 @@ public class NodeServiceImpl implements NodeService {
 
         nodes.forEach(initData -> {
             NodeListItem bean = new NodeListItem();
-            try {
-                bean.init(initData);
-            } catch (UnknownLocationException e) {
-                bean.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
-            }
+            bean.init(initData);
             data.add(bean);
         });
         return returnData;
@@ -128,11 +123,7 @@ public class NodeServiceImpl implements NodeService {
 
         NodeDetail returnData = new NodeDetail();
         NodeRanking initData = nodes.get(0);
-        try {
-            returnData.init(initData);
-        } catch (UnknownLocationException e) {
-            returnData.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
-        }
+        returnData.init(initData);
 
         returnData.setLogo(imageServerUrl+initData.getUrl());
         return returnData;
