@@ -51,15 +51,16 @@ public class GeoUtil {
                         il.setLocation(il.getLocation()+" "+city.getName());
                     }
                 }
+            }else{
+                throw new RuntimeException("");
             }
         }catch (Exception ex){
             // ip不合法，直接返回默认数据
             il.setCountryCode("0");
             il.setLocation("");
-            il.setLocation("");
             il.setLatitude("0");
             il.setLongitude("0");
-            logger.error("Cant't resolve ip location: {}", ip);
+            logger.debug("Cant't resolve ip location: {}", ip);
         }
 
         return il;
@@ -82,7 +83,7 @@ public class GeoUtil {
 
     public static boolean ipCheck(String ip) {
         if(StringUtils.isBlank(ip)){
-            logger.error("请指定IP地址！");
+            logger.debug("请指定IP地址！");
             throw new RuntimeException("请指定IP地址！");
         }
         String regex = "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."+
@@ -92,7 +93,7 @@ public class GeoUtil {
         if (ip.matches(regex)) {
             return true;
         }
-        logger.error("IP地址不合法！");
+        logger.debug("IP地址不合法！");
         throw new RuntimeException("IP地址不合法！");
     }
 
