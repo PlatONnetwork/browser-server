@@ -112,7 +112,12 @@ public class TestDataUtil {
             node.setBeginNumber(1l);
             node.setEndNumber(199l);
             node.setBlockCount(55l);
-            node.setUrl("https://www.platon.network/");
+
+            if(i%2==0){
+                node.setUrl("1");
+            }else{
+                node.setUrl("2");
+            }
 
             nodes.add(node);
         }
