@@ -114,10 +114,13 @@ public class TestDataUtil {
             node.setEndNumber(199l);
             node.setBlockCount(55l);
 
-            if(i%2==0){
-                node.setUrl("1");
-            }else{
-                node.setUrl("2");
+            Random random = new Random();
+            while (true){
+                int logo = random.nextInt(43);
+                if(logo>0){
+                    node.setUrl(String.valueOf(logo));
+                    break;
+                }
             }
 
             nodes.add(node);
