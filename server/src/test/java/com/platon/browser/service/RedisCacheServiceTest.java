@@ -1,8 +1,11 @@
 package com.platon.browser.service;
 
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockKey;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.block.BlockPushItem;
@@ -143,6 +146,32 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             redisCacheService.updateTransactionCache(chainId,data);
             RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
             Assert.assertEquals(data.size(),cache.getData().size());
+        });
+    }
+
+
+    /***************统计缓存****************/
+    @Autowired
+    BlockMapper blockMapper;
+    @Test
+    public void updateStatisticsCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            List<NodeRanking> data = TestDataUtil.generateNode(chainId);
+            BlockKey bk = new BlockKey();
+            bk.setChainId(chainId);
+            bk.setHash("0x0f67ebf56cbac0fc09f4dd46bfee21f2385582f9eab637c65ade2784b0669541");
+            Block block = blockMapper.selectByPrimaryKey(bk);
+
+            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data);
+            Assert.assertEquals(true,result);
+        });
+    }
+
+    @Test
+    public void getStatisticsCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            StatisticsCache result = redisCacheService.getStatisticsCache(chainId);
+            Assert.assertNotNull(result);
         });
     }
 }

@@ -1,21 +1,14 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.SpringbootApplication;
+import com.platon.TestBase;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.NodeFilter;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.Web3j;
@@ -34,25 +27,9 @@ import java.util.Optional;
  * Time: 15:00
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=dev-1")
-public class NodeFilterTest {
+public class NodeFilterTest extends TestBase {
 
     private static Logger logger = LoggerFactory.getLogger(NodeFilterTest.class);
-
-    @Autowired
-    private NodeFilter nodeFilter;
-
-    @Value("${chain.id}")
-    private String chainId;
-
-    @Autowired
-    private BlockFilter blockFilter;
-
-    @Autowired
-    private Web3jClient web3jClient;
-
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
 
 
     @Test

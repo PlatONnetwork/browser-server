@@ -1,18 +1,12 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.SpringbootApplication;
-import com.platon.browser.client.Web3jClient;
+import com.platon.TestBase;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.NodeFilter;
-import com.platon.browser.filter.StompPushFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.Web3j;
@@ -31,22 +25,9 @@ import java.util.Optional;
  * Time: 15:45
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=test-1")
-public class StompPushFilterTest {
+public class StompPushFilterTest extends TestBase {
 
     private static Logger logger = LoggerFactory.getLogger(StompPushFilterTest.class);
-
-    @Autowired
-    private BlockFilter blockFilter;
-
-    @Autowired
-    private StompPushFilter stompPushFilter;
-
-    @Autowired
-    private NodeFilter nodeFilter;
-
-    @Autowired
-    private Web3jClient web3jClient;
 
     @Test
     public void StompPushFilterTest(){

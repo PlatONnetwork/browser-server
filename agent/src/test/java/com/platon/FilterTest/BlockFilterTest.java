@@ -1,15 +1,12 @@
 package com.platon.FilterTest;
 
-import com.platon.browser.SpringbootApplication;
+import com.platon.TestBase;
 import com.platon.browser.client.Web3jClient;
-import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.dao.entity.Block;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -27,13 +24,9 @@ import java.util.Optional;
  * Time: 10:44
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=1")
-public class BlockFilterTest {
+public class BlockFilterTest extends TestBase {
 
     protected static Logger logger = LoggerFactory.getLogger(BlockFilterTest.class);
-
-    @Autowired
-    private BlockFilter blockFilter;
 
     @Test
     public void  BlockFilterBuildTest(){
