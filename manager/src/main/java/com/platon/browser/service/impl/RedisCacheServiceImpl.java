@@ -1,11 +1,13 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomStatisticsMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticPushItem;
@@ -62,6 +64,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
+    private NodeRankingMapper nodeRankingMapper;
+    @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
@@ -78,12 +82,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void clearNodePushCache(String chainId) {
-        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
     }
 
     private static class CachePageInfo<T>{
@@ -123,11 +121,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return cpi;
     }
 
-
-    private <T> void updateCache(String cacheKey,Collection<T> items){
+    private <T> void updateCache(String cacheKey,Collection<T> data){
         long size = redisTemplate.opsForZSet().size(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        items.forEach(item -> {
+        data.forEach(item -> {
             Long startOffset=0l,endOffset=0l,score=0l;
             if(item instanceof Block){
                 Block bl = (Block)item;
@@ -153,6 +150,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
     }
 
+    /**
+     * 清除区块缓存
+     * @param chainId
+     */
     @Override
     public void clearBlockCache(String chainId) {
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
@@ -170,6 +171,28 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         updateCache(cacheKey,items);
     }
 
+    /**
+     * 重置区块缓存
+     * @param chainId
+     */
+    @Override
+    public void resetBlockCache(String chainId) {
+        clearBlockCache(chainId);
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.setOrderByClause("number desc");
+        for(int i=0;i<500;i++){
+            PageHelper.startPage(i+1,1000);
+            List<Block> data = blockMapper.selectByExample(condition);
+            if(data.size()==0) break;
+            updateBlockCache(chainId,new HashSet<>(data));
+        }
+    }
+
+    /**
+     * 清除交易缓存
+     * @param chainId
+     */
     @Override
     public void clearTransactionCache(String chainId) {
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
@@ -185,6 +208,24 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(!validateParam(chainId,items))return;
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
         updateCache(cacheKey,items);
+    }
+
+    /**
+     * 重置交易缓存
+     * @param chainId
+     */
+    @Override
+    public void resetTransactionCache(String chainId) {
+        clearTransactionCache(chainId);
+        TransactionExample condition = new TransactionExample();
+        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.setOrderByClause("block_number desc,transaction_index desc");
+        for(int i=0;i<500;i++){
+            PageHelper.startPage(i+1,1000);
+            List<Transaction> data = transactionMapper.selectByExample(condition);
+            if(data.size()==0) break;
+            updateTransactionCache(chainId,new HashSet<>(data));
+        }
     }
 
     /**
@@ -319,6 +360,20 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return returnData;
     }
 
+    /**
+     * 清除节点推送缓存
+     * @param chainId
+     */
+    @Override
+    public void clearNodePushCache(String chainId) {
+        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+    }
+
+    /**
+     * 更新节点推送缓存
+     * @param chainId
+     */
     @Override
     public void updateNodePushCache(String chainId, Set<NodeRanking> items) {
         if(!validateParam(chainId,items))return;
@@ -335,6 +390,25 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
     }
 
+    /**
+     * 重置节点推送缓存
+     * @param chainId
+     */
+    @Override
+    public void resetNodePushCache(String chainId) {
+        clearNodePushCache(chainId);
+        NodeRankingExample condition = new NodeRankingExample();
+        condition.createCriteria().andChainIdEqualTo(chainId)
+                .andIsValidEqualTo(1);
+        List<NodeRanking> data = nodeRankingMapper.selectByExample(condition);
+        if(data.size()==0) return;
+        updateNodePushCache(chainId,new HashSet<>(data));
+    }
+
+    /**
+     * 获取节点推送缓存
+     * @param chainId
+     */
     @Override
     public List<NodePushItem> getNodePushCache(String chainId) {
         List<NodePushItem> returnData = new LinkedList<>();
@@ -350,6 +424,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return returnData;
     }
 
+    /**
+     * 更新统计缓存
+     * @param chainId
+     */
     @Override
     public boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings){
         StatisticsCache cache = new StatisticsCache();
@@ -437,6 +515,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return true;
     }
 
+    /**
+     * 获取统计缓存
+     * @param chainId
+     */
     @Override
     public StatisticsCache getStatisticsCache(String chainId){
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);

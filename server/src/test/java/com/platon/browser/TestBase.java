@@ -11,11 +11,17 @@ import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.TransactionService;
+import com.platon.browser.util.TestDataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
 
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=server")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=test")
 public class TestBase {
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:8793"));
+    static { TestDataUtil.web3j = web3j; }
+
     @Autowired
     protected ChainsConfig chainsConfig;
     @Autowired

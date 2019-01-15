@@ -1,11 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.common.dto.StatisticsCache;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockKey;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.block.BlockPushItem;
@@ -17,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -151,16 +148,18 @@ public class RedisCacheServiceTest extends ServiceTestBase {
 
 
     /***************统计缓存****************/
-    @Autowired
-    BlockMapper blockMapper;
     @Test
     public void updateStatisticsCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
             List<NodeRanking> data = TestDataUtil.generateNode(chainId);
-            BlockKey bk = new BlockKey();
-            bk.setChainId(chainId);
-            bk.setHash("0x0f67ebf56cbac0fc09f4dd46bfee21f2385582f9eab637c65ade2784b0669541");
-            Block block = blockMapper.selectByPrimaryKey(bk);
+
+            BlockListItem blockItem = getOneBlock(chainId);
+            Block block = new Block();
+
+            BeanUtils.copyProperties(blockItem,block);
+            block.setNumber(blockItem.getHeight());
+            block.setTimestamp(new Date(blockItem.getTimestamp()));
+            block.setTransactionNumber(Long.valueOf(blockItem.getTransaction()).intValue());
 
             boolean result = redisCacheService.updateStatisticsCache(chainId,block,data);
             Assert.assertEquals(true,result);
@@ -173,5 +172,20 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             StatisticsCache result = redisCacheService.getStatisticsCache(chainId);
             Assert.assertNotNull(result);
         });
+    }
+
+    @Test
+    public void initCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            List<NodeRanking> nodes = nodeRankingMapper.selectByExample(new NodeRankingExample());
+            redisCacheService.updateNodePushCache(chainId,new HashSet<>(nodes));
+
+            List<Block> blocks = blockMapper.selectByExample(new BlockExample());
+            redisCacheService.updateBlockCache(chainId,new HashSet<>(blocks));
+
+            List<Transaction> transactions = transactionMapper.selectByExample(new TransactionExample());
+            redisCacheService.updateTransactionCache(chainId,new HashSet<>(transactions));
+        });
+
     }
 }

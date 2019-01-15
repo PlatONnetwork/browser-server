@@ -51,11 +51,12 @@ public class GeoUtil {
                         il.setLocation(il.getLocation()+" "+city.getName());
                     }
                 }
+            }else{
+                throw new RuntimeException("");
             }
         }catch (Exception ex){
             // ip不合法，直接返回默认数据
             il.setCountryCode("0");
-            il.setLocation("");
             il.setLocation("");
             il.setLatitude("0");
             il.setLongitude("0");

@@ -13,7 +13,6 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.http.HttpService;
 import rx.Subscription;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
-    public final static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:8793"));
+    public static Web3j web3j;
 
     public static String getForeignRandomIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;
@@ -93,6 +92,7 @@ public class TestDataUtil {
                     node.setLongitude(location.getLongitude());
                     node.setLocation(location.getLocation());
                     node.setIp(ip);
+                    node.setName(location.getLocation());
                     break;
                 }catch (Exception e){}
             }
@@ -113,7 +113,15 @@ public class TestDataUtil {
             node.setBeginNumber(1l);
             node.setEndNumber(199l);
             node.setBlockCount(55l);
-            node.setUrl("https://www.platon.network/");
+
+            Random random = new Random();
+            while (true){
+                int logo = random.nextInt(43);
+                if(logo>0){
+                    node.setUrl(String.valueOf(logo));
+                    break;
+                }
+            }
 
             nodes.add(node);
         }
@@ -121,6 +129,11 @@ public class TestDataUtil {
     }
 
     public static List<Block> generateBlock(String chainId){
+
+        if(web3j==null){
+            throw new RuntimeException("请先实例化web3j！");
+        }
+
         Set<Block> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
@@ -161,6 +174,11 @@ public class TestDataUtil {
     }
 
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId) {
+
+        if(web3j==null){
+            throw new RuntimeException("请先实例化web3j！");
+        }
+
         Set<TransactionWithBLOBs> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
@@ -193,6 +211,10 @@ public class TestDataUtil {
                     bean.setReceiveType("account");
 
                     bean.setTxInfo("{\"type\":\"1\",\"functionName\":\"getData\"}");
+
+                    if(StringUtils.isBlank(bean.getTo())){
+                        bean.setTo("0x");
+                    }
 
                     data.add(bean);
                 });

@@ -9,7 +9,7 @@ import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.gas.DefaultWasmGasProvider;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -63,7 +63,7 @@ public class Web3jClient {
         Web3j web3j = Web3jClient.getWeb3jClient();
         if (ticketContract == null) {
             try {
-                ticketContract = TicketContract.load(web3j,loadCredentials(), DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+                ticketContract = TicketContract.load(web3j,loadCredentials(), new DefaultWasmGasProvider());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (CipherException e) {
@@ -78,7 +78,7 @@ public class Web3jClient {
         Web3j web3j = Web3jClient.getWeb3jClient();
         if (candidateContract == null) {
             try {
-                candidateContract = candidateContract.load(web3j,loadCredentials(), DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
+                candidateContract = candidateContract.load(web3j,loadCredentials(), new DefaultWasmGasProvider());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (CipherException e) {
