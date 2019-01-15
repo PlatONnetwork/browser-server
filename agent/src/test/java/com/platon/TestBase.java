@@ -2,6 +2,7 @@ package com.platon;
 
 import com.platon.browser.SpringbootApplication;
 import com.platon.browser.client.Web3jClient;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.filter.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,9 @@ public class TestBase {
 
     @Autowired
     protected RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    protected NodeRankingMapper nodeRankingMapper;
 
     @Value("${platon.redis.key.transaction}")
     protected String transactionCacheKeyTemplate;
