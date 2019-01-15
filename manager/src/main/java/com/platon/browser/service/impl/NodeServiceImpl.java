@@ -82,17 +82,6 @@ public class NodeServiceImpl implements NodeService {
         RespPage<NodeListItem> returnData = PageUtil.getRespPage(page,data);
         if(nodes.size()==0) return returnData;
 
-        // 批量查询节点的统计信息
-        List<String> nodeIds = new ArrayList<>();
-        nodes.forEach(node->nodeIds.add(node.getNodeId()));
-        StatisticsExample statisticsExample = new StatisticsExample();
-        statisticsExample.createCriteria().andChainIdEqualTo(req.getCid())
-                .andTypeEqualTo(StatisticsEnum.block_count.name())
-                .andNodeIdIn(nodeIds);
-        List<Statistics> statisticsList = statisticsMapper.selectByExample(statisticsExample);
-        Map<StatisticsEnum,Map<String,String>> statisticsMap = classifyStatistic(statisticsList);
-        Map<String,String> blockCountMap = statisticsMap.get(StatisticsEnum.block_count);
-
         nodes.forEach(initData -> {
             NodeListItem bean = new NodeListItem();
             try {
@@ -100,15 +89,6 @@ public class NodeServiceImpl implements NodeService {
             } catch (UnknownLocationException e) {
                 bean.setLocation(i18n.i(I18nEnum.UNKNOWN_LOCATION));
             }
-            // 设置统计信息
-            String blockCountStr = blockCountMap.get(initData.getId());
-            int blockCount = 0;
-            if(StringUtils.isNotBlank(blockCountStr)){
-                blockCount = Integer.valueOf(blockCountStr);
-            }
-            bean.setBlockCount(blockCount);
-            // 设置logo url
-            bean.setLogo(imageServerUrl+initData.getUrl());
             data.add(bean);
         });
         return returnData;

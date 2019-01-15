@@ -1,11 +1,9 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
-import com.platon.browser.common.base.JsonResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.TransactionPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;

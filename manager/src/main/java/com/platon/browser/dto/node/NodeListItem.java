@@ -7,12 +7,9 @@ import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.exception.UnknownLocationException;
 import com.platon.browser.util.GeoUtil;
 import com.platon.browser.util.I18nEnum;
-import com.platon.browser.util.I18nUtil;
-import jnr.ffi.annotations.In;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.web3j.abi.datatypes.Int;
 
 @Data
 public class NodeListItem {
@@ -31,6 +28,8 @@ public class NodeListItem {
     private Integer isValid;
     public void init(NodeRanking initData) throws UnknownLocationException {
         BeanUtils.copyProperties(initData,this);
+        this.setBlockCount(initData.getBlockCount().intValue());
+
         try {
             CityResponse response = GeoUtil.getResponse(initData.getIp());
             Country country = response.getCountry();
@@ -45,5 +44,6 @@ public class NodeListItem {
         }catch (Exception e){
             throw new UnknownLocationException(I18nEnum.UNKNOWN_LOCATION.name());
         }
+
     }
 }

@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.platon.browser.dao.entity.TransactionPage;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;

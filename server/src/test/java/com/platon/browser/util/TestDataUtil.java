@@ -203,6 +203,10 @@ public class TestDataUtil {
 
                     bean.setTxInfo("{\"type\":\"1\",\"functionName\":\"getData\"}");
 
+                    if(StringUtils.isBlank(bean.getTo())){
+                        bean.setTo("0x");
+                    }
+
                     data.add(bean);
                 });
 
