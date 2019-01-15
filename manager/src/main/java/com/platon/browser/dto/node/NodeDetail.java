@@ -39,6 +39,11 @@ public class NodeDetail {
         BeanUtils.copyProperties(initData,this);
         this.setJoinTime(initData.getJoinTime().getTime());
         this.setNodeUrl("http://"+initData.getIp()+":"+initData.getPort());
+        // 公钥就是节点ID
+        this.setPublicKey(initData.getNodeId());
+        // 钱包就是address
+        this.setWallet(initData.getAddress());
+
         // 设置地理位置信息
         try {
             CityResponse response = GeoUtil.getResponse(initData.getIp());
@@ -53,10 +58,5 @@ public class NodeDetail {
         }catch (Exception e){
             throw new UnknownLocationException(I18nEnum.UNKNOWN_LOCATION.name());
         }
-
-        // 公钥就是节点ID
-        this.setPublicKey(initData.getNodeId());
-        // 钱包就是address
-        this.setWallet(initData.getAddress());
     }
 }
