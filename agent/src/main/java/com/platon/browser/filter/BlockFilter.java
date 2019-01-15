@@ -8,6 +8,7 @@ import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.EventRes;
+import com.platon.browser.job.ChainInfoFilterJob;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,7 @@ import org.web3j.utils.AsciiUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -58,7 +56,7 @@ public class BlockFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-
+    //Transactional
     public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
         log.debug("[into BlockFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
@@ -68,7 +66,7 @@ public class BlockFilter {
     }
 
 
-    @Transactional
+
     public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));

@@ -45,6 +45,7 @@ public class TransactionFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    //@Transactional
     public boolean transactionAnalysis( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
@@ -52,7 +53,7 @@ public class TransactionFilter {
         return res;
     }
 
-    @Transactional
+
     public boolean build( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
         Web3j web3j = Web3jClient.getWeb3jClient();
         //build database struct<Transaction>
@@ -79,7 +80,7 @@ public class TransactionFilter {
                             transactionWithBLOBs.setReceiveType("contract");
                         }
                     } else {
-                        transactionWithBLOBs.setTo("0x");
+                        transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
                         transactionWithBLOBs.setReceiveType("contract");
                     }
                     transactionWithBLOBs.setValue(transaction.getValue().toString());

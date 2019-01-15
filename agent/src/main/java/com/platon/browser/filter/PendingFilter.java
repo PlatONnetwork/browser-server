@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -41,6 +42,7 @@ public class PendingFilter {
     @Autowired
     private Web3jClient web3jClient;
 
+    //@Transactional
     public boolean pendingTxAnalysis (EthPendingTransactions ethPendingTransactions)throws  Exception {
         Web3j web3j = web3jClient.getWeb3jClient();
         List <Transaction> list = ethPendingTransactions.getTransactions();
