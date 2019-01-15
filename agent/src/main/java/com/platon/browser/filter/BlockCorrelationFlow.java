@@ -24,6 +24,7 @@ import org.web3j.protocol.core.methods.response.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,10 +33,9 @@ import java.util.Optional;
  * Time: 14:34
  */
 @Component
-public class WorkFlowFactory {
+public class BlockCorrelationFlow {
 
-    private static Logger log = LoggerFactory.getLogger(WorkFlowFactory.class);
-
+    private static Logger log = LoggerFactory.getLogger(BlockCorrelationFlow.class);
 
     @Value("${chain.id}")
     private String chainId;
@@ -47,21 +47,25 @@ public class WorkFlowFactory {
     private TransactionFilter transactionFilter;
 
     @Autowired
-    private PendingFilter pendingFilter;
-
-    @Autowired
     private NodeFilter nodeFilter;
 
     @Autowired
     private StompPushFilter stompPushFilter;
 
     @Transactional
-    public void doFilter ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionList, String nodeInfoList,
-                              EthPendingTransactions ethPendingTransactions ) throws Exception {
+    public void doFilter () throws Exception {
         Block block = new Block();
         List <NodeRanking> nodeRankings = new ArrayList <>();
+        Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
+        EthBlock ethBlock = (EthBlock) threadLocalMap.get("ethBlock");
+        List<Transaction> transactionList = (List <Transaction>) threadLocalMap.get("transactionList");
+        List<TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionList");
+        String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
+
+
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList);
+            threadLocalMap.put("block",block);
             String blockString = JSON.toJSONString(block);
             log.debug("block info :" + blockString);
             if (StringUtils.isEmpty(block)) {
@@ -91,6 +95,7 @@ public class WorkFlowFactory {
         try {
             if(!StringUtils.isEmpty(nodeInfoList)){
                 nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, block.getNumber().longValue(), ethBlock, block.getBlockReward());
+                threadLocalMap.put("nodeRankings",nodeRankings);
                 String nodeRankingString = JSONArray.toJSONString(nodeRankings);
                 log.debug("node info :" + nodeRankingString);
                 if (nodeRankings.size() < 0 && nodeRankings == null) {
@@ -104,27 +109,6 @@ public class WorkFlowFactory {
             throw new AppException(ErrorCodeEnum.NODE_ERROR);
         }
 
-        try {
-            if(ethPendingTransactions != null){
-                boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);
-                if (!res) {
-                    log.error("Analysis PendingTx is null !!!....");
-                }
-            }
-           log.debug("PengdingTx in the block are empty !!!...");
-        } catch (Exception e) {
-            log.error("PendingTx Filter exception", e);
-            log.error("PendingTx analysis exception", e.getMessage());
-            throw new AppException(ErrorCodeEnum.PENDINGTX_ERROR);
-        }
-
-        try {
-            stompPushFilter.stompPush(block, nodeRankings);
-        } catch (Exception e) {
-            log.error("Stomp Filter exception", e);
-            log.error("push redis exception", e.getMessage());
-            throw new AppException(ErrorCodeEnum.STOMP_ERROR);
-        }
     }
 
 }

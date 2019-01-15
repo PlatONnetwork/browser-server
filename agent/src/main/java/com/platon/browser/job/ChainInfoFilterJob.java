@@ -56,7 +56,10 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
     private Web3jClient web3jClient;
 
     @Autowired
-    private WorkFlowFactory workFlowFactory;
+    private BlockCorrelationFlow blockCorrelationFlow;
+
+    @Autowired
+    private OtherFlow otherFlow;
 
     public final static ThreadLocal<Map<String,Object>> map = new ThreadLocal <>();
 
@@ -125,7 +128,8 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 threadMap.put("nodeInfoList",nodeInfoList);
                 threadMap.put("ethPendingTransactions",ethPendingTransactions);
                 map.set(threadMap);
-                workFlowFactory.doFilter(ethBlock,transactionReceiptList,transactionList,nodeInfoList,ethPendingTransactions);
+                blockCorrelationFlow.doFilter();
+                otherFlow.doFilter();
                 maxNubmer =Long.valueOf(blockNumber);
 
                /* if(res){
