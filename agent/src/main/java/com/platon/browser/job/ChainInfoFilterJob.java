@@ -118,26 +118,22 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 //build candidate contract
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
                 //get candidate list info
-                String nodeInfoList = candidateContract.CandidateList().send();
-                //get pendingTransaction
                 EthPendingTransactions ethPendingTransactions = web3j.ethPendingTx().send();
+
                 Map<String,Object> threadMap = new HashMap <>();
+                String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(i))).send();
+                if(!"0x".equals(nodeInfoList)){
+                    threadMap.put("nodeInfoList",nodeInfoList);
+                }
                 threadMap.put("ethBlock",ethBlock);
                 threadMap.put("transactionReceiptList",transactionReceiptList);
                 threadMap.put("transactionList",transactionList);
-                threadMap.put("nodeInfoList",nodeInfoList);
                 threadMap.put("ethPendingTransactions",ethPendingTransactions);
                 map.set(threadMap);
                 blockCorrelationFlow.doFilter();
                 otherFlow.doFilter();
                 maxNubmer =Long.valueOf(blockNumber);
 
-               /* if(res){
-                    maxNubmer =Long.valueOf(blockNumber);
-                    logger.debug("ChainInfoJob succ !!!");
-                }else {
-                    logger.error("ChainInfoJob fail !!!");
-                }*/
                 log.info("++++++++++++++++++++++++++++++++++++++++++++++++"+ new Date()  +"+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             }
         } catch (Exception e) {

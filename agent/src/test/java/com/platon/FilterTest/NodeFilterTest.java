@@ -37,9 +37,12 @@ public class NodeFilterTest extends TestBase {
         try{
             CandidateContract candidateContract = web3jClient.getCandidateContract();
             Web3j web3j = Web3jClient.getWeb3jClient();
-            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1116L)));
+            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1600L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
-            String nodeInfoList = candidateContract.CandidateList().send();
+            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(1600L))).send();
+            logger.info("--------------------------");
+            logger.info("{nodeInfoList}: "+ nodeInfoList);
+            logger.info("--------------------------");
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             List<Transaction> list1 = new ArrayList<>();
             List<TransactionReceipt> list2 = new ArrayList <>();
@@ -59,8 +62,7 @@ public class NodeFilterTest extends TestBase {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidNotEqualTo(1);
             List<NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
-            //Assert.assertEquals(nodeRankings.size(),);
-            nodeRankingMapper.deleteByExample(nodeRankingExample);
+
         }catch (Exception e) {
             e.printStackTrace();
         }

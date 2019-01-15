@@ -105,9 +105,12 @@ public class TransactionFilter {
                     transactionWithBLOBs.setBlockHash(transaction.getBlockHash());
                     transactionWithBLOBs.setBlockNumber(transaction.getBlockNumber().longValue());
                     transactionWithBLOBs.setInput(transaction.getInput());
+                    if(transaction.getInput().equals("0x") && transaction.getValue() != null){
+                        transactionWithBLOBs.setTxType("transfer");
+                    }
                     AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
                     String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
-                    transactionWithBLOBs.setTxType(type);
+                    transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
                     String txinfo = JSON.toJSONString(analysisResult);
                     transactionWithBLOBs.setTxInfo(txinfo);
                     transactionWithBLOBsList.add(transactionWithBLOBs);
