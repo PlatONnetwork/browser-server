@@ -92,6 +92,7 @@ public class TestDataUtil {
                     node.setLongitude(location.getLongitude());
                     node.setLocation(location.getLocation());
                     node.setIp(ip);
+                    node.setName(location.getLocation());
                     break;
                 }catch (Exception e){}
             }

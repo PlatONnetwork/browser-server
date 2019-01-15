@@ -1,9 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.common.dto.StatisticsCache;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.block.BlockPushItem;
@@ -174,5 +172,20 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             StatisticsCache result = redisCacheService.getStatisticsCache(chainId);
             Assert.assertNotNull(result);
         });
+    }
+
+    @Test
+    public void initCache(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            List<NodeRanking> nodes = nodeRankingMapper.selectByExample(new NodeRankingExample());
+            redisCacheService.updateNodePushCache(chainId,new HashSet<>(nodes));
+
+            List<Block> blocks = blockMapper.selectByExample(new BlockExample());
+            redisCacheService.updateBlockCache(chainId,new HashSet<>(blocks));
+
+            List<Transaction> transactions = transactionMapper.selectByExample(new TransactionExample());
+            redisCacheService.updateTransactionCache(chainId,new HashSet<>(transactions));
+        });
+
     }
 }

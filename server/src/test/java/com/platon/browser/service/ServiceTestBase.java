@@ -14,11 +14,11 @@ import java.util.List;
 
 public class ServiceTestBase extends TestBase {
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
+    protected NodeRankingMapper nodeRankingMapper;
     @Autowired
-    private BlockMapper blockMapper;
+    protected BlockMapper blockMapper;
     @Autowired
-    private TransactionMapper transactionMapper;
+    protected TransactionMapper transactionMapper;
 
     @Autowired
     protected BlockService blockService;
