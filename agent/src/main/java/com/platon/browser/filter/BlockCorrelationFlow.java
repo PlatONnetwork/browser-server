@@ -59,7 +59,7 @@ public class BlockCorrelationFlow {
         Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
         EthBlock ethBlock = (EthBlock) threadLocalMap.get("ethBlock");
         List<Transaction> transactionList = (List <Transaction>) threadLocalMap.get("transactionList");
-        List<TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionList");
+        List<TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionReceiptList");
         String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
 
 
