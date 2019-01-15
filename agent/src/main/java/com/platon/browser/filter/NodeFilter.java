@@ -95,7 +95,7 @@ public class NodeFilter {
                 nodeRanking.setRewardRatio(BigDecimal.valueOf(candidateDto.getFee()).divide(BigDecimal.valueOf(10000),4,BigDecimal.ROUND_FLOOR).doubleValue());
 
                 nodeRanking.setRanking(i);
-                nodeRanking.setBlockCount(1L);
+                nodeRanking.setBlockCount(0L);
                 BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
                 nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
                 nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
@@ -170,7 +170,7 @@ public class NodeFilter {
         for (NodeRanking nodeRanking : list) {
             if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x",""), 16))) {
                 long count = nodeRanking.getBlockCount();
-                count = count + 1;
+                count = count ++;
                 nodeRanking.setBlockCount(count);
                 nodeRanking.getRewardRatio();
 

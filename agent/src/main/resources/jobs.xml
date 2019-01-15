@@ -13,17 +13,17 @@
     <reg:zookeeper id="regCenter" server-lists="${regCenter.serverList}" namespace="${regCenter.namespace}"
                    base-sleep-time-milliseconds="1000"
                    max-sleep-time-milliseconds="3000" max-retries="3"/>
-   <!-- <job:simple id="chainInfoFilterJob{netInfo}" class="com.platon.browser.job.ChainInfoFilterJob"
+   <job:simple id="chainInfoFilterJob{netInfo}" class="com.platon.browser.job.ChainInfoFilterJob"
                 registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=chainInfoFilterJob"
                 overwrite="true"
                 failover="true" misfire="true" description="区块相关信息分析任务"/>
 
 
-    <job:simple id="pendingTxUpdateTaskJob${netInfo}" class="com.platon.browser.job.PendingTxUpdateTaskJob"
-                registry-center-ref="regCenter"
-                cron="*/30 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxUpdateTaskJob"
-                overwrite="true"
-                failover="true" misfire="true" description="挂起交易同步任务"/>-->
+    <!--  <job:simple id="pendingTxUpdateTaskJob${netInfo}" class="com.platon.browser.job.PendingTxUpdateTaskJob"
+                 registry-center-ref="regCenter"
+                 cron="*/30 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=pendingTxUpdateTaskJob"
+                 overwrite="true"
+                 failover="true" misfire="true" description="挂起交易同步任务"/>-->
 
 </beans>
