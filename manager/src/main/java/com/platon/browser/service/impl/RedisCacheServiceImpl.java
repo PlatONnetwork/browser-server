@@ -500,6 +500,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BlockExample blockExample = new BlockExample();
         blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
         List<Block> blocks = blockMapper.selectByExample(blockExample);
+        cache.setCurrent(0);
         if(blocks.size()>0){
             for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
         }
