@@ -142,6 +142,7 @@ public class NodeFilter {
                     NodeRanking chainNode = dbNodeIdToNodeRankingMap.get(dbNode.getNodeId());
                     if (chainNode != null) {
                         // 库里有效属性保留
+                        chainNode.setBlockCount(dbNode.getBlockCount());
                         chainNode.setJoinTime(dbNode.getJoinTime());
                         chainNode.setBeginNumber(dbNode.getBeginNumber());
                         chainNode.setId(dbNode.getId());
@@ -186,7 +187,7 @@ public class NodeFilter {
                 sum = sum.add(reward);
                 nodeRanking.setBlockReward(sum.toString());
                 BigDecimal rate = new BigDecimal(String.valueOf(1 - nodeRanking.getRewardRatio()));
-                nodeRanking.setRewardRatio(sum.multiply(rate).doubleValue());
+                nodeRanking.setRewardAmount(sum.multiply(rate).toString());
                 BigDecimal fee = new BigDecimal(String.valueOf(nodeRanking.getRewardRatio()));
                 nodeRanking.setProfitAmount(sum.multiply(fee).toString());
             }
