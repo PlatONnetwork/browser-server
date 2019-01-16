@@ -31,9 +31,10 @@ public class TransactionListItem {
         this.setBlockHeight(initData.getBlockNumber());
         // 交易时间就是出块时间
         this.setBlockTime(initData.getTimestamp().getTime());
-        BigDecimal txCost = new BigDecimal(initData.getActualTxCost());
-        txCost=Convert.fromWei(txCost, Convert.Unit.ETHER);
+        BigDecimal txCost=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
         this.setActualTxCost(String.valueOf(txCost));
+        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+        this.setValue(value.toString());
         this.setServerTime(System.currentTimeMillis());
     }
 

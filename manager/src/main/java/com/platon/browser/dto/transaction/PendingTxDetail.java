@@ -1,6 +1,11 @@
 package com.platon.browser.dto.transaction;
 
+import com.platon.browser.dao.entity.PendingTx;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.web3j.utils.Convert;
+
+import java.math.BigDecimal;
 
 @Data
 public class PendingTxDetail {
@@ -20,4 +25,11 @@ public class PendingTxDetail {
     private long expectTime;
     private String receiveType;
 
+    public void init(PendingTx initData) {
+        BeanUtils.copyProperties(initData,this);
+        this.setTxHash(initData.getHash());
+        this.setTimestamp(initData.getTimestamp().getTime());
+        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+        this.setValue(value.toString());
+    }
 }
