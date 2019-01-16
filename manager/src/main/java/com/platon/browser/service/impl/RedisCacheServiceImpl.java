@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 
@@ -429,7 +430,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,String publicKey){
+    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,BigInteger publicKey){
         StatisticsCache cache = getStatisticsCache(chainId);
 
         /************* 设置当前块高、出块节点*************/
@@ -438,7 +439,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         /************* 设置节点名称*************/
         nodeRankings.forEach(node->{
-            if(node.getNodeId().equals(publicKey)){
+            if(new BigInteger(node.getNodeId().replace("0x", ""), 16).equals(publicKey)){
                 cache.setNodeName(node.getName());
             }
         });

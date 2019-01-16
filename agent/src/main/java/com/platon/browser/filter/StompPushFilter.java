@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class StompPushFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    public boolean stompPush( Block block , List<NodeRanking> nodeRankings, String publickey){
+    public boolean stompPush( Block block , List<NodeRanking> nodeRankings, BigInteger publickey){
         return redisCacheService.updateStatisticsCache(chainId,block,nodeRankings,publickey);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class OtherFlow {
         EthPendingTransactions ethPendingTransactions = (EthPendingTransactions) threadLocalMap.get("ethPendingTransactions");
         List<NodeRanking> nodeRankings = (List <NodeRanking>) threadLocalMap.get("nodeRankings");
         Block block = (Block) threadLocalMap.get("block");
-        String publicKey = (String) threadLocalMap.get("publicKey");
+        BigInteger publicKey = (BigInteger) threadLocalMap.get("publicKey");
         try {
             if(ethPendingTransactions != null){
                 boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);
