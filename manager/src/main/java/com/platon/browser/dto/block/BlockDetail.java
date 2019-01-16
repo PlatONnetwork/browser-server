@@ -1,6 +1,11 @@
 package com.platon.browser.dto.block;
 
+import com.platon.browser.dao.entity.Block;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.web3j.utils.Convert;
+
+import java.math.BigDecimal;
 
 @Data
 public class BlockDetail {
@@ -20,4 +25,13 @@ public class BlockDetail {
     private boolean first;
     // 是否最后一条
     private boolean last;
+
+    public void init(Block initData){
+        BeanUtils.copyProperties(initData,this);
+        this.setHeight(initData.getNumber());
+        this.setTransaction(initData.getTransactionNumber());
+        this.setTimestamp(initData.getTimestamp().getTime());
+        BigDecimal reward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
+        this.setBlockReward(reward.toString());
+    }
 }

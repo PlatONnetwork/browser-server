@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class TransactionListItem {
     private String txHash;
+    private String blockHash;
     private Long blockHeight;
     private Long blockTime;
     private String from;

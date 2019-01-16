@@ -28,7 +28,6 @@ import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -430,15 +429,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,String publickey){
-        StatisticsCache cache = new StatisticsCache();
+    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,String publicKey){
+        StatisticsCache cache = getStatisticsCache(chainId);
 
         /************* 设置当前块高、出块节点*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
 
+        /************* 设置节点名称*************/
         nodeRankings.forEach(node->{
-            if(node.getNodeId().equals(publickey)){
+            if(node.getNodeId().equals(publicKey)){
                 cache.setNodeName(node.getName());
             }
         });
@@ -490,31 +490,19 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BigDecimal avgTime=BigDecimal.valueOf(highestBlockTimestamp-lowestBlockTimestamp).divide(BigDecimal.valueOf(divider),4,BigDecimal.ROUND_HALF_UP);
         cache.setAvgTime(avgTime);
 
-        /************** 计算最大TPS ************/
-        String maxtpsCacheKey = maxtpsCacheKeyTemplate.replace("{}",chainId);
-        String maxtpsStr = redisTemplate.opsForValue().get(maxtpsCacheKey);
-        long maxtpsLong = 0;
-        if(StringUtils.isNotBlank(maxtpsStr)){
-            maxtpsLong = Long.valueOf(maxtpsStr);
-        }
-        cache.setMaxTps(maxtpsLong);
-        if(maxtpsLong<cache.getCurrent()){
-            cache.setMaxTps(cache.getCurrent());
-            redisTemplate.opsForValue().set(maxtpsCacheKey,String.valueOf(cache.getMaxTps()));
-        }
-
-
         /************** 计算当前TPS ************/
         Date endDate = new Date(block.getTimestamp().getTime());
         Date startDate = new Date(block.getTimestamp().getTime()-1000);
-
         BlockExample blockExample = new BlockExample();
         blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
-        List<Block> blockList=blockMapper.selectByExample(blockExample);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        if(blocks.size()>0){
+            blocks.forEach(e -> cache.setCurrent(cache.getCurrent()+e.getTransactionNumber()));
+        }
 
-        cache.setCurrent(0);
-        if(blockList.size()>0){
-            blockList.forEach(blocks -> cache.setCurrent(cache.getCurrent()+block.getTransactionNumber()));
+        /************** 计算最大TPS ************/
+        if(cache.getMaxTps()<cache.getCurrent()){
+            cache.setMaxTps(cache.getCurrent());
         }
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);

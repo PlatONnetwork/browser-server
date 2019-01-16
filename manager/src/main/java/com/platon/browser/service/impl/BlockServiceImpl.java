@@ -4,7 +4,6 @@ import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.BlockPage;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -12,7 +11,10 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.req.block.*;
+import com.platon.browser.req.block.BlockDetailNavigateReq;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockDownloadReq;
+import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nEnum;
@@ -24,7 +26,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -95,12 +96,9 @@ public class BlockServiceImpl implements BlockService {
             logger.error("invalid block number {}",req.getHeight());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_NOT_EXIST));
         }
-        BlockDetail blockDetail = new BlockDetail();
-        Block currentBlock = blocks.get(0);
-        BeanUtils.copyProperties(currentBlock,blockDetail);
-        blockDetail.setHeight(currentBlock.getNumber());
-        blockDetail.setTransaction(currentBlock.getTransactionNumber());
-        blockDetail.setTimestamp(currentBlock.getTimestamp().getTime());
+        BlockDetail returnData = new BlockDetail();
+        Block initData = blocks.get(0);
+        returnData.init(initData);
 
         // 取上一个区块
         blockExample = new BlockExample();
@@ -113,12 +111,12 @@ public class BlockServiceImpl implements BlockService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
         }
         if(blocks.size()==0){
-            blockDetail.setTimeDiff(0);
+            returnData.setTimeDiff(0);
             // 当前块没有上一个块证明这是第一个块, 设置first标识
-            blockDetail.setFirst(true);
+            returnData.setFirst(true);
         }else{
             Block prevBlock = blocks.get(0);
-            blockDetail.setTimeDiff(blockDetail.getTimestamp()-prevBlock.getTimestamp().getTime());
+            returnData.setTimeDiff(returnData.getTimestamp()-prevBlock.getTimestamp().getTime());
         }
 
         /** 设置last标识 **/
@@ -129,10 +127,10 @@ public class BlockServiceImpl implements BlockService {
         blocks = blockMapper.selectByExample(blockExample);
         if(blocks.size()==0){
             // 当前区块没有下一个块，则表示这是最后一个块，设置last标识
-            blockDetail.setLast(true);
+            returnData.setLast(true);
         }
 
-        return blockDetail;
+        return returnData;
     }
 
     /**

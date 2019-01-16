@@ -118,7 +118,11 @@ public class TestDataUtil {
             while (true){
                 int logo = random.nextInt(43);
                 if(logo>0){
-                    node.setUrl(String.valueOf(logo));
+                    String str = String.valueOf(logo);
+                    if(str.length()==1){
+                        str = "0"+str;
+                    }
+                    node.setUrl(str);
                     break;
                 }
             }
