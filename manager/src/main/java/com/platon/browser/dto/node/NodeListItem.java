@@ -23,5 +23,6 @@ public class NodeListItem {
         BeanUtils.copyProperties(initData,this);
         this.setBlockCount(initData.getBlockCount().intValue());
         this.setLogo(initData.getUrl());
+        this.setRewardRatio(1-initData.getRewardRatio());
     }
 }

@@ -49,5 +49,6 @@ public class NodeDetail {
         this.setBlockReward(blockReward.toString());
         BigDecimal deposit = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER);
         this.setDeposit(deposit.toString());
+        this.setRewardRatio(1-initData.getRewardRatio());
     }
 }
