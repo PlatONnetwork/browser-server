@@ -3,10 +3,7 @@ package com.platon.browser.util;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.TestData;
 import com.platon.browser.common.util.ConvertUtil;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.*;
 import io.netty.util.internal.ConcurrentSet;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,16 +23,27 @@ public class DataGenTool extends TestData {
     private static final Logger logger = LoggerFactory.getLogger(DataGenTool.class);
     public static Web3j web3j;
 
-    public static final void writeToFile(String chainId, TestDataFileNameEnum dataFileNameEnum, Collection data) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(testDataDir+dataFileNameEnum.prefix+chainId+".json"));
-        writer.write(JSON.toJSONString(data));
-        writer.flush();
-        writer.close();
+    public static final void writeToFile(String chainId, TestDataFileNameEnum dataFileNameEnum, Collection data) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(testDataDir+dataFileNameEnum.prefix+chainId+".json"));
+            writer.write(JSON.toJSONString(data));
+            writer.flush();
+            writer.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * 生成节点数据
+     * @param chainId
+     * @param writeToFile
+     * @return
+     */
     public static List<NodeRanking> generateNode(String chainId, boolean writeToFile) {
         List<NodeRanking> nodes = new ArrayList<>();
 
+        Random random = new Random();
         for(int i=0;i<200;i++){
             NodeRanking node = new NodeRanking();
             node.setChainId(chainId);
@@ -60,7 +68,7 @@ public class DataGenTool extends TestData {
                     break;
                 }catch (Exception e){}
             }
-            node.setChainId("1");
+            node.setChainId(chainId);
             node.setCreateTime(new Date());
             node.setElectionStatus(1);
             node.setAddress("0x493301712671ada506ba6ca7891f436d2918582"+i);
@@ -68,17 +76,16 @@ public class DataGenTool extends TestData {
             node.setUpdateTime(new Date());
             node.setOrgName("platon");
             node.setOrgWebsite("https://www.platon.network/");
-            node.setDeposit("87854");
-            node.setPort(808+i);
+            node.setDeposit(String.valueOf(random.nextInt(200000000)));
+            node.setPort(random.nextInt(10000));
             node.setJoinTime(new Date());
             node.setType(1);
             node.setRanking(i);
             node.setIsValid(1);
-            node.setBeginNumber(1l);
-            node.setEndNumber(199l);
-            node.setBlockCount(55l);
+            node.setBeginNumber(random.nextLong());
+            node.setEndNumber(random.nextLong());
+            node.setBlockCount(random.nextLong());
 
-            Random random = new Random();
             while (true){
                 int logo = random.nextInt(43);
                 if(logo>0){
@@ -93,16 +100,16 @@ public class DataGenTool extends TestData {
 
             nodes.add(node);
         }
-        if(writeToFile) {
-            try {
-                writeToFile(chainId,TestDataFileNameEnum.NODE,nodes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        if(writeToFile) writeToFile(chainId,TestDataFileNameEnum.NODE,nodes);
         return nodes;
     }
 
+    /**
+     * 生成区块数据
+     * @param chainId
+     * @param writeToFile
+     * @return
+     */
     public static List<Block> generateBlock(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -145,17 +152,17 @@ public class DataGenTool extends TestData {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<Block> blocks = new ArrayList<>(data);
-        if(writeToFile) {
-            try {
-                writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return blocks;
+        List<Block> returnData = new ArrayList<>(data);
+        if(writeToFile) writeToFile(chainId,TestDataFileNameEnum.BLOCK,returnData);
+        return returnData;
     }
 
+    /**
+     * 生成交易数据
+     * @param chainId
+     * @param writeToFile
+     * @return
+     */
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -209,26 +216,45 @@ public class DataGenTool extends TestData {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<TransactionWithBLOBs> transactions = new ArrayList<>(data);
-        if(writeToFile) {
-            try {
-                writeToFile(chainId,TestDataFileNameEnum.TRANSACTION,transactions);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        List<TransactionWithBLOBs> returnData = new ArrayList<>(data);
+        if(writeToFile) writeToFile(chainId,TestDataFileNameEnum.TRANSACTION,returnData);
+        return returnData;
+    }
+
+    public static List<PendingTx> generatePendingTx(String chainId, boolean writeToFile) {
+        List<PendingTx> returnData = new ArrayList<>();
+        Random random = new Random();
+        for (int i=0;i<50;i++){
+            PendingTx bean = new PendingTx();
+            bean.setChainId(chainId);
+            bean.setEnergonLimit(String.valueOf(random.nextInt(500000)));
+            bean.setEnergonUsed(String.valueOf(random.nextInt(500000)));
+            bean.setEnergonPrice(String.valueOf(random.nextInt(200000000)));
+            bean.setHash("0x"+UUID.randomUUID().toString());
+            bean.setValue(String.valueOf(random.nextInt(2000000000)));
+            bean.setTimestamp(new Date());
+            bean.setCreateTime(new Date());
+            bean.setUpdateTime(new Date());
+            bean.setFrom("0x11c5a274ef2a924f59e7182abc7c031206cdcf66");
+            bean.setTo("0x788641dc03b80240207f04bb1f8be5e10269ab8f");
+            bean.setReceiveType("account");
+            bean.setTxType("transfer");
+            bean.setInput("8888888");
+            returnData.add(bean);
         }
-        return transactions;
+        if(writeToFile) writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,returnData);
+        return returnData;
     }
 
     public static List<Transaction> generateTransaction(String chainId, boolean writeToFile) {
         List<TransactionWithBLOBs> data = generateTransactionWithBLOB(chainId,writeToFile);
-        List<Transaction> set = new ArrayList<>();
+        List<Transaction> returnData = new ArrayList<>();
         data.forEach(e->{
             Transaction bean = new Transaction();
             BeanUtils.copyProperties(e,bean);
-            set.add(bean);
+            returnData.add(bean);
         });
-        return set;
+        return returnData;
     }
 
     public static <T> List<T> getTestData(String chainId,TestDataFileNameEnum dataFileNameEnum, Class<T> clazz) throws IOException {
@@ -247,5 +273,7 @@ public class DataGenTool extends TestData {
         generateBlock("1",true);
         generateTransaction("1",true);
         generateNode("1",true);
+        generatePendingTx("1",true);
+        System.exit(1);
     }
 }
