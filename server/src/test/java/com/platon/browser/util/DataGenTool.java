@@ -30,7 +30,7 @@ public class DataGenTool extends TestData {
         }
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(JSON.toJSONString(data));
+            writer.write(JSON.toJSONString(data,true));
             writer.flush();
             writer.close();
         }catch (Exception e){
