@@ -1,1 +1,25 @@
-[{"actualTxCost":"48925","blockHash":"0x2503f5fb368c3525e59872f964790f483471a4c5bd7f236c64e1ed5697e70d74","blockNumber":389,"chainId":"1","energonLimit":"41226319712","energonPrice":"9000000000","energonUsed":"90000","failReason":"1263171","from":"0x493301712671ada506ba6ca7891f436d29185821","hash":"0x387ea3ab3551c0f3fd95e2ea6718229fe86aea845f045ea95d1756ca74c1937f","input":"1656704","nonce":"0","receiveType":"account","sequence":0,"timestamp":1547640103047,"to":"0x4e5a1b6e935449da4dc85d5927355c5fff2d8a35","transactionIndex":0,"txInfo":"{\"type\":\"1\",\"functionName\":\"getData\"}","txReceiptStatus":1,"txType":"transfer","value":"1208925819614629174706176"}]
+[
+	{
+		"actualTxCost":"119759",
+		"blockHash":"0x2503f5fb368c3525e59872f964790f483471a4c5bd7f236c64e1ed5697e70d74",
+		"blockNumber":389,
+		"chainId":"1",
+		"energonLimit":"41226319712",
+		"energonPrice":"9000000000",
+		"energonUsed":"90000",
+		"failReason":"833687",
+		"from":"0x493301712671ada506ba6ca7891f436d29185821",
+		"hash":"0x387ea3ab3551c0f3fd95e2ea6718229fe86aea845f045ea95d1756ca74c1937f",
+		"input":"1314069",
+		"nonce":"0",
+		"receiveType":"account",
+		"sequence":0,
+		"timestamp":1547640294393,
+		"to":"0x4e5a1b6e935449da4dc85d5927355c5fff2d8a35",
+		"transactionIndex":0,
+		"txInfo":"{\"type\":\"1\",\"functionName\":\"getData\"}",
+		"txReceiptStatus":1,
+		"txType":"transfer",
+		"value":"1208925819614629174706176"
+	}
+]
