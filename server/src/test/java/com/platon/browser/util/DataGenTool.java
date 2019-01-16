@@ -24,8 +24,12 @@ public class DataGenTool extends TestData {
     public static Web3j web3j;
 
     public static final void writeToFile(String chainId, TestDataFileNameEnum dataFileNameEnum, Collection data) {
+        File file = new File(testDataDir+dataFileNameEnum.prefix+chainId+".json");
+        if(file.exists()){
+            file.delete();
+        }
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(testDataDir+dataFileNameEnum.prefix+chainId+".json"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(JSON.toJSONString(data));
             writer.flush();
             writer.close();
@@ -44,7 +48,7 @@ public class DataGenTool extends TestData {
         List<NodeRanking> nodes = new ArrayList<>();
 
         Random random = new Random();
-        for(int i=0;i<200;i++){
+        for(int i=1;i<=200;i++){
             NodeRanking node = new NodeRanking();
             node.setChainId(chainId);
             while (true){
@@ -119,7 +123,7 @@ public class DataGenTool extends TestData {
         Random random = new Random();
         Set<Block> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
-        Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
+        Subscription subscription = web3j.catchUpToLatestBlockObservable(DefaultBlockParameter.valueOf(currentHeight),true)
         .subscribe(eblock -> {
             EthBlock.Block block = eblock.getBlock();
             if (block!=null){
@@ -171,7 +175,7 @@ public class DataGenTool extends TestData {
 
         Set<TransactionWithBLOBs> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
-        Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewTransactionsObservable(DefaultBlockParameter.valueOf(currentHeight))
+        Subscription subscription = web3j.catchUpToLatestTransactionObservable(DefaultBlockParameter.valueOf(currentHeight))
                 .subscribe(transaction -> {
                     TransactionWithBLOBs bean = new TransactionWithBLOBs();
                     BeanUtils.copyProperties(transaction,bean);
@@ -274,6 +278,5 @@ public class DataGenTool extends TestData {
         generateTransaction("1",true);
         generateNode("1",true);
         generatePendingTx("1",true);
-        System.exit(1);
     }
 }
