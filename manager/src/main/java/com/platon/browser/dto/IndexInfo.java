@@ -11,7 +11,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Data
 public class IndexInfo {
     private long currentHeight;
-    private String node;
+    private String miner;
+    private String nodeName;
     private long currentTransaction;
     private long consensusNodeAmount;
     private long addressAmount;

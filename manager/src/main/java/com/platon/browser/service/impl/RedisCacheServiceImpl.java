@@ -432,6 +432,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,BigInteger publicKey){
         StatisticsCache cache = getStatisticsCache(chainId);
+        if(cache==null) cache = new StatisticsCache();
 
         /************* 设置当前块高、出块节点*************/
         cache.setMiner(block.getMiner());
@@ -500,7 +501,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
         List<Block> blocks = blockMapper.selectByExample(blockExample);
         if(blocks.size()>0){
-            blocks.forEach(e -> cache.setCurrent(cache.getCurrent()+e.getTransactionNumber()));
+            for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
         }
 
         /************** 计算最大TPS ************/
