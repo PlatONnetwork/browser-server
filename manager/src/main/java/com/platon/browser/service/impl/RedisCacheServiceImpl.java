@@ -438,11 +438,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         cache.setCurrentHeight(block.getNumber());
 
         /************* 设置节点名称*************/
-        nodeRankings.forEach(node->{
-            if(new BigInteger(node.getNodeId().replace("0x", ""), 16).equals(publicKey)){
-                cache.setNodeName(node.getName());
-            }
-        });
+        Map<BigInteger,String> keyNameMap = new HashMap<>();
+        nodeRankings.forEach(e->keyNameMap.put(new BigInteger(e.getNodeId().replace("0x", ""), 16),e.getName()));
+        cache.setNodeName(keyNameMap.get(publicKey));
+        if(StringUtils.isBlank(cache.getNodeName())) cache.setNodeName("Unknown");
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();
