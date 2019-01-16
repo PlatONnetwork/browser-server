@@ -432,17 +432,17 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,BigInteger publicKey){
         StatisticsCache cache = getStatisticsCache(chainId);
+        if(cache==null) cache = new StatisticsCache();
 
         /************* 设置当前块高、出块节点*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
 
         /************* 设置节点名称*************/
-        nodeRankings.forEach(node->{
-            if(new BigInteger(node.getNodeId().replace("0x", ""), 16).equals(publicKey)){
-                cache.setNodeName(node.getName());
-            }
-        });
+        Map<BigInteger,String> keyNameMap = new HashMap<>();
+        nodeRankings.forEach(e->keyNameMap.put(new BigInteger(e.getNodeId().replace("0x", ""), 16),e.getName()));
+        cache.setNodeName(keyNameMap.get(publicKey));
+        if(StringUtils.isBlank(cache.getNodeName())) cache.setNodeName("Unknown");
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();
@@ -501,7 +501,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
         List<Block> blocks = blockMapper.selectByExample(blockExample);
         if(blocks.size()>0){
-            blocks.forEach(e -> cache.setCurrent(cache.getCurrent()+e.getTransactionNumber()));
+            for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
         }
 
         /************** 计算最大TPS ************/

@@ -1,5 +1,6 @@
 package com.platon.browser.service;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.RespPage;
@@ -7,7 +8,7 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
-import com.platon.browser.util.TestDataUtil;
+import com.platon.browser.util.DataGenTool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
@@ -72,20 +74,20 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Test
     public void updateNodePushCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+            Set<NodeRanking> nodes = new HashSet<>(DataGenTool.generateNode(chainId,false));
             redisCacheService.updateNodePushCache(chainId,nodes);
-            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).pushNodeKey,0,-1);
-            Assert.assertEquals(nodes.size(),cache.size());
+            Set<String> result = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).pushNodeKey,0,-1);
+            Assert.assertEquals(nodes.size(),result.size());
         });
     }
 
     @Test
     public void getNodePushCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<NodeRanking> nodes = new HashSet<>(TestDataUtil.generateNode(chainId));
+            Set<NodeRanking> nodes = new HashSet<>(DataGenTool.generateNode(chainId,false));
             redisCacheService.updateNodePushCache(chainId,nodes);
-            List<NodePushItem> nodeInfoList = redisCacheService.getNodePushCache(chainId);
-            Assert.assertEquals(nodes.size(),nodeInfoList.size());
+            List<NodePushItem> result = redisCacheService.getNodePushCache(chainId);
+            Assert.assertEquals(nodes.size(),result.size());
         });
     }
 
@@ -94,30 +96,30 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Test
     public void updateBlockCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
+            Set<Block> data = new HashSet<>(DataGenTool.generateBlock(chainId,false));
             redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).blockKey);
             redisCacheService.updateBlockCache(chainId,data);
-            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).blockKey,0,-1);
-            Assert.assertEquals(data.size(),cache.size());
+            Set<String> result = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).blockKey,0,-1);
+            Assert.assertEquals(data.size(),result.size());
         });
     }
 
     @Test
     public void getBlockCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<Block> data = new HashSet<>(TestDataUtil.generateBlock(chainId));
+            Set<Block> data = new HashSet<>(DataGenTool.generateBlock(chainId,false));
             redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).blockKey);
             redisCacheService.updateBlockCache(chainId,data);
-            RespPage<BlockListItem> cache = redisCacheService.getBlockPage(chainId,1,data.size());
-            Assert.assertEquals(data.size(),cache.getData().size());
+            RespPage<BlockListItem> result = redisCacheService.getBlockPage(chainId,1,data.size());
+            Assert.assertEquals(data.size(),result.getData().size());
         });
     }
 
     @Test
     public void getBlockPushData(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
-            Assert.assertEquals(10,blocks.size());
+            List<BlockPushItem> result = redisCacheService.getBlockPushCache(chainId,1,10);
+            Assert.assertEquals(10,result.size());
         });
     }
 
@@ -126,22 +128,22 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Test
     public void updateTransactionCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
+            Set<Transaction> data = new HashSet<>(DataGenTool.generateTransaction(chainId,false));
             redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).transactionKey);
             redisCacheService.updateTransactionCache(chainId,data);
-            Set<String> cache = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).transactionKey,0,-1);
-            Assert.assertEquals(data.size(),cache.size());
+            Set<String> result = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).transactionKey,0,-1);
+            Assert.assertEquals(data.size(),result.size());
         });
     }
 
     @Test
     public void getTransactionCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            Set<Transaction> data = new HashSet<>(TestDataUtil.generateTransaction(chainId));
+            Set<Transaction> data = new HashSet<>(DataGenTool.generateTransaction(chainId,false));
             redisTemplate.delete(chainIdToCacheKeyMap.get(chainId).transactionKey);
             redisCacheService.updateTransactionCache(chainId,data);
-            RespPage<TransactionListItem> cache = redisCacheService.getTransactionPage(chainId,1,data.size());
-            Assert.assertEquals(data.size(),cache.getData().size());
+            RespPage<TransactionListItem> result = redisCacheService.getTransactionPage(chainId,1,data.size());
+            Assert.assertEquals(data.size(),result.getData().size());
         });
     }
 
@@ -150,10 +152,13 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Test
     public void updateStatisticsCache(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            List<NodeRanking> data = TestDataUtil.generateNode(chainId);
-
-            /*BlockListItem blockItem = getOneBlock(chainId);
-            Block block = new Block();*/
+            initNodeRankingTableAndCache();
+            initBlockTableAndCache();
+            initTransactionTableAndCache();
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId);
+            PageHelper.startPage(1,10);
+            List<NodeRanking> data = nodeRankingMapper.selectByExample(nodeRankingExample);
 
             TransactionListItem transaction = getOneTransaction(chainId);
             BlockKey key = new BlockKey();
@@ -161,13 +166,7 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             key.setHash(transaction.getBlockHash());
             Block block = blockMapper.selectByPrimaryKey(key);
 
-            /*BeanUtils.copyProperties(blockItem,block);
-            block.setNumber(blockItem.getHeight());
-            block.setTimestamp(new Date(blockItem.getTimestamp()));
-            block.setTransactionNumber(Long.valueOf(blockItem.getTransaction()).intValue());*/
-
-            String publicKey = "r42424234234234";
-
+            BigInteger publicKey = new BigInteger("561989965773895576813579715222857160699960464449120684591664494480641850412901703913038313549619636487002155264521480576575605556920764090030793982122823");
             boolean result = redisCacheService.updateStatisticsCache(chainId,block,data,publicKey);
             Assert.assertEquals(true,result);
         });

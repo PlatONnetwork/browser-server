@@ -70,7 +70,6 @@ public class StompPushTask {
 
             IndexInfo index = new IndexInfo();
             BeanUtils.copyProperties(cache,index);
-            index.setNode(cache.getMiner());
             index.setConsensusNodeAmount(cache.getConsensusCount());
             index.setCurrentTransaction(cache.getTransactionCount());
             index.setAddressAmount(cache.getAddressCount());

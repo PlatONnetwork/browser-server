@@ -1,11 +1,13 @@
 package com.platon.browser.service;
 
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
+import com.platon.browser.util.DataTool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,21 +25,20 @@ public class NodeServiceTest extends ServiceTestBase {
     @Test
     public void getPage(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initNodeRankingTable();
+            initNodeRankingTableAndCache();
+            List<NodeRanking> originData = DataTool.getTestData(chainId,TestDataFileNameEnum.NODE, NodeRanking.class);
             NodePageReq req = new NodePageReq();
             req.setCid(chainId);
-            req.setKeyword("777");
-            req.setIsValid(1);
-            req.setNodeType(1);
-            RespPage<NodeListItem> data = nodeService.getPage(req);
-            Assert.assertTrue(data.getData().size()>=0);
+            req.setPageSize(originData.size());
+            RespPage<NodeListItem> result = nodeService.getPage(req);
+            Assert.assertEquals(originData.size(),result.getData().size());
         });
     }
 
     @Test
     public void getDetail(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initNodeRankingTable();
+            initNodeRankingTableAndCache();
             NodeListItem data = getOneNode(chainId);
             NodeDetailReq req = new NodeDetailReq();
             req.setCid(chainId);
@@ -50,9 +51,9 @@ public class NodeServiceTest extends ServiceTestBase {
     @Test
     public void getPushData(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initNodeRankingTable();
-            List<NodePushItem> data = nodeService.getPushCache(chainId);
-            Assert.assertTrue(data.size()>=0);
+            initNodeRankingTableAndCache();
+            List<NodePushItem> result = nodeService.getPushCache(chainId);
+            Assert.assertTrue(result.size()>=0);
         });
     }
 }

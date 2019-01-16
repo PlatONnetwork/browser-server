@@ -80,14 +80,10 @@ public class TransactionServiceImpl implements TransactionService {
             logger.error("invalid transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(),i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
         }
-        TransactionDetail transactionDetail = new TransactionDetail();
-        TransactionWithBLOBs currentTran = transactions.get(0);
-        BeanUtils.copyProperties(currentTran,transactionDetail);
-        transactionDetail.setTxHash(currentTran.getHash());
-        transactionDetail.setBlockHeight(currentTran.getBlockNumber());
-        transactionDetail.setTimestamp(currentTran.getTimestamp().getTime());
-        transactionDetail.setInputData(currentTran.getInput());
-        return transactionDetail;
+        TransactionDetail returnData = new TransactionDetail();
+        TransactionWithBLOBs initData = transactions.get(0);
+        returnData.init(initData);
+        return returnData;
     }
 
     private void setupNavigateFlag(String chainId,TransactionDetail detail){
@@ -114,12 +110,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetail getDetail(TransactionDetailReq req) {
-
         // 取得当前交易详情
         TransactionDetail transactionDetail = loadDetail(req);
         // 设置浏览前后标识
         setupNavigateFlag(req.getCid(),transactionDetail);
-
         return transactionDetail;
     }
 
@@ -191,18 +185,12 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
         }
 
-        TransactionWithBLOBs transaction = transactions.get(0);
-        TransactionDetail transactionDetail = new TransactionDetail();
-        BeanUtils.copyProperties(transaction,transactionDetail);
-        transactionDetail.setTxHash(transaction.getHash());
-        transactionDetail.setBlockHeight(transaction.getBlockNumber());
-        transactionDetail.setInputData(transaction.getInput());
-        transactionDetail.setTimestamp(transaction.getTimestamp().getTime());
-
+        TransactionWithBLOBs initData = transactions.get(0);
+        TransactionDetail returnData = new TransactionDetail();
+        returnData.init(initData);
         // 设置浏览前后标识
-        setupNavigateFlag(req.getCid(),transactionDetail);
-
-        return transactionDetail;
+        setupNavigateFlag(req.getCid(),returnData);
+        return returnData;
     }
 
     @Override

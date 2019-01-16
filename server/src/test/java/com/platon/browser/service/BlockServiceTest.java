@@ -1,16 +1,20 @@
 package com.platon.browser.service;
 
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.util.DataTool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 public class BlockServiceTest extends ServiceTestBase {
@@ -19,18 +23,20 @@ public class BlockServiceTest extends ServiceTestBase {
     @Test
     public void getPage(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initBlockTable();
+            initBlockTableAndCache();
+            List<Block> originData = DataTool.getTestData(chainId,TestDataFileNameEnum.BLOCK, Block.class);
             BlockPageReq req = new BlockPageReq();
             req.setCid(chainId);
-            RespPage<BlockListItem> blocks = blockService.getPage(req);
-            Assert.assertTrue(blocks.getData().size()>=0);
+            req.setPageSize(originData.size());
+            RespPage<BlockListItem> result = blockService.getPage(req);
+            Assert.assertEquals(originData.size(),result.getData().size());
         });
     }
 
     @Test
     public void getDetail(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initBlockTable();
+            initBlockTableAndCache();
             BlockListItem data = getOneBlock(chainId);
             BlockDetailReq req = new BlockDetailReq();
             req.setCid(chainId);

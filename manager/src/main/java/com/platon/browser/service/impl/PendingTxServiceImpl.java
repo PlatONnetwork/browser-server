@@ -93,14 +93,11 @@ public class PendingTxServiceImpl implements PendingTxService {
             logger.error("invalid transaction hash {}",req.getTxHash());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.PENDING_ERROR_NOT_EXIST));
         }
-        PendingTxDetail pendingTxDetail = new PendingTxDetail();
-        PendingTx transaction = transactions.get(0);
-        BeanUtils.copyProperties(transaction,pendingTxDetail);
-        pendingTxDetail.setTxHash(transaction.getHash());
-        pendingTxDetail.setInputData(transaction.getInput());
-        pendingTxDetail.setTimestamp(transaction.getTimestamp().getTime());
+        PendingTxDetail returnData = new PendingTxDetail();
+        PendingTx initData = transactions.get(0);
+        returnData.init(initData);
         pot.setType("pending");
-        pot.setPending(pendingTxDetail);
+        pot.setPending(returnData);
         return pot;
     }
 
