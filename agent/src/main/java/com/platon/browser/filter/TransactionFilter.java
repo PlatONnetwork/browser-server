@@ -104,11 +104,18 @@ public class TransactionFilter {
                     transactionWithBLOBs.setChainId(chainId);
                     transactionWithBLOBs.setBlockHash(transaction.getBlockHash());
                     transactionWithBLOBs.setBlockNumber(transaction.getBlockNumber().longValue());
-                    transactionWithBLOBs.setInput(transaction.getInput());
+                    if(transaction.getInput().length() <= 65535){
+                        transactionWithBLOBs.setInput(transaction.getInput());
+                    }else {
+                        transactionWithBLOBs.setInput(transaction.getInput().substring(0,65535));
+                    }
                     if(transaction.getInput().equals("0x") && transaction.getValue() != null){
                         transactionWithBLOBs.setTxType("transfer");
                     }
                     AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
+                    if("1".equals(analysisResult.getType())){
+                        analysisResult.setFunctionName("contract deploy");
+                    }
                     String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
                     transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
                     String txinfo = JSON.toJSONString(analysisResult);

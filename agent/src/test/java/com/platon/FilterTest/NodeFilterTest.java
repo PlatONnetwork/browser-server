@@ -81,7 +81,7 @@ public class NodeFilterTest extends TestBase {
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(7773L))).send();
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
             BigInteger a = CalculatePublicKey.testBlock(ethBlock);
-            String node38793 = new BigInteger("71f7b5f7294a9a1fb6a1b796478d81d00986ea1481307b10237d6f292c9bee72663bef4eec06a5003f17c89bf072a442a4a288031fab80cc03dc0dfd84330349",16).toString();
+            String node38793 = new BigInteger("65093423df6a0050ca9143f6150f2061932f9b26bf3ae30330e167d4c475d8039ce7b8467dfd706f59a1c625f54deb821048d725f84fe8a9091e98d2f350f9f9",16).toString();
             logger.info(node38793);
             logger.info(a.toString());
              list.forEach(candidateDto -> {
