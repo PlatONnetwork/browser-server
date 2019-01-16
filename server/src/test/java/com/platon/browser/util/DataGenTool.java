@@ -53,11 +53,7 @@ public class DataGenTool extends TestData {
             node.setChainId(chainId);
             while (true){
                 try {
-                    String ip = IPGenTool.getForeignRandomIp();
-                    if(i%2==0){
-                        ip = IPGenTool.getChinaRandomIp();
-                    }
-
+                    String ip = i%2==0?IPGenTool.getForeignRandomIp():IPGenTool.getChinaRandomIp();
                     GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
                     if(StringUtils.isBlank(location.getCountryCode())){
                         continue;
@@ -89,6 +85,13 @@ public class DataGenTool extends TestData {
             node.setBeginNumber(random.nextLong());
             node.setEndNumber(random.nextLong());
             node.setBlockCount(random.nextLong());
+            node.setIsValid(i%2==0?1:0);
+            node.setRewardAmount(String.valueOf(random.nextInt(200000000)));
+            node.setProfitAmount(String.valueOf(random.nextInt(200000000)));
+            node.setBlockReward(String.valueOf(random.nextInt(200000000)));
+
+            double ratio = random.nextInt(10)/10;
+            node.setRewardRatio(ratio);
 
             while (true){
                 int logo = random.nextInt(43);
@@ -234,7 +237,7 @@ public class DataGenTool extends TestData {
             bean.setEnergonLimit(String.valueOf(random.nextInt(500000)));
             bean.setEnergonUsed(String.valueOf(random.nextInt(500000)));
             bean.setEnergonPrice(String.valueOf(random.nextInt(200000000)));
-            bean.setHash("0x"+UUID.randomUUID().toString());
+            bean.setHash("0x"+UUID.randomUUID().toString().replace("-",""));
             bean.setValue(String.valueOf(random.nextInt(2000000000)));
             bean.setTimestamp(new Date());
             bean.setCreateTime(new Date());
@@ -274,9 +277,9 @@ public class DataGenTool extends TestData {
     }
 
     public static void main(String[] args) {
-        generateBlock("1",true);
-        generateTransaction("1",true);
         generateNode("1",true);
         generatePendingTx("1",true);
+        generateTransaction("1",true);
+        generateBlock("1",true);
     }
 }
