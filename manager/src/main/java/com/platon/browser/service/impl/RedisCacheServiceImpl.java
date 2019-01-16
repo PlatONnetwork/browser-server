@@ -28,6 +28,7 @@ import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -429,12 +430,18 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings){
+    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,String publickey){
         StatisticsCache cache = new StatisticsCache();
 
         /************* 设置当前块高、出块节点*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
+
+        nodeRankings.forEach(node->{
+            if(node.getNodeId().equals(publickey)){
+                cache.setNodeName(node.getName());
+            }
+        });
 
         /************* 设置交易笔数***********/
         cache.setTransactionCount(block.getTransactionNumber());

@@ -124,7 +124,7 @@ public class NodeFilter {
                 nodeList.add(nodeRanking);
             }
             //calulate this block publickey
-            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock, BigInteger.valueOf(blockNumber));
+            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
 
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();

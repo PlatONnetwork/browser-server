@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class StompPushFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    public boolean stompPush( Block block ,List<NodeRanking> nodeRankings){
-        return redisCacheService.updateStatisticsCache(chainId,block,nodeRankings);
+    public boolean stompPush( Block block , List<NodeRanking> nodeRankings, String publickey){
+        return redisCacheService.updateStatisticsCache(chainId,block,nodeRankings,publickey);
     }
 }

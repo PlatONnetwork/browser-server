@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.enums.ErrorCodeEnum;
+import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -128,7 +129,8 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 }catch (Exception e){
                     log.debug("nodeInfoList is null !!!...",e.getMessage());
                 }
-
+                BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock );
+                threadMap.put("publicKey",publicKey);
                 threadMap.put("ethBlock",ethBlock);
                 threadMap.put("transactionReceiptList",transactionReceiptList);
                 threadMap.put("transactionList",transactionList);

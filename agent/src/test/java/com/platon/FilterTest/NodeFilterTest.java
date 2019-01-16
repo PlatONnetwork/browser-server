@@ -2,6 +2,7 @@ package com.platon.FilterTest;
 
 import com.platon.TestBase;
 import com.platon.browser.client.Web3jClient;
+import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
@@ -40,9 +41,6 @@ public class NodeFilterTest extends TestBase {
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(1L))).send();
-            logger.info("--------------------------");
-            logger.info("{nodeInfoList}: "+ nodeInfoList);
-            logger.info("--------------------------");
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             List<Transaction> list1 = new ArrayList<>();
             List<TransactionReceipt> list2 = new ArrayList <>();
@@ -62,6 +60,7 @@ public class NodeFilterTest extends TestBase {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidNotEqualTo(1);
             List<NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
+            BigInteger a  = CalculatePublicKey.testBlock(ethBlock);
 
         }catch (Exception e) {
             e.printStackTrace();

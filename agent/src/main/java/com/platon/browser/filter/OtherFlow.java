@@ -44,6 +44,7 @@ public class OtherFlow {
         EthPendingTransactions ethPendingTransactions = (EthPendingTransactions) threadLocalMap.get("ethPendingTransactions");
         List<NodeRanking> nodeRankings = (List <NodeRanking>) threadLocalMap.get("nodeRankings");
         Block block = (Block) threadLocalMap.get("block");
+        String publicKey = (String) threadLocalMap.get("publicKey");
         try {
             if(ethPendingTransactions != null){
                 boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);
@@ -60,7 +61,7 @@ public class OtherFlow {
 
         try {
             if(null != nodeRankings && nodeRankings.size() > 0 ){
-                stompPushFilter.stompPush(block, nodeRankings);
+                stompPushFilter.stompPush(block, nodeRankings,publicKey);
             }
         } catch (Exception e) {
             log.error("Stomp Filter exception", e);
