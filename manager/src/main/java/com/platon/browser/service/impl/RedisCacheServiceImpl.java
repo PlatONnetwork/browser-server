@@ -443,8 +443,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             }
         });
 
-        /************* 设置交易笔数***********/
-        cache.setTransactionCount(block.getTransactionNumber());
+        /************* 设置总交易笔数***********/
+        TransactionExample transactionCon = new TransactionExample();
+        transactionCon.createCriteria().andChainIdEqualTo(chainId);
+        long totalTransaction = transactionMapper.countByExample(transactionCon);
+        cache.setTransactionCount(totalTransaction);
 
 
         /************* 设置地址数*************/
