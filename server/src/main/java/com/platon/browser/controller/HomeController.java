@@ -117,7 +117,7 @@ public class HomeController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
      *      	    "currentHeight": ,//当前区块高度
-     *      	    "node":"",//出块节点地址
+     *      	    "miner":"",//出块节点地址
      *      	    "nodeName":"",//出块节点名称
      *      	    "currentTransaction": //当前交易笔数
      *      	    "consensusNodeAmount": //共识节点数
