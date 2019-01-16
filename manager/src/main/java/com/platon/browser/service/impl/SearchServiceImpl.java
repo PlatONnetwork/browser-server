@@ -7,13 +7,11 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.dto.transaction.AccTransactionItem;
@@ -21,8 +19,6 @@ import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.node.NodeDetailReq;
-import com.platon.browser.req.node.NodeListReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
@@ -32,7 +28,6 @@ import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -188,13 +183,11 @@ public class SearchServiceImpl implements SearchService {
                 List<Block> blockList = blockMapper.selectByExample(blockExample);
                 if(blockList.size()>0){
                     // 如果找到区块信息，则构造结果并返回
-                    BlockDetail blockDetail = new BlockDetail();
-                    Block block = blockList.get(0);
-                    BeanUtils.copyProperties(block,blockDetail);
-                    blockDetail.setHeight(block.getNumber());
-                    blockDetail.setTimestamp(block.getTimestamp().getTime());
+                    BlockDetail returnData = new BlockDetail();
+                    Block initData = blockList.get(0);
+                    returnData.init(initData);
                     result.setType("block");
-                    result.setStruct(blockDetail);
+                    result.setStruct(returnData);
                     return result;
                 }
 
