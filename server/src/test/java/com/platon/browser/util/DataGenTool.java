@@ -109,6 +109,7 @@ public class DataGenTool extends TestData {
             throw new RuntimeException("请先实例化web3j！");
         }
 
+        Random random = new Random();
         Set<Block> data = new ConcurrentSet<>();
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(currentHeight),true)
@@ -122,17 +123,17 @@ public class DataGenTool extends TestData {
                 bean.setTimestamp(new Date(block.getTimestamp().longValue()));
                 bean.setChainId(chainId);
                 bean.setTransactionNumber(block.getTransactions().size());
-                bean.setBlockReward("0.265");
+                bean.setBlockReward(String.valueOf(random.nextInt(2000000000)));
 
                 bean.setNonce(block.getNonce().toString());
                 bean.setSize(block.getSize().intValue());
                 bean.setEnergonUsed(block.getGasUsed().toString());
                 bean.setEnergonLimit(block.getGasLimit().toString());
-                bean.setEnergonAverage("0.2365");
-                bean.setActualTxCostSum("33434");
-                bean.setBlockCampaignAmount(3333l);
-                bean.setBlockVoteAmount(3333l);
-                bean.setBlockVoteNumber(432l);
+                bean.setEnergonAverage(String.valueOf(random.nextInt(2000000000)));
+                bean.setActualTxCostSum(String.valueOf(random.nextInt(2000000000)));
+                bean.setBlockCampaignAmount(random.nextLong());
+                bean.setBlockVoteAmount(random.nextLong());
+                bean.setBlockVoteNumber(random.nextLong());
 
                 data.add(bean);
             }
@@ -174,7 +175,8 @@ public class DataGenTool extends TestData {
                     bean.setValue(value.toString());
                     bean.setSequence(Long.valueOf(data.size()));
                     bean.setTimestamp(new Date(System.currentTimeMillis()));
-                    bean.setActualTxCost("0.23566");
+                    Random random = new Random();
+                    bean.setActualTxCost(String.valueOf(random.nextInt(2000000000)));
                     try {
                         EthBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
                         bean.setBlockNumber(eblock.getBlock().getNumber().longValue());
@@ -183,8 +185,8 @@ public class DataGenTool extends TestData {
                         e.printStackTrace();
                     }
                     bean.setEnergonUsed(transaction.getGas().toString());
-                    bean.setInput("33434");
-                    bean.setFailReason("4545433");
+                    bean.setInput(String.valueOf(random.nextInt(2000000000)));
+                    bean.setFailReason(String.valueOf(random.nextInt(2000000000)));
                     bean.setTxType("transfer");
                     bean.setEnergonPrice(transaction.getGasPrice().toString());
                     bean.setNonce(transaction.getNonce().toString());
