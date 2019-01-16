@@ -22,7 +22,7 @@ import java.util.List;
  * Time: 10:52
  */
 public class CalculatePublicKey {
-    public static BigInteger testBlock ( EthBlock tBlock, BigInteger blockNumber ) throws Exception {
+    public static BigInteger testBlock ( EthBlock tBlock ) throws Exception {
 
         String extraData = tBlock.getBlock().getExtraData();
 

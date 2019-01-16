@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
-import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +42,7 @@ public class OtherFlow {
         EthPendingTransactions ethPendingTransactions = (EthPendingTransactions) threadLocalMap.get("ethPendingTransactions");
         List<NodeRanking> nodeRankings = (List <NodeRanking>) threadLocalMap.get("nodeRankings");
         Block block = (Block) threadLocalMap.get("block");
+        String publicKey = (String) threadLocalMap.get("publicKey");
         try {
             if(ethPendingTransactions != null){
                 boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);
@@ -60,7 +59,7 @@ public class OtherFlow {
 
         try {
             if(null != nodeRankings && nodeRankings.size() > 0 ){
-                stompPushFilter.stompPush(block, nodeRankings);
+                stompPushFilter.stompPush(block, nodeRankings,publicKey);
             }
         } catch (Exception e) {
             log.error("Stomp Filter exception", e);

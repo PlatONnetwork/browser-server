@@ -35,4 +35,7 @@ public class StatisticsCache {
 
     //24小时内交易数
     private long dayTransaction;
+
+    //出块节点名称
+    private String nodeName;
 }
