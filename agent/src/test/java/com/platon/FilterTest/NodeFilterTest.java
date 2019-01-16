@@ -76,9 +76,9 @@ public class NodeFilterTest extends TestBase {
         try {
             CandidateContract candidateContract = web3jClient.getCandidateContract();
             Web3j web3j = Web3jClient.getWeb3jClient();
-            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(7773L)));
+            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(2985L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
-            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(7773L))).send();
+            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(2985L))).send();
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
             BigInteger a = CalculatePublicKey.testBlock(ethBlock);
             String node38793 = new BigInteger("65093423df6a0050ca9143f6150f2061932f9b26bf3ae30330e167d4c475d8039ce7b8467dfd706f59a1c625f54deb821048d725f84fe8a9091e98d2f350f9f9",16).toString();
