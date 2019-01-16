@@ -25,33 +25,29 @@ public class DBDataTool extends TestBase {
     @Test
     public void exportData() {
         chainsConfig.getChainIds().forEach(chainId->{
-            try {
-                BlockExample blockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId);
-                PageHelper.startPage(pageNum,pageSize);
-                List<Block> blocks = blockMapper.selectByExample(blockExample);
-                DataGenTool.writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId);
+            PageHelper.startPage(pageNum,pageSize);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);
 
-                NodeRankingExample nodeRankingExample = new NodeRankingExample();
-                nodeRankingExample.createCriteria().andChainIdEqualTo(chainId);
-                PageHelper.startPage(pageNum,pageSize);
-                List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-                DataGenTool.writeToFile(chainId,TestDataFileNameEnum.NODE,nodes);
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId);
+            PageHelper.startPage(pageNum,pageSize);
+            List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.NODE,nodes);
 
-                TransactionExample transactionExample = new TransactionExample();
-                transactionExample.createCriteria().andChainIdEqualTo(chainId);
-                PageHelper.startPage(pageNum,pageSize);
-                List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-                DataGenTool.writeToFile(chainId,TestDataFileNameEnum.TRANSACTION,transactions);
+            TransactionExample transactionExample = new TransactionExample();
+            transactionExample.createCriteria().andChainIdEqualTo(chainId);
+            PageHelper.startPage(pageNum,pageSize);
+            List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(transactionExample);
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.TRANSACTION,transactions);
 
-                PendingTxExample pendingTxExample = new PendingTxExample();
-                pendingTxExample.createCriteria().andChainIdEqualTo(chainId);
-                PageHelper.startPage(pageNum,pageSize);
-                List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(pendingTxExample);
-                DataGenTool.writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,pendingTxes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            PendingTxExample pendingTxExample = new PendingTxExample();
+            pendingTxExample.createCriteria().andChainIdEqualTo(chainId);
+            PageHelper.startPage(pageNum,pageSize);
+            List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(pendingTxExample);
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,pendingTxes);
         });
     }
 
