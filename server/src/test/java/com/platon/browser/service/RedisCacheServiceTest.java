@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -153,15 +152,23 @@ public class RedisCacheServiceTest extends ServiceTestBase {
         chainsConfig.getChainIds().forEach(chainId -> {
             List<NodeRanking> data = TestDataUtil.generateNode(chainId);
 
-            BlockListItem blockItem = getOneBlock(chainId);
-            Block block = new Block();
+            /*BlockListItem blockItem = getOneBlock(chainId);
+            Block block = new Block();*/
 
-            BeanUtils.copyProperties(blockItem,block);
+            TransactionListItem transaction = getOneTransaction(chainId);
+            BlockKey key = new BlockKey();
+            key.setChainId(chainId);
+            key.setHash(transaction.getBlockHash());
+            Block block = blockMapper.selectByPrimaryKey(key);
+
+            /*BeanUtils.copyProperties(blockItem,block);
             block.setNumber(blockItem.getHeight());
             block.setTimestamp(new Date(blockItem.getTimestamp()));
-            block.setTransactionNumber(Long.valueOf(blockItem.getTransaction()).intValue());
+            block.setTransactionNumber(Long.valueOf(blockItem.getTransaction()).intValue());*/
 
-            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data);
+            String publicKey = "r42424234234234";
+
+            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data,publicKey);
             Assert.assertEquals(true,result);
         });
     }
