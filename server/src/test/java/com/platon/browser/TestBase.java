@@ -1,6 +1,10 @@
 package com.platon.browser;
 
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.dao.mapper.PendingTxMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeListItem;
@@ -10,26 +14,31 @@ import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
+import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
-import com.platon.browser.util.TestDataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
 
 @SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=server")
-public class TestBase {
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:8793"));
-    static { TestDataUtil.web3j = web3j; }
-
+public class TestBase extends TestData {
+    @Autowired
+    protected NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    protected BlockMapper blockMapper;
+    @Autowired
+    protected TransactionMapper transactionMapper;
+    @Autowired
+    protected PendingTxMapper pendingTxMapper;
     @Autowired
     protected ChainsConfig chainsConfig;
     @Autowired
-    private NodeService nodeService;
+    protected NodeService nodeService;
     @Autowired
-    private BlockService blockService;
+    protected BlockService blockService;
     @Autowired
-    private TransactionService transactionService;
+    protected TransactionService transactionService;
+    @Autowired
+    protected PendingTxService pendingTxService;
 
     protected NodeListItem getOneNode(String chainId){
         NodePageReq req = new NodePageReq();

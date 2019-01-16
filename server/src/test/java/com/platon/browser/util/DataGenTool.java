@@ -1,5 +1,7 @@
 package com.platon.browser.util;
 
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.TestData;
 import com.platon.browser.common.util.ConvertUtil;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -15,61 +17,23 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import rx.Subscription;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class TestDataUtil {
-    private static final Logger logger = LoggerFactory.getLogger(TestDataUtil.class);
+public class DataGenTool extends TestData {
+    private static final Logger logger = LoggerFactory.getLogger(DataGenTool.class);
     public static Web3j web3j;
 
-    public static String getForeignRandomIp(){
-        int a = 108 * 256 * 256 + 1 * 256 + 5;
-        int b = 145 * 256 * 256 + 110 * 256 + 35;
-        int c = new Random().nextInt(b - a) + a;
-        String ip = "192." + (c / (256 * 256)) + "." + ((c / 256) % 256) + "." + (c % 256);
-        return ip;
+    public static final void writeToFile(String chainId, TestDataFileNameEnum dataFileNameEnum, Collection data) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(testDataDir+dataFileNameEnum.prefix+chainId+".json"));
+        writer.write(JSON.toJSONString(data));
+        writer.flush();
+        writer.close();
     }
 
-    public static String getChinaRandomIp() {
-
-        // ip范围
-        int[][] range = { { 607649792, 608174079 }, // 36.56.0.0-36.63.255.255
-                { 1038614528, 1039007743 }, // 61.232.0.0-61.237.255.255
-                { 1783627776, 1784676351 }, // 106.80.0.0-106.95.255.255
-                { 2035023872, 2035154943 }, // 121.76.0.0-121.77.255.255
-                { 2078801920, 2079064063 }, // 123.232.0.0-123.235.255.255
-                { -1950089216, -1948778497 }, // 139.196.0.0-139.215.255.255
-                { -1425539072, -1425014785 }, // 171.8.0.0-171.15.255.255
-                { -1236271104, -1235419137 }, // 182.80.0.0-182.92.255.255
-                { -770113536, -768606209 }, // 210.25.0.0-210.47.255.255
-                { -569376768, -564133889 }, // 222.16.0.0-222.95.255.255
-        };
-
-        Random rdint = new Random();
-        int index = rdint.nextInt(10);
-        String ip = num2ip(range[index][0] + new Random().nextInt(range[index][1] - range[index][0]));
-        return ip;
-    }
-
-    /*
-     * 将十进制转换成IP地址
-     */
-    public static String num2ip(int ip) {
-        int[] b = new int[4];
-        String x = "";
-        b[0] = (int) ((ip >> 24) & 0xff);
-        b[1] = (int) ((ip >> 16) & 0xff);
-        b[2] = (int) ((ip >> 8) & 0xff);
-        b[3] = (int) (ip & 0xff);
-        x = Integer.toString(b[0]) + "." + Integer.toString(b[1]) + "." + Integer.toString(b[2]) + "." + Integer.toString(b[3]);
-
-        return x;
-    }
-
-
-    public static List<NodeRanking> generateNode(String chainId){
+    public static List<NodeRanking> generateNode(String chainId, boolean writeToFile) {
         List<NodeRanking> nodes = new ArrayList<>();
 
         for(int i=0;i<200;i++){
@@ -77,9 +41,9 @@ public class TestDataUtil {
             node.setChainId(chainId);
             while (true){
                 try {
-                    String ip = TestDataUtil.getForeignRandomIp();
+                    String ip = IPGenTool.getForeignRandomIp();
                     if(i%2==0){
-                        ip = TestDataUtil.getChinaRandomIp();
+                        ip = IPGenTool.getChinaRandomIp();
                     }
 
                     GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
@@ -129,10 +93,17 @@ public class TestDataUtil {
 
             nodes.add(node);
         }
+        if(writeToFile) {
+            try {
+                writeToFile(chainId,TestDataFileNameEnum.NODE,nodes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return nodes;
     }
 
-    public static List<Block> generateBlock(String chainId){
+    public static List<Block> generateBlock(String chainId, boolean writeToFile) {
 
         if(web3j==null){
             throw new RuntimeException("请先实例化web3j！");
@@ -174,10 +145,17 @@ public class TestDataUtil {
             e.printStackTrace();
         }
         List<Block> blocks = new ArrayList<>(data);
+        if(writeToFile) {
+            try {
+                writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return blocks;
     }
 
-    public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId) {
+    public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId, boolean writeToFile) {
 
         if(web3j==null){
             throw new RuntimeException("请先实例化web3j！");
@@ -230,11 +208,18 @@ public class TestDataUtil {
             e.printStackTrace();
         }
         List<TransactionWithBLOBs> transactions = new ArrayList<>(data);
+        if(writeToFile) {
+            try {
+                writeToFile(chainId,TestDataFileNameEnum.TRANSACTION,transactions);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return transactions;
     }
 
-    public static List<Transaction> generateTransaction(String chainId) {
-        List<TransactionWithBLOBs> data = generateTransactionWithBLOB(chainId);
+    public static List<Transaction> generateTransaction(String chainId, boolean writeToFile) {
+        List<TransactionWithBLOBs> data = generateTransactionWithBLOB(chainId,writeToFile);
         List<Transaction> set = new ArrayList<>();
         data.forEach(e->{
             Transaction bean = new Transaction();
@@ -242,5 +227,23 @@ public class TestDataUtil {
             set.add(bean);
         });
         return set;
+    }
+
+    public static <T> List<T> getTestData(String chainId,TestDataFileNameEnum dataFileNameEnum, Class<T> clazz) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(testDataDir+dataFileNameEnum.prefix+chainId+".json"));
+        StringBuffer sb = new StringBuffer();
+        reader.lines().forEach(line->sb.append(line));
+        reader.close();
+        if(sb.length()>0){
+            List<T> data = JSON.parseArray(sb.toString(),clazz);
+            return data;
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static void main(String[] args) {
+        generateBlock("1",true);
+        generateTransaction("1",true);
+        generateNode("1",true);
     }
 }
