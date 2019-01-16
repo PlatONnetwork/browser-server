@@ -167,6 +167,7 @@ public class NodeFilter {
     private List <NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
         for (NodeRanking nodeRanking : list) {
             if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16))) {
+                log.info("nodeId transfer : " + new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16));
                 long count = nodeRanking.getBlockCount();
                 count = count++;
                 nodeRanking.setBlockCount(count);
