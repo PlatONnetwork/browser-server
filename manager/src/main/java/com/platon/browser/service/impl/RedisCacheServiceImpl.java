@@ -430,7 +430,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,String publicKey){
-        StatisticsCache cache = new StatisticsCache();
+        StatisticsCache cache = getStatisticsCache(chainId);
 
         /************* 设置当前块高、出块节点*************/
         cache.setMiner(block.getMiner());
