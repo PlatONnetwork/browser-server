@@ -10,6 +10,8 @@
 *.iws
 .idea/
 .gradle/
+*.txt
+*.log
 
 # Geany project file
 .geany
