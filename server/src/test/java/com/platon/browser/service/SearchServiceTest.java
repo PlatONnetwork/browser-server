@@ -24,49 +24,49 @@ public class SearchServiceTest extends ServiceTestBase {
     public void searchNode(){
         // 搜索节点
         chainsConfig.getChainIds().forEach(chainId -> {
-            initNodeRankingTable();
+            initNodeRankingTableAndCache();
 
             SearchReq req = new SearchReq();
             req.setCid(chainId);
             NodeListItem node = getOneNode(chainId);
 
             req.setParameter(node.getNodeId());
-            SearchResult data = searchService.search(req);
-            Assert.assertEquals("node",data.getType());
+            SearchResult result = searchService.search(req);
+            Assert.assertEquals("node",result.getType());
         });
     }
 
     @Test
     public void searchBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initBlockTable();
+            initBlockTableAndCache();
 
             SearchReq req = new SearchReq();
             req.setCid(chainId);
 
             BlockListItem block = getOneBlock(chainId);
             req.setParameter(String.valueOf(block.getHeight()));
-            SearchResult data = searchService.search(req);
-            Assert.assertTrue("block".equals(data.getType()));
+            SearchResult result = searchService.search(req);
+            Assert.assertTrue("block".equals(result.getType()));
 
             req.setParameter(block.getHash());
-            data = searchService.search(req);
-            Assert.assertTrue("block".equals(data.getType()));
+            result = searchService.search(req);
+            Assert.assertTrue("block".equals(result.getType()));
         });
     }
 
     @Test
     public void searchTransaction(){
         chainsConfig.getChainIds().forEach(chainId -> {
-            initTransactionTable();
+            initTransactionTableAndCache();
 
             SearchReq req = new SearchReq();
             req.setCid(chainId);
 
             TransactionListItem transaction = getOneTransaction(chainId);
             req.setParameter(transaction.getTxHash());
-            SearchResult data = searchService.search(req);
-            Assert.assertTrue("block".equals(data.getType())||"transaction".equals(data.getType()));
+            SearchResult result = searchService.search(req);
+            Assert.assertTrue("block".equals(result.getType())||"transaction".equals(result.getType()));
         });
     }
 
