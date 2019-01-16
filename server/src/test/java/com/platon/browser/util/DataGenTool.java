@@ -84,7 +84,7 @@ public class DataGenTool extends TestData {
             node.setIsValid(1);
             node.setBeginNumber(Math.abs(random.nextLong()));
             node.setEndNumber(Math.abs(random.nextLong()));
-            node.setBlockCount(Math.abs(random.nextLong()));
+            node.setBlockCount(Math.abs(Long.valueOf(random.nextInt(200000))));
             node.setIsValid(i%2==0?1:0);
             node.setRewardAmount(String.valueOf(Math.abs(random.nextInt(200000000))));
             node.setProfitAmount(String.valueOf(Math.abs(random.nextInt(200000000))));
