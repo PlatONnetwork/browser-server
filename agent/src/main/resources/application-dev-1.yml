@@ -26,8 +26,8 @@ logging:
 log.eljob.path: ./logs
 
 platon:
-  # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
-  chains: MAIN_NET:1
+  # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
+  chains: MAIN_NET-1-http://192.168.9.76:8793
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:

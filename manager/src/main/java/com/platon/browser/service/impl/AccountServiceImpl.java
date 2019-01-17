@@ -2,6 +2,7 @@ package com.platon.browser.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.account.AddressDetail;
@@ -15,8 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.utils.Convert;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -32,10 +36,19 @@ public class AccountServiceImpl implements AccountService {
     private TransactionService transactionService;
     @Autowired
     private PendingTxService pendingTxService;
+    @Autowired
+    private ChainsConfig chainsConfig;
 
     @Override
     public AddressDetail getAddressDetail(AddressDetailReq req) {
         AddressDetail returnData = new AddressDetail();
+        try {
+            EthGetBalance balance = chainsConfig.getChainInfo(req.getCid()).web3j.ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
+            BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
+            returnData.setBalance(String.valueOf(v.doubleValue()));
+        } catch (IOException e) {
+            returnData.setBalance("查询出错！");
+        }
         // 取已完成交易
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
