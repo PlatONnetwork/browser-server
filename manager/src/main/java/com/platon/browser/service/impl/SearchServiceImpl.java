@@ -9,15 +9,15 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.search.SearchResult;
-import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.TransactionDetail;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.req.search.SearchReq;
@@ -98,9 +98,9 @@ public class SearchServiceImpl implements SearchService {
 
         if (isAccountOrContract) {
             // 账户或合约
-            AccountDetailReq accountDetailReq = new AccountDetailReq();
-            accountDetailReq.setCid(chainId);
-            accountDetailReq.setAddress(keyword);
+            AddressDetailReq adr = new AddressDetailReq();
+            adr.setCid(chainId);
+            adr.setAddress(keyword);
             /**
              * 逻辑分析：
              * 1、对同一条链，钱包地址和合约地址是属性同一命名空间的，因此是唯一的，钱包地址和合约地址不可能相同；
@@ -117,9 +117,9 @@ public class SearchServiceImpl implements SearchService {
             long transactionCount = transactionMapper.countByExample(condition);
             if(transactionCount>0){
                 // from里是否有查询关键字的值, 证明是钱包地址【外部账户】
-                List<AccTransactionItem> trades = accountService.getTransactionList(accountDetailReq);
-                AddressDetail detail = new AddressDetail();
-                detail.setTrades(trades);
+                AddressDetail addressDetail = accountService.getAddressDetail(adr);
+                AccountDetail detail = new AccountDetail();
+                detail.setTrades(addressDetail.getTrades());
                 result.setStruct(detail);
                 result.setType("account");
                 return result;
@@ -138,19 +138,19 @@ public class SearchServiceImpl implements SearchService {
                 }
                 // to存在查询关键字的值, 取出此记录，查看其receive_type字段的值来判定to字段存放的是钱包地址还是合约地址
                 Transaction transaction = transactionList.get(0);
-                List<AccTransactionItem> trades = accountService.getTransactionList(accountDetailReq);
+                AddressDetail addressDetail = accountService.getAddressDetail(adr);
                 result.setType(transaction.getReceiveType());
                 if("account".equals(transaction.getReceiveType())){
                     // 存放的是账户地址
-                    AddressDetail detail = new AddressDetail();
-                    detail.setTrades(trades);
+                    AccountDetail detail = new AccountDetail();
+                    detail.setTrades(addressDetail.getTrades());
                     result.setStruct(detail);
                     return result;
                 }
                 if("contract".equals(transaction.getReceiveType())){
                     // 存放的是合约地址
                     ContractDetail detail = new ContractDetail();
-                    detail.setTrades(trades);
+                    detail.setTrades(addressDetail.getTrades());
                     result.setStruct(detail);
                     return result;
                 }

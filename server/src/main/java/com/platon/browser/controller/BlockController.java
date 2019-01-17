@@ -75,8 +75,8 @@ public class BlockController  {
      *                  "miner": "0x234", // 出块节点
      *                  "energonUsed": 111,//能量消耗
      *                  "energonLimit": 24234,//能量消耗限制
-     *                  "energonAverage": 11, //平均能量价值
-     *                  "blockReward": "123123",//区块奖励
+     *                  "energonAverage": 11, //平均能量价值(单位:Energon)
+     *                  "blockReward": "123123",//区块奖励(单位:Energon)
      *                  "serverTime": 1708098077  //服务器时间
      *                  }
      *              ]
@@ -120,7 +120,7 @@ public class BlockController  {
      *           "size": 123,//区块大小
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗
-     *           "blockReward": "123123",//区块奖励
+     *           "blockReward": "123123",//区块奖励(单位:Energon)
      *           "extraData": "xxx",//附加数据
      *           "first":false, // 是否第一条记录
      *           "last":true // 是否最后一条记录
@@ -169,7 +169,7 @@ public class BlockController  {
      *           "size": 123,//区块大小
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗
-     *           "blockReward": "123123",//区块奖励
+     *           "blockReward": "123123",//区块奖励(单位:Energon)
      *           "extraData": "xxx",//附加数据
      *           "first":false, // 是否第一条记录
      *           "last":true // 是否最后一条记录

@@ -1,9 +1,8 @@
-package com.platon.browser.data;
+package com.platon.browser.util;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.util.DataGenTool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -14,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-public class DBDataTool extends TestBase {
-    private static final Logger logger = LoggerFactory.getLogger(DBDataTool.class);
+public class DatabaseTool extends TestBase {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseTool.class);
     private static final int pageNum = 1;
     private static final int pageSize = 100;
 

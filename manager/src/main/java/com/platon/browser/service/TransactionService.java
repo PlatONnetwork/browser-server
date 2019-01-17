@@ -5,7 +5,7 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionListItem;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
@@ -17,7 +17,7 @@ public interface TransactionService {
     RespPage<TransactionListItem> getPage(TransactionPageReq req);
     RespPage<TransactionListItem> getPageByBlockNumber(TransactionPageReq req);
     TransactionDetail getDetail(TransactionDetailReq req);
-    List<TransactionWithBLOBs> getList(AccountDetailReq req);
+    List<TransactionWithBLOBs> getList(AddressDetailReq req);
     TransactionDetail getTransactionDetailNavigate(TransactionDetailNavigateReq req);
     void clearCache(String chainId);
     void updateCache(String chainId, Set<Transaction> data);

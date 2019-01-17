@@ -1,8 +1,8 @@
 package com.platon.browser.filter;
 
-import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -40,11 +39,11 @@ public class PendingFilter {
     private PendingTxMapper pendingTxMapper;
 
     @Autowired
-    private Web3jClient web3jClient;
+    private ChainsConfig chainsConfig;
 
     //@Transactional
     public boolean pendingTxAnalysis (EthPendingTransactions ethPendingTransactions)throws  Exception {
-        Web3j web3j = web3jClient.getWeb3jClient();
+        Web3j web3j = chainsConfig.getWeb3j(chainId);
         List <Transaction> list = ethPendingTransactions.getTransactions();
         List <PendingTx> pendingTxes = new ArrayList <>();
         if (!list.equals(null) && list.size() > 0) {

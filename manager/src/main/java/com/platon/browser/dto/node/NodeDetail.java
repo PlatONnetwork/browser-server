@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class NodeDetail {
@@ -41,14 +42,16 @@ public class NodeDetail {
         // 钱包就是address
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
-        BigDecimal profitAmount = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER);
-        this.setProfitAmount(profitAmount.toString());
-        BigDecimal rewardAmount = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER);
-        this.setRewardAmount(rewardAmount.toString());
-        BigDecimal blockReward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
-        this.setBlockReward(blockReward.toString());
-        BigDecimal deposit = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER);
-        this.setDeposit(deposit.toString());
-        this.setRewardRatio(1-initData.getRewardRatio());
+        BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setProfitAmount(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setRewardAmount(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setBlockReward(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setDeposit(String.valueOf(v.doubleValue()));
+        v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
+        this.setRewardRatio(v.doubleValue());
+        this.setLogo(initData.getUrl());
     }
 }

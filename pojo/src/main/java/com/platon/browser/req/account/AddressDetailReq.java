@@ -1,6 +1,5 @@
 package com.platon.browser.req.account;
 
-import com.platon.browser.common.req.PageReq;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotBlank;
@@ -15,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AccountDetailReq extends PageReq {
+public class AddressDetailReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     @NotBlank(message = "{address.notnull}")
@@ -25,4 +24,6 @@ public class AccountDetailReq extends PageReq {
     private Date startDate;
     // 数据结束日期
     private Date endDate;
+    private Integer pageNo = 1;
+    private Integer pageSize = 10;
 }

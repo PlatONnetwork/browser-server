@@ -2,14 +2,13 @@ package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.block.BlockDownload;
-import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.req.account.AccountDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.BlockService;
@@ -42,8 +41,6 @@ public class ExportServiceImpl implements ExportService {
     @Autowired
     private BlockService blockService;
     @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
     private I18nUtil i18n;
 
     @Override
@@ -51,15 +48,15 @@ public class ExportServiceImpl implements ExportService {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
-        AccountDetailReq accountDetailReq = new AccountDetailReq();
+        AddressDetailReq accountDetailReq = new AddressDetailReq();
         // 一页取完所有数据
         accountDetailReq.setPageSize(Integer.MAX_VALUE);
         BeanUtils.copyProperties(req,accountDetailReq);
 
-        List<AccTransactionItem> transactionList = accountService.getTransactionList(accountDetailReq);
+        AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
 
         List<Object[]> rows = new ArrayList<>();
-        transactionList.forEach(transaction->{
+        addressDetail.getTrades().forEach(transaction->{
             String transactionType;
             try {
                 TransactionTypeEnum type = TransactionTypeEnum.getEnum(transaction.getTxType());

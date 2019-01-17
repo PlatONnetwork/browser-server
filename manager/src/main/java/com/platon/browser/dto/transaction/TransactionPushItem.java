@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class TransactionPushItem {
@@ -23,7 +24,7 @@ public class TransactionPushItem {
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());
-        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
-        this.setValue(value.toString());
+        BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setValue(String.valueOf(v.doubleValue()));
     }
 }

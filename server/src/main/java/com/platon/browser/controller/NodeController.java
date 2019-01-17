@@ -14,7 +14,6 @@ import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
-import com.platon.browser.req.node.NodeListReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.service.NodeService;
@@ -22,7 +21,6 @@ import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,7 +78,7 @@ public class NodeController {
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "countryCode":"CN", // 国家代码
      *           "location": "中国广东深圳",// 地理位置
-     *           "deposit": "1.254555555", // 质押金，单位-ATP
+     *           "deposit": "1.254555555", // 质押金(单位:Energon)
      *           "blockCount": 252125,// 产生的总区块数
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
@@ -126,7 +124,7 @@ public class NodeController {
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "countryCode":"CN", // 国家代码
      *           "location": "中国广东深圳",// 地理位置
-     *           "deposit": "1.254555555", // 质押金，单位-ATP
+     *           "deposit": "1.254555555", // 质押金(单位:Energon)
      *           "blockCount": 252125,// 产生的总区块数
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
@@ -170,14 +168,14 @@ public class NodeController {
      *           "electionStatus": 1,// 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
      *           "location": "中国广东深圳",// 所属区域
      *           "joinTime": 199880011,// 加入时间，单位-毫秒
-     *           "deposit": "1.254555555", // 质押金，单位-ATP
+     *           "deposit": "1.254555555", // 质押金(单位:Energon)
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "ranking": 1,// 质押排名
-     *           "profitAmount": "2.12425451222222",// 累计收益，单位-ATP
+     *           "profitAmount": "2.12425451222222",// 累计收益(单位:Energon)
      *           "verifyCount": 44554, // 节点验证次数
      *           "blockCount": 252125,// 累计出块数
      *           "avgBlockTime": 1.312, // 平均出块时长,单位-秒
-     *           "rewardAmount": "0.12425451222222",// 累计分红，单位-ATP
+     *           "rewardAmount": "0.12425451222222",// 累计分红(单位:Energon)
      *           "nodeUrl":"http://mainnet.abc.cn:10332", // 节点URL地址
      *           "publicKey":"0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DE", // 节点公钥
      *           "wallet":"0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4", // 节点钱包
@@ -226,8 +224,8 @@ public class NodeController {
      *          "miner": "0x234", // 出块节点
      *          "energonUsed": 111,//能量消耗
      *          "energonLimit": 24234,//能量消耗限制
-     *          "energonAverage": 11, //平均能量价值
-     *          "blockReward": "123123",//区块奖励
+     *          "energonAverage": 11, //平均能量价值(单位:Energon)
+     *          "blockReward": "123123",//区块奖励(单位:Energon)
      *          "serverTime": 1708098077  //服务器时间
      *       }]
      * }

@@ -30,7 +30,7 @@ public class DataGenTool extends TestData {
         }
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(JSON.toJSONString(data));
+            writer.write(JSON.toJSONString(data,true));
             writer.flush();
             writer.close();
         }catch (Exception e){
@@ -53,7 +53,7 @@ public class DataGenTool extends TestData {
             node.setChainId(chainId);
             while (true){
                 try {
-                    String ip = i%2==0?IPGenTool.getForeignRandomIp():IPGenTool.getChinaRandomIp();
+                    String ip = i%2==0?IPGenTool.getForeignIp():IPGenTool.getChinaIp();
                     GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
                     if(StringUtils.isBlank(location.getCountryCode())){
                         continue;
@@ -76,19 +76,19 @@ public class DataGenTool extends TestData {
             node.setUpdateTime(new Date());
             node.setOrgName("platon");
             node.setOrgWebsite("https://www.platon.network/");
-            node.setDeposit(String.valueOf(Math.abs(random.nextInt(200000000))));
+            node.setDeposit(String.valueOf(Math.abs(random.nextInt(20000))));
             node.setPort(Math.abs(random.nextInt(10000)));
             node.setJoinTime(new Date());
             node.setType(1);
             node.setRanking(i);
             node.setIsValid(1);
-            node.setBeginNumber(Math.abs(random.nextLong()));
-            node.setEndNumber(Math.abs(random.nextLong()));
-            node.setBlockCount(Math.abs(random.nextLong()));
+            node.setBeginNumber(Math.abs(Long.valueOf(random.nextInt(2000))));
+            node.setEndNumber(Math.abs(Long.valueOf(random.nextInt(20000))));
+            node.setBlockCount(Math.abs(Long.valueOf(random.nextInt(200000))));
             node.setIsValid(i%2==0?1:0);
-            node.setRewardAmount(String.valueOf(Math.abs(random.nextInt(200000000))));
-            node.setProfitAmount(String.valueOf(Math.abs(random.nextInt(200000000))));
-            node.setBlockReward(String.valueOf(Math.abs(random.nextInt(200000000))));
+            node.setRewardAmount(String.valueOf(Math.abs(random.nextInt(200000))));
+            node.setProfitAmount(String.valueOf(Math.abs(random.nextInt(200000))));
+            node.setBlockReward(String.valueOf(Math.abs(random.nextInt(200000))));
 
             double ratio = random.nextInt(10)/10;
             node.setRewardRatio(ratio);
@@ -137,14 +137,14 @@ public class DataGenTool extends TestData {
                 bean.setTimestamp(new Date(block.getTimestamp().longValue()));
                 bean.setChainId(chainId);
                 bean.setTransactionNumber(block.getTransactions().size());
-                bean.setBlockReward(String.valueOf(Math.abs(random.nextInt(2000000000))));
+                bean.setBlockReward(String.valueOf(Math.abs(random.nextInt(200000))));
 
                 bean.setNonce(block.getNonce().toString());
                 bean.setSize(block.getSize().intValue());
                 bean.setEnergonUsed(block.getGasUsed().toString());
                 bean.setEnergonLimit(block.getGasLimit().toString());
-                bean.setEnergonAverage(String.valueOf(Math.abs(random.nextInt(2000000000))));
-                bean.setActualTxCostSum(String.valueOf(Math.abs(random.nextInt(2000000000))));
+                bean.setEnergonAverage(String.valueOf(Math.abs(random.nextInt(200000))));
+                bean.setActualTxCostSum(String.valueOf(Math.abs(random.nextInt(200000))));
                 bean.setBlockCampaignAmount(Math.abs(random.nextLong()));
                 bean.setBlockVoteAmount(Math.abs(random.nextLong()));
                 bean.setBlockVoteNumber(Math.abs(random.nextLong()));
@@ -190,7 +190,7 @@ public class DataGenTool extends TestData {
                     bean.setSequence(Long.valueOf(data.size()));
                     bean.setTimestamp(new Date(System.currentTimeMillis()));
                     Random random = new Random();
-                    bean.setActualTxCost(String.valueOf(Math.abs(random.nextInt(2000000000))));
+                    bean.setActualTxCost(String.valueOf(Math.abs(random.nextInt(200000))));
                     try {
                         EthBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
                         bean.setBlockNumber(eblock.getBlock().getNumber().longValue());
@@ -199,8 +199,8 @@ public class DataGenTool extends TestData {
                         e.printStackTrace();
                     }
                     bean.setEnergonUsed(transaction.getGas().toString());
-                    bean.setInput(String.valueOf(Math.abs(random.nextInt(2000000000))));
-                    bean.setFailReason(String.valueOf(Math.abs(random.nextInt(2000000000))));
+                    bean.setInput(String.valueOf(Math.abs(random.nextInt(2000000))));
+                    bean.setFailReason(String.valueOf(Math.abs(random.nextInt(2000000))));
                     bean.setTxType("transfer");
                     bean.setEnergonPrice(transaction.getGasPrice().toString());
                     bean.setNonce(transaction.getNonce().toString());
@@ -236,9 +236,9 @@ public class DataGenTool extends TestData {
             bean.setChainId(chainId);
             bean.setEnergonLimit(String.valueOf(Math.abs(random.nextInt(500000))));
             bean.setEnergonUsed(String.valueOf(Math.abs(random.nextInt(500000))));
-            bean.setEnergonPrice(String.valueOf(Math.abs(random.nextInt(200000000))));
+            bean.setEnergonPrice(String.valueOf(Math.abs(random.nextInt(200000))));
             bean.setHash("0x"+UUID.randomUUID().toString().replace("-",""));
-            bean.setValue(String.valueOf(Math.abs(random.nextInt(2000000000))));
+            bean.setValue(String.valueOf(Math.abs(random.nextInt(2000000))));
             bean.setTimestamp(new Date());
             bean.setCreateTime(new Date());
             bean.setUpdateTime(new Date());

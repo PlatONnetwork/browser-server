@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class BlockListItem {
@@ -20,13 +21,14 @@ public class BlockListItem {
     private String energonAverage;
     private String blockReward;
     private long serverTime;
+    private String nodeName;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setTransaction(initData.getTransactionNumber());
-        BigDecimal reward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
-        this.setBlockReward(reward.toString());
+        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setBlockReward(String.valueOf(v.doubleValue()));
     }
 }

@@ -3,6 +3,10 @@ package com.platon.browser.dto.node;
 import com.platon.browser.dao.entity.NodeRanking;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.utils.Convert;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class NodeListItem {
@@ -23,6 +27,9 @@ public class NodeListItem {
         BeanUtils.copyProperties(initData,this);
         this.setBlockCount(initData.getBlockCount().intValue());
         this.setLogo(initData.getUrl());
-        this.setRewardRatio(1-initData.getRewardRatio());
+        BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
+        this.setRewardRatio(v.doubleValue());
+        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18);
+        this.setDeposit(String.valueOf(v.doubleValue()));
     }
 }

@@ -12,7 +12,7 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
@@ -123,7 +123,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return
      */
     @Override
-    public List<TransactionWithBLOBs> getList(AccountDetailReq req) {
+    public List<TransactionWithBLOBs> getList(AddressDetailReq req) {
         TransactionExample condition = new TransactionExample();
         TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andFromEqualTo(req.getAddress());

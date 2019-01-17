@@ -1,9 +1,9 @@
 package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -16,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -47,6 +46,9 @@ public class TransactionFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    @Autowired
+    private ChainsConfig chainsConfig;
+
     //@Transactional
     public boolean transactionAnalysis( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
         log.debug("[into NodeFilter !!!...]");
@@ -57,7 +59,7 @@ public class TransactionFilter {
 
 
     public boolean build( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
-        Web3j web3j = Web3jClient.getWeb3jClient();
+        Web3j web3j = chainsConfig.getWeb3j(chainId);
         //build database struct<Transaction>
         List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
         Set<com.platon.browser.dao.entity.Transaction> transactionSet = new HashSet <>();

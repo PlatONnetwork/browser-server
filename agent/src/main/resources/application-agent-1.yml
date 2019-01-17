@@ -5,7 +5,7 @@ server.port: 9040
 spring.redis.cluster.nodes: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 #数据源配置
 datasource:
-  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_server?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: platon
   password: platon
 
@@ -26,8 +26,8 @@ logging:
 log.eljob.path: ./logs
 
 platon:
-  # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
-  chains: MAIN_NET:1
+  # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
+  chains: MAIN_NET-1-http://192.168.9.76:8793
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
@@ -42,8 +42,7 @@ platon:
   # 图片服务器地址
   image.server.url: http://192.168.9.86:8082/
 
-#Web3j配置
-node.ip: http://192.168.9.76:8793
+#Web3j配置(要采集哪条链的数据)
 chain.id: 1
 # Zookeeper注册中心配置
 regCenter:

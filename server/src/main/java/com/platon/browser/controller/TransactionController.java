@@ -6,12 +6,13 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.transaction.*;
 import com.platon.browser.service.*;
@@ -86,8 +87,8 @@ public class TransactionController {
      *           "from": "0x667766",//发送方, 必定是钱包地址
      *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
      *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *           "value": "222",//数额
-     *           "actualTxCost": "22",//交易费用
+     *           "value": "222",//数额(单位:Energon)
+     *           "actualTxCost": "22",//交易费用(单位:Energon)
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "txType": "", // 交易类型
                         transfer ：转账
@@ -147,11 +148,12 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
-     *           "value": "222",//数额
-     *           "actualTxCost": "22",//实际交易手续费
+     *           "value": "222",//数额(单位:Energon)
+     *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
      *           "energonUsed": 122,//能量消耗
-     *           "energonPrice": "123",//能量价格
+     *           "priceInE":"1000000000000000000", // 能量价格(单位:E)
+     *           "priceInEnergon":"0.1", // 能量价格(单位:Energon)
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
      *           "failReason":"",//失败原因
@@ -209,11 +211,12 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
-     *           "value": "222",//数额
-     *           "actualTxCost": "22",//实际交易手续费
+     *           "value": "222",//数额(单位:Energon)
+     *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
      *           "energonUsed": 122,//能量消耗
-     *           "energonPrice": "123",//能量价格
+     *           "priceInE":"1000000000000000000", // 能量价格(单位:E)
+     *           "priceInEnergon":"0.1", // 能量价格(单位:Energon)
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
      *           "first":false, // 是否第一条记录
@@ -275,11 +278,12 @@ public class TransactionController {
      *           "txHash": "0x234234",//交易hash
      *           "timestamp": 33,// 交易接收时间
      *           "energonLimit": 55555,//能量限制
-     *           "energonPrice": 55555,//能量价格
+     *           "priceInE":"1000000000000000000", // 能量价格(单位:E)
+     *           "priceInEnergon":"0.1", // 能量价格(单位:Energon)
      *           "from": "0x667766",//发送方
      *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
      *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *           "value": "222",//数额
+     *           "value": "222",//数额(单位:Energon)
      *           "txType": "", // 交易类型
      *                 transfer ：转账
      *                 MPCtransaction ： MPC交易
@@ -335,17 +339,18 @@ public class TransactionController {
                 "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
                                  // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
                 "txType": "", // 交易类型
-                transfer ：转账
-                MPCtransaction ： MPC交易
-                contractCreate ： 合约创建
-                vote ： 投票
-                transactionExecute ： 合约执行
-                authorization ： 权限
-                "value": "222",//数额
-                "actualTxCost": "22",//实际交易手续费
+                    transfer ：转账
+                    MPCtransaction ： MPC交易
+                    contractCreate ： 合约创建
+                    vote ： 投票
+                    transactionExecute ： 合约执行
+                    authorization ： 权限
+                "value": "222",//数额(单位:Energon)
+                "actualTxCost": "22",//实际交易手续费(单位:Energon)
                 "energonLimit": 232,//能量限制
                 "energonUsed": 122,//能量消耗
-                "energonPrice": "123",//能量价格
+                "priceInE":"1000000000000000000", // 能量价格(单位:E)
+                "priceInEnergon":"0.1", // 能量价格(单位:Energon)
                 "inputData": "",//附加输入数据
                 "expectTime": 12312333, // 预计确认时间
                 "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
@@ -400,11 +405,12 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
-     *           "value": "222",//数额
-     *           "actualTxCost": "22",//实际交易手续费
+     *           "value": "222",//数额(单位:Energon)
+     *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
      *           "energonUsed": 122,//能量消耗
-     *           "energonPrice": "123",//能量价格
+     *           "priceInE":"1000000000000000000", // 能量价格(单位:E)
+     *           "priceInEnergon":"0.1", // 能量价格(单位:Energon)
      *           "inputData": "",//附加输入数据
      *           "expectTime": 12312333, // 预计确认时间
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
@@ -446,7 +452,7 @@ public class TransactionController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
-     *         "balance":131,165,156.62618849461651616321, // 余额
+     *         "balance":131,165,156.62618849461651616321, // 余额(单位:Energon)
      *         "tradeCount":236, // 交易数
      *         "votePledge":131,165,156.62618, // 投票质押
      *         "nodeCount":3, // 投票节点数
@@ -457,8 +463,8 @@ public class TransactionController {
      *                "from": "0x667766",//发送方
      *                "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
      *                                  // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *                "value": "222",//数额
-     *                "actualTxCost": "22",//交易费用
+     *                "value": "222",//数额(单位:Energon)
+     *                "actualTxCost": "22",//交易费用(单位:Energon)
      *                "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *                "txType": "", // 交易类型
                          transfer ：转账
@@ -476,21 +482,21 @@ public class TransactionController {
      * }
      */
     @PostMapping("addressDetails")
-    public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
+    public BaseResp<AccountDetail> addressDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
             req.setPageSize(20);
-            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
-            AddressDetail addressDetail = new AddressDetail();
-            if(transactionList.size()>20){
+            AddressDetail initData = accountService.getAddressDetail(req);
+            AccountDetail returnData = new AccountDetail();
+            returnData.init(initData);
+            List<AccTransactionItem> transactions = initData.getTrades();
+            if(transactions.size()>20){
                 // 大于20，则取前20条数据返回
-                addressDetail.setTrades(transactionList.subList(0,20));
-            }else{
-                addressDetail.setTrades(transactionList);
+                returnData.setTrades(transactions.subList(0,20));
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),addressDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),returnData);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }
@@ -566,7 +572,7 @@ public class TransactionController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
-     *          "balance":131,165,156.62618849461651616321, // 余额
+     *          "balance":131,165,156.62618849461651616321, // 余额(单位:Energon)
                 "tradeCount":236, // 交易数
                 "developer":131,165,156.62618, // 合约开发者
                 "ownerCount":3, // 合约拥有者
@@ -577,8 +583,8 @@ public class TransactionController {
      *                 "from": "0x667766",//发送方
      *                 "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
      *                                 // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *                 "value": "222",//数额
-     *                 "actualTxCost": "22",//交易费用
+     *                 "value": "222",//数额(单位:Energon)
+     *                 "actualTxCost": "22",//交易费用(单位:Energon)
      *                 "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *                 "txType": "", // 交易类型
                           transfer ：转账
@@ -596,21 +602,21 @@ public class TransactionController {
      * }
      */
     @PostMapping("contractDetails")
-    public BaseResp contractDetails (@Valid @RequestBody AccountDetailReq req) {
+    public BaseResp contractDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
             req.setPageSize(20);
-            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
-            ContractDetail contractDetail = new ContractDetail();
-            if(transactionList.size()>20){
+            AddressDetail initData = accountService.getAddressDetail(req);
+            ContractDetail returnData = new ContractDetail();
+            returnData.init(initData);
+            List<AccTransactionItem> transactions = initData.getTrades();
+            if(transactions.size()>20){
                 // 大于20，则取前20条数据返回
-                contractDetail.setTrades(transactionList.subList(0,20));
-            }else{
-                contractDetail.setTrades(transactionList);
+                returnData.setTrades(transactions.subList(0,20));
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),contractDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),returnData);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }
@@ -663,8 +669,8 @@ public class TransactionController {
      *           "from": "0x667766",//发送方
      *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
      *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *           "value": "222",//数额
-     *           "actualTxCost": "22",//交易费用
+     *           "value": "222",//数额(单位:Energon)
+     *           "actualTxCost": "22",//交易费用(单位:Energon)
      *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
      *           "txType": "", // 交易类型
                     transfer ：转账

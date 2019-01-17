@@ -1,9 +1,13 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.transaction.AccTransactionItem;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
@@ -12,7 +16,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.utils.Convert;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,44 +36,63 @@ public class AccountServiceImpl implements AccountService {
     private TransactionService transactionService;
     @Autowired
     private PendingTxService pendingTxService;
+    @Autowired
+    private ChainsConfig chainsConfig;
 
     @Override
-    public List<AccTransactionItem> getTransactionList(AccountDetailReq req) {
+    public AddressDetail getAddressDetail(AddressDetailReq req) {
+        AddressDetail returnData = new AddressDetail();
+        try {
+            EthGetBalance balance = chainsConfig.getWeb3j(req.getCid()).ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
+            BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
+            returnData.setBalance(String.valueOf(v.doubleValue()));
+        } catch (IOException e) {
+            returnData.setBalance("0(error)");
+        }
         // 取已完成交易
-        req.buildPage();
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
-        long serverTime = System.currentTimeMillis();
-        List<AccTransactionItem> accTransactionList = new ArrayList<>();
-        transactions.forEach(transaction -> {
+        returnData.setTradeCount(Long.valueOf(page.getTotal()).intValue());
+        List<AccTransactionItem> data = new ArrayList<>();
+        transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setServerTime(serverTime);
+            BeanUtils.copyProperties(initData,bean);
+            bean.setTxHash(initData.getHash());
+            bean.setServerTime(System.currentTimeMillis());
             // 交易生成的时间就是出块时间
-            bean.setBlockTime(transaction.getTimestamp().getTime());
-            accTransactionList.add(bean);
+            bean.setBlockTime(initData.getTimestamp().getTime());
+            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setValue(String.valueOf(v.doubleValue()));
+            v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setActualTxCost(String.valueOf(v.doubleValue()));
+            data.add(bean);
         });
 
         // 取待处理交易
-        req.buildPage();
+        page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
-        pendingTxes.forEach(pendingTx -> {
+        returnData.setTradeCount(returnData.getTradeCount()+Long.valueOf(page.getTotal()).intValue());
+        pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(pendingTx,bean);
-            bean.setTxHash(pendingTx.getHash());
-            bean.setServerTime(serverTime);
+            BeanUtils.copyProperties(initData,bean);
+            bean.setTxHash(initData.getHash());
+            bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
+            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setValue(String.valueOf(v.doubleValue()));
             bean.setActualTxCost("0");
-            accTransactionList.add(bean);
+            data.add(bean);
         });
 
         // 按时间倒排
-        Collections.sort(accTransactionList,(c1,c2)->{
+        Collections.sort(data,(c1,c2)->{
             long t1 = c1.getTimestamp().getTime(),t2 = c2.getTimestamp().getTime();
             if(t1<t2) return 1;
             if(t1>t2) return -1;
             return 0;
         });
-        return accTransactionList;
+        returnData.setTrades(data);
+        return returnData;
     }
+
 }
