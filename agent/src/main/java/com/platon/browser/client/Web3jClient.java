@@ -40,7 +40,7 @@ public class Web3jClient {
     }
 
     private Credentials loadCredentials() throws IOException, CipherException {
-        InputStream in = Web3jClient.class.getClassLoader().getResource("platonbrowser.json").openStream();
+        InputStream in = Web3jClient.class.getClassLoader().getResource("wallet.json").openStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         File file = new File(System.getProperty("user.dir")+"/tmp.txt");
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
