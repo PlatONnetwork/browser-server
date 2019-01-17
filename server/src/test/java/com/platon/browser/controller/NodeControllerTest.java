@@ -76,7 +76,7 @@ public class NodeControllerTest extends ControllerTestBase {
                 }
                 BlockListReq req = new BlockListReq();
                 req.setCid(chainId);
-                req.setAddress(node.getAddress());
+                req.setNodeId(node.getNodeId());
                 sendPost("/node/blockList",req);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,7 +96,7 @@ public class NodeControllerTest extends ControllerTestBase {
 
                 BlockDownloadReq req = new BlockDownloadReq();
                 req.setCid(chainId);
-                req.setAddress(node.getAddress());
+                req.setNodeId(node.getNodeId());
 
                 mockMvc.perform(get("/node/blockDownload")
                         .param("cid",chainId)
