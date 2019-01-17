@@ -1,6 +1,7 @@
 package com.platon.browser.dto.node;
 
 import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -43,13 +44,13 @@ public class NodeDetail {
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
         BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setProfitAmount(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setProfitAmount(EnergonUtil.convert(v));
         v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setRewardAmount(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setRewardAmount(EnergonUtil.convert(v));
         v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setBlockReward(EnergonUtil.convert(v));
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setDeposit(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setDeposit(EnergonUtil.convert(v));
         v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         this.setLogo(initData.getUrl());

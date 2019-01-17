@@ -1,6 +1,7 @@
 package com.platon.browser.dto.block;
 
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -25,7 +26,7 @@ public class BlockPushItem {
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setTransaction(initData.getTransactionNumber());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setBlockReward(EnergonUtil.convert(v));
         this.setServerTime(System.currentTimeMillis());
     }
 }

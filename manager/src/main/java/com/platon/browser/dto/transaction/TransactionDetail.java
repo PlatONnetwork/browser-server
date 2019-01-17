@@ -2,6 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -43,11 +44,11 @@ public class TransactionDetail {
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
         BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setActualTxCost(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setActualTxCost(EnergonUtil.convert(v));
         v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setValue(EnergonUtil.convert(v));
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-        this.setPriceInEnergon(BigDecimal.valueOf(v.doubleValue()).toString());
+        this.setPriceInEnergon(EnergonUtil.convert(v));
     }
 }
