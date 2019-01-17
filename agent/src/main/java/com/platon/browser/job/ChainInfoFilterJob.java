@@ -136,7 +136,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 blockCorrelationFlow.doFilter();
                 otherFlow.doFilter();
                 maxNubmer =Long.valueOf(blockNumber);
-
+                map.remove();
                 log.info("+++++++++++++++++++dojob+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++dojob+++++++++++++++++++++++++");
             }
         } catch (Exception e) {
