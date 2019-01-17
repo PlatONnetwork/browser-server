@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class PendingTxItem {
@@ -25,7 +26,7 @@ public class PendingTxItem {
         this.setTxHash(initData.getHash());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setServerTime(System.currentTimeMillis());
-        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setValue(value.toString());
     }
 }

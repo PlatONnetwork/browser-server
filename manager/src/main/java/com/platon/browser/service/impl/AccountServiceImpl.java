@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,9 +48,9 @@ public class AccountServiceImpl implements AccountService {
             bean.setServerTime(System.currentTimeMillis());
             // 交易生成的时间就是出块时间
             bean.setBlockTime(initData.getTimestamp().getTime());
-            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
             bean.setValue(value.toString());
-            BigDecimal txCost = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
+            BigDecimal txCost = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
             bean.setActualTxCost(txCost.toString());
             data.add(bean);
         });
@@ -64,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
             bean.setTxHash(initData.getHash());
             bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
-            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
             bean.setValue(value.toString());
             bean.setActualTxCost("0");
             data.add(bean);

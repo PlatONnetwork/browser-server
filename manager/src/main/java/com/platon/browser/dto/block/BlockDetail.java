@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class BlockDetail {
@@ -31,7 +32,7 @@ public class BlockDetail {
         this.setHeight(initData.getNumber());
         this.setTransaction(initData.getTransactionNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
-        BigDecimal reward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
+        BigDecimal reward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setBlockReward(reward.toString());
     }
 }

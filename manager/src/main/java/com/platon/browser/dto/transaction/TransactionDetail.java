@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 public class TransactionDetail {
@@ -40,9 +41,9 @@ public class TransactionDetail {
         this.setBlockHeight(initData.getBlockNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
-        BigDecimal txCost=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
+        BigDecimal txCost=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setActualTxCost(String.valueOf(txCost));
-        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setValue(value.toString());
     }
 }
