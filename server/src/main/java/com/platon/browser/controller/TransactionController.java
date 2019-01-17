@@ -610,6 +610,8 @@ public class TransactionController {
             req.setPageSize(20);
             AddressDetail initData = accountService.getAddressDetail(req);
             ContractDetail returnData = new ContractDetail();
+            returnData.setDeveloper(req.getAddress());
+            returnData.setOwnerCount(1);
             returnData.init(initData);
             List<AccTransactionItem> transactions = initData.getTrades();
             if(transactions.size()>20){
