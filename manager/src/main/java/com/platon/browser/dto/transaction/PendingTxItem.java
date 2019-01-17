@@ -13,7 +13,8 @@ public class PendingTxItem {
     private String txHash;
     private long timestamp;
     private String energonLimit;
-    private String energonPrice;
+    private String priceInE;
+    private String priceInEnergon;
     private String from;
     private String to;
     private String value;
@@ -28,5 +29,8 @@ public class PendingTxItem {
         this.setServerTime(System.currentTimeMillis());
         BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setValue(String.valueOf(v.doubleValue()));
+        this.setPriceInE(initData.getEnergonPrice());
+        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
+        this.setPriceInEnergon(String.valueOf(v.doubleValue()));
     }
 }

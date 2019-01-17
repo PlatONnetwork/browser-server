@@ -22,7 +22,8 @@ public class TransactionDetail {
     private String actualTxCost;
     private String energonLimit;
     private String energonUsed;
-    private String energonPrice;
+    private String priceInE;
+    private String priceInEnergon;
     private String inputData;
     private long expectTime;
     private String failReason;
@@ -45,5 +46,8 @@ public class TransactionDetail {
         this.setActualTxCost(String.valueOf(v.doubleValue()));
         v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
         this.setValue(String.valueOf(v.doubleValue()));
+        this.setPriceInE(initData.getEnergonPrice());
+        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
+        this.setPriceInEnergon(String.valueOf(v.doubleValue()));
     }
 }
