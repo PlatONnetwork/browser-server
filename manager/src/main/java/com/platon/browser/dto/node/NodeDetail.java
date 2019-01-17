@@ -44,13 +44,13 @@ public class NodeDetail {
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
         BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setProfitAmount(EnergonUtil.convert(v));
+        this.setProfitAmount(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setRewardAmount(EnergonUtil.convert(v));
+        this.setRewardAmount(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(EnergonUtil.convert(v));
+        this.setBlockReward(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setDeposit(EnergonUtil.convert(v));
+        this.setDeposit(EnergonUtil.format(v));
         v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         this.setLogo(initData.getUrl());

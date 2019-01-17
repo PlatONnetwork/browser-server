@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
         try {
             EthGetBalance balance = chainsConfig.getWeb3j(req.getCid()).ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
             BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-            returnData.setBalance(EnergonUtil.convert(v));
+            returnData.setBalance(EnergonUtil.format(v));
         } catch (IOException e) {
             returnData.setBalance("0(error)");
         }
@@ -63,9 +63,9 @@ public class AccountServiceImpl implements AccountService {
             // 交易生成的时间就是出块时间
             bean.setBlockTime(initData.getTimestamp().getTime());
             BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(EnergonUtil.convert(v));
+            bean.setValue(EnergonUtil.format(v));
             v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setActualTxCost(EnergonUtil.convert(v));
+            bean.setActualTxCost(EnergonUtil.format(v));
             data.add(bean);
         });
 
@@ -80,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
             bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
             BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(EnergonUtil.convert(v));
+            bean.setValue(EnergonUtil.format(v));
             bean.setActualTxCost("0");
             data.add(bean);
         });

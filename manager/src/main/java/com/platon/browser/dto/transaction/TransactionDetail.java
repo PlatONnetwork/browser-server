@@ -44,11 +44,11 @@ public class TransactionDetail {
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
         BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setActualTxCost(EnergonUtil.convert(v));
+        this.setActualTxCost(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(EnergonUtil.convert(v));
+        this.setValue(EnergonUtil.format(v));
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-        this.setPriceInEnergon(EnergonUtil.convert(v));
+        this.setPriceInEnergon(EnergonUtil.format(v));
     }
 }
