@@ -49,5 +49,8 @@ public class IPGenTool {
 
         System.out.println(EnergonUtil.format(BigDecimal.valueOf(0)));
 
+        ThreadLocal tl = new ThreadLocal();
+
+
     }
 }

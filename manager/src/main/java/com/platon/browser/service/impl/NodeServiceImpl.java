@@ -7,6 +7,7 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
@@ -44,6 +45,8 @@ public class NodeServiceImpl implements NodeService {
     private I18nUtil i18n;
     @Autowired
     private RedisCacheServiceImpl redisCacheService;
+    @Autowired
+    private BlockMapper blockMapper;
 
     @Override
     public RespPage<NodeListItem> getPage(NodePageReq req) {

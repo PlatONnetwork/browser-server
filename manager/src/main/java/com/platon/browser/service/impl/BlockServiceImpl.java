@@ -160,7 +160,7 @@ public class BlockServiceImpl implements BlockService {
         BlockExample condition = new BlockExample();
         BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
         if(StringUtils.isNotBlank(req.getAddress())){
-            criteria.andMinerEqualTo(req.getAddress());
+            criteria.andNodeIdEqualTo(req.getAddress());
         }
         if(req.getStartDate()!=null){
             criteria.andTimestampGreaterThanOrEqualTo(req.getStartDate());
