@@ -47,7 +47,7 @@ public class IPGenTool {
         String rs = NumberUtil.format(val,".##################");
         System.out.println(rs);
 
-        System.out.println(EnergonUtil.convert(BigDecimal.valueOf(0)));
+        System.out.println(EnergonUtil.format(BigDecimal.valueOf(0)));
 
     }
 }
