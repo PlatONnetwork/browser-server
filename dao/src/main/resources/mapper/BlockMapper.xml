@@ -22,6 +22,7 @@
     <result column="block_vote_amount" jdbcType="BIGINT" property="blockVoteAmount" />
     <result column="block_vote_number" jdbcType="BIGINT" property="blockVoteNumber" />
     <result column="block_campaign_amount" jdbcType="BIGINT" property="blockCampaignAmount" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -84,7 +85,8 @@
   <sql id="Base_Column_List">
     hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
     energon_limit, energon_average, transaction_number, `timestamp`, block_reward, create_time, 
-    update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, block_campaign_amount
+    update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, block_campaign_amount, 
+    node_name
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -125,14 +127,16 @@
       energon_limit, energon_average, transaction_number, 
       `timestamp`, block_reward, create_time, 
       update_time, actual_tx_cost_sum, block_vote_amount, 
-      block_vote_number, block_campaign_amount)
+      block_vote_number, block_campaign_amount, node_name
+      )
     values (#{hash,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, 
       #{parentHash,jdbcType=VARCHAR}, #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, 
       #{extraData,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, 
       #{energonLimit,jdbcType=VARCHAR}, #{energonAverage,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=INTEGER}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR}, #{blockVoteAmount,jdbcType=BIGINT}, 
-      #{blockVoteNumber,jdbcType=BIGINT}, #{blockCampaignAmount,jdbcType=BIGINT})
+      #{blockVoteNumber,jdbcType=BIGINT}, #{blockCampaignAmount,jdbcType=BIGINT}, #{nodeName,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
     insert into block
@@ -197,6 +201,9 @@
       <if test="blockCampaignAmount != null">
         block_campaign_amount,
       </if>
+      <if test="nodeName != null">
+        node_name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -258,6 +265,9 @@
       </if>
       <if test="blockCampaignAmount != null">
         #{blockCampaignAmount,jdbcType=BIGINT},
+      </if>
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -330,6 +340,9 @@
       <if test="record.blockCampaignAmount != null">
         block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT},
       </if>
+      <if test="record.nodeName != null">
+        node_name = #{record.nodeName,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -356,7 +369,8 @@
       actual_tx_cost_sum = #{record.actualTxCostSum,jdbcType=VARCHAR},
       block_vote_amount = #{record.blockVoteAmount,jdbcType=BIGINT},
       block_vote_number = #{record.blockVoteNumber,jdbcType=BIGINT},
-      block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT}
+      block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT},
+      node_name = #{record.nodeName,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -418,6 +432,9 @@
       <if test="blockCampaignAmount != null">
         block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT},
       </if>
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
       and chain_id = #{chainId,jdbcType=VARCHAR}
@@ -441,7 +458,8 @@
       actual_tx_cost_sum = #{actualTxCostSum,jdbcType=VARCHAR},
       block_vote_amount = #{blockVoteAmount,jdbcType=BIGINT},
       block_vote_number = #{blockVoteNumber,jdbcType=BIGINT},
-      block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT}
+      block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT},
+      node_name = #{nodeName,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
@@ -455,7 +473,7 @@
     (hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
       energon_limit, energon_average, transaction_number, `timestamp`, block_reward, 
       create_time, update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, 
-      block_campaign_amount)
+      block_campaign_amount, node_name)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, 
@@ -465,8 +483,8 @@
         #{item.transactionNumber,jdbcType=INTEGER}, #{item.timestamp,jdbcType=TIMESTAMP}, 
         #{item.blockReward,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
         #{item.actualTxCostSum,jdbcType=VARCHAR}, #{item.blockVoteAmount,jdbcType=BIGINT}, 
-        #{item.blockVoteNumber,jdbcType=BIGINT}, #{item.blockCampaignAmount,jdbcType=BIGINT}
-        )
+        #{item.blockVoteNumber,jdbcType=BIGINT}, #{item.blockCampaignAmount,jdbcType=BIGINT}, 
+        #{item.nodeName,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -544,10 +562,12 @@
         <if test="'block_campaign_amount'.toString() == column.value">
           #{item.blockCampaignAmount,jdbcType=BIGINT}
         </if>
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
-
 
 </mapper>

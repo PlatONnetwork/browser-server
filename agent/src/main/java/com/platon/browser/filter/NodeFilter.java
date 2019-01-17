@@ -2,16 +2,14 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.common.dto.agent.CandidateDetailDto;
+import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
-import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.job.ChainInfoFilterJob;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.util.GeoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,45 +66,16 @@ public class NodeFilter {
             int i = 1;
             for (CandidateDto candidateDto : list) {
                 NodeRanking nodeRanking = new NodeRanking();
-                nodeRanking.setChainId(chainId);
-                nodeRanking.setIp(candidateDto.getHost());
-                nodeRanking.setNodeId(candidateDto.getCandidateId());
-                nodeRanking.setPort(Integer.valueOf(candidateDto.getPort()));
-                nodeRanking.setAddress(candidateDto.getOwner());
-                nodeRanking.setUpdateTime(new Date());
-                nodeRanking.setCreateTime(new Date());
-                CandidateDetailDto candidateDetailDto = null;
-                try {
-                    if (candidateDto.getExtra().length() > 0 && null != candidateDto.getExtra()) {
-                        candidateDetailDto = JSONObject.parseObject(candidateDto.getExtra(), CandidateDetailDto.class);
-                        nodeRanking.setName(candidateDetailDto.getNodeName());
-                        nodeRanking.setIntro(candidateDetailDto.getNodeDiscription());
-                        nodeRanking.setOrgName(candidateDetailDto.getNodeDepartment());
-                        nodeRanking.setOrgWebsite(candidateDetailDto.getOfficialWebsite());
-                        nodeRanking.setUrl(candidateDetailDto.getNodePortrait() != null ? candidateDetailDto.getNodePortrait() : "test");
-                    }
-                } catch (Exception e) {
-                    nodeRanking.setName("");
-                    nodeRanking.setIntro("");
-                    nodeRanking.setOrgName("");
-                    nodeRanking.setOrgWebsite("");
-                    nodeRanking.setUrl("");
-                    log.error("Extra Date error: " + candidateDto.getExtra() + ",NodeId : " + nodeRanking.getNodeId());
-                }
-                nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
-                nodeRanking.setDeposit(candidateDto.getDeposit().toString());
-                nodeRanking.setBlockReward(blockReward);
-                nodeRanking.setRewardRatio(BigDecimal.valueOf(candidateDto.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
-
-                nodeRanking.setRanking(i);
-                nodeRanking.setBlockCount(0L);
+                NodeRankingDto nrd = new NodeRankingDto();
+                nrd.init(candidateDto);
+                BeanUtils.copyProperties(nrd,nodeRanking);
                 BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
+                nodeRanking.setChainId(chainId);
+                nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
+                nodeRanking.setBlockReward(blockReward);
                 nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
                 nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
-
-                GeoUtil.IpLocation ipLocation = GeoUtil.getIpLocation(nodeRanking.getIp());
-                BeanUtils.copyProperties(ipLocation, nodeRanking);
-
+                nodeRanking.setRanking(i);
                 i = i++;
                 nodeRanking.setType(1);
                 // Set the node election status according to the ranking
@@ -123,8 +92,8 @@ public class NodeFilter {
                 nodeRanking.setBeginNumber(blockNumber);
                 nodeList.add(nodeRanking);
             }
-            //calulate this block publickey
-            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
+            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
+            BigInteger publicKey =(BigInteger)threadLocalMap.get("publicKey");
 
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();

@@ -53,17 +53,17 @@ public class BlockCorrelationFlow {
     public void doFilter () throws Exception {
         Block block = new Block();
         List <NodeRanking> nodeRankings = new ArrayList <>();
-        Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
+        Map <String, Object> threadLocalMap = ChainInfoFilterJob.map.get();
         EthBlock ethBlock = (EthBlock) threadLocalMap.get("ethBlock");
-        List<Transaction> transactionList = (List <Transaction>) threadLocalMap.get("transactionList");
-        List<TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionReceiptList");
+        List <Transaction> transactionList = (List <Transaction>) threadLocalMap.get("transactionList");
+        List <TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionReceiptList");
         String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
 
-        log.info("-----------------BlockCorrelationFlow-----------------------"+ new Date()  +"--------------------------BlockCorrelationFlow------------------------");
+
 
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList);
-            threadLocalMap.put("block",block);
+            threadLocalMap.put("block", block);
             String blockString = JSON.toJSONString(block);
             log.debug("block info :" + blockString);
             if (StringUtils.isEmpty(block)) {
@@ -76,8 +76,8 @@ public class BlockCorrelationFlow {
         }
 
         try {
-            if(transactionList.size() > 0 && transactionReceiptList.size() > 0
-                    && transactionList != null && transactionReceiptList != null){
+            if (transactionList.size() > 0 && transactionReceiptList.size() > 0
+                    && transactionList != null && transactionReceiptList != null) {
                 boolean res = transactionFilter.transactionAnalysis(transactionReceiptList, transactionList, block.getTimestamp().getTime());
                 if (!res) {
                     log.error("Analysis Transaction is null !!!....");
@@ -91,9 +91,9 @@ public class BlockCorrelationFlow {
         }
 
         try {
-            if(!StringUtils.isEmpty(nodeInfoList)){
+            if (!StringUtils.isEmpty(nodeInfoList)) {
                 nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, block.getNumber().longValue(), ethBlock, block.getBlockReward());
-                threadLocalMap.put("nodeRankings",nodeRankings);
+                threadLocalMap.put("nodeRankings", nodeRankings);
                 String nodeRankingString = JSONArray.toJSONString(nodeRankings);
                 log.debug("node info :" + nodeRankingString);
                 if (nodeRankings.size() < 0 && nodeRankings == null) {
@@ -106,9 +106,6 @@ public class BlockCorrelationFlow {
             log.error("Node analysis exception", e.getMessage());
             throw new AppException(ErrorCodeEnum.NODE_ERROR);
         }
-
-
-        log.info("+++++++++++++++++++BlockCorrelationFlow+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++BlockCorrelationFlow+++++++++++++++++++++++++");
     }
 
 }

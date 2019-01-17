@@ -2,8 +2,10 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
+import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -15,13 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.utils.AsciiUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -73,6 +73,7 @@ public class BlockFilter {
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
         log.debug("[ List <Transaction> info :]" + JSONArray.toJSONString(transactionsList));
         if (!StringUtils.isEmpty(ethBlock)) {
+            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
             block.setNumber(ethBlock.getBlock().getNumber().longValue());
             if (String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10) {
                 block.setTimestamp(new Date(ethBlock.getBlock().getTimestamp().longValue() * 1000L));
@@ -96,6 +97,18 @@ public class BlockFilter {
             block.setExtraData(ethBlock.getBlock().getExtraData());
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
+            String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
+            BigInteger publicKey =(BigInteger)threadLocalMap.get("publicKey");
+            List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
+            if(null != list && list.size() > 0 ){
+                list.forEach(candidateDto -> {
+                    if(publicKey.equals(new BigInteger(candidateDto.getCandidateId().replace("0x", ""), 16))){
+                        NodeRankingDto nodeRankingDto = new NodeRankingDto();
+                        nodeRankingDto.init(candidateDto);
+                        block.setNodeName(nodeRankingDto.getName() == null ? "" : nodeRankingDto.getName());
+                    }
+                });
+            }
             String rewardWei = getBlockReward(ethBlock.getBlock().getNumber().toString());
             block.setBlockReward(rewardWei);
             //actuakTxCostSum
@@ -119,7 +132,6 @@ public class BlockFilter {
                 return block;
             }
             for (Transaction transaction : transactionsList) {
-                Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
                 if(null != threadLocalMap.get(transaction.getHash())){
                     TransactionReceipt transactionReceipt = (TransactionReceipt) threadLocalMap.get(transaction.getHash());
                         sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
