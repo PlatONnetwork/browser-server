@@ -1,6 +1,7 @@
 package com.platon.browser.dto.node;
 
 import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -30,6 +31,6 @@ public class NodeListItem {
         BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18);
-        this.setDeposit(String.valueOf(v.doubleValue()));
+        this.setDeposit(EnergonUtil.convert(v));
     }
 }

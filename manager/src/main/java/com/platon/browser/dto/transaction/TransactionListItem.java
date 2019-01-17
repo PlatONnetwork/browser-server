@@ -2,6 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -33,9 +34,9 @@ public class TransactionListItem {
         // 交易时间就是出块时间
         this.setBlockTime(initData.getTimestamp().getTime());
         BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setActualTxCost(String.valueOf(v.doubleValue()));
+        this.setActualTxCost(EnergonUtil.convert(v));
         v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(String.valueOf(v.doubleValue()));
+        this.setValue(EnergonUtil.convert(v));
         this.setServerTime(System.currentTimeMillis());
     }
 

@@ -1,6 +1,7 @@
 package com.platon.browser.dto.transaction;
 
 import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -32,9 +33,9 @@ public class PendingTxDetail {
         this.setTxHash(initData.getHash());
         this.setTimestamp(initData.getTimestamp().getTime());
         BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(String.valueOf(v.doubleValue()));
+        this.setValue(EnergonUtil.convert(v));
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-        this.setPriceInEnergon(String.valueOf(v.doubleValue()));
+        this.setPriceInEnergon(EnergonUtil.convert(v));
     }
 }

@@ -11,6 +11,7 @@ import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
+import com.platon.browser.util.EnergonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -45,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
         try {
             EthGetBalance balance = chainsConfig.getWeb3j(req.getCid()).ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
             BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-            returnData.setBalance(String.valueOf(v.doubleValue()));
+            returnData.setBalance(EnergonUtil.convert(v));
         } catch (IOException e) {
             returnData.setBalance("0(error)");
         }
@@ -62,9 +63,9 @@ public class AccountServiceImpl implements AccountService {
             // 交易生成的时间就是出块时间
             bean.setBlockTime(initData.getTimestamp().getTime());
             BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(String.valueOf(v.doubleValue()));
+            bean.setValue(EnergonUtil.convert(v));
             v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setActualTxCost(String.valueOf(v.doubleValue()));
+            bean.setActualTxCost(EnergonUtil.convert(v));
             data.add(bean);
         });
 
@@ -79,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
             bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
             BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(String.valueOf(v.doubleValue()));
+            bean.setValue(EnergonUtil.convert(v));
             bean.setActualTxCost("0");
             data.add(bean);
         });
