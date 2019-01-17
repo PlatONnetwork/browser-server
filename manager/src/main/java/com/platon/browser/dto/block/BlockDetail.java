@@ -22,6 +22,7 @@ public class BlockDetail {
     private String blockReward;
     private String extraData;
     private long timeDiff;
+    private String nodeName;
     // 是否第一条
     private boolean first;
     // 是否最后一条

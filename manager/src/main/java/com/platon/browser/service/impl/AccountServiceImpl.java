@@ -61,9 +61,9 @@ public class AccountServiceImpl implements AccountService {
             bean.setServerTime(System.currentTimeMillis());
             // 交易生成的时间就是出块时间
             bean.setBlockTime(initData.getTimestamp().getTime());
-            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(value.toString());
-            BigDecimal v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setValue(String.valueOf(v.doubleValue()));
+            v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
             bean.setActualTxCost(String.valueOf(v.doubleValue()));
             data.add(bean);
         });

@@ -16,6 +16,7 @@ public class BlockPushItem {
     private String node;
     private Integer transaction;
     private String blockReward;
+    private String nodeName;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);

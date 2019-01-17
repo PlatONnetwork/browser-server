@@ -21,6 +21,7 @@ public class BlockListItem {
     private String energonAverage;
     private String blockReward;
     private long serverTime;
+    private String nodeName;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);
