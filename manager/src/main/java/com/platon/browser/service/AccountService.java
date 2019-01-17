@@ -1,10 +1,8 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dto.transaction.AccTransactionItem;
-import com.platon.browser.req.account.AccountDetailReq;
-
-import java.util.List;
+import com.platon.browser.dto.account.AddressDetail;
+import com.platon.browser.req.account.AddressDetailReq;
 
 public interface AccountService {
-    List<AccTransactionItem> getTransactionList(AccountDetailReq req);
+    AddressDetail getAddressDetail(AddressDetailReq req);
 }

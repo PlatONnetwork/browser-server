@@ -6,12 +6,13 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.*;
 import com.platon.browser.exception.ResponseException;
-import com.platon.browser.req.account.AccountDetailReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
 import com.platon.browser.req.transaction.*;
 import com.platon.browser.service.*;
@@ -476,21 +477,21 @@ public class TransactionController {
      * }
      */
     @PostMapping("addressDetails")
-    public BaseResp addressDetails (@Valid @RequestBody AccountDetailReq req) {
+    public BaseResp<AccountDetail> addressDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
             req.setPageSize(20);
-            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
-            AddressDetail addressDetail = new AddressDetail();
-            if(transactionList.size()>20){
+            AddressDetail initData = accountService.getAddressDetail(req);
+            AccountDetail returnData = new AccountDetail();
+            returnData.init(initData);
+            List<AccTransactionItem> transactions = initData.getTrades();
+            if(transactions.size()>20){
                 // 大于20，则取前20条数据返回
-                addressDetail.setTrades(transactionList.subList(0,20));
-            }else{
-                addressDetail.setTrades(transactionList);
+                returnData.setTrades(transactions.subList(0,20));
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),addressDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),returnData);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }
@@ -596,21 +597,21 @@ public class TransactionController {
      * }
      */
     @PostMapping("contractDetails")
-    public BaseResp contractDetails (@Valid @RequestBody AccountDetailReq req) {
+    public BaseResp contractDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
             req.setPageSize(20);
-            List<AccTransactionItem> transactionList = accountService.getTransactionList(req);
-            ContractDetail contractDetail = new ContractDetail();
-            if(transactionList.size()>20){
+            AddressDetail initData = accountService.getAddressDetail(req);
+            ContractDetail returnData = new ContractDetail();
+            returnData.init(initData);
+            List<AccTransactionItem> transactions = initData.getTrades();
+            if(transactions.size()>20){
                 // 大于20，则取前20条数据返回
-                contractDetail.setTrades(transactionList.subList(0,20));
-            }else{
-                contractDetail.setTrades(transactionList);
+                returnData.setTrades(transactions.subList(0,20));
             }
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),contractDetail);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),returnData);
         }catch (BusinessException be){
             throw new ResponseException(be.getMessage());
         }

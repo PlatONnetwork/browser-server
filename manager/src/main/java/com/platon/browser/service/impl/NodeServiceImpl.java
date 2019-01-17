@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -36,18 +35,13 @@ import java.util.Set;
 
 @Service
 public class NodeServiceImpl implements NodeService {
-
     private final Logger logger = LoggerFactory.getLogger(NodeServiceImpl.class);
-
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private BlockService blockService;
     @Autowired
     private I18nUtil i18n;
-    @Value("${platon.image.server.url}")
-    private String imageServerUrl;
-
     @Autowired
     private RedisCacheServiceImpl redisCacheService;
 
@@ -125,7 +119,7 @@ public class NodeServiceImpl implements NodeService {
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
 
-        returnData.setLogo(imageServerUrl+initData.getUrl());
+        returnData.setLogo(initData.getUrl());
         return returnData;
     }
 

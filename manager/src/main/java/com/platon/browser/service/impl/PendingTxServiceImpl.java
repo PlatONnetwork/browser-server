@@ -12,11 +12,8 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.PendingTxDetail;
-import com.platon.browser.dto.transaction.PendingTxDetailNavigate;
 import com.platon.browser.dto.transaction.PendingTxItem;
-import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.req.account.AccountDetailReq;
-import com.platon.browser.req.transaction.PendingTxDetailNavigateReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxPageReq;
 import com.platon.browser.service.PendingTxService;
@@ -25,7 +22,6 @@ import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,7 +103,7 @@ public class PendingTxServiceImpl implements PendingTxService {
      * @return
      */
     @Override
-    public List<PendingTx> getTransactionList(AccountDetailReq req) {
+    public List<PendingTx> getTransactionList(AddressDetailReq req) {
         PendingTxExample condition = new PendingTxExample();
         PendingTxExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
                 .andFromEqualTo(req.getAddress());
@@ -135,32 +131,4 @@ public class PendingTxServiceImpl implements PendingTxService {
         return pendingTxes;
     }
 
-    @Override
-    public PendingTxDetailNavigate getPendingTxDetailNavigate(PendingTxDetailNavigateReq req) {
-        req.setPageSize(1);
-        switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-            case PREV:
-                req.setPageNo(req.getIndex()-1);
-                break;
-            case NEXT:
-                req.setPageNo(req.getIndex()+1);
-                break;
-        }
-        req.buildPage();
-        PendingTxExample condition = new PendingTxExample();
-        condition.setOrderByClause("timestamp desc");
-        List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(condition);
-        if(pendingTxes.size()==0){
-            logger.error("no more pending transactions");
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.PENDING_ERROR_NOT_EXIST));
-        }
-
-        PendingTx pendingTx = pendingTxes.get(0);
-        PendingTxDetailNavigate pendingTxDetailNavigate = new PendingTxDetailNavigate();
-        BeanUtils.copyProperties(pendingTx,pendingTxDetailNavigate);
-        pendingTxDetailNavigate.setTxHash(pendingTx.getHash());
-        pendingTxDetailNavigate.setInputData(pendingTx.getInput());
-        pendingTxDetailNavigate.setTimestamp(pendingTx.getTimestamp().getTime());
-        return pendingTxDetailNavigate;
-    }
 }
