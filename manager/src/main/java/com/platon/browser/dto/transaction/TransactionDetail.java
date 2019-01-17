@@ -22,6 +22,7 @@ public class TransactionDetail {
     private String actualTxCost;
     private String energonLimit;
     private String energonUsed;
+    private String energonPrice;
     private String priceInE;
     private String priceInEnergon;
     private String inputData;

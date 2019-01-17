@@ -21,6 +21,7 @@ public class PendingTxDetail {
     private String actualTxCost;
     private int energonLimit;
     private int energonUsed;
+    private String energonPrice;
     private String priceInE;
     private String priceInEnergon;
     private String inputData;
