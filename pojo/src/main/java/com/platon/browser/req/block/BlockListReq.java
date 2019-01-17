@@ -11,6 +11,6 @@ import javax.validation.constraints.NotNull;
 public class BlockListReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotNull(message = "{node.address.notnull}")
-    private String address;
+    @NotNull(message = "{node.id.notnull}")
+    private String nodeId;
 }

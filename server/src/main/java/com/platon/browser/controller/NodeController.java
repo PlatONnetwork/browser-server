@@ -209,7 +209,7 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "address": "0xsfjl34jfljsl435kd",// 节点地址(必填)
+     *      "nodId": "0xsfjl34jfljsl435kd",// 节点Id(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -258,7 +258,7 @@ public class NodeController {
     }
 
     /**
-     * @api {get} node/blockDownload?cid=:cid&address=:address&date=:date d.导出节点区块详情
+     * @api {get} node/blockDownload?cid=:cid&nodeId=:nodeId&date=:date d.导出节点区块详情
      * @apiVersion 1.0.0
      * @apiName blockDownload
      * @apiGroup node
@@ -272,10 +272,10 @@ public class NodeController {
      * 响应为 二进制文件流
      */
     @GetMapping("blockDownload")
-    public void blockDownload(@RequestParam String cid,@RequestParam String address,@RequestParam String date, HttpServletResponse response) {
+    public void blockDownload(@RequestParam String cid,@RequestParam String nodeId,@RequestParam String date, HttpServletResponse response) {
         BlockDownloadReq req = new BlockDownloadReq();
         req.setCid(cid);
-        req.setAddress(address);
+        req.setNodeId(nodeId);
         try {
             SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
