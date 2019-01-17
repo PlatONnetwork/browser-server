@@ -50,15 +50,15 @@ public class TransactionFilter {
     private ChainsConfig chainsConfig;
 
     //@Transactional
-    public boolean transactionAnalysis( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
+    public boolean transactionAnalysis(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
-        boolean res = build(transactionReceiptList,transactionsList, time);
+        boolean res = build(transactionReceiptMap,transactionsList, time);
         return res;
     }
 
 
-    public boolean build( List<TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList , long time)throws Exception{
+    public boolean build(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
         Web3j web3j = chainsConfig.getWeb3j(chainId);
         //build database struct<Transaction>
         List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
@@ -66,9 +66,8 @@ public class TransactionFilter {
         //for loop transaction & transactionReceipt build database struct on PlatON
         List<String> txHashes = new ArrayList <>();
         for(Transaction transaction : transactionsList){
-            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
-            if(null != threadLocalMap.get(transaction.getHash())){
-                TransactionReceipt transactionReceipt = (TransactionReceipt) threadLocalMap.get(transaction.getHash());
+            if(null != transactionReceiptMap.get(transaction.getHash())){
+                TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
                     txHashes.add(transaction.getHash());
                     com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
                     TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();

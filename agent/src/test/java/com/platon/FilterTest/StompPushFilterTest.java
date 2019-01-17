@@ -49,9 +49,9 @@ public class StompPushFilterTest extends TestBase {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.build(ethBlock,list2,list1);
-            List<NodeRanking> list3 = nodeFilter.nodeAnalysis(nodeInfoList,block.getNumber(),ethBlock,block.getBlockReward());
-            stompPushFilter.stompPush(block,list3);
+            //Block block = blockFilter.build(ethBlock,list2,list1);
+            //List<NodeRanking> list3 = nodeFilter.nodeAnalysis(nodeInfoList,block.getNumber(),ethBlock,block.getBlockReward());
+            //stompPushFilter.stompPush(block,list3);
 
         }catch (Exception e ){
             e.printStackTrace();

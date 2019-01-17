@@ -9,6 +9,7 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.filter.BlockCorrelationFlow;
 import com.platon.browser.filter.OtherFlow;
@@ -57,7 +58,6 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
     @Autowired
     private OtherFlow otherFlow;
 
-    public final static ThreadLocal<Map<String,Object>> map = new ThreadLocal <>();
 
 
     @PostConstruct
@@ -81,7 +81,8 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         log.debug("ChainInfoFilterJob-->{},begin data analysis!!!...");
-
+        Map<String,Object> transactionMap = new HashMap <>();
+        Map<String,Object> transactionReceiptMap = new HashMap <>();
         try {
             log.info("-----------------dojob-----------------------"+ new Date()  +"--------------------------dojob------------------------");
             EthBlockNumber ethBlockNumber = null;
@@ -93,7 +94,6 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
-            Map<String,Object> threadMap = new HashMap <>();
              for (int i = maxNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
                 //select blockinfo from PlatON
                 DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(i)));
@@ -107,12 +107,13 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                     Optional <org.web3j.protocol.core.methods.response.Transaction> value = ethTransaction.getTransaction();
                     org.web3j.protocol.core.methods.response.Transaction transaction = value.get();
                     transactionList.add(transaction);
+                    transactionMap.put(transaction.getHash(),transaction);
                     EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(transaction.getHash()).send();
                     Optional <TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
                     TransactionReceipt receipt = transactionReceipt.get();
                     transactionReceiptList.add(receipt);
-                    threadMap.put(transaction.getHash(),transaction);
-                    threadMap.put(receipt.getTransactionHash(),receipt);
+                    transactionReceiptMap.put(receipt.getTransactionHash(),receipt);
+
                 }
                 //build candidate contract
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
@@ -122,21 +123,15 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 String nodeInfoList = null;
                 try{
                     nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(i))).send();
-                    threadMap.put("nodeInfoList",nodeInfoList);
                 }catch (Exception e){
                     log.debug("nodeInfoList is null !!!...",e.getMessage());
                 }
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock );
-                threadMap.put("publicKey",publicKey);
-                threadMap.put("ethBlock",ethBlock);
-                threadMap.put("transactionReceiptList",transactionReceiptList);
-                threadMap.put("transactionList",transactionList);
-                threadMap.put("ethPendingTransactions",ethPendingTransactions);
-                map.set(threadMap);
-                blockCorrelationFlow.doFilter();
-                otherFlow.doFilter();
+                Map<String,Object> map = blockCorrelationFlow.doFilter(ethBlock,transactionList,transactionReceiptList,publicKey,nodeInfoList,transactionReceiptMap);
+                List<NodeRanking> nodeRankings = (List <NodeRanking>) map.get("nodeRanking");
+                Block block = (Block) map.get("block");
+                otherFlow.doFilter(ethPendingTransactions,nodeRankings,block);
                 maxNubmer =Long.valueOf(blockNumber);
-                map.remove();
                 log.info("+++++++++++++++++++dojob+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++dojob+++++++++++++++++++++++++");
             }
         } catch (Exception e) {

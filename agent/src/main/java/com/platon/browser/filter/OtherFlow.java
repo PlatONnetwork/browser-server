@@ -4,7 +4,6 @@ import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.job.ChainInfoFilterJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: dongqile
@@ -38,12 +36,8 @@ public class OtherFlow {
     private StompPushFilter stompPushFilter;
 
     @Transactional
-    public void doFilter(){
+    public void doFilter(EthPendingTransactions ethPendingTransactions,List<NodeRanking> nodeRankings,Block block){
         log.info("-----------------OtherFlow-----------------------"+ new Date()  +"--------------------------OtherFlow------------------------");
-        Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
-        EthPendingTransactions ethPendingTransactions = (EthPendingTransactions) threadLocalMap.get("ethPendingTransactions");
-        List<NodeRanking> nodeRankings = (List <NodeRanking>) threadLocalMap.get("nodeRankings");
-        Block block = (Block) threadLocalMap.get("block");
         try {
             if(ethPendingTransactions != null){
                 boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);

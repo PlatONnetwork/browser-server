@@ -2,7 +2,6 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.dto.agent.CandidateDto;
@@ -10,7 +9,7 @@ import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.EventRes;
-import com.platon.browser.job.ChainInfoFilterJob;
+import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,23 +56,24 @@ public class BlockFilter {
     private RedisCacheService redisCacheService;
 
     //Transactional
-    public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
+    public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList,
+                                 String nodeInfoList ,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
         log.debug("[into BlockFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildBlockStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        Block block = build(ethBlock, transactionReceiptList, transactionsList);
+        Block block = build(ethBlock, transactionReceiptList, transactionsList,nodeInfoList,publicKey,transactionReceiptMap);
         return block;
     }
 
 
 
-    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ) throws Exception {
+    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ,
+                         String nodeInfoList,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
         log.debug("[ List <Transaction> info :]" + JSONArray.toJSONString(transactionsList));
         if (!StringUtils.isEmpty(ethBlock)) {
-            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
             block.setNumber(ethBlock.getBlock().getNumber().longValue());
             if (String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10) {
                 block.setTimestamp(new Date(ethBlock.getBlock().getTimestamp().longValue() * 1000L));
@@ -97,8 +97,8 @@ public class BlockFilter {
             block.setExtraData(ethBlock.getBlock().getExtraData());
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
-            String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
-            BigInteger publicKey =(BigInteger)threadLocalMap.get("publicKey");
+            String nodeId = publicKey.toString(16);
+            block.setNodeId(nodeId);
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
             if(null != list && list.size() > 0 ){
                 list.forEach(candidateDto -> {
@@ -132,8 +132,8 @@ public class BlockFilter {
                 return block;
             }
             for (Transaction transaction : transactionsList) {
-                if(null != threadLocalMap.get(transaction.getHash())){
-                    TransactionReceipt transactionReceipt = (TransactionReceipt) threadLocalMap.get(transaction.getHash());
+                if(null != transactionReceiptMap.get(transaction.getHash())){
+                    TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
                         sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
                         AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
                         String type = TransactionAnalysis.getTypeName(analysisResult.getType());

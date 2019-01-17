@@ -45,7 +45,7 @@ public class BlockFilterTest extends TestBase {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.build(ethBlock,list2,list1);
+            //Block block = blockFilter.build(ethBlock,list2,list1);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class BlockFilterTest extends TestBase {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.blockAnalysis(ethBlock,list2,list1);
+            //Block block = blockFilter.blockAnalysis(ethBlock,list2,list1);
 
         }catch (Exception e){
             e.printStackTrace();

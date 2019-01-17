@@ -46,15 +46,15 @@ public class NodeFilter {
     private RedisCacheService redisCacheService;
 
     //@Transactional
-    public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
+    public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward);
+        List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward, publicKey);
         return list;
     }
 
-    public List <NodeRanking> build ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ) throws Exception {
+    public List <NodeRanking> build ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
         if (StringUtils.isNotBlank(nodeInfoList)) {
             //list is cadidate struct on PlatON
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
@@ -93,9 +93,6 @@ public class NodeFilter {
                 nodeRanking.setBeginNumber(blockNumber);
                 nodeList.add(nodeRanking);
             }
-            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
-            BigInteger publicKey =(BigInteger)threadLocalMap.get("publicKey");
-
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
             //data form database and node status is vaild

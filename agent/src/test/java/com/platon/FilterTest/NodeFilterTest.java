@@ -54,8 +54,8 @@ public class NodeFilterTest extends TestBase {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            Block block = blockFilter.blockAnalysis(ethBlock, list2, list1);
-            nodeFilter.build(nodeInfoList, ethBlock.getBlock().getNumber().longValue(), ethBlock, block.getBlockReward());
+            //Block block = blockFilter.blockAnalysis(ethBlock, list2, list1);
+            //nodeFilter.build(nodeInfoList, ethBlock.getBlock().getNumber().longValue(), ethBlock, block.getBlockReward());
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidNotEqualTo(1);
             List <NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
