@@ -72,7 +72,8 @@ public class BlockController  {
      *                  "timestamp": 1798798798798,//出块时间
      *                  "transaction": 10000,//块内交易数
      *                  "size": 188,//块大小
-     *                  "miner": "0x234", // 出块节点
+     *                  "miner": "0x234", // 出块节点地址
+     *                  "nodeName": "node-01", // 出块节点名称
      *                  "energonUsed": 111,//能量消耗
      *                  "energonLimit": 24234,//能量消耗限制
      *                  "energonAverage": 11, //平均能量价值(单位:Energon)
@@ -115,7 +116,8 @@ public class BlockController  {
      *           "transaction": 1288,//块内交易总数
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
-     *           "miner": "0x234", // 出块节点（多少时间内）
+     *           "miner": "0x234", // 出块节点地址
+     *           "nodeName": "node-01", // 出块节点名称
      *           "timeDiff":424234, // 当前块出块时间距离上一个块出块时间之差（毫秒）
      *           "size": 123,//区块大小
      *           "energonLimit": 24234,//能量消耗限制
@@ -165,7 +167,8 @@ public class BlockController  {
      *           "transaction": 1288,//块内交易总数
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
-     *           "miner": "0x234", // 出块节点（多少时间内）
+     *           "miner": "0x234", // 出块节点地址
+     *           "nodeName": "node-01", // 出块节点名称
      *           "size": 123,//区块大小
      *           "energonLimit": 24234,//能量消耗限制
      *           "energonUsed": 2342,//能量消耗
