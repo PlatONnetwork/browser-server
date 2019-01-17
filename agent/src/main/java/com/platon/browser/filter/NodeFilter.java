@@ -85,7 +85,8 @@ public class NodeFilter {
                  * After 100：alternative nodes
                  * **/
                 int electionStatus = 1;
-                if (1 <= i && i < 100) electionStatus = 1;
+                if( 1 <= i && i < 25) electionStatus = 3;
+                if (26 <= i && i < 100) electionStatus = 1;
                 if (i >= 100) electionStatus = 4;
                 nodeRanking.setElectionStatus(electionStatus);
                 nodeRanking.setIsValid(1);
