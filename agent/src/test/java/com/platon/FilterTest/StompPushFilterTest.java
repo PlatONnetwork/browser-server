@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.platon.contracts.CandidateContract;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
@@ -32,7 +31,6 @@ public class StompPushFilterTest extends TestBase {
     @Test
     public void StompPushFilterTest(){
         try{
-            Web3j web3j = web3jClient.getWeb3jClient();
             CandidateContract candidateContract = web3jClient.getCandidateContract();
             String nodeInfoList = candidateContract.CandidateList().send();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));

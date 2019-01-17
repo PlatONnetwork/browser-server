@@ -2,7 +2,6 @@ package com.platon.FilterTest;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.TestBase;
-import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.Block;
@@ -13,9 +12,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.contracts.CandidateContract;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
@@ -40,7 +37,6 @@ public class NodeFilterTest extends TestBase {
     public void NodeFilterTest () {
         try {
             CandidateContract candidateContract = web3jClient.getCandidateContract();
-            Web3j web3j = Web3jClient.getWeb3jClient();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(400L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(400L))).send();
@@ -75,7 +71,6 @@ public class NodeFilterTest extends TestBase {
     public void nodeIdEqualsPublicKeyTest () {
         try {
             CandidateContract candidateContract = web3jClient.getCandidateContract();
-            Web3j web3j = Web3jClient.getWeb3jClient();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(2985L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(2985L))).send();

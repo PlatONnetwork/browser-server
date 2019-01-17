@@ -1,14 +1,12 @@
 package com.platon.FilterTest;
 
 import com.platon.TestBase;
-import com.platon.browser.client.Web3jClient;
 import com.platon.browser.dao.entity.Block;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
@@ -31,7 +29,6 @@ public class BlockFilterTest extends TestBase {
     @Test
     public void  BlockFilterBuildTest(){
         try{
-            Web3j web3j = Web3jClient.getWeb3jClient();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
@@ -57,7 +54,6 @@ public class BlockFilterTest extends TestBase {
     @Test
     public void BlockFilterTest(){
         try {
-            Web3j web3j = Web3jClient.getWeb3jClient();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();

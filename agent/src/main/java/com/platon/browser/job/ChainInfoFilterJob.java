@@ -1,28 +1,22 @@
 package com.platon.browser.job;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.common.util.CalculatePublicKey;
+import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.filter.*;
+import com.platon.browser.filter.BlockCorrelationFlow;
+import com.platon.browser.filter.OtherFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
-import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -32,7 +26,6 @@ import org.web3j.protocol.core.methods.response.*;
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * User: dongqile
@@ -55,6 +48,8 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
 
     @Autowired
     private Web3jClient web3jClient;
+    @Autowired
+    private ChainsConfig chainsConfig;
 
     @Autowired
     private BlockCorrelationFlow blockCorrelationFlow;
@@ -89,7 +84,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
         try {
             //log.info("----------------------------------------"+ new Date()  +"--------------------------------------------------");
             EthBlockNumber ethBlockNumber = null;
-            Web3j web3j = web3jClient.getWeb3jClient();
+            Web3j web3j = chainsConfig.getWeb3j(chainId);
             try {
                 ethBlockNumber = web3j.ethBlockNumber().send();
             } catch (Exception e) {

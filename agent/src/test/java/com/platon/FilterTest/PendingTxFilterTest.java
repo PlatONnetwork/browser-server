@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 
 /**
@@ -22,7 +21,6 @@ public class PendingTxFilterTest extends TestBase {
     @Test
     public void PengdingTxFilterTest(){
         try {
-            Web3j web3j = web3jClient.getWeb3jClient();
             EthPendingTransactions ethPendingTransactions = web3j.ethPendingTx().send();
             pendingFilter.pendingTxAnalysis(ethPendingTransactions);
         }catch (Exception e){
