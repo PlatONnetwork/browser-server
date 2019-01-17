@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,25 +36,31 @@ public class AccountServiceImpl implements AccountService {
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
         long serverTime = System.currentTimeMillis();
         List<AccTransactionItem> accTransactionList = new ArrayList<>();
-        transactions.forEach(transaction -> {
+        transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(transaction,bean);
-            bean.setTxHash(transaction.getHash());
-            bean.setServerTime(serverTime);
+            BeanUtils.copyProperties(initData,this);
+            bean.setTxHash(initData.getHash());
+            bean.setServerTime(System.currentTimeMillis());
             // 交易生成的时间就是出块时间
-            bean.setBlockTime(transaction.getTimestamp().getTime());
+            bean.setBlockTime(initData.getTimestamp().getTime());
+            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+            bean.setValue(value.toString());
+            BigDecimal txCost = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
+            bean.setActualTxCost(txCost.toString());
             accTransactionList.add(bean);
         });
 
         // 取待处理交易
         req.buildPage();
         List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
-        pendingTxes.forEach(pendingTx -> {
+        pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(pendingTx,bean);
-            bean.setTxHash(pendingTx.getHash());
-            bean.setServerTime(serverTime);
+            BeanUtils.copyProperties(initData,bean);
+            bean.setTxHash(initData.getHash());
+            bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
+            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+            bean.setValue(value.toString());
             bean.setActualTxCost("0");
             accTransactionList.add(bean);
         });
