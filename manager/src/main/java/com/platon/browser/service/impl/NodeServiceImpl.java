@@ -5,8 +5,10 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
@@ -14,7 +16,6 @@ import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.BlockService;
@@ -25,7 +26,6 @@ import com.platon.browser.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +44,8 @@ public class NodeServiceImpl implements NodeService {
     private I18nUtil i18n;
     @Autowired
     private RedisCacheServiceImpl redisCacheService;
+    @Autowired
+    private BlockMapper blockMapper;
 
     @Override
     public RespPage<NodeListItem> getPage(NodePageReq req) {
@@ -121,10 +123,21 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public List<BlockListItem> getBlockList(BlockListReq req) {
-        BlockDownloadReq downloadReq = new BlockDownloadReq();
-        BeanUtils.copyProperties(req,downloadReq);
-        List<Block> blocks = blockService.getList(downloadReq);
+    public List<BlockListItem> getBlockList(BlockDownloadReq req) {
+        BlockExample condition = new BlockExample();
+        BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(StringUtils.isNotBlank(req.getAddress())){
+            criteria.andNodeIdEqualTo(req.getAddress());
+        }
+        if(req.getStartDate()!=null){
+            criteria.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            criteria.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
+        condition.setOrderByClause("number desc");
+        List<Block> blocks = blockMapper.selectByExample(condition);
+
         List<BlockListItem> returnData = new LinkedList<>();
         blocks.forEach(initData -> {
             BlockListItem bean = new BlockListItem();

@@ -12,7 +12,6 @@ import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.ExportService;
@@ -231,7 +230,7 @@ public class NodeController {
      * }
      */
     @PostMapping("blockList")
-    public BaseResp blockList (@Valid @RequestBody BlockListReq req) {
+    public BaseResp blockList (@Valid @RequestBody BlockDownloadReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
