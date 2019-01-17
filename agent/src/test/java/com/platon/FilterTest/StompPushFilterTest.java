@@ -51,7 +51,7 @@ public class StompPushFilterTest extends TestBase {
             }
             Block block = blockFilter.build(ethBlock,list2,list1);
             List<NodeRanking> list3 = nodeFilter.nodeAnalysis(nodeInfoList,block.getNumber(),ethBlock,block.getBlockReward());
-            stompPushFilter.stompPush(block,list3,BigInteger.ZERO);
+            stompPushFilter.stompPush(block,list3);
 
         }catch (Exception e ){
             e.printStackTrace();

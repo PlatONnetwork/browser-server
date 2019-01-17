@@ -430,19 +430,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings,BigInteger publicKey){
+    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings){
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        /************* 设置当前块高、出块节点*************/
+        /************* 设置当前块高、出块节点、节点名称*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
-
-        /************* 设置节点名称*************/
-        Map<BigInteger,String> keyNameMap = new HashMap<>();
-        nodeRankings.forEach(e->keyNameMap.put(new BigInteger(e.getNodeId().replace("0x", ""), 16),e.getName()));
-        cache.setNodeName(keyNameMap.get(publicKey));
-        if(StringUtils.isBlank(cache.getNodeName())) cache.setNodeName("Unknown");
+        cache.setNodeName(block.getNodeName());
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();

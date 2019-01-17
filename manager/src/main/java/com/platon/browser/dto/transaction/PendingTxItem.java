@@ -29,9 +29,9 @@ public class PendingTxItem {
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setServerTime(System.currentTimeMillis());
         BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(EnergonUtil.convert(v));
+        this.setValue(EnergonUtil.format(v));
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
-        this.setPriceInEnergon(EnergonUtil.convert(v));
+        this.setPriceInEnergon(EnergonUtil.format(v));
     }
 }

@@ -26,6 +26,6 @@ public class TransactionPushItem {
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());
         BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(EnergonUtil.convert(v));
+        this.setValue(EnergonUtil.format(v));
     }
 }
