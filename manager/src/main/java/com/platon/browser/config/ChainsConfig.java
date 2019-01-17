@@ -15,7 +15,7 @@ public class ChainsConfig {
     public static class ChainInfo{
         public String chainName;
         public String chainId;
-        public Web3j web3j;
+        private Web3j web3j;
         public ChainInfo(String chainName,String chainId,Web3j web3j){
             this.chainName = chainName;
             this.chainId = chainId;
@@ -54,6 +54,9 @@ public class ChainsConfig {
 
     public ChainInfo getChainInfo(String chainId){
         return chainsConfig.get(chainId);
+    }
+    public Web3j getWeb3j(String chainId){
+        return chainsConfig.get(chainId).web3j;
     }
 
     public boolean isValid(String chainId){

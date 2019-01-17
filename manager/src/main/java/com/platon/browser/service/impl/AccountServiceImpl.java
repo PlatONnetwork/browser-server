@@ -43,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
     public AddressDetail getAddressDetail(AddressDetailReq req) {
         AddressDetail returnData = new AddressDetail();
         try {
-            EthGetBalance balance = chainsConfig.getChainInfo(req.getCid()).web3j.ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
+            EthGetBalance balance = chainsConfig.getWeb3j(req.getCid()).ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
             BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
             returnData.setBalance(String.valueOf(v.doubleValue()));
         } catch (IOException e) {
