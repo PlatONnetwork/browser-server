@@ -12,7 +12,6 @@ import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +31,6 @@ public interface RedisCacheService {
     void resetNodePushCache(String chainId);
     List<NodePushItem> getNodePushCache(String chainId);
     List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
-    boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings,BigInteger publicKey);
+    boolean updateStatisticsCache(String chainId, Block block ,List<NodeRanking> nodeRankings);
     StatisticsCache getStatisticsCache(String chainId);
 }

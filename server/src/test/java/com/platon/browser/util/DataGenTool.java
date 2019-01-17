@@ -148,7 +148,7 @@ public class DataGenTool extends TestData {
                 bean.setBlockCampaignAmount(Math.abs(random.nextLong()));
                 bean.setBlockVoteAmount(Math.abs(random.nextLong()));
                 bean.setBlockVoteNumber(Math.abs(random.nextLong()));
-
+                bean.setNodeName("Node-"+random.nextDouble());
                 data.add(bean);
             }
         });

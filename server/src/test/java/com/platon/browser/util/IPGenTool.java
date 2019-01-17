@@ -1,5 +1,7 @@
 package com.platon.browser.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 
 public class IPGenTool {
@@ -38,5 +40,14 @@ public class IPGenTool {
         for(char c : chars) sb.append(Integer.toHexString(c));
 
         System.out.println(sb.toString());
+
+        BigDecimal val = BigDecimal.valueOf(10.4568999999995555).setScale(18, RoundingMode.DOWN);
+        System.out.println(val.doubleValue());
+
+        String rs = NumberUtil.format(val,".##################");
+        System.out.println(rs);
+
+        System.out.println(EnergonUtil.convert(BigDecimal.valueOf(0)));
+
     }
 }

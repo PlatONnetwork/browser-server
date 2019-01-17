@@ -20,7 +20,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
-import java.math.BigInteger;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
@@ -166,8 +165,7 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             key.setHash(transaction.getBlockHash());
             Block block = blockMapper.selectByPrimaryKey(key);
 
-            BigInteger publicKey = new BigInteger("561989965773895576813579715222857160699960464449120684591664494480641850412901703913038313549619636487002155264521480576575605556920764090030793982122823");
-            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data,publicKey);
+            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data);
             Assert.assertEquals(true,result);
         });
     }
