@@ -34,11 +34,10 @@ public class AccountServiceImpl implements AccountService {
         // 取已完成交易
         req.buildPage();
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
-        long serverTime = System.currentTimeMillis();
         List<AccTransactionItem> accTransactionList = new ArrayList<>();
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(initData,this);
+            BeanUtils.copyProperties(initData,bean);
             bean.setTxHash(initData.getHash());
             bean.setServerTime(System.currentTimeMillis());
             // 交易生成的时间就是出块时间
