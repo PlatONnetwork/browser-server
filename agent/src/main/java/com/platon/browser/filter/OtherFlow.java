@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class OtherFlow {
 
     @Transactional
     public void doFilter(){
+        log.info("-----------------OtherFlow-----------------------"+ new Date()  +"--------------------------OtherFlow------------------------");
         Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
         EthPendingTransactions ethPendingTransactions = (EthPendingTransactions) threadLocalMap.get("ethPendingTransactions");
         List<NodeRanking> nodeRankings = (List <NodeRanking>) threadLocalMap.get("nodeRankings");
@@ -67,5 +69,8 @@ public class OtherFlow {
             log.error("push redis exception", e.getMessage());
             throw new AppException(ErrorCodeEnum.STOMP_ERROR);
         }
+
+        log.info("+++++++++++++++++++OtherFlow+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++OtherFlow+++++++++++++++++++++++++");
+
     }
 }

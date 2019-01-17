@@ -119,8 +119,9 @@ public class BlockFilter {
                 return block;
             }
             for (Transaction transaction : transactionsList) {
-                for (TransactionReceipt transactionReceipt : transactionReceiptList) {
-                    if (transaction.getHash().equals(transactionReceipt.getTransactionHash())) {
+                Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
+                if(null != threadLocalMap.get(transaction.getHash())){
+                    TransactionReceipt transactionReceipt = (TransactionReceipt) threadLocalMap.get(transaction.getHash());
                         sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
                         AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
                         String type = TransactionAnalysis.getTypeName(analysisResult.getType());
@@ -137,7 +138,6 @@ public class BlockFilter {
                         } else if ("candidateDeposit".equals(type)) {
                             campaignAmount.add(BigInteger.ONE);
                         }
-                    }
                     block.setBlockVoteAmount(voteAmount.longValue());
                     block.setBlockCampaignAmount(campaignAmount.longValue());
                     block.setActualTxCostSum(sum.toString());

@@ -22,10 +22,7 @@ import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -62,6 +59,7 @@ public class BlockCorrelationFlow {
         List<TransactionReceipt> transactionReceiptList = (List <TransactionReceipt>) threadLocalMap.get("transactionReceiptList");
         String nodeInfoList = (String) threadLocalMap.get("nodeInfoList");
 
+        log.info("-----------------BlockCorrelationFlow-----------------------"+ new Date()  +"--------------------------BlockCorrelationFlow------------------------");
 
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList);
@@ -109,6 +107,8 @@ public class BlockCorrelationFlow {
             throw new AppException(ErrorCodeEnum.NODE_ERROR);
         }
 
+
+        log.info("+++++++++++++++++++BlockCorrelationFlow+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++BlockCorrelationFlow+++++++++++++++++++++++++");
     }
 
 }

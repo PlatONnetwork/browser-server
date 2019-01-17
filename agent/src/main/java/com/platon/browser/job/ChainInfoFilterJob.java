@@ -64,6 +64,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
 
     public final static ThreadLocal<Map<String,Object>> map = new ThreadLocal <>();
 
+
     @PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
@@ -87,7 +88,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
         log.debug("ChainInfoFilterJob-->{},begin data analysis!!!...");
 
         try {
-            //log.info("----------------------------------------"+ new Date()  +"--------------------------------------------------");
+            log.info("-----------------dojob-----------------------"+ new Date()  +"--------------------------dojob------------------------");
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = web3jClient.getWeb3jClient();
             try {
@@ -97,8 +98,8 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
             }
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
-
-            for (int i = maxNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
+            Map<String,Object> threadMap = new HashMap <>();
+             for (int i = maxNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
                 //select blockinfo from PlatON
                 DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(i)));
                 EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
@@ -115,13 +116,14 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                     Optional <TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
                     TransactionReceipt receipt = transactionReceipt.get();
                     transactionReceiptList.add(receipt);
+                    threadMap.put(transaction.getHash(),transaction);
+                    threadMap.put(receipt.getTransactionHash(),receipt);
                 }
                 //build candidate contract
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
                 //get candidate list info
                 EthPendingTransactions ethPendingTransactions = web3j.ethPendingTx().send();
 
-                Map<String,Object> threadMap = new HashMap <>();
                 String nodeInfoList = null;
                 try{
                     nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(i))).send();
@@ -140,7 +142,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 otherFlow.doFilter();
                 maxNubmer =Long.valueOf(blockNumber);
 
-                //log.info("++++++++++++++++++++++++++++++++++++++++++++++++"+ new Date()  +"+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                log.info("+++++++++++++++++++dojob+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++dojob+++++++++++++++++++++++++");
             }
         } catch (Exception e) {
             log.error(e.getMessage());

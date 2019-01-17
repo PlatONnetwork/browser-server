@@ -7,7 +7,9 @@ import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.job.ChainInfoFilterJob;
 import com.platon.browser.service.RedisCacheService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -62,8 +64,9 @@ public class TransactionFilter {
         //for loop transaction & transactionReceipt build database struct on PlatON
         List<String> txHashes = new ArrayList <>();
         for(Transaction transaction : transactionsList){
-            for(TransactionReceipt transactionReceipt : transactionReceiptList){
-                if(transaction.getHash().equals(transactionReceipt.getTransactionHash())){
+            Map<String,Object> threadLocalMap = ChainInfoFilterJob.map.get();
+            if(null != threadLocalMap.get(transaction.getHash())){
+                TransactionReceipt transactionReceipt = (TransactionReceipt) threadLocalMap.get(transaction.getHash());
                     txHashes.add(transaction.getHash());
                     com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
                     TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
@@ -125,7 +128,6 @@ public class TransactionFilter {
                     transactionSet.add(transactions);
                 }
             }
-        }
         //insert list into database
         transactionMapper.batchInsert(transactionWithBLOBsList);
         //insert list into redis
