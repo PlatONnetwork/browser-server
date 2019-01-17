@@ -13,6 +13,7 @@ import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.ExportService;
+import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
@@ -22,11 +23,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,16 +75,14 @@ public class ExportServiceImpl implements ExportService {
                 transactionStatus = i18n.i(I18nEnum.UNKNOWN_STATUS);
             }
 
-            BigDecimal txCost = new BigDecimal(transaction.getActualTxCost());
-            txCost = txCost.divide(new BigDecimal("1000000000000000000"));
             Object[] row = {
                     transaction.getTxHash(),
                     ymdhms.format(new Date(transaction.getBlockTime())),
                     transactionType,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    transaction.getValue()+"Energon",
-                    txCost.toString()+"Energon",
+                    EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon",
+                    EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon",
                     transactionStatus
             };
             rows.add(row);
@@ -124,7 +124,7 @@ public class ExportServiceImpl implements ExportService {
                     block.getNumber(),
                     ymdhms.format(block.getTimestamp()),
                     block.getTransactionNumber(),
-                    block.getBlockReward()
+                    EnergonUtil.format(Convert.fromWei(block.getBlockReward(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))
             };
             rows.add(row);
         });
