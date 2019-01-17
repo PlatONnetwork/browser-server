@@ -3,7 +3,7 @@ package com.platon.browser.util;
 import java.util.Random;
 
 public class IPGenTool {
-    public static String getForeignRandomIp(){
+    public static String getForeignIp(){
         int a = 108 * 256 * 256 + 1 * 256 + 5;
         int b = 145 * 256 * 256 + 110 * 256 + 35;
         int c = new Random().nextInt(b - a) + a;
@@ -11,7 +11,7 @@ public class IPGenTool {
         return ip;
     }
 
-    public static String getChinaRandomIp() {
+    public static String getChinaIp() {
         int[][] range = {
                 { 607649792, 608174079 }, // 36.56.0.0-36.63.255.255
                 { 1038614528, 1039007743 }, // 61.232.0.0-61.237.255.255
@@ -32,6 +32,11 @@ public class IPGenTool {
     }
 
     public static void main(String[] args) {
-        System.out.println(getChinaRandomIp());
+        String data = "561989965773895576813579715222857160699960464449120684591664494480641850412901703913038313549619636487002155264521480576575605556920764090030793982122823";
+        char [] chars = data.toCharArray();
+        StringBuffer sb = new StringBuffer();
+        for(char c : chars) sb.append(Integer.toHexString(c));
+
+        System.out.println(sb.toString());
     }
 }

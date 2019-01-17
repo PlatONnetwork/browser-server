@@ -53,7 +53,7 @@ public class DataGenTool extends TestData {
             node.setChainId(chainId);
             while (true){
                 try {
-                    String ip = i%2==0?IPGenTool.getForeignRandomIp():IPGenTool.getChinaRandomIp();
+                    String ip = i%2==0?IPGenTool.getForeignIp():IPGenTool.getChinaIp();
                     GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip);
                     if(StringUtils.isBlank(location.getCountryCode())){
                         continue;
