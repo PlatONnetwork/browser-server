@@ -14,6 +14,7 @@ public class PendingTxItem {
     private String txHash;
     private long timestamp;
     private String energonLimit;
+    private String energonPrice;
     private String priceInE;
     private String priceInEnergon;
     private String from;
