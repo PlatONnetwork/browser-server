@@ -34,6 +34,6 @@ public class BlockDetail {
         this.setTransaction(initData.getTransactionNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(String.valueOf(v.doubleValue()));
+        this.setBlockReward(BigDecimal.valueOf(v.doubleValue()).toString());
     }
 }

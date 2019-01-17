@@ -43,13 +43,13 @@ public class NodeDetail {
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
         BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setProfitAmount(String.valueOf(v.doubleValue()));
+        this.setProfitAmount(BigDecimal.valueOf(v.doubleValue()).toString());
         v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setRewardAmount(String.valueOf(v.doubleValue()));
+        this.setRewardAmount(BigDecimal.valueOf(v.doubleValue()).toString());
         v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(String.valueOf(v.doubleValue()));
+        this.setBlockReward(BigDecimal.valueOf(v.doubleValue()).toString());
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setDeposit(String.valueOf(v.doubleValue()));
+        this.setDeposit(BigDecimal.valueOf(v.doubleValue()).toString());
         v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         this.setLogo(initData.getUrl());

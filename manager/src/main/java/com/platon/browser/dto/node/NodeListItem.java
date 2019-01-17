@@ -30,6 +30,6 @@ public class NodeListItem {
         BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18);
-        this.setDeposit(String.valueOf(v.doubleValue()));
+        this.setDeposit(BigDecimal.valueOf(v.doubleValue()).toString());
     }
 }
