@@ -2,7 +2,7 @@ package com.platon.RedisTest2;
 
 public class TestClass {
     public static void main(String[] args) throws Exception {
-/*        URL resource = NodeSynchronizeJob.class.getClassLoader().getResource("platonbrowser.json");
+/*        URL resource = NodeSynchronizeJob.class.getClassLoader().getResource("wallet.json");
         String path = resource.getPath();
         Credentials credentials = WalletUtils.loadCredentials("88888888", path);
         Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:6788"));
