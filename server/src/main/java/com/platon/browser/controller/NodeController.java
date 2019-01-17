@@ -161,7 +161,8 @@ public class NodeController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": {
-     *           "id": "0xsfjl34jfljsl435kd", // 节点ID
+     *           "id": "0xsfjl34jfljsl435kd", // 库标识
+     *           "nodeId": "0xsfjl34jfljsl435kd", // 节点ID
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
      *           "name": "node-1",// 账户名称
      *           "logo":"", // 节点LOGO，具体形式待定
