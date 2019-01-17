@@ -47,7 +47,7 @@ public class AccountServiceImpl implements AccountService {
             BigDecimal v = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
             returnData.setBalance(String.valueOf(v.doubleValue()));
         } catch (IOException e) {
-            returnData.setBalance("查询出错！");
+            returnData.setBalance("0(error)");
         }
         // 取已完成交易
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
