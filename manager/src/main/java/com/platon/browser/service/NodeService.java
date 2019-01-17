@@ -6,7 +6,7 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
-import com.platon.browser.req.block.BlockDownloadReq;
+import com.platon.browser.req.block.BlockListReq;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 
@@ -19,5 +19,5 @@ public interface NodeService {
     void updatePushData(String chainId, Set<NodeRanking> data);
     void clearPushCache(String chainId);
     List<NodePushItem> getPushCache(String chainId);
-    List<BlockListItem> getBlockList(BlockDownloadReq req);
+    List<BlockListItem> getBlockList(BlockListReq req);
 }

@@ -13,11 +13,13 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -151,6 +153,24 @@ public class BlockServiceImpl implements BlockService {
         }
         BlockDetail blockDetail = getDetail(detailReq);
         return blockDetail;
+    }
+
+    @Override
+    public List<Block> getList(BlockDownloadReq req) {
+        BlockExample condition = new BlockExample();
+        BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(StringUtils.isNotBlank(req.getAddress())){
+            criteria.andNodeIdEqualTo(req.getAddress());
+        }
+        if(req.getStartDate()!=null){
+            criteria.andTimestampGreaterThanOrEqualTo(req.getStartDate());
+        }
+        if(req.getEndDate()!=null){
+            criteria.andTimestampLessThanOrEqualTo(req.getEndDate());
+        }
+        condition.setOrderByClause("number desc");
+        List<Block> blocks = blockMapper.selectByExample(condition);
+        return blocks;
     }
 
     @Override
