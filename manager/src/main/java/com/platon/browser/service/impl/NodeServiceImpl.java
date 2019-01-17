@@ -114,12 +114,9 @@ public class NodeServiceImpl implements NodeService {
             logger.error("invalid node {} {}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
-
-        NodeDetail returnData = new NodeDetail();
         NodeRanking initData = nodes.get(0);
+        NodeDetail returnData = new NodeDetail();
         returnData.init(initData);
-
-        returnData.setLogo(initData.getUrl());
         return returnData;
     }
 
