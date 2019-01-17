@@ -117,7 +117,7 @@ public class NodeController {
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "data": [
      *           {
-     *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 节点ID
+     *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 库标识
      *           "ranking": 1,// 排名
      *           "logo":"", // 节点LOGO，具体形式待定
      *           "name": "node-1",// 账户名称
