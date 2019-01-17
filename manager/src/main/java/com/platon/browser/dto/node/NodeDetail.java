@@ -42,16 +42,16 @@ public class NodeDetail {
         // 钱包就是address
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
-        BigDecimal profitAmount = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setProfitAmount(profitAmount.toString());
-        BigDecimal rewardAmount = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setRewardAmount(rewardAmount.toString());
-        BigDecimal blockReward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(blockReward.toString());
-        BigDecimal deposit = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setDeposit(deposit.toString());
-        BigDecimal ratio = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
-        this.setRewardRatio(ratio.doubleValue());
+        BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setProfitAmount(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setRewardAmount(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setBlockReward(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setDeposit(String.valueOf(v.doubleValue()));
+        v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
+        this.setRewardRatio(v.doubleValue());
         this.setLogo(initData.getUrl());
     }
 }

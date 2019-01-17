@@ -50,8 +50,8 @@ public class AccountServiceImpl implements AccountService {
             bean.setBlockTime(initData.getTimestamp().getTime());
             BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
             bean.setValue(value.toString());
-            BigDecimal txCost = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setActualTxCost(txCost.toString());
+            BigDecimal v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setActualTxCost(String.valueOf(v.doubleValue()));
             data.add(bean);
         });
 
@@ -65,8 +65,8 @@ public class AccountServiceImpl implements AccountService {
             bean.setTxHash(initData.getHash());
             bean.setServerTime(System.currentTimeMillis());
             bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
-            BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-            bean.setValue(value.toString());
+            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+            bean.setValue(String.valueOf(v.doubleValue()));
             bean.setActualTxCost("0");
             data.add(bean);
         });

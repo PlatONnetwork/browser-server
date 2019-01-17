@@ -30,7 +30,7 @@ public class PendingTxDetail {
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setTimestamp(initData.getTimestamp().getTime());
-        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(value.toString());
+        BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setValue(String.valueOf(v.doubleValue()));
     }
 }

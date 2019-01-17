@@ -27,7 +27,7 @@ public class BlockListItem {
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setTransaction(initData.getTransactionNumber());
-        BigDecimal reward = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setBlockReward(reward.toString());
+        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setBlockReward(String.valueOf(v.doubleValue()));
     }
 }

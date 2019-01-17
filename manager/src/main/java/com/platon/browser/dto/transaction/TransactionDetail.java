@@ -41,9 +41,9 @@ public class TransactionDetail {
         this.setBlockHeight(initData.getBlockNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
-        BigDecimal txCost=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setActualTxCost(String.valueOf(txCost));
-        BigDecimal value = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
-        this.setValue(value.toString());
+        BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setActualTxCost(String.valueOf(v.doubleValue()));
+        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        this.setValue(String.valueOf(v.doubleValue()));
     }
 }

@@ -27,9 +27,9 @@ public class NodeListItem {
         BeanUtils.copyProperties(initData,this);
         this.setBlockCount(initData.getBlockCount().intValue());
         this.setLogo(initData.getUrl());
-        BigDecimal ratio = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
-        this.setRewardRatio(ratio.doubleValue());
-        BigDecimal deposit = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18);
-        this.setDeposit(deposit.toString());
+        BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
+        this.setRewardRatio(v.doubleValue());
+        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(18);
+        this.setDeposit(String.valueOf(v.doubleValue()));
     }
 }
