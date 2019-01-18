@@ -35,7 +35,7 @@ public class BlockDetail {
         this.setHeight(initData.getNumber());
         this.setTransaction(initData.getTransactionNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
-        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
         this.setBlockReward(EnergonUtil.format(v));
     }
 }

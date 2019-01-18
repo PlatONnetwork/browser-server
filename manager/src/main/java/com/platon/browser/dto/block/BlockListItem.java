@@ -30,7 +30,7 @@ public class BlockListItem {
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setTransaction(initData.getTransactionNumber());
-        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
         this.setBlockReward(EnergonUtil.format(v));
     }
 }

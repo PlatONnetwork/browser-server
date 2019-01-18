@@ -29,10 +29,10 @@ public class PendingTxItem {
         this.setTxHash(initData.getHash());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setServerTime(System.currentTimeMillis());
-        BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN);
+        BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
         this.setValue(EnergonUtil.format(v));
         this.setPriceInE(initData.getEnergonPrice());
-        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN);
+        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(8,RoundingMode.DOWN);
         this.setPriceInEnergon(EnergonUtil.format(v));
     }
 }
