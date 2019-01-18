@@ -47,10 +47,19 @@ public class NodeFilter {
 
     //@Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
+
+        //TODO:任务开始时间
+        Date beginTime = new Date();
+
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
         List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward, publicKey);
+
+        //TODO:任务结束时间
+/*        Date endTime = new Date();
+        String time = String.valueOf(endTime.getTime() - beginTime.getTime());
+        log.info("-------------------nodeAnalysis 执行时间："+time);*/
         return list;
     }
 
