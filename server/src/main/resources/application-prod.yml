@@ -31,5 +31,5 @@ platon:
       node: browser:prod:chain{}:nodes
       block: browser:prod:chain{}:blocks
       transaction: browser:prod:chain{}:transactions
-      staticstics: browser:0.4.0:prod:chain{}:staticstics
+      staticstics: browser:prod:chain{}:staticstics
       max-item: 500000
