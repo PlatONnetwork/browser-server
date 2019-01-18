@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +19,15 @@ import java.util.Map;
 
 public class GeoUtil {
     private final static Logger logger = LoggerFactory.getLogger(GeoUtil.class);
+    private static DatabaseReader reader;
+
+    static {
+        try {
+            reader = new DatabaseReader.Builder(GeoUtil.class.getClassLoader().getResource("GeoLite2-City.mmdb").openStream()).build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static final Map<String,IpLocation> ipMap = new HashMap <>();
 
@@ -75,8 +83,6 @@ public class GeoUtil {
         CityResponse response=null;
         if(ipCheck(ip)){
             try {
-                InputStream inputStream = GeoUtil.class.getClassLoader().getResource("GeoLite2-City.mmdb").openStream();
-                DatabaseReader reader = new DatabaseReader.Builder(inputStream).build();
                 InetAddress ipAddress = InetAddress.getByName(ip);
                 response = reader.city(ipAddress);
             } catch (IOException | GeoIp2Exception e) {

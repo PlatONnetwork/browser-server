@@ -19,6 +19,7 @@ import com.platon.browser.service.ExportService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,7 +154,8 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "id": "0xsfjl34jfljsl435kd", // 节点ID (必填)
+     *      "id": "0xsfjl34jfljsl435kd", // 数据库ID (id和nodeId必选一个)
+     *      "nodeId": "0xsfjl34jfljsl435kd", // 节点ID (id和nodeId必选一个)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -190,6 +192,9 @@ public class NodeController {
     public BaseResp getDetail (@Valid @RequestBody NodeDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
+        }
+        if(req.getId()==null&&StringUtils.isBlank(req.getNodeId())){
+            throw new ResponseException(i18n.i(I18nEnum.NEED_ID_OR_NODE_ID,req.getCid()));
         }
         try{
             NodeDetail detail = nodeService.getDetail(req);
