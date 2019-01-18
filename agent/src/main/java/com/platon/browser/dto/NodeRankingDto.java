@@ -3,15 +3,14 @@ package com.platon.browser.dto;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
-import com.platon.browser.common.dto.agent.TransactionDto;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.util.GeoUtil;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 /**
  * User: dongqile
@@ -44,8 +43,12 @@ public class NodeRankingDto extends NodeRanking {
         this.setDeposit(initData.getDeposit().toString());
         this.setRewardRatio(BigDecimal.valueOf(initData.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
         this.setBlockCount(0L);
-        GeoUtil.IpLocation ipLocation = GeoUtil.getIpLocation(getIp());
-        BeanUtils.copyProperties(ipLocation, this);
-
+        GeoUtil.IpLocation ipLocation =GeoUtil.ipMap.get(initData.getHost());
+        if(StringUtils.isEmpty(ipLocation)){
+            GeoUtil.IpLocation nowIpLocation = GeoUtil.getIpLocation(getIp());
+            BeanUtils.copyProperties(nowIpLocation, this);
+        }else {
+            BeanUtils.copyProperties(ipLocation, this);
+        }
     }
 }

@@ -96,6 +96,7 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
             String blockNumber = ethBlockNumber.getBlockNumber().toString();
              for (int i = maxNubmer.intValue() + 1; i <= Integer.parseInt(blockNumber); i++) {
                 //select blockinfo from PlatON
+                Date beginTime = new Date();
                 DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(i)));
                 EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
                 List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
@@ -132,6 +133,9 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 Block block = (Block) map.get("block");
                 otherFlow.doFilter(ethPendingTransactions,nodeRankings,block);
                 maxNubmer =Long.valueOf(blockNumber);
+                Date endTime = new Date();
+                String time = String.valueOf(endTime.getTime()-beginTime.getTime());
+                log.info("--------------------------------------ChainInfoFilterJob :" + time);
             }
         } catch (Exception e) {
             log.error(e.getMessage());

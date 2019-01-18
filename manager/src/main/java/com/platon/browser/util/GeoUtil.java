@@ -14,9 +14,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class GeoUtil {
     private final static Logger logger = LoggerFactory.getLogger(GeoUtil.class);
+
+    public static final Map<String,IpLocation> ipMap = new HashMap <>();
 
     @Data
     public static class IpLocation {
@@ -62,7 +67,7 @@ public class GeoUtil {
             il.setLongitude("0");
             logger.debug("Cant't resolve ip location: {}", ip);
         }
-
+        ipMap.put(ip,il);
         return il;
     }
 

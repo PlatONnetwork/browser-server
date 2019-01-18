@@ -50,7 +50,7 @@ public class BlockCorrelationFlow {
         Block block = new Block();
         Map<String,Object> map = new HashMap <>();
         List<NodeRanking> nodeRankings = new ArrayList <>();
-
+        Date beginTime = new Date();
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList,nodeInfoList,publicKey,transactionReceiptMap);
             String blockString = JSON.toJSONString(block);
@@ -97,6 +97,9 @@ public class BlockCorrelationFlow {
         }
         map.put("block",block);
         map.put("nodeRanking",nodeRankings);
+        Date endTime = new Date();
+        String time = String.valueOf(endTime.getTime()-beginTime.getTime());
+        log.info("--------------------------------------BlockCorrelationFlow :" + time);
         return map;
     }
 

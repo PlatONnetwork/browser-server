@@ -58,10 +58,14 @@ public class BlockFilter {
     //Transactional
     public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList,
                                  String nodeInfoList ,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
+        Date beginTime = new Date();
         log.debug("[into BlockFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildBlockStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
         Block block = build(ethBlock, transactionReceiptList, transactionsList,nodeInfoList,publicKey,transactionReceiptMap);
+        Date endTime = new Date();
+        String time = String.valueOf(endTime.getTime()-beginTime.getTime());
+        log.info("--------------------------------------blockAnalysis :" + time);
         return block;
     }
 

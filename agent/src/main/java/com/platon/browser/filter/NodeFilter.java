@@ -48,11 +48,14 @@ public class NodeFilter {
     //@Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
 
-
+        Date beginTime = new Date();
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
         List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward, publicKey);
+        Date endTime = new Date();
+        String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
+        log.info("--------------------------------------nodeAnalysis :" + time2);
         return list;
     }
 
@@ -63,9 +66,17 @@ public class NodeFilter {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
             //find NodeRanking info by condition on database
+            Date date5 = new Date();
+
             List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+
+            Date date6 = new Date();
+            log.info("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
+
             List <NodeRanking> nodeList = new ArrayList <>();
             int i = 1;
+
+            Date date7 = new Date();
             for (CandidateDto candidateDto : list) {
                 NodeRanking nodeRanking = new NodeRanking();
                 NodeRankingDto nrd = new NodeRankingDto();
@@ -95,6 +106,8 @@ public class NodeFilter {
                 nodeList.add(nodeRanking);
                 i = i + 1;
             }
+            Date date8 = new Date();
+            log.info("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
             //data form database and node status is vaild
@@ -105,6 +118,7 @@ public class NodeFilter {
                 updateList.add(e);
             });
 
+            Date date9 = new Date();
             if (dbList.size() > 0 && dbList != null) {
                 for (int j = 0; j < dbList.size(); j++) {
                     NodeRanking dbNode = dbList.get(j);
@@ -122,12 +136,20 @@ public class NodeFilter {
                     }
                 }
             }
+            Date date10 = new Date();
+            log.info("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
             String date = JSONArray.toJSONString(updateList);
             currentBlockOwner(updateList, publicKey);
             dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
+            Date date1 = new Date();
             cutsomNodeRankingMapper.insertOrUpdate(updateList);
+            Date date2 = new Date();
+            log.info("-------------------------------------- replace into :"  + String.valueOf(date2.getTime() - date1.getTime()));
+            Date date3 = new Date();
             Set <NodeRanking> nodes = new HashSet <>(updateList);
             redisCacheService.updateNodePushCache(chainId, nodes);
+            Date date4 = new Date();
+            log.info("-------------------------------------- redis update :"  + String.valueOf(date4.getTime() - date3.getTime()));
             return updateList;
         }
         return Collections.emptyList();

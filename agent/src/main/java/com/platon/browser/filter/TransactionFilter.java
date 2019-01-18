@@ -51,9 +51,13 @@ public class TransactionFilter {
 
     //@Transactional
     public boolean transactionAnalysis(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
+        Date beginTime = new Date();
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         boolean res = build(transactionReceiptMap,transactionsList, time);
+        Date endTime = new Date();
+        String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
+        log.info("--------------------------------------transactionAnalysis :" + time2);
         return res;
     }
 
