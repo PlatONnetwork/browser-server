@@ -20,7 +20,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 public class RedisCacheServiceTest extends ServiceTestBase {
@@ -185,6 +187,29 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             List<Transaction> transactions = transactionMapper.selectByExample(new TransactionExample());
             redisCacheService.updateTransactionCache(chainId,new HashSet<>(transactions));
         });
+
+    }
+
+    @Test
+    public void pushNodes(){
+
+        chainsConfig.getChainIds().forEach(chainId->{
+            while (true){
+                try {
+                    List<NodeRanking> nodes = DataGenTool.getTestData(chainId,TestDataFileNameEnum.NODE,NodeRanking.class);
+                    redisCacheService.updateNodePushCache(chainId,new HashSet<>(nodes));
+                    try {
+                        TimeUnit.SECONDS.sleep(2);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
 
     }
 }

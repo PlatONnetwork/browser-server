@@ -3,6 +3,8 @@ package com.platon.browser.util;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class IPGenTool {
     public static String getForeignIp(){
@@ -50,6 +52,9 @@ public class IPGenTool {
         System.out.println(EnergonUtil.format(BigDecimal.valueOf(0)));
 
         ThreadLocal tl = new ThreadLocal();
+
+        ExecutorService service = Executors.newFixedThreadPool(10);
+
 
 
     }

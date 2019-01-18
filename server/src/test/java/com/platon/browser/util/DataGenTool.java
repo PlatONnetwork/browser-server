@@ -48,7 +48,7 @@ public class DataGenTool extends TestData {
         List<NodeRanking> nodes = new ArrayList<>();
 
         Random random = new Random();
-        for(int i=1;i<=200;i++){
+        for(int i=1;i<=7;i++){
             NodeRanking node = new NodeRanking();
             node.setChainId(chainId);
             while (true){
@@ -277,8 +277,8 @@ public class DataGenTool extends TestData {
 
     public static void main(String[] args) {
         generateNode("1",true);
-        generatePendingTx("1",true);
+        /*generatePendingTx("1",true);
         generateTransaction("1",true);
-        generateBlock("1",true);
+        generateBlock("1",true);*/
     }
 }
