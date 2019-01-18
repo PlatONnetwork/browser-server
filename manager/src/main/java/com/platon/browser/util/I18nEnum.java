@@ -1,7 +1,5 @@
 package com.platon.browser.util;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 public enum I18nEnum {
 
     // 通用
@@ -49,6 +47,7 @@ public enum I18nEnum {
     // 节点
     NODE_ERROR_DUPLICATE,
     NODE_ERROR_NOT_EXIST,
+    NEED_ID_OR_NODE_ID,
 
     // 交易
     TRANSACTION_TRANSFER,
