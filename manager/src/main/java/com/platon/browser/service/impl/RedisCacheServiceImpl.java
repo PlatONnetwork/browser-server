@@ -417,6 +417,10 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             NodePushItem bean = JSON.parseObject(nodeStr,NodePushItem.class);
             returnData.add(bean);
         });
+        Collections.sort(returnData,(n1,n2)->{
+            if(n1.getRanking()>n2.getRanking()) return 1;
+            return 0;
+        });
         return returnData;
     }
 
