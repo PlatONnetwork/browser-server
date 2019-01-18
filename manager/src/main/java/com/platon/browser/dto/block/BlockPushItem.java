@@ -15,6 +15,7 @@ public class BlockPushItem {
     private Long timestamp;
     private Long serverTime;
     private String node;
+    private String nodeId;
     private Integer transaction;
     private String blockReward;
     private String nodeName;
