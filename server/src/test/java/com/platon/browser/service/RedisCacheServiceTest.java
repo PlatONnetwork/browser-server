@@ -36,23 +36,19 @@ public class RedisCacheServiceTest extends ServiceTestBase {
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
     @Value("${platon.redis.key.node}")
-    private String pushNodeCacheKeyTemplate;
-    @Value("${platon.redis.key.push-node}")
     private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.max-item}")
     protected long maxItemNum;
 
     public static class CacheKey {
-        public CacheKey(String blockKey,String transactionKey,String nodeKey,String pushNodeKey){
+        public CacheKey(String blockKey,String transactionKey,String nodeKey){
             this.blockKey = blockKey;
             this.transactionKey = transactionKey;
             this.nodeKey = nodeKey;
-            this.pushNodeKey = pushNodeKey;
         }
         public String blockKey;
         public String transactionKey;
         public String nodeKey;
-        public String pushNodeKey;
     }
 
     protected Map<String,CacheKey> chainIdToCacheKeyMap = new HashMap<>();
@@ -63,8 +59,7 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             chainIdToCacheKeyMap.put(chainId,new CacheKey(
                     blockCacheKeyTemplate.replace("{}",chainId),
                     transactionCacheKeyTemplate.replace("{}",chainId),
-                    nodeCacheKeyTemplate.replace("{}",chainId),
-                    pushNodeCacheKeyTemplate.replace("{}",chainId)
+                    nodeCacheKeyTemplate.replace("{}",chainId)
             ));
         });
     }
@@ -75,7 +70,7 @@ public class RedisCacheServiceTest extends ServiceTestBase {
         chainsConfig.getChainIds().forEach(chainId -> {
             Set<NodeRanking> nodes = new HashSet<>(DataGenTool.generateNode(chainId,false));
             redisCacheService.updateNodePushCache(chainId,nodes);
-            Set<String> result = redisTemplate.opsForZSet().reverseRange(chainIdToCacheKeyMap.get(chainId).pushNodeKey,0,-1);
+            List<String> result = redisTemplate.opsForList().range(chainIdToCacheKeyMap.get(chainId).nodeKey,0,-1);
             Assert.assertEquals(nodes.size(),result.size());
         });
     }

@@ -5,6 +5,7 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockDownloadReq;
 import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.util.DataTool;
 import org.junit.Assert;
@@ -43,6 +44,20 @@ public class BlockServiceTest extends ServiceTestBase {
             req.setHeight(data.getHeight());
             BlockDetail result = blockService.getDetail(req);
             Assert.assertEquals(data.getHash(),result.getHash());
+        });
+    }
+
+    @Test
+    public void getList(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            initBlockTableAndCache();
+            initNodeRankingTableAndCache();
+            BlockListItem data = getOneBlock(chainId);
+            BlockDownloadReq req = new BlockDownloadReq();
+            req.setCid(chainId);
+            req.setNodeId(data.getNodeId());
+            List<Block> result = blockService.getList(req);
+            Assert.assertTrue(result.size()>=0);
         });
     }
 }
