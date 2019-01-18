@@ -419,6 +419,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         });
         Collections.sort(returnData,(n1,n2)->{
             if(n1.getRanking()>n2.getRanking()) return 1;
+            if(n1.getRanking()<n2.getRanking()) return -1;
             return 0;
         });
         return returnData;
