@@ -15,10 +15,10 @@ public class BlockPushItem {
     private Long timestamp;
     private Long serverTime;
     private String node;
-    private String nodeId;
     private Integer transaction;
     private String blockReward;
     private String nodeName;
+    private String nodeId;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);

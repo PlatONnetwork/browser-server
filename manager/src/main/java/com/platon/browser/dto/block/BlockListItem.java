@@ -1,6 +1,5 @@
 package com.platon.browser.dto.block;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
@@ -24,7 +23,6 @@ public class BlockListItem {
     private String blockReward;
     private long serverTime;
     private String nodeName;
-    @JsonIgnore
     private String nodeId;
 
     public void init(Block initData){
