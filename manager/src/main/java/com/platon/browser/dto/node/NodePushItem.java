@@ -16,6 +16,7 @@ public class NodePushItem {
     private Integer nodeType;
     private Integer netState;
     private String nodeName;
+    private String nodeId;
 
     public void init(NodeRanking initData){
         BeanUtils.copyProperties(initData,this);
