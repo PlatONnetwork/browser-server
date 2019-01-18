@@ -29,7 +29,7 @@ public class GeoUtil {
         }
     }
 
-    public static final Map<String,IpLocation> ipMap = new HashMap <>();
+
 
     @Data
     public static class IpLocation {
@@ -75,7 +75,6 @@ public class GeoUtil {
             il.setLongitude("0");
             logger.debug("Cant't resolve ip location: {}", ip);
         }
-        ipMap.put(ip,il);
         return il;
     }
 

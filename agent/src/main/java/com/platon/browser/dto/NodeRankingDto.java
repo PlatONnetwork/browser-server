@@ -11,6 +11,8 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: dongqile
@@ -18,6 +20,9 @@ import java.util.Date;
  * Time: 16:22
  */
 public class NodeRankingDto extends NodeRanking {
+
+    public static final Map<String,GeoUtil.IpLocation> ipMap = new HashMap<>();
+
     public void init ( CandidateDto initData ) {
         CandidateDetailDto candidateDetailDto = null;
         try {
@@ -43,10 +48,11 @@ public class NodeRankingDto extends NodeRanking {
         this.setDeposit(initData.getDeposit().toString());
         this.setRewardRatio(BigDecimal.valueOf(initData.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
         this.setBlockCount(0L);
-        GeoUtil.IpLocation ipLocation =GeoUtil.ipMap.get(initData.getHost());
+        GeoUtil.IpLocation ipLocation =ipMap.get(initData.getHost());
         if(StringUtils.isEmpty(ipLocation)){
             GeoUtil.IpLocation nowIpLocation = GeoUtil.getIpLocation(getIp());
             BeanUtils.copyProperties(nowIpLocation, this);
+            ipMap.put(initData.getHost(),nowIpLocation);
         }else {
             BeanUtils.copyProperties(ipLocation, this);
         }
