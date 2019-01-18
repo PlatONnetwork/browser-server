@@ -375,14 +375,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(!validateParam(chainId,items))return;
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
-        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+        List<String> nodes = new ArrayList<>();
         items.forEach(initData -> {
             NodePushItem bean = new NodePushItem();
             bean.init(initData);
-            tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(bean),initData.getRanking().doubleValue()));
+            nodes.add(JSON.toJSONString(bean));
         });
-        if(tupleSet.size()>0){
-            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+        if(nodes.size()>0){
+            redisTemplate.opsForList().leftPushAll(cacheKey,nodes);
         }
     }
 
@@ -409,7 +409,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public List<NodePushItem> getNodePushCache(String chainId) {
         List<NodePushItem> returnData = new LinkedList<>();
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        Set<String> cacheData = redisTemplate.opsForZSet().reverseRange(cacheKey,0,-1);
+        List<String> cacheData = redisTemplate.opsForList().range(cacheKey,0,-1);
         if(cacheData.size()==0){
             return returnData;
         }

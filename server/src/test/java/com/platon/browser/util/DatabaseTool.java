@@ -8,8 +8,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -84,6 +87,16 @@ public class DatabaseTool extends TestBase {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Test
+    public void test(){
+        Web3j web3j = chainsConfig.getWeb3j("1");
+
+        web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.ONE),false).subscribe(eblock->{
+            logger.error("{}",eblock.getBlock().getNumber());
+        });
+
     }
 
 }

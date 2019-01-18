@@ -15,10 +15,12 @@ public class NodePushItem {
     private String latitude;
     private Integer nodeType;
     private Integer netState;
+    private String nodeName;
 
     public void init(NodeRanking initData){
         BeanUtils.copyProperties(initData,this);
         this.setNodeType(initData.getType());
+        this.setNodeName(initData.getName());
         this.setNetState(1);
     }
 
