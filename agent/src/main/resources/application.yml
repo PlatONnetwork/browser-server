@@ -3,7 +3,7 @@
 server.context-path: /browser-agent
 #Spring应用配置
 spring:
-  profiles.active: agent-1
+  profiles.active: prod
   application.name: browser-agent
   #Redis集群配置
   redis:

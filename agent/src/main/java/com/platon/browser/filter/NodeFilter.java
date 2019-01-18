@@ -48,18 +48,11 @@ public class NodeFilter {
     //@Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
 
-        //TODO:任务开始时间
-        Date beginTime = new Date();
 
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
         log.debug("[buildNodeStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
         List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward, publicKey);
-
-        //TODO:任务结束时间
-/*        Date endTime = new Date();
-        String time = String.valueOf(endTime.getTime() - beginTime.getTime());
-        log.info("-------------------nodeAnalysis 执行时间："+time);*/
         return list;
     }
 
@@ -85,7 +78,6 @@ public class NodeFilter {
                 nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
                 nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
                 nodeRanking.setRanking(i);
-                i = i++;
                 nodeRanking.setType(1);
                 // Set the node election status according to the ranking
                 // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
@@ -101,6 +93,7 @@ public class NodeFilter {
                 nodeRanking.setIsValid(1);
                 nodeRanking.setBeginNumber(blockNumber);
                 nodeList.add(nodeRanking);
+                i = i + 1;
             }
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
