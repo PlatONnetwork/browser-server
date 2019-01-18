@@ -25,6 +25,7 @@ import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
 import javax.annotation.PostConstruct;
+import javax.xml.crypto.Data;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -84,7 +85,6 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
         Map<String,Object> transactionMap = new HashMap <>();
         Map<String,Object> transactionReceiptMap = new HashMap <>();
         try {
-            log.info("-----------------dojob-----------------------"+ new Date()  +"--------------------------dojob------------------------");
             EthBlockNumber ethBlockNumber = null;
             Web3j web3j = chainsConfig.getWeb3j(chainId);
             try {
@@ -132,7 +132,6 @@ public class ChainInfoFilterJob extends AbstractTaskJob {
                 Block block = (Block) map.get("block");
                 otherFlow.doFilter(ethPendingTransactions,nodeRankings,block);
                 maxNubmer =Long.valueOf(blockNumber);
-                log.info("+++++++++++++++++++dojob+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++dojob+++++++++++++++++++++++++");
             }
         } catch (Exception e) {
             log.error(e.getMessage());

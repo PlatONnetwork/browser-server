@@ -37,7 +37,7 @@ public class OtherFlow {
 
     @Transactional
     public void doFilter(EthPendingTransactions ethPendingTransactions,List<NodeRanking> nodeRankings,Block block){
-        log.info("-----------------OtherFlow-----------------------"+ new Date()  +"--------------------------OtherFlow------------------------");
+
         try {
             if(ethPendingTransactions != null){
                 boolean res = pendingFilter.pendingTxAnalysis(ethPendingTransactions);
@@ -61,8 +61,6 @@ public class OtherFlow {
             log.error("push redis exception", e.getMessage());
             throw new AppException(ErrorCodeEnum.STOMP_ERROR);
         }
-
-        log.info("+++++++++++++++++++OtherFlow+++++++++++++++++++++++++++++"+ new Date()  +"++++++++++++++++++++++++++++++OtherFlow+++++++++++++++++++++++++");
 
     }
 }

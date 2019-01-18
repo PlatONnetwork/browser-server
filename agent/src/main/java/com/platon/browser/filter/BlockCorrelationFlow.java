@@ -3,6 +3,7 @@ package com.platon.browser.filter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.common.base.AppException;
+import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -18,10 +19,7 @@ import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -52,6 +50,7 @@ public class BlockCorrelationFlow {
         Block block = new Block();
         Map<String,Object> map = new HashMap <>();
         List<NodeRanking> nodeRankings = new ArrayList <>();
+
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList,nodeInfoList,publicKey,transactionReceiptMap);
             String blockString = JSON.toJSONString(block);
@@ -81,8 +80,8 @@ public class BlockCorrelationFlow {
         }
 
         try {
-
-            if (!StringUtils.isEmpty(nodeInfoList)) {
+            List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
+            if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
                  nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, block.getNumber().longValue(), ethBlock, block.getBlockReward(),publicKey);
                 String nodeRankingString = JSONArray.toJSONString(nodeRankings);
                 log.debug("node info :" + nodeRankingString);

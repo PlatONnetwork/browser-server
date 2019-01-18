@@ -8,6 +8,7 @@
 	</parent>
 	<artifactId>agent</artifactId>
 	<version>0.4.0</version>
+	<packaging>war</packaging>
 	<name>agent</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>

@@ -43,6 +43,9 @@ public class PendingFilter {
 
     //@Transactional
     public boolean pendingTxAnalysis (EthPendingTransactions ethPendingTransactions)throws  Exception {
+
+        //TODO:任务开始时间
+        Date beginTime = new Date();
         Web3j web3j = chainsConfig.getWeb3j(chainId);
         List <Transaction> list = ethPendingTransactions.getTransactions();
         List <PendingTx> pendingTxes = new ArrayList <>();
@@ -74,6 +77,11 @@ public class PendingFilter {
                 pendingTxes.add(pendingTx);
             }
         }
+
+        Date endTime = new Date();
+        String time = String.valueOf(endTime.getTime() - beginTime.getTime());
+        //log.info("-------------------pendingTxAnalysis 执行时间："+time);
+
         return true;
 
     }

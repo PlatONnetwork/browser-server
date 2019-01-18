@@ -130,9 +130,9 @@ public class TransactionFilter {
                 }
             }
         //insert list into database
-        transactionMapper.batchInsert(transactionWithBLOBsList);
         //insert list into redis
         if(txHashes.size()>0){
+            transactionMapper.batchInsert(transactionWithBLOBsList);
             TransactionExample condition = new TransactionExample();
             condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHashes);
             List<com.platon.browser.dao.entity.Transaction> transactionList = transactionMapper.selectByExample(condition);
