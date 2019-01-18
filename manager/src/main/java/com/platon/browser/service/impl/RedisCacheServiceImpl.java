@@ -429,10 +429,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        /************* 设置当前块高、出块节点、节点名称*************/
+        /************* 设置当前块高、出块节点、节点名称、节点ID*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
         cache.setNodeName(block.getNodeName());
+        cache.setNodeId(block.getNodeId());
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();

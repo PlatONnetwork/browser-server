@@ -38,4 +38,6 @@ public class StatisticsCache {
 
     //出块节点名称
     private String nodeName;
+    // 出块节点ID
+    private String nodeId;
 }
