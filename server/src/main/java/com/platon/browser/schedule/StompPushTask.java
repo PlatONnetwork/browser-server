@@ -39,8 +39,6 @@ public class StompPushTask {
     private RedisCacheService redisCacheService;
     @Autowired
     private I18nUtil i18n;
-    @Value("${platon.redis.key.maxtps}")
-    private String maxtpsCacheKeyTemplate;
     @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
     @Autowired

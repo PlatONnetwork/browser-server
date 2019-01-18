@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 @Data
 public class NodeDetail {
     private Long id;
+    private String nodeId;
     private String address;
     private String name;
     private String logo;

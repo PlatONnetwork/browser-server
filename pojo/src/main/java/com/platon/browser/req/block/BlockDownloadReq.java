@@ -14,8 +14,8 @@ import java.util.Date;
 public class BlockDownloadReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
-    @NotBlank(message = "{node.address.notnull}")
-    private String address;
+    @NotBlank(message = "{node.id.notnull}")
+    private String nodeId;
     private Date startDate;
     @NotNull(message = "{download.date.start.notnull}")
     @Past(message = "{download.date.start.must.less.than.now}")

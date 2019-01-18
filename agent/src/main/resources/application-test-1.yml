@@ -31,18 +31,11 @@ platon:
   redis:
     key:
       node: browser:0.4.0:test:chain{}:nodes
-      push-node: browser:0.4.0:test:chain{}:pushnodes
       block: browser:0.4.0:test:chain{}:blocks
       transaction: browser:0.4.0:test:chain{}:transactions
-      maxtps: browser:0.4.0:test:chain{}:maxtps
-      max-item: 500000
-      number: browser:0.4.0:test:chain{}:number
       staticstics: browser:0.4.0:test:chain{}:staticstics
-  # 图片服务器地址
-  image.server.url: http://192.168.9.86:8082/
-
+      max-item: 500000
 #Web3j配置
-node.ip: http://192.168.9.76:8793
 chain.id: 1
 # Zookeeper注册中心配置
 regCenter:

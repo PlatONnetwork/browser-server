@@ -29,12 +29,7 @@ platon:
   redis:
     key:
       node: browser:0.4.0:dev:chain{}:nodes
-      push-node: browser:0.4.0:dev:chain{}:pushnodes
       block: browser:0.4.0:dev:chain{}:blocks
       transaction: browser:0.4.0:dev:chain{}:transactions
-      maxtps: browser:0.4.0:dev:chain{}:maxtps
-      max-item: 500000
-      number: browser:0.4.0:dev:chain{}:number
       staticstics: browser:0.4.0:dev:chain{}:staticstics
-  # 图片服务器地址
-  image.server.url: http://192.168.9.86:8082/
+      max-item: 500000

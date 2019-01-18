@@ -23,6 +23,7 @@ public class BlockListItem {
     private String blockReward;
     private long serverTime;
     private String nodeName;
+    private String nodeId;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);

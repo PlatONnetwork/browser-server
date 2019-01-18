@@ -142,7 +142,7 @@ public class ExportServiceImpl implements ExportService {
         BlockDownload blockDownload = new BlockDownload();
         blockDownload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        blockDownload.setFilename("block-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
+        blockDownload.setFilename("block-"+req.getNodeId()+"-"+ymd.format(req.getEndDate())+".csv");
         blockDownload.setLength(baos.size());
         return blockDownload;
     }

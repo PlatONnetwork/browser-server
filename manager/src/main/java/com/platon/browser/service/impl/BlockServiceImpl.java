@@ -159,8 +159,8 @@ public class BlockServiceImpl implements BlockService {
     public List<Block> getList(BlockDownloadReq req) {
         BlockExample condition = new BlockExample();
         BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
-        if(StringUtils.isNotBlank(req.getAddress())){
-            criteria.andNodeIdEqualTo(req.getAddress());
+        if(StringUtils.isNotBlank(req.getNodeId())){
+            criteria.andNodeIdEqualTo(req.getNodeId());
         }
         if(req.getStartDate()!=null){
             criteria.andTimestampGreaterThanOrEqualTo(req.getStartDate());

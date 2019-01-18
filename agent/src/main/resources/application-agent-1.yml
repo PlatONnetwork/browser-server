@@ -32,16 +32,10 @@ platon:
   redis:
     key:
       node: browser:0.4.0:agent:chain{}:nodes
-      push-node: browser:0.4.0:agent:chain{}:pushnodes
       block: browser:0.4.0:agent:chain{}:blocks
       transaction: browser:0.4.0:agent:chain{}:transactions
-      maxtps: browser:0.4.0:agent:chain{}:maxtps
-      max-item: 500000
-      number: browser:0.4.0:agent:chain{}:number
       staticstics: browser:0.4.0:agent:chain{}:staticstics
-  # 图片服务器地址
-  image.server.url: http://192.168.9.86:8082/
-
+      max-item: 500000
 #Web3j配置(要采集哪条链的数据)
 chain.id: 1
 # Zookeeper注册中心配置

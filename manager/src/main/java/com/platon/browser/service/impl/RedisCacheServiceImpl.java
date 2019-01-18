@@ -30,7 +30,6 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 
@@ -47,12 +46,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private long maxItemNum;
     @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
-
     @Value("${platon.redis.key.staticstics}")
     private String staticsticsCacheKeyTemplate;
-
-    @Value("${platon.redis.key.maxtps}")
-    private String maxtpsCacheKeyTemplate;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -434,10 +429,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        /************* 设置当前块高、出块节点、节点名称*************/
+        /************* 设置当前块高、出块节点、节点名称、节点ID*************/
         cache.setMiner(block.getMiner());
         cache.setCurrentHeight(block.getNumber());
         cache.setNodeName(block.getNodeName());
+        cache.setNodeId(block.getNodeId());
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();

@@ -13,6 +13,7 @@ public class IndexInfo {
     private long currentHeight;
     private String miner;
     private String nodeName;
+    private String nodeId;
     private long currentTransaction;
     private long consensusNodeAmount;
     private long addressAmount;
