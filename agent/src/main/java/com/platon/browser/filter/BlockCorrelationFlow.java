@@ -63,7 +63,6 @@ public class BlockCorrelationFlow {
                                        BigInteger publicKey,String nodeInfoList,Map<String,Object> transactionReceiptMap) throws Exception {
         Block block = null;
         Map<String,Object> map = new HashMap <>();
-        Date beginTime = new Date();
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList,nodeInfoList,publicKey,transactionReceiptMap);
             Set <Block> set = new HashSet <>();
@@ -91,10 +90,13 @@ public class BlockCorrelationFlow {
                         && transactionList != null && transactionReceiptList != null) {
                     List<String> txHash = transactionFilter.transactionAnalysis(transactionReceiptMap, transactionList, blockRef.getTimestamp().getTime());
                     if (txHash.size()>0) {
-                        TransactionExample condition = new TransactionExample();
-                        condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
-                        List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
-                        redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
+                        executorService.submit(()->{
+                            log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
+                            TransactionExample condition = new TransactionExample();
+                            condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
+                            List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
+                            redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
+                        });
                     }
                 }
             } catch (Exception e) {
@@ -111,8 +113,11 @@ public class BlockCorrelationFlow {
                 if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
                     List<NodeRanking> nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, blockRef.getNumber().longValue(), ethBlock, blockRef.getBlockReward(),publicKey);
 
-                    Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
-                    redisCacheService.updateNodePushCache(chainId, nodes);
+                    executorService.submit(()->{
+                        log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
+                        Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
+                        redisCacheService.updateNodePushCache(chainId, nodes);
+                    });
 
                     String nodeRankingString = JSONArray.toJSONString(nodeRankings);
                     log.debug("node info :" + nodeRankingString);

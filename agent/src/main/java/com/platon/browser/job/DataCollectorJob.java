@@ -67,7 +67,7 @@ public class DataCollectorJob {
             List <Block> blocks = blockMapper.selectByExample(condition);
             long beginNumber = 1;
             if (blocks.size() > 0) {
-                beginNumber = blocks.get(0).getNumber();
+                beginNumber = blocks.get(0).getNumber()+1;
             }
 
             Map<String,Object> transactionMap = new HashMap <>();

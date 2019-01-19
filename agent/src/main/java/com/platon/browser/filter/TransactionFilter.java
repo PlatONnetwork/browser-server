@@ -50,7 +50,7 @@ public class TransactionFilter {
         List<String> txHash = build(transactionReceiptMap,transactionsList, time);
         Date endTime = new Date();
         String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
-        log.info("--------------------------------------transactionAnalysis :" + time2);
+        log.debug("--------------------------------------transactionAnalysis :" + time2);
         return txHash;
     }
 

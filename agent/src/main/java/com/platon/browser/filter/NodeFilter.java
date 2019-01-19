@@ -8,7 +8,6 @@ import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.NodeRankingDto;
-import com.platon.browser.service.RedisCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +41,6 @@ public class NodeFilter {
     @Autowired
     private CutsomNodeRankingMapper cutsomNodeRankingMapper;
 
-    @Autowired
-    private RedisCacheService redisCacheService;
-
     @Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
 
@@ -55,7 +51,7 @@ public class NodeFilter {
         List <NodeRanking> list = build(nodeInfoList, blockNumber, ethBlock, blockReward, publicKey);
         Date endTime = new Date();
         String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
-        log.info("--------------------------------------nodeAnalysis :" + time2);
+        log.debug("--------------------------------------nodeAnalysis :" + time2);
         return list;
     }
 
@@ -76,7 +72,7 @@ public class NodeFilter {
             nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
 
             Date date6 = new Date();
-            log.info("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
+            log.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
 
             List <NodeRanking> nodeList = new ArrayList <>();
             int i = 1;
@@ -112,7 +108,7 @@ public class NodeFilter {
                 i = i + 1;
             }
             Date date8 = new Date();
-            log.info("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
+            log.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
             //data form database and node status is vaild
@@ -142,14 +138,14 @@ public class NodeFilter {
                 }
             }
             Date date10 = new Date();
-            log.info("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
+            log.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
             String date = JSONArray.toJSONString(updateList);
             currentBlockOwner(updateList, publicKey);
             dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
             Date date1 = new Date();
             cutsomNodeRankingMapper.insertOrUpdate(updateList);
             Date date2 = new Date();
-            log.info("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
+            log.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
             return updateList;
         }
         return Collections.emptyList();

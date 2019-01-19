@@ -24,9 +24,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -64,7 +62,7 @@ public class BlockFilter {
         Block block = build(ethBlock, transactionReceiptList, transactionsList,nodeInfoList,publicKey,transactionReceiptMap);
         Date endTime = new Date();
         String time = String.valueOf(endTime.getTime()-beginTime.getTime());
-        log.info("--------------------------------------blockAnalysis :" + time);
+        log.debug("--------------------------------------blockAnalysis :" + time);
         return block;
     }
 
