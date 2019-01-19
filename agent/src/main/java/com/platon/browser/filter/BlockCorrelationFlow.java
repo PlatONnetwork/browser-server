@@ -125,8 +125,10 @@ public class BlockCorrelationFlow {
                         log.error("Analysis NodeInfo is null !!!....");
                     }
 
-                    EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-                    otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                    executorService.submit(()->{
+                        EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
+                        otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                    });
                 }
             } catch (Exception e) {
                 log.error("Node Filter exception", e);
