@@ -74,6 +74,16 @@ public class StompPushTask {
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
             messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
 
+            // 全量推送区块信息
+            List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
+            BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
+            messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
+
+            // 全量推送交易信息
+            List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
+            BaseResp transactionResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
+            messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, transactionResp);
+
             StatisticInfo statistic = new StatisticInfo();
             BeanUtils.copyProperties(cache,statistic);
             /************** 组装图表数据 ************/
@@ -94,21 +104,4 @@ public class StompPushTask {
         });
     }
 
-    /**
-     * 推送区块相关信息
-     */
-    @Scheduled(cron="0/1 * * * * ?")
-    public void pushBlock(){
-        chainsConfig.getChainIds().forEach(chainId -> {
-            // 全量推送区块信息
-            List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
-            BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
-            messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
-
-            // 全量推送交易信息
-            List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
-            BaseResp transactionResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
-            messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, transactionResp);
-        });
-    }
 }
