@@ -62,7 +62,7 @@ public class DataCollectorJob {
             isError = false;
             BlockExample condition = new BlockExample();
             condition.createCriteria().andChainIdEqualTo(chainId);
-            condition.setOrderByClause("timestamp desc");
+            condition.setOrderByClause("number desc");
             PageHelper.startPage(1, 1);
             List <Block> blocks = blockMapper.selectByExample(condition);
             long beginNumber = 1;
