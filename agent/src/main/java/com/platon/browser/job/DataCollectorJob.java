@@ -70,14 +70,14 @@ public class DataCollectorJob {
                 beginNumber = blocks.get(0).getNumber()+1;
             }
 
-            Map<String,Object> transactionMap = new HashMap <>();
-            Map<String,Object> transactionReceiptMap = new HashMap <>();
-
             Web3j web3j = chainsConfig.getWeb3j(chainId);
-
             web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true)
                 .doOnError(ex->this.isError=true)
                 .subscribe(ethBlock -> {
+
+                    Map<String,Object> transactionMap = new HashMap <>();
+                    Map<String,Object> transactionReceiptMap = new HashMap <>();
+
                     List <EthBlock.TransactionResult> transactions = ethBlock.getBlock().getTransactions();
                     List <org.web3j.protocol.core.methods.response.Transaction> transactionList = new ArrayList<>();
                     List <TransactionReceipt> transactionReceiptList = new ArrayList <>();

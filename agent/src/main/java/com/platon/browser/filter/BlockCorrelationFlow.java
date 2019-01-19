@@ -60,10 +60,9 @@ public class BlockCorrelationFlow {
 
     private final static ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    public Map<String,Object> doFilter (EthBlock ethBlock, List<Transaction> transactionList,List<TransactionReceipt> transactionReceiptList,
+    public void doFilter (EthBlock ethBlock, List<Transaction> transactionList,List<TransactionReceipt> transactionReceiptList,
                                        BigInteger publicKey,String nodeInfoList,Map<String,Object> transactionReceiptMap) throws Exception {
         Block block = null;
-        Map<String,Object> map = new HashMap <>();
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList,nodeInfoList,publicKey,transactionReceiptMap);
             Set <Block> set = new HashSet <>();
@@ -82,7 +81,6 @@ public class BlockCorrelationFlow {
 
         if(block==null) block = new Block();
         Block blockRef = block;
-
 
         executorService.submit(()->{
             log.debug("Transaction thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
@@ -108,7 +106,6 @@ public class BlockCorrelationFlow {
         });
 
         executorService.submit(()->{
-            log.debug("NodeRanking thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
             try {
                 List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
                 if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
@@ -142,8 +139,6 @@ public class BlockCorrelationFlow {
                 throw new AppException(ErrorCodeEnum.NODE_ERROR);
             }
         });
-
-        return map;
     }
 
 }
