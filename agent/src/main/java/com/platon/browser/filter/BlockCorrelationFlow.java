@@ -65,8 +65,8 @@ public class BlockCorrelationFlow {
         Block block = null;
         try {
             block = blockFilter.blockAnalysis(ethBlock, transactionReceiptList, transactionList,nodeInfoList,publicKey,transactionReceiptMap);
-            Set <Block> set = new HashSet <>(CacheTool.blocksCache);
-            CacheTool.blocksCache.clear();
+            Set <Block> set = new HashSet <>();
+            set.add(block);
             executorService.submit(()->redisCacheService.updateBlockCache(chainId, set));
             String blockString = JSON.toJSONString(block);
             log.debug("block info :" + blockString);

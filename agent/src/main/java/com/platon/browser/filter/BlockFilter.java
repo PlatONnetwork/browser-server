@@ -130,7 +130,6 @@ public class BlockFilter {
                 CacheTool.currentBlockNumber=block.getNumber();
                 if(CacheTool.blocks.size()==5){
                     blockMapper.batchInsert(CacheTool.blocks);
-                    CacheTool.blocksCache.addAll(CacheTool.blocks);
                     CacheTool.blocks.clear();
                 }
                 return block;
@@ -164,7 +163,6 @@ public class BlockFilter {
             CacheTool.currentBlockNumber=block.getNumber();
             if(CacheTool.blocks.size()==5){
                 blockMapper.batchInsert(CacheTool.blocks);
-                CacheTool.blocksCache.addAll(CacheTool.blocks);
                 CacheTool.blocks.clear();
             }
         }
