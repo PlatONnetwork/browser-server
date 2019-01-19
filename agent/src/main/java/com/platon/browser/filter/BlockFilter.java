@@ -126,7 +126,12 @@ public class BlockFilter {
                 log.debug("[Block info :]" + JSON.toJSONString(block));
                 log.debug("[this block is An empty block , transaction null !!!...]");
                 log.debug("[exit BlockFilter !!!...]");
-                blockMapper.insert(block);
+                CacheTool.blocks.add(block);
+                CacheTool.currentBlockNumber=block.getNumber();
+                if(CacheTool.blocks.size()==5){
+                    blockMapper.batchInsert(CacheTool.blocks);
+                    CacheTool.blocks.clear();
+                }
                 return block;
             }
             for (Transaction transaction : transactionsList) {
@@ -156,7 +161,7 @@ public class BlockFilter {
             //insert struct<block> into database
             CacheTool.blocks.add(block);
             CacheTool.currentBlockNumber=block.getNumber();
-            if(CacheTool.blocks.size()==100){
+            if(CacheTool.blocks.size()==5){
                 blockMapper.batchInsert(CacheTool.blocks);
                 CacheTool.blocks.clear();
             }
