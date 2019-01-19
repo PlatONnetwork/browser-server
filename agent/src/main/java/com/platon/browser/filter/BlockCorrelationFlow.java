@@ -22,6 +22,7 @@ import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -126,8 +127,13 @@ public class BlockCorrelationFlow {
                     }
 
                     executorService.submit(()->{
-                        EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-                        otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                        try {
+                            EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
+                            otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                        } catch (IOException e) {
+                            log.error("OtherFlow execute error !!!....");
+                        }
+
                     });
                 }
             } catch (Exception e) {
