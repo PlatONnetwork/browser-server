@@ -17,11 +17,11 @@ logging:
       springframework:
         boot: debug
         web: debug
-        jdbc: debug
-        dao: debug
-        transaction: debug
-      mybatis: debug
-    com.platon.browser.dao: debug
+        jdbc: error
+        dao: error
+        transaction: error
+      mybatis: error
+    com.platon.browser.dao: error
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 
@@ -41,4 +41,4 @@ chain.id: 1
 # Zookeeper注册中心配置
 regCenter:
   serverList: 192.168.9.191:2181
-  namespace: browser_job_0.4.0
+  namespace: browser_job_0.4.0_01

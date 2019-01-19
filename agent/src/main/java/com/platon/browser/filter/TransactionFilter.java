@@ -4,18 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.job.ChainInfoFilterJob;
-import com.platon.browser.service.RedisCacheService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -41,28 +38,23 @@ public class TransactionFilter {
     private String transactionCacheKeyTemplate;
 
     @Autowired
+    private ChainsConfig chainsConfig;
+    @Autowired
     private TransactionMapper transactionMapper;
 
-    @Autowired
-    private RedisCacheService redisCacheService;
-
-    @Autowired
-    private ChainsConfig chainsConfig;
-
-    //@Transactional
-    public boolean transactionAnalysis(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
+    @Transactional
+    public List<String> transactionAnalysis(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
         Date beginTime = new Date();
         log.debug("[into NodeFilter !!!...]");
         log.debug("[blockChain chainId is ]: " + chainId);
-        boolean res = build(transactionReceiptMap,transactionsList, time);
+        List<String> txHash = build(transactionReceiptMap,transactionsList, time);
         Date endTime = new Date();
         String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
         log.info("--------------------------------------transactionAnalysis :" + time2);
-        return res;
+        return txHash;
     }
 
-
-    public boolean build(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
+    public List<String> build(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
         Web3j web3j = chainsConfig.getWeb3j(chainId);
         //build database struct<Transaction>
         List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
@@ -137,12 +129,8 @@ public class TransactionFilter {
         //insert list into redis
         if(txHashes.size()>0){
             transactionMapper.batchInsert(transactionWithBLOBsList);
-            TransactionExample condition = new TransactionExample();
-            condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHashes);
-            List<com.platon.browser.dao.entity.Transaction> transactionList = transactionMapper.selectByExample(condition);
-            redisCacheService.updateTransactionCache(chainId,new HashSet <>(transactionList));
         }
-        return true;
+        return txHashes;
     }
 
 }

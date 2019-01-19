@@ -10,12 +10,12 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.dto.NodeRankingDto;
-import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -24,7 +24,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: dongqile
@@ -52,10 +54,7 @@ public class BlockFilter {
     @Autowired
     private BlockMapper blockMapper;
 
-    @Autowired
-    private RedisCacheService redisCacheService;
-
-    //Transactional
+    @Transactional
     public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList,
                                  String nodeInfoList ,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
         Date beginTime = new Date();
@@ -129,9 +128,6 @@ public class BlockFilter {
                 log.debug("[Block info :]" + JSON.toJSONString(block));
                 log.debug("[this block is An empty block , transaction null !!!...]");
                 log.debug("[exit BlockFilter !!!...]");
-                Set <Block> set = new HashSet <>();
-                set.add(block);
-                redisCacheService.updateBlockCache(chainId, set);
                 blockMapper.insert(block);
                 return block;
             }
@@ -160,11 +156,12 @@ public class BlockFilter {
                 }
             }
             //insert struct<block> into database
-            blockMapper.insert(block);
-            Set <Block> set = new HashSet <>();
-            set.add(block);
-            //insert struct<block> into redis
-            redisCacheService.updateBlockCache(chainId, set);
+            CacheTool.blocks.add(block);
+            CacheTool.currentBlockNumber=block.getNumber();
+            if(CacheTool.blocks.size()==100){
+                blockMapper.batchInsert(CacheTool.blocks);
+                CacheTool.blocks.clear();
+            }
         }
         return block;
     }

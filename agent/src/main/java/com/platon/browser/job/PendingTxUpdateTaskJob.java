@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
@@ -18,20 +19,24 @@ import org.springframework.util.StopWatch;
 import java.util.List;
 
 
+*/
 /**
  * User: dongqile
  * Date: 2018/11/12
  * Time: 17:40
- */
+ *//*
+
 public class PendingTxUpdateTaskJob extends AbstractTaskJob {
-    /**
+    */
+/**
      * 挂起交易更新任务
      * <p>
      * <p>
      * 1. 定时查询挂起交易列表
      * 2. 比对交易列表数据
      * 3. 相同表示挂起交易已出块，删除挂起交易列表中该数据
-     */
+     *//*
+
     private static Logger log = LoggerFactory.getLogger(PendingTxUpdateTaskJob.class);
 
     @Autowired
@@ -76,4 +81,4 @@ public class PendingTxUpdateTaskJob extends AbstractTaskJob {
     }
 
 
-}
+}*/

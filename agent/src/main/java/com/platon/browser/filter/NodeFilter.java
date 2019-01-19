@@ -2,13 +2,12 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.job.ChainInfoFilterJob;
+import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.service.RedisCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigDecimal;
@@ -45,7 +45,7 @@ public class NodeFilter {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    //@Transactional
+    @Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
 
         Date beginTime = new Date();
@@ -69,6 +69,11 @@ public class NodeFilter {
             Date date5 = new Date();
 
             List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+
+            // 把库中记录全部置为无效
+            NodeRanking node = new NodeRanking();
+            node.setIsValid(0);
+            nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
 
             Date date6 = new Date();
             log.info("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
@@ -144,12 +149,7 @@ public class NodeFilter {
             Date date1 = new Date();
             cutsomNodeRankingMapper.insertOrUpdate(updateList);
             Date date2 = new Date();
-            log.info("-------------------------------------- replace into :"  + String.valueOf(date2.getTime() - date1.getTime()));
-            Date date3 = new Date();
-            Set <NodeRanking> nodes = new HashSet <>(updateList);
-            redisCacheService.updateNodePushCache(chainId, nodes);
-            Date date4 = new Date();
-            log.info("-------------------------------------- redis update :"  + String.valueOf(date4.getTime() - date3.getTime()));
+            log.info("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
             return updateList;
         }
         return Collections.emptyList();

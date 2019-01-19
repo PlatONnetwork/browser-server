@@ -1,3 +1,4 @@
+<!--
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -9,7 +10,7 @@
                         http://www.dangdang.com/schema/ddframe/reg/reg.xsd
                         http://www.dangdang.com/schema/ddframe/job
                         http://www.dangdang.com/schema/ddframe/job/job.xsd">
-    <!--配置作业注册中心 dubbo一样zk注册中心-->
+    &lt;!&ndash;配置作业注册中心 dubbo一样zk注册中心&ndash;&gt;
     <reg:zookeeper id="regCenter" server-lists="${regCenter.serverList}" namespace="${regCenter.namespace}"
                    base-sleep-time-milliseconds="1000"
                    max-sleep-time-milliseconds="3000" max-retries="3"/>
@@ -19,13 +20,13 @@
                 overwrite="true"
                 failover="true" misfire="true" description="区块相关信息分析任务"/>
 
-<!--
+&lt;!&ndash;
     <job:simple id="testJon${netInfo}" class="com.platon.browser.job.testJob"
                 registry-center-ref="regCenter"
                 cron="*/1 * * * * ?" sharding-total-count="1" sharding-item-parameters="0=testJob"
                 overwrite="true"
                 failover="true" misfire="true" description="区块相关信息分析任务"/>
--->
+&ndash;&gt;
 
 
 
@@ -35,4 +36,4 @@
                  overwrite="true"
                  failover="true" misfire="true" description="挂起交易同步任务"/>
 
-</beans>
+</beans>-->
