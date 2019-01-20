@@ -5,7 +5,7 @@ server.port: 9030
 spring.redis.cluster.nodes: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
 #数据源配置
 datasource:
-  url: jdbc:mysql://52.187.38.88:3306/platon_browser_0.3.0?useUnicode=true&characterEncoding=utf-8
+  url: jdbc:mysql://52.187.38.88:3306/platon_browser_0.3.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: root
   password: Juzhenyuan_123
 #日志配置
