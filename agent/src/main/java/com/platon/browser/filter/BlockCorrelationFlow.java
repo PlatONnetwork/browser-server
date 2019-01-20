@@ -105,40 +105,35 @@ public class BlockCorrelationFlow {
             }
         });
 
-        executorService.submit(()->{
-            try {
-                List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
-                if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
-                    List<NodeRanking> nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, blockRef.getNumber().longValue(), ethBlock, blockRef.getBlockReward(),publicKey);
+        try {
+            List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
+            if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
+                List<NodeRanking> nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, blockRef.getNumber().longValue(), ethBlock, blockRef.getBlockReward(),publicKey);
 
-                    executorService.submit(()->{
-                        log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
-                        Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
-                        redisCacheService.updateNodePushCache(chainId, nodes);
-                    });
+                executorService.submit(()->{
+                    log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
+                    Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
+                    redisCacheService.updateNodePushCache(chainId, nodes);
+                });
 
-                    String nodeRankingString = JSONArray.toJSONString(nodeRankings);
-                    log.debug("node info :" + nodeRankingString);
-                    if (nodeRankings.size() < 0 && nodeRankings == null) {
-                        log.error("Analysis NodeInfo is null !!!....");
-                    }
-
-                    executorService.submit(()->{
-                        try {
-                            EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-                            otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
-                        } catch (IOException e) {
-                            log.error("OtherFlow execute error !!!....");
-                        }
-
-                    });
+                String nodeRankingString = JSONArray.toJSONString(nodeRankings);
+                log.debug("node info :" + nodeRankingString);
+                if (nodeRankings.size() < 0 && nodeRankings == null) {
+                    log.error("Analysis NodeInfo is null !!!....");
                 }
-            } catch (Exception e) {
-                log.error("Node Filter exception", e);
-                log.error("Node analysis exception", e.getMessage());
-                throw new AppException(ErrorCodeEnum.NODE_ERROR);
+
+                try {
+                    EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
+                    otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                } catch (IOException e) {
+                    log.error("OtherFlow execute error !!!....");
+                }
             }
-        });
+        } catch (Exception e) {
+            log.error("Node Filter exception", e);
+            log.error("Node analysis exception", e.getMessage());
+            throw new AppException(ErrorCodeEnum.NODE_ERROR);
+        }
     }
 
 }
