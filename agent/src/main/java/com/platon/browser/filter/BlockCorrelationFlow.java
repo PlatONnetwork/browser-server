@@ -24,7 +24,10 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -105,35 +108,37 @@ public class BlockCorrelationFlow {
             }
         });
 
-        try {
-            List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
-            if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
-                List<NodeRanking> nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, blockRef.getNumber().longValue(), ethBlock, blockRef.getBlockReward(),publicKey);
+        executorService.submit(()->{
+            try {
+                List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
+                if (!StringUtils.isEmpty(nodeInfoList) && list.size() > 0) {
+                    List<NodeRanking> nodeRankings = nodeFilter.nodeAnalysis(nodeInfoList, blockRef.getNumber().longValue(), ethBlock, blockRef.getBlockReward(),publicKey);
 
-                executorService.submit(()->{
-                    log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
-                    Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
-                    redisCacheService.updateNodePushCache(chainId, nodes);
-                });
+                    executorService.submit(()->{
+                        log.debug("Redis update thread[name:{},id:{}] ",Thread.currentThread().getName(),Thread.currentThread().getId());
+                        Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
+                        redisCacheService.updateNodePushCache(chainId, nodes);
+                    });
 
-                String nodeRankingString = JSONArray.toJSONString(nodeRankings);
-                log.debug("node info :" + nodeRankingString);
-                if (nodeRankings.size() < 0 && nodeRankings == null) {
-                    log.error("Analysis NodeInfo is null !!!....");
+                    String nodeRankingString = JSONArray.toJSONString(nodeRankings);
+                    log.debug("node info :" + nodeRankingString);
+                    if (nodeRankings.size() < 0 && nodeRankings == null) {
+                        log.error("Analysis NodeInfo is null !!!....");
+                    }
+
+                    try {
+                        EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
+                        otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
+                    } catch (IOException e) {
+                        log.error("OtherFlow execute error !!!....");
+                    }
                 }
-
-                try {
-                    EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-                    otherFlow.doFilter(ethPendingTransactions,nodeRankings,blockRef);
-                } catch (IOException e) {
-                    log.error("OtherFlow execute error !!!....");
-                }
+            } catch (Exception e) {
+                log.error("Node Filter exception", e);
+                log.error("Node analysis exception", e.getMessage());
+                throw new AppException(ErrorCodeEnum.NODE_ERROR);
             }
-        } catch (Exception e) {
-            log.error("Node Filter exception", e);
-            log.error("Node analysis exception", e.getMessage());
-            throw new AppException(ErrorCodeEnum.NODE_ERROR);
-        }
+        });
     }
 
 }

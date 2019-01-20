@@ -21,8 +21,6 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * User: dongqile
@@ -42,8 +40,6 @@ public class NodeFilter {
 
     @Autowired
     private CutsomNodeRankingMapper cutsomNodeRankingMapper;
-
-    private final static ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     @Transactional
     public List <NodeRanking> nodeAnalysis ( String nodeInfoList, long blockNumber, EthBlock ethBlock, String blockReward ,BigInteger publicKey) throws Exception {
@@ -69,8 +65,6 @@ public class NodeFilter {
             Date date5 = new Date();
 
             List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-
-            LOCK.writeLock().lock();
 
             // 把库中记录全部置为无效
             NodeRanking node = new NodeRanking();
@@ -153,7 +147,6 @@ public class NodeFilter {
             Date date2 = new Date();
             log.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
 
-            LOCK.writeLock().unlock();
             return updateList;
         }
         return Collections.emptyList();
