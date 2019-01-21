@@ -21,8 +21,8 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import rx.Subscription;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
@@ -52,7 +52,10 @@ public class DataCollectorJob {
     @Autowired
     private BlockCorrelationFlow blockCorrelationFlow;
 
-    private boolean isError = true;
+    private long beginNumber=1;
+    private boolean isPrevDone = true;
+
+    private Web3j web3j;
 
     public static class AnalysisParam {
         public EthBlock ethBlock;
@@ -63,95 +66,102 @@ public class DataCollectorJob {
         public String nodeInfoList;
     }
 
-    private Subscription subscription;
+
+    @PostConstruct
+    public void init () {
+        BlockExample condition = new BlockExample();
+        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.setOrderByClause("number desc");
+        PageHelper.startPage(1, 1);
+        List <Block> blocks = blockMapper.selectByExample(condition);
+        // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
+        // 2、如果查询不到则从0开始
+        if (blocks.size() == 0) {
+            beginNumber = 1L;
+        } else {
+            beginNumber = blocks.get(0).getNumber()+1;
+        }
+        web3j = chainsConfig.getWeb3j(chainId);
+    }
 
     @Scheduled(cron="0/1 * * * * ?")
     protected void doJob () {
-
-        if (isError){
+        if (isPrevDone){
             logger.debug("In the job **************************");
-            isError = false;
-            BlockExample condition = new BlockExample();
-            condition.createCriteria().andChainIdEqualTo(chainId);
-            condition.setOrderByClause("number desc");
-            PageHelper.startPage(1, 1);
-            List <Block> blocks = blockMapper.selectByExample(condition);
-            long beginNumber = 1;
-            if (blocks.size() > 0) {
-                beginNumber = blocks.get(0).getNumber()+1;
+            isPrevDone = false;
+            try {
+                BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
+                while (beginNumber<=endNumber.longValue()){
+                    EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    analysis(ethBlock,web3j);
+                    beginNumber++;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            isPrevDone=true;
+        }
+    }
 
-            Web3j web3j = chainsConfig.getWeb3j(chainId);
-            subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true)
-                .doOnError(ex->{
-                    // 取消订阅
-                    if(subscription!=null) subscription.unsubscribe();
-                    // 设置为true，等待下一秒定时任务进来重新订阅
-                    this.isError=true;
-                })
-                .subscribe(ethBlock -> {
+    private void analysis(EthBlock ethBlock,Web3j web3j) throws Exception {
+        // 构造分析参数
+        AnalysisParam param = new AnalysisParam();
+        param.ethBlock = ethBlock;
 
-                    // 构造分析参数
-                    AnalysisParam param = new AnalysisParam();
-                    param.ethBlock = ethBlock;
+        Map<String,Object> transactionMap = new HashMap <>();
+        Map<String,Object> transactionReceiptMap = new HashMap <>();
 
-                    Map<String,Object> transactionMap = new HashMap <>();
-                    Map<String,Object> transactionReceiptMap = new HashMap <>();
+        List <EthBlock.TransactionResult> transactions = ethBlock.getBlock().getTransactions();
 
-                    List <EthBlock.TransactionResult> transactions = ethBlock.getBlock().getTransactions();
+        List <org.web3j.protocol.core.methods.response.Transaction> transactionList = new ArrayList<>();
+        List <TransactionReceipt> transactionReceiptList = new ArrayList <>();
+        transactions.forEach(transaction->{
+            org.web3j.protocol.core.methods.response.Transaction rawTransaction = (org.web3j.protocol.core.methods.response.Transaction) transaction.get();
+            transactionList.add(rawTransaction);
+            transactionMap.put(rawTransaction.getHash(),transaction);
+            try {
+                EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(rawTransaction.getHash()).send();
+                Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+                TransactionReceipt receipt = transactionReceipt.get();
+                transactionReceiptList.add(receipt);
+                transactionReceiptMap.put(receipt.getTransactionHash(),receipt);
+            } catch (IOException e) {
+                logger.error("Transaction resolve error: {}", e.getMessage());
+            }
+        });
 
-                    List <org.web3j.protocol.core.methods.response.Transaction> transactionList = new ArrayList<>();
-                    List <TransactionReceipt> transactionReceiptList = new ArrayList <>();
-                    transactions.forEach(transaction->{
-                        org.web3j.protocol.core.methods.response.Transaction rawTransaction = (org.web3j.protocol.core.methods.response.Transaction) transaction.get();
-                        transactionList.add(rawTransaction);
-                        transactionMap.put(rawTransaction.getHash(),transaction);
-                        try {
-                            EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(rawTransaction.getHash()).send();
-                            Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
-                            TransactionReceipt receipt = transactionReceipt.get();
-                            transactionReceiptList.add(receipt);
-                            transactionReceiptMap.put(receipt.getTransactionHash(),receipt);
-                        } catch (IOException e) {
-                            logger.error("Transaction resolve error: {}", e.getMessage());
-                        }
-                    });
+        param.transactionList=transactionList;
+        param.transactionReceiptList=transactionReceiptList;
+        param.transactionReceiptMap=transactionReceiptMap;
 
-                    param.transactionList=transactionList;
-                    param.transactionReceiptList=transactionReceiptList;
-                    param.transactionReceiptMap=transactionReceiptMap;
+        try{
+            CandidateContract candidateContract = web3jClient.getCandidateContract();
+            param.nodeInfoList=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
+        }catch (Exception e){
+            logger.debug("nodeInfoList is null !!!...",e.getMessage());
+        }
 
-                    try{
-                        CandidateContract candidateContract = web3jClient.getCandidateContract();
-                        param.nodeInfoList=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
-                    }catch (Exception e){
-                        logger.debug("nodeInfoList is null !!!...",e.getMessage());
-                    }
+        try {
+            param.publicKey = CalculatePublicKey.testBlock(ethBlock );
+        } catch (Exception e) {
+            logger.debug("Public key is null !!!...",e.getMessage());
+        }
 
-                    try {
-                        param.publicKey = CalculatePublicKey.testBlock(ethBlock );
-                    } catch (Exception e) {
-                        logger.debug("Public key is null !!!...",e.getMessage());
-                    }
+        try {
+            blockCorrelationFlow.doFilter(param);
+        } catch (Exception e) {
+            logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
+        }
 
-                    try {
-                        blockCorrelationFlow.doFilter(param);
-                    } catch (Exception e) {
-                        logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
-                    }
-
-                    try {
-                        // 如果当前链上块高等于分析后的块高，证明已追上，把剩余的缓存块批量入库
-                        long chainCurrentBlockNumber = web3j.ethBlockNumber().send().getBlockNumber().longValue();
-                        if(CacheTool.currentBlockNumber==chainCurrentBlockNumber){
-                            blockMapper.batchInsert(CacheTool.blocks);
-                            CacheTool.blocks.clear();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-
+        try {
+            // 如果当前链上块高等于分析后的块高，证明已追上，把剩余的缓存块批量入库
+            long chainCurrentBlockNumber = web3j.ethBlockNumber().send().getBlockNumber().longValue();
+            if(CacheTool.currentBlockNumber==chainCurrentBlockNumber){
+                blockMapper.batchInsert(CacheTool.blocks);
+                CacheTool.blocks.clear();
+            }
+        } catch (IOException e) {
+            throw e;
         }
     }
 }
