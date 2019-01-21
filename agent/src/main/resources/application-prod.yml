@@ -32,7 +32,7 @@ platon:
     key:
       node: browser:prod:chain{}:nodes
       block: browser:prod:chain{}:blocks
-      transaction: browser:prod:chain{     }:transactions
+      transaction: browser:prod:chain{}:transactions
       staticstics: browser:prod:chain{}:staticstics
       max-item: 500000
 #Web3j配置
