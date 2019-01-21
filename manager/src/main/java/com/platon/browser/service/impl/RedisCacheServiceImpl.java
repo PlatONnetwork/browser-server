@@ -119,35 +119,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return cpi;
     }
 
-    private <T> void updateCache(String cacheKey,Collection<T> data){
-        long size = redisTemplate.opsForZSet().size(cacheKey);
-        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        data.forEach(item -> {
-            Long startOffset=0l,endOffset=0l,score=0l;
-            if(item instanceof Block){
-                Block bl = (Block)item;
-                startOffset = endOffset = score = bl.getNumber();
-            }
-            if(item instanceof Transaction){
-                Transaction tr = (Transaction)item;
-                startOffset = endOffset = score = tr.getSequence();
-            }
-            // 根据score来判断缓存中的记录是否已经存在
-            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
-            if(exist.size()==0){
-                // 在缓存中不存在的才放入缓存
-                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));
-            }
-        });
-        if(tupleSet.size()>0){
-            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
-        }
-        if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
-            redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
-        }
-    }
-
     /**
      * 清除区块缓存
      * @param chainId
@@ -166,7 +137,23 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public void updateBlockCache(String chainId, Set<Block> items){
         if(!validateParam(chainId,items))return;
         String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        updateCache(cacheKey,items);
+        long size = redisTemplate.opsForZSet().size(cacheKey);
+        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+        items.forEach(block -> {
+            // 根据score来判断缓存中的记录是否已经存在
+            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,block.getNumber(),block.getNumber());
+            if(exist.size()==0){
+                // 在缓存中不存在的才放入缓存
+                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(block),block.getNumber().doubleValue()));
+            }
+        });
+        if(tupleSet.size()>0){
+            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+        }
+        if(size>maxItemNum){
+            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+            redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
+        }
     }
 
     /**
@@ -174,13 +161,13 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public void resetBlockCache(String chainId) {
-        clearBlockCache(chainId);
+    public void resetBlockCache(String chainId, boolean clearOld) {
+        if(clearOld) clearBlockCache(chainId);
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("number desc");
-        for(int i=0;i<500;i++){
-            PageHelper.startPage(i+1,1000);
+        for(int i=0;i<1000;i++){
+            PageHelper.startPage(i+1,500);
             List<Block> data = blockMapper.selectByExample(condition);
             if(data.size()==0) break;
             updateBlockCache(chainId,new HashSet<>(data));
@@ -205,7 +192,23 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     public void updateTransactionCache(String chainId, Set<Transaction> items){
         if(!validateParam(chainId,items))return;
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        updateCache(cacheKey,items);
+        long size = redisTemplate.opsForZSet().size(cacheKey);
+        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
+        items.forEach(transaction -> {
+            // 根据score来判断缓存中的记录是否已经存在
+            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,transaction.getSequence(),transaction.getSequence());
+            if(exist.size()==0){
+                // 在缓存中不存在的才放入缓存
+                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(transaction),transaction.getSequence().doubleValue()));
+            }
+        });
+        if(tupleSet.size()>0){
+            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
+        }
+        if(size>maxItemNum){
+            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
+            redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
+        }
     }
 
     /**
@@ -213,8 +216,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public void resetTransactionCache(String chainId) {
-        clearTransactionCache(chainId);
+    public void resetTransactionCache(String chainId,boolean clearOld) {
+        if(clearOld) clearTransactionCache(chainId);
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("block_number desc,transaction_index desc");
@@ -393,7 +396,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public void resetNodePushCache(String chainId) {
+    public void resetNodePushCache(String chainId, boolean clearOld) {
         clearNodePushCache(chainId);
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria().andChainIdEqualTo(chainId)
@@ -436,8 +439,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings){
-        // 由于统计缓存会被多个线程更新，需要加锁，防止状态错乱
-        LOCK.writeLock().lock();
+
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
@@ -524,7 +526,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.opsForValue().set(cacheKey,JSON.toJSONString(cache));
 
-        LOCK.writeLock().unlock();
         return true;
     }
 
