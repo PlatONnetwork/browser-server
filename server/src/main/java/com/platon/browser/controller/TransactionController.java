@@ -185,6 +185,7 @@ public class TransactionController {
      *                  }"//返回交易解析结构
      *           }
      *           "ticketIds":[string1,string2]//区块内选票id列表
+     *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
      * }
      */
     @PostMapping("transactionDetails")
@@ -530,11 +531,11 @@ public class TransactionController {
      *                "serverTime": 1123123,//服务器时间
      *                "failReason":"",//失败原因
      *                "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
-     *                 "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *                "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *                "deposit":"",//质押金
      *                ---------以下字段只有type=vote有值----------
      *                "votePrice":"",//票价
      *                "voteNumber":"",//有效票/投票数
-     *                "deposit":"",//质押金
      *                "income":"",//收益
      *             }
      *          ]
@@ -705,6 +706,7 @@ public class TransactionController {
     }
 
     /**
+     * TODO:入参增加type字段
      * @api {get} transaction/blockTransaction k.查询区块交易信息
      * @apiVersion 1.0.0
      * @apiName blockTransaction
