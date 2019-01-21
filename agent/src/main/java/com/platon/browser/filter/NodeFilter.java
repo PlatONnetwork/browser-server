@@ -156,7 +156,6 @@ public class NodeFilter {
                 count = count + 1;
                 nodeRanking.setBlockCount(count);
                 nodeRanking.getRewardRatio();
-
             }
         }
         return list;
@@ -170,9 +169,9 @@ public class NodeFilter {
                 sum = sum.add(reward);
                 nodeRanking.setBlockReward(sum.toString());
                 BigDecimal rate = new BigDecimal(String.valueOf(1 - nodeRanking.getRewardRatio()));
-                nodeRanking.setRewardAmount(sum.multiply(rate).toString());
+                nodeRanking.setRewardAmount(sum.multiply(rate).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
                 BigDecimal fee = new BigDecimal(String.valueOf(nodeRanking.getRewardRatio()));
-                nodeRanking.setProfitAmount(sum.multiply(fee).toString());
+                nodeRanking.setProfitAmount(sum.multiply(fee).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
             }
         }
         return list;
