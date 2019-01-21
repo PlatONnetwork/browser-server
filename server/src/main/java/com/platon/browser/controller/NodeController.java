@@ -105,9 +105,9 @@ public class NodeController {
     }
 
     /**
-     * @api {post} node/list b.历史节点列表
+     * @api {post} node/historyList b.历史节点列表
      * @apiVersion 1.0.0
-     * @apiName list
+     * @apiName historyList
      * @apiGroup node
      * @apiDescription 节点列表
      * @apiUse CommonHeaderFiled
@@ -139,7 +139,7 @@ public class NodeController {
      *       ]
      * }
      */
-    @PostMapping("history")
+    @PostMapping("historyList")
     public RespPage<NodeListItem> getHistory (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));

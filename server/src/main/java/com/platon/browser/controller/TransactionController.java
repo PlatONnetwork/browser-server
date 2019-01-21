@@ -523,7 +523,6 @@ public class TransactionController {
                          vote ： 投票
                          transactionExecute ： 合约执行
                          authorization ： 权限
-                         authorization ： 权限
                          candidateDeposit ： 竞选质押
                          candidateApplyWithdraw ： 减持质押
                          candidateWithdraw ： 提取质押
@@ -620,12 +619,13 @@ public class TransactionController {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
      *      "txType":"", // 交易类型 (可选)
-                transfer ：转账
-                MPCtransaction ： MPC交易
-                contractCreate ： 合约创建
                 vote ： 投票
                 transactionExecute ： 合约执行
                 authorization ： 权限
+                candidateDeposit ： 竞选质押
+                candidateApplyWithdraw ： 减持质押
+                candidateWithdraw ： 提取质押
+                unknown ： 未知
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -719,6 +719,13 @@ public class TransactionController {
      *      "pageNo": 1,//页数(必填)
      *      "pageSize": 10,//页大小(必填),
      *      "height": 123,//区块高度(必填)
+     *      "txType": "", // 交易类型
+                    transfer ：转账
+                    MPCtransaction ： MPC交易
+                    contractCreate ： 合约创建
+                    vote ： 投票
+                    transactionExecute ： 合约执行
+                    authorization ： 权限
      * }
      * @apiSuccessExample {json} Success-Response:
      * {
