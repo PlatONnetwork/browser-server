@@ -97,6 +97,7 @@ public class BlockCorrelationFlow {
                 e.printStackTrace();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
         }
     }
