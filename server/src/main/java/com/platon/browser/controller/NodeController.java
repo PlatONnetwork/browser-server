@@ -107,7 +107,7 @@ public class NodeController {
     /**
      * @api {post} node/historyList b.历史节点列表
      * @apiVersion 1.0.0
-     * @apiName list
+     * @apiName historyList
      * @apiGroup node
      * @apiDescription 节点列表
      * @apiUse CommonHeaderFiled
