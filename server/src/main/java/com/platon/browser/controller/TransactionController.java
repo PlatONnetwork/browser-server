@@ -97,6 +97,11 @@ public class TransactionController {
                         vote ： 投票
                         transactionExecute ： 合约执行
                         authorization ： 权限
+                        candidateDeposit ： 竞选质押
+                        candidateApplyWithdraw ： 减持质押
+                        candidateWithdraw ： 提取质押
+                        unknown ： 未知
+     *      	    "value": 3.6,//数额
      *           "serverTime": 1123123,//服务器时间
      *           "failReason":"",//失败原因
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
@@ -148,6 +153,10 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
+                    candidateDeposit ： 竞选质押
+                    candidateApplyWithdraw ： 减持质押
+                    candidateWithdraw ： 提取质押
+                    unknown ： 未知
      *           "value": "222",//数额(单位:Energon)
      *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
@@ -160,7 +169,22 @@ public class TransactionController {
      *           "first":false, // 是否第一条记录
      *           "last":true // 是否最后一条记录
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *           "txInfo": "{
+     *                  "functionName":"",//方法名称
+     *                  "parameters":{},//参数
+     *                  "type":"1"//交易类型
+     *                      0：转账
+     *                      1：合约发布
+     *                      2：合约调用
+     *                      4：权限
+     *                      5：MPC交易
+     *                      1000：投票
+     *                      1001：竞选质押
+     *                      1002：减持质押
+     *                      1003：提取质押
+     *                  }"//返回交易解析结构
      *           }
+     *           "ticketIds":[string1,string2]//区块内选票id列表
      * }
      */
     @PostMapping("transactionDetails")
@@ -211,6 +235,11 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
+                    authorization ： 权限
+                    candidateDeposit ： 竞选质押
+                    candidateApplyWithdraw ： 减持质押
+                    candidateWithdraw ： 提取质押
+                    unknown ： 未知
      *           "value": "222",//数额(单位:Energon)
      *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
@@ -285,12 +314,17 @@ public class TransactionController {
      *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
      *           "value": "222",//数额(单位:Energon)
      *           "txType": "", // 交易类型
-     *                 transfer ：转账
-     *                 MPCtransaction ： MPC交易
-     *                 contractCreate ： 合约创建
-     *                 vote ： 投票
-     *                 transactionExecute ： 合约执行
-     *                 authorization ： 权限
+                        transfer ：转账
+                        MPCtransaction ： MPC交易
+                        contractCreate ： 合约创建
+                        vote ： 投票
+                        transactionExecute ： 合约执行
+                        authorization ： 权限
+                        authorization ： 权限
+                        candidateDeposit ： 竞选质押
+                        candidateApplyWithdraw ： 减持质押
+                        candidateWithdraw ： 提取质押
+                        unknown ： 未知
      *           "serverTime": 1123123,//服务器时间
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *           }
@@ -345,6 +379,11 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
+                    authorization ： 权限
+                    candidateDeposit ： 竞选质押
+                    candidateApplyWithdraw ： 减持质押
+                    candidateWithdraw ： 提取质押
+                    unknown ： 未知
                 "value": "222",//数额(单位:Energon)
                 "actualTxCost": "22",//实际交易手续费(单位:Energon)
                 "energonLimit": 232,//能量限制
@@ -405,6 +444,11 @@ public class TransactionController {
                     vote ： 投票
                     transactionExecute ： 合约执行
                     authorization ： 权限
+                    authorization ： 权限
+                    candidateDeposit ： 竞选质押
+                    candidateApplyWithdraw ： 减持质押
+                    candidateWithdraw ： 提取质押
+                    unknown ： 未知
      *           "value": "222",//数额(单位:Energon)
      *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
      *           "energonLimit": 232,//能量限制
@@ -445,6 +489,11 @@ public class TransactionController {
                 vote ： 投票
                 transactionExecute ： 合约执行
                 authorization ： 权限
+                authorization ： 权限
+                candidateDeposit ： 竞选质押
+                candidateApplyWithdraw ： 减持质押
+                candidateWithdraw ： 提取质押
+                unknown ： 未知
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -473,9 +522,20 @@ public class TransactionController {
                          vote ： 投票
                          transactionExecute ： 合约执行
                          authorization ： 权限
+                         authorization ： 权限
+                         candidateDeposit ： 竞选质押
+                         candidateApplyWithdraw ： 减持质押
+                         candidateWithdraw ： 提取质押
+                         unknown ： 未知
      *                "serverTime": 1123123,//服务器时间
      *                "failReason":"",//失败原因
      *                "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *                 "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *                ---------以下字段只有type=vote有值----------
+     *                "votePrice":"",//票价
+     *                "voteNumber":"",//有效票/投票数
+     *                "deposit":"",//质押金
+     *                "income":"",//收益
      *             }
      *          ]
      *      }
@@ -596,6 +656,7 @@ public class TransactionController {
      *                 "serverTime": 1123123,//服务器时间
      *                 "failReason":"",//失败原因
      *                 "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *
      *                 }
      *             ]
      *      }
@@ -684,7 +745,23 @@ public class TransactionController {
      *           "serverTime": 1123123,//服务器时间
      *           "failReason":"",//失败原因
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *           "txInfo": "{
+     *                  "functionName":"",//方法名称
+     *                  "parameters":{},//参数
+     *                  "type":"1"//交易类型
+     *                      0：转账
+     *                      1：合约发布
+     *                      2：合约调用
+     *                      4：权限
+     *                      5：MPC交易
+     *                      1000：投票
+     *                      1001：竞选质押
+     *                      1002：减持质押
+     *                      1003：提取质押
+     *                  }"//返回交易解析结构
      *           }
+     *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *
      *       ]
      * }
      */
@@ -698,4 +775,45 @@ public class TransactionController {
         RespPage<TransactionListItem> returnData = transactionService.getPageByBlockNumber(tlr);
         return returnData;
     }
+
+    /**
+     * @api {post} transaction/voteList l.根据块高/hash查询投票列表
+     * @apiVersion 1.0.0
+     * @apiName voteList
+     * @apiGroup transaction
+     * @apiDescription 根据块高/hash查询投票列表
+     * @apiUse CommonHeaderFiled
+     * @apiParamExample {json} Request-Example:
+     * {
+     *      "cid":"", // 链ID (必填)
+     *      "pageNo": 1,//页数(必填)
+     *      "pageSize": 10,//页大小(必填)
+     *      "parameter": 123//区块高度/hash(必填)
+     * }
+     *
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg": "",//描述信息
+     *      "code": 0,//成功（0），失败则由相关失败码
+     *      "displayTotalCount":18,//显示总数
+     *      "totalCount":18,// 小于等于500000记录的总数
+     *      "totalPages":1,//总页数
+     *      "data": [
+     *                  {
+     *                  "ticketId":  "",//票id
+     *                  "nodeName":  "",//投票给
+     *                  "owner": "0x234",//所有者
+     *                  "status": ,//票状态
+     *                  1->正常
+     *                  2->被选中
+     *                  3->过期
+     *                  4->掉榜
+     *                  "income": "", //收益
+     *                  "time": 111//实际过期时间（只有status = 3显示该时间的值，其他情况显示预期时间的值）
+     *                  "expectTime"://预期时间
+     *                  }
+     *              ]
+     * }
+     */
 }

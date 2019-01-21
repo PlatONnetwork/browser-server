@@ -70,7 +70,8 @@ public class HomeController {
      *      	    "longitude": "",//经度
      *      	    "latitude":"",//纬度
      *      	    "nodeType": ,//节点状态：1-共识节点 2-非共识
-     *      	    "netState": //节点状态 1 正常 2 异常
+     *      	    "netState": ,//节点状态 1 正常 2 异常
+     *      	    "nodeName": //节点名称
      *           }
      *      ]
      *   }
@@ -120,7 +121,7 @@ public class HomeController {
      *      	    "miner":"",//出块节点地址
      *      	    "nodeName":"",//出块节点名称
      *      	    "currentTransaction": //当前交易笔数
-     *      	    "consensusNodeAmount": //共识节点数
+     *      	    "consensusNodeAmount": //竞选节点数
      *      	    "addressAmount": //地址数
      *      	    "voteAmount": //投票数
      *      	    "proportion": //占比
@@ -308,6 +309,10 @@ public class HomeController {
                         vote ： 投票
                         transactionExecute ： 合约执行
                         authorization ： 权限
+                        candidateDeposit ： 竞选质押
+                        candidateApplyWithdraw ： 减持质押
+                        candidateWithdraw ： 提取质押
+                        unknown ： 未知
      *      	    "value": 3.6,//数额
      *      	    "timestamp"：155788,//交易时间
      *      	    "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址

@@ -78,7 +78,10 @@ public class BlockController  {
      *                  "energonLimit": 24234,//能量消耗限制
      *                  "energonAverage": 11, //平均能量价值(单位:Energon)
      *                  "blockReward": "123123",//区块奖励(单位:Energon)
-     *                  "serverTime": 1708098077  //服务器时间
+     *                  "serverTime": 1708098077,  //服务器时间
+     *                  "blockVoteAmount":,//区块内投票交易个数
+     *                  "blockVoteNumber":,//区块中包含的选票张数
+     *                  "blockCampaignAmount"://区块内竞选交易个数
      *                  }
      *              ]
      * }
@@ -191,4 +194,6 @@ public class BlockController  {
             throw new ResponseException(be.getMessage());
         }
     }
+
+
 }

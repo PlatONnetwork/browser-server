@@ -70,6 +70,11 @@ public class NodeController {
      * {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
+     *      "voteRatio":"",//投票数/占比
+     *      "blockReward":"",//每个区块奖励
+     *      "votePrice":"",//票价
+     *      "node":"",//竞选节点
+     *      "deposit ":"",//最低/最高质押
      *      "data": [
      *           {
      *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 节点ID
@@ -83,6 +88,7 @@ public class NodeController {
      *           "blockCount": 252125,// 产生的总区块数
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
+     *           "ticket ":""//得票数
      *           }
      *       ]
      * }
@@ -185,6 +191,8 @@ public class NodeController {
      *           "intro":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // 节点简介
      *           "orgName":"platon", // 机构名称
      *           "orgWebsite":"https://www.platon.network", // 机构官网
+     *           "ticket ":"",//得票数
+     *           "ticketAge" :""//票龄
      *           }
      * }
      */
