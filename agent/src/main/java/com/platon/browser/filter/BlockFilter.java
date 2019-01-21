@@ -7,7 +7,10 @@ import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.job.DataCollectorJob;
@@ -55,6 +58,9 @@ public class BlockFilter {
     @Autowired
     private BlockMapper blockMapper;
 
+    @Autowired
+    private NodeRankingMapper nodeRankingMapper;
+
     @Transactional
     public Block analysis (DataCollectorJob.AnalysisParam param) {
 
@@ -62,7 +68,6 @@ public class BlockFilter {
         List<Transaction> transactionsList = param.transactionList;
         List<TransactionReceipt> transactionReceiptList = param.transactionReceiptList;
         BigInteger publicKey = param.publicKey;
-        String nodeInfoList = param.nodeInfoList;
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
 
         Block block = new Block();
@@ -93,18 +98,14 @@ public class BlockFilter {
             block.setExtraData(ethBlock.getBlock().getExtraData());
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
-            String nodeId = publicKey.toString(16);
-            block.setNodeId(nodeId);
-            List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
-            if(null != list && list.size() > 0 ){
-                list.forEach(candidateDto -> {
-                    if(publicKey.equals(new BigInteger(candidateDto.getCandidateId().replace("0x", ""), 16))){
-                        NodeRankingDto nodeRankingDto = new NodeRankingDto();
-                        nodeRankingDto.init(candidateDto);
-                        block.setNodeName(nodeRankingDto.getName() == null ? "" : nodeRankingDto.getName());
-                    }
-                });
+
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andNodeIdEqualTo(publicKey.toString(16)).andIsValidEqualTo(1);
+            List<NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+            if(null != dbList && dbList.size() > 0){
+                block.setNodeName(dbList.get(0).getName());
             }
+
             String rewardWei = getBlockReward(ethBlock.getBlock().getNumber().toString());
             block.setBlockReward(rewardWei);
             //actuakTxCostSum

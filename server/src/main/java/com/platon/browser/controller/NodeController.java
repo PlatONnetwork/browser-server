@@ -105,7 +105,7 @@ public class NodeController {
     }
 
     /**
-     * @api {post} node/list a.历史节点列表
+     * @api {post} node/list b.历史节点列表
      * @apiVersion 1.0.0
      * @apiName list
      * @apiGroup node
@@ -151,7 +151,7 @@ public class NodeController {
 
 
     /**
-     * @api {post} node/detail b.节点详情
+     * @api {post} node/detail c.节点详情
      * @apiVersion 1.0.0
      * @apiName detail
      * @apiGroup node
@@ -214,7 +214,7 @@ public class NodeController {
 
 
     /**
-     * @api {post} node/blockList c.节点区块列表(显示最新20条)
+     * @api {post} node/blockList d.节点区块列表(显示最新20条)
      * @apiVersion 1.0.0
      * @apiName blockList
      * @apiGroup node
@@ -272,7 +272,7 @@ public class NodeController {
     }
 
     /**
-     * @api {get} node/blockDownload?cid=:cid&nodeId=:nodeId&date=:date d.导出节点区块详情
+     * @api {get} node/blockDownload?cid=:cid&nodeId=:nodeId&date=:date e.导出节点区块详情
      * @apiVersion 1.0.0
      * @apiName blockDownload
      * @apiGroup node
