@@ -8,7 +8,6 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.filter.BlockCorrelationFlow;
-import com.platon.browser.filter.CacheTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,17 +150,6 @@ public class DataCollectorJob {
             blockCorrelationFlow.doFilter(param);
         } catch (Exception e) {
             logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
-        }
-
-        try {
-            // 如果当前链上块高等于分析后的块高，证明已追上，把剩余的缓存块批量入库
-            long chainCurrentBlockNumber = web3j.ethBlockNumber().send().getBlockNumber().longValue();
-            if(CacheTool.currentBlockNumber==chainCurrentBlockNumber){
-                blockMapper.batchInsert(CacheTool.blocks);
-                CacheTool.blocks.clear();
-            }
-        } catch (IOException e) {
-            throw e;
         }
     }
 }

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
-import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -12,7 +11,6 @@ import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.EventRes;
-import com.platon.browser.dto.NodeRankingDto;
 import com.platon.browser.job.DataCollectorJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,12 +120,7 @@ public class BlockFilter {
                 log.debug("[Block info :]" + JSON.toJSONString(block));
                 log.debug("[this block is An empty block , transaction null !!!...]");
                 log.debug("[exit BlockFilter !!!...]");
-                CacheTool.blocks.add(block);
-                CacheTool.currentBlockNumber=block.getNumber();
-                if(CacheTool.blocks.size()==5){
-                    blockMapper.batchInsert(CacheTool.blocks);
-                    CacheTool.blocks.clear();
-                }
+                blockMapper.insert(block);
                 return block;
             }
             for (Transaction transaction : transactionsList) {
@@ -155,12 +148,7 @@ public class BlockFilter {
                 }
             }
             //insert struct<block> into database
-            CacheTool.blocks.add(block);
-            CacheTool.currentBlockNumber=block.getNumber();
-            if(CacheTool.blocks.size()==5){
-                blockMapper.batchInsert(CacheTool.blocks);
-                CacheTool.blocks.clear();
-            }
+            blockMapper.insert(block);
         }
         return block;
     }
