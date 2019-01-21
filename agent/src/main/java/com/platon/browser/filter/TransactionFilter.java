@@ -6,6 +6,7 @@ import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.job.DataCollectorJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -43,18 +44,15 @@ public class TransactionFilter {
     private TransactionMapper transactionMapper;
 
     @Transactional
-    public List<String> transactionAnalysis(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
-        Date beginTime = new Date();
-        log.debug("[into NodeFilter !!!...]");
-        log.debug("[blockChain chainId is ]: " + chainId);
-        List<String> txHash = build(transactionReceiptMap,transactionsList, time);
-        Date endTime = new Date();
-        String time2 = String.valueOf(endTime.getTime()-beginTime.getTime());
-        log.debug("--------------------------------------transactionAnalysis :" + time2);
-        return txHash;
-    }
+    public List<String> analysis(DataCollectorJob.AnalysisParam param, long time)throws Exception{
 
-    public List<String> build(Map<String,Object> transactionReceiptMap, List <Transaction> transactionsList , long time)throws Exception{
+        List<Transaction> transactionsList = param.transactionList;
+        Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
+
+        if (transactionsList.size() == 0 && transactionReceiptMap.size() == 0){
+            return Collections.EMPTY_LIST;
+        }
+
         Web3j web3j = chainsConfig.getWeb3j(chainId);
         //build database struct<Transaction>
         List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
@@ -64,67 +62,67 @@ public class TransactionFilter {
         for(Transaction transaction : transactionsList){
             if(null != transactionReceiptMap.get(transaction.getHash())){
                 TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
-                    txHashes.add(transaction.getHash());
-                    com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
-                    TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
-                    transactionWithBLOBs.setHash(transaction.getHash());
-                    transactionWithBLOBs.setFrom(transaction.getFrom());
-                    if (null != transaction.getTo()) {
-                        //judge `to` address is accountAddress or contractAddress
-                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                        if ("0x".equals(ethGetCode.getCode())) {
-                            transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
-                            transactionWithBLOBs.setReceiveType("account");
-                        } else {
-                            transactionWithBLOBs.setTo(transaction.getTo());
-                            transactionWithBLOBs.setReceiveType("contract");
-                        }
-                    } else {
+                txHashes.add(transaction.getHash());
+                com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
+                TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
+                transactionWithBLOBs.setHash(transaction.getHash());
+                transactionWithBLOBs.setFrom(transaction.getFrom());
+                if (null != transaction.getTo()) {
+                    //judge `to` address is accountAddress or contractAddress
+                    EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                    if ("0x".equals(ethGetCode.getCode())) {
                         transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
+                        transactionWithBLOBs.setReceiveType("account");
+                    } else {
+                        transactionWithBLOBs.setTo(transaction.getTo());
                         transactionWithBLOBs.setReceiveType("contract");
                     }
-                    transactionWithBLOBs.setValue(transaction.getValue().toString());
-                    transactionWithBLOBs.setTransactionIndex(transactionReceipt.getTransactionIndex().intValue());
-                    transactionWithBLOBs.setEnergonPrice(transaction.getGasPrice().toString());
-                    transactionWithBLOBs.setEnergonLimit(transaction.getGas().toString());
-                    transactionWithBLOBs.setEnergonUsed(transactionReceipt.getGasUsed().toString());
-                    transactionWithBLOBs.setNonce(transaction.getNonce().toString());
-                    if (String.valueOf(time).length() == 10) {
-                        transactionWithBLOBs.setTimestamp(new Date(time * 1000L));
-                    } else {
-                        transactionWithBLOBs.setTimestamp(new Date(time));
-                    }
-                    transactionWithBLOBs.setCreateTime(new Date());
-                    transactionWithBLOBs.setUpdateTime(new Date());
-                    if(null == transactionReceipt.getBlockNumber() ){
-                        transactionWithBLOBs.setTxReceiptStatus(0);
-                    }
-                    transactionWithBLOBs.setTxReceiptStatus(1);
-                    transactionWithBLOBs.setActualTxCost(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()).toString());
-                    transactionWithBLOBs.setChainId(chainId);
-                    transactionWithBLOBs.setBlockHash(transaction.getBlockHash());
-                    transactionWithBLOBs.setBlockNumber(transaction.getBlockNumber().longValue());
-                    if(transaction.getInput().length() <= 65535){
-                        transactionWithBLOBs.setInput(transaction.getInput());
-                    }else {
-                        transactionWithBLOBs.setInput(transaction.getInput().substring(0,65535));
-                    }
-                    if(transaction.getInput().equals("0x") && transaction.getValue() != null){
-                        transactionWithBLOBs.setTxType("transfer");
-                    }
-                    AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
-                    if("1".equals(analysisResult.getType())){
-                        analysisResult.setFunctionName("contract deploy");
-                    }
-                    String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
-                    transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
-                    String txinfo = JSON.toJSONString(analysisResult);
-                    transactionWithBLOBs.setTxInfo(txinfo);
-                    transactionWithBLOBsList.add(transactionWithBLOBs);
-                    BeanUtils.copyProperties(transactionWithBLOBs,transactions);
-                    transactionSet.add(transactions);
+                } else {
+                    transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
+                    transactionWithBLOBs.setReceiveType("contract");
                 }
+                transactionWithBLOBs.setValue(transaction.getValue().toString());
+                transactionWithBLOBs.setTransactionIndex(transactionReceipt.getTransactionIndex().intValue());
+                transactionWithBLOBs.setEnergonPrice(transaction.getGasPrice().toString());
+                transactionWithBLOBs.setEnergonLimit(transaction.getGas().toString());
+                transactionWithBLOBs.setEnergonUsed(transactionReceipt.getGasUsed().toString());
+                transactionWithBLOBs.setNonce(transaction.getNonce().toString());
+                if (String.valueOf(time).length() == 10) {
+                    transactionWithBLOBs.setTimestamp(new Date(time * 1000L));
+                } else {
+                    transactionWithBLOBs.setTimestamp(new Date(time));
+                }
+                transactionWithBLOBs.setCreateTime(new Date());
+                transactionWithBLOBs.setUpdateTime(new Date());
+                if(null == transactionReceipt.getBlockNumber() ){
+                    transactionWithBLOBs.setTxReceiptStatus(0);
+                }
+                transactionWithBLOBs.setTxReceiptStatus(1);
+                transactionWithBLOBs.setActualTxCost(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()).toString());
+                transactionWithBLOBs.setChainId(chainId);
+                transactionWithBLOBs.setBlockHash(transaction.getBlockHash());
+                transactionWithBLOBs.setBlockNumber(transaction.getBlockNumber().longValue());
+                if(transaction.getInput().length() <= 65535){
+                    transactionWithBLOBs.setInput(transaction.getInput());
+                }else {
+                    transactionWithBLOBs.setInput(transaction.getInput().substring(0,65535));
+                }
+                if(transaction.getInput().equals("0x") && transaction.getValue() != null){
+                    transactionWithBLOBs.setTxType("transfer");
+                }
+                AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
+                if("1".equals(analysisResult.getType())){
+                    analysisResult.setFunctionName("contract deploy");
+                }
+                String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
+                transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
+                String txinfo = JSON.toJSONString(analysisResult);
+                transactionWithBLOBs.setTxInfo(txinfo);
+                transactionWithBLOBsList.add(transactionWithBLOBs);
+                BeanUtils.copyProperties(transactionWithBLOBs,transactions);
+                transactionSet.add(transactions);
             }
+        }
         //insert list into database
         //insert list into redis
         if(txHashes.size()>0){
@@ -132,5 +130,4 @@ public class TransactionFilter {
         }
         return txHashes;
     }
-
 }

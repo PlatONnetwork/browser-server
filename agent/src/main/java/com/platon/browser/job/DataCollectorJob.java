@@ -21,6 +21,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import rx.Subscription;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -53,6 +54,16 @@ public class DataCollectorJob {
 
     private boolean isError = true;
 
+    public static class AnalysisParam {
+        public EthBlock ethBlock;
+        public List <org.web3j.protocol.core.methods.response.Transaction> transactionList;
+        public List <TransactionReceipt> transactionReceiptList;
+        public Map<String,Object> transactionReceiptMap;
+        public BigInteger publicKey;
+        public String nodeInfoList;
+    }
+
+    private Subscription subscription;
 
     @Scheduled(cron="0/1 * * * * ?")
     protected void doJob () {
@@ -71,17 +82,27 @@ public class DataCollectorJob {
             }
 
             Web3j web3j = chainsConfig.getWeb3j(chainId);
-            web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true)
-                .doOnError(ex->this.isError=true)
+            subscription = web3j.catchUpToLatestAndSubscribeToNewBlocksObservable(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true)
+                .doOnError(ex->{
+                    // 取消订阅
+                    if(subscription!=null) subscription.unsubscribe();
+                    // 设置为true，等待下一秒定时任务进来重新订阅
+                    this.isError=true;
+                })
                 .subscribe(ethBlock -> {
+
+                    // 构造分析参数
+                    AnalysisParam param = new AnalysisParam();
+                    param.ethBlock = ethBlock;
 
                     Map<String,Object> transactionMap = new HashMap <>();
                     Map<String,Object> transactionReceiptMap = new HashMap <>();
 
                     List <EthBlock.TransactionResult> transactions = ethBlock.getBlock().getTransactions();
+
                     List <org.web3j.protocol.core.methods.response.Transaction> transactionList = new ArrayList<>();
                     List <TransactionReceipt> transactionReceiptList = new ArrayList <>();
-                    for (EthBlock.TransactionResult transaction : transactions) {
+                    transactions.forEach(transaction->{
                         org.web3j.protocol.core.methods.response.Transaction rawTransaction = (org.web3j.protocol.core.methods.response.Transaction) transaction.get();
                         transactionList.add(rawTransaction);
                         transactionMap.put(rawTransaction.getHash(),transaction);
@@ -94,24 +115,27 @@ public class DataCollectorJob {
                         } catch (IOException e) {
                             logger.error("Transaction resolve error: {}", e.getMessage());
                         }
-                    }
-                    //build candidate contract
-                    CandidateContract candidateContract = web3jClient.getCandidateContract();
-                    //get candidate list info
-                    String nodeInfoList = null;
+                    });
+
+                    param.transactionList=transactionList;
+                    param.transactionReceiptList=transactionReceiptList;
+                    param.transactionReceiptMap=transactionReceiptMap;
+
                     try{
-                        nodeInfoList = candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
+                        CandidateContract candidateContract = web3jClient.getCandidateContract();
+                        param.nodeInfoList=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
                     }catch (Exception e){
                         logger.debug("nodeInfoList is null !!!...",e.getMessage());
                     }
-                    BigInteger publicKey = null;
+
                     try {
-                        publicKey = CalculatePublicKey.testBlock(ethBlock );
+                        param.publicKey = CalculatePublicKey.testBlock(ethBlock );
                     } catch (Exception e) {
                         logger.debug("Public key is null !!!...",e.getMessage());
                     }
+
                     try {
-                        blockCorrelationFlow.doFilter(ethBlock,transactionList,transactionReceiptList,publicKey,nodeInfoList,transactionReceiptMap);
+                        blockCorrelationFlow.doFilter(param);
                     } catch (Exception e) {
                         logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
                     }
