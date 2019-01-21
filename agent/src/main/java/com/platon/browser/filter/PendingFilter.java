@@ -3,13 +3,16 @@ package com.platon.browser.filter;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.mapper.PendingTxMapper;
+import com.platon.browser.job.DataCollectorJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -41,9 +44,10 @@ public class PendingFilter {
     @Autowired
     private ChainsConfig chainsConfig;
 
-    //@Transactional
-    public boolean pendingTxAnalysis (EthPendingTransactions ethPendingTransactions)throws  Exception {
+    @Transactional
+    public boolean analysis (DataCollectorJob.AnalysisParam param, Block block)throws  Exception {
 
+        EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
         //TODO:任务开始时间
         Date beginTime = new Date();
         Web3j web3j = chainsConfig.getWeb3j(chainId);

@@ -10,6 +10,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.dto.NodeRankingDto;
+import com.platon.browser.job.DataCollectorJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: dongqile
@@ -53,23 +56,15 @@ public class BlockFilter {
     private BlockMapper blockMapper;
 
     @Transactional
-    public Block blockAnalysis ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList,
-                                 String nodeInfoList ,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
-        Date beginTime = new Date();
-        log.debug("[into BlockFilter !!!...]");
-        log.debug("[blockChain chainId is ]: " + chainId);
-        log.debug("[buildBlockStruct blockNumber is ]: " + ethBlock.getBlock().getNumber());
-        Block block = build(ethBlock, transactionReceiptList, transactionsList,nodeInfoList,publicKey,transactionReceiptMap);
-        Date endTime = new Date();
-        String time = String.valueOf(endTime.getTime()-beginTime.getTime());
-        log.debug("--------------------------------------blockAnalysis :" + time);
-        return block;
-    }
+    public Block analysis (DataCollectorJob.AnalysisParam param) {
 
+        EthBlock ethBlock = param.ethBlock;
+        List<Transaction> transactionsList = param.transactionList;
+        List<TransactionReceipt> transactionReceiptList = param.transactionReceiptList;
+        BigInteger publicKey = param.publicKey;
+        String nodeInfoList = param.nodeInfoList;
+        Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
 
-
-    public Block build ( EthBlock ethBlock, List <TransactionReceipt> transactionReceiptList, List <Transaction> transactionsList ,
-                         String nodeInfoList,BigInteger publicKey,Map<String,Object> transactionReceiptMap) throws Exception {
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
@@ -137,22 +132,22 @@ public class BlockFilter {
             for (Transaction transaction : transactionsList) {
                 if(null != transactionReceiptMap.get(transaction.getHash())){
                     TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
-                        sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
-                        AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
-                        String type = TransactionAnalysis.getTypeName(analysisResult.getType());
-                        if ("voteTicket".equals(type)) {
-                            voteAmount.add(BigInteger.ONE);
-                            //get tickVoteContract vote event
-                            List <TicketContract.VoteTicketEventEventResponse> eventEventResponses =
-                                    web3jClient.getTicketContract().getVoteTicketEventEvents(transactionReceipt);
-                            String event = eventEventResponses.get(0).param1;
-                            EventRes eventRes = JSON.parseObject(event, EventRes.class);
-                            //event objcet is jsonString , transform jsonObject <EventRes>
-                            //EventRes get Data
-                            block.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
-                        } else if ("candidateDeposit".equals(type)) {
-                            campaignAmount.add(BigInteger.ONE);
-                        }
+                    sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
+                    AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
+                    String type = TransactionAnalysis.getTypeName(analysisResult.getType());
+                    if ("voteTicket".equals(type)) {
+                        voteAmount.add(BigInteger.ONE);
+                        //get tickVoteContract vote event
+                        List <TicketContract.VoteTicketEventEventResponse> eventEventResponses =
+                                web3jClient.getTicketContract().getVoteTicketEventEvents(transactionReceipt);
+                        String event = eventEventResponses.get(0).param1;
+                        EventRes eventRes = JSON.parseObject(event, EventRes.class);
+                        //event objcet is jsonString , transform jsonObject <EventRes>
+                        //EventRes get Data
+                        block.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
+                    } else if ("candidateDeposit".equals(type)) {
+                        campaignAmount.add(BigInteger.ONE);
+                    }
                     block.setBlockVoteAmount(voteAmount.longValue());
                     block.setBlockCampaignAmount(campaignAmount.longValue());
                     block.setActualTxCostSum(sum.toString());

@@ -32,9 +32,6 @@ public class TestBase {
     protected PendingFilter pendingFilter;
 
     @Autowired
-    protected StompPushFilter stompPushFilter;
-
-    @Autowired
     protected TransactionFilter transactionFilter;
 
     @Autowired
