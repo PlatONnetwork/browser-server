@@ -706,7 +706,6 @@ public class TransactionController {
     }
 
     /**
-     * TODO:入参增加type字段
      * @api {get} transaction/blockTransaction k.查询区块交易信息
      * @apiVersion 1.0.0
      * @apiName blockTransaction
@@ -720,12 +719,9 @@ public class TransactionController {
      *      "pageSize": 10,//页大小(必填),
      *      "height": 123,//区块高度(必填)
      *      "txType": "", // 交易类型
-                    transfer ：转账
-                    MPCtransaction ： MPC交易
-                    contractCreate ： 合约创建
+                    trancaction ：交易
                     vote ： 投票
-                    transactionExecute ： 合约执行
-                    authorization ： 权限
+                    candidateDeposit ： 竞选
      * }
      * @apiSuccessExample {json} Success-Response:
      * {

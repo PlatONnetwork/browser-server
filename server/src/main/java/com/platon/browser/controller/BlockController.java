@@ -129,7 +129,8 @@ public class BlockController  {
      *           "extraData": "xxx",//附加数据
      *           "first":false, // 是否第一条记录
      *           "last":true // 是否最后一条记录
-     *           "voteNumber":""//投票数
+     *           "voteNumber":"",//选票数
+     *           "voteTransaction":""//投票交易数
      *           }
      * }
      */
