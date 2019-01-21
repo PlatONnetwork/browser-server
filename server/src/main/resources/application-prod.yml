@@ -10,7 +10,7 @@ datasource:
   password: Juzhenyuan_123
 #日志配置
 logging:
-  file: ./browser-server-prod.log
+  file: /data/logs/browser-server-prod.log
   level:
     org:
       springframework:
