@@ -77,6 +77,7 @@ public class StompPushTask {
                 index.setAddressAmount(cache.getAddressCount());
                 resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
                 messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
+                prevIndex=index;
             }
 
             // 全量推送区块信息
