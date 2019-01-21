@@ -52,7 +52,7 @@ public class BlockCorrelationFlow {
     public void doFilter (DataCollectorJob.AnalysisParam param) {
 
         try {
-            /// 分析区块数据并入库，开启线程更新缓存
+            /// 分析区块数据并入库
             Block block = blockFilter.analysis(param);
             Set <Block> set = new HashSet <>();
             set.add(block);
@@ -60,47 +60,42 @@ public class BlockCorrelationFlow {
             if(block==null) block = new Block();
             Block blockRef = block;
 
+            // 分析节点数据并入库
+            List<NodeRanking> nodeRankings = nodeFilter.analysis(param,blockRef);
             executorService.submit(()->{
-                // 分析节点数据并入库
                 try {
-                    List<NodeRanking> nodeRankings = nodeFilter.analysis(param,blockRef);
                     Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
                     redisCacheService.updateNodePushCache(chainId, nodes);
                     redisCacheService.updateStatisticsCache(chainId, blockRef, nodeRankings);
                 } catch (Exception e) {
-                    throw new AppException(ErrorCodeEnum.NODE_ERROR);
+                    e.printStackTrace();
                 }
             });
 
             // 更新区块缓存
             executorService.submit(()->redisCacheService.updateBlockCache(chainId, set));
 
-            // 分析交易数据并入库，开启线程更新缓存
-            executorService.submit(()->{
-                try {
-                    List<String> txHash = transactionFilter.analysis(param,blockRef.getTimestamp().getTime());
-                    if (txHash.size()>0) {
-                        executorService.submit(()->{
-                            TransactionExample condition = new TransactionExample();
-                            condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
-                            List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
-                            redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
-                        });
-                    }
-                } catch (Exception e) {
-                    throw new AppException(ErrorCodeEnum.TX_ERROR);
+            // 分析交易数据并入库
+            List<String> txHash = transactionFilter.analysis(param,blockRef.getTimestamp().getTime());
+            try {
+                if (txHash.size()>0) {
+                    executorService.submit(()->{
+                        TransactionExample condition = new TransactionExample();
+                        condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
+                        List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
+                        redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
+                    });
                 }
-            });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            // 分析待处理交易数据并入库，开启线程更新缓存
-            executorService.submit(()->{
-                try {
-                    pendingFilter.analysis(param,blockRef);
-                } catch (Exception e) {
-                    throw new AppException(ErrorCodeEnum.NODE_ERROR);
-                }
-            });
-
+            // 分析待处理交易数据并入库
+            try {
+                pendingFilter.analysis(param,blockRef);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             throw new AppException(ErrorCodeEnum.BLOCKCHAIN_ERROR);
         }
