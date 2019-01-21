@@ -68,13 +68,12 @@ public class TransactionFilter {
                 transactionWithBLOBs.setHash(transaction.getHash());
                 transactionWithBLOBs.setFrom(transaction.getFrom());
                 if (null != transaction.getTo()) {
+                    transactionWithBLOBs.setTo(transaction.getTo());
                     //judge `to` address is accountAddress or contractAddress
                     EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
                     if ("0x".equals(ethGetCode.getCode())) {
-                        transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
                         transactionWithBLOBs.setReceiveType("account");
                     } else {
-                        transactionWithBLOBs.setTo(transaction.getTo());
                         transactionWithBLOBs.setReceiveType("contract");
                     }
                 } else {
