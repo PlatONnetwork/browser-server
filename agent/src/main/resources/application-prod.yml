@@ -34,7 +34,7 @@ platon:
       block: browser:prod:chain{}:blocks
       transaction: browser:prod:chain{     }:transactions
       staticstics: browser:prod:chain{}:staticstics
-      max-item: 50000
+      max-item: 500000
 #Web3j配置
 chain.id: 1
 # Zookeeper注册中心配置
