@@ -25,6 +25,8 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * User: dongqile
@@ -47,116 +49,134 @@ public class NodeFilter {
     @Autowired
     private Web3jClient web3jClient;
 
+    private final static ReadWriteLock LOCK = new ReentrantReadWriteLock();
+
     @Transactional
-    public List <NodeRanking> analysis (DataCollectorJob.AnalysisParam param,Block block) throws Exception {
+    public DataCollectorJob.AnalysisResult analysis ( DataCollectorJob.AnalysisParam param, Block block) throws Exception {
 
         EthBlock ethBlock = param.ethBlock;
         BigInteger publicKey = param.publicKey;
         String blockReward = block.getBlockReward();
         Long blockNumber = block.getNumber();
 
-        String nodeInfo=null;
-        long startTime3 = System.currentTimeMillis();
-        try{
-            CandidateContract candidateContract = web3jClient.getCandidateContract();
-            nodeInfo=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
-        }catch (Exception e){
-            logger.debug("nodeInfoList is null !!!...",e.getMessage());
-        }
-        logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime3);
-        if (StringUtils.isBlank(nodeInfo)) return Collections.EMPTY_LIST;
-        List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
-        if (nodes.size()==0) return Collections.EMPTY_LIST;
+        LOCK.writeLock().lock();
+        try {
+            DataCollectorJob.AnalysisResult analysisResult = new DataCollectorJob.AnalysisResult();
+            String nodeInfo=null;
+            String verifiersInfo=null;
+            long startTime3 = System.currentTimeMillis();
+            try{
+                CandidateContract candidateContract = web3jClient.getCandidateContract();
+                verifiersInfo=candidateContract.VerifiersList(ethBlock.getBlock().getNumber()).send();
+                nodeInfo=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
+            }catch (Exception e){
+                logger.debug("nodeInfoList is null !!!...",e.getMessage());
+            }
+            logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime3);
+            List<CandidateDto> verifiers = JSON.parseArray(verifiersInfo,CandidateDto.class);
+            analysisResult.consensusCount = verifiers.size();
+            if (StringUtils.isBlank(nodeInfo)){
+                analysisResult.nodeRankings = Collections.EMPTY_LIST;
+                return analysisResult;
+            }
+            List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
+            if (nodes.size()==0) {
+                analysisResult.nodeRankings = Collections.EMPTY_LIST;
+                return analysisResult;
+            }
 
-        NodeRankingExample nodeRankingExample = new NodeRankingExample();
-        nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
-        //find NodeRanking info by condition on database
-        Date date5 = new Date();
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
+            //find NodeRanking info by condition on database
+            Date date5 = new Date();
 
-        List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+            List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
 
-        // 把库中记录全部置为无效
-        NodeRanking node = new NodeRanking();
-        node.setIsValid(0);
-        nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
+            // 把库中记录全部置为无效
+            NodeRanking node = new NodeRanking();
+            node.setIsValid(0);
+            nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
 
-        Date date6 = new Date();
-        logger.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
+            Date date6 = new Date();
+            logger.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
 
-        List <NodeRanking> nodeList = new ArrayList <>();
-        int i = 1;
+            List <NodeRanking> nodeList = new ArrayList <>();
+            int i = 1;
 
-        Date date7 = new Date();
-        for (CandidateDto candidateDto : nodes) {
-            NodeRanking nodeRanking = new NodeRanking();
-            NodeRankingDto nrd = new NodeRankingDto();
-            nrd.init(candidateDto);
-            BeanUtils.copyProperties(nrd,nodeRanking);
-            BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
-            nodeRanking.setChainId(chainId);
-            nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
-            nodeRanking.setBlockReward(blockReward);
-            nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
-            nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
-            nodeRanking.setRanking(i);
-            nodeRanking.setType(1);
-            // Set the node election status according to the ranking
-            // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
-            /**
-             * The first 100：candidate nodes
-             * After 100：alternative nodes
-             * **/
-            int electionStatus = 1;
-            if( 1 <= i && i < 25) electionStatus = 3;
-            if (26 <= i && i < 100) electionStatus = 1;
-            if (i >= 100) electionStatus = 4;
-            nodeRanking.setElectionStatus(electionStatus);
-            nodeRanking.setIsValid(1);
-            nodeRanking.setBeginNumber(blockNumber);
-            nodeList.add(nodeRanking);
-            i = i + 1;
-        }
-        Date date8 = new Date();
-        logger.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
-        //this time update database struct
-        List <NodeRanking> updateList = new ArrayList <>();
-        //data form database and node status is vaild
+            Date date7 = new Date();
+            for (CandidateDto candidateDto : nodes) {
+                NodeRanking nodeRanking = new NodeRanking();
+                NodeRankingDto nrd = new NodeRankingDto();
+                nrd.init(candidateDto);
+                BeanUtils.copyProperties(nrd,nodeRanking);
+                BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
+                nodeRanking.setChainId(chainId);
+                nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
+                nodeRanking.setBlockReward(blockReward);
+                nodeRanking.setProfitAmount(new BigDecimal(blockReward).multiply(rate).toString());
+                nodeRanking.setRewardAmount(new BigDecimal(blockReward).multiply(BigDecimal.ONE.subtract(rate)).toString());
+                nodeRanking.setRanking(i);
+                nodeRanking.setType(1);
+                // Set the node election status according to the ranking
+                // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
+                /**
+                 * The first 100：candidate nodes
+                 * After 100：alternative nodes
+                 * **/
+                int electionStatus = 1;
+                if( 1 <= i && i < 25) electionStatus = 3;
+                if (26 <= i && i < 100) electionStatus = 1;
+                if (i >= 100) electionStatus = 4;
+                nodeRanking.setElectionStatus(electionStatus);
+                nodeRanking.setIsValid(1);
+                nodeRanking.setBeginNumber(blockNumber);
+                nodeList.add(nodeRanking);
+                i = i + 1;
+            }
+            Date date8 = new Date();
+            logger.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
+            //this time update database struct
+            List <NodeRanking> updateList = new ArrayList <>();
+            //data form database and node status is vaild
 
-        Map <String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap <>();
-        nodeList.forEach(e -> {
-            dbNodeIdToNodeRankingMap.put(e.getNodeId(), e);
-            updateList.add(e);
-        });
+            Map <String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap <>();
+            nodeList.forEach(e -> {
+                dbNodeIdToNodeRankingMap.put(e.getNodeId(), e);
+                updateList.add(e);
+            });
 
-        Date date9 = new Date();
-        if (dbList.size() > 0 && dbList != null) {
-            for (int j = 0; j < dbList.size(); j++) {
-                NodeRanking dbNode = dbList.get(j);
-                NodeRanking chainNode = dbNodeIdToNodeRankingMap.get(dbNode.getNodeId());
-                if (chainNode != null) {
-                    // 库里有效属性保留
-                    chainNode.setBlockCount(dbNode.getBlockCount());
-                    chainNode.setJoinTime(dbNode.getJoinTime());
-                    chainNode.setBeginNumber(dbNode.getBeginNumber());
-                    chainNode.setId(dbNode.getId());
-                } else {
-                    dbNode.setEndNumber(blockNumber);
-                    dbNode.setIsValid(0);
-                    updateList.add(dbNode);
+            Date date9 = new Date();
+            if (dbList.size() > 0 && dbList != null) {
+                for (int j = 0; j < dbList.size(); j++) {
+                    NodeRanking dbNode = dbList.get(j);
+                    NodeRanking chainNode = dbNodeIdToNodeRankingMap.get(dbNode.getNodeId());
+                    if (chainNode != null) {
+                        // 库里有效属性保留
+                        chainNode.setBlockCount(dbNode.getBlockCount());
+                        chainNode.setJoinTime(dbNode.getJoinTime());
+                        chainNode.setBeginNumber(dbNode.getBeginNumber());
+                        chainNode.setId(dbNode.getId());
+                    } else {
+                        dbNode.setEndNumber(blockNumber);
+                        dbNode.setIsValid(0);
+                        updateList.add(dbNode);
+                    }
                 }
             }
+            Date date10 = new Date();
+            logger.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
+            String date = JSONArray.toJSONString(updateList);
+            FilterTool.currentBlockOwner(updateList, publicKey);
+            FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
+            Date date1 = new Date();
+            cutsomNodeRankingMapper.insertOrUpdate(updateList);
+            analysisResult.nodeRankings = updateList;
+            Date date2 = new Date();
+            logger.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
+            return analysisResult;
+        }finally {
+            LOCK.writeLock().unlock();
         }
-        Date date10 = new Date();
-        logger.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
-        String date = JSONArray.toJSONString(updateList);
-        FilterTool.currentBlockOwner(updateList, publicKey);
-        FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
-        Date date1 = new Date();
-        cutsomNodeRankingMapper.insertOrUpdate(updateList);
-        Date date2 = new Date();
-        logger.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
-
-        return updateList;
     }
 
 

@@ -66,13 +66,13 @@ public class BlockCorrelationFlow {
             executorService.submit(()->{
                 long startTime0 = System.currentTimeMillis();
                 try{
-                    List<NodeRanking> nodeRankings = nodeFilter.analysis(param,blockRef);
+                    DataCollectorJob.AnalysisResult analysisResult  = nodeFilter.analysis(param,blockRef);
                     logger.debug("NodeFilter.analysis()               :--->{}",System.currentTimeMillis()-startTime0);
                     executorService.submit(()->{
                         try {
-                            Set <NodeRanking> nodes = new HashSet <>(nodeRankings);
+                            Set <NodeRanking> nodes = new HashSet <>(analysisResult.nodeRankings);
                             redisCacheService.updateNodePushCache(chainId, nodes);
-                            redisCacheService.updateStatisticsCache(chainId, blockRef, nodeRankings);
+                            redisCacheService.updateStatisticsCache(chainId, blockRef, analysisResult.consensusCount);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

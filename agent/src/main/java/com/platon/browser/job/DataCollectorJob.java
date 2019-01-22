@@ -5,6 +5,7 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.filter.BlockCorrelationFlow;
 import org.slf4j.Logger;
@@ -56,6 +57,11 @@ public class DataCollectorJob {
         public List <TransactionReceipt> transactionReceiptList;
         public Map<String,Object> transactionReceiptMap;
         public BigInteger publicKey;
+    }
+
+    public static class AnalysisResult {
+        public List<NodeRanking> nodeRankings;
+        public int consensusCount;
     }
 
     @PostConstruct
@@ -127,7 +133,8 @@ public class DataCollectorJob {
 
         long startTime4 = System.currentTimeMillis();
         try {
-            param.publicKey = CalculatePublicKey.testBlock(ethBlock );
+            //param.publicKey = CalculatePublicKey.testBlock(ethBlock );
+            param.publicKey = BigInteger.TEN;
         } catch (Exception e) {
             logger.debug("Public key is null !!!...",e.getMessage());
         }

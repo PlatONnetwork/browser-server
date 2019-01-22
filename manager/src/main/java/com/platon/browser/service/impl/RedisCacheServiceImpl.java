@@ -438,7 +438,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache( String chainId, Block block , List<NodeRanking> nodeRankings){
+    public boolean updateStatisticsCache( String chainId, Block block ,int nodeNumber){
 
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
@@ -460,7 +460,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         cache.setAddressCount(addressCount);
 
         /************* 设置共识节点数*************/
-        cache.setConsensusCount(nodeRankings.size());
+        cache.setConsensusCount(nodeNumber);
 
         /************** 计算24小时内的交易数 ************/
         long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
