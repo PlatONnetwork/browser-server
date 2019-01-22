@@ -812,7 +812,7 @@ public class TransactionController {
      *                  "status": ,//票状态
      *                  1->候选中
      *                  2->中选票
-     *                  3->已过期
+     *                  3->已失效
      *                  4->待确认
      *                  "income": "", //收益
      *                  "time": 111//实际过期时间（只有status = 3显示该时间的值，其他情况显示预期时间的值）
