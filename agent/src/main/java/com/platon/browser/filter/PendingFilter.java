@@ -3,10 +3,8 @@ package com.platon.browser.filter;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.mapper.PendingTxMapper;
-import com.platon.browser.job.DataCollectorJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,43 +43,46 @@ public class PendingFilter {
     private ChainsConfig chainsConfig;
 
     @Transactional
-    public boolean analysis (DataCollectorJob.AnalysisParam param, Block block)throws  Exception {
+    public void analysis() {
 
-        EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-
-        Web3j web3j = chainsConfig.getWeb3j(chainId);
-        List <Transaction> list = ethPendingTransactions.getTransactions();
-        List <PendingTx> pendingTxes = new ArrayList <>();
-        if (!list.equals(null) && list.size() > 0) {
-            for (Transaction transaction : list) {
-                PendingTx pendingTx = new PendingTx();
-                pendingTx.setHash(transaction.getHash());
-                pendingTx.setFrom(transaction.getFrom());
-                pendingTx.setTo(transaction.getTo());
-                if (null != transaction.getTo()) {
-                    EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                    if ("0x".equals(ethGetCode.getCode())) {
-                        pendingTx.setReceiveType("account");
+        try {
+            EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
+            Web3j web3j = chainsConfig.getWeb3j(chainId);
+            List <Transaction> list = ethPendingTransactions.getTransactions();
+            List <PendingTx> pendingTxes = new ArrayList <>();
+            if (!list.equals(null) && list.size() > 0) {
+                for (Transaction transaction : list) {
+                    PendingTx pendingTx = new PendingTx();
+                    pendingTx.setHash(transaction.getHash());
+                    pendingTx.setFrom(transaction.getFrom());
+                    if (null != transaction.getTo()) {
+                        pendingTx.setTo(transaction.getTo());
+                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                        if ("0x".equals(ethGetCode.getCode())) {
+                            pendingTx.setReceiveType("account");
+                        } else {
+                            pendingTx.setReceiveType("contract");
+                        }
                     } else {
-                        pendingTx.setReceiveType("contract");
+                        pendingTx.setTo("0x0000000000000000000000000000000000000000");
                     }
-                } else {
-                    pendingTx.setTo("0x");
+                    pendingTx.setEnergonLimit(transaction.getGas().toString());
+                    pendingTx.setEnergonPrice(transaction.getGasPrice().toString());
+                    pendingTx.setTimestamp(new Date());
+                    pendingTx.setValue(valueConversion(transaction.getValue()));
+                    pendingTx.setInput(transaction.getInput());
+                    AnalysisResult analysisResult = TransactionAnalysis.analysis(!transaction.getInput().equals(null) ? transaction.getInput() : "0x", true);
+                    String type = TransactionAnalysis.getTypeName(analysisResult.getType());
+                    pendingTx.setTxType(type);
+                    pendingTxes.add(pendingTx);
+                    log.debug("PendingTx Synchronization is complete !!!...");
                 }
-                pendingTx.setEnergonLimit(transaction.getGas().toString());
-                pendingTx.setEnergonPrice(transaction.getGasPrice().toString());
-                //pendingTx.setNonce(transaction.getNonce().toString());
-                pendingTx.setTimestamp(new Date() );
-                pendingTx.setValue(valueConversion(transaction.getValue()));
-                pendingTx.setInput(transaction.getInput());
-                AnalysisResult analysisResult = TransactionAnalysis.analysis(!transaction.getInput().equals(null) ? transaction.getInput() : "0x",true);
-                String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
-                pendingTx.setTxType(type);
-                pendingTxes.add(pendingTx);
+                pendingTxMapper.batchInsert(pendingTxes);
             }
+            log.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
+        } catch (Exception e) {
+            log.error("PendingTxSynchronizeJob Exception",e.getMessage());
         }
-        return true;
-
     }
 
     public String valueConversion(BigInteger value){

@@ -44,35 +44,29 @@ public class PendingUpdateJob {
 
     @Scheduled(cron="0/5 * * * * ?")
     protected void doJob () {
-
-        if(isPreviousDone){
-            isPreviousDone=false;
-            try {
-                //比对交易信息数据更新pending交易列表
-                List <PendingTx> pendingTxeList = pendingTxMapper.selectByExample(new PendingTxExample());
-                if (pendingTxeList.size() > 0) {
-                    for (PendingTx pendingTx : pendingTxeList) {
-                        TransactionExample transactionExample = new TransactionExample();
-                        transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(chainId);
-                        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
-                        if (transactionList.size() == 1) {
-                            pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());
-                            log.debug("PendingTx update..... ->{" + pendingTx.getHash() + "}");
-                        }
-                        if (transactionList.size() > 1) {
-                            log.error("PendingTx comparison transaction repeat!!!... TxHash:{" + pendingTx.getHash() + "}");
-                            throw new AppException(ErrorCodeEnum.PENDINGTX_REPEAT);
-                        }
-                        log.debug("PendingTx update list is null...,wait next time update...");
+        try {
+            //比对交易信息数据更新pending交易列表
+            List <PendingTx> pendingTxeList = pendingTxMapper.selectByExample(new PendingTxExample());
+            if (pendingTxeList.size() > 0) {
+                for (PendingTx pendingTx : pendingTxeList) {
+                    TransactionExample transactionExample = new TransactionExample();
+                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(chainId);
+                    List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+                    if (transactionList.size() == 1) {
+                        pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());
+                        log.debug("PendingTx update..... ->{" + pendingTx.getHash() + "}");
                     }
+                    if (transactionList.size() > 1) {
+                        log.error("PendingTx comparison transaction repeat!!!... TxHash:{" + pendingTx.getHash() + "}");
+                        throw new AppException(ErrorCodeEnum.PENDINGTX_REPEAT);
+                    }
+                    log.debug("PendingTx update list is null...,wait next time update...");
                 }
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e.getStackTrace());
             }
-            isPreviousDone=true;
-        }
 
+        } catch (Exception e) {
+            log.error(e.getMessage(), e.getStackTrace());
+        }
     }
 
 
