@@ -96,7 +96,7 @@ public class BlockFilter {
             block.setExtraData(ethBlock.getBlock().getExtraData());
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
-
+            block.setNodeId(publicKey.toString(16));
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andNodeIdEqualTo(publicKey.toString(16)).andIsValidEqualTo(1);
             List<NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);

@@ -2,15 +2,19 @@ package com.platon.FilterTest;
 
 import com.platon.TestBase;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.filter.BlockFilter;
+import com.platon.browser.job.DataCollectorJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
+import javax.xml.crypto.Data;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +30,13 @@ public class BlockFilterTest extends TestBase {
 
     protected static Logger logger = LoggerFactory.getLogger(BlockFilterTest.class);
 
+    @Autowired
+    private BlockFilter blockFilter;
+
     @Test
     public void  BlockFilterBuildTest(){
         try{
-            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));
+            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(320041L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             List<Transaction> list1 = new ArrayList <>();
@@ -45,7 +52,7 @@ public class BlockFilterTest extends TestBase {
                 TransactionReceipt receipt = transactionReceipt.get();
                 list2.add(receipt);
             }
-            //Block block = blockFilter.build(ethBlock,list2,list1);
+            //Block block = blockFilter.analysis(ethBlock,list2,list1);
         }catch (Exception e){
             e.printStackTrace();
         }
