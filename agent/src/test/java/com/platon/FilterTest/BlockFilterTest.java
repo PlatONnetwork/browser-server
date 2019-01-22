@@ -3,6 +3,7 @@ package com.platon.FilterTest;
 import com.platon.TestBase;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.filter.BlockFilter;
+import com.platon.browser.filter.FilterTool;
 import com.platon.browser.job.DataCollectorJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,7 +89,7 @@ public class BlockFilterTest extends TestBase {
     public void BlockFilterValueConversion(){
         try {
             BigInteger bigInteger = new BigInteger("234550000");
-            String res = blockFilter.valueConversion(bigInteger);
+            String res = FilterTool.valueConversion(bigInteger);
             System.out.println(res);
         }catch (Exception e){
             e.printStackTrace();

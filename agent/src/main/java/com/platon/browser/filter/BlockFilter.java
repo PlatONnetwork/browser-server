@@ -60,13 +60,13 @@ public class BlockFilter {
     private NodeRankingMapper nodeRankingMapper;
 
     @Transactional
-    public Block analysis (DataCollectorJob.AnalysisParam param) {
+    public Block analysis ( DataCollectorJob.AnalysisParam param ) {
 
         EthBlock ethBlock = param.ethBlock;
-        List<Transaction> transactionsList = param.transactionList;
-        List<TransactionReceipt> transactionReceiptList = param.transactionReceiptList;
+        List <Transaction> transactionsList = param.transactionList;
+        List <TransactionReceipt> transactionReceiptList = param.transactionReceiptList;
         BigInteger publicKey = param.publicKey;
-        Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
+        Map <String, Object> transactionReceiptMap = param.transactionReceiptMap;
 
         Block block = new Block();
         log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
@@ -83,7 +83,7 @@ public class BlockFilter {
             block.setChainId(chainId);
             if (ethBlock.getBlock().getTransactions().size() <= 0) {
                 block.setEnergonAverage(BigInteger.ZERO.toString());
-            }else {
+            } else {
                 block.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))).toString());
             }
             block.setHash(ethBlock.getBlock().getHash());
@@ -99,12 +99,12 @@ public class BlockFilter {
             block.setNodeId(publicKey.toString(16));
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andNodeIdEqualTo(publicKey.toString(16)).andIsValidEqualTo(1);
-            List<NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-            if(null != dbList && dbList.size() > 0){
+            List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+            if (null != dbList && dbList.size() > 0) {
                 block.setNodeName(dbList.get(0).getName());
             }
 
-            String rewardWei = getBlockReward(ethBlock.getBlock().getNumber().toString());
+            String rewardWei = FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString());
             block.setBlockReward(rewardWei);
             //actuakTxCostSum
             BigInteger sum = new BigInteger("0");
@@ -124,7 +124,7 @@ public class BlockFilter {
                 return block;
             }
             for (Transaction transaction : transactionsList) {
-                if(null != transactionReceiptMap.get(transaction.getHash())){
+                if (null != transactionReceiptMap.get(transaction.getHash())) {
                     TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
                     sum = sum.add(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()));
                     AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
@@ -151,32 +151,6 @@ public class BlockFilter {
             blockMapper.insert(block);
         }
         return block;
-    }
-
-    private static String getBlockReward ( String number ) {
-        //ATP trasnfrom ADP
-        BigDecimal rate = BigDecimal.valueOf(10L).pow(18);
-        BigDecimal height = new BigDecimal(number);
-        BigDecimal blockSumOnYear = BigDecimal.valueOf(24).multiply(BigDecimal.valueOf(3600)).multiply(BigDecimal.valueOf(365));
-        BigDecimal definiteValue = new BigDecimal("1.025");
-        BigDecimal base = BigDecimal.valueOf(100000000L);
-        BigDecimal wheel = height.divide(blockSumOnYear, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
-        if (wheel.intValue() == 0) {
-            //one period block
-            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear, 0, java.math.BigDecimal.ROUND_HALF_DOWN);
-            return result.setScale(0).toString();
-        }
-        BigDecimal thisRound = base.multiply(rate).multiply(definiteValue.pow(wheel.intValue()));
-        BigDecimal previousRound = base.multiply(rate).multiply(definiteValue.pow(wheel.subtract(BigDecimal.valueOf(1L)).intValue()));
-        BigDecimal result = thisRound.subtract(previousRound).divide(blockSumOnYear);
-        return result.setScale(0).toString();
-    }
-
-
-    public String valueConversion ( BigInteger value ) {
-        BigDecimal valueDiec = new BigDecimal(value.toString());
-        BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
-        return conversionCoin.toString();
     }
 
 
