@@ -92,7 +92,7 @@ public class DataCollectorJob {
                 BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
                 while (beginNumber<=endNumber.longValue()){
                     EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
-                    analysis(ethBlock,web3j);
+                    analysis(ethBlock);
                     beginNumber++;
                 }
             } catch (Exception e) {
@@ -102,7 +102,7 @@ public class DataCollectorJob {
         }
     }
 
-    private void analysis(EthBlock ethBlock,Web3j web3j) throws Exception {
+    private void analysis(EthBlock ethBlock) throws Exception {
         // 构造分析参数
         AnalysisParam param = new AnalysisParam();
         param.ethBlock = ethBlock;
