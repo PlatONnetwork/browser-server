@@ -47,7 +47,7 @@ public enum I18nEnum {
     // 节点
     NODE_ERROR_DUPLICATE,
     NODE_ERROR_NOT_EXIST,
-    NEED_ID_OR_NODE_ID,
+    NODE_ERROR_NEED_ID_OR_NODE_ID,
 
     // 交易
     TRANSACTION_TRANSFER,
