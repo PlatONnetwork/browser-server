@@ -2,6 +2,7 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import java.math.BigDecimal;
@@ -32,7 +34,7 @@ import java.util.*;
 @Component
 public class NodeFilter {
 
-    private static Logger log = LoggerFactory.getLogger(NodeFilter.class);
+    private static Logger logger = LoggerFactory.getLogger(NodeFilter.class);
 
     @Value("${chain.id}")
     private String chainId;
@@ -42,6 +44,8 @@ public class NodeFilter {
 
     @Autowired
     private CutsomNodeRankingMapper cutsomNodeRankingMapper;
+    @Autowired
+    private Web3jClient web3jClient;
 
     @Transactional
     public List <NodeRanking> analysis (DataCollectorJob.AnalysisParam param,Block block) throws Exception {
@@ -51,7 +55,15 @@ public class NodeFilter {
         String blockReward = block.getBlockReward();
         Long blockNumber = block.getNumber();
 
-        String nodeInfo = param.nodeInfoList;
+        String nodeInfo=null;
+        long startTime3 = System.currentTimeMillis();
+        try{
+            CandidateContract candidateContract = web3jClient.getCandidateContract();
+            nodeInfo=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
+        }catch (Exception e){
+            logger.debug("nodeInfoList is null !!!...",e.getMessage());
+        }
+        logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime3);
         if (StringUtils.isBlank(nodeInfo)) return Collections.EMPTY_LIST;
         List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
         if (nodes.size()==0) return Collections.EMPTY_LIST;
@@ -69,7 +81,7 @@ public class NodeFilter {
         nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
 
         Date date6 = new Date();
-        log.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
+        logger.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
 
         List <NodeRanking> nodeList = new ArrayList <>();
         int i = 1;
@@ -105,7 +117,7 @@ public class NodeFilter {
             i = i + 1;
         }
         Date date8 = new Date();
-        log.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
+        logger.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
         //this time update database struct
         List <NodeRanking> updateList = new ArrayList <>();
         //data form database and node status is vaild
@@ -135,14 +147,14 @@ public class NodeFilter {
             }
         }
         Date date10 = new Date();
-        log.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
+        logger.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
         String date = JSONArray.toJSONString(updateList);
         FilterTool.currentBlockOwner(updateList, publicKey);
         FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
         Date date1 = new Date();
         cutsomNodeRankingMapper.insertOrUpdate(updateList);
         Date date2 = new Date();
-        log.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
+        logger.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
 
         return updateList;
     }

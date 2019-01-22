@@ -1,7 +1,6 @@
 package com.platon.browser.job;
 
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -36,7 +34,6 @@ public class DataCollectorJob {
 
     private static Logger logger = LoggerFactory.getLogger(DataCollectorJob.class);
 
-
     @Autowired
     private BlockMapper blockMapper;
 
@@ -44,15 +41,12 @@ public class DataCollectorJob {
     private String chainId;
 
     @Autowired
-    private Web3jClient web3jClient;
-    @Autowired
     private ChainsConfig chainsConfig;
 
     @Autowired
     private BlockCorrelationFlow blockCorrelationFlow;
 
     private long beginNumber=1;
-    private boolean isPrevDone = true;
 
     private Web3j web3j;
 
@@ -62,9 +56,7 @@ public class DataCollectorJob {
         public List <TransactionReceipt> transactionReceiptList;
         public Map<String,Object> transactionReceiptMap;
         public BigInteger publicKey;
-        public String nodeInfoList;
     }
-
 
     @PostConstruct
     public void init () {
@@ -85,24 +77,24 @@ public class DataCollectorJob {
 
     @Scheduled(cron="0/1 * * * * ?")
     protected void doJob () {
-        if (isPrevDone){
-            logger.debug("In the job **************************");
-            isPrevDone = false;
-            try {
-                BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
-                while (beginNumber<=endNumber.longValue()){
-                    EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
-                    analysis(ethBlock);
-                    beginNumber++;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
+            while (beginNumber<=endNumber.longValue()){
+                EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                analysis(ethBlock);
+                beginNumber++;
             }
-            isPrevDone=true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void analysis(EthBlock ethBlock) throws Exception {
+    private void analysis(EthBlock ethBlock) {
+
+        logger.debug("************** Analysis start ***************");
+
+        long startTime1 = System.currentTimeMillis();
+
         // 构造分析参数
         AnalysisParam param = new AnalysisParam();
         param.ethBlock = ethBlock;
@@ -133,23 +125,24 @@ public class DataCollectorJob {
         param.transactionReceiptList=transactionReceiptList;
         param.transactionReceiptMap=transactionReceiptMap;
 
-        try{
-            CandidateContract candidateContract = web3jClient.getCandidateContract();
-            param.nodeInfoList=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
-        }catch (Exception e){
-            logger.debug("nodeInfoList is null !!!...",e.getMessage());
-        }
-
+        long startTime4 = System.currentTimeMillis();
         try {
             param.publicKey = CalculatePublicKey.testBlock(ethBlock );
         } catch (Exception e) {
             logger.debug("Public key is null !!!...",e.getMessage());
         }
+        logger.debug("CalculatePublicKey.testBlock()         :--->{}",System.currentTimeMillis()-startTime4);
 
         try {
+            long startTime2 = System.currentTimeMillis();
             blockCorrelationFlow.doFilter(param);
+            logger.debug("BlockCorrelationFlow.doFilter(param):--->{}",System.currentTimeMillis()-startTime2);
         } catch (Exception e) {
             logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
         }
+
+        logger.debug("DataCollectorJob.analysis()         :--->{}",System.currentTimeMillis()-startTime1);
+
+        logger.debug("************** Analysis finished ***************");
     }
 }
