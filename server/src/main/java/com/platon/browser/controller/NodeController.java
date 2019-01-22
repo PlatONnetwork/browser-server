@@ -202,7 +202,7 @@ public class NodeController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         if(req.getId()==null&&StringUtils.isBlank(req.getNodeId())){
-            throw new ResponseException(i18n.i(I18nEnum.NEED_ID_OR_NODE_ID,req.getCid()));
+            throw new ResponseException(i18n.i(I18nEnum.NODE_ERROR_NEED_ID_OR_NODE_ID,req.getCid()));
         }
         try{
             NodeDetail detail = nodeService.getDetail(req);
