@@ -137,8 +137,8 @@ public class NodeFilter {
         Date date10 = new Date();
         log.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
         String date = JSONArray.toJSONString(updateList);
-        currentBlockOwner(updateList, publicKey);
-        dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
+        FilterTool.currentBlockOwner(updateList, publicKey);
+        FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
         Date date1 = new Date();
         cutsomNodeRankingMapper.insertOrUpdate(updateList);
         Date date2 = new Date();
@@ -148,34 +148,6 @@ public class NodeFilter {
     }
 
 
-    //Increase the number of blocks according to the ownership
-    private List <NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
-        for (NodeRanking nodeRanking : list) {
-            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16))) {
-                long count = nodeRanking.getBlockCount();
-                count = count + 1;
-                nodeRanking.setBlockCount(count);
-                nodeRanking.getRewardRatio();
-            }
-        }
-        return list;
-    }
-
-    private List <NodeRanking> dateStatistics ( List <NodeRanking> list, BigInteger publicKey, String blockReward ) throws Exception {
-        for (NodeRanking nodeRanking : list) {
-            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16))) {
-                BigDecimal sum = new BigDecimal(nodeRanking.getBlockReward());
-                BigDecimal reward = new BigDecimal(blockReward);
-                sum = sum.add(reward);
-                nodeRanking.setBlockReward(sum.toString());
-                BigDecimal rate = new BigDecimal(String.valueOf(1 - nodeRanking.getRewardRatio()));
-                nodeRanking.setRewardAmount(sum.multiply(rate).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
-                BigDecimal fee = new BigDecimal(String.valueOf(nodeRanking.getRewardRatio()));
-                nodeRanking.setProfitAmount(sum.multiply(fee).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
-            }
-        }
-        return list;
-    }
 
 
 
