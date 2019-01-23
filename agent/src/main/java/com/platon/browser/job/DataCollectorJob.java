@@ -5,7 +5,10 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.filter.BlockCorrelationFlow;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.CacheTool;
@@ -57,6 +60,11 @@ public class DataCollectorJob {
     private Web3j web3j;
 
     @Autowired
+    private NodeRankingMapper nodeRankingMapper;
+
+    public final static Map<String,String> NODE_ID_TO_NAME = new HashMap<>();
+
+    @Autowired
     private RedisCacheService redisCacheService;
 
     public static class AnalysisParam {
@@ -87,9 +95,17 @@ public class DataCollectorJob {
     @Scheduled(cron="0/1 * * * * ?")
     protected void doJob () {
         try {
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
+            List <NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
+            NODE_ID_TO_NAME.clear();
+            nodes.forEach(node->NODE_ID_TO_NAME.put(node.getNodeId(),node.getName()));
+
             BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
             while (beginNumber<=endNumber.longValue()){
+                long startTime = System.currentTimeMillis();
                 EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                logger.debug("RPC web3j.ethGetBlockByNumber()--->{}",System.currentTimeMillis()-startTime);
                 analysis(ethBlock);
                 beginNumber++;
             }
@@ -126,7 +142,9 @@ public class DataCollectorJob {
             transactionList.add(rawTransaction);
             transactionMap.put(rawTransaction.getHash(),transaction);
             try {
+                long startTime = System.currentTimeMillis();
                 EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(rawTransaction.getHash()).send();
+                logger.debug("RPC web3j.ethGetTransactionReceipt()--->{}",System.currentTimeMillis()-startTime);
                 Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
                 TransactionReceipt receipt = transactionReceipt.get();
                 transactionReceiptList.add(receipt);
