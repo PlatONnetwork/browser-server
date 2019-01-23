@@ -24,7 +24,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.util.*;
 
-import static com.platon.browser.filter.BlockCorrelationFlow.EXECUTOR_SERVICE;
+import static com.platon.browser.job.DataCollectorJob.EXECUTOR_SERVICE;
 
 /**
  * User: dongqile

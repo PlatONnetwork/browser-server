@@ -3,15 +3,11 @@ package com.platon.browser.job;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.filter.BlockCorrelationFlow;
-import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.CacheTool;
+import com.platon.browser.filter.*;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +25,8 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * User: dongqile
@@ -50,10 +48,11 @@ public class DataCollectorJob {
     private ChainsConfig chainsConfig;
 
     @Autowired
-    private BlockCorrelationFlow blockCorrelationFlow;
-
-    @Autowired
     private BlockFilter blockFilter;
+    @Autowired
+    private TransactionFilter transactionFilter;
+    @Autowired
+    private NodeFilter nodeFilter;
 
     private long beginNumber=1;
 
@@ -62,7 +61,12 @@ public class DataCollectorJob {
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
 
+    @Autowired
+    private BlockMissingMapper blockMissingMapper;
+
     public final static Map<String,String> NODE_ID_TO_NAME = new HashMap<>();
+
+    public final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(10);
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -89,6 +93,7 @@ public class DataCollectorJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
+        beginNumber = 501220;
         web3j = chainsConfig.getWeb3j(chainId);
     }
 
@@ -103,11 +108,18 @@ public class DataCollectorJob {
 
             BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
             while (beginNumber<=endNumber.longValue()){
-                long startTime = System.currentTimeMillis();
-                EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
-                logger.debug("RPC web3j.ethGetBlockByNumber()--->{}",System.currentTimeMillis()-startTime);
-                analysis(ethBlock);
-                beginNumber++;
+                try{
+                    long startTime = System.currentTimeMillis();
+                    EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    logger.debug("RPC web3j.ethGetBlockByNumber()--->{}",System.currentTimeMillis()-startTime);
+                    analysis(ethBlock);
+                    beginNumber++;
+                }catch (Exception e){
+                    BlockMissing bean = new BlockMissing();
+                    bean.setNumber(beginNumber);
+                    blockMissingMapper.insert(bean);
+                    blockFilter.flush();
+                }
             }
             if(CacheTool.currentBlockNumber==endNumber.longValue()){
                 // 如果本地缓存中的当前块高等于本次从链上取回来的最高块高，则把本地缓存中的缓存刷入数据库和redis
@@ -124,7 +136,7 @@ public class DataCollectorJob {
 
         logger.debug("************** Analysis start ***************");
 
-        long startTime1 = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
         // 构造分析参数
         AnalysisParam param = new AnalysisParam();
@@ -142,9 +154,7 @@ public class DataCollectorJob {
             transactionList.add(rawTransaction);
             transactionMap.put(rawTransaction.getHash(),transaction);
             try {
-                long startTime = System.currentTimeMillis();
                 EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(rawTransaction.getHash()).send();
-                logger.debug("RPC web3j.ethGetTransactionReceipt()--->{}",System.currentTimeMillis()-startTime);
                 Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
                 TransactionReceipt receipt = transactionReceipt.get();
                 transactionReceiptList.add(receipt);
@@ -167,15 +177,36 @@ public class DataCollectorJob {
         }
         logger.debug("CalculatePublicKey.testBlock()         :--->{}",System.currentTimeMillis()-startTime4);
 
-        try {
-            long startTime2 = System.currentTimeMillis();
-            blockCorrelationFlow.doFilter(param);
-            logger.debug("BlockCorrelationFlow.doFilter(param):--->{}",System.currentTimeMillis()-startTime2);
-        } catch (Exception e) {
-            logger.error("Invoke blockCorrelationFlow.doFilter() error: {}", e.getMessage());
-        }
 
-        logger.debug("DataCollectorJob.analysis()         :--->{}",System.currentTimeMillis()-startTime1);
+        /// 分析区块数据并入库
+        startTime = System.currentTimeMillis();
+        Block block = blockFilter.analysis(param);
+        logger.debug("BlockFilter.analysis()              :--->{}",System.currentTimeMillis()-startTime);
+
+        if(block==null) block = new Block();
+        Block blockRef = block;
+
+        // 分析节点数据并入库
+        EXECUTOR_SERVICE.submit(()->{
+            long startTime0 = System.currentTimeMillis();
+            try{
+                nodeFilter.analysis(param,blockRef);
+                logger.debug("NodeFilter.analysis()               :--->{}",System.currentTimeMillis()-startTime0);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        // 分析交易数据并入库
+        EXECUTOR_SERVICE.submit(()->{
+            long startTime1 = System.currentTimeMillis();
+            try{
+                transactionFilter.analysis(param,blockRef.getTimestamp().getTime());
+                logger.debug("TransactionFilter.analysis()        :--->{}",System.currentTimeMillis()-startTime1);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
 
         logger.debug("************** Analysis finished ***************");
     }

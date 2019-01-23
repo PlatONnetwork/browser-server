@@ -43,9 +43,9 @@ public class PendingFilter {
     private ChainsConfig chainsConfig;
 
     @Transactional
-    public void analysis() {
+    public void analysis() throws Exception{
 
-        try {
+
             EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
             Web3j web3j = chainsConfig.getWeb3j(chainId);
             List <Transaction> list = ethPendingTransactions.getTransactions();
@@ -80,9 +80,7 @@ public class PendingFilter {
                 pendingTxMapper.batchInsert(pendingTxes);
             }
             log.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
-        } catch (Exception e) {
-            log.error("PendingTxSynchronizeJob Exception",e.getMessage());
-        }
+
     }
 
     public String valueConversion(BigInteger value){

@@ -29,7 +29,8 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.platon.browser.filter.BlockCorrelationFlow.EXECUTOR_SERVICE;
+import static com.platon.browser.job.DataCollectorJob.EXECUTOR_SERVICE;
+
 
 /**
  * User: dongqile
@@ -67,7 +68,6 @@ public class NodeFilter {
         LOCK.writeLock().lock();
         try {
             String nodeInfo=null;
-            String verifiersInfo="[]";
             long startTime = System.currentTimeMillis();
             try{
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
@@ -77,15 +77,13 @@ public class NodeFilter {
                 logger.debug("nodeInfoList is null !!!...",e.getMessage());
             }
             logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime);
-            List<CandidateDto> verifiers = JSON.parseArray(verifiersInfo,CandidateDto.class);
+            //List<CandidateDto> verifiers = JSON.parseArray(verifiersInfo,CandidateDto.class);
 
             if (StringUtils.isBlank(nodeInfo)){
-                flush(Collections.EMPTY_LIST,block,verifiers.size());
                 return;
             }
             List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
             if (nodes.size()==0) {
-                flush(Collections.EMPTY_LIST,block,verifiers.size());
                 return;
             }
 
@@ -172,7 +170,13 @@ public class NodeFilter {
             cutsomNodeRankingMapper.insertOrUpdate(updateList);
             logger.debug("-------------------------------------- replace into :{}",System.currentTimeMillis()-startTime);
 
-            flush(nodeList,block,verifiers.size());
+            int consensusCount = 0;
+            for (NodeRanking nodeRanking : updateList) {
+                if (nodeRanking.getIsValid().equals(1)) {
+                    consensusCount = consensusCount + 1;
+                }
+            }
+            flush(nodeList,block,consensusCount);
         }finally {
             LOCK.writeLock().unlock();
         }

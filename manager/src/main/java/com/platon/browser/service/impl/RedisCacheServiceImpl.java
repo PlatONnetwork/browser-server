@@ -461,6 +461,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         /************* 设置共识节点数*************/
         cache.setConsensusCount(nodeNumber);
+        //cache.setConsensusCount(nodeRankings.size());
 
         /************** 计算24小时内的交易数 ************/
         long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);

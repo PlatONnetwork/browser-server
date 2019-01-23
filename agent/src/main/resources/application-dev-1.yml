@@ -22,8 +22,8 @@ logging:
         transaction: error
       mybatis: error
     com.platon.browser.dao: error
-#    com.platon.browser.filter: debug
-#    com.platon.browser.job: debug
+    com.platon.browser.filter: error
+    com.platon.browser.job: error
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 
@@ -33,8 +33,8 @@ platon:
 #  chains: MAIN_NET-1-http://10.10.8.209:6789
 #  chains: MAIN_NET-1-http://10.10.8.209:6789
 #  chains: MAIN_NET-1-https://syde.platon.network/test
-  chains: MAIN_NET-1-http://192.168.9.76:1234
-#  chains: MAIN_NET-1-http://127.0.0.1:7793
+#  chains: MAIN_NET-1-http://192.168.9.76:1234
+  chains: MAIN_NET-1-http://127.0.0.1:7793
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:

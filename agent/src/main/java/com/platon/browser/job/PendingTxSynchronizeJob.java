@@ -33,7 +33,13 @@ public class PendingTxSynchronizeJob {
     private PendingFilter pendingFilter;
 
     @Scheduled(cron = "0/1 * * * * ?")
-    protected void doJob () {
-        pendingFilter.analysis();
+    protected void doJob() {
+        log.debug("**************PendingTx Analysis start ***************");
+        try {
+            pendingFilter.analysis();
+            log.debug("**************PendingTx Analysis end ***************");
+        } catch (Exception e) {
+            log.error("PendingTxSynchronizeJob Exception", e.getMessage());
+        }
     }
 }

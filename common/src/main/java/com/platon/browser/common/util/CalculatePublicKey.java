@@ -69,6 +69,7 @@ public class CalculatePublicKey {
         //Bloom       Bloom          `json:"logsBloom"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getLogsBloom())));
         //Difficulty  *big.Int       `json:"difficulty"       gencodec:"required"`
+        //TODO:0.4.0链去除难度值得解析
         result.add(RlpString.create(block.getDifficulty()));
         //Number      *big.Int       `json:"number"           gencodec:"required"`
         result.add(RlpString.create(block.getNumber()));

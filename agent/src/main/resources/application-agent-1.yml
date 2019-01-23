@@ -22,12 +22,15 @@ logging:
         transaction: error
       mybatis: error
     com.platon.browser.dao: error
+    com.platon.browser.job: debug
+    com.platon.browser.filter: debug
+
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 
 platon:
   # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
-  chains: MAIN_NET-1-http://192.168.9.76:8793
+  chains: MAIN_NET-1-http://192.168.9.76:1234
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
@@ -36,6 +39,7 @@ platon:
       transaction: browser:0.4.0:agent:chain{}:transactions
       staticstics: browser:0.4.0:agent:chain{}:staticstics
       max-item: 500000
+      number: browser:0.4.0:agent:chain{}:number
 #Web3j配置(要采集哪条链的数据)
 chain.id: 1
 # Zookeeper注册中心配置

@@ -89,8 +89,8 @@ public class BlockFilterTest extends TestBase {
     public void BlockFilterValueConversion(){
         try {
             BigInteger bigInteger = new BigInteger("234550000");
-            String res = FilterTool.valueConversion(bigInteger);
-            System.out.println(res);
+           // String res = blockFilter.valueConversion(bigInteger);
+            //System.out.println(res);
         }catch (Exception e){
             e.printStackTrace();
         }
