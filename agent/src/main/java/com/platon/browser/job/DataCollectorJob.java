@@ -7,6 +7,9 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.filter.BlockCorrelationFlow;
+import com.platon.browser.filter.BlockFilter;
+import com.platon.browser.filter.CacheTool;
+import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +49,15 @@ public class DataCollectorJob {
     @Autowired
     private BlockCorrelationFlow blockCorrelationFlow;
 
+    @Autowired
+    private BlockFilter blockFilter;
+
     private long beginNumber=1;
 
     private Web3j web3j;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     public static class AnalysisParam {
         public EthBlock ethBlock;
@@ -84,7 +93,13 @@ public class DataCollectorJob {
                 analysis(ethBlock);
                 beginNumber++;
             }
+            if(CacheTool.currentBlockNumber==endNumber.longValue()){
+                // 如果本地缓存中的当前块高等于本次从链上取回来的最高块高，则把本地缓存中的缓存刷入数据库和redis
+                blockFilter.flush();
+            }
         } catch (Exception e) {
+            // 出现异常，需要把本地缓存刷入数据库和redis
+            blockFilter.flush();
             e.printStackTrace();
         }
     }
@@ -127,7 +142,8 @@ public class DataCollectorJob {
 
         long startTime4 = System.currentTimeMillis();
         try {
-            param.publicKey = CalculatePublicKey.testBlock(ethBlock );
+            param.publicKey = CalculatePublicKey.testBlock(ethBlock);
+//            param.publicKey = BigInteger.TEN;
         } catch (Exception e) {
             logger.debug("Public key is null !!!...",e.getMessage());
         }

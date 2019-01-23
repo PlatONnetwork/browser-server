@@ -12,6 +12,7 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.job.DataCollectorJob;
+import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,9 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,9 @@ public class BlockFilter {
 
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Transactional
     public Block analysis ( DataCollectorJob.AnalysisParam param ) {
@@ -120,7 +124,13 @@ public class BlockFilter {
                 log.debug("[Block info :]" + JSON.toJSONString(block));
                 log.debug("[this block is An empty block , transaction null !!!...]");
                 log.debug("[exit BlockFilter !!!...]");
-                blockMapper.insert(block);
+
+                CacheTool.blocks.add(block);
+                CacheTool.currentBlockNumber=block.getNumber();
+                if(CacheTool.blocks.size()>=200){
+                    flush();
+                }
+//                blockMapper.insert(block);
                 return block;
             }
             for (Transaction transaction : transactionsList) {
@@ -148,10 +158,24 @@ public class BlockFilter {
                 }
             }
             //insert struct<block> into database
-            blockMapper.insert(block);
+            CacheTool.blocks.add(block);
+            CacheTool.currentBlockNumber=block.getNumber();
+            if(CacheTool.blocks.size()>=200){
+                flush();
+            }
+//            blockMapper.insert(block);
         }
         return block;
     }
 
 
+    public void flush(){
+        try{
+            blockMapper.batchInsert(CacheTool.blocks);
+            // 更新区块缓存
+            redisCacheService.updateBlockCache(chainId, new HashSet<>(CacheTool.blocks));
+        }finally {
+            CacheTool.blocks.clear();
+        }
+    }
 }

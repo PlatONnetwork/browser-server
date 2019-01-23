@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.job.DataCollectorJob;
+import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +23,8 @@ import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.util.*;
+
+import static com.platon.browser.filter.BlockCorrelationFlow.EXECUTOR_SERVICE;
 
 /**
  * User: dongqile
@@ -42,6 +46,8 @@ public class TransactionFilter {
     private ChainsConfig chainsConfig;
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Transactional
     public List<String> analysis(DataCollectorJob.AnalysisParam param, long time)throws Exception{
@@ -127,6 +133,18 @@ public class TransactionFilter {
         if(txHashes.size()>0){
             transactionMapper.batchInsert(transactionWithBLOBsList);
         }
+        flush(txHashes);
         return txHashes;
+    }
+
+    public void flush(List<String> txHash){
+        if (txHash.size()>0) {
+            EXECUTOR_SERVICE.submit(()->{
+                TransactionExample condition = new TransactionExample();
+                condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
+                List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
+                redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
+            });
+        }
     }
 }

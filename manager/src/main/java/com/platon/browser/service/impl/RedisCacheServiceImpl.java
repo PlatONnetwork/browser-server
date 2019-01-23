@@ -474,7 +474,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(cache.getCurrentHeight()<block.getNumber()){
             cache.setMiner(block.getMiner());
             cache.setCurrentHeight(block.getNumber());
-            cache.setNodeName(block.getNodeName());
+            cache.setNodeName(StringUtils.isBlank(block.getNodeName())?"Unknown":block.getNodeName());
             cache.setNodeId(block.getNodeId());
         }
 
