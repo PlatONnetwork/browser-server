@@ -51,54 +51,60 @@ public class NodeFilter {
     private CutsomNodeRankingMapper cutsomNodeRankingMapper;
     @Autowired
     private Web3jClient web3jClient;
+
+    private final static ReadWriteLock LOCK = new ReentrantReadWriteLock();
     @Autowired
     private RedisCacheService redisCacheService;
 
-    private final static ReadWriteLock LOCK = new ReentrantReadWriteLock();
-
     @Transactional
-    public List <NodeRanking> analysis (DataCollectorJob.AnalysisParam param,Block block) throws Exception {
+    public void analysis ( DataCollectorJob.AnalysisParam param, Block block) throws Exception {
 
+        EthBlock ethBlock = param.ethBlock;
+        BigInteger publicKey = param.publicKey;
+        String blockReward = block.getBlockReward();
+        Long blockNumber = block.getNumber();
+
+        LOCK.writeLock().lock();
         try {
-            LOCK.writeLock().lock();
-
-            EthBlock ethBlock = param.ethBlock;
-            BigInteger publicKey = param.publicKey;
-            String blockReward = block.getBlockReward();
-            Long blockNumber = block.getNumber();
-
             String nodeInfo=null;
-            long startTime3 = System.currentTimeMillis();
+            String verifiersInfo=null;
+            long startTime = System.currentTimeMillis();
             try{
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
+                verifiersInfo=candidateContract.VerifiersList(ethBlock.getBlock().getNumber()).send();
                 nodeInfo=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
             }catch (Exception e){
                 logger.debug("nodeInfoList is null !!!...",e.getMessage());
             }
-            logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime3);
-            if (StringUtils.isBlank(nodeInfo)) return Collections.EMPTY_LIST;
+            logger.debug("CandidateContract.CandidateList()         :--->{}",System.currentTimeMillis()-startTime);
+            List<CandidateDto> verifiers = JSON.parseArray(verifiersInfo,CandidateDto.class);
+
+            if (StringUtils.isBlank(nodeInfo)){
+                flush(Collections.EMPTY_LIST,block,verifiers.size());
+                return;
+            }
             List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
-            if (nodes.size()==0) return Collections.EMPTY_LIST;
+            if (nodes.size()==0) {
+                flush(Collections.EMPTY_LIST,block,verifiers.size());
+                return;
+            }
 
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
             //find NodeRanking info by condition on database
-            Date date5 = new Date();
 
+            startTime = System.currentTimeMillis();
             List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-
             // 把库中记录全部置为无效
             NodeRanking node = new NodeRanking();
             node.setIsValid(0);
             nodeRankingMapper.updateByExampleSelective(node,nodeRankingExample);
-
-            Date date6 = new Date();
-            logger.debug("-------------------------------------- nodeRankingMapper sql :"  + String.valueOf(date6.getTime() - date5.getTime()));
+            logger.debug("-------------------------------------- nodeRankingMapper sql :{}",System.currentTimeMillis()-startTime);
 
             List <NodeRanking> nodeList = new ArrayList <>();
             int i = 1;
 
-            Date date7 = new Date();
+            startTime = System.currentTimeMillis();
             for (CandidateDto candidateDto : nodes) {
                 NodeRanking nodeRanking = new NodeRanking();
                 NodeRankingDto nrd = new NodeRankingDto();
@@ -128,8 +134,7 @@ public class NodeFilter {
                 nodeList.add(nodeRanking);
                 i = i + 1;
             }
-            Date date8 = new Date();
-            logger.debug("-------------------------------------- CandidateDto for :"  + String.valueOf(date8.getTime() - date7.getTime()));
+            logger.debug("-------------------------------------- CandidateDto for :{}",System.currentTimeMillis()-startTime);
             //this time update database struct
             List <NodeRanking> updateList = new ArrayList <>();
             //data form database and node status is vaild
@@ -140,7 +145,7 @@ public class NodeFilter {
                 updateList.add(e);
             });
 
-            Date date9 = new Date();
+            startTime = System.currentTimeMillis();
             if (dbList.size() > 0 && dbList != null) {
                 for (int j = 0; j < dbList.size(); j++) {
                     NodeRanking dbNode = dbList.get(j);
@@ -158,29 +163,26 @@ public class NodeFilter {
                     }
                 }
             }
-            Date date10 = new Date();
-            logger.debug("-------------------------------------- date for :"  + String.valueOf(date10.getTime() - date9.getTime()));
+            logger.debug("-------------------------------------- date for :{}",System.currentTimeMillis()-startTime);
             String date = JSONArray.toJSONString(updateList);
             FilterTool.currentBlockOwner(updateList, publicKey);
             FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
-            Date date1 = new Date();
+
+            startTime = System.currentTimeMillis();
             cutsomNodeRankingMapper.insertOrUpdate(updateList);
-            Date date2 = new Date();
-            logger.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
+            logger.debug("-------------------------------------- replace into :{}",System.currentTimeMillis()-startTime);
 
-            //flush(nodeList,block);
-
-            return updateList;
+            flush(nodeList,block,verifiers.size());
         }finally {
             LOCK.writeLock().unlock();
         }
     }
 
 
-    public void flush(List<NodeRanking> nodeRankings,Block currentBlock,int consenseNodeNum){
+    public void flush(List<NodeRanking> nodeRankings,Block currentBlock,int nodeNumber){
         EXECUTOR_SERVICE.submit(()->{
             redisCacheService.updateNodePushCache(chainId, new HashSet<>(nodeRankings));
-            redisCacheService.updateStatisticsCache(chainId, currentBlock, consenseNodeNum);
+            redisCacheService.updateStatisticsCache(chainId, currentBlock, nodeNumber);
         });
     }
 }
