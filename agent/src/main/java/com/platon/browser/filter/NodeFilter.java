@@ -168,7 +168,7 @@ public class NodeFilter {
             Date date2 = new Date();
             logger.debug("-------------------------------------- replace into :"  + String.valueOf(date1.getTime() - date2.getTime()));
 
-            flush(nodeList,block);
+            //flush(nodeList,block);
 
             return updateList;
         }finally {
@@ -177,10 +177,10 @@ public class NodeFilter {
     }
 
 
-    public void flush(List<NodeRanking> nodeRankings,Block currentBlock){
+    public void flush(List<NodeRanking> nodeRankings,Block currentBlock,int consenseNodeNum){
         EXECUTOR_SERVICE.submit(()->{
             redisCacheService.updateNodePushCache(chainId, new HashSet<>(nodeRankings));
-            redisCacheService.updateStatisticsCache(chainId, currentBlock, nodeRankings);
+            redisCacheService.updateStatisticsCache(chainId, currentBlock, consenseNodeNum);
         });
     }
 }

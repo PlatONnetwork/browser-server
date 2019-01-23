@@ -73,7 +73,7 @@ public class BlockFilter {
         Map <String, Object> transactionReceiptMap = param.transactionReceiptMap;
 
         Block block = new Block();
-        log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
+        //log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
         log.debug("[ List <Transaction> info :]" + JSONArray.toJSONString(transactionsList));
         if (!StringUtils.isEmpty(ethBlock)) {
