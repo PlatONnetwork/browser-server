@@ -93,7 +93,6 @@ public class DataCollectorJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
-        beginNumber = 501220;
         web3j = chainsConfig.getWeb3j(chainId);
     }
 
