@@ -71,12 +71,12 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private boolean validateParam(String chainId,Collection items){
         if (!chainsConfig.getChainIds().contains(chainId)){
             // 非法链ID
-            logger.error("Invalid Chain ID: {}", chainId);
+            logger.debug("Invalid Chain ID: {}", chainId);
             return false;
         }
         if(items.size()==0){
             // 无更新内容
-            logger.error("Empty Content");
+            logger.debug("Empty Content");
             return false;
         }
         return true;

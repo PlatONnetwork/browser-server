@@ -67,11 +67,11 @@ public class NodeFilter {
         LOCK.writeLock().lock();
         try {
             String nodeInfo=null;
-            String verifiersInfo=null;
+            String verifiersInfo="[]";
             long startTime = System.currentTimeMillis();
             try{
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
-                verifiersInfo=candidateContract.VerifiersList(ethBlock.getBlock().getNumber()).send();
+                //verifiersInfo=candidateContract.VerifiersList(ethBlock.getBlock().getNumber()).send();
                 nodeInfo=candidateContract.CandidateList(ethBlock.getBlock().getNumber()).send();
             }catch (Exception e){
                 logger.debug("nodeInfoList is null !!!...",e.getMessage());

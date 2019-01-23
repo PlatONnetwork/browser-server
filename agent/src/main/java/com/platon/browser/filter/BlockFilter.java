@@ -6,10 +6,7 @@ import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.job.DataCollectorJob;
 import com.platon.browser.service.RedisCacheService;
@@ -18,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -30,6 +26,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import static com.platon.browser.job.DataCollectorJob.NODE_ID_TO_NAME;
 
 /**
  * User: dongqile
@@ -58,13 +56,11 @@ public class BlockFilter {
     private BlockMapper blockMapper;
 
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-
-    @Autowired
     private RedisCacheService redisCacheService;
 
-    @Transactional
     public Block analysis ( DataCollectorJob.AnalysisParam param ) {
+
+        long startTime = System.currentTimeMillis();
 
         EthBlock ethBlock = param.ethBlock;
         List <Transaction> transactionsList = param.transactionList;
@@ -101,12 +97,13 @@ public class BlockFilter {
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
             block.setNodeId(publicKey.toString(16));
-            NodeRankingExample nodeRankingExample = new NodeRankingExample();
-            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andNodeIdEqualTo(publicKey.toString(16)).andIsValidEqualTo(1);
-            List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-            if (null != dbList && dbList.size() > 0) {
-                block.setNodeName(dbList.get(0).getName());
-            }
+            block.setNodeName(NODE_ID_TO_NAME.get(block.getNodeId()));
+
+
+            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 1 -> {}",System.currentTimeMillis()-startTime);
+
+
+            startTime = System.currentTimeMillis();
 
             String rewardWei = FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString());
             block.setBlockReward(rewardWei);
@@ -116,6 +113,12 @@ public class BlockFilter {
             BigInteger voteAmount = new BigInteger("0");
             //blockCampaignAmount
             BigInteger campaignAmount = new BigInteger("0");
+
+            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 2 -> {}",System.currentTimeMillis()-startTime);
+
+
+            startTime = System.currentTimeMillis();
+
             if (transactionsList.size() <= 0 && transactionReceiptList.size() <= 0) {
                 block.setActualTxCostSum("0");
                 block.setBlockVoteAmount(0L);
@@ -130,9 +133,13 @@ public class BlockFilter {
                 if(CacheTool.blocks.size()>=200){
                     flush();
                 }
+
+                if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 3 -> {}",System.currentTimeMillis()-startTime);
 //                blockMapper.insert(block);
                 return block;
             }
+
+            startTime = System.currentTimeMillis();
             for (Transaction transaction : transactionsList) {
                 if (null != transactionReceiptMap.get(transaction.getHash())) {
                     TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
@@ -163,17 +170,19 @@ public class BlockFilter {
             if(CacheTool.blocks.size()>=200){
                 flush();
             }
+
+            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 4 -> {}",System.currentTimeMillis()-startTime);
 //            blockMapper.insert(block);
         }
         return block;
     }
 
-
     public void flush(){
         try{
-            blockMapper.batchInsert(CacheTool.blocks);
-            // 更新区块缓存
-            redisCacheService.updateBlockCache(chainId, new HashSet<>(CacheTool.blocks));
+            if(CacheTool.blocks.size()>0){
+                blockMapper.batchInsert(CacheTool.blocks);
+                redisCacheService.updateBlockCache(chainId, new HashSet<>(CacheTool.blocks));
+            }
         }finally {
             CacheTool.blocks.clear();
         }

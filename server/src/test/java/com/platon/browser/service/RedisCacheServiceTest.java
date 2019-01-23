@@ -162,7 +162,7 @@ public class RedisCacheServiceTest extends ServiceTestBase {
             key.setHash(transaction.getBlockHash());
             Block block = blockMapper.selectByPrimaryKey(key);
 
-            boolean result = redisCacheService.updateStatisticsCache(chainId,block,data);
+            boolean result = redisCacheService.updateStatisticsCache(chainId,block,30);
             Assert.assertEquals(true,result);
         });
     }
