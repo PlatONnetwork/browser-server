@@ -69,6 +69,7 @@ public class NodeInfoSynJob {
     @Autowired
     private Web3jClient web3jClient;
 
+    public final static Map<String,String> NODE_ID_TO_NAME = new HashMap<>();
 
     @PostConstruct
     public void init () {
@@ -90,6 +91,15 @@ public class NodeInfoSynJob {
     @Scheduled(cron = "0/1 * * * * ?")
     protected void doJob () {
         try {
+
+            // 从数据库查询节点信息，放入本地缓存
+            NodeRankingExample dbCon = new NodeRankingExample();
+            dbCon.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
+            List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(dbCon);
+            NODE_ID_TO_NAME.clear();
+            dbNodes.forEach(node->NODE_ID_TO_NAME.put(node.getNodeId(),node.getName()));
+
+
             EthBlock ethBlock = null;
             Web3j web3j = chainsConfig.getWeb3j(chainId);
             BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
@@ -188,8 +198,9 @@ public class NodeInfoSynJob {
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
                 for (NodeRanking nodeRanking : updateList) {
-                    if (nodeRanking.getIsValid().equals(1)) {
-                        consensusCount = consensusCount + 1;
+                    if (nodeRanking.getIsValid()==1) {
+                        consensusCount++;
+                        NODE_ID_TO_NAME.put(nodeRanking.getNodeId(),nodeRanking.getName());
                     }
                 }
 

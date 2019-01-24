@@ -67,6 +67,7 @@ public class AnalyseFlow {
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->
             THREAD_POOL.submit(()->{
+                long threadTime = System.currentTimeMillis();
                 try {
                     try {
                         Block block = blockFilter.analysis(param);
@@ -84,6 +85,7 @@ public class AnalyseFlow {
                 }finally {
                     latch.countDown();
                 }
+                if((System.currentTimeMillis()-threadTime)>0) logger.debug("Thread ID={},NAME={} : -> {}",Thread.currentThread().getId(),Thread.currentThread().getName(),System.currentTimeMillis()-threadTime);
             })
         );
 
@@ -93,8 +95,10 @@ public class AnalyseFlow {
             e.printStackTrace();
         }
 
+        long startTime = System.currentTimeMillis();
         // 分析完成后在同一事务中批量入库分析结果
         databaseService.flush(result);
+        if((System.currentTimeMillis()-startTime)>0) logger.debug("databaseService.flush(result): -> {}",System.currentTimeMillis()-startTime);
     }
 
     /**

@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.platon.browser.job.DataCollectorJob.NODE_ID_TO_NAME;
+import static com.platon.browser.job.NodeInfoSynJob.NODE_ID_TO_NAME;
 
 /**
  * User: dongqile

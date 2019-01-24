@@ -4,8 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.filter.AnalyseFlow;
@@ -24,9 +22,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,7 +58,6 @@ public class DataCollectorJob {
 
     @Autowired
     private AnalyseFlow analyseFlow;
-    public final static Map<String,String> NODE_ID_TO_NAME = new HashMap<>();
 
     @PostConstruct
     public void init () {
@@ -83,12 +78,6 @@ public class DataCollectorJob {
 
     @Scheduled(cron="0/1 * * * * ?")
     protected void doJob () {
-        NodeRankingExample nodeRankingExample = new NodeRankingExample();
-        nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
-        List <NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-        NODE_ID_TO_NAME.clear();
-        nodes.forEach(node->NODE_ID_TO_NAME.put(node.getNodeId(),node.getName()));
-
         try {
             // 需要并发处理的区块数据
             List<EthBlock> concurrentBlocks = new ArrayList<>();
