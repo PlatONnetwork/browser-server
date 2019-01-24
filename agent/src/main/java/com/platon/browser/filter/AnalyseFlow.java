@@ -71,7 +71,7 @@ public class AnalyseFlow {
                     try {
                         Block block = blockFilter.analysis(param);
                         List<TransactionWithBLOBs> transactions = transactionFilter.analysis(param, block.getTimestamp().getTime());
-                        // 一切正常，则把分析结果添加到分析结果中
+                        // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
                     } catch (Exception e) {

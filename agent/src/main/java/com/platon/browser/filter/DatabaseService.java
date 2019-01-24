@@ -52,5 +52,8 @@ public class DatabaseService {
         if(result.errorBlocks.size()>0){
             blockMissingMapper.batchInsert(result.errorBlocks);
         }
+
+        // 更新统计缓存
+        redisCacheService.updateStatisticsCache(chainId);
     }
 }

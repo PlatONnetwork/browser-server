@@ -116,13 +116,4 @@ public class DataCollectorJob {
         }
 
     }
-
-
-    /**
-     * 更新统计信息信息
-     */
-    @Scheduled(cron="0/1 * * * * ?")
-    public void updateStatisticsCache(){
-        chainsConfig.getChainIds().forEach(chainId -> redisCacheService.updateStatisticsCache(chainId));
-    }
 }
