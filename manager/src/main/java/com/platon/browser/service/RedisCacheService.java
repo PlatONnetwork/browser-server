@@ -31,6 +31,6 @@ public interface RedisCacheService {
     void resetNodePushCache(String chainId,boolean clearOld);
     List<NodePushItem> getNodePushCache(String chainId);
     List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
-    boolean updateStatisticsCache(String chainId, Block block ,int nodeNumber);
+    boolean updateStatisticsCache(String chainId);
     StatisticsCache getStatisticsCache(String chainId);
 }

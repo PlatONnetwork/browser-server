@@ -438,15 +438,48 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public boolean updateStatisticsCache( String chainId, Block block ,int nodeNumber){
+    public boolean updateStatisticsCache(String chainId){
 
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        if(cache.getCurrentHeight()>block.getNumber()){
-            // 如果参数的块高比缓存中的块高小，则不作更新
-            return false;
+        RespPage<BlockListItem> cacheBlocks = getBlockPage(chainId,1,1);
+        if(cacheBlocks.getData().size()>0){
+            BlockListItem block = cacheBlocks.getData().get(0);
+            if(cache.getCurrentHeight()>block.getHeight()){
+                // 如果参数的块高比缓存中的块高小，则不作更新
+                return false;
+            }
+
+            /************* 设置当前块高、出块节点、节点名称、节点ID*************/
+            if(cache.getCurrentHeight()<block.getHeight()){
+                cache.setMiner(block.getMiner());
+                cache.setCurrentHeight(block.getHeight());
+                cache.setNodeName(StringUtils.isBlank(block.getNodeName())?"Unknown":block.getNodeName());
+                cache.setNodeId(block.getNodeId());
+            }
+
+            /************** 计算当前TPS ************/
+            Date endDate = new Date(block.getTimestamp());
+            Date startDate = new Date(block.getTimestamp()-1000);
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            cache.setCurrent(0);
+            if(blocks.size()>0){
+                for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
+            }
         }
+
+        /************** 计算最大TPS ************/
+        if(cache.getMaxTps()<cache.getCurrent()){
+            cache.setMaxTps(cache.getCurrent());
+        }
+
+        List<NodePushItem> nodes = getNodePushCache(chainId);
+        /************* 设置共识节点数*************/
+        cache.setConsensusCount(nodes.size());
+
 
         /************* 设置总交易笔数***********/
         TransactionExample transactionCon = new TransactionExample();
@@ -459,10 +492,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         long addressCount = customStatisticsMapper.countAddress(chainId);
         cache.setAddressCount(addressCount);
 
-        /************* 设置共识节点数*************/
-        cache.setConsensusCount(nodeNumber);
-        //cache.setConsensusCount(nodeRankings.size());
-
         /************** 计算24小时内的交易数 ************/
         long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
         cache.setDayTransaction(dayTransactionCount);
@@ -471,13 +500,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BigDecimal avgBlockTrans = customStatisticsMapper.countAvgTransactionPerBlock(chainId);
         cache.setAvgTransaction(avgBlockTrans);
 
-        /************* 设置当前块高、出块节点、节点名称、节点ID*************/
-        if(cache.getCurrentHeight()<block.getNumber()){
-            cache.setMiner(block.getMiner());
-            cache.setCurrentHeight(block.getNumber());
-            cache.setNodeName(StringUtils.isBlank(block.getNodeName())?"Unknown":block.getNodeName());
-            cache.setNodeId(block.getNodeId());
-        }
+
 
         /************** 计算平均出块时长 *************/
         String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
@@ -507,22 +530,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BigDecimal avgTime=BigDecimal.valueOf(highestBlockTimestamp-lowestBlockTimestamp).divide(BigDecimal.valueOf(divider),4,BigDecimal.ROUND_HALF_UP);
         cache.setAvgTime(avgTime);
 
-        /************** 计算当前TPS ************/
-        Date endDate = new Date(block.getTimestamp().getTime());
-        Date startDate = new Date(block.getTimestamp().getTime()-1000);
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
-        List<Block> blocks = blockMapper.selectByExample(blockExample);
-        cache.setCurrent(0);
-        if(blocks.size()>0){
-            for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
-        }
-
-
-        /************** 计算最大TPS ************/
-        if(cache.getMaxTps()<cache.getCurrent()){
-            cache.setMaxTps(cache.getCurrent());
-        }
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.opsForValue().set(cacheKey,JSON.toJSONString(cache));

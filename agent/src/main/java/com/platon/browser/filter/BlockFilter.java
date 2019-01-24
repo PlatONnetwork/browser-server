@@ -6,10 +6,7 @@ import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.EventRes;
-import com.platon.browser.job.DataCollectorJob;
-import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -52,13 +48,7 @@ public class BlockFilter {
     @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
 
-    @Autowired
-    private BlockMapper blockMapper;
-
-    @Autowired
-    private RedisCacheService redisCacheService;
-
-    public Block analysis ( DataCollectorJob.AnalysisParam param ) {
+    public Block analysis ( AnalyseFlow.AnalysisParam param ) {
 
         long startTime = System.currentTimeMillis();
 
@@ -127,13 +117,6 @@ public class BlockFilter {
                 log.debug("[Block info :]" + JSON.toJSONString(block));
                 log.debug("[this block is An empty block , transaction null !!!...]");
                 log.debug("[exit BlockFilter !!!...]");
-
-                CacheTool.blocks.add(block);
-                CacheTool.currentBlockNumber=block.getNumber();
-                if(CacheTool.blocks.size()>=200){
-                    flush();
-                }
-
                 if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 3 -> {}",System.currentTimeMillis()-startTime);
 //                blockMapper.insert(block);
                 return block;
@@ -164,27 +147,9 @@ public class BlockFilter {
                     block.setActualTxCostSum(sum.toString());
                 }
             }
-            //insert struct<block> into database
-            CacheTool.blocks.add(block);
-            CacheTool.currentBlockNumber=block.getNumber();
-            if(CacheTool.blocks.size()>=200){
-                flush();
-            }
-
             if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 4 -> {}",System.currentTimeMillis()-startTime);
 //            blockMapper.insert(block);
         }
         return block;
-    }
-
-    public void flush(){
-        try{
-            if(CacheTool.blocks.size()>0){
-                blockMapper.batchInsert(CacheTool.blocks);
-                redisCacheService.updateBlockCache(chainId, new HashSet<>(CacheTool.blocks));
-            }
-        }finally {
-            CacheTool.blocks.clear();
-        }
     }
 }

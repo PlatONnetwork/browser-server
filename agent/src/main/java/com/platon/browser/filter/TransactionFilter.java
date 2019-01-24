@@ -4,18 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.job.DataCollectorJob;
-import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
@@ -24,7 +19,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.util.*;
 
-import static com.platon.browser.job.DataCollectorJob.EXECUTOR_SERVICE;
 
 /**
  * User: dongqile
@@ -44,13 +38,8 @@ public class TransactionFilter {
 
     @Autowired
     private ChainsConfig chainsConfig;
-    @Autowired
-    private TransactionMapper transactionMapper;
-    @Autowired
-    private RedisCacheService redisCacheService;
 
-    @Transactional
-    public List<String> analysis(DataCollectorJob.AnalysisParam param, long time)throws Exception{
+    public List<TransactionWithBLOBs> analysis(AnalyseFlow.AnalysisParam param, long time) throws Exception{
 
         List<Transaction> transactionsList = param.transactionList;
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
@@ -128,23 +117,7 @@ public class TransactionFilter {
                 transactionSet.add(transactions);
             }
         }
-        //insert list into database
-        //insert list into redis
-        if(txHashes.size()>0){
-            transactionMapper.batchInsert(transactionWithBLOBsList);
-        }
-        flush(txHashes);
-        return txHashes;
+        return transactionWithBLOBsList;
     }
 
-    public void flush(List<String> txHash){
-        if (txHash.size()>0) {
-            EXECUTOR_SERVICE.submit(()->{
-                TransactionExample condition = new TransactionExample();
-                condition.createCriteria().andChainIdEqualTo(chainId).andHashIn(txHash);
-                List<com.platon.browser.dao.entity.Transaction> dbTrans = transactionMapper.selectByExample(condition);
-                redisCacheService.updateTransactionCache(chainId,new HashSet <>(dbTrans));
-            });
-        }
-    }
 }
