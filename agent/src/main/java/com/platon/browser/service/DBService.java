@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.BlockMissingMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,16 @@ public class DBService {
     private BlockMissingMapper blockMissingMapper;
     @Autowired
     protected RedisCacheService redisCacheService;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
 
     @Transactional
     public void flush(AnalyseThread.AnalysisResult result){
 
         if(result.blocks.size()>0){
             blockMapper.batchInsert(result.blocks);
+            // 更新区块中的节点名称字段：node_name
+            customBlockMapper.updateBlockNodeName(chainId);
             // 更新缓存
             redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
         }

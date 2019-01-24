@@ -99,11 +99,4 @@ public class BlockAnalyseJob {
         }
     }
 
-    /**
-     * 更新区块中node_name字段为空的记录
-     */
-    @Scheduled(cron="0/5 * * * * ?")
-    protected void updateBlockNodeName() {
-        customBlockMapper.updateBlockNodeName(chainId);
-    }
 }
