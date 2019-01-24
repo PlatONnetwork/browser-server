@@ -73,6 +73,7 @@ public class BlockAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
+        beginNumber = 572043;
         web3j = chainsConfig.getWeb3j(chainId);
     }
 
@@ -88,9 +89,16 @@ public class BlockAnalyseJob {
                 logger.debug("RPC web3j.ethGetBlockByNumber()--->{}",System.currentTimeMillis()-startTime);
 
                 concurrentBlocks.add(ethBlock);
-                if(concurrentBlocks.size()>=threadBatchSize){
+                if(
+                        concurrentBlocks.size()>=threadBatchSize || // 如果并发区块数量达到线程处理阈值，开启线程处理
+                        (endNumber.longValue()-beginNumber)<threadBatchSize // 结束区块号与起始区块号之差小于线程批量处理数量，也进入线程批量处理,防止追上后响应过慢
+                ){
                     analyseFlow.analyse(concurrentBlocks);
                     concurrentBlocks.clear();
+                }
+
+                if((endNumber.longValue()-beginNumber)<threadBatchSize){
+                    // 如果结束区块号与起始区块号之差小于线程批量处理数量，则
                 }
 
                 beginNumber++;
