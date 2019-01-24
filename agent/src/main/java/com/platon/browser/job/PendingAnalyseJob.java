@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * Time: 18:07
  */
 @Component
-public class PendingTxSynchronizeJob {
+public class PendingAnalyseJob {
 
     /**
      * 挂起交易同步任务
@@ -24,7 +24,7 @@ public class PendingTxSynchronizeJob {
      * 4.数据整合推送至rabbitMQ队列
      */
 
-    private static Logger log = LoggerFactory.getLogger(PendingTxSynchronizeJob.class);
+    private static Logger log = LoggerFactory.getLogger(PendingAnalyseJob.class);
 
     @Value("${chain.id}")
     private String chainId;

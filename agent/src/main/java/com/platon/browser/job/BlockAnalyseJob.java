@@ -6,7 +6,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.filter.AnalyseFlow;
+import com.platon.browser.thread.AnalyseFlow;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +31,9 @@ import java.util.concurrent.TimeUnit;
  * Time: 17:28
  */
 @Component
-public class DataCollectorJob {
+public class BlockAnalyseJob {
 
-    private static Logger logger = LoggerFactory.getLogger(DataCollectorJob.class);
+    private static Logger logger = LoggerFactory.getLogger(BlockAnalyseJob.class);
 
     @Autowired
     private BlockMapper blockMapper;

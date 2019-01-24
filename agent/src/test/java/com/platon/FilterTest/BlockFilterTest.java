@@ -1,10 +1,7 @@
 package com.platon.FilterTest;
 
 import com.platon.TestBase;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.FilterTool;
-import com.platon.browser.job.DataCollectorJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,7 +12,6 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
-import javax.xml.crypto.Data;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

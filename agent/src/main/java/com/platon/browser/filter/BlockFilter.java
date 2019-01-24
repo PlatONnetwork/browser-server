@@ -2,13 +2,16 @@ package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.EventRes;
+import com.platon.browser.thread.AnalyseFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,11 +22,10 @@ import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.platon.browser.job.NodeInfoSynJob.NODE_ID_TO_NAME;
+import static com.platon.browser.job.NodeAnalyseJob.NODE_ID_TO_NAME;
 
 /**
  * User: dongqile
@@ -62,56 +64,19 @@ public class BlockFilter {
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
         log.debug("[ List <Transaction> info :]" + JSONArray.toJSONString(transactionsList));
         if (!StringUtils.isEmpty(ethBlock)) {
-            block.setNumber(ethBlock.getBlock().getNumber().longValue());
-            if (String.valueOf(ethBlock.getBlock().getTimestamp().longValue()).length() == 10) {
-                block.setTimestamp(new Date(ethBlock.getBlock().getTimestamp().longValue() * 1000L));
-            } else {
-                block.setTimestamp(new Date(ethBlock.getBlock().getTimestamp().longValue()));
-            }
-            block.setSize(ethBlock.getBlock().getSize().intValue());
-            block.setChainId(chainId);
-            if (ethBlock.getBlock().getTransactions().size() <= 0) {
-                block.setEnergonAverage(BigInteger.ZERO.toString());
-            } else {
-                block.setEnergonAverage(ethBlock.getBlock().getGasUsed().divide(new BigInteger(String.valueOf(ethBlock.getBlock().getTransactions().size()))).toString());
-            }
-            block.setHash(ethBlock.getBlock().getHash());
-            block.setEnergonLimit(ethBlock.getBlock().getGasLimit().toString());
-            block.setEnergonUsed(ethBlock.getBlock().getGasUsed().toString());
-            block.setTransactionNumber(ethBlock.getBlock().getTransactions().size() > 0 ? ethBlock.getBlock().getTransactions().size() : new Integer(0));
-            block.setCreateTime(new Date());
-            block.setUpdateTime(new Date());
-            block.setMiner(ethBlock.getBlock().getMiner());
-            block.setExtraData(ethBlock.getBlock().getExtraData());
-            block.setParentHash(ethBlock.getBlock().getParentHash());
-            block.setNonce(ethBlock.getBlock().getNonce().toString());
-            block.setNodeId(publicKey.toString(16));
+            // 使用EthBlock初始化BlockBean
+            BlockBean tmp = new BlockBean();
+            tmp.init(ethBlock);
+            BeanUtils.copyProperties(tmp,block);
 
+            // 设置需要使用当前上下文的属性
+            block.setChainId(chainId);
+            block.setNodeId(publicKey.toString(16));
             // 设置节点名称
             String nodeName = NODE_ID_TO_NAME.get(block.getNodeId());
             block.setNodeName(nodeName);
 
-
-            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 1 -> {}",System.currentTimeMillis()-startTime);
-
-
-            startTime = System.currentTimeMillis();
-
-            String rewardWei = FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString());
-            block.setBlockReward(rewardWei);
-            //actuakTxCostSum
-            BigInteger sum = new BigInteger("0");
-            //blockVoteAmount
-            BigInteger voteAmount = new BigInteger("0");
-            //blockCampaignAmount
-            BigInteger campaignAmount = new BigInteger("0");
-
-            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 2 -> {}",System.currentTimeMillis()-startTime);
-
-
-            startTime = System.currentTimeMillis();
-
-            if (transactionsList.size() <= 0 && transactionReceiptList.size() <= 0) {
+            if (transactionsList.isEmpty() && transactionReceiptList.isEmpty()) {
                 block.setActualTxCostSum("0");
                 block.setBlockVoteAmount(0L);
                 block.setBlockCampaignAmount(0L);
@@ -124,7 +89,13 @@ public class BlockFilter {
                 return block;
             }
 
-            startTime = System.currentTimeMillis();
+
+            //actuakTxCostSum
+            BigInteger sum = new BigInteger("0");
+            //blockVoteAmount
+            BigInteger voteAmount = new BigInteger("0");
+            //blockCampaignAmount
+            BigInteger campaignAmount = new BigInteger("0");
             for (Transaction transaction : transactionsList) {
                 if (null != transactionReceiptMap.get(transaction.getHash())) {
                     TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
@@ -134,7 +105,7 @@ public class BlockFilter {
                     if ("voteTicket".equals(type)) {
                         voteAmount.add(BigInteger.ONE);
                         //get tickVoteContract vote event
-                        List <TicketContract.VoteTicketEventEventResponse> eventEventResponses =
+                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses =
                                 web3jClient.getTicketContract().getVoteTicketEventEvents(transactionReceipt);
                         String event = eventEventResponses.get(0).param1;
                         EventRes eventRes = JSON.parseObject(event, EventRes.class);
@@ -149,8 +120,7 @@ public class BlockFilter {
                     block.setActualTxCostSum(sum.toString());
                 }
             }
-            if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 4 -> {}",System.currentTimeMillis()-startTime);
-//            blockMapper.insert(block);
+
         }
         return block;
     }

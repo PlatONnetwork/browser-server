@@ -1,11 +1,11 @@
-package com.platon.browser.filter;
+package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.thread.AnalyseFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

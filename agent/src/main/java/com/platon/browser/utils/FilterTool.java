@@ -1,4 +1,4 @@
-package com.platon.browser.filter;
+package com.platon.browser.utils;
 
 import com.platon.browser.dao.entity.NodeRanking;
 

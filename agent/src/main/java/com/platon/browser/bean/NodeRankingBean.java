@@ -1,4 +1,4 @@
-package com.platon.browser.dto;
+package com.platon.browser.bean;
 
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
@@ -19,7 +19,7 @@ import java.util.Map;
  * Date: 2018/10/24
  * Time: 16:22
  */
-public class NodeRankingDto extends NodeRanking {
+public class NodeRankingBean extends NodeRanking {
 
     public static final Map<String,GeoUtil.IpLocation> ipMap = new HashMap<>();
 

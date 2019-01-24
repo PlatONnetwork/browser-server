@@ -5,6 +5,7 @@ import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.thread.AnalyseFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

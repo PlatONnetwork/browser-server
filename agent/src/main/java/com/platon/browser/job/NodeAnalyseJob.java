@@ -14,8 +14,8 @@ import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.dto.NodeRankingDto;
-import com.platon.browser.filter.FilterTool;
+import com.platon.browser.bean.NodeRankingBean;
+import com.platon.browser.utils.FilterTool;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +40,9 @@ import java.util.*;
  * Time: 11:55
  */
 @Component
-public class NodeInfoSynJob {
+public class NodeAnalyseJob {
 
-    private static Logger log = LoggerFactory.getLogger(NodeInfoSynJob.class);
+    private static Logger log = LoggerFactory.getLogger(NodeAnalyseJob.class);
 
     @Value("${chain.id}")
     private String chainId;
@@ -134,7 +134,7 @@ public class NodeInfoSynJob {
 
                 for (CandidateDto candidateDto : nodes) {
                     NodeRanking nodeRanking = new NodeRanking();
-                    NodeRankingDto nrd = new NodeRankingDto();
+                    NodeRankingBean nrd = new NodeRankingBean();
                     nrd.init(candidateDto);
                     BeanUtils.copyProperties(nrd, nodeRanking);
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());

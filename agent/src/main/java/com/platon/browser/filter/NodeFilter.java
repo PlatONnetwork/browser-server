@@ -8,7 +8,9 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.dto.NodeRankingDto;
+import com.platon.browser.bean.NodeRankingBean;
+import com.platon.browser.thread.AnalyseFlow;
+import com.platon.browser.utils.FilterTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +88,7 @@ public class NodeFilter {
         startTime = System.currentTimeMillis();
         for (CandidateDto candidateDto : nodes) {
             NodeRanking nodeRanking = new NodeRanking();
-            NodeRankingDto nrd = new NodeRankingDto();
+            NodeRankingBean nrd = new NodeRankingBean();
             nrd.init(candidateDto);
             BeanUtils.copyProperties(nrd,nodeRanking);
             BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
