@@ -35,7 +35,6 @@ public class BlockFilter {
 
     private static Logger log = LoggerFactory.getLogger(BlockFilter.class);
 
-
     @Autowired
     private Web3jClient web3jClient;
 
@@ -87,7 +86,10 @@ public class BlockFilter {
             block.setParentHash(ethBlock.getBlock().getParentHash());
             block.setNonce(ethBlock.getBlock().getNonce().toString());
             block.setNodeId(publicKey.toString(16));
-            block.setNodeName(NODE_ID_TO_NAME.get(block.getNodeId()));
+
+            // 设置节点名称
+            String nodeName = NODE_ID_TO_NAME.get(block.getNodeId());
+            block.setNodeName(nodeName);
 
 
             if((System.currentTimeMillis()-startTime)>0) log.debug("BlockFilter.analysis(): SECTION 1 -> {}",System.currentTimeMillis()-startTime);

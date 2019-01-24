@@ -92,12 +92,13 @@ public class NodeInfoSynJob {
     protected void doJob () {
         try {
 
-            // 从数据库查询节点信息，放入本地缓存
-            NodeRankingExample dbCon = new NodeRankingExample();
-            dbCon.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
-            List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(dbCon);
-            NODE_ID_TO_NAME.clear();
-            dbNodes.forEach(node->NODE_ID_TO_NAME.put(node.getNodeId(),node.getName()));
+            // 从数据库查询有效节点信息，放入本地缓存
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria()
+                    .andChainIdEqualTo(chainId)
+                    .andIsValidEqualTo(1);
+            List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
+            dbNodes.forEach(n->NODE_ID_TO_NAME.put(n.getNodeId(),n.getName()));
 
 
             EthBlock ethBlock = null;
@@ -117,7 +118,7 @@ public class NodeInfoSynJob {
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if (null == nodeInfo);
                 if (null == nodes && nodes.size() < 0);
-                NodeRankingExample nodeRankingExample = new NodeRankingExample();
+                nodeRankingExample = new NodeRankingExample();
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
