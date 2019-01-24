@@ -40,6 +40,8 @@ public class TransactionFilter {
     @Autowired
     private ChainsConfig chainsConfig;
 
+    public static Map<String,String> toAddressTypeMap = new HashMap <>();
+
     public List<TransactionWithBLOBs> analyse(AnalyseThread.AnalysisParam param, long time) throws Exception{
 
         List<Transaction> transactionsList = param.transactionList;
@@ -63,19 +65,7 @@ public class TransactionFilter {
                 TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
                 transactionWithBLOBs.setHash(transaction.getHash());
                 transactionWithBLOBs.setFrom(transaction.getFrom());
-                if (null != transaction.getTo()) {
-                    transactionWithBLOBs.setTo(transaction.getTo());
-                    //judge `to` address is accountAddress or contractAddress
-                    EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                    if ("0x".equals(ethGetCode.getCode())) {
-                        transactionWithBLOBs.setReceiveType("account");
-                    } else {
-                        transactionWithBLOBs.setReceiveType("contract");
-                    }
-                } else {
-                    transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
-                    transactionWithBLOBs.setReceiveType("contract");
-                }
+
                 transactionWithBLOBs.setValue(transaction.getValue().toString());
                 transactionWithBLOBs.setTransactionIndex(transactionReceipt.getTransactionIndex().intValue());
                 transactionWithBLOBs.setEnergonPrice(transaction.getGasPrice().toString());
@@ -108,7 +98,24 @@ public class TransactionFilter {
                 AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
                 if("1".equals(analysisResult.getType())){
                     analysisResult.setFunctionName("contract deploy");
+                    transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
+                    transactionWithBLOBs.setReceiveType("contract");
                 }
+                if (null != transaction.getTo()) {
+                    transactionWithBLOBs.setTo(transaction.getTo());
+                    //judge `to` address is accountAddress or contractAddress
+                    if(null != toAddressTypeMap.get(transaction.getTo())){
+                        transactionWithBLOBs.setReceiveType(toAddressTypeMap.get(transaction.getTo()));
+                    }else {
+                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                        if ("0x".equals(ethGetCode.getCode())) {
+                            transactionWithBLOBs.setReceiveType("account");
+                        } else {
+                            transactionWithBLOBs.setReceiveType("contract");
+                        }
+                    }
+                }
+                toAddressTypeMap.put(transaction.getTo(),transactionWithBLOBs.getReceiveType());
                 String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
                 transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
                 String txinfo = JSON.toJSONString(analysisResult);
