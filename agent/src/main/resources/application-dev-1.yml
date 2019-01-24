@@ -22,8 +22,8 @@ logging:
         transaction: error
       mybatis: error
     com.platon.browser.dao: error
-    com.platon.browser.filter: debug
-    com.platon.browser.job: debug
+    com.platon.browser.filter: error
+    com.platon.browser.job: error
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 
