@@ -5,7 +5,7 @@ import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.thread.AnalyseFlow;
+import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,7 +40,7 @@ public class TransactionFilter {
     @Autowired
     private ChainsConfig chainsConfig;
 
-    public List<TransactionWithBLOBs> analysis(AnalyseFlow.AnalysisParam param, long time) throws Exception{
+    public List<TransactionWithBLOBs> analyse(AnalyseThread.AnalysisParam param, long time) throws Exception{
 
         List<Transaction> transactionsList = param.transactionList;
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;

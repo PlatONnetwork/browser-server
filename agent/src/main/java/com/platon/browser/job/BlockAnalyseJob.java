@@ -6,7 +6,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.thread.AnalyseFlow;
+import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class BlockAnalyseJob {
     private CustomBlockMapper customBlockMapper;
 
     @Autowired
-    private AnalyseFlow analyseFlow;
+    private AnalyseThread analyseThread;
 
     @PostConstruct
     public void init () {
@@ -69,7 +69,6 @@ public class BlockAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
-        beginNumber = 572043;
         web3j = chainsConfig.getWeb3j(chainId);
     }
 
@@ -90,7 +89,7 @@ public class BlockAnalyseJob {
                         concurrentBlocks.size()>=threadBatchSize || // 如果并发区块数量达到线程处理阈值，开启线程处理
                         (endNumber.longValue()-beginNumber)<threadBatchSize // 结束区块号与起始区块号之差小于线程批量处理数量，也进入线程批量处理,防止追上后响应过慢
                 ){
-                    analyseFlow.analyse(concurrentBlocks);
+                    analyseThread.analyse(concurrentBlocks);
                     concurrentBlocks.clear();
                 }
                 beginNumber++;

@@ -5,7 +5,7 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.thread.AnalyseFlow;
+import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Component
-public class DatabaseService {
+public class DBService {
 
     @Value("${chain.id}")
     private String chainId;
@@ -30,7 +30,7 @@ public class DatabaseService {
     protected RedisCacheService redisCacheService;
 
     @Transactional
-    public void flush(AnalyseFlow.AnalysisResult result){
+    public void flush(AnalyseThread.AnalysisResult result){
 
         if(result.blocks.size()>0){
             blockMapper.batchInsert(result.blocks);

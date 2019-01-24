@@ -47,7 +47,7 @@ public class NodeAnalyseJob {
     @Value("${chain.id}")
     private String chainId;
 
-    private static Long maxNubmer = 0L;
+    private static Long beginNumber = 0L;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -81,9 +81,9 @@ public class NodeAnalyseJob {
         // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
         // 2、如果查询不到则从0开始
         if (blocks.size() == 0) {
-            maxNubmer = 1L;
+            beginNumber = 1L;
         } else {
-            maxNubmer = blocks.get(0).getNumber() + 1;
+            beginNumber = blocks.get(0).getNumber() + 1;
         }
     }
 
@@ -106,15 +106,15 @@ public class NodeAnalyseJob {
             EthBlock ethBlock = null;
             Web3j web3j = chainsConfig.getWeb3j(chainId);
             BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
-            while (maxNubmer <= endNumber.longValue()) {
+            while (beginNumber <= endNumber.longValue()) {
                 long startTime = System.currentTimeMillis();
-                ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(maxNubmer)), true).send();
-                maxNubmer++;
+                ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
+                beginNumber++;
                 log.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
                 //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
-                String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(maxNubmer)).send();
+                String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
                 log.debug("candidate---------------------------------->{}", System.currentTimeMillis()-startTime);
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
@@ -159,7 +159,7 @@ public class NodeAnalyseJob {
                     if (i >= 100) electionStatus = 4;
                     nodeRanking.setElectionStatus(electionStatus);
                     nodeRanking.setIsValid(1);
-                    nodeRanking.setBeginNumber(maxNubmer);
+                    nodeRanking.setBeginNumber(beginNumber);
                     nodeList.add(nodeRanking);
                     i = i + 1;
                 }
@@ -185,7 +185,7 @@ public class NodeAnalyseJob {
                             chainNode.setBeginNumber(dbNode.getBeginNumber());
                             chainNode.setId(dbNode.getId());
                         } else {
-                            dbNode.setEndNumber(maxNubmer);
+                            dbNode.setEndNumber(beginNumber);
                             dbNode.setIsValid(0);
                             updateList.add(dbNode);
                         }

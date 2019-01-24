@@ -8,7 +8,7 @@ import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.EventRes;
-import com.platon.browser.thread.AnalyseFlow;
+import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -49,7 +49,7 @@ public class BlockFilter {
     @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
 
-    public Block analysis ( AnalyseFlow.AnalysisParam param ) {
+    public Block analyse ( AnalyseThread.AnalysisParam param ) {
 
         long startTime = System.currentTimeMillis();
 

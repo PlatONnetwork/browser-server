@@ -17,8 +17,8 @@ import javax.annotation.PostConstruct;
 public class TestBase {
     @Autowired
     protected BlockFilter blockFilter;
-    @Autowired
-    protected NodeFilter nodeFilter;
+    //@Autowired
+    //protected NodeFilter nodeFilter;
 
     @Value("${chain.id}")
     protected String chainId;

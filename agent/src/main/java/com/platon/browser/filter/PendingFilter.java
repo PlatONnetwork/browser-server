@@ -43,7 +43,7 @@ public class PendingFilter {
     private ChainsConfig chainsConfig;
 
     @Transactional
-    public void analysis() throws Exception{
+    public void analyse() throws Exception{
 
 
             EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();

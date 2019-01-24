@@ -39,7 +39,7 @@ public class PendingAnalyseJob {
     protected void analysePending() {
         log.debug("**************PendingTx Analysis start ***************");
         try {
-            pendingFilter.analysis();
+            pendingFilter.analyse();
             log.debug("**************PendingTx Analysis end ***************");
         } catch (Exception e) {
             log.error("PendingTxSynchronizeJob Exception", e.getMessage());

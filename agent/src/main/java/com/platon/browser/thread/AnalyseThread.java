@@ -4,11 +4,10 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
-import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.TransactionFilter;
-import com.platon.browser.service.DatabaseService;
+import com.platon.browser.service.DBService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-public class AnalyseFlow {
-    private static Logger logger = LoggerFactory.getLogger(AnalyseFlow.class);
+public class AnalyseThread {
+    private static Logger logger = LoggerFactory.getLogger(AnalyseThread.class);
     public static class AnalysisParam {
         public EthBlock ethBlock;
         public List <org.web3j.protocol.core.methods.response.Transaction> transactionList;
@@ -41,7 +40,6 @@ public class AnalyseFlow {
         public List<Block> blocks = new CopyOnWriteArrayList<>();
         public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
         public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
-        public List<NodeRanking> nodes = new CopyOnWriteArrayList<>();
     }
 
     @Value("${chain.id}")
@@ -55,7 +53,7 @@ public class AnalyseFlow {
     @Autowired
     private TransactionFilter transactionFilter;
     @Autowired
-    private DatabaseService databaseService;
+    private DBService dbService;
 
     public static ExecutorService THREAD_POOL;
     @PostConstruct
@@ -73,8 +71,8 @@ public class AnalyseFlow {
                 long threadTime = System.currentTimeMillis();
                 try {
                     try {
-                        Block block = blockFilter.analysis(param);
-                        List<TransactionWithBLOBs> transactions = transactionFilter.analysis(param, block.getTimestamp().getTime());
+                        Block block = blockFilter.analyse(param);
+                        List<TransactionWithBLOBs> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
                         // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
@@ -100,7 +98,7 @@ public class AnalyseFlow {
 
         long startTime = System.currentTimeMillis();
         // 分析完成后在同一事务中批量入库分析结果
-        databaseService.flush(result);
+        dbService.flush(result);
         if((System.currentTimeMillis()-startTime)>0) logger.debug("databaseService.flush(result): -> {}",System.currentTimeMillis()-startTime);
     }
 
