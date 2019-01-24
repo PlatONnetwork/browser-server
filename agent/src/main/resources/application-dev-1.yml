@@ -36,7 +36,7 @@ platon:
 #  chains: MAIN_NET-1-http://192.168.9.76:1234
   chains: MAIN_NET-1-http://127.0.0.1:7793
   # 批量采集数量
-  thread.batch.size: 50
+  thread.batch.size: ${thread.num}
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:

@@ -5,7 +5,6 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +47,6 @@ public class BlockAnalyseJob {
     private long beginNumber=1;
 
     private Web3j web3j;
-
-    @Autowired
-    private CustomBlockMapper customBlockMapper;
 
     @Autowired
     private AnalyseThread analyseThread;
