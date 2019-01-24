@@ -17,3 +17,7 @@ node.type: eth
 netInfo: v0.4.0
 # 默认区块处理线程数量
 thread.num: 50
+debug:
+  level:
+    job: error
+    filter: error

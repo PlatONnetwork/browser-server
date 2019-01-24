@@ -21,6 +21,8 @@ logging:
         transaction: debug
       mybatis: debug
     com.platon.browser.dao: debug
+    com.platon.browser.job: ${debug.level.job}
+    com.platon.browser.filter: ${debug.level.filter}
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 

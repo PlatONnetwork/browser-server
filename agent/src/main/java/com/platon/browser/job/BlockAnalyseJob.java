@@ -73,6 +73,7 @@ public class BlockAnalyseJob {
      */
     @Scheduled(cron="0/1 * * * * ?")
     protected void analyseBlock () {
+        logger.debug("*** In the BlockAnalyseJob *** ");
         try {
             // 需要并发处理的区块数据
             List<EthBlock> concurrentBlocks = new ArrayList<>();
@@ -83,7 +84,8 @@ public class BlockAnalyseJob {
                 concurrentBlocks.add(ethBlock);
                 if(
                         concurrentBlocks.size()>=threadBatchSize || // 如果并发区块数量达到线程处理阈值，开启线程处理
-                        (endNumber.longValue()-beginNumber)<threadBatchSize // 结束区块号与起始区块号之差小于线程批量处理数量，也进入线程批量处理,防止追上后响应过慢
+                                ((endNumber.longValue()-beginNumber)<threadBatchSize
+                                        && concurrentBlocks.size()==(endNumber.longValue()-beginNumber)) // 结束区块号与起始区块号之差小于线程批量处理数量，也进入线程批量处理,防止追上后响应过慢
                 ){
                     analyseThread.analyse(concurrentBlocks);
                     concurrentBlocks.clear();
@@ -93,6 +95,7 @@ public class BlockAnalyseJob {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.debug("*** End the BlockAnalyseJob *** ");
     }
 
 }

@@ -24,7 +24,7 @@ public class PendingAnalyseJob {
      * 4.数据整合推送至rabbitMQ队列
      */
 
-    private static Logger log = LoggerFactory.getLogger(PendingAnalyseJob.class);
+    private static Logger logger = LoggerFactory.getLogger(PendingAnalyseJob.class);
 
     @Value("${chain.id}")
     private String chainId;
@@ -37,12 +37,13 @@ public class PendingAnalyseJob {
      */
     @Scheduled(cron = "0/1 * * * * ?")
     protected void analysePending() {
-        log.debug("**************PendingTx Analysis start ***************");
+        logger.debug("*** In the PendingAnalyseJob *** ");
         try {
             pendingFilter.analyse();
-            log.debug("**************PendingTx Analysis end ***************");
+            logger.debug("**************PendingTx Analysis end ***************");
         } catch (Exception e) {
-            log.error("PendingTxSynchronizeJob Exception", e.getMessage());
+            logger.error("PendingTxSynchronizeJob Exception", e.getMessage());
         }
+        logger.debug("*** End the PendingAnalyseJob *** ");
     }
 }
