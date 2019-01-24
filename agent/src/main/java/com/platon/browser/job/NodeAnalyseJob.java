@@ -195,7 +195,9 @@ public class NodeAnalyseJob {
                 //TODO:publickey 0.4.0解析存在问题
                 FilterTool.currentBlockOwner(updateList, publicKey);
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
-                cutsomNodeRankingMapper.insertOrUpdate(updateList);
+                if(!updateList.isEmpty()){
+                    cutsomNodeRankingMapper.insertOrUpdate(updateList);
+                }
                 log.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
@@ -214,7 +216,7 @@ public class NodeAnalyseJob {
 
 
         } catch (Exception e) {
-            log.error("PendingTxSynchronizeJob Exception", e.getMessage());
+            log.error("NodeAnalyseJob Exception", e.getMessage());
         }
 
     }
