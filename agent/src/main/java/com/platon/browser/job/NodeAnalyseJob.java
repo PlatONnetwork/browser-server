@@ -87,9 +87,11 @@ public class NodeAnalyseJob {
         }
     }
 
-
+    /**
+     * 分析节点数据
+     */
     @Scheduled(cron = "0/1 * * * * ?")
-    protected void doJob () {
+    protected void analyseNode () {
         try {
 
             // 从数据库查询有效节点信息，放入本地缓存

@@ -32,8 +32,11 @@ public class PendingAnalyseJob {
     @Autowired
     private PendingFilter pendingFilter;
 
+    /**
+     * 分析待处理交易
+     */
     @Scheduled(cron = "0/1 * * * * ?")
-    protected void doJob() {
+    protected void analysePending() {
         log.debug("**************PendingTx Analysis start ***************");
         try {
             pendingFilter.analysis();

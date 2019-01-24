@@ -42,8 +42,11 @@ public class PendingUpdateJob {
 
     private boolean isPreviousDone=true;
 
+    /**
+     * 更新待处理交易
+     */
     @Scheduled(cron="0/5 * * * * ?")
-    protected void doJob () {
+    protected void updatePending () {
         try {
             //比对交易信息数据更新pending交易列表
             List <PendingTx> pendingTxeList = pendingTxMapper.selectByExample(new PendingTxExample());
