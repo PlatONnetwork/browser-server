@@ -118,8 +118,8 @@ public class NodeAnalyseJob {
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
                 log.debug("candidate---------------------------------->{}", System.currentTimeMillis()-startTime);
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
-                if (null == nodeInfo);
-                if (null == nodes && nodes.size() < 0);
+                if (null == nodeInfo) return;
+                if (null == nodes && nodes.size() < 0)return;
                 nodeRankingExample = new NodeRankingExample();
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database

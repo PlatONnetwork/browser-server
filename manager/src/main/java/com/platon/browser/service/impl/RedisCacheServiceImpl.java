@@ -477,6 +477,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
 
         List<NodePushItem> nodes = getNodePushCache(chainId);
+        //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正，共识节点数为verifierList的长度
         /************* 设置共识节点数*************/
         cache.setConsensusCount(nodes.size());
 
