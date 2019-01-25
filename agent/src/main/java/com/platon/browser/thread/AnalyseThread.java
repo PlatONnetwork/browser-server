@@ -2,8 +2,6 @@ package com.platon.browser.thread;
 
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.common.dto.AnalysisResult;
-import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -23,7 +21,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -97,7 +94,6 @@ public class AnalyseThread {
         public List <Transaction> transactions;
         public List <TransactionReceipt> transactionReceipts;
         public Map<String,Object> transactionReceiptMap;
-        public BigInteger publicKey;
         public AnalyseParam(EthBlock initData, Web3j web3j){
             this.ethBlock=initData;
             this.transactionReceiptMap = new HashMap <>();
@@ -119,11 +115,6 @@ public class AnalyseThread {
                     logger.error("Transaction resolve error: {}", e.getMessage());
                 }
             });
-            try {
-                this.publicKey = CalculatePublicKey.testBlock(ethBlock);
-            } catch (Exception e) {
-                logger.debug("Public key is null !!!...",e.getMessage());
-            }
         }
     }
 

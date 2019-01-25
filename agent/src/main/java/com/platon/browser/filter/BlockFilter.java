@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.AnalysisResult;
+import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.EventRes;
@@ -48,7 +49,20 @@ public class BlockFilter {
 
             // 设置需要使用当前上下文的属性
             block.setChainId(platon.getChainId());
-            block.setNodeId(param.publicKey.toString(16));
+
+            try {
+                // 设置节点ID，不足128前面补0
+                BigInteger publicKeyInt = CalculatePublicKey.testBlock(param.ethBlock);
+                String publicKey = publicKeyInt.toString(16);
+                if(publicKey.length()<128){
+                    int num = 128-publicKeyInt.intValue();
+                    for (int i=0;i<num;i++) publicKey="0"+publicKey;
+                }
+                block.setNodeId(publicKey);
+            } catch (Exception e) {
+                logger.debug("Public key is null !!!...",e.getMessage());
+            }
+
             // 设置节点名称
             String nodeName = NODE_ID_TO_NAME.get(block.getNodeId());
             block.setNodeName(nodeName);
