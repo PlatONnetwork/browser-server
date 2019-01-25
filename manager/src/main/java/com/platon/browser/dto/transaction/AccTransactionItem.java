@@ -1,8 +1,15 @@
 package com.platon.browser.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.web3j.utils.Convert;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -24,4 +31,32 @@ public class AccTransactionItem {
 
     @JsonIgnore
     private Date timestamp;
+
+    public void init(Object initData){
+        BeanUtils.copyProperties(initData,this);
+        this.setServerTime(System.currentTimeMillis());
+
+        String txHash = "",value = "0",cost = "0";
+        if(initData instanceof TransactionWithBLOBs){
+            TransactionWithBLOBs transaction = (TransactionWithBLOBs)initData;
+            // 交易生成的时间就是出块时间
+            this.setBlockTime(transaction.getTimestamp().getTime());
+            txHash = transaction.getHash();
+            value = transaction.getValue();
+            cost = transaction.getActualTxCost();
+        }
+
+        if(initData instanceof PendingTx){
+            PendingTx pendingTx = (PendingTx)initData;
+            this.setTxReceiptStatus(-1); // 手动设置交易状态为pending
+            txHash = pendingTx.getHash();
+            value = pendingTx.getValue();
+        }
+
+        this.setTxHash(txHash);
+        BigDecimal v = Convert.fromWei(value, Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        this.setValue(EnergonUtil.format(v));
+        v = Convert.fromWei(cost, Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        this.setActualTxCost(EnergonUtil.format(v));
+    }
 }
