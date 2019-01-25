@@ -3,7 +3,7 @@
 server.context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles.active: server
+  profiles.active: test
   application.name: browser-server
   #国际化配置
   messages.basename: messages

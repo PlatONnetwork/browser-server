@@ -61,7 +61,7 @@ public class AnalyseThread {
          THREAD_POOL = Executors.newFixedThreadPool(threadBatchSize);
     }
 
-    public void analyse(List<EthBlock> blocks){
+    public void  analyse(List<EthBlock> blocks){
         List<AnalysisParam> params = new ArrayList<>();
         blocks.forEach(block->params.add(getAnalyseParam(block)));
         AnalysisResult result = new AnalysisResult();

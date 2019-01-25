@@ -24,7 +24,7 @@ logging:
 
 platon:
   # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
-  chains: MAIN_NET-1-http://192.168.9.76:1234
+  chains: MAIN_NET-1-http://192.168.120.76:6789
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
