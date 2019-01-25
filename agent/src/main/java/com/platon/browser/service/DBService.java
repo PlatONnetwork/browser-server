@@ -33,7 +33,7 @@ public class DBService {
     private CustomBlockMapper customBlockMapper;
 
     @Transactional
-    public void flush(AnalyseThread.AnalysisResult result){
+    public void flush(AnalyseThread.AnalyseResult result){
 
         if(result.blocks.size()>0){
             blockMapper.batchInsert(result.blocks);

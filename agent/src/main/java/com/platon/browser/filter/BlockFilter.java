@@ -11,7 +11,6 @@ import com.platon.browser.dto.EventRes;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,25 +48,22 @@ public class BlockFilter {
     @Value("${platon.redis.key.max-item}")
     private long maxItemNum;
 
-    public Block analyse ( AnalyseThread.AnalysisParam param ) {
+    public Block analyse ( AnalyseThread.AnalyseParam param ) {
 
         long startTime = System.currentTimeMillis();
 
         EthBlock ethBlock = param.ethBlock;
-        List <Transaction> transactionsList = param.transactionList;
-        List <TransactionReceipt> transactionReceiptList = param.transactionReceiptList;
+        List <Transaction> transactionsList = param.transactions;
+        List <TransactionReceipt> transactionReceiptList = param.transactionReceipts;
         BigInteger publicKey = param.publicKey;
         Map <String, Object> transactionReceiptMap = param.transactionReceiptMap;
 
-        Block block = new Block();
+        BlockBean block = new BlockBean();
         //log.debug("[EthBlock info :]" + JSON.toJSONString(ethBlock));
         log.debug("[List <TransactionReceipt> info :]" + JSONArray.toJSONString(transactionReceiptList));
         log.debug("[ List <Transaction> info :]" + JSONArray.toJSONString(transactionsList));
         if (!StringUtils.isEmpty(ethBlock)) {
-            // 使用EthBlock初始化BlockBean
-            BlockBean tmp = new BlockBean();
-            tmp.init(ethBlock);
-            BeanUtils.copyProperties(tmp,block);
+            block.init(ethBlock);
 
             // 设置需要使用当前上下文的属性
             block.setChainId(chainId);

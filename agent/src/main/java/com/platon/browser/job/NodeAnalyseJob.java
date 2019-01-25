@@ -3,6 +3,7 @@ package com.platon.browser.job;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
@@ -14,12 +15,10 @@ import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.bean.NodeRankingBean;
-import com.platon.browser.utils.FilterTool;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.utils.FilterTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -136,10 +135,8 @@ public class NodeAnalyseJob {
                 int i = 1;
 
                 for (CandidateDto candidateDto : nodes) {
-                    NodeRanking nodeRanking = new NodeRanking();
-                    NodeRankingBean nrd = new NodeRankingBean();
-                    nrd.init(candidateDto);
-                    BeanUtils.copyProperties(nrd, nodeRanking);
+                    NodeRankingBean nodeRanking = new NodeRankingBean();
+                    nodeRanking.init(candidateDto);
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
                     nodeRanking.setChainId(chainId);
                     nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
