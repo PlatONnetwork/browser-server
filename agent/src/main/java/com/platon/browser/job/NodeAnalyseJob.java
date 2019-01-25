@@ -81,7 +81,7 @@ public class NodeAnalyseJob {
                     .andChainIdEqualTo(platon.getChainId())
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-            dbNodes.forEach(n->NODE_ID_TO_NAME.put(n.getNodeId(),n.getName()));
+            dbNodes.forEach(n->NODE_ID_TO_NAME.put(n.getNodeId().replaceFirst("^0*", ""),n.getName()));
 
 
             EthBlock ethBlock = null;

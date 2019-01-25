@@ -2,6 +2,7 @@ package com.platon.browser.thread;
 
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
@@ -49,10 +50,12 @@ public class AnalyseThread {
          THREAD_POOL = Executors.newFixedThreadPool(threadBatchSize);
     }
 
+
     public void analyse(List<EthBlock> blocks){
         List<AnalyseParam> params = new ArrayList<>();
         blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
         AnalyseResult result = new AnalyseResult();
+
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->
             THREAD_POOL.submit(()->{
