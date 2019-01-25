@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 public class PlatonClient {
     private TicketContract ticketContract;
     private CandidateContract candidateContract;
-
     @Value("${chain.id}")
     private String chainId;
     @Autowired
@@ -37,7 +36,6 @@ public class PlatonClient {
     public CandidateContract getCandidateContract () {
         return candidateContract;
     }
-
     public TicketContract getTicketContract () {
         return ticketContract;
     }
