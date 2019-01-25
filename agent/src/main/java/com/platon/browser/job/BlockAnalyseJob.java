@@ -70,9 +70,11 @@ public class BlockAnalyseJob {
             while (beginNumber<=endNumber.longValue()){
                 EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
                 concurrentBlocks.add(ethBlock);
+                long range = endNumber.longValue()-beginNumber+1;
                 if(
-                    (concurrentBlocks.size()>=threadBatchSize) || // 如果并发区块数量达到线程处理阈值，开启线程处理
-                    ((endNumber.longValue()-beginNumber)<threadBatchSize) // 结束区块号与起始区块号之差小于2，也进入线程批量处理,防止追上后响应过慢
+                    // 如果并发区块数量达到线程处理阈值，开启线程处理
+                    (concurrentBlocks.size()>=threadBatchSize)||
+                    (concurrentBlocks.size()>=range)
                 ){
                     analyseThread.analyse(concurrentBlocks);
                     concurrentBlocks.clear();
