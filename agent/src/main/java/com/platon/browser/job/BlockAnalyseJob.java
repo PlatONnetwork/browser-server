@@ -5,7 +5,6 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +49,6 @@ public class BlockAnalyseJob {
     private Web3j web3j;
 
     @Autowired
-    private CustomBlockMapper customBlockMapper;
-
-    @Autowired
     private AnalyseThread analyseThread;
 
     @PostConstruct
@@ -77,6 +73,7 @@ public class BlockAnalyseJob {
      */
     @Scheduled(cron="0/1 * * * * ?")
     protected void analyseBlock () {
+        logger.debug("*** In the BlockAnalyseJob *** ");
         try {
             // 需要并发处理的区块数据
             List<EthBlock> concurrentBlocks = new ArrayList<>();
@@ -87,7 +84,7 @@ public class BlockAnalyseJob {
                 concurrentBlocks.add(ethBlock);
                 if(
                         concurrentBlocks.size()>=threadBatchSize || // 如果并发区块数量达到线程处理阈值，开启线程处理
-                        (endNumber.longValue()-beginNumber)<threadBatchSize // 结束区块号与起始区块号之差小于线程批量处理数量，也进入线程批量处理,防止追上后响应过慢
+                                (endNumber.longValue()-beginNumber)<2 // 结束区块号与起始区块号之差小于2，也进入线程批量处理,防止追上后响应过慢
                 ){
                     analyseThread.analyse(concurrentBlocks);
                     concurrentBlocks.clear();
@@ -97,13 +94,7 @@ public class BlockAnalyseJob {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.debug("*** End the BlockAnalyseJob *** ");
     }
 
-    /**
-     * 更新区块中node_name字段为空的记录
-     */
-    @Scheduled(cron="0/5 * * * * ?")
-    protected void updateBlockNodeName() {
-        customBlockMapper.updateBlockNodeName(chainId);
-    }
 }

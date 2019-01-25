@@ -14,13 +14,13 @@ logging:
   level:
     org:
       springframework:
-        boot: debug
-        web: debug
-        jdbc: debug
-        dao: debug
-        transaction: debug
-      mybatis: debug
-    com.platon.browser.dao: debug
+        boot: error
+        web: error
+        jdbc: error
+        dao: error
+        transaction: error
+      mybatis: error
+    com.platon.browser.dao: error
 
 platon:
   # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔

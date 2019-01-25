@@ -42,7 +42,7 @@ import java.util.*;
 @Component
 public class NodeAnalyseJob {
 
-    private static Logger log = LoggerFactory.getLogger(NodeAnalyseJob.class);
+    private static Logger logger = LoggerFactory.getLogger(NodeAnalyseJob.class);
 
     @Value("${chain.id}")
     private String chainId;
@@ -92,6 +92,7 @@ public class NodeAnalyseJob {
      */
     @Scheduled(cron = "0/1 * * * * ?")
     protected void analyseNode () {
+        logger.debug("*** In the NodeAnalyseJob *** ");
         try {
 
             // 从数据库查询有效节点信息，放入本地缓存
@@ -110,13 +111,13 @@ public class NodeAnalyseJob {
                 long startTime = System.currentTimeMillis();
                 ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
                 beginNumber++;
-                log.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = web3jClient.getCandidateContract();
                 //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
-                log.debug("candidate---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("candidate---------------------------------->{}", System.currentTimeMillis()-startTime);
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if (null == nodeInfo) return;
                 if (null == nodes && nodes.size() < 0)return;
@@ -124,12 +125,12 @@ public class NodeAnalyseJob {
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-                log.debug("find db list---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("find db list---------------------------------->{}", System.currentTimeMillis()-startTime);
                 // 把库中记录全部置为无效
               /*  NodeRanking node = new NodeRanking();
                 node.setIsValid(0);
                 nodeRankingMapper.updateByExampleSelective(node, nodeRankingExample);*/
-                log.debug("update db list---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("update db list---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 List <NodeRanking> nodeList = new ArrayList <>();
                 int i = 1;
@@ -195,8 +196,10 @@ public class NodeAnalyseJob {
                 //TODO:publickey 0.4.0解析存在问题
                 FilterTool.currentBlockOwner(updateList, publicKey);
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
-                cutsomNodeRankingMapper.insertOrUpdate(updateList);
-                log.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
+                if(!updateList.isEmpty()){
+                    cutsomNodeRankingMapper.insertOrUpdate(updateList);
+                }
+                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
@@ -209,14 +212,14 @@ public class NodeAnalyseJob {
 
                 Set <NodeRanking> redisNode = new HashSet<>(updateList);
                 redisCacheService.updateNodePushCache(chainId, redisNode);
-                log.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
             }
 
 
         } catch (Exception e) {
-            log.error("PendingTxSynchronizeJob Exception", e.getMessage());
+            logger.error("NodeAnalyseJob Exception", e.getMessage());
         }
-
+        logger.debug("*** End the NodeAnalyseJob *** ");
     }
 
 

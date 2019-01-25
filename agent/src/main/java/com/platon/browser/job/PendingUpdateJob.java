@@ -29,7 +29,7 @@ public class PendingUpdateJob {
      * 3. 相同表示挂起交易已出块，删除挂起交易列表中该数据*/
 
 
-    private static Logger log = LoggerFactory.getLogger(PendingUpdateJob.class);
+    private static Logger logger = LoggerFactory.getLogger(PendingUpdateJob.class);
 
     @Autowired
     private TransactionMapper transactionMapper;
@@ -47,6 +47,7 @@ public class PendingUpdateJob {
      */
     @Scheduled(cron="0/5 * * * * ?")
     protected void updatePending () {
+        logger.debug("*** In the PendingUpdateJob *** ");
         try {
             //比对交易信息数据更新pending交易列表
             List <PendingTx> pendingTxeList = pendingTxMapper.selectByExample(new PendingTxExample());
@@ -57,19 +58,20 @@ public class PendingUpdateJob {
                     List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
                     if (transactionList.size() == 1) {
                         pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());
-                        log.debug("PendingTx update..... ->{" + pendingTx.getHash() + "}");
+                        logger.debug("PendingTx update..... ->{" + pendingTx.getHash() + "}");
                     }
                     if (transactionList.size() > 1) {
-                        log.error("PendingTx comparison transaction repeat!!!... TxHash:{" + pendingTx.getHash() + "}");
+                        logger.error("PendingTx comparison transaction repeat!!!... TxHash:{" + pendingTx.getHash() + "}");
                         throw new AppException(ErrorCodeEnum.PENDINGTX_REPEAT);
                     }
-                    log.debug("PendingTx update list is null...,wait next time update...");
+                    logger.debug("PendingTx update list is null...,wait next time update...");
                 }
             }
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e.getStackTrace());
+            logger.error(e.getMessage(), e.getStackTrace());
         }
+        logger.debug("*** End the PendingUpdateJob *** ");
     }
 
 

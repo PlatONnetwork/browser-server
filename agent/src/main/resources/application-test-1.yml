@@ -21,6 +21,8 @@ logging:
         transaction: debug
       mybatis: debug
     com.platon.browser.dao: debug
+    com.platon.browser.job: ${debug.level.job}
+    com.platon.browser.filter: ${debug.level.filter}
 #Elastic job日志存储位置
 log.eljob.path: ./logs
 
@@ -28,7 +30,7 @@ platon:
   # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
   chains: MAIN_NET-1-http://192.168.9.76:1234
   # 批量采集数量
-  thread.batch.size: 10
+  thread.batch.size: ${thread.num}
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
