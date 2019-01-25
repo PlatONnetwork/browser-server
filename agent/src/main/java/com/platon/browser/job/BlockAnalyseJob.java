@@ -87,5 +87,4 @@ public class BlockAnalyseJob {
         }
         logger.debug("*** End the BlockAnalyseJob *** ");
     }
-
 }
