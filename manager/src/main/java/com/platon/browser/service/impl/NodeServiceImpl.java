@@ -114,14 +114,11 @@ public class NodeServiceImpl implements NodeService {
             criteria.andNodeIdEqualTo(req.getNodeId());
         }
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
-        if (nodes.size()>1){
-            logger.error("duplicate node: node {} {}",req.getId());
-            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_DUPLICATE));
-        }
         if(nodes.size()==0){
             logger.error("invalid node {} {}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
+        // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
         return returnData;
