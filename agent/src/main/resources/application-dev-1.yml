@@ -29,12 +29,12 @@ log.eljob.path: ./logs
 
 platon:
   # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
-  chains: MAIN_NET-1-http://192.168.120.76:6789
+#  chains: MAIN_NET-1-http://192.168.120.76:6789
 #  chains: MAIN_NET-1-http://10.10.8.209:6789
 #  chains: MAIN_NET-1-http://10.10.8.209:6789
 #  chains: MAIN_NET-1-https://syde.platon.network/test
 #  chains: MAIN_NET-1-http://192.168.9.76:1234
-#  chains: MAIN_NET-1-http://127.0.0.1:7793
+  chains: MAIN_NET-1-http://127.0.0.1:7793
   # 批量采集数量
   thread.batch.size: ${thread.num}
   # 区块列表缓存和交易列表缓存配置
