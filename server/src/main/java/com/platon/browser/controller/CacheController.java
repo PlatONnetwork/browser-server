@@ -26,8 +26,8 @@ public class CacheController {
     @Autowired
     private ChainsConfig chainsConfig;
 
-    @GetMapping("reset/{chainId}/{cacheName}/{clearOld}")
-    public String reset(@PathVariable String chainId, @PathVariable String cacheName, @PathVariable boolean clearOld){
+    @GetMapping("reset/{chainId}/{cacheName}")
+    public String reset(@PathVariable String chainId, @PathVariable String cacheName){
         if(StringUtils.isBlank(chainId)){
             return "Please provide the chain id.";
         }
@@ -40,9 +40,9 @@ public class CacheController {
         try {
             CacheEnum cacheEnum = CacheEnum.valueOf(cacheName.toUpperCase());
             switch (cacheEnum){
-                case NODE:redisCacheService.resetNodePushCache(chainId,clearOld);break;
-                case BLOCK:redisCacheService.resetBlockCache(chainId,clearOld);break;
-                case TRANSACTION:redisCacheService.resetTransactionCache(chainId,clearOld);break;
+                case NODE:redisCacheService.resetNodePushCache(chainId,true);break;
+                case BLOCK:redisCacheService.resetBlockCache(chainId,true);break;
+                case TRANSACTION:redisCacheService.resetTransactionCache(chainId,true);break;
             }
         }catch (Exception ex){
             return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";
