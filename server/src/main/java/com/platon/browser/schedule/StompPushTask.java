@@ -24,6 +24,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -92,12 +93,13 @@ public class StompPushTask {
             List<StatisticPushItem> items = redisCacheService.getStatisticPushCache(chainId,1,50);
             StatisticGraphData graphData = new StatisticGraphData();
             for (int i=0;i<items.size();i++){
-                StatisticPushItem item = items.get(i);
+                StatisticPushItem currentBlock = items.get(i);
                 if(i==0||i==items.size()-1) continue;
-                StatisticPushItem prevItem = items.get(i-1);
-                graphData.getX().add(item.getHeight());
-                graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
-                graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
+                StatisticPushItem previousBlock = items.get(i-1);
+                graphData.getX().add(currentBlock.getHeight());
+                BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
+                graphData.getYa().add(sec.doubleValue());
+                graphData.getYb().add(currentBlock.getTransaction()==null?0:currentBlock.getTransaction());
             }
             statistic.setGraphData(graphData);
             BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);

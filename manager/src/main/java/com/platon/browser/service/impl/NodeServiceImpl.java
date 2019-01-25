@@ -116,7 +116,7 @@ public class NodeServiceImpl implements NodeService {
         PageHelper.startPage(1,1);
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if(nodes.size()==0){
-            logger.error("invalid node {} {}",req.getId());
+            logger.error("invalid node id:{}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
         // 取第一条

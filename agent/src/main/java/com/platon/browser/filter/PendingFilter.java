@@ -1,8 +1,7 @@
 package com.platon.browser.filter;
 
+import com.platon.browser.bean.PendingBean;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.common.dto.AnalysisResult;
-import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import org.slf4j.Logger;
@@ -15,10 +14,8 @@ import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
 import org.web3j.protocol.core.methods.response.Transaction;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,54 +25,43 @@ import java.util.List;
  */
 @Component
 public class PendingFilter {
-    private static Logger log = LoggerFactory.getLogger(PendingFilter.class);
+    private static Logger logger = LoggerFactory.getLogger(PendingFilter.class);
     @Autowired
     private PendingTxMapper pendingTxMapper;
     @Autowired
     private PlatonClient platon;
 
     @Transactional
-    public void analyse() throws Exception{
+    public void analyse() {
+        try {
             EthPendingTransactions ethPendingTransactions = platon.getWeb3j().ethPendingTx().send();
-            List <Transaction> list = ethPendingTransactions.getTransactions();
+            List <Transaction> transactions = ethPendingTransactions.getTransactions();
             List <PendingTx> pendingTxes = new ArrayList <>();
-            if (!list.equals(null) && list.size() > 0) {
-                for (Transaction transaction : list) {
-                    PendingTx pendingTx = new PendingTx();
-                    pendingTx.setHash(transaction.getHash());
-                    pendingTx.setFrom(transaction.getFrom());
-                    if (null != transaction.getTo()) {
-                        pendingTx.setTo(transaction.getTo());
-                        EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+            transactions.forEach(initData -> {
+                PendingBean bean = new PendingBean();
+                bean.initData(initData);
+                // 设置接收地址类型
+                if (null != initData.getTo()) {
+                    try {
+                        EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                         if ("0x".equals(ethGetCode.getCode())) {
-                            pendingTx.setReceiveType("account");
+                            bean.setReceiveType("account");
                         } else {
-                            pendingTx.setReceiveType("contract");
+                            bean.setReceiveType("contract");
                         }
-                    } else {
-                        pendingTx.setTo("0x0000000000000000000000000000000000000000");
+                    } catch (IOException e) {
+                        logger.error("platon.getWeb3j().ethGetCode() error:{}",e.getMessage());
                     }
-                    pendingTx.setEnergonLimit(transaction.getGas().toString());
-                    pendingTx.setEnergonPrice(transaction.getGasPrice().toString());
-                    pendingTx.setTimestamp(new Date());
-                    pendingTx.setValue(valueConversion(transaction.getValue()));
-                    pendingTx.setInput(transaction.getInput());
-                    AnalysisResult analysisResult = TransactionAnalysis.analysis(!transaction.getInput().equals(null) ? transaction.getInput() : "0x", true);
-                    String type = TransactionAnalysis.getTypeName(analysisResult.getType());
-                    pendingTx.setTxType(type);
-                    pendingTxes.add(pendingTx);
-                    log.debug("PendingTx Synchronization is complete !!!...");
+                } else {
+                    bean.setTo("0x0000000000000000000000000000000000000000");
                 }
-                pendingTxMapper.batchInsert(pendingTxes);
-            }
-            log.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
-
+                pendingTxes.add(bean);
+                logger.debug("PendingTx Synchronization is complete !!!...");
+            });
+            if(pendingTxes.size()>0) pendingTxMapper.batchInsert(pendingTxes);
+            logger.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    public String valueConversion(BigInteger value){
-        BigDecimal valueDiec = new BigDecimal(value.toString());
-        BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
-        return  conversionCoin.toString();
-    }
-
 }
