@@ -1,6 +1,6 @@
 package com.platon;
 
-import com.platon.browser.SpringbootApplication;
+import com.platon.browser.AgentApplication;
 import com.platon.browser.client.Web3jClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
@@ -13,7 +13,7 @@ import org.web3j.protocol.Web3j;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootTest(classes= SpringbootApplication.class, value = "spring.profiles.active=agent-1")
+@SpringBootTest(classes= AgentApplication.class, value = "spring.profiles.active=agent-1")
 public class TestBase {
     @Autowired
     protected BlockFilter blockFilter;
