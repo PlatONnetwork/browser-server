@@ -4,7 +4,6 @@ import com.platon.browser.filter.PendingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,10 +24,6 @@ public class PendingAnalyseJob {
      */
 
     private static Logger logger = LoggerFactory.getLogger(PendingAnalyseJob.class);
-
-    @Value("${chain.id}")
-    private String chainId;
-
     @Autowired
     private PendingFilter pendingFilter;
 

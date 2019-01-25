@@ -1,17 +1,15 @@
 package com.platon.browser.filter;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.mapper.PendingTxMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthPendingTransactions;
@@ -30,24 +28,15 @@ import java.util.List;
  */
 @Component
 public class PendingFilter {
-
     private static Logger log = LoggerFactory.getLogger(PendingFilter.class);
-
-    @Value("${chain.id}")
-    private String chainId;
-
     @Autowired
     private PendingTxMapper pendingTxMapper;
-
     @Autowired
-    private ChainsConfig chainsConfig;
+    private PlatonClient platon;
 
     @Transactional
     public void analyse() throws Exception{
-
-
-            EthPendingTransactions ethPendingTransactions = chainsConfig.getWeb3j(chainId).ethPendingTx().send();
-            Web3j web3j = chainsConfig.getWeb3j(chainId);
+            EthPendingTransactions ethPendingTransactions = platon.getWeb3j().ethPendingTx().send();
             List <Transaction> list = ethPendingTransactions.getTransactions();
             List <PendingTx> pendingTxes = new ArrayList <>();
             if (!list.equals(null) && list.size() > 0) {
@@ -57,7 +46,7 @@ public class PendingFilter {
                     pendingTx.setFrom(transaction.getFrom());
                     if (null != transaction.getTo()) {
                         pendingTx.setTo(transaction.getTo());
-                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
+                        EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
                         if ("0x".equals(ethGetCode.getCode())) {
                             pendingTx.setReceiveType("account");
                         } else {

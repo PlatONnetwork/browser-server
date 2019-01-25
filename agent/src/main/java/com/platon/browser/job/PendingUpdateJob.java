@@ -1,5 +1,6 @@
 package com.platon.browser.job;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.base.AppException;
 import com.platon.browser.common.enums.ErrorCodeEnum;
 import com.platon.browser.dao.entity.PendingTx;
@@ -11,7 +12,6 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,18 +27,13 @@ public class PendingUpdateJob {
      * 1. 定时查询挂起交易列表
      * 2. 比对交易列表数据
      * 3. 相同表示挂起交易已出块，删除挂起交易列表中该数据*/
-
-
     private static Logger logger = LoggerFactory.getLogger(PendingUpdateJob.class);
-
     @Autowired
     private TransactionMapper transactionMapper;
-
     @Autowired
     private PendingTxMapper pendingTxMapper;
-
-    @Value("${chain.id}")
-    private String chainId;
+    @Autowired
+    private PlatonClient platon;
 
     /**
      * 更新待处理交易
@@ -52,7 +47,7 @@ public class PendingUpdateJob {
             if (pendingTxeList.size() > 0) {
                 for (PendingTx pendingTx : pendingTxeList) {
                     TransactionExample transactionExample = new TransactionExample();
-                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(chainId);
+                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(platon.getChainId());
                     List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
                     if (transactionList.size() == 1) {
                         pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());

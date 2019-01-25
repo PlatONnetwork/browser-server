@@ -1,8 +1,8 @@
 package com.platon.browser.thread;
 
 import com.platon.browser.bean.TransactionBean;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -32,12 +32,10 @@ import java.util.concurrent.Executors;
 @Component
 public class AnalyseThread {
     private static Logger logger = LoggerFactory.getLogger(AnalyseThread.class);
-    @Value("${chain.id}")
-    private String chainId;
+    @Autowired
+    private PlatonClient platon;
     @Value("${platon.thread.batch.size}")
     private int threadBatchSize;
-    @Autowired
-    private ChainsConfig chainsConfig;
     @Autowired
     private BlockFilter blockFilter;
     @Autowired
@@ -53,7 +51,7 @@ public class AnalyseThread {
 
     public void analyse(List<EthBlock> blocks){
         List<AnalyseParam> params = new ArrayList<>();
-        blocks.forEach(block->params.add(new AnalyseParam(block,chainsConfig.getWeb3j(chainId))));
+        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
         AnalyseResult result = new AnalyseResult();
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->

@@ -1,7 +1,7 @@
 package com.platon.browser.job;
 
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
@@ -29,32 +28,22 @@ import java.util.List;
  */
 @Component
 public class BlockAnalyseJob {
-
     private static Logger logger = LoggerFactory.getLogger(BlockAnalyseJob.class);
-
     @Autowired
     private BlockMapper blockMapper;
-
-    @Value("${chain.id}")
-    private String chainId;
     @Value("${platon.thread.batch.size}")
     private int threadBatchSize;
-
     @Autowired
-    private ChainsConfig chainsConfig;
-
+    private PlatonClient platon;
     // 起始区块号
     private long beginNumber=1;
-
-    private Web3j web3j;
-
     @Autowired
     private AnalyseThread analyseThread;
 
     @PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.createCriteria().andChainIdEqualTo(platon.getChainId());
         condition.setOrderByClause("number desc");
         PageHelper.startPage(1, 1);
         List <Block> blocks = blockMapper.selectByExample(condition);
@@ -65,7 +54,6 @@ public class BlockAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
-        web3j = chainsConfig.getWeb3j(chainId);
     }
 
     /**
@@ -78,9 +66,9 @@ public class BlockAnalyseJob {
             // 需要并发处理的区块数据
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             // 结束区块号
-            BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
+            BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
             while (beginNumber<=endNumber.longValue()){
-                EthBlock ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
                 concurrentBlocks.add(ethBlock);
                 if(
                     (concurrentBlocks.size()>=threadBatchSize) || // 如果并发区块数量达到线程处理阈值，开启线程处理

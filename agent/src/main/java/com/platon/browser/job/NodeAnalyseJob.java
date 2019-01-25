@@ -4,10 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.NodeRankingBean;
-import com.platon.browser.client.Web3jClient;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -20,11 +19,9 @@ import com.platon.browser.utils.FilterTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
@@ -40,40 +37,24 @@ import java.util.*;
  */
 @Component
 public class NodeAnalyseJob {
-
     private static Logger logger = LoggerFactory.getLogger(NodeAnalyseJob.class);
-
-    @Value("${chain.id}")
-    private String chainId;
-
     private static Long beginNumber = 0L;
-
     @Autowired
     private BlockMapper blockMapper;
-
-
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
-
     @Autowired
     private CutsomNodeRankingMapper cutsomNodeRankingMapper;
-
     @Autowired
     private RedisCacheService redisCacheService;
-
-
     @Autowired
-    private ChainsConfig chainsConfig;
-
-    @Autowired
-    private Web3jClient web3jClient;
-
+    private PlatonClient platon;
     public final static Map<String,String> NODE_ID_TO_NAME = new HashMap<>();
 
     @PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.createCriteria().andChainIdEqualTo(platon.getChainId());
         condition.setOrderByClause("number desc");
         PageHelper.startPage(1, 1);
         List <Block> blocks = blockMapper.selectByExample(condition);
@@ -97,22 +78,21 @@ public class NodeAnalyseJob {
             // 从数据库查询有效节点信息，放入本地缓存
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria()
-                    .andChainIdEqualTo(chainId)
+                    .andChainIdEqualTo(platon.getChainId())
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             dbNodes.forEach(n->NODE_ID_TO_NAME.put(n.getNodeId(),n.getName()));
 
 
             EthBlock ethBlock = null;
-            Web3j web3j = chainsConfig.getWeb3j(chainId);
-            BigInteger endNumber = web3j.ethBlockNumber().send().getBlockNumber();
+            BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
             while (beginNumber <= endNumber.longValue()) {
                 long startTime = System.currentTimeMillis();
-                ethBlock = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
+                ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
                 beginNumber++;
                 logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
-                CandidateContract candidateContract = web3jClient.getCandidateContract();
+                CandidateContract candidateContract = platon.getCandidateContract();
                 //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
@@ -121,7 +101,7 @@ public class NodeAnalyseJob {
                 if (null == nodeInfo) return;
                 if (null == nodes && nodes.size() < 0)return;
                 nodeRankingExample = new NodeRankingExample();
-                nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
+                nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
                 logger.debug("find db list---------------------------------->{}", System.currentTimeMillis()-startTime);
@@ -138,7 +118,7 @@ public class NodeAnalyseJob {
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
-                    nodeRanking.setChainId(chainId);
+                    nodeRanking.setChainId(platon.getChainId());
                     nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
                     nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
                     nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(rate).toString());
@@ -208,7 +188,7 @@ public class NodeAnalyseJob {
                 }
 
                 Set <NodeRanking> redisNode = new HashSet<>(updateList);
-                redisCacheService.updateNodePushCache(chainId, redisNode);
+                redisCacheService.updateNodePushCache(platon.getChainId(), redisNode);
                 logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
             }
 

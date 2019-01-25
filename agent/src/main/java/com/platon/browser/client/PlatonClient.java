@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
  * Time: 14:42
  */
 @Component
-public class Web3jClient {
+public class PlatonClient {
     private TicketContract ticketContract;
     private CandidateContract candidateContract;
 
@@ -41,4 +41,8 @@ public class Web3jClient {
     public TicketContract getTicketContract () {
         return ticketContract;
     }
+    public Web3j getWeb3j () {
+        return chainsConfig.getWeb3j(chainId);
+    }
+    public String getChainId(){return chainId;}
 }

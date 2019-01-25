@@ -1,14 +1,13 @@
 package com.platon.browser.filter;
 
 import com.platon.browser.bean.TransactionBean;
-import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -24,23 +23,16 @@ import java.util.*;
  */
 @Component
 public class TransactionFilter {
-
     private static Logger log = LoggerFactory.getLogger(TransactionFilter.class);
-
-    @Value("${chain.id}")
-    private String chainId;
-
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
-
     @Autowired
-    private ChainsConfig chainsConfig;
+    private PlatonClient platon;
 
     public final static Map<String,String> RECEIVE_TYPE_MAP = new HashMap<>();
 
     public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
-        Web3j web3j = chainsConfig.getWeb3j(chainId);
         List<TransactionBean> transactions = new ArrayList <>();
         param.transactions.forEach(initData -> {
             if(null != transactionReceiptMap.get(initData.getHash())){
@@ -55,7 +47,7 @@ public class TransactionFilter {
                     transaction.setTimestamp(new Date(time));
                 }
                 // Setup the chain id
-                transaction.setChainId(chainId);
+                transaction.setChainId(platon.getChainId());
                 // Setup the receiver type
                 if (null != initData.getTo()) {
                     transaction.setTo(initData.getTo());
@@ -64,7 +56,7 @@ public class TransactionFilter {
                         transaction.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
                     }else {
                         try {
-                            EthGetCode ethGetCode = web3j.ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                            EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                             if ("0x".equals(ethGetCode.getCode())) {
                                 transaction.setReceiveType("account");
                             } else {
