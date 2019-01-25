@@ -54,9 +54,9 @@ public class AccTransactionItem {
         }
 
         this.setTxHash(txHash);
-        BigDecimal v = Convert.fromWei(value, Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        BigDecimal v = Convert.fromWei(value, Convert.Unit.ETHER);
         this.setValue(EnergonUtil.format(v));
-        v = Convert.fromWei(cost, Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
     }
 }

@@ -33,9 +33,9 @@ public class TransactionListItem {
         this.setBlockHeight(initData.getBlockNumber());
         // 交易时间就是出块时间
         this.setBlockTime(initData.getTimestamp().getTime());
-        BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
-        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
         this.setValue(EnergonUtil.format(v));
         this.setServerTime(System.currentTimeMillis());
     }

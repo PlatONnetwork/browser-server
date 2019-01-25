@@ -44,12 +44,12 @@ public class TransactionDetail {
         this.setBlockHeight(initData.getBlockNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
-        BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        BigDecimal v=Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
-        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
         this.setValue(EnergonUtil.format(v));
         this.setPriceInE(initData.getEnergonPrice());
-        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER).setScale(8,RoundingMode.DOWN);
+        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER);
         this.setPriceInEnergon(EnergonUtil.format(v));
     }
 }
