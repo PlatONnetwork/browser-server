@@ -74,6 +74,7 @@ public class BlockAnalyseJob {
                 if(
                     // 如果并发区块数量达到线程处理阈值，开启线程处理
                     (concurrentBlocks.size()>=threadBatchSize)||
+                    // 追上之后，有多处理多少
                     (concurrentBlocks.size()>=range)
                 ){
                     analyseThread.analyse(concurrentBlocks);
