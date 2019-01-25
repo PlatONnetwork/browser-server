@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,6 +45,14 @@ public class DBService {
         }
 
         if(result.transactions.size()>0){
+            // 更新交易前，需要先根据区块号和交易索引排序
+            Collections.sort(result.transactions,(t1,t2)->{
+                if(t1.getBlockNumber()>t2.getBlockNumber()) return 1;
+                if(t1.getBlockNumber()<t2.getBlockNumber()) return -1;
+                if(t1.getTransactionIndex()>t2.getTransactionIndex()) return 1;
+                if(t1.getTransactionIndex()<t2.getTransactionIndex()) return -1;
+                return 0;
+            });
             transactionMapper.batchInsert(result.transactions);
             // 更新缓存
             List<String> txHashes = new ArrayList<>();
