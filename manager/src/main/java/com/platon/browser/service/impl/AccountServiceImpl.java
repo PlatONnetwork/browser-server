@@ -14,7 +14,6 @@ import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.EnergonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -57,15 +56,7 @@ public class AccountServiceImpl implements AccountService {
         List<AccTransactionItem> data = new ArrayList<>();
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(initData,bean);
-            bean.setTxHash(initData.getHash());
-            bean.setServerTime(System.currentTimeMillis());
-            // 交易生成的时间就是出块时间
-            bean.setBlockTime(initData.getTimestamp().getTime());
-            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
-            bean.setValue(EnergonUtil.format(v));
-            v = Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
-            bean.setActualTxCost(EnergonUtil.format(v));
+            bean.init(initData);
             data.add(bean);
         });
 
@@ -75,13 +66,7 @@ public class AccountServiceImpl implements AccountService {
         returnData.setTradeCount(returnData.getTradeCount()+Long.valueOf(page.getTotal()).intValue());
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
-            BeanUtils.copyProperties(initData,bean);
-            bean.setTxHash(initData.getHash());
-            bean.setServerTime(System.currentTimeMillis());
-            bean.setTxReceiptStatus(-1); // 手动设置交易状态为pending
-            BigDecimal v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
-            bean.setValue(EnergonUtil.format(v));
-            bean.setActualTxCost("0");
+            bean.init(initData);
             data.add(bean);
         });
 

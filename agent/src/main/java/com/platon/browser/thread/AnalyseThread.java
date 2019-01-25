@@ -1,7 +1,9 @@
 package com.platon.browser.thread;
 
+import com.platon.browser.bean.TransactionBean;
+import com.platon.browser.client.PlatonClient;
+import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -13,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
+import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.PostConstruct;
@@ -29,25 +33,10 @@ import java.util.concurrent.Executors;
 @Component
 public class AnalyseThread {
     private static Logger logger = LoggerFactory.getLogger(AnalyseThread.class);
-    public static class AnalysisParam {
-        public EthBlock ethBlock;
-        public List <org.web3j.protocol.core.methods.response.Transaction> transactionList;
-        public List <TransactionReceipt> transactionReceiptList;
-        public Map<String,Object> transactionReceiptMap;
-        public BigInteger publicKey;
-    }
-    public static class AnalysisResult{
-        public List<Block> blocks = new CopyOnWriteArrayList<>();
-        public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
-        public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
-    }
-
-    @Value("${chain.id}")
-    private String chainId;
+    @Autowired
+    private PlatonClient platon;
     @Value("${platon.thread.batch.size}")
     private int threadBatchSize;
-    @Autowired
-    private ChainsConfig chainsConfig;
     @Autowired
     private BlockFilter blockFilter;
     @Autowired
@@ -61,10 +50,12 @@ public class AnalyseThread {
          THREAD_POOL = Executors.newFixedThreadPool(threadBatchSize);
     }
 
-    public void  analyse(List<EthBlock> blocks){
-        List<AnalysisParam> params = new ArrayList<>();
-        blocks.forEach(block->params.add(getAnalyseParam(block)));
-        AnalysisResult result = new AnalysisResult();
+
+    public void analyse(List<EthBlock> blocks){
+        List<AnalyseParam> params = new ArrayList<>();
+        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
+        AnalyseResult result = new AnalyseResult();
+
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->
             THREAD_POOL.submit(()->{
@@ -72,7 +63,7 @@ public class AnalyseThread {
                 try {
                     try {
                         Block block = blockFilter.analyse(param);
-                        List<TransactionWithBLOBs> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
+                        List<TransactionBean> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
                         // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
@@ -81,7 +72,6 @@ public class AnalyseThread {
                         BlockMissing err = new BlockMissing();
                         err.setNumber(param.ethBlock.getBlock().getNumber().longValue());
                         result.errorBlocks.add(err);
-                        return;
                     }
                 }finally {
                     latch.countDown();
@@ -102,56 +92,44 @@ public class AnalyseThread {
         if((System.currentTimeMillis()-startTime)>0) logger.debug("databaseService.flush(result): -> {}",System.currentTimeMillis()-startTime);
     }
 
-    /**
-     * 通过原生区块信息构造分析参数
-     * @param ethBlock
-     * @return
-     */
-    private AnalysisParam getAnalyseParam(EthBlock ethBlock) {
+    public static class AnalyseParam {
+        public EthBlock ethBlock;
+        public List <Transaction> transactions;
+        public List <TransactionReceipt> transactionReceipts;
+        public Map<String,Object> transactionReceiptMap;
+        public BigInteger publicKey;
+        public AnalyseParam(EthBlock initData, Web3j web3j){
+            this.ethBlock=initData;
+            this.transactionReceiptMap = new HashMap <>();
+            this.transactions = new ArrayList<>();
+            this.transactionReceipts = new ArrayList <>();
 
-        logger.debug("************** Analysis start ***************");
-
-        long startTime = System.currentTimeMillis();
-
-        // 构造分析参数
-        AnalysisParam param = new AnalysisParam();
-        param.ethBlock = ethBlock;
-
-        Map<String,Object> transactionMap = new HashMap<>();
-        Map<String,Object> transactionReceiptMap = new HashMap <>();
-
-        List <EthBlock.TransactionResult> transactions = ethBlock.getBlock().getTransactions();
-
-        List <org.web3j.protocol.core.methods.response.Transaction> transactionList = new ArrayList<>();
-        List <TransactionReceipt> transactionReceiptList = new ArrayList <>();
-        transactions.forEach(transaction->{
-            org.web3j.protocol.core.methods.response.Transaction rawTransaction = (org.web3j.protocol.core.methods.response.Transaction) transaction.get();
-            transactionList.add(rawTransaction);
-            transactionMap.put(rawTransaction.getHash(),transaction);
+            Map<String,Object> transactionMap = new HashMap<>();
+            this.ethBlock.getBlock().getTransactions().forEach(transaction->{
+                Transaction rawTransaction = (Transaction) transaction.get();
+                transactions.add(rawTransaction);
+                transactionMap.put(rawTransaction.getHash(),transaction);
+                try {
+                    EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(rawTransaction.getHash()).send();
+                    Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+                    TransactionReceipt receipt = transactionReceipt.get();
+                    transactionReceipts.add(receipt);
+                    transactionReceiptMap.put(receipt.getTransactionHash(),receipt);
+                } catch (IOException e) {
+                    logger.error("Transaction resolve error: {}", e.getMessage());
+                }
+            });
             try {
-                EthGetTransactionReceipt ethGetTransactionReceipt = chainsConfig.getWeb3j(chainId).ethGetTransactionReceipt(rawTransaction.getHash()).send();
-                Optional<TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
-                TransactionReceipt receipt = transactionReceipt.get();
-                transactionReceiptList.add(receipt);
-                transactionReceiptMap.put(receipt.getTransactionHash(),receipt);
-            } catch (IOException e) {
-                logger.error("Transaction resolve error: {}", e.getMessage());
+                this.publicKey = CalculatePublicKey.testBlock(ethBlock);
+            } catch (Exception e) {
+                logger.debug("Public key is null !!!...",e.getMessage());
             }
-        });
-        logger.debug("ethGetTransactionReceipt()         :--->{}",System.currentTimeMillis()-startTime);
-
-        param.transactionList=transactionList;
-        param.transactionReceiptList=transactionReceiptList;
-        param.transactionReceiptMap=transactionReceiptMap;
-
-        startTime = System.currentTimeMillis();
-        try {
-            param.publicKey = CalculatePublicKey.testBlock(ethBlock);
-        } catch (Exception e) {
-            logger.debug("Public key is null !!!...",e.getMessage());
         }
-        logger.debug("CalculatePublicKey.testBlock()         :--->{}",System.currentTimeMillis()-startTime);
+    }
 
-        return param;
+    public static class AnalyseResult{
+        public List<Block> blocks = new CopyOnWriteArrayList<>();
+        public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
+        public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
     }
 }

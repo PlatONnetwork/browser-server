@@ -7,7 +7,6 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class BlockPushItem {
@@ -26,7 +25,7 @@ public class BlockPushItem {
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setTransaction(initData.getTransactionNumber());
-        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER).setScale(8, RoundingMode.DOWN);
+        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));
         this.setServerTime(System.currentTimeMillis());
     }

@@ -1,10 +1,6 @@
 package com.platon.browser.util;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class IPGenTool {
     public static String getForeignIp(){
@@ -35,27 +31,4 @@ public class IPGenTool {
         return b[0]+"."+b[1]+"."+b[2]+"."+b[3];
     }
 
-    public static void main(String[] args) {
-        String data = "561989965773895576813579715222857160699960464449120684591664494480641850412901703913038313549619636487002155264521480576575605556920764090030793982122823";
-        char [] chars = data.toCharArray();
-        StringBuffer sb = new StringBuffer();
-        for(char c : chars) sb.append(Integer.toHexString(c));
-
-        System.out.println(sb.toString());
-
-        BigDecimal val = BigDecimal.valueOf(10.4568999999995555).setScale(18, RoundingMode.DOWN);
-        System.out.println(val.doubleValue());
-
-        String rs = NumberUtil.format(val,".##################");
-        System.out.println(rs);
-
-        System.out.println(EnergonUtil.format(BigDecimal.valueOf(0)));
-
-        ThreadLocal tl = new ThreadLocal();
-
-        ExecutorService service = Executors.newFixedThreadPool(10);
-
-
-
-    }
 }

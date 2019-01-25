@@ -21,12 +21,11 @@ import java.util.Map;
  */
 public class NodeRankingBean extends NodeRanking {
 
-    public static final Map<String,GeoUtil.IpLocation> ipMap = new HashMap<>();
+    public static final Map<String,GeoUtil.IpLocation> IP_MAP = new HashMap<>();
 
     public void init ( CandidateDto initData ) {
-        CandidateDetailDto candidateDetailDto = null;
         try {
-            candidateDetailDto = JSONObject.parseObject(initData.getExtra(), CandidateDetailDto.class);
+            CandidateDetailDto candidateDetailDto = JSONObject.parseObject(initData.getExtra(), CandidateDetailDto.class);
             this.setName(candidateDetailDto.getNodeName());
             this.setIntro(candidateDetailDto.getNodeDiscription());
             this.setOrgName(candidateDetailDto.getNodeDepartment());
@@ -48,11 +47,11 @@ public class NodeRankingBean extends NodeRanking {
         this.setDeposit(initData.getDeposit().toString());
         this.setRewardRatio(BigDecimal.valueOf(initData.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
         this.setBlockCount(0L);
-        GeoUtil.IpLocation ipLocation =ipMap.get(initData.getHost());
+        GeoUtil.IpLocation ipLocation =IP_MAP.get(initData.getHost());
         if(StringUtils.isEmpty(ipLocation)){
             GeoUtil.IpLocation nowIpLocation = GeoUtil.getIpLocation(getIp());
             BeanUtils.copyProperties(nowIpLocation, this);
-            ipMap.put(initData.getHost(),nowIpLocation);
+            IP_MAP.put(initData.getHost(),nowIpLocation);
         }else {
             BeanUtils.copyProperties(ipLocation, this);
         }

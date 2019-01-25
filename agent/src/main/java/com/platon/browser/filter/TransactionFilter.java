@@ -1,23 +1,18 @@
 package com.platon.browser.filter;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.dto.AnalysisResult;
-import com.platon.browser.common.util.TransactionAnalysis;
-import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.bean.TransactionBean;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetCode;
-import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -28,104 +23,56 @@ import java.util.*;
  */
 @Component
 public class TransactionFilter {
-
     private static Logger log = LoggerFactory.getLogger(TransactionFilter.class);
-
-    @Value("${chain.id}")
-    private String chainId;
-
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
-
     @Autowired
-    private ChainsConfig chainsConfig;
+    private PlatonClient platon;
 
-    public static Map<String,String> toAddressTypeMap = new HashMap <>();
+    public final static Map<String,String> RECEIVE_TYPE_MAP = new HashMap<>();
 
-    public List<TransactionWithBLOBs> analyse(AnalyseThread.AnalysisParam param, long time) throws Exception{
-
-        List<Transaction> transactionsList = param.transactionList;
+    public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
-
-        if (transactionsList.size() == 0 && transactionReceiptMap.size() == 0){
-            return Collections.EMPTY_LIST;
-        }
-
-        Web3j web3j = chainsConfig.getWeb3j(chainId);
-        //build database struct<Transaction>
-        List<TransactionWithBLOBs> transactionWithBLOBsList = new ArrayList <>();
-        Set<com.platon.browser.dao.entity.Transaction> transactionSet = new HashSet <>();
-        //for loop transaction & transactionReceipt build database struct on PlatON
-        List<String> txHashes = new ArrayList <>();
-        for(Transaction transaction : transactionsList){
-            if(null != transactionReceiptMap.get(transaction.getHash())){
-                TransactionReceipt transactionReceipt = (TransactionReceipt) transactionReceiptMap.get(transaction.getHash());
-                txHashes.add(transaction.getHash());
-                com.platon.browser.dao.entity.Transaction transactions= new com.platon.browser.dao.entity.Transaction();
-                TransactionWithBLOBs transactionWithBLOBs = new TransactionWithBLOBs();
-                transactionWithBLOBs.setHash(transaction.getHash());
-                transactionWithBLOBs.setFrom(transaction.getFrom());
-
-                transactionWithBLOBs.setValue(transaction.getValue().toString());
-                transactionWithBLOBs.setTransactionIndex(transactionReceipt.getTransactionIndex().intValue());
-                transactionWithBLOBs.setEnergonPrice(transaction.getGasPrice().toString());
-                transactionWithBLOBs.setEnergonLimit(transaction.getGas().toString());
-                transactionWithBLOBs.setEnergonUsed(transactionReceipt.getGasUsed().toString());
-                transactionWithBLOBs.setNonce(transaction.getNonce().toString());
+        List<TransactionBean> transactions = new ArrayList <>();
+        param.transactions.forEach(initData -> {
+            if(null != transactionReceiptMap.get(initData.getHash())){
+                TransactionReceipt receipt = (TransactionReceipt) transactionReceiptMap.get(initData.getHash());
+                TransactionBean transaction = new TransactionBean();
+                // Initialize the entity with the raw transaction and receipt
+                transaction.init(initData,receipt);
+                // Convert timestamp into milliseconds
                 if (String.valueOf(time).length() == 10) {
-                    transactionWithBLOBs.setTimestamp(new Date(time * 1000L));
+                    transaction.setTimestamp(new Date(time * 1000L));
                 } else {
-                    transactionWithBLOBs.setTimestamp(new Date(time));
+                    transaction.setTimestamp(new Date(time));
                 }
-                transactionWithBLOBs.setCreateTime(new Date());
-                transactionWithBLOBs.setUpdateTime(new Date());
-                if(null == transactionReceipt.getBlockNumber() ){
-                    transactionWithBLOBs.setTxReceiptStatus(0);
-                }
-                transactionWithBLOBs.setTxReceiptStatus(1);
-                transactionWithBLOBs.setActualTxCost(transactionReceipt.getGasUsed().multiply(transaction.getGasPrice()).toString());
-                transactionWithBLOBs.setChainId(chainId);
-                transactionWithBLOBs.setBlockHash(transaction.getBlockHash());
-                transactionWithBLOBs.setBlockNumber(transaction.getBlockNumber().longValue());
-                if(transaction.getInput().length() <= 65535){
-                    transactionWithBLOBs.setInput(transaction.getInput());
-                }else {
-                    transactionWithBLOBs.setInput(transaction.getInput().substring(0,65535));
-                }
-                if(transaction.getInput().equals("0x") && transaction.getValue() != null){
-                    transactionWithBLOBs.setTxType("transfer");
-                }
-                AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
-                if("1".equals(analysisResult.getType())){
-                    analysisResult.setFunctionName("contract deploy");
-                    transactionWithBLOBs.setTo("0x0000000000000000000000000000000000000000");
-                    transactionWithBLOBs.setReceiveType("contract");
-                }
-                if (null != transaction.getTo()) {
-                    transactionWithBLOBs.setTo(transaction.getTo());
+                // Setup the chain id
+                transaction.setChainId(platon.getChainId());
+                // Setup the receiver type
+                if (null != initData.getTo()) {
+                    transaction.setTo(initData.getTo());
                     //judge `to` address is accountAddress or contractAddress
-                    if(null != toAddressTypeMap.get(transaction.getTo())){
-                        transactionWithBLOBs.setReceiveType(toAddressTypeMap.get(transaction.getTo()));
+                    if(null != RECEIVE_TYPE_MAP.get(initData.getTo())){
+                        transaction.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
                     }else {
-                        EthGetCode ethGetCode = web3j.ethGetCode(transaction.getTo(), DefaultBlockParameterName.LATEST).send();
-                        if ("0x".equals(ethGetCode.getCode())) {
-                            transactionWithBLOBs.setReceiveType("account");
-                        } else {
-                            transactionWithBLOBs.setReceiveType("contract");
+                        try {
+                            EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                            if ("0x".equals(ethGetCode.getCode())) {
+                                transaction.setReceiveType("account");
+                            } else {
+                                transaction.setReceiveType("contract");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-                toAddressTypeMap.put(transaction.getTo(),transactionWithBLOBs.getReceiveType());
-                String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
-                transactionWithBLOBs.setTxType(type == null ? "transfer" : type);
-                String txinfo = JSON.toJSONString(analysisResult);
-                transactionWithBLOBs.setTxInfo(txinfo);
-                transactionWithBLOBsList.add(transactionWithBLOBs);
-                BeanUtils.copyProperties(transactionWithBLOBs,transactions);
-                transactionSet.add(transactions);
+                // Cache the receiver type for later use
+                RECEIVE_TYPE_MAP.put(initData.getTo(),transaction.getReceiveType());
+                transactions.add(transaction);
             }
-        }
-        return transactionWithBLOBsList;
+        });
+        return transactions;
     }
 
 }

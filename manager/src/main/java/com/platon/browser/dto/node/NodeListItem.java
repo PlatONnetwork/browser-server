@@ -30,7 +30,7 @@ public class NodeListItem {
         this.setLogo(initData.getUrl());
         BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
-        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER).setScale(8);
+        v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER);
         this.setDeposit(EnergonUtil.format(v));
     }
 }

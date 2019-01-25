@@ -1,7 +1,7 @@
 package com.platon;
 
 import com.platon.browser.AgentApplication;
-import com.platon.browser.client.Web3jClient;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.filter.*;
@@ -24,7 +24,7 @@ public class TestBase {
     protected String chainId;
 
     @Autowired
-    protected Web3jClient web3jClient;
+    protected PlatonClient web3jClient;
     @Autowired
     protected ChainsConfig chainsConfig;
 
