@@ -35,21 +35,15 @@ public class DBService {
             blockMapper.batchInsert(result.blocks);
             // 更新区块中的节点名称字段：node_name
             customBlockMapper.updateBlockNodeName(chainId);
-            // 更新缓存
             redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
         }
 
         if(result.transactions.size()>0){
             transactionMapper.batchInsert(result.transactions);
-            // 更新缓存
             redisCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
         }
 
-        if(result.errorBlocks.size()>0){
-            blockMissingMapper.batchInsert(result.errorBlocks);
-        }
-
-        // 更新统计缓存
+        if(result.errorBlocks.size()>0) blockMissingMapper.batchInsert(result.errorBlocks);
         redisCacheService.updateStatisticsCache(chainId);
     }
 }
