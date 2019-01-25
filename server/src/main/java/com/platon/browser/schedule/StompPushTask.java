@@ -97,8 +97,8 @@ public class StompPushTask {
                 if(i==0||i==items.size()-1) continue;
                 StatisticPushItem previousBlock = items.get(i-1);
                 graphData.getX().add(currentBlock.getHeight());
-                BigDecimal den = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime());
-                graphData.getYa().add(den.divide(BigDecimal.valueOf(1000)).doubleValue());
+                BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
+                graphData.getYa().add(sec.doubleValue());
                 graphData.getYb().add(currentBlock.getTransaction()==null?0:currentBlock.getTransaction());
             }
             statistic.setGraphData(graphData);
