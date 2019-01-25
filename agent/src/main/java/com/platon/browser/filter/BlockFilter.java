@@ -43,12 +43,12 @@ public class BlockFilter {
     public Block analyse ( AnalyseThread.AnalyseParam param ) {
         long startTime = System.currentTimeMillis();
 
-        BlockBean block = new BlockBean();
+        BlockBean bean = new BlockBean();
         if (param.ethBlock!=null) {
-            block.init(param.ethBlock);
+            bean.init(param.ethBlock);
 
             // 设置需要使用当前上下文的属性
-            block.setChainId(platon.getChainId());
+            bean.setChainId(platon.getChainId());
 
             try {
                 // 设置节点ID，不足128前面补0
@@ -58,21 +58,22 @@ public class BlockFilter {
                     int num = 128-publicKeyInt.intValue();
                     for (int i=0;i<num;i++) publicKey="0"+publicKey;
                 }
-                block.setNodeId(publicKey);
+                bean.setNodeId(publicKey);
             } catch (Exception e) {
                 logger.debug("Public key is null !!!...",e.getMessage());
             }
 
             // 设置节点名称
-            String nodeName = NODE_ID_TO_NAME.get(block.getNodeId());
-            block.setNodeName(nodeName);
+            String nodeName = NODE_ID_TO_NAME.get(bean.getNodeId());
+            bean.setNodeName(nodeName);
 
             if (param.transactions.isEmpty() && param.transactionReceipts.isEmpty()) {
-                block.setActualTxCostSum("0");
-                block.setBlockVoteAmount(0L);
-                block.setBlockCampaignAmount(0L);
-                block.setBlockVoteNumber(0L);
-                return block;
+                // 如果交易及
+                bean.setActualTxCostSum("0");
+                bean.setBlockVoteAmount(0L);
+                bean.setBlockCampaignAmount(0L);
+                bean.setBlockVoteNumber(0L);
+                return bean;
             }
 
             //actuakTxCostSum
@@ -95,17 +96,17 @@ public class BlockFilter {
                         EventRes eventRes = JSON.parseObject(event, EventRes.class);
                         //event objcet is jsonString , transform jsonObject <EventRes>
                         //EventRes get Data
-                        block.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
+                        bean.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
                     } else if ("candidateDeposit".equals(type)) {
                         campaignAmount=campaignAmount.add(BigInteger.ONE);
                     }
-                    block.setBlockVoteAmount(voteAmount.longValue());
-                    block.setBlockCampaignAmount(campaignAmount.longValue());
-                    block.setActualTxCostSum(sum.toString());
+                    bean.setBlockVoteAmount(voteAmount.longValue());
+                    bean.setBlockCampaignAmount(campaignAmount.longValue());
+                    bean.setActualTxCostSum(sum.toString());
                 }
             }
 
         }
-        return block;
+        return bean;
     }
 }

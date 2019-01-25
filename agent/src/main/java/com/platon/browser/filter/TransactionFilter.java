@@ -36,31 +36,31 @@ public class TransactionFilter {
         List<TransactionBean> transactions = new ArrayList <>();
         param.transactions.forEach(initData -> {
             if(null != transactionReceiptMap.get(initData.getHash())){
+                TransactionBean bean = new TransactionBean();
                 TransactionReceipt receipt = (TransactionReceipt) transactionReceiptMap.get(initData.getHash());
-                TransactionBean transaction = new TransactionBean();
                 // Initialize the entity with the raw transaction and receipt
-                transaction.init(initData,receipt);
+                bean.init(initData,receipt);
                 // Convert timestamp into milliseconds
                 if (String.valueOf(time).length() == 10) {
-                    transaction.setTimestamp(new Date(time * 1000L));
+                    bean.setTimestamp(new Date(time * 1000L));
                 } else {
-                    transaction.setTimestamp(new Date(time));
+                    bean.setTimestamp(new Date(time));
                 }
                 // Setup the chain id
-                transaction.setChainId(platon.getChainId());
+                bean.setChainId(platon.getChainId());
                 // Setup the receiver type
                 if (null != initData.getTo()) {
-                    transaction.setTo(initData.getTo());
+                    bean.setTo(initData.getTo());
                     //judge `to` address is accountAddress or contractAddress
                     if(null != RECEIVE_TYPE_MAP.get(initData.getTo())){
-                        transaction.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
+                        bean.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
                     }else {
                         try {
                             EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                             if ("0x".equals(ethGetCode.getCode())) {
-                                transaction.setReceiveType("account");
+                                bean.setReceiveType("account");
                             } else {
-                                transaction.setReceiveType("contract");
+                                bean.setReceiveType("contract");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -68,8 +68,8 @@ public class TransactionFilter {
                     }
                 }
                 // Cache the receiver type for later use
-                RECEIVE_TYPE_MAP.put(initData.getTo(),transaction.getReceiveType());
-                transactions.add(transaction);
+                RECEIVE_TYPE_MAP.put(initData.getTo(),bean.getReceiveType());
+                transactions.add(bean);
             }
         });
         return transactions;
