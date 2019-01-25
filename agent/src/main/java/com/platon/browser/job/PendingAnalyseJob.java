@@ -42,7 +42,7 @@ public class PendingAnalyseJob {
             pendingFilter.analyse();
             logger.debug("**************PendingTx Analysis end ***************");
         } catch (Exception e) {
-            logger.error("PendingTxSynchronizeJob Exception", e.getMessage());
+            logger.error("PendingTxSynchronizeJob Exception:{}", e.getMessage());
         }
         logger.debug("*** End the PendingAnalyseJob *** ");
     }

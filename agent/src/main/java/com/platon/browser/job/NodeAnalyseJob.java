@@ -214,7 +214,7 @@ public class NodeAnalyseJob {
 
 
         } catch (Exception e) {
-            logger.error("NodeAnalyseJob Exception", e.getMessage());
+            logger.error("NodeAnalyseJob Exception:{}", e.getMessage());
         }
         logger.debug("*** End the NodeAnalyseJob *** ");
     }

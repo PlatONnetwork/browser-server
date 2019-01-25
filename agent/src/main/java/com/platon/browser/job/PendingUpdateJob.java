@@ -67,7 +67,7 @@ public class PendingUpdateJob {
             }
 
         } catch (Exception e) {
-            logger.error("PendingUpdateJob Exception", e.getMessage());
+            logger.error("PendingUpdateJob Exception:{}", e.getMessage());
         }
         logger.debug("*** End the PendingUpdateJob *** ");
     }

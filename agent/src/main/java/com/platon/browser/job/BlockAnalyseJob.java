@@ -92,7 +92,7 @@ public class BlockAnalyseJob {
                 beginNumber++;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("BlockAnalyseJob Exception:{}", e.getMessage());
         }
         logger.debug("*** End the BlockAnalyseJob *** ");
     }
