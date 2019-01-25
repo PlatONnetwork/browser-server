@@ -46,7 +46,9 @@
   </select>
 
   <update id="updateBlockNodeName" parameterType="java.lang.String">
-    UPDATE block bl SET bl.`node_name`=(SELECT nr.`name` FROM `node_ranking` nr WHERE nr.`node_id`=bl.`node_id`) WHERE bl.`chain_id`=#{chainId} AND bl.`node_name` IS NULL;
+    UPDATE block bl SET bl.`node_name`=
+      (SELECT nr.`name` FROM `node_ranking` nr WHERE nr.`node_id`=bl.`node_id` ORDER BY nr.`create_time` DESC LIMIT 1)
+    WHERE bl.`chain_id`=#{chainId} AND bl.`node_name` IS NULL
   </update>
 
 </mapper>
