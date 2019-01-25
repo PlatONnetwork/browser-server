@@ -3,7 +3,9 @@ package com.platon.FilterTest;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.platon.browser.dao.entity.Block;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,25 +21,33 @@ public class CacheTest {
 
     protected static Logger logger = LoggerFactory.getLogger(CacheTest.class);
 
-    public void testCacha(){
-        String key = "ip";
-        Cache <String, String> cache = CacheBuilder.newBuilder().maximumSize(1000).build();
-        try {
-            cache.get(key, new Callable <String>() {
-                @Override
-                public String call () throws Exception {
-                    return null;
-                }
-            });
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-    public static void main(String args[]){
-        String a = "01d033b5b07407e377a3eb268bdc3f07033774fb845b7826a6b741430c5e6b719bda5c4877514e8052fa5dbc2f20fb111a576f6696b6a16ca765de49e11e0541";
-        System.out.println(a.replaceFirst("^0*", ""));
+    public static CacheLoader <String, String> createCacheLoader () {
+        return new CacheLoader <String, String>() {
+            @Override
+            public String load ( String key ) throws Exception {
+                logger.info("加载并创建key" + key);
+
+                //return new Block(key, key + "dept", key + "id");
+                return null;
+            }
+        };
+
     }
 
+    public void testCacha () {
+
+    }
+/*    public static void main(String args[]){
+        String a = "01d033b5b07407e377a3eb268bdc3f07033774fb845b7826a6b741430c5e6b719bda5c4877514e8052fa5dbc2f20fb111a576f6696b6a16ca765de49e11e0541";
+        System.out.println(a.replaceFirst("^0*", ""));
+    }*/
+
+    public static void main ( String[] args ) {
+        Cache <Integer, String> cache = CacheBuilder.newBuilder().build();
+        cache.put(1, "a");
+        System.out.println(cache.getIfPresent(1));
+        System.out.println(cache.getIfPresent(2));
+    }
 }
 
 
