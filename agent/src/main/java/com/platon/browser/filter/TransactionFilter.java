@@ -36,7 +36,7 @@ public class TransactionFilter {
     @Autowired
     private ChainsConfig chainsConfig;
 
-    public final static Map<String,String> toAddressTypeMap = new HashMap<>();
+    public final static Map<String,String> RECEIVE_TYPE_MAP = new HashMap<>();
 
     public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
@@ -60,8 +60,8 @@ public class TransactionFilter {
                 if (null != initData.getTo()) {
                     transaction.setTo(initData.getTo());
                     //judge `to` address is accountAddress or contractAddress
-                    if(null != toAddressTypeMap.get(initData.getTo())){
-                        transaction.setReceiveType(toAddressTypeMap.get(initData.getTo()));
+                    if(null != RECEIVE_TYPE_MAP.get(initData.getTo())){
+                        transaction.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
                     }else {
                         try {
                             EthGetCode ethGetCode = web3j.ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
@@ -76,7 +76,7 @@ public class TransactionFilter {
                     }
                 }
                 // Cache the receiver type for later use
-                toAddressTypeMap.put(initData.getTo(),transaction.getReceiveType());
+                RECEIVE_TYPE_MAP.put(initData.getTo(),transaction.getReceiveType());
                 transactions.add(transaction);
             }
         });

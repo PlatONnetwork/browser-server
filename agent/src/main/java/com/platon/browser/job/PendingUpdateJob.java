@@ -40,8 +40,6 @@ public class PendingUpdateJob {
     @Value("${chain.id}")
     private String chainId;
 
-    private boolean isPreviousDone=true;
-
     /**
      * 更新待处理交易
      */
