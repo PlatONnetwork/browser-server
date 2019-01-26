@@ -83,9 +83,9 @@ public class BlockAnalyseJob {
                     long range = endNumber.longValue()-beginNumber+1;
                     if(
                         // 如果并发区块数量达到线程处理阈值，开启线程处理
-                            (concurrentBlocks.size()>=batchNum)||
-                                    // 追上之后，有多少处理多少
-                                    (concurrentBlocks.size()>=range)
+                        (concurrentBlocks.size()>=batchNum)||
+                        // 追上之后，有多少处理多少
+                        (concurrentBlocks.size()>=range)
                     ){
                         analyseThread.analyse(concurrentBlocks);
                         concurrentBlocks.clear();
