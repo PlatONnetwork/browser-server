@@ -67,20 +67,30 @@ public class BlockAnalyseJob {
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             // 结束区块号
             BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
-            while (beginNumber<=endNumber.longValue()){
-                EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
-                concurrentBlocks.add(ethBlock);
-                long range = endNumber.longValue()-beginNumber+1;
-                if(
-                    // 如果并发区块数量达到线程处理阈值，开启线程处理
-                    (concurrentBlocks.size()>=threadBatchSize)||
-                    // 追上之后，有多少处理多少
-                    (concurrentBlocks.size()>=range)
-                ){
-                    analyseThread.analyse(concurrentBlocks);
-                    concurrentBlocks.clear();
+            if((endNumber.intValue()-beginNumber)<threadBatchSize){
+                while (beginNumber<=endNumber.longValue()){
+                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    concurrentBlocks.add(ethBlock);
+                    beginNumber++;
                 }
-                beginNumber++;
+                analyseThread.analyse(concurrentBlocks);
+                concurrentBlocks.clear();
+            }else{
+                while (beginNumber<=endNumber.longValue()){
+                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    concurrentBlocks.add(ethBlock);
+                    long range = endNumber.longValue()-beginNumber+1;
+                    if(
+                        // 如果并发区块数量达到线程处理阈值，开启线程处理
+                        (concurrentBlocks.size()>=threadBatchSize)||
+                        // 追上之后，有多少处理多少
+                        (concurrentBlocks.size()>=range)
+                    ){
+                        analyseThread.analyse(concurrentBlocks);
+                        concurrentBlocks.clear();
+                    }
+                    beginNumber++;
+                }
             }
         } catch (IOException e) {
             logger.error("BlockAnalyseJob Exception:{}", e.getMessage());
