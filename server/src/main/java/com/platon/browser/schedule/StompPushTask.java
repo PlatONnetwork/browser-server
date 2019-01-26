@@ -24,8 +24,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class StompPushTask {
@@ -52,8 +54,25 @@ public class StompPushTask {
     public void pushNode(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
-            List<NodePushItem> nodeCache = nodeService.getPushCache(chainId);
-            BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeCache);
+            List<NodePushItem> cache = nodeService.getPushCache(chainId);
+            Map<String,List<NodePushItem>> groups = new HashMap<>();
+            cache.forEach(node->{
+                List<NodePushItem> group = groups.get(node.getIp());
+                if(group==null) {
+                    group = new ArrayList<>();
+                    groups.put(node.getIp(),group);
+                }
+                group.add(node);
+            });
+            groups.forEach((ip,nodes)->{
+                double i = 1;
+                for (NodePushItem node : nodes){
+                    String lat = String.valueOf((Double.valueOf(node.getLatitude())+i));
+                    node.setLatitude(lat);
+                    i=i+0.5;
+                }
+            });
+            BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),cache);
             messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
         });
     }
@@ -97,8 +116,9 @@ public class StompPushTask {
                 if(i==0||i==items.size()-1) continue;
                 StatisticPushItem previousBlock = items.get(i-1);
                 graphData.getX().add(currentBlock.getHeight());
-                BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
-                graphData.getYa().add(sec.doubleValue());
+                //BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
+//                graphData.getYa().add(sec.doubleValue());
+                graphData.getYa().add(new Double(currentBlock.getTime()-previousBlock.getTime()));
                 graphData.getYb().add(currentBlock.getTransaction()==null?0:currentBlock.getTransaction());
             }
             statistic.setGraphData(graphData);
