@@ -24,6 +24,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.platon.browser.service.impl.RedisCacheServiceImpl.NODEID_TO_FAKE_NODES;
@@ -105,9 +106,9 @@ public class StompPushTask {
                 if(i==0||i==items.size()-1) continue;
                 StatisticPushItem previousBlock = items.get(i-1);
                 graphData.getX().add(currentBlock.getHeight());
-                //BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
-//                graphData.getYa().add(sec.doubleValue());
-                graphData.getYa().add(new Double(currentBlock.getTime()-previousBlock.getTime()));
+                BigDecimal sec = BigDecimal.valueOf(currentBlock.getTime()-previousBlock.getTime()).divide(BigDecimal.valueOf(1000));
+                graphData.getYa().add(sec.doubleValue());
+//                graphData.getYa().add(new Double(currentBlock.getTime()-previousBlock.getTime()));
                 graphData.getYb().add(currentBlock.getTransaction()==null?0:currentBlock.getTransaction());
             }
             statistic.setGraphData(graphData);
