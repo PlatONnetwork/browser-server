@@ -29,6 +29,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -67,6 +72,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private ChainsConfig chainsConfig;
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+
+    public final static Map<String,NodePushItem> NODEID_TO_FAKE_NODES = new HashMap<>();
+
+    @PostConstruct
+    private void init(){loadFakeLocation();}
 
     private boolean validateParam(String chainId,Collection items){
         if (!chainsConfig.getChainIds().contains(chainId)){
@@ -388,13 +398,31 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public void resetNodePushCache(String chainId, boolean clearOld) {
+        loadFakeLocation();
+
         clearNodePushCache(chainId);
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria().andChainIdEqualTo(chainId)
                 .andIsValidEqualTo(1);
         List<NodeRanking> data = nodeRankingMapper.selectByExample(condition);
         if(data.size()==0) return;
+
         updateNodePushCache(chainId,new HashSet<>(data));
+    }
+
+    private void loadFakeLocation() {
+        // 加载虚假节点地理位置
+        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            StringBuilder sb = new StringBuilder();
+            br.lines().forEach(line->sb.append(line));
+            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
+            NODEID_TO_FAKE_NODES.clear();
+            nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

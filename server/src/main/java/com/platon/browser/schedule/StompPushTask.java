@@ -24,10 +24,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.platon.browser.service.impl.RedisCacheServiceImpl.NODEID_TO_FAKE_NODES;
 
 @Component
 public class StompPushTask {
@@ -55,22 +54,11 @@ public class StompPushTask {
         chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
             List<NodePushItem> cache = nodeService.getPushCache(chainId);
-            Map<String,List<NodePushItem>> groups = new HashMap<>();
             cache.forEach(node->{
-                List<NodePushItem> group = groups.get(node.getIp());
-                if(group==null) {
-                    group = new ArrayList<>();
-                    groups.put(node.getIp(),group);
-                }
-                group.add(node);
-            });
-            groups.forEach((ip,nodes)->{
-                double i = 1;
-                for (NodePushItem node : nodes){
-                    if(i==1) continue;
-                    String lat = String.valueOf((Double.valueOf(node.getLatitude())+i));
-                    node.setLatitude(lat);
-                    i++;
+                NodePushItem fake = NODEID_TO_FAKE_NODES.get(node.getNodeId());
+                if(fake!=null){
+                    node.setLongitude(fake.getLongitude());
+                    node.setLatitude(fake.getLatitude());
                 }
             });
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),cache);

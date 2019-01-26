@@ -1,7 +1,15 @@
 package com.platon.browser.util;
 
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.node.NodePushItem;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.List;
 
 public class EnergonUtil {
     private final static Integer DEFAULT_SHARP_NUM = 8;
@@ -25,5 +33,19 @@ public class EnergonUtil {
             return "0"+result;
         }
         return result;
+    }
+
+
+    public static void main(String[] args) {
+        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            StringBuilder sb = new StringBuilder();
+            br.lines().forEach(line->sb.append(line));
+            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
+            System.out.println(sb.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
