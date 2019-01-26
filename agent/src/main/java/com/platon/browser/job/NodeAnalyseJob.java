@@ -90,7 +90,6 @@ public class NodeAnalyseJob {
             while (beginNumber <= endNumber.longValue()) {
                 long startTime = System.currentTimeMillis();
                 ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
-                beginNumber++;
                 logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = platon.getCandidateContract();
@@ -190,6 +189,7 @@ public class NodeAnalyseJob {
 
                 Set <NodeRanking> redisNode = new HashSet<>(updateList);
                 redisCacheService.updateNodePushCache(platon.getChainId(), redisNode);
+                beginNumber++;
                 logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
             }
 
