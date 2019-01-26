@@ -78,6 +78,21 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @PostConstruct
     private void init(){loadFakeLocation();}
 
+    private void loadFakeLocation() {
+        // 加载虚假节点地理位置
+        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            StringBuilder sb = new StringBuilder();
+            br.lines().forEach(line->sb.append(line));
+            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
+            NODEID_TO_FAKE_NODES.clear();
+            nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private boolean validateParam(String chainId,Collection items){
         if (!chainsConfig.getChainIds().contains(chainId)){
             // 非法链ID
@@ -408,21 +423,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(data.size()==0) return;
 
         updateNodePushCache(chainId,new HashSet<>(data));
-    }
-
-    private void loadFakeLocation() {
-        // 加载虚假节点地理位置
-        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            StringBuilder sb = new StringBuilder();
-            br.lines().forEach(line->sb.append(line));
-            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
-            NODEID_TO_FAKE_NODES.clear();
-            nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
