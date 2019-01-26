@@ -31,8 +31,8 @@ public class BlockAnalyseJob {
     private static Logger logger = LoggerFactory.getLogger(BlockAnalyseJob.class);
     @Autowired
     private BlockMapper blockMapper;
-    @Value("${platon.thread.batch.size}")
-    private int threadBatchSize;
+    @Value("${platon.block.batch.num}")
+    private int batchNum;
     @Autowired
     private PlatonClient platon;
     // 起始区块号
@@ -54,6 +54,7 @@ public class BlockAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
+        analyseBlock();
     }
 
     /**
@@ -67,20 +68,30 @@ public class BlockAnalyseJob {
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             // 结束区块号
             BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
-            while (beginNumber<=endNumber.longValue()){
-                EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
-                concurrentBlocks.add(ethBlock);
-                long range = endNumber.longValue()-beginNumber+1;
-                if(
-                    // 如果并发区块数量达到线程处理阈值，开启线程处理
-                    (concurrentBlocks.size()>=threadBatchSize)||
-                    // 追上之后，有多少处理多少
-                    (concurrentBlocks.size()>=range)
-                ){
-                    analyseThread.analyse(concurrentBlocks);
-                    concurrentBlocks.clear();
+            if((endNumber.intValue()-beginNumber)<batchNum){
+                while (beginNumber<=endNumber.longValue()){
+                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    concurrentBlocks.add(ethBlock);
+                    beginNumber++;
                 }
-                beginNumber++;
+                analyseThread.analyse(concurrentBlocks);
+                concurrentBlocks.clear();
+            }else{
+                while (beginNumber<=endNumber.longValue()){
+                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    concurrentBlocks.add(ethBlock);
+                    long range = endNumber.longValue()-beginNumber+1;
+                    if(
+                        // 如果并发区块数量达到线程处理阈值，开启线程处理
+                        (concurrentBlocks.size()>=batchNum)||
+                        // 追上之后，有多少处理多少
+                        (concurrentBlocks.size()>=range)
+                    ){
+                        analyseThread.analyse(concurrentBlocks);
+                        concurrentBlocks.clear();
+                    }
+                    beginNumber++;
+                }
             }
         } catch (IOException e) {
             logger.error("BlockAnalyseJob Exception:{}", e.getMessage());

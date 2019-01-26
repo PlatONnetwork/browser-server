@@ -32,8 +32,8 @@ public class AnalyseThread {
     private static Logger logger = LoggerFactory.getLogger(AnalyseThread.class);
     @Autowired
     private PlatonClient platon;
-    @Value("${platon.thread.batch.size}")
-    private int threadBatchSize;
+    @Value("${platon.block.pool.size}")
+    private int threadNum;
     @Autowired
     private BlockFilter blockFilter;
     @Autowired
@@ -44,9 +44,8 @@ public class AnalyseThread {
     public static ExecutorService THREAD_POOL;
     @PostConstruct
     private void init(){
-         THREAD_POOL = Executors.newFixedThreadPool(threadBatchSize);
+         THREAD_POOL = Executors.newFixedThreadPool(threadNum);
     }
-
 
     public void analyse(List<EthBlock> blocks){
         List<AnalyseParam> params = new ArrayList<>();
