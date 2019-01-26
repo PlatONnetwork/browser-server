@@ -1,15 +1,12 @@
 package com.platon.browser.geo;
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
-import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.*;
 import com.platon.browser.util.GeoUtil;
 
-import java.io.IOException;
+import java.util.Arrays;
 
 public class GeoTest {
-    public static void main(String[] args) throws IOException, GeoIp2Exception {
-        /*try {
+   /* public static void main(String[] args) throws IOException, GeoIp2Exception {
+        *//*try {
             String path = LookupService.class.getClassLoader().getResource("dev/GeoLiteCity.dat").getPath();
             LookupService cl = new LookupService(path, LookupService.GEOIP_MEMORY_CACHE);
             Location l2 = cl.getLocation("14.215.177.39");
@@ -22,7 +19,7 @@ public class GeoTest {
                             "longitude: " + l2.longitude);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }*//*
 
 
         CityResponse response = GeoUtil.getResponse("128.101.101.101");
@@ -45,5 +42,34 @@ public class GeoTest {
         Location location = response.getLocation();
         System.out.println(location.getLatitude());  // 44.9733
         System.out.println(location.getLongitude()); // -93.2323
+    }*/
+
+
+
+
+    public static void main(String[] args) {
+        class IP{
+            String name,ip;
+            public IP(String name,String ip){
+                this.name=name;
+                this.ip=ip;
+            }
+        }
+       IP[] ips = {
+               new IP("新西兰奥克兰","156.62.183.193"),
+               new IP("德国法兰克福","108.61.210.117"),
+               new IP("美国西雅图","108.61.194.105"),
+               new IP("美国纽约","170.3.239.102"),
+               new IP("日本大阪","218.42.250.255"),
+               new IP("日本东京","218.132.30.255"),
+               new IP("法国巴黎","193.54.67.4"),
+               new IP("莫斯科","89.208.161.81"),
+               new IP("韩国首尔","112.144.9.177"),
+               new IP("加拿大温哥华","99.172.41.65")
+       };
+        Arrays.asList(ips).forEach(ip->{
+            GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip.ip);
+            System.out.println("name:【"+ip.name+"】,ip:【"+ip.ip+"】,longitude:【"+location.getLongitude()+"】,latitude:【"+location.getLatitude()+"】");
+        });
     }
 }
