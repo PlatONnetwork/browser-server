@@ -1,11 +1,11 @@
 # ***************************生产配置**************************** #
 #服务器配置
-server.port: 8030
+server.port: 28030
 #Spring应用配置
 spring.redis.cluster.nodes: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
 #数据源配置
 datasource:
-  url: jdbc:mysql://52.187.38.88:3306/platon_browser_0.3.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+  url: jdbc:mysql://52.187.38.88:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
   username: root
   password: Juzhenyuan_123
 #日志配置
@@ -24,7 +24,7 @@ logging:
 
 platon:
   # 链配置格式 链名称:链ID，多个链配置使用逗号分隔
-  chains: MAIN_NET-1-http://10.0.0.5:6790
+  chains: MAIN_NET-1-http://10.0.0.5:6792
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
