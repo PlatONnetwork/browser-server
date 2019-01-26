@@ -54,7 +54,6 @@ public class BlockAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
         }
-        analyseBlock();
     }
 
     /**
