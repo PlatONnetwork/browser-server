@@ -43,6 +43,7 @@ platon:
       staticstics: browser:0.4.0:agent:chain{}:staticstics
       max-item: 500000
       number: browser:0.4.0:agent:chain{}:number
+      jsonfilename: fakelocation-0.4.0.json
 #Web3j配置(要采集哪条链的数据)
 chain.id: 1
 # Zookeeper注册中心配置
