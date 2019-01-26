@@ -10,7 +10,7 @@ datasource:
   password: Juzhenyuan_123
 #日志配置
 logging:
-  file: /data/logs/browser-agent-prod.log
+  file: /data/logs/browser-agent-prod-0.4.0.log
   level:
     org:
       springframework:
@@ -36,10 +36,10 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
-      node: browser:prod:chain{}:nodes
-      block: browser:prod:chain{}:blocks
-      transaction: browser:prod:chain{}:transactions
-      staticstics: browser:prod:chain{}:staticstics
+      node: browser:0.4.0:prod:chain{}:nodes
+      block: browser:0.4.0:prod:chain{}:blocks
+      transaction: browser:0.4.0:prod:chain{}:transactions
+      staticstics: browser:0.4.0:prod:chain{}:staticstics
       max-item: 500000
 #Web3j配置
 chain.id: 1
