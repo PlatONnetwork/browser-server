@@ -67,9 +67,10 @@ public class StompPushTask {
             groups.forEach((ip,nodes)->{
                 double i = 1;
                 for (NodePushItem node : nodes){
+                    if(i==1) continue;
                     String lat = String.valueOf((Double.valueOf(node.getLatitude())+i));
                     node.setLatitude(lat);
-                    i=i+0.5;
+                    i++;
                 }
             });
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),cache);
