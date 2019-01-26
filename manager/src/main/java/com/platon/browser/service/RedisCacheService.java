@@ -20,6 +20,7 @@ public interface RedisCacheService {
     void updateBlockCache(String chainId, Set<Block> items);
     void resetBlockCache(String chainId,boolean clearOld);
     void clearTransactionCache(String chainId);
+    void clearStaticsticsCache(String chainId);
     void updateTransactionCache(String chainId, Set<Transaction> items);
     void resetTransactionCache(String chainId,boolean clearOld);
     RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize);
@@ -33,4 +34,5 @@ public interface RedisCacheService {
     List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
     boolean updateStatisticsCache(String chainId);
     StatisticsCache getStatisticsCache(String chainId);
+
 }

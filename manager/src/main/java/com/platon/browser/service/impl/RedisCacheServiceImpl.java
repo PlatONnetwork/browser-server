@@ -80,6 +80,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
     private void loadFakeLocation() {
         // 加载虚假节点地理位置
+
         String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
@@ -207,12 +208,22 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     /**
-     * 清除交易缓存
+     * 清除首页统计缓存
      * @param chainId
      */
     @Override
     public void clearTransactionCache(String chainId) {
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+    }
+
+    /**
+     * 清除交易缓存
+     * @param chainId
+     */
+    @Override
+    public void clearStaticsticsCache(String chainId) {
+        String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
     }
 
@@ -244,6 +255,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             updateTransactionCache(chainId,new HashSet<>(data));
         }
     }
+
 
     /**
      * 根据页数和每页大小获取区块的缓存分页
