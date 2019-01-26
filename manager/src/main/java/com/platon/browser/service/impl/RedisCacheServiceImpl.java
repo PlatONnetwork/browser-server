@@ -55,6 +55,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.staticstics}")
     private String staticsticsCacheKeyTemplate;
+    @Value("${platon.redis.key.jsonfilename}")
+    private String jsonFileName;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -81,7 +83,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private void loadFakeLocation() {
         // 加载虚假节点地理位置
 
-        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
+        String path = System.getProperty("user.home") + File.separator + jsonFileName;
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
             StringBuilder sb = new StringBuilder();

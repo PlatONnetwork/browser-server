@@ -33,3 +33,4 @@ platon:
       transaction: browser:0.4.0:server:chain{}:transactions
       staticstics: browser:0.4.0:server:chain{}:staticstics
       max-item: 500000
+      jsonfilename: fakelocation-0.4.0.json
