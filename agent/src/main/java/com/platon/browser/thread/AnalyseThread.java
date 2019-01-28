@@ -4,7 +4,9 @@ import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockMissing;
+import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
@@ -38,8 +40,14 @@ public class AnalyseThread {
     private BlockFilter blockFilter;
     @Autowired
     private TransactionFilter transactionFilter;
+//    @Autowired
+//    private NodeFilter nodeFilter;
     @Autowired
     private DBService dbService;
+//    @Autowired
+//    private NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    private BlockMissingMapper blockMissingMapper;
 
     public static ExecutorService THREAD_POOL;
     @PostConstruct
@@ -60,9 +68,11 @@ public class AnalyseThread {
                     try {
                         Block block = blockFilter.analyse(param);
                         List<TransactionBean> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
+//                        List<NodeRanking> nodes = nodeFilter.analyse(param);
                         // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
+//                        result.nodeGroups.put(block.getNumber(),nodes);
                     } catch (Exception e) {
                         // 出错之后记录下出错的区块号，并返回
                         BlockMissing err = new BlockMissing();
@@ -83,8 +93,51 @@ public class AnalyseThread {
         }
 
         long startTime = System.currentTimeMillis();
+
+        /*if(result.nodeGroups.keySet().size()>0){
+            AtomicLong maxNumber = new AtomicLong();
+            result.nodeGroups.keySet().forEach(number->{
+                if(number>maxNumber.get()) maxNumber.set(number);
+            });
+            List<NodeRanking> newGroup = result.nodeGroups.get(maxNumber.get());
+            Map<String,NodeRanking> nodeIdToNodeRankingMap = new HashMap<>();
+            newGroup.forEach(node -> nodeIdToNodeRankingMap.put(node.getNodeId(),node));
+
+            List<NodeRanking> oldGroup = new ArrayList<>();
+            result.nodeGroups.remove(maxNumber.get());
+            result.nodeGroups.forEach((blockNumber,oldNodes)->oldGroup.addAll(oldNodes));
+
+            List<NodeRanking> allresult = new ArrayList<>(newGroup);
+            oldGroup.forEach(oldNode->{
+                NodeRanking newNode = nodeIdToNodeRankingMap.get(oldNode.getNodeId());
+                if(newNode==null){
+                    oldNode.setIsValid(0);
+                    allresult.add(oldNode);
+                }
+                if(newNode!=null) {
+                    newNode.setBlockCount(newNode.getBlockCount()+oldNode.getBlockCount());
+                }
+            });
+
+            // 查询出数据库中所有有效的节点
+            NodeRankingExample example = new NodeRankingExample();
+            example.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
+            List<NodeRanking> dbNodes = nodeRankingMapper.selectByExample(example);
+        }*/
+
         // 分析完成后在同一事务中批量入库分析结果
-        dbService.flush(result);
+        try {
+            dbService.flush(result);
+        } catch (Exception e) {
+            result.blocks.forEach(block -> {
+                BlockMissing err = new BlockMissing();
+                err.setNumber(block.getNumber());
+                result.errorBlocks.add(err);
+            });
+            if(result.errorBlocks.size()>0){
+                blockMissingMapper.batchInsert(result.errorBlocks);
+            }
+        }
         if((System.currentTimeMillis()-startTime)>0) logger.debug("databaseService.flush(result): -> {}",System.currentTimeMillis()-startTime);
     }
 
@@ -121,5 +174,6 @@ public class AnalyseThread {
         public List<Block> blocks = new CopyOnWriteArrayList<>();
         public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
         public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
+        public Map<Long,List<NodeRanking>> nodeGroups = new HashMap<>();
     }
 }
