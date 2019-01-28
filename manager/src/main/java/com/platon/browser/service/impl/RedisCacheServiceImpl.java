@@ -49,14 +49,14 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String blockCacheKeyTemplate;
     @Value("${platon.redis.key.transaction}")
     private String transactionCacheKeyTemplate;
-    @Value("${platon.redis.key.max-item}")
+    @Value("${platon.redis.max-item}")
     private long maxItemNum;
     @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.staticstics}")
     private String staticsticsCacheKeyTemplate;
-    @Value("${platon.redis.key.jsonfilename}")
-    private String jsonFileName;
+    @Value("${platon.fake.location.filename}")
+    private String fakeLocationFilename;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -83,7 +83,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private void loadFakeLocation() {
         // 加载虚假节点地理位置
 
-        String path = System.getProperty("user.home") + File.separator + jsonFileName;
+        String path = System.getProperty("user.home") + File.separator + fakeLocationFilename;
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
             StringBuilder sb = new StringBuilder();

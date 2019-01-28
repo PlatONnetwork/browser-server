@@ -1,6 +1,10 @@
 # ***************************通用配置**************************** #
+# 应用版本
+version: 0.4.0
 #服务器配置
-server.context-path: /browser-server
+server:
+  port: ${port}
+  context-path: /browser-server
 #Spring应用配置
 spring:
   profiles.active: prod
@@ -10,7 +14,31 @@ spring:
   #Redis集群配置
   redis:
     database: 0
-    cluster.max-redirects: 3
+    cluster:
+      max-redirects: 3
+      nodes: ${redis}
 #数据源配置
-datasource.driverClassName: com.mysql.jdbc.Driver
-jdbc.validationQuery: SELECT 1
+datasource:
+  url: ${dburl}
+  username: ${dbuser}
+  password: ${dbpass}
+  driverClassName: com.mysql.jdbc.Driver
+# Platon配置
+platon:
+  # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
+  chain.config: ${chain.config}
+  fake.location.filename: fakelocation-${version}-${profile}.json
+  # 区块列表缓存和交易列表缓存配置
+  redis:
+    key:
+      node: browser:${version}:${profile}:chain{}:nodes
+      block: browser:${version}:${profile}:chain{}:blocks
+      transaction: browser:${version}:${profile}:chain{}:transactions
+      staticstics: browser:${version}:${profile}:chain{}:staticstics
+    max-item: 500000
+#日志配置
+logging:
+  file: ${logpath}
+  level:
+    org.springframework: ${loglevel.spring}
+    com.platon.browser: ${loglevel.platon}

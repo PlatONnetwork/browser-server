@@ -1,36 +1,19 @@
 # ***************************开发配置**************************** #
-#服务器配置
-server.port: 8040
-#Spring应用配置
-spring.redis.cluster.nodes: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
-#数据源配置
-datasource:
-  url: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false
-  username: platon
-  password: platon
-#日志配置
-logging:
-  file: ./browser-server-dev.log
-  level:
-    org:
-      springframework:
-        boot: error
-        web: error
-        jdbc: error
-        dao: error
-        transaction: error
-      mybatis: error
-    com.platon.browser.dao: error
-
-platon:
-  # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
-  chains: MAIN_NET-1-http://192.168.9.76:8793
-  # 区块列表缓存和交易列表缓存配置
-  redis:
-    key:
-      node: browser:0.4.0:dev:chain{}:nodes
-      block: browser:0.4.0:dev:chain{}:blocks
-      transaction: browser:0.4.0:dev:chain{}:transactions
-      staticstics: browser:0.4.0:dev:chain{}:staticstics
-      max-item: 500000
-      jsonfilename: fakelocation-0.4.0.json
+# 当前激活的配置名称(请不要修改)
+profile: dev
+# 服务器端口号
+port: 8040
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_0.4.0_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dbuser: platon
+dbpass: platon
+# Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+chain.config: MAIN_NET-1-http://192.168.9.76:8793
+# Redis集群节点
+redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
+# 日志文件存储文件
+logpath: ./browser-server-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: debug
+  platon: debug
