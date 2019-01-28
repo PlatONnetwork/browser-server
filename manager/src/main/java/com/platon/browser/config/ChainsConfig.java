@@ -26,7 +26,7 @@ public class ChainsConfig {
     private static final String CHAIN_CONFIG_SPLITTER = ",";
     private static final String PART_SPLITTER = "-";
 
-    @Value("${platon.chains}")
+    @Value("${platon.chain.config}")
     private String configStr;
 
     private Map<String,ChainInfo> chainsConfig = new HashMap<>();

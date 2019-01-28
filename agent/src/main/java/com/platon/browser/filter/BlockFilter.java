@@ -37,8 +37,6 @@ public class BlockFilter {
     private PlatonClient platon;
     @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
-    @Value("${platon.redis.key.max-item}")
-    private long maxItemNum;
 
     public Block analyse ( AnalyseThread.AnalyseParam param ) {
         long startTime = System.currentTimeMillis();
