@@ -12,7 +12,7 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
+import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.utils.FilterTool;
@@ -45,7 +45,7 @@ public class NodeAnalyseJob {
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
-    private CutsomNodeRankingMapper cutsomNodeRankingMapper;
+    private CustomNodeRankingMapper customNodeRankingMapper;
     @Autowired
     private RedisCacheService redisCacheService;
     @Autowired
@@ -174,7 +174,7 @@ public class NodeAnalyseJob {
                 FilterTool.currentBlockOwner(updateList, publicKey);
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
                 if(!updateList.isEmpty()){
-                    cutsomNodeRankingMapper.insertOrUpdate(updateList);
+                    customNodeRankingMapper.insertOrUpdate(updateList);
                 }
                 logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 

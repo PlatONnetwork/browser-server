@@ -1,10 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.BlockMissingMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +23,8 @@ public class DBService {
     protected RedisCacheService redisCacheService;
     @Autowired
     private CustomBlockMapper customBlockMapper;
+//    @Autowired
+//    private CustomNodeRankingMapper customNodeRankingMapper;
 
     @Transactional
     public void flush(AnalyseThread.AnalyseResult result){
@@ -41,6 +40,11 @@ public class DBService {
             transactionMapper.batchInsert(result.transactions);
             redisCacheService.updateTransactionCache(platon.getChainId(),new HashSet<>(result.transactions));
         }
+
+//        if(result.nodes.size()>0){
+//            customNodeRankingMapper.insertOrUpdate(result.nodes);
+//            redisCacheService.updateNodePushCache(platon.getChainId(), new HashSet<>(result.nodes));
+//        }
 
         if(result.errorBlocks.size()>0) blockMissingMapper.batchInsert(result.errorBlocks);
         redisCacheService.updateStatisticsCache(platon.getChainId());
