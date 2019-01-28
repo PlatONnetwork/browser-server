@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -123,28 +122,6 @@ public class NodeServiceImpl implements NodeService {
         // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
-
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNodeIdEqualTo(returnData.getNodeId());
-        blockExample.setOrderByClause("timestamp DESC");
-        PageHelper.startPage(1,3600);
-        List<Block> blocks = blockMapper.selectByExample(blockExample);
-
-        if(blocks.size()>0){
-            class Count {
-                long time = 0l;
-                Block prevBlock = null;
-            }
-            Count count = new Count();
-            blocks.forEach(block -> {
-                if(count.prevBlock==null) count.prevBlock=block;
-                count.time=count.time+(block.getTimestamp().getTime()- count.prevBlock.getTimestamp().getTime());
-            });
-            double avgBlockTime = count.time/blocks.size()/1000;
-            returnData.setAvgBlockTime(avgBlockTime);
-        }else {
-            returnData.setAvgBlockTime(0d);
-        }
         return returnData;
     }
 

@@ -12,7 +12,6 @@ import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -30,17 +29,11 @@ import static com.platon.browser.job.NodeAnalyseJob.NODE_ID_TO_NAME;
  */
 @Component
 public class BlockFilter {
-
     private static Logger logger = LoggerFactory.getLogger(BlockFilter.class);
-
     @Autowired
     private PlatonClient platon;
-    @Value("${platon.redis.key.block}")
-    private String blockCacheKeyTemplate;
 
     public Block analyse ( AnalyseThread.AnalyseParam param ) {
-        long startTime = System.currentTimeMillis();
-
         BlockBean bean = new BlockBean();
         if (param.ethBlock!=null) {
             bean.init(param.ethBlock);
