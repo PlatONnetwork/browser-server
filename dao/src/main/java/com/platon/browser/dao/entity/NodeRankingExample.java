@@ -2074,6 +2074,66 @@ public class NodeRankingExample {
             addCriterion("latitude not between", value1, value2, "latitude");
             return (Criteria) this;
         }
+
+        public Criteria andAvgTimeIsNull() {
+            addCriterion("avg_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeIsNotNull() {
+            addCriterion("avg_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeEqualTo(Double value) {
+            addCriterion("avg_time =", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeNotEqualTo(Double value) {
+            addCriterion("avg_time <>", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeGreaterThan(Double value) {
+            addCriterion("avg_time >", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeGreaterThanOrEqualTo(Double value) {
+            addCriterion("avg_time >=", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeLessThan(Double value) {
+            addCriterion("avg_time <", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeLessThanOrEqualTo(Double value) {
+            addCriterion("avg_time <=", value, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeIn(List<Double> values) {
+            addCriterion("avg_time in", values, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeNotIn(List<Double> values) {
+            addCriterion("avg_time not in", values, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeBetween(Double value1, Double value2) {
+            addCriterion("avg_time between", value1, value2, "avgTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvgTimeNotBetween(Double value1, Double value2) {
+            addCriterion("avg_time not between", value1, value2, "avgTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

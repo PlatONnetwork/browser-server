@@ -162,6 +162,7 @@ public class NodeAnalyseJob {
                             chainNode.setJoinTime(dbNode.getJoinTime());
                             chainNode.setBeginNumber(dbNode.getBeginNumber());
                             chainNode.setId(dbNode.getId());
+                            chainNode.setAvgTime(dbNode.getAvgTime());
                         } else {
                             dbNode.setEndNumber(beginNumber);
                             dbNode.setIsValid(0);
