@@ -1,13 +1,19 @@
 package com.platon.browser.service;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.entity.BlockMissingExample;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.BlockMissingMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 @Component
 public class DBService {
@@ -46,7 +52,14 @@ public class DBService {
 //            redisCacheService.updateNodePushCache(platon.getChainId(), new HashSet<>(result.nodes));
 //        }
 
-        if(result.errorBlocks.size()>0) blockMissingMapper.batchInsert(result.errorBlocks);
+        if(result.errorBlocks.size()>0) {
+            List<Long> numbers = new ArrayList<>();
+            result.errorBlocks.forEach(err->numbers.add(err.getNumber()));
+            BlockMissingExample example = new BlockMissingExample();
+            example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
+            blockMissingMapper.deleteByExample(example);
+            blockMissingMapper.batchInsert(result.errorBlocks);
+        }
         redisCacheService.updateStatisticsCache(platon.getChainId());
     }
 }

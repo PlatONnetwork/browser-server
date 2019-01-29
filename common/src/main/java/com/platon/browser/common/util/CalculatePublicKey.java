@@ -23,14 +23,14 @@ import java.util.List;
  */
 public class CalculatePublicKey {
 
-    public static String getPublicKey(EthBlock ethBlock){
+    public static String getPublicKey(EthBlock ethBlock) throws Exception {
         String publicKey = testBlock(ethBlock).toString(16);
         // 不足128前面补0
         if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
         return publicKey;
     }
 
-    public static BigInteger testBlock ( EthBlock tBlock ) {
+    public static BigInteger testBlock ( EthBlock tBlock ) throws Exception{
 
         String extraData = tBlock.getBlock().getExtraData();
 
