@@ -44,8 +44,6 @@ public class AnalyseThread {
 //    private NodeFilter nodeFilter;
     @Autowired
     private DBService dbService;
-//    @Autowired
-//    private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private BlockMissingMapper blockMissingMapper;
 
@@ -56,10 +54,11 @@ public class AnalyseThread {
     }
 
     public void analyse(List<EthBlock> blocks){
+        if(blocks.size()==0) return;
         List<AnalyseParam> params = new ArrayList<>();
         blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
         AnalyseResult result = new AnalyseResult();
-
+//        Map<Long,List<NodeRanking>> nodeGroups = new HashMap<>();
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->
             THREAD_POOL.submit(()->{
@@ -72,7 +71,7 @@ public class AnalyseThread {
                         // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
-//                        result.nodeGroups.put(block.getNumber(),nodes);
+//                        nodeGroups.put(block.getNumber(),nodes);
                     } catch (Exception e) {
                         // 出错之后记录下出错的区块号，并返回
                         BlockMissing err = new BlockMissing();
@@ -94,36 +93,8 @@ public class AnalyseThread {
 
         long startTime = System.currentTimeMillis();
 
-        /*if(result.nodeGroups.keySet().size()>0){
-            AtomicLong maxNumber = new AtomicLong();
-            result.nodeGroups.keySet().forEach(number->{
-                if(number>maxNumber.get()) maxNumber.set(number);
-            });
-            List<NodeRanking> newGroup = result.nodeGroups.get(maxNumber.get());
-            Map<String,NodeRanking> nodeIdToNodeRankingMap = new HashMap<>();
-            newGroup.forEach(node -> nodeIdToNodeRankingMap.put(node.getNodeId(),node));
-
-            List<NodeRanking> oldGroup = new ArrayList<>();
-            result.nodeGroups.remove(maxNumber.get());
-            result.nodeGroups.forEach((blockNumber,oldNodes)->oldGroup.addAll(oldNodes));
-
-            List<NodeRanking> allresult = new ArrayList<>(newGroup);
-            oldGroup.forEach(oldNode->{
-                NodeRanking newNode = nodeIdToNodeRankingMap.get(oldNode.getNodeId());
-                if(newNode==null){
-                    oldNode.setIsValid(0);
-                    allresult.add(oldNode);
-                }
-                if(newNode!=null) {
-                    newNode.setBlockCount(newNode.getBlockCount()+oldNode.getBlockCount());
-                }
-            });
-
-            // 查询出数据库中所有有效的节点
-            NodeRankingExample example = new NodeRankingExample();
-            example.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
-            List<NodeRanking> dbNodes = nodeRankingMapper.selectByExample(example);
-        }*/
+        // 聚合所有区块的节点信息
+//        result.nodes=nodeFilter.aggregateNodes(nodeGroups);
 
         // 分析完成后在同一事务中批量入库分析结果
         try {
@@ -174,6 +145,6 @@ public class AnalyseThread {
         public List<Block> blocks = new CopyOnWriteArrayList<>();
         public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
         public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
-        public Map<Long,List<NodeRanking>> nodeGroups = new HashMap<>();
+        public List<NodeRanking> nodes = new ArrayList<>();
     }
 }

@@ -67,6 +67,7 @@ public class BlockAnalyseJob {
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             // 结束区块号
             BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
+            if(beginNumber>endNumber.intValue()) return;
             if((endNumber.intValue()-beginNumber)<batchNum){
                 while (beginNumber<=endNumber.longValue()){
                     EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();

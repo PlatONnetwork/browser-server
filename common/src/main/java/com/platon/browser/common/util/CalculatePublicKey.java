@@ -22,7 +22,15 @@ import java.util.List;
  * Time: 10:52
  */
 public class CalculatePublicKey {
-    public static BigInteger testBlock ( EthBlock tBlock ) throws Exception {
+
+    public static String getPublicKey(EthBlock ethBlock){
+        String publicKey = testBlock(ethBlock).toString(16);
+        // 不足128前面补0
+        if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
+        return publicKey;
+    }
+
+    public static BigInteger testBlock ( EthBlock tBlock ) {
 
         String extraData = tBlock.getBlock().getExtraData();
 
