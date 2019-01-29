@@ -53,6 +53,7 @@ public class DBService {
 //        }
 
         if(result.errorBlocks.size()>0) {
+            // 先删后插，防止重复主键导致插入失败，以及防止因为重复主键错误导致整个事务回滚
             List<Long> numbers = new ArrayList<>();
             result.errorBlocks.forEach(err->numbers.add(err.getNumber()));
             BlockMissingExample example = new BlockMissingExample();
