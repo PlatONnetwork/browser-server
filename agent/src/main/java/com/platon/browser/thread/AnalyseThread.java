@@ -137,12 +137,6 @@ public class AnalyseThread {
             List<BlockMissing> missings = blockMissingMapper.selectByExample(example);
             if(missings.size()==0) return;
 
-            List<Long> numbers = new ArrayList<>();
-            missings.forEach(missing->numbers.add(missing.getNumber()));
-            example = new BlockMissingExample();
-            example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
-            blockMissingMapper.deleteByExample(example);
-
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             missings.forEach(missing->{
                 try {
@@ -152,7 +146,17 @@ public class AnalyseThread {
                     e.printStackTrace();
                 }
             });
-            analyse(concurrentBlocks);
+
+            List<Long> numbers = new ArrayList<>();
+            if(concurrentBlocks.size()>0){
+                // 删除block_missing表中实际从链上查询回来的块号
+                concurrentBlocks.forEach(ethBlock->numbers.add(ethBlock.getBlock().getNumber().longValue()));
+                example = new BlockMissingExample();
+                example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
+                blockMissingMapper.deleteByExample(example);
+                // 分析缺失的块
+                analyse(concurrentBlocks);
+            }
         }
 
         if((System.currentTimeMillis()-startTime)>0) logger.debug("databaseService.flush(result): -> {}",System.currentTimeMillis()-startTime);
