@@ -27,7 +27,7 @@ platon:
     config: ${chain.config}
     active: ${chain.active}
   # 虚假节点位置配置文件
-  fake.location.filename: fakelocation-${version}-${profile}.json
+  fake.location.filename: fakelocation.json
   # 批量采集线程池大小
   block.pool.size: ${thread.num}
   # 批量处理数量

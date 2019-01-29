@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -37,13 +38,15 @@ public class RelatedDataJob {
     private PlatonClient platon;
 
     //@Scheduled(cron = "0 */1 * * * ?")
-    @Scheduled(cron = "0/1 * * * * ?")
+   /* @Scheduled(cron = "0/1 * * * * ?")
     protected void statistics () {
         logger.debug("*** In the RelatedDataJob ***");
+        Map<Long,Date> blockOfNodeinfo = new HashMap <>();
+        List<Long> beforeNumberList = new ArrayList <>();
         List<NodeRanking> rankings = new ArrayList <>();
         try {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
-            nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
+            nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(0);
             //有效节点信息列表
             List<NodeRanking> nodeRankingList = nodeRankingMapper.selectByExample(nodeRankingExample);
             nodeRankingList.forEach(nodeRanking -> {
@@ -55,25 +58,36 @@ public class RelatedDataJob {
                 PageHelper.startPage(1,3600);
                 List<Block> blocks = blockMapper.selectByExample(blockExample);
                 if(blocks.size()>0) {
-                    long diff= 0l;
-                    for(int i = 0; i < blocks.size(); i++){
-                        //防止下溢出
-                        if(i+1 <= blocks.size()){
-                            diff = blocks.get(i+1).getTimestamp().getTime() - blocks.get(i).getTimestamp().getTime();
-                        }
+                    //查询出的nodeid所属的区块列表遍历，，并将节点k-v（number-time）存储到map，将该节点所出的区块-1,找到每个区块的前一个块，并查询列表
+                    blocks.forEach(block -> {
+                        blockOfNodeinfo.put(block.getNumber(),block.getTimestamp());
+                        if (block.getNumber() > 1){
+                            beforeNumberList.add(block.getNumber() -1);
+                        }else beforeNumberList.add(block.getNumber());
+                    });
+                    BlockExample before = new BlockExample();
+                    before.createCriteria()
+                            .andChainIdEqualTo(platon.getChainId())
+                            .andNumberIn(beforeNumberList);
+                    before.setOrderByClause("timestamp DESC");
+                    List<Block> beforBlockList = blockMapper.selectByExample(before);
+                    long diff = 0L;
+                    for(Block block : beforBlockList){
+                        diff = blockOfNodeinfo.get(block.getNumber() + 1 ).getTime() - block.getTimestamp().getTime();
                     }
-                    double avgBlockTime = diff / blocks.size() / 1000;
-                    nodeRanking.setAvgTime(avgBlockTime);
-                    rankings.add(nodeRanking);
+                    BigDecimal  avgTime = BigDecimal.valueOf(Math.abs(diff)).divide(BigDecimal.valueOf(blocks.size()),4,RoundingMode.HALF_UP);
+                    BigDecimal res = avgTime.divide(BigDecimal.valueOf(1000L),4, RoundingMode.HALF_UP);
+                    nodeRanking.setAvgTime(res.doubleValue());
                 }
 
                 if(rankings.size()> 0){
-                    customNodeRankingMapper.insertOrUpdate(rankings);
+                    customNodeRankingMapper.insertOrUpdate(nodeRankingList);
                 }
             });
         }catch (Exception e){
+            e.printStackTrace();
             logger.debug("*** RelatedDataJob Exception ***");
         }
         logger.debug("*** End the RelatedDataJob ***");
-    }
+    }*/
 }
