@@ -51,8 +51,8 @@ public class AnalyseThread {
 
     public static ExecutorService THREAD_POOL;
 
-    // 缺失块处理指标
-    private Integer lackIndex = 0;
+    // 缺失块处理阈值，只有阈值达到才开启检查缺失块的处理逻辑
+    private Integer threshold = 0;
 
     @PostConstruct
     private void init(){
@@ -62,7 +62,7 @@ public class AnalyseThread {
     public void analyse(List<EthBlock> blocks){
         if(blocks.size()==0) return;
 
-        lackIndex++;
+        threshold++;
 
         List<AnalyseParam> params = new ArrayList<>();
         blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
@@ -126,10 +126,10 @@ public class AnalyseThread {
             }
         }
 
-        // 处理缺失块
-        if(lackIndex%5==0){
-            lackIndex=0;
-            // 每批量采集五次，检测一下block_missing表里是否有缺失的块
+        // 处理缺失块，每批量采集五次，检测一下block_missing表里是否有缺失的块
+        if(threshold%5==0){
+            // 重置阈值，防止无限增长
+            threshold=0;
             BlockMissingExample example = new BlockMissingExample();
             example.createCriteria().andChainIdEqualTo(platon.getChainId());
             example.setOrderByClause("number ASC");
