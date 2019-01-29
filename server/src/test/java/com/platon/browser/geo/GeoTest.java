@@ -74,6 +74,11 @@ public class GeoTest {
                new IP("芬兰","194.112.15.25"),
                new IP("休斯顿","128.42.194.95"),
                new IP("日本北海道","103.10.112.0"),
+               new IP("吉隆坡","223.25.242.116"),
+               new IP("德国","45.32.152.0"),
+               new IP("旧金山","169.230.104.141"),
+               new IP("洛杉矶","103.49.209.27"),
+
        };
         Arrays.asList(ips).forEach(ip->{
             GeoUtil.IpLocation location = GeoUtil.getIpLocation(ip.ip);

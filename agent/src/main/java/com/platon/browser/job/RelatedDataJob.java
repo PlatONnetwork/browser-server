@@ -7,7 +7,7 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CutsomNodeRankingMapper;
+import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +31,14 @@ public class RelatedDataJob {
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
-    private CutsomNodeRankingMapper customNodeRankingMapper;
+    private CustomNodeRankingMapper customNodeRankingMapper;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private PlatonClient platon;
 
     //@Scheduled(cron = "0 */1 * * * ?")
-   /* @Scheduled(cron = "0/1 * * * * ?")
+    @Scheduled(cron = "0/1 * * * * ?")
     protected void statistics () {
         logger.debug("*** In the RelatedDataJob ***");
         Map<Long,Date> blockOfNodeinfo = new HashMap <>();
@@ -46,7 +46,7 @@ public class RelatedDataJob {
         List<NodeRanking> rankings = new ArrayList <>();
         try {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
-            nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(0);
+            nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
             //有效节点信息列表
             List<NodeRanking> nodeRankingList = nodeRankingMapper.selectByExample(nodeRankingExample);
             nodeRankingList.forEach(nodeRanking -> {
@@ -73,7 +73,7 @@ public class RelatedDataJob {
                     List<Block> beforBlockList = blockMapper.selectByExample(before);
                     long diff = 0L;
                     for(Block block : beforBlockList){
-                        diff = blockOfNodeinfo.get(block.getNumber() + 1 ).getTime() - block.getTimestamp().getTime();
+                        diff = diff + blockOfNodeinfo.get(block.getNumber() + 1 ).getTime() - block.getTimestamp().getTime();
                     }
                     BigDecimal  avgTime = BigDecimal.valueOf(Math.abs(diff)).divide(BigDecimal.valueOf(blocks.size()),4,RoundingMode.HALF_UP);
                     BigDecimal res = avgTime.divide(BigDecimal.valueOf(1000L),4, RoundingMode.HALF_UP);
@@ -89,5 +89,5 @@ public class RelatedDataJob {
             logger.debug("*** RelatedDataJob Exception ***");
         }
         logger.debug("*** End the RelatedDataJob ***");
-    }*/
+    }
 }

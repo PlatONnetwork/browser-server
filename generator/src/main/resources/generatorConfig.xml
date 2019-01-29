@@ -48,10 +48,10 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-<!--        <table tableName="block_missing" domainObjectName="BlockMissing">
+        <table tableName="block_missing" domainObjectName="BlockMissing">
              <columnRenamingRule searchString="^D_"
                                  replaceString=""/>
-        </table>-->
+        </table>
 
 <!--          <table tableName="pending_tx" domainObjectName="PendingTx">
             &lt;!&ndash;<columnRenamingRule searchString="^D_"
@@ -70,10 +70,12 @@
         <columnRenamingRule searchString="^D_"
                             replaceString=""/>
     </table>-->
+<!--
          <table tableName="node_ranking" domainObjectName="NodeRanking">
         <columnRenamingRule searchString="^D_"
                             replaceString=""/>
     </table>
+-->
 
 
 
