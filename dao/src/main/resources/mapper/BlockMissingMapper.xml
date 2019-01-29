@@ -3,6 +3,7 @@
 <mapper namespace="com.platon.browser.dao.mapper.BlockMissingMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.BlockMissing">
     <id column="number" jdbcType="BIGINT" property="number" />
+    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +64,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `number`
+    `number`, chain_id
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockMissingExample" resultMap="BaseResultMap">
     select
@@ -79,6 +80,12 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from block_missing
+    where `number` = #{number,jdbcType=BIGINT}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from block_missing
     where `number` = #{number,jdbcType=BIGINT}
@@ -90,8 +97,8 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.BlockMissing">
-    insert into block_missing (`number`)
-    values (#{number,jdbcType=BIGINT})
+    insert into block_missing (`number`, chain_id)
+    values (#{number,jdbcType=BIGINT}, #{chainId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.BlockMissing">
     insert into block_missing
@@ -99,10 +106,16 @@
       <if test="number != null">
         `number`,
       </if>
+      <if test="chainId != null">
+        chain_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="number != null">
         #{number,jdbcType=BIGINT},
+      </if>
+      <if test="chainId != null">
+        #{chainId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -118,6 +131,9 @@
       <if test="record.number != null">
         `number` = #{record.number,jdbcType=BIGINT},
       </if>
+      <if test="record.chainId != null">
+        chain_id = #{record.chainId,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -125,10 +141,25 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update block_missing
-    set `number` = #{record.number,jdbcType=BIGINT}
+    set `number` = #{record.number,jdbcType=BIGINT},
+      chain_id = #{record.chainId,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.BlockMissing">
+    update block_missing
+    <set>
+      <if test="chainId != null">
+        chain_id = #{chainId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where `number` = #{number,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.BlockMissing">
+    update block_missing
+    set chain_id = #{chainId,jdbcType=VARCHAR}
+    where `number` = #{number,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -137,10 +168,10 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into block_missing
-    (`number`)
+    (`number`, chain_id)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.number,jdbcType=BIGINT})
+      (#{item.number,jdbcType=BIGINT}, #{item.chainId,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -161,8 +192,12 @@
         <if test="'number'.toString() == column.value">
           #{item.number,jdbcType=BIGINT}
         </if>
+        <if test="'chain_id'.toString() == column.value">
+          #{item.chainId,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

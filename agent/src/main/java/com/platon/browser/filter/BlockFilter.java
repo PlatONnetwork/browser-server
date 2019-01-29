@@ -40,7 +40,12 @@ public class BlockFilter {
 
             // 设置需要使用当前上下文的属性
             bean.setChainId(platon.getChainId());
-            String publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
+            String publicKey = null;
+            try{
+                publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
+            }catch (Exception e){
+                publicKey = "";
+            }
             bean.setNodeId(publicKey);
 
             // 设置节点名称

@@ -163,6 +163,76 @@ public class BlockMissingExample {
             addCriterion("`number` not between", value1, value2, "number");
             return (Criteria) this;
         }
+
+        public Criteria andChainIdIsNull() {
+            addCriterion("chain_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdIsNotNull() {
+            addCriterion("chain_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdEqualTo(String value) {
+            addCriterion("chain_id =", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotEqualTo(String value) {
+            addCriterion("chain_id <>", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdGreaterThan(String value) {
+            addCriterion("chain_id >", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdGreaterThanOrEqualTo(String value) {
+            addCriterion("chain_id >=", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLessThan(String value) {
+            addCriterion("chain_id <", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLessThanOrEqualTo(String value) {
+            addCriterion("chain_id <=", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdLike(String value) {
+            addCriterion("chain_id like", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotLike(String value) {
+            addCriterion("chain_id not like", value, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdIn(List<String> values) {
+            addCriterion("chain_id in", values, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotIn(List<String> values) {
+            addCriterion("chain_id not in", values, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdBetween(String value1, String value2) {
+            addCriterion("chain_id between", value1, value2, "chainId");
+            return (Criteria) this;
+        }
+
+        public Criteria andChainIdNotBetween(String value1, String value2) {
+            addCriterion("chain_id not between", value1, value2, "chainId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
