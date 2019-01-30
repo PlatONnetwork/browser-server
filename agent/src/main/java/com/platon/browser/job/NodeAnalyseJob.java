@@ -125,6 +125,7 @@ public class NodeAnalyseJob {
                     nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                     nodeRanking.setRanking(i);
                     nodeRanking.setType(1);
+
                     // Set the node election status according to the ranking
                     // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
                     /**
