@@ -20,7 +20,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.platon.browser.job.NodeAnalyseJob.NODE_ID_TO_NAME;
+import static com.platon.browser.utils.CacheTool.NODE_ID_TO_NAME;
 
 /**
  * User: dongqile

@@ -29,7 +29,8 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.platon.browser.utils.CacheTool.NODE_ID_TO_NAME;
 
 /**
  * User: dongqile
@@ -50,7 +51,6 @@ public class NodeAnalyseJob {
     private RedisCacheService redisCacheService;
     @Autowired
     private PlatonClient platon;
-    public final static Map<String,String> NODE_ID_TO_NAME = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init () {
