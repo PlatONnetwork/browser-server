@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.common.dto.agent.CandidateDetailDto;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.job.RelatedDataJob;
 import com.platon.browser.util.GeoUtil;
 
 import org.springframework.beans.BeanUtils;
@@ -38,6 +39,8 @@ public class NodeRankingBean extends NodeRanking {
             this.setOrgWebsite("");
             this.setUrl("");
         }
+
+
         this.setIp(initData.getHost());
         this.setNodeId(initData.getCandidateId());
         this.setPort(Integer.valueOf(initData.getPort()));
@@ -47,6 +50,9 @@ public class NodeRankingBean extends NodeRanking {
         this.setDeposit(initData.getDeposit().toString());
         this.setRewardRatio(BigDecimal.valueOf(initData.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
         this.setBlockCount(0L);
+        if(null != RelatedDataJob.nodeAvgTimeMap.get(initData.getCandidateId())){
+            this.setAvgTime(RelatedDataJob.nodeAvgTimeMap.get(initData.getCandidateId()));
+        }
         GeoUtil.IpLocation ipLocation =IP_MAP.get(initData.getHost());
         if(StringUtils.isEmpty(ipLocation)){
             GeoUtil.IpLocation nowIpLocation = GeoUtil.getIpLocation(getIp());

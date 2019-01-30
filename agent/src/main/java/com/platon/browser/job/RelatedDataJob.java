@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: dongqile
@@ -31,11 +32,11 @@ public class RelatedDataJob {
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
-    private CustomNodeRankingMapper customNodeRankingMapper;
-    @Autowired
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private PlatonClient platon;
+
+    public static Map<String,Double> nodeAvgTimeMap = new ConcurrentHashMap <>();
 
     //@Scheduled(cron = "0 */1 * * * ?")
     @Scheduled(cron = "0/1 * * * * ?")
@@ -43,7 +44,6 @@ public class RelatedDataJob {
         logger.debug("*** In the RelatedDataJob ***");
         Map<Long,Date> blockOfNodeinfo = new HashMap <>();
         List<Long> beforeNumberList = new ArrayList <>();
-        List<NodeRanking> rankings = new ArrayList <>();
         try {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
@@ -73,15 +73,11 @@ public class RelatedDataJob {
                     List<Block> beforBlockList = blockMapper.selectByExample(before);
                     long diff = 0L;
                     for(Block block : beforBlockList){
-                        diff = diff + blockOfNodeinfo.get(block.getNumber() + 1 ).getTime() - block.getTimestamp().getTime();
+                        diff = diff + blockOfNodeinfo.get(block.getNumber() + 1).getTime() - block.getTimestamp().getTime();
                     }
                     BigDecimal  avgTime = BigDecimal.valueOf(Math.abs(diff)).divide(BigDecimal.valueOf(blocks.size()),4,RoundingMode.HALF_UP);
                     BigDecimal res = avgTime.divide(BigDecimal.valueOf(1000L),4, RoundingMode.HALF_UP);
-                    nodeRanking.setAvgTime(res.doubleValue());
-                }
-
-                if(rankings.size()> 0){
-                    customNodeRankingMapper.insertOrUpdate(nodeRankingList);
+                    nodeAvgTimeMap.put(nodeRanking.getNodeId(),res.doubleValue());
                 }
             });
         }catch (Exception e){
