@@ -9,4 +9,6 @@ public class CacheTool {
     public final static Map<String,String> NODEID_TO_NAME = new ConcurrentHashMap<>();
     // 交易接收者地址与接收者类型的映射缓存
     public final static Map<String,String> RECEIVER_TO_TYPE = new HashMap<>();
+    // 节点出块平均时间
+    public final static Map<String,Double> NODEID_TO_AVGTIME = new HashMap<>();
 }

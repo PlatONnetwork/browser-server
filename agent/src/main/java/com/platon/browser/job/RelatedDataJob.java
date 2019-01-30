@@ -11,8 +11,6 @@ import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 2019/1/28
  * Time: 16:49
  */
-@Component
+//@Component
 public class RelatedDataJob {
     private static Logger logger = LoggerFactory.getLogger(RelatedDataJob.class);
 
@@ -38,7 +36,8 @@ public class RelatedDataJob {
     public static Map <String, Double> nodeAvgTimeMap = new ConcurrentHashMap <>();
 
     //@Scheduled(cron = "0 */1 * * * ?")
-    @Scheduled(cron = "0/2 * * * * ?")
+    //Scheduled(cron = "0/2 * * * * ?")
+    //Scheduled(cron = "0/2 * * * * ?")
     protected void statistics () {
         logger.debug("*** In the RelatedDataJob ***");
         Map <Long, Date> blockOfNodeinfo = new HashMap <>();
@@ -85,3 +84,4 @@ public class RelatedDataJob {
         logger.debug("*** End the RelatedDataJob ***");
     }
 }
+

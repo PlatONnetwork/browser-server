@@ -3,23 +3,23 @@
 <mapper namespace="com.platon.browser.dao.mapper.CustomNodeRankingMapper">
   <insert id="insertOrUpdate" parameterType="map">
     replace  into node_ranking
-    (id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, 
-      chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status, 
-      is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount, 
-      block_reward, country_code, `location`, longitude, latitude)
+    (id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website,
+    chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status,
+    is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount,
+    block_reward, country_code, `location`, longitude, latitude, avg_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, 
-        #{item.port,jdbcType=INTEGER}, #{item.name,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, 
-        #{item.intro,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.deposit,jdbcType=VARCHAR}, 
-        #{item.orgName,jdbcType=VARCHAR}, #{item.orgWebsite,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, 
-        #{item.joinTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.rewardRatio,jdbcType=DOUBLE}, #{item.ranking,jdbcType=INTEGER}, #{item.electionStatus,jdbcType=INTEGER}, 
-        #{item.isValid,jdbcType=INTEGER}, #{item.url,jdbcType=VARCHAR}, #{item.beginNumber,jdbcType=BIGINT}, 
-        #{item.endNumber,jdbcType=BIGINT}, #{item.blockCount,jdbcType=BIGINT}, #{item.rewardAmount,jdbcType=VARCHAR}, 
-        #{item.profitAmount,jdbcType=VARCHAR}, #{item.blockReward,jdbcType=VARCHAR}, #{item.countryCode,jdbcType=VARCHAR}, 
-        #{item.location,jdbcType=VARCHAR}, #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR}
-        )
+      (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR},
+      #{item.port,jdbcType=INTEGER}, #{item.name,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER},
+      #{item.intro,jdbcType=VARCHAR}, #{item.address,jdbcType=VARCHAR}, #{item.deposit,jdbcType=VARCHAR},
+      #{item.orgName,jdbcType=VARCHAR}, #{item.orgWebsite,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR},
+      #{item.joinTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP},
+      #{item.rewardRatio,jdbcType=DOUBLE}, #{item.ranking,jdbcType=INTEGER}, #{item.electionStatus,jdbcType=INTEGER},
+      #{item.isValid,jdbcType=INTEGER}, #{item.url,jdbcType=VARCHAR}, #{item.beginNumber,jdbcType=BIGINT},
+      #{item.endNumber,jdbcType=BIGINT}, #{item.blockCount,jdbcType=BIGINT}, #{item.rewardAmount,jdbcType=VARCHAR},
+      #{item.profitAmount,jdbcType=VARCHAR}, #{item.blockReward,jdbcType=VARCHAR}, #{item.countryCode,jdbcType=VARCHAR},
+      #{item.location,jdbcType=VARCHAR}, #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR},
+      #{item.avgTime,jdbcType=DOUBLE})
     </foreach>
   </insert>
 

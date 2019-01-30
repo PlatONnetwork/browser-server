@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.platon.browser.utils.CacheTool.NODEID_TO_AVGTIME;
+
 /**
  * User: dongqile
  * Date: 2018/10/24
@@ -61,5 +63,7 @@ public class NodeRankingBean extends NodeRanking {
         }else {
             BeanUtils.copyProperties(ipLocation, this);
         }
+        Double avgTime = NODEID_TO_AVGTIME.get(this.getNodeId());
+        if(avgTime!=null) this.setAvgTime(avgTime);
     }
 }
