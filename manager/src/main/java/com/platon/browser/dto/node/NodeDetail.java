@@ -44,6 +44,7 @@ public class NodeDetail {
         // 钱包就是address
         this.setWallet(initData.getAddress());
         this.setLogo(initData.getUrl());
+        this.setAvgBlockTime(initData.getAvgTime());
         BigDecimal v = Convert.fromWei(initData.getProfitAmount(), Convert.Unit.ETHER);
         this.setProfitAmount(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getRewardAmount(), Convert.Unit.ETHER);

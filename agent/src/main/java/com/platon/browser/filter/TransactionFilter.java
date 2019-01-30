@@ -15,6 +15,8 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.io.IOException;
 import java.util.*;
 
+import static com.platon.browser.utils.CacheTool.RECEIVER_TO_TYPE;
+
 
 /**
  * User: dongqile
@@ -28,8 +30,6 @@ public class TransactionFilter {
     private String transactionCacheKeyTemplate;
     @Autowired
     private PlatonClient platon;
-
-    public final static Map<String,String> RECEIVE_TYPE_MAP = new HashMap<>();
 
     public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
@@ -52,8 +52,8 @@ public class TransactionFilter {
                 if (null != initData.getTo()) {
                     bean.setTo(initData.getTo());
                     //judge `to` address is accountAddress or contractAddress
-                    if(null != RECEIVE_TYPE_MAP.get(initData.getTo())){
-                        bean.setReceiveType(RECEIVE_TYPE_MAP.get(initData.getTo()));
+                    if(null != RECEIVER_TO_TYPE.get(initData.getTo())){
+                        bean.setReceiveType(RECEIVER_TO_TYPE.get(initData.getTo()));
                     }else {
                         try {
                             EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
@@ -68,7 +68,7 @@ public class TransactionFilter {
                     }
                 }
                 // Cache the receiver type for later use
-                RECEIVE_TYPE_MAP.put(initData.getTo(),bean.getReceiveType());
+                RECEIVER_TO_TYPE.put(initData.getTo(),bean.getReceiveType());
                 transactions.add(bean);
             }
         });

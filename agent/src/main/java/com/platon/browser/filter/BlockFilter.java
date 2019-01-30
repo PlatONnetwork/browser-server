@@ -20,7 +20,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.platon.browser.job.NodeAnalyseJob.NODE_ID_TO_NAME;
+import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 
 /**
  * User: dongqile
@@ -49,7 +49,7 @@ public class BlockFilter {
             bean.setNodeId(publicKey);
 
             // 设置节点名称
-            String nodeName = NODE_ID_TO_NAME.get(bean.getNodeId());
+            String nodeName = NODEID_TO_NAME.get(bean.getNodeId());
             bean.setNodeName(nodeName);
 
             if (param.transactions.isEmpty() && param.transactionReceipts.isEmpty()) {
