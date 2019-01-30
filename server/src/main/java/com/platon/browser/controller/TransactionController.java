@@ -101,7 +101,21 @@ public class TransactionController {
                         candidateApplyWithdraw ： 减持质押
                         candidateWithdraw ： 提取质押
                         unknown ： 未知
-     *      	    "value": 3.6,//数额
+     *           "txInfo": "{
+     *                  "functionName":"",//方法名称
+     *                  "parameters":{},//参数
+     *                  "type":"1"//交易类型
+     *                      0：转账
+     *                      1：合约发布
+     *                      2：合约调用
+     *                      4：权限
+     *                      5：MPC交易
+     *                      1000：投票
+     *                      1001：竞选质押
+     *                      1002：减持质押
+     *                      1003：提取质押
+     *                  }"//返回交易解析结构
+     *           }
      *           "serverTime": 1123123,//服务器时间
      *           "failReason":"",//失败原因
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
@@ -782,7 +796,7 @@ public class TransactionController {
     }
 
     /**
-     * @api {post} transaction/voteList l.根据块高/hash查询投票列表
+     * @api {post} transaction/voteList l.根据块高/hash查询选票列表
      * @apiVersion 1.0.0
      * @apiName voteList
      * @apiGroup transaction
