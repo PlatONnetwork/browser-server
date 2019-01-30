@@ -71,7 +71,7 @@ public class NodeAvgTimeJob {
             });
 
             BigDecimal avgTime = BigDecimal.valueOf(sumTime.get()).divide(BigDecimal.valueOf(afterBlocks.size()),2, RoundingMode.HALF_UP);
-            avgTime = avgTime.divide(BigDecimal.valueOf(1000),2, RoundingMode.HALF_UP);
+            avgTime = avgTime.divide(BigDecimal.valueOf(1000),4, RoundingMode.HALF_UP);
             NODEID_TO_AVGTIME.put(node.getNodeId(),avgTime.doubleValue());
             logger.debug("node:{},sumTime:{}ms,avgTime:{}s",node.getName(),sumTime, avgTime.doubleValue());
         });
