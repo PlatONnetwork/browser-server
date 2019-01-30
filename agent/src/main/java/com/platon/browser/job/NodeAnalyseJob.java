@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.platon.browser.utils.CacheTool.NODE_ID_TO_NAME;
+import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 
 /**
  * User: dongqile
@@ -82,7 +82,7 @@ public class NodeAnalyseJob {
                     .andChainIdEqualTo(platon.getChainId())
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-            dbNodes.forEach(n->NODE_ID_TO_NAME.put(n.getNodeId().replaceFirst("^0*", ""),n.getName()));
+            dbNodes.forEach(n->NODEID_TO_NAME.put(n.getNodeId().replaceFirst("^0*", ""),n.getName()));
 
 
             EthBlock ethBlock = null;
@@ -184,7 +184,7 @@ public class NodeAnalyseJob {
                 for (NodeRanking nodeRanking : updateList) {
                     if (nodeRanking.getIsValid()==1) {
                         consensusCount++;
-                        NODE_ID_TO_NAME.put(nodeRanking.getNodeId(),nodeRanking.getName());
+                        NODEID_TO_NAME.put(nodeRanking.getNodeId(),nodeRanking.getName());
                     }
                 }
 
