@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.platon.browser.utils.CacheTool.NODEID_TO_AVGTIME;
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 
 /**
@@ -174,19 +175,22 @@ public class NodeAnalyseJob {
                 //TODO:publickey 0.4.0解析存在问题
                 FilterTool.currentBlockOwner(updateList, publicKey);
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
-                if(!updateList.isEmpty()){
-                    customNodeRankingMapper.insertOrUpdate(updateList);
-                }
-                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
                 for (NodeRanking nodeRanking : updateList) {
+                    Double avgTime = NODEID_TO_AVGTIME.get(nodeRanking.getNodeId());
+                    if(avgTime!=null) nodeRanking.setAvgTime(avgTime);
                     if (nodeRanking.getIsValid()==1) {
                         consensusCount++;
                         NODEID_TO_NAME.put(nodeRanking.getNodeId(),nodeRanking.getName());
                     }
                 }
+
+                if(!updateList.isEmpty()){
+                    customNodeRankingMapper.insertOrUpdate(updateList);
+                }
+                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 Set <NodeRanking> redisNode = new HashSet<>(updateList);
                 redisCacheService.updateNodePushCache(platon.getChainId(), redisNode);
