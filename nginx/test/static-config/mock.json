@@ -1,0 +1,10 @@
+{
+  "chainList":[
+    {
+      "cid": "1",
+      "en": "MainNet",
+      "zh": "MainNet(主网络)",
+      "http": "http://192.168.9.190:10030/newversion_test"
+    }
+  ]
+}
