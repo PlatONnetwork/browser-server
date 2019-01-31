@@ -12,7 +12,7 @@ dbpass: platon
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
 #  config: MAIN_NET-1-http://127.0.0.1:7793
-  config: MAIN_NET-1-http://192.168.9.76:6789
+  config: MAIN_NET-1-http://192.168.9.76:8793
 #  config: MAIN_NET-1-https://syde.platon.network/test
   # 要采集哪个ID的链
   active: 1
