@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>com.platon.browser</groupId>
 		<artifactId>browser-server</artifactId>
-		<version>0.4.0</version>
+		<version>0.4.2</version>
 	</parent>
 	<artifactId>server</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.2</version>
 	<name>server</name>
 	<url>http://maven.apache.org</url>
 	<properties>
