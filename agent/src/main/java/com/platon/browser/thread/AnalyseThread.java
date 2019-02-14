@@ -6,6 +6,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.filter.BlockFilter;
+import com.platon.browser.filter.TicketFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class AnalyseThread {
     private int batchNum;
     @Autowired
     private BlockFilter blockFilter;
+    @Autowired
+    private TicketFilter ticketFilter;
     @Autowired
     private TransactionFilter transactionFilter;
 //    @Autowired
@@ -76,10 +79,12 @@ public class AnalyseThread {
                     try {
                         Block block = blockFilter.analyse(param);
                         List<TransactionBean> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
+                        List<Ticket> tickets = ticketFilter.analyse(transactions);
 //                        List<NodeRanking> nodes = nodeFilter.analyse(param);
                         // 一切正常，则把分析结果添加到结果中
                         result.blocks.add(block);
                         result.transactions.addAll(transactions);
+                        result.tickets.addAll(tickets);
 //                        nodeGroups.put(block.getNumber(),nodes);
                     } catch (Exception e) {
                         // 出错之后记录下出错的区块号，并返回
@@ -194,6 +199,7 @@ public class AnalyseThread {
     public static class AnalyseResult{
         public List<Block> blocks = new CopyOnWriteArrayList<>();
         public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
+        public List<Ticket> tickets = new CopyOnWriteArrayList<>();
         public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
         public List<NodeRanking> nodes = new ArrayList<>();
     }

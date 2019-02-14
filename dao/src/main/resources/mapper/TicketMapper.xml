@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.TicketMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Ticket">
+    <id column="ticket_id" jdbcType="VARCHAR" property="ticketId" />
+    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
+    <result column="candidate_id" jdbcType="VARCHAR" property="candidateId" />
+    <result column="owner" jdbcType="VARCHAR" property="owner" />
+    <result column="block_number" jdbcType="BIGINT" property="blockNumber" />
+    <result column="rblock_number" jdbcType="BIGINT" property="rblockNumber" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="income" jdbcType="DECIMAL" property="income" />
+    <result column="estimate_expire_time" jdbcType="TIMESTAMP" property="estimateExpireTime" />
+    <result column="actual_expire_time" jdbcType="TIMESTAMP" property="actualExpireTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ticket_id, tx_hash, candidate_id, `owner`, block_number, rblock_number, `state`, 
+    income, estimate_expire_time, actual_expire_time
+  </sql>
+  <select id="selectByExample" parameterType="com.platon.browser.dao.entity.TicketExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ticket
+    where ticket_id = #{ticketId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from ticket
+    where ticket_id = #{ticketId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.TicketExample">
+    delete from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.platon.browser.dao.entity.Ticket">
+    insert into ticket (ticket_id, tx_hash, candidate_id, 
+      `owner`, block_number, rblock_number, 
+      `state`, income, estimate_expire_time, 
+      actual_expire_time)
+    values (#{ticketId,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR}, #{candidateId,jdbcType=VARCHAR}, 
+      #{owner,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, #{rblockNumber,jdbcType=BIGINT}, 
+      #{state,jdbcType=INTEGER}, #{income,jdbcType=DECIMAL}, #{estimateExpireTime,jdbcType=TIMESTAMP}, 
+      #{actualExpireTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Ticket">
+    insert into ticket
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="ticketId != null">
+        ticket_id,
+      </if>
+      <if test="txHash != null">
+        tx_hash,
+      </if>
+      <if test="candidateId != null">
+        candidate_id,
+      </if>
+      <if test="owner != null">
+        `owner`,
+      </if>
+      <if test="blockNumber != null">
+        block_number,
+      </if>
+      <if test="rblockNumber != null">
+        rblock_number,
+      </if>
+      <if test="state != null">
+        `state`,
+      </if>
+      <if test="income != null">
+        income,
+      </if>
+      <if test="estimateExpireTime != null">
+        estimate_expire_time,
+      </if>
+      <if test="actualExpireTime != null">
+        actual_expire_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="ticketId != null">
+        #{ticketId,jdbcType=VARCHAR},
+      </if>
+      <if test="txHash != null">
+        #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="candidateId != null">
+        #{candidateId,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null">
+        #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="blockNumber != null">
+        #{blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="rblockNumber != null">
+        #{rblockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="income != null">
+        #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="estimateExpireTime != null">
+        #{estimateExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualExpireTime != null">
+        #{actualExpireTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.platon.browser.dao.entity.TicketExample" resultType="java.lang.Long">
+    select count(*) from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ticket
+    <set>
+      <if test="record.ticketId != null">
+        ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.txHash != null">
+        tx_hash = #{record.txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.candidateId != null">
+        candidate_id = #{record.candidateId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.owner != null">
+        `owner` = #{record.owner,jdbcType=VARCHAR},
+      </if>
+      <if test="record.blockNumber != null">
+        block_number = #{record.blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="record.rblockNumber != null">
+        rblock_number = #{record.rblockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="record.state != null">
+        `state` = #{record.state,jdbcType=INTEGER},
+      </if>
+      <if test="record.income != null">
+        income = #{record.income,jdbcType=DECIMAL},
+      </if>
+      <if test="record.estimateExpireTime != null">
+        estimate_expire_time = #{record.estimateExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.actualExpireTime != null">
+        actual_expire_time = #{record.actualExpireTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ticket
+    set ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      tx_hash = #{record.txHash,jdbcType=VARCHAR},
+      candidate_id = #{record.candidateId,jdbcType=VARCHAR},
+      `owner` = #{record.owner,jdbcType=VARCHAR},
+      block_number = #{record.blockNumber,jdbcType=BIGINT},
+      rblock_number = #{record.rblockNumber,jdbcType=BIGINT},
+      `state` = #{record.state,jdbcType=INTEGER},
+      income = #{record.income,jdbcType=DECIMAL},
+      estimate_expire_time = #{record.estimateExpireTime,jdbcType=TIMESTAMP},
+      actual_expire_time = #{record.actualExpireTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Ticket">
+    update ticket
+    <set>
+      <if test="txHash != null">
+        tx_hash = #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="candidateId != null">
+        candidate_id = #{candidateId,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null">
+        `owner` = #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="blockNumber != null">
+        block_number = #{blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="rblockNumber != null">
+        rblock_number = #{rblockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="state != null">
+        `state` = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="income != null">
+        income = #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="estimateExpireTime != null">
+        estimate_expire_time = #{estimateExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualExpireTime != null">
+        actual_expire_time = #{actualExpireTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ticket_id = #{ticketId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Ticket">
+    update ticket
+    set tx_hash = #{txHash,jdbcType=VARCHAR},
+      candidate_id = #{candidateId,jdbcType=VARCHAR},
+      `owner` = #{owner,jdbcType=VARCHAR},
+      block_number = #{blockNumber,jdbcType=BIGINT},
+      rblock_number = #{rblockNumber,jdbcType=BIGINT},
+      `state` = #{state,jdbcType=INTEGER},
+      income = #{income,jdbcType=DECIMAL},
+      estimate_expire_time = #{estimateExpireTime,jdbcType=TIMESTAMP},
+      actual_expire_time = #{actualExpireTime,jdbcType=TIMESTAMP}
+    where ticket_id = #{ticketId,jdbcType=VARCHAR}
+  </update>
+  <insert id="batchInsert" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into ticket
+    (ticket_id, tx_hash, candidate_id, `owner`, block_number, rblock_number, `state`, 
+      income, estimate_expire_time, actual_expire_time)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.ticketId,jdbcType=VARCHAR}, #{item.txHash,jdbcType=VARCHAR}, #{item.candidateId,jdbcType=VARCHAR}, 
+        #{item.owner,jdbcType=VARCHAR}, #{item.blockNumber,jdbcType=BIGINT}, #{item.rblockNumber,jdbcType=BIGINT}, 
+        #{item.state,jdbcType=INTEGER}, #{item.income,jdbcType=DECIMAL}, #{item.estimateExpireTime,jdbcType=TIMESTAMP}, 
+        #{item.actualExpireTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+  <insert id="batchInsertSelective" parameterType="map">
+    <!--
+      WARNING - @mbg.generated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      @project https://github.com/itfsw/mybatis-generator-plugin
+    -->
+    insert into ticket (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'ticket_id'.toString() == column.value">
+          #{item.ticketId,jdbcType=VARCHAR}
+        </if>
+        <if test="'tx_hash'.toString() == column.value">
+          #{item.txHash,jdbcType=VARCHAR}
+        </if>
+        <if test="'candidate_id'.toString() == column.value">
+          #{item.candidateId,jdbcType=VARCHAR}
+        </if>
+        <if test="'owner'.toString() == column.value">
+          #{item.owner,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_number'.toString() == column.value">
+          #{item.blockNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'rblock_number'.toString() == column.value">
+          #{item.rblockNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'state'.toString() == column.value">
+          #{item.state,jdbcType=INTEGER}
+        </if>
+        <if test="'income'.toString() == column.value">
+          #{item.income,jdbcType=DECIMAL}
+        </if>
+        <if test="'estimate_expire_time'.toString() == column.value">
+          #{item.estimateExpireTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'actual_expire_time'.toString() == column.value">
+          #{item.actualExpireTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

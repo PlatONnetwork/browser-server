@@ -2,10 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.BlockMissingExample;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.BlockMissingMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +20,8 @@ public class DBService {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private TicketMapper ticketMapper;
     @Autowired
     private BlockMissingMapper blockMissingMapper;
     @Autowired
@@ -45,6 +44,10 @@ public class DBService {
         if(result.transactions.size()>0){
             transactionMapper.batchInsert(result.transactions);
             redisCacheService.updateTransactionCache(platon.getChainId(),new HashSet<>(result.transactions));
+        }
+
+        if(result.tickets.size()>0){
+            ticketMapper.batchInsert(result.tickets);
         }
 
 //        if(result.nodes.size()>0){
