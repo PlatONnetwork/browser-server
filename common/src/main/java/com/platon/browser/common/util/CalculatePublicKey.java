@@ -78,7 +78,7 @@ public class CalculatePublicKey {
         result.add(RlpString.create(decodeHash(block.getLogsBloom())));
         //Difficulty  *big.Int       `json:"difficulty"       gencodec:"required"`
         //TODO:0.4.0链去除难度值得解析
-        result.add(RlpString.create(block.getDifficulty()));
+        //result.add(RlpString.create(block.getDifficulty()));
         //Number      *big.Int       `json:"number"           gencodec:"required"`
         result.add(RlpString.create(block.getNumber()));
         //GasLimit    uint64         `json:"gasLimit"         gencodec:"required"`

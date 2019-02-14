@@ -19,7 +19,7 @@ import com.platon.browser.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=server")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
     @Autowired
     protected NodeRankingMapper nodeRankingMapper;

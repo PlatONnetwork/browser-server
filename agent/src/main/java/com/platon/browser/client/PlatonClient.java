@@ -30,7 +30,7 @@ public class PlatonClient {
     private void init () {
         Web3j web3j = chainsConfig.getWeb3j(chainId);
         ticketContract = TicketContract.load(web3j,new ReadonlyTransactionManager(web3j,TicketContract.CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        candidateContract = candidateContract.load(web3j,new ReadonlyTransactionManager(web3j,CandidateContract.CONTRACT_ADDRESS), new DefaultWasmGasProvider());
+        candidateContract = CandidateContract.load(web3j,new ReadonlyTransactionManager(web3j,CandidateContract.CONTRACT_ADDRESS), new DefaultWasmGasProvider());
     }
 
     public CandidateContract getCandidateContract () {
