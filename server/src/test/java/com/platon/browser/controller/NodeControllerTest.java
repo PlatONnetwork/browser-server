@@ -39,7 +39,7 @@ public class NodeControllerTest extends ControllerTestBase {
             try {
                 NodePageReq req = new NodePageReq();
                 req.setCid(chainId);
-                sendPost("/node/history",req);
+                sendPost("/node/historyList",req);
             } catch (Exception e) {
                 e.printStackTrace();
             }

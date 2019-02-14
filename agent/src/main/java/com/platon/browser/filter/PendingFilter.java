@@ -40,6 +40,7 @@ public class PendingFilter {
             transactions.forEach(initData -> {
                 PendingBean bean = new PendingBean();
                 bean.initData(initData);
+                bean.setChainId(platon.getChainId());
                 // 设置接收地址类型
                 if (null != initData.getTo()) {
                     try {

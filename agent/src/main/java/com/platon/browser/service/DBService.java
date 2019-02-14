@@ -46,9 +46,9 @@ public class DBService {
             redisCacheService.updateTransactionCache(platon.getChainId(),new HashSet<>(result.transactions));
         }
 
-        if(result.tickets.size()>0){
+       /* if(result.tickets.size()>0){
             ticketMapper.batchInsert(result.tickets);
-        }
+        }*/
 
 //        if(result.nodes.size()>0){
 //            customNodeRankingMapper.insertOrUpdate(result.nodes);
