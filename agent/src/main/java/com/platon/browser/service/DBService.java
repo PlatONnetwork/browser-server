@@ -21,8 +21,6 @@ public class DBService {
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
-    private TicketMapper ticketMapper;
-    @Autowired
     private BlockMissingMapper blockMissingMapper;
     @Autowired
     protected RedisCacheService redisCacheService;
@@ -45,10 +43,6 @@ public class DBService {
             transactionMapper.batchInsert(result.transactions);
             redisCacheService.updateTransactionCache(platon.getChainId(),new HashSet<>(result.transactions));
         }
-
-       /* if(result.tickets.size()>0){
-            ticketMapper.batchInsert(result.tickets);
-        }*/
 
 //        if(result.nodes.size()>0){
 //            customNodeRankingMapper.insertOrUpdate(result.nodes);
