@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
 
@@ -29,8 +28,6 @@ import java.util.List;
 @Component
 public class TicketFilter {
     private static Logger log = LoggerFactory.getLogger(TicketFilter.class);
-    @Value("${platon.redis.key.transaction}")
-    private String transactionCacheKeyTemplate;
     @Autowired
     private PlatonClient platon;
 
