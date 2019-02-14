@@ -4,7 +4,7 @@
       "cid": "1",
       "en": "MainNet",
       "zh": "MainNet(主网络)",
-      "http": "http://192.168.9.190:10040/newversion_test"
+      "http": "http://192.168.9.190:10042/newversion_test"
     }
   ]
 }
