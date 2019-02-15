@@ -99,7 +99,7 @@ public class BlockController  {
       @api {post} block/transactionList a.区块列表
       @apiVersion 1.0.0
       @apiName transactionList
-      @apiGroup blcok
+      @apiGroup block
       @apiDescription 区块列表
       @apiUse CommonHeaderFiled
       @apiParamExample {json} Request-Example:
@@ -188,7 +188,7 @@ public class BlockController  {
      * @api {post} block/blockDetails b.区块详情
      * @apiVersion 1.0.0
      * @apiName blockDetails
-     * @apiGroup blcok
+     * @apiGroup block
      * @apiDescription 区块详情
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
@@ -240,7 +240,7 @@ public class BlockController  {
      * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate
-     * @apiGroup blcok
+     * @apiGroup block
      * @apiDescription 区块详情前后跳转浏览
      * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
