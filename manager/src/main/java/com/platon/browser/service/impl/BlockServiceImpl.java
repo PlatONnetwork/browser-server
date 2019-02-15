@@ -1,22 +1,28 @@
 package com.platon.browser.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
+import com.platon.browser.dto.ticket.Ticket;
+import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.req.block.BlockDetailNavigateReq;
-import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.block.*;
+import com.platon.browser.req.ticket.TicketListReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.TicketService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +32,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +52,8 @@ public class BlockServiceImpl implements BlockService {
 
     @Autowired
     private RedisCacheService redisCacheService;
+    @Autowired
+    private TicketService ticketService;
 
     @Override
     public RespPage<BlockListItem> getPage(BlockPageReq req) {
@@ -181,6 +191,57 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public void updateCache(String chainId,Set<Block> data) {
         redisCacheService.updateBlockCache(chainId,data);
+    }
+
+    @Override
+    public RespPage<TransactionListItem> getBlockTransactionList(BlockTransactionPageReq req) {
+        TransactionExample example = new TransactionExample();
+        TransactionExample.Criteria criteria = example.createCriteria().andChainIdEqualTo(req.getCid())
+                .andBlockNumberEqualTo(req.getBlockNumber());
+        example.setOrderByClause("transaction_index ASC");
+        if(StringUtils.isNotBlank(req.getTxType())){
+            // 根据交易类型查询
+            if(req.getTxType().contains(",")){
+                String [] txTypes = req.getTxType().split(",");
+                List<String> txTypesList = Arrays.asList(txTypes);
+                criteria.andTxTypeIn(txTypesList);
+            }else{
+                criteria.andTxTypeEqualTo(req.getTxType());
+            }
+        }
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        List<Transaction> transactions = transactionMapper.selectByExample(example);
+        List<TransactionListItem> data = new ArrayList<>();
+        transactions.forEach(initData -> {
+            TransactionListItem bean = new TransactionListItem();
+            bean.init(initData);
+            data.add(bean);
+        });
+        RespPage<TransactionListItem> returnData = new RespPage<>();
+        returnData.init(page,data);
+        return returnData;
+    }
+
+    @Override
+    public RespPage<Ticket> getBlockTicketList(BlockTicketPageReq req) {
+        BlockTransactionPageReq transactionPageReq = new BlockTransactionPageReq();
+        BeanUtils.copyProperties(req,transactionPageReq);
+        transactionPageReq.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+        RespPage<TransactionListItem> transactions = getBlockTransactionList(transactionPageReq);
+        List<Ticket> tickets = new ArrayList<>();
+        if(transactions.getData().size()>0){
+            TicketListReq ticketListReq = new TicketListReq();
+            ticketListReq.setCid(req.getCid());
+            transactions.getData().forEach(transaction->{
+                ticketListReq.setTxHash(transaction.getTxHash());
+                RespPage<Ticket> ticketPage = ticketService.getList(ticketListReq);
+                if(ticketPage.getData().size()>0) tickets.addAll(ticketPage.getData());
+            });
+        }
+        Page page = PageHelper.startPage(1,1);
+        RespPage<Ticket> returnData = new RespPage<>();
+        returnData.init(page,tickets);
+        return returnData;
     }
 
 

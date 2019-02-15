@@ -4,9 +4,10 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.req.block.BlockDetailReq;
-import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.dto.ticket.Ticket;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.block.*;
 import com.platon.browser.util.DataTool;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,6 +59,29 @@ public class BlockServiceTest extends ServiceTestBase {
             req.setNodeId(data.getNodeId());
             List<Block> result = blockService.getList(req);
             Assert.assertTrue(result.size()>=0);
+        });
+    }
+
+    @Test
+    public void getBlockTransactionList(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            BlockTransactionPageReq req = new BlockTransactionPageReq();
+            req.setCid(chainId);
+            req.setBlockNumber(24l);
+            req.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+            RespPage<TransactionListItem> result = blockService.getBlockTransactionList(req);
+            Assert.assertTrue(result.getData().size()>=0);
+        });
+    }
+
+    @Test
+    public void getBlockTicketList(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            BlockTicketPageReq req = new BlockTicketPageReq();
+            req.setCid(chainId);
+            req.setBlockNumber(24l);
+            RespPage<Ticket> result = blockService.getBlockTicketList(req);
+            Assert.assertTrue(result.getData().size()>=0);
         });
     }
 }
