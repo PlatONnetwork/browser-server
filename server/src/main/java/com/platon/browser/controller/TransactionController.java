@@ -501,9 +501,8 @@ public class TransactionController {
                 transfer ：转账
                 MPCtransaction ： MPC交易
                 contractCreate ： 合约创建
-                vote ： 投票
+                voteTicket ： 投票
                 transactionExecute ： 合约执行
-                authorization ： 权限
                 authorization ： 权限
                 candidateDeposit ： 竞选质押
                 candidateApplyWithdraw ： 减持质押
