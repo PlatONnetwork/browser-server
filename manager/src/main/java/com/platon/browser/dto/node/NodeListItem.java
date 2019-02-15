@@ -8,6 +8,7 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 
 @Data
 public class NodeListItem {
@@ -24,8 +25,10 @@ public class NodeListItem {
     private Double rewardRatio;
     private String address;
     private Integer isValid;
+    private Date eliminateTime;
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);
+        if(initData.getIsValid()==0) this.setEliminateTime(initData.getUpdateTime());
         this.setBlockCount(initData.getBlockCount().intValue());
         this.setLogo(initData.getUrl());
         BigDecimal v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2,RoundingMode.DOWN);
