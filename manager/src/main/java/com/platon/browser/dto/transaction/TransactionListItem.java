@@ -8,7 +8,6 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class TransactionListItem {
@@ -26,6 +25,7 @@ public class TransactionListItem {
     private String failReason;
     // to字段存储的账户类型：account-钱包地址，contract-合约地址
     private String receiveType;
+    private String txInfo;
 
     public void init(Transaction initData){
         BeanUtils.copyProperties(initData,this);
