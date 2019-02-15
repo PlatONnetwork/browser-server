@@ -39,8 +39,7 @@ public class TicketController {
       @apiParamExample {json} Request-Example:
       {
            "cid":"", // 链ID (必填)
-           "pageNo": 1,//页数(必填)
-           "pageSize": 10,//页大小(必填)
+           "txHash":"" // 投票交易的hash (必填)
       }
       @apiSuccessExample {json} Success-Response:
       HTTP/1.1 200 OK
