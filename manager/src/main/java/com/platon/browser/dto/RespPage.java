@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.github.pagehelper.Page;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class RespPage<T> {
     //总页数
     private long totalPages;
     // 响应数据
-    private List<T> data;
+    private List<T> data= Collections.EMPTY_LIST;
 
     public void init(Page page, List<T> data){
         this.setTotalCount(page.getTotal());
