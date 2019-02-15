@@ -135,6 +135,7 @@ public class NodeController {
      *           "blockCount": 252125,// 产生的总区块数
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
+     *           "eliminateTime":"" // 淘汰时间
      *           }
      *       ]
      * }

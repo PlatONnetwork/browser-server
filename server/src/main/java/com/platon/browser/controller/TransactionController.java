@@ -793,45 +793,4 @@ public class TransactionController {
         RespPage<TransactionListItem> returnData = transactionService.getPageByBlockNumber(tlr);
         return returnData;
     }
-
-    /**
-     * @api {post} transaction/voteList l.根据块高/hash查询选票列表
-     * @apiVersion 1.0.0
-     * @apiName voteList
-     * @apiGroup transaction
-     * @apiDescription 根据块高/hash查询投票列表
-     * @apiUse CommonHeaderFiled
-     * @apiParamExample {json} Request-Example:
-     * {
-     *      "cid":"", // 链ID (必填)
-     *      "pageNo": 1,//页数(必填)
-     *      "pageSize": 10,//页大小(必填)
-     *      "parameter": 123//区块高度/hash(必填)
-     * }
-     *
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *      "errMsg": "",//描述信息
-     *      "code": 0,//成功（0），失败则由相关失败码
-     *      "displayTotalCount":18,//显示总数
-     *      "totalCount":18,// 小于等于500000记录的总数
-     *      "totalPages":1,//总页数
-     *      "data": [
-     *                  {
-     *                  "ticketId":  "",//票id
-     *                  "nodeName":  "",//投票给
-     *                  "owner": "0x234",//所有者
-     *                  "status": ,//票状态
-     *                  1->候选中
-     *                  2->中选票
-     *                  3->已失效
-     *                  4->待确认
-     *                  "income": "", //收益
-     *                  "time": 111//实际过期时间（只有status = 3显示该时间的值，其他情况显示预期时间的值）
-     *                  "expectTime"://预期时间
-     *                  }
-     *              ]
-     * }
-     */
 }
