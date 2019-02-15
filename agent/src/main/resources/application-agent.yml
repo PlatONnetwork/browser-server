@@ -2,7 +2,7 @@
 # 当前激活的配置名称(请不要修改)
 profile: agent
 # 服务器端口号
-port: 20040
+port: 20042
 # MySQL数据库连接地址
 dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
