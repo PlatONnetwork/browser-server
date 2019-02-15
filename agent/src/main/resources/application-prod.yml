@@ -4,7 +4,7 @@ profile: prod
 # 服务器端口号
 port: 29030
 # MySQL数据库连接地址
-dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_0.4.0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
 dbuser: root
 # MySQL数据库密码

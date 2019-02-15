@@ -13,5 +13,5 @@ import java.util.List;
 public interface PendingTxService {
     RespPage<PendingTxItem> getTransactionList(PendingTxPageReq req);
     PendingOrTransaction getDetail(PendingTxDetailReq req);
-    List<PendingTx> getTransactionList(AddressDetailReq req);
+    List<PendingTx> getList(AddressDetailReq req);
 }

@@ -1,6 +1,8 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
@@ -39,6 +41,9 @@ public class TransactionControllerTest extends ControllerTestBase {
     public void getDetail() {
         chainsConfig.getChainIds().forEach(chainId->{
             try {
+                // 同步缓存
+                sendGet("/cache/reset/"+chainId+"/transaction");
+
                 TransactionListItem data = getOneTransaction(chainId);
                 if(data==null){
                     Assert.fail("No data in the database.");
@@ -56,9 +61,52 @@ public class TransactionControllerTest extends ControllerTestBase {
     }
 
     @Test
+    public void addressDetails() {
+        chainsConfig.getChainIds().forEach(chainId->{
+            try {
+                // 同步缓存
+                sendGet("/cache/reset/"+chainId+"/transaction");
+
+                TransactionListItem data = getOneTransaction(chainId);
+                if(data==null){
+                    Assert.fail("No data in the database.");
+                    return;
+                }
+
+                // 一般查询
+                AddressDetailReq req = new AddressDetailReq();
+                req.setCid(chainId);
+                req.setAddress(data.getFrom());
+                sendPost("/transaction/addressDetails",req);
+
+                // 投票交易查询
+                req.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+                sendPost("/transaction/addressDetails",req);
+
+                // 质押交易查询
+                StringBuilder sb = new StringBuilder();
+                sb.append(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code).append(",")
+                        .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code).append(",")
+                        .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
+                req.setTxType(sb.toString());
+                sendPost("/transaction/addressDetails",req);
+
+                // 指定交易类型查询
+                req.setTxType(data.getTxType());
+                sendPost("/transaction/addressDetails",req);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Test
     public void detailNavigate() {
         chainsConfig.getChainIds().forEach(chainId->{
             try {
+                // 同步缓存
+                sendGet("/cache/reset/"+chainId+"/transaction");
+
                 TransactionListItem data = getOneTransaction(chainId);
                 if(data==null){
                     Assert.fail("No data in the database.");

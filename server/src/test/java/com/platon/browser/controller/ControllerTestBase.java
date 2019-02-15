@@ -14,6 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +37,15 @@ public class ControllerTestBase extends TestBase {
     protected void sendPost(String url, Object req) throws Exception {
         MockHttpServletRequestBuilder builder = post(url)
                 .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(req))
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(builder)
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    protected void sendGet(String url) throws Exception {
+        MockHttpServletRequestBuilder builder = get(url)
+                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
         mockMvc.perform(builder)
                 .andExpect(status().isOk())

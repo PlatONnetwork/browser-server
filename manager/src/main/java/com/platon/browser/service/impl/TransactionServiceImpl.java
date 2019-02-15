@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -132,8 +133,15 @@ public class TransactionServiceImpl implements TransactionService {
                 .andToEqualTo(req.getAddress());
         if(StringUtils.isNotBlank(req.getTxType())){
             // 根据交易类型查询
-            first.andTxTypeEqualTo(req.getTxType());
-            second.andTxTypeEqualTo(req.getTxType());
+            if(req.getTxType().contains(",")){
+                String [] txTypes = req.getTxType().split(",");
+                List<String> txTypesList = Arrays.asList(txTypes);
+                first.andTxTypeIn(txTypesList);
+                second.andTxTypeIn(txTypesList);
+            }else{
+                first.andTxTypeEqualTo(req.getTxType());
+                second.andTxTypeEqualTo(req.getTxType());
+            }
         }
         if(req.getStartDate()!=null){
             // 根据交易生成起始时间查询

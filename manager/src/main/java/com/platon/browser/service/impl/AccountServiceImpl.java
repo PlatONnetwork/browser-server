@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
 
         // 取待处理交易
         page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        List<PendingTx> pendingTxes = pendingTxService.getTransactionList(req);
+        List<PendingTx> pendingTxes = pendingTxService.getList(req);
         returnData.setTradeCount(returnData.getTradeCount()+Long.valueOf(page.getTotal()).intValue());
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
