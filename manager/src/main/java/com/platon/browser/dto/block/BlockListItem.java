@@ -23,6 +23,9 @@ public class BlockListItem {
     private long serverTime;
     private String nodeName;
     private String nodeId;
+    private Long blockVoteAmount;
+    private Long blockVoteNumber;
+    private Long blockCampaignAmount;
 
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);
