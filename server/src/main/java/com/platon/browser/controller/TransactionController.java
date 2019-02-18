@@ -206,6 +206,7 @@ public class TransactionController {
      *           }
      *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
      *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "voteCount",33// 投票数（只有投票交易此字段才有值）
      * }
      */
     @PostMapping("transactionDetails")

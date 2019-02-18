@@ -36,6 +36,7 @@ public class TransactionDetail {
     private String receiveType;
     private String txInfo;
     private String nodeId;
+    private Integer voteCount;
     // 是否第一条
     private boolean first;
     // 是否最后一条
@@ -66,6 +67,7 @@ public class TransactionDetail {
                         TxInfo.Parameter parameter = info.getParameters();
                         if(parameter!=null){
                             this.setNodeId(parameter.getNodeId());
+                            this.setVoteCount(parameter.getCount());
                         }
                     }
                     break;
