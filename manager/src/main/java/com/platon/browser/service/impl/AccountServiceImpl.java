@@ -64,7 +64,7 @@ public class AccountServiceImpl implements AccountService {
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
             data.add(bean);
         });
 
@@ -75,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
             data.add(bean);
         });
 
@@ -94,7 +94,7 @@ public class AccountServiceImpl implements AccountService {
                     .andNodeIdIn(new ArrayList<>(nodeIds));
             List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             nodes.forEach(node->{
-                if(node.getNodeId().startsWith("0x")) node.setNodeId(node.getNodeId().replace("0x",""));
+                if(!node.getNodeId().startsWith("0x")) node.setNodeId("0x"+node.getNodeId());
                 nodeIdToName.put(node.getNodeId(),node.getName());
             });
         }
