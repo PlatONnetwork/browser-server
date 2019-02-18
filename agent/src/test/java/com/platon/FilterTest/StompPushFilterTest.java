@@ -1,8 +1,6 @@
 package com.platon.FilterTest;
 
 import com.platon.TestBase;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NodeRanking;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,7 +29,7 @@ public class StompPushFilterTest extends TestBase {
     @Test
     public void StompPushFilterTest(){
         try{
-            CandidateContract candidateContract = web3jClient.getCandidateContract();
+            CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
             String nodeInfoList = candidateContract.CandidateList().send();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();

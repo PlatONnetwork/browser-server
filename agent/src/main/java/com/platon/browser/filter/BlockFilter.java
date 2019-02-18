@@ -12,6 +12,7 @@ import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -32,6 +33,8 @@ public class BlockFilter {
     private static Logger logger = LoggerFactory.getLogger(BlockFilter.class);
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
 
     public Block analyse ( AnalyseThread.AnalyseParam param ) {
         BlockBean bean = new BlockBean();
@@ -39,7 +42,7 @@ public class BlockFilter {
             bean.init(param.ethBlock);
 
             // 设置需要使用当前上下文的属性
-            bean.setChainId(platon.getChainId());
+            bean.setChainId(chainId);
             String publicKey = null;
             try{
                 publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
@@ -76,7 +79,7 @@ public class BlockFilter {
                     if ("voteTicket".equals(type)) {
                         voteAmount=voteAmount.add(BigInteger.ONE);
                         //get tickVoteContract vote event
-                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = platon.getTicketContract().getVoteTicketEventEvents(receipt);
+                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = platon.getTicketContract(chainId).getVoteTicketEventEvents(receipt);
                         String event = eventEventResponses.get(0).param1;
                         EventRes eventRes = JSON.parseObject(event, EventRes.class);
                         //event objcet is jsonString , transform jsonObject <EventRes>

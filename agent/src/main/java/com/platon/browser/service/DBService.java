@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.BlockMissingExample;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class DBService {
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
@@ -35,13 +38,13 @@ public class DBService {
         if(result.blocks.size()>0){
             blockMapper.batchInsert(result.blocks);
             // 更新区块中的节点名称字段：node_name
-            customBlockMapper.updateBlockNodeName(platon.getChainId());
-            redisCacheService.updateBlockCache(platon.getChainId(), new HashSet<>(result.blocks));
+            customBlockMapper.updateBlockNodeName(chainId);
+            redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
         }
 
         if(result.transactions.size()>0){
             transactionMapper.batchInsert(result.transactions);
-            redisCacheService.updateTransactionCache(platon.getChainId(),new HashSet<>(result.transactions));
+            redisCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
         }
 
 //        if(result.nodes.size()>0){
@@ -54,10 +57,10 @@ public class DBService {
             List<Long> numbers = new ArrayList<>();
             result.errorBlocks.forEach(err->numbers.add(err.getNumber()));
             BlockMissingExample example = new BlockMissingExample();
-            example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
+            example.createCriteria().andChainIdEqualTo(chainId).andNumberIn(numbers);
             blockMissingMapper.deleteByExample(example);
             blockMissingMapper.batchInsert(result.errorBlocks);
         }
-        redisCacheService.updateStatisticsCache(platon.getChainId());
+        redisCacheService.updateStatisticsCache(chainId);
     }
 }

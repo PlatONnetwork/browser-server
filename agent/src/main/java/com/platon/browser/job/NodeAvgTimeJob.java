@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,13 +40,15 @@ public class NodeAvgTimeJob {
     private NodeRankingMapper nodeRankingMapper;
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
 
     @Scheduled(cron = "0/5 * * * * ?")
     protected void statistics () {
         logger.debug("*** In the NodeAvgTimeJob *** ");
         try{
             NodeRankingExample nodeCon = new NodeRankingExample();
-            nodeCon.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
+            nodeCon.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
             List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeCon);
             nodes.forEach(node->{
                 // 查询节点最近3600个块

@@ -34,6 +34,8 @@ public class AnalyseThread {
     private static Logger logger = LoggerFactory.getLogger(AnalyseThread.class);
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
     @Value("${platon.block.pool.size}")
     private int threadNum;
     @Value("${platon.block.batch.num}")
@@ -65,7 +67,7 @@ public class AnalyseThread {
         threshold++;
 
         List<AnalyseParam> params = new ArrayList<>();
-        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
+        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j(chainId))));
         AnalyseResult result = new AnalyseResult();
 //        Map<Long,List<NodeRanking>> nodeGroups = new HashMap<>();
         CountDownLatch latch = new CountDownLatch(params.size());
@@ -84,7 +86,7 @@ public class AnalyseThread {
                     } catch (Exception e) {
                         // 出错之后记录下出错的区块号，并返回
                         BlockMissing err = new BlockMissing();
-                        err.setChainId(platon.getChainId());
+                        err.setChainId(chainId);
                         err.setNumber(param.ethBlock.getBlock().getNumber().longValue());
                         result.errorBlocks.add(err);
                     }
@@ -114,13 +116,13 @@ public class AnalyseThread {
             result.blocks.forEach(block -> {
                 numbers.add(block.getNumber());
                 BlockMissing err = new BlockMissing();
-                err.setChainId(platon.getChainId());
+                err.setChainId(chainId);
                 err.setNumber(block.getNumber());
                 result.errorBlocks.add(err);
             });
             if(result.errorBlocks.size()>0){
                 BlockMissingExample example = new BlockMissingExample();
-                example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
+                example.createCriteria().andChainIdEqualTo(chainId).andNumberIn(numbers);
                 blockMissingMapper.deleteByExample(example);
                 blockMissingMapper.batchInsert(result.errorBlocks);
             }
@@ -131,7 +133,7 @@ public class AnalyseThread {
             // 重置阈值，防止无限增长
             threshold=0;
             BlockMissingExample example = new BlockMissingExample();
-            example.createCriteria().andChainIdEqualTo(platon.getChainId());
+            example.createCriteria().andChainIdEqualTo(chainId);
             example.setOrderByClause("number ASC");
             PageHelper.startPage(1,batchNum);
             List<BlockMissing> missings = blockMissingMapper.selectByExample(example);
@@ -140,7 +142,7 @@ public class AnalyseThread {
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             missings.forEach(missing->{
                 try {
-                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(missing.getNumber())),true).send();
+                    EthBlock ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(missing.getNumber())),true).send();
                     concurrentBlocks.add(ethBlock);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -152,7 +154,7 @@ public class AnalyseThread {
                 // 删除block_missing表中实际从链上查询回来的块号
                 concurrentBlocks.forEach(ethBlock->numbers.add(ethBlock.getBlock().getNumber().longValue()));
                 example = new BlockMissingExample();
-                example.createCriteria().andChainIdEqualTo(platon.getChainId()).andNumberIn(numbers);
+                example.createCriteria().andChainIdEqualTo(chainId).andNumberIn(numbers);
                 blockMissingMapper.deleteByExample(example);
                 // 分析缺失的块
                 analyse(concurrentBlocks);

@@ -35,6 +35,8 @@ public class BlockAnalyseJob {
     private int batchNum;
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
     // 起始区块号
     private long beginNumber=1;
     @Autowired
@@ -43,7 +45,7 @@ public class BlockAnalyseJob {
     @PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(platon.getChainId());
+        condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("number desc");
         PageHelper.startPage(1, 1);
         List <Block> blocks = blockMapper.selectByExample(condition);
@@ -66,11 +68,11 @@ public class BlockAnalyseJob {
             // 需要并发处理的区块数据
             List<EthBlock> concurrentBlocks = new ArrayList<>();
             // 结束区块号
-            BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
+            BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
             if(beginNumber>endNumber.intValue()) return;
             if((endNumber.intValue()-beginNumber)<batchNum){
                 while (beginNumber<=endNumber.longValue()){
-                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    EthBlock ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
                     concurrentBlocks.add(ethBlock);
                     beginNumber++;
                 }
@@ -78,7 +80,7 @@ public class BlockAnalyseJob {
                 concurrentBlocks.clear();
             }else{
                 while (beginNumber<=endNumber.longValue()){
-                    EthBlock ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
+                    EthBlock ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)),true).send();
                     concurrentBlocks.add(ethBlock);
                     long range = endNumber.longValue()-beginNumber+1;
                     if(

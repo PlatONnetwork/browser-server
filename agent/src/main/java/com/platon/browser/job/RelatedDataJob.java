@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,6 +34,9 @@ public class RelatedDataJob {
     @Autowired
     private PlatonClient platon;
 
+    @Value("${platon.chain.active}")
+    private String chainId;
+
     public static Map <String, Double> nodeAvgTimeMap = new ConcurrentHashMap <>();
 
     //@Scheduled(cron = "0 */1 * * * ?")
@@ -44,13 +48,13 @@ public class RelatedDataJob {
         List <Long> beforeNumberList = new ArrayList <>();
         try {
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
-            nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
             //有效节点信息列表
             List <NodeRanking> nodeRankingList = nodeRankingMapper.selectByExample(nodeRankingExample);
             nodeRankingList.forEach(nodeRanking -> {
                 BlockExample blockExample = new BlockExample();
                 blockExample.createCriteria()
-                        .andChainIdEqualTo(platon.getChainId())
+                        .andChainIdEqualTo(chainId)
                         .andNodeIdEqualTo(nodeRanking.getNodeId());
                 blockExample.setOrderByClause("timestamp DESC");
                 PageHelper.startPage(1, 4);
@@ -65,7 +69,7 @@ public class RelatedDataJob {
                 });
                 BlockExample before = new BlockExample();
                 before.createCriteria()
-                        .andChainIdEqualTo(platon.getChainId())
+                        .andChainIdEqualTo(chainId)
                         .andNumberIn(beforeNumberList);
                 before.setOrderByClause("timestamp DESC");
                 List <Block> beforBlockList = blockMapper.selectByExample(before);
