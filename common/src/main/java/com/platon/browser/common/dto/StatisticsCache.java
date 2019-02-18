@@ -40,4 +40,10 @@ public class StatisticsCache {
     private String nodeName;
     // 出块节点ID
     private String nodeId;
+    //票价
+    private BigDecimal ticketPrice;
+    //占比
+    private BigDecimal proportion;
+    //当前票数
+    private long voteAmount;
 }

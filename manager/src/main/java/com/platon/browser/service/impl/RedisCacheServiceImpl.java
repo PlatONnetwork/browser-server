@@ -2,6 +2,7 @@ package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
@@ -28,6 +29,7 @@ import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.contracts.TicketContract;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -35,9 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 @Component
@@ -57,6 +58,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String staticsticsCacheKeyTemplate;
     @Value("${platon.fake.location.filename}")
     private String fakeLocationFilename;
+    @Autowired
+    private PlatonClient platon;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -216,16 +219,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public void clearTransactionCache(String chainId) {
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
-    }
-
-    /**
-     * 清除交易缓存
-     * @param chainId
-     */
-    @Override
-    public void clearStatisticsCache(String chainId) {
-        String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
     }
 
@@ -463,9 +456,16 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         return returnData;
     }
 
+    /**
+     * 清除统计缓存
+     * @param chainId
+     */
+    @Override
+    public void clearStatisticsCache(String chainId) {
+        String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.delete(cacheKey);
+    }
 
-
-    private final static ReadWriteLock LOCK = new ReentrantReadWriteLock();
     /**
      * 更新统计缓存
      * @param chainId
@@ -564,6 +564,34 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         BigDecimal avgTime=BigDecimal.valueOf(highestBlockTimestamp-lowestBlockTimestamp).divide(BigDecimal.valueOf(divider),4,BigDecimal.ROUND_HALF_UP);
         cache.setAvgTime(avgTime);
 
+        /*********************** 获取当前投票数、占比、票价 ***********************/
+        TicketContract ticketContract = platon.getTicketContract(chainId);
+        try {
+            String ticketPrice = ticketContract.GetTicketPrice().send();
+            cache.setTicketPrice(BigDecimal.valueOf(Double.valueOf(ticketPrice)));
+        } catch (Exception e) {
+            cache.setTicketPrice(BigDecimal.ZERO);
+            e.printStackTrace();
+        }
+
+        try {
+            String ticketPrice = ticketContract.GetTicketPrice().send();
+            cache.setTicketPrice(BigDecimal.valueOf(Double.valueOf(ticketPrice)));
+        } catch (Exception e) {
+            cache.setTicketPrice(BigDecimal.ZERO);
+            e.printStackTrace();
+        }
+
+        try {
+            String remainder = ticketContract.GetPoolRemainder().send();
+            cache.setVoteAmount(Long.valueOf(remainder));
+        } catch (Exception e) {
+            cache.setVoteAmount(0);
+            e.printStackTrace();
+        }
+
+        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteAmount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.HALF_UP);
+        cache.setProportion(proportion);
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.opsForValue().set(cacheKey,JSON.toJSONString(cache));
