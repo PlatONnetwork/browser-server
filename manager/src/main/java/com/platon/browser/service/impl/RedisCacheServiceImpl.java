@@ -224,7 +224,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      * @param chainId
      */
     @Override
-    public void clearStaticsticsCache(String chainId) {
+    public void clearStatisticsCache(String chainId) {
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
     }
