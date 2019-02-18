@@ -7,10 +7,7 @@ import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
@@ -113,7 +110,10 @@ public class NodeAnalyseJob {
 
                 List <NodeRanking> nodeList = new ArrayList <>();
                 int i = 1;
-
+                BlockKey key = new BlockKey();
+                key.setChainId(platon.getChainId());
+                key.setHash(ethBlock.getBlock().getHash());
+                Block block = blockMapper.selectByPrimaryKey(key);
                 for (CandidateDto candidateDto : nodes) {
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
@@ -121,7 +121,9 @@ public class NodeAnalyseJob {
                     nodeRanking.setChainId(platon.getChainId());
                     nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
                     nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
-                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(rate).toString());
+                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
+                            multiply(rate).
+                            add(new BigDecimal(block.getActualTxCostSum()!= null ? block.getActualTxCostSum() : "0")).toString());
                     nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                     nodeRanking.setRanking(i);
                     nodeRanking.setType(1);
@@ -152,7 +154,6 @@ public class NodeAnalyseJob {
                     updateList.add(e);
                 });
 
-                Date date9 = new Date();
                 if (dbList.size() > 0 && dbList != null) {
                     for (int j = 0; j < dbList.size(); j++) {
                         NodeRanking dbNode = dbList.get(j);
@@ -164,6 +165,9 @@ public class NodeAnalyseJob {
                             chainNode.setBeginNumber(dbNode.getBeginNumber());
                             chainNode.setId(dbNode.getId());
                             chainNode.setAvgTime(dbNode.getAvgTime());
+                            chainNode.setProfitAmount(new BigDecimal(dbNode.getProfitAmount()).add(new BigDecimal(chainNode.getProfitAmount())).toString());
+                            chainNode.setRewardAmount(new BigDecimal(dbNode.getRewardAmount()).add(new BigDecimal(chainNode.getRewardAmount())).toString());
+                            chainNode.setBlockReward(new BigDecimal(dbNode.getBlockReward()).add(new BigDecimal(chainNode.getBlockReward())).toString());
                         } else {
                             dbNode.setEndNumber(beginNumber);
                             dbNode.setIsValid(0);

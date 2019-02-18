@@ -113,6 +113,7 @@ public class NodeServiceImpl implements NodeService {
         }else{
             criteria.andNodeIdEqualTo(req.getNodeId());
         }
+        //criteria.andIsValidEqualTo(1);
         PageHelper.startPage(1,1);
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         if(nodes.size()==0){
