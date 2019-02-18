@@ -35,6 +35,7 @@ public class AccTransactionItem {
     private BigDecimal ticketPrice;
     private BigDecimal income;
     private long voteCount;
+    private BigDecimal deposit;
 
     @JsonIgnore
     private Date timestamp;
@@ -66,18 +67,35 @@ public class AccTransactionItem {
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
 
-        if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(this.getTxType())){
-            // 如果是投票交易，则解析投票参数信息
-            if(StringUtils.isNotBlank(txInfo)){
-                TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
-                TxInfo.Parameter parameter = info.getParameters();
-                if (parameter!=null&&parameter.getPrice()!=null){
-                    this.setTicketPrice(Convert.fromWei(BigDecimal.valueOf(parameter.getPrice().longValue()), Convert.Unit.ETHER));
-                }
-                if (parameter!=null&&parameter.getCount()!=null){
-                    this.setVoteCount(parameter.getCount());
-                }
+        try{
+            TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(this.getTxType());
+            switch (typeEnum){
+                case TRANSACTION_VOTE_TICKET:
+                    // 如果是投票交易，则解析投票参数信息
+                    if(StringUtils.isNotBlank(txInfo)){
+                        TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
+                        TxInfo.Parameter parameter = info.getParameters();
+                        if (parameter!=null&&parameter.getPrice()!=null){
+                            this.setTicketPrice(Convert.fromWei(BigDecimal.valueOf(parameter.getPrice().longValue()), Convert.Unit.ETHER));
+                        }
+                        if (parameter!=null&&parameter.getCount()!=null){
+                            this.setVoteCount(parameter.getCount());
+                        }
+                    }
+                    break;
+                case TRANSACTION_CANDIDATE_DEPOSIT:
+                case TRANSACTION_CANDIDATE_WITHDRAW:
+                case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
+                    if(StringUtils.isNotBlank(this.value)){
+                        Double dep = Double.valueOf(this.value);
+                        this.setDeposit(BigDecimal.valueOf(dep));
+                    }else {
+                        this.setDeposit(BigDecimal.ZERO);
+                    }
+                    break;
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
