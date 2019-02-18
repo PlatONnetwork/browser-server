@@ -6,6 +6,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -138,14 +139,26 @@ public class NodeServiceImpl implements NodeService {
             data.add(bean);
         });
 
-        returnData.setSelectedCount(holder.selectedCount);
+        returnData.setSelectedNodeCount(holder.selectedCount);
         returnData.setHighestDeposit(holder.highestDeposit);
         returnData.setLowestDeposit(holder.lowestDeposit);
 
         // 设置占比
-        // 占比
         BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.HALF_UP);
         returnData.setProportion(proportion);
+
+        // 取区块奖励
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid());
+        blockExample.setOrderByClause("number DESC");
+        PageHelper.startPage(1,1);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        if(blocks.size()>0){
+            Block block = blocks.get(0);
+            returnData.setBlockReward(new BigDecimal(block.getBlockReward()));
+        }else{
+            returnData.setBlockReward(BigDecimal.ZERO);
+        }
 
         // 设置竞选节点数
         return returnData;
