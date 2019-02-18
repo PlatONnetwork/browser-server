@@ -94,7 +94,7 @@ public class AccountServiceImpl implements AccountService {
                     .andNodeIdIn(new ArrayList<>(nodeIds));
             List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             nodes.forEach(node->{
-                if(!node.getNodeId().startsWith("0x")) node.setNodeId("0x"+node.getNodeId());
+                if(node.getNodeId().startsWith("0x")) node.setNodeId(node.getNodeId().replace("0x",""));
                 nodeIdToName.put(node.getNodeId(),node.getName());
             });
         }
