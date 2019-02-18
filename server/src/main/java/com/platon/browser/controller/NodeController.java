@@ -77,8 +77,8 @@ public class NodeController {
      *      "ticketPrice":3.66,//票价
      *      "selectedNodeCount":33,//已选中节点数
      *      "totalNodeCount":200,//总节点数
-     *      “lowestDeposit”:545.44, // 最低质押（单位Energon）
-     *      “highestDeposit”:545.44, // 最高质押（单位Energon）
+     *      "lowestDeposit":545.44, // 最低质押（单位Energon）
+     *      "highestDeposit":545.44, // 最高质押（单位Energon）
      *      "data": [
      *           {
      *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 节点ID
