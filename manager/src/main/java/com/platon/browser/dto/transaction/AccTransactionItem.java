@@ -36,6 +36,7 @@ public class AccTransactionItem {
     private BigDecimal income;
     private long voteCount;
     private BigDecimal deposit;
+    private String nodeId;
 
     @JsonIgnore
     private Date timestamp;
@@ -80,6 +81,9 @@ public class AccTransactionItem {
                         }
                         if (parameter!=null&&parameter.getCount()!=null){
                             this.setVoteCount(parameter.getCount());
+                        }
+                        if(parameter!=null&&parameter.getNodeId()!=null){
+                            this.setNodeId(parameter.getNodeId());
                         }
                     }
                     break;
