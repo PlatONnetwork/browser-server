@@ -4,16 +4,20 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AccountDetail;
+import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.*;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.exception.ResponseException;
-import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.account.AccountDownloadReq;
+import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.*;
 import com.platon.browser.service.*;
 import com.platon.browser.util.I18nEnum;
@@ -56,6 +60,8 @@ public class TransactionController {
     private RedisCacheService redisCacheService;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     /**
       @api {post} transaction/transactionList a.交易列表
@@ -684,8 +690,17 @@ public class TransactionController {
         try{
             req.setPageSize(20);
             AddressDetail initData = accountService.getAddressDetail(req);
+
             ContractDetail returnData = new ContractDetail();
-            returnData.setDeveloper(req.getAddress());
+
+            // 取合约开发者地址，取创建合约交易中的from地址
+            TransactionExample trEx = new TransactionExample();
+            trEx.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+            List<Transaction> trans = transactionMapper.selectByExample(trEx);
+            if(trans.size()==0){
+                Transaction transaction = trans.get(0);
+                returnData.setDeveloper(transaction.getFrom());
+            }
             returnData.setOwnerCount(1);
             returnData.init(initData);
             List<AccTransactionItem> transactions = initData.getTrades();
