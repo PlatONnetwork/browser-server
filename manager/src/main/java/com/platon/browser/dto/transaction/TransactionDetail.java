@@ -1,14 +1,17 @@
 package com.platon.browser.dto.transaction;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class TransactionDetail {
@@ -31,6 +34,8 @@ public class TransactionDetail {
     private String failReason;
     private long confirmNum;
     private String receiveType;
+    private String txInfo;
+    private String nodeId;
     // 是否第一条
     private boolean first;
     // 是否最后一条
@@ -51,5 +56,22 @@ public class TransactionDetail {
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER);
         this.setPriceInEnergon(EnergonUtil.format(v));
+
+        try {
+            TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(txType);
+            switch (typeEnum){
+                case TRANSACTION_VOTE_TICKET:
+                    if(StringUtils.isNotBlank(txInfo)){
+                        TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
+                        TxInfo.Parameter parameter = info.getParameters();
+                        if(parameter!=null){
+                            this.setNodeId(parameter.getNodeId());
+                        }
+                    }
+                    break;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

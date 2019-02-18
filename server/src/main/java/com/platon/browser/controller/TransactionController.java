@@ -205,6 +205,7 @@ public class TransactionController {
      *                  }"//返回交易解析结构
      *           }
      *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
      * }
      */
     @PostMapping("transactionDetails")
