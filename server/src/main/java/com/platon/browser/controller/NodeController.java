@@ -5,6 +5,7 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.block.BlockListItem;
@@ -94,13 +95,13 @@ public class NodeController {
      * }
      */
     @PostMapping("list")
-    public RespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
+    public NodeRespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         req.setIsValid(1);
         req.setPageSize(200);
-        RespPage<NodeListItem> returnData = nodeService.getPage(req);
+        NodeRespPage<NodeListItem> returnData = nodeService.getPage(req);
         return returnData;
     }
 

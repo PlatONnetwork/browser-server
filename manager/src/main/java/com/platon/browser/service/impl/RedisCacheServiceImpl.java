@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
+import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -566,30 +567,33 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
         /*********************** 获取当前投票数、占比、票价 ***********************/
         TicketContract ticketContract = platon.getTicketContract(chainId);
-        try {
-            String ticketPrice = ticketContract.GetTicketPrice().send();
-            cache.setTicketPrice(BigDecimal.valueOf(Double.valueOf(ticketPrice)));
-        } catch (Exception e) {
-            cache.setTicketPrice(BigDecimal.ZERO);
-            e.printStackTrace();
-        }
-        try {
-            String ticketPrice = ticketContract.GetTicketPrice().send();
-            cache.setTicketPrice(BigDecimal.valueOf(Double.valueOf(ticketPrice)));
-        } catch (Exception e) {
-            cache.setTicketPrice(BigDecimal.ZERO);
-            e.printStackTrace();
-        }
 
+        // 票价
+        try {
+            String ticketPrice = ticketContract.GetTicketPrice().send();
+            if(StringUtils.isNotBlank(ticketPrice)){
+                cache.setTicketPrice(Convert.fromWei(ticketPrice, Convert.Unit.ETHER));
+            }else{
+                cache.setTicketPrice(BigDecimal.ZERO);
+            }
+        } catch (Exception e) {
+            cache.setTicketPrice(BigDecimal.ZERO);
+            e.printStackTrace();
+        }
+        // 投票数
         try {
             String remainder = ticketContract.GetPoolRemainder().send();
-            cache.setVoteAmount(Long.valueOf(remainder));
+            if(StringUtils.isNotBlank(remainder)){
+                cache.setVoteCount(Long.valueOf(remainder));
+            }else{
+                cache.setVoteCount(0);
+            }
         } catch (Exception e) {
-            cache.setVoteAmount(0);
+            cache.setVoteCount(0);
             e.printStackTrace();
         }
-
-        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteAmount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.HALF_UP);
+        // 占比
+        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.HALF_UP);
         cache.setProportion(proportion);
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);

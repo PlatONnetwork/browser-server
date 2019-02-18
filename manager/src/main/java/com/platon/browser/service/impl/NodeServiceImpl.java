@@ -2,6 +2,7 @@ package com.platon.browser.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
@@ -9,6 +10,7 @@ import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
@@ -29,7 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.TicketContract;
+import org.web3j.utils.Convert;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -47,9 +53,11 @@ public class NodeServiceImpl implements NodeService {
     private RedisCacheServiceImpl redisCacheService;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private PlatonClient platon;
 
     @Override
-    public RespPage<NodeListItem> getPage(NodePageReq req) {
+    public NodeRespPage<NodeListItem> getPage(NodePageReq req) {
         NodeRankingExample condition = new NodeRankingExample();
         NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
         if(StringUtils.isNotBlank(req.getKeyword())){
@@ -75,14 +83,71 @@ public class NodeServiceImpl implements NodeService {
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
         List<NodeListItem> data = new LinkedList<>();
 
-        RespPage<NodeListItem> returnData = PageUtil.getRespPage(page,data);
+        RespPage<NodeListItem> pageData = PageUtil.getRespPage(page,data);
+        NodeRespPage returnData = new NodeRespPage();
+        BeanUtils.copyProperties(pageData,returnData);
+
         if(nodes.size()==0) return returnData;
 
+        class CountHolder{
+            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.ZERO;
+            Long selectedCount=0l;
+        }
+        CountHolder holder = new CountHolder();
+
+        // 取票价
+        TicketContract ticketContract = platon.getTicketContract(req.getCid());
+        try {
+            String price = ticketContract.GetTicketPrice().send();
+            if (StringUtils.isNotBlank(price)){
+                returnData.setTicketPrice(Convert.fromWei(price, Convert.Unit.ETHER));
+            }else {
+                returnData.setTicketPrice(BigDecimal.ZERO);
+            }
+        } catch (Exception e) {
+            returnData.setTicketPrice(BigDecimal.ZERO);
+            e.printStackTrace();
+        }
+        try {
+            String voteCount = ticketContract.GetPoolRemainder().send();
+            if (StringUtils.isNotBlank(voteCount)){
+                returnData.setVoteCount(Long.valueOf(voteCount));
+            }else{
+                returnData.setTicketPrice(BigDecimal.ZERO);
+            }
+        } catch (Exception e) {
+            returnData.setVoteCount(0l);
+            e.printStackTrace();
+        }
         nodes.forEach(initData -> {
             NodeListItem bean = new NodeListItem();
             bean.init(initData);
+            // 计算最低、最高质押金
+            if(StringUtils.isNotBlank(bean.getDeposit())&&bean.getIsValid()==1){
+                BigDecimal deposit = new BigDecimal(bean.getDeposit());
+                if(holder.highestDeposit.compareTo(deposit)<0){
+                    holder.highestDeposit=deposit;
+                }
+                if(holder.lowestDeposit.compareTo(deposit)>0){
+                    holder.lowestDeposit=deposit;
+                }
+            }
+            if(bean.getIsValid()==1){
+                holder.selectedCount++;
+            }
             data.add(bean);
         });
+
+        returnData.setSelectedCount(holder.selectedCount);
+        returnData.setHighestDeposit(holder.highestDeposit);
+        returnData.setLowestDeposit(holder.lowestDeposit);
+
+        // 设置占比
+        // 占比
+        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.HALF_UP);
+        returnData.setProportion(proportion);
+
+        // 设置竞选节点数
         return returnData;
     }
 

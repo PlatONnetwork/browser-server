@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface NodeService {
-    RespPage<NodeListItem> getPage(NodePageReq req);
+    NodeRespPage<NodeListItem> getPage(NodePageReq req);
     NodeDetail getDetail(NodeDetailReq req);
     void updatePushData(String chainId, Set<NodeRanking> data);
     void clearPushCache(String chainId);
