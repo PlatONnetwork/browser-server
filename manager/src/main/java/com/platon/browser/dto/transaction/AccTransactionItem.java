@@ -37,6 +37,7 @@ public class AccTransactionItem {
     private long voteCount;
     private BigDecimal deposit;
     private String nodeId;
+    private String nodeName;
 
     @JsonIgnore
     private Date timestamp;
