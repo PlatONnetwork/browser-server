@@ -204,7 +204,6 @@ public class TransactionController {
      *                      1003：提取质押
      *                  }"//返回交易解析结构
      *           }
-     *           "ticketIds":[string1,string2]//区块内选票id列表
      *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
      * }
      */
