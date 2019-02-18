@@ -550,7 +550,7 @@ public class TransactionController {
      *                "failReason":"",//失败原因
      *                "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *                "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
-     *                "deposit":"",//质押金
+     *                "deposit":"",//质押金 (竞选交易此字段才有值)
      *                ---------以下字段只有txType=voteTicket有效----------
      *                "ticketPrice":"",//票价
      *                "voteCount":"",//有效票/投票数
