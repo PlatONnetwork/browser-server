@@ -30,6 +30,8 @@ public class TransactionFilter {
     private String transactionCacheKeyTemplate;
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
 
     public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
@@ -47,7 +49,7 @@ public class TransactionFilter {
                     bean.setTimestamp(new Date(time));
                 }
                 // Setup the chain id
-                bean.setChainId(platon.getChainId());
+                bean.setChainId(chainId);
                 // Setup the receiver type
                 if (null != initData.getTo()) {
                     bean.setTo(initData.getTo());
@@ -56,7 +58,7 @@ public class TransactionFilter {
                         bean.setReceiveType(RECEIVER_TO_TYPE.get(initData.getTo()));
                     }else {
                         try {
-                            EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                            EthGetCode ethGetCode = platon.getWeb3j(chainId).ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                             if ("0x".equals(ethGetCode.getCode())) {
                                 bean.setReceiveType("account");
                             } else {

@@ -7,6 +7,7 @@ import com.platon.browser.dao.mapper.PendingTxMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -30,21 +31,23 @@ public class PendingFilter {
     private PendingTxMapper pendingTxMapper;
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
 
     @Transactional
     public void analyse() {
         try {
-            EthPendingTransactions ethPendingTransactions = platon.getWeb3j().ethPendingTx().send();
+            EthPendingTransactions ethPendingTransactions = platon.getWeb3j(chainId).ethPendingTx().send();
             List <Transaction> transactions = ethPendingTransactions.getTransactions();
             List <PendingTx> pendingTxes = new ArrayList <>();
             transactions.forEach(initData -> {
                 PendingBean bean = new PendingBean();
                 bean.initData(initData);
-                bean.setChainId(platon.getChainId());
+                bean.setChainId(chainId);
                 // 设置接收地址类型
                 if (null != initData.getTo()) {
                     try {
-                        EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                        EthGetCode ethGetCode = platon.getWeb3j(chainId).ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                         if ("0x".equals(ethGetCode.getCode())) {
                             bean.setReceiveType("account");
                         } else {

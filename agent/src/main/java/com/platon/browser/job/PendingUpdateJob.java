@@ -12,6 +12,7 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,8 @@ public class PendingUpdateJob {
     private PendingTxMapper pendingTxMapper;
     @Autowired
     private PlatonClient platon;
-
+    @Value("${platon.chain.active}")
+    private String chainId;
     /**
      * 更新待处理交易
      */
@@ -47,7 +49,7 @@ public class PendingUpdateJob {
             if (pendingTxeList.size() > 0) {
                 for (PendingTx pendingTx : pendingTxeList) {
                     TransactionExample transactionExample = new TransactionExample();
-                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(platon.getChainId());
+                    transactionExample.createCriteria().andHashEqualTo(pendingTx.getHash()).andChainIdEqualTo(chainId);
                     List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
                     if (transactionList.size() == 1) {
                         pendingTxMapper.deleteByPrimaryKey(pendingTx.getHash());

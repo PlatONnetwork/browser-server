@@ -19,6 +19,7 @@ import com.platon.browser.utils.FilterTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
@@ -51,11 +52,13 @@ public class NodeAnalyseJob {
     private RedisCacheService redisCacheService;
     @Autowired
     private PlatonClient platon;
+    @Value("${platon.chain.active}")
+    private String chainId;
 
     @PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(platon.getChainId());
+        condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("number desc");
         PageHelper.startPage(1, 1);
         List <Block> blocks = blockMapper.selectByExample(condition);
@@ -79,20 +82,20 @@ public class NodeAnalyseJob {
             // 从数据库查询有效节点信息，放入本地缓存
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria()
-                    .andChainIdEqualTo(platon.getChainId())
+                    .andChainIdEqualTo(chainId)
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             dbNodes.forEach(n->NODEID_TO_NAME.put(n.getNodeId().replaceFirst("^0*", ""),n.getName()));
 
 
             EthBlock ethBlock = null;
-            BigInteger endNumber = platon.getWeb3j().ethBlockNumber().send().getBlockNumber();
+            BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
             while (beginNumber <= endNumber.longValue()) {
                 long startTime = System.currentTimeMillis();
-                ethBlock = platon.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
+                ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
                 logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
-                CandidateContract candidateContract = platon.getCandidateContract();
+                CandidateContract candidateContract = platon.getCandidateContract(chainId);
                 //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
@@ -101,7 +104,7 @@ public class NodeAnalyseJob {
                 if (null == nodeInfo) return;
                 if (null == nodes && nodes.size() < 0)return;
                 nodeRankingExample = new NodeRankingExample();
-                nodeRankingExample.createCriteria().andChainIdEqualTo(platon.getChainId()).andIsValidEqualTo(1);
+                nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
                 logger.debug("find db list---------------------------------->{}", System.currentTimeMillis()-startTime);
@@ -118,7 +121,7 @@ public class NodeAnalyseJob {
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
-                    nodeRanking.setChainId(platon.getChainId());
+                    nodeRanking.setChainId(chainId);
                     nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
                     nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
                     nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(rate).toString());
@@ -191,7 +194,7 @@ public class NodeAnalyseJob {
                 logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
 
                 Set <NodeRanking> redisNode = new HashSet<>(updateList);
-                redisCacheService.updateNodePushCache(platon.getChainId(), redisNode);
+                redisCacheService.updateNodePushCache(chainId, redisNode);
                 beginNumber++;
                 logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
             }

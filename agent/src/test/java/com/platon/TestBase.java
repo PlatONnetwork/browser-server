@@ -22,7 +22,7 @@ public class TestBase {
     //@Autowired
     //protected NodeFilter nodeFilter;
 
-    @Value("${chain.id}")
+    @Value("${platon.chain.active}")
     protected String chainId;
 
     @Autowired

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.platon.TestBase;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class NodeFilterTest extends TestBase {
     @Test
     public void NodeFilterTest () {
         try {
-            CandidateContract candidateContract = web3jClient.getCandidateContract();
+            CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(400L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(400L))).send();
@@ -70,7 +69,7 @@ public class NodeFilterTest extends TestBase {
     @Test
     public void nodeIdEqualsPublicKeyTest () {
         try {
-            CandidateContract candidateContract = web3jClient.getCandidateContract();
+            CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(2985L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(2985L))).send();

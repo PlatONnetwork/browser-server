@@ -573,7 +573,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             cache.setTicketPrice(BigDecimal.ZERO);
             e.printStackTrace();
         }
-
         try {
             String ticketPrice = ticketContract.GetTicketPrice().send();
             cache.setTicketPrice(BigDecimal.valueOf(Double.valueOf(ticketPrice)));
