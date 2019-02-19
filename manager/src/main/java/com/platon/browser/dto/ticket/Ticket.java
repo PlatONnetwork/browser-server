@@ -2,6 +2,7 @@ package com.platon.browser.dto.ticket;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 @Data
 public class Ticket {
@@ -12,7 +13,7 @@ public class Ticket {
     private Long blockNumber;
     private Long rblockNumber;
     private Integer state;
-    private Long income;
+    private BigDecimal income;
     private Date estimateExpireTime;
     private Date actualExpireTime;
 }
