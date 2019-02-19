@@ -2,6 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.ticket.TxInfo;
@@ -10,6 +11,7 @@ import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
@@ -20,6 +22,7 @@ import java.util.Date;
  */
 @Data
 public class AccTransactionItem {
+
     private String txHash;
     private long blockTime;
     private String from;

@@ -12,9 +12,10 @@
     <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
     <result column="tx_type" jdbcType="VARCHAR" property="txType" />
     <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="receive_type" jdbcType="VARCHAR" property="receiveType" />
+    <result column="tx_info" jdbcType="VARCHAR" property="txInfo" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="receive_type" jdbcType="VARCHAR" property="receiveType" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.PendingTx">
     <result column="input" jdbcType="LONGVARCHAR" property="input" />
@@ -79,7 +80,7 @@
   </sql>
   <sql id="Base_Column_List">
     hash, `from`, `to`, energon_used, energon_limit, energon_price, `timestamp`, chain_id, 
-    tx_type, `value`, create_time, update_time, receive_type
+    tx_type, `value`, receive_type, tx_info, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
     `input`
@@ -136,13 +137,15 @@
     insert into pending_tx (hash, `from`, `to`, 
       energon_used, energon_limit, energon_price, 
       `timestamp`, chain_id, tx_type, 
-      `value`, create_time, update_time, 
-      receive_type, `input`)
+      `value`, receive_type, tx_info, 
+      create_time, update_time, `input`
+      )
     values (#{hash,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, 
       #{energonUsed,jdbcType=VARCHAR}, #{energonLimit,jdbcType=VARCHAR}, #{energonPrice,jdbcType=VARCHAR}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{chainId,jdbcType=VARCHAR}, #{txType,jdbcType=VARCHAR}, 
-      #{value,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{receiveType,jdbcType=VARCHAR}, #{input,jdbcType=LONGVARCHAR})
+      #{value,jdbcType=VARCHAR}, #{receiveType,jdbcType=VARCHAR}, #{txInfo,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{input,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.PendingTx">
     insert into pending_tx
@@ -177,14 +180,17 @@
       <if test="value != null">
         `value`,
       </if>
+      <if test="receiveType != null">
+        receive_type,
+      </if>
+      <if test="txInfo != null">
+        tx_info,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
       <if test="updateTime != null">
         update_time,
-      </if>
-      <if test="receiveType != null">
-        receive_type,
       </if>
       <if test="input != null">
         `input`,
@@ -221,14 +227,17 @@
       <if test="value != null">
         #{value,jdbcType=VARCHAR},
       </if>
+      <if test="receiveType != null">
+        #{receiveType,jdbcType=VARCHAR},
+      </if>
+      <if test="txInfo != null">
+        #{txInfo,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="receiveType != null">
-        #{receiveType,jdbcType=VARCHAR},
       </if>
       <if test="input != null">
         #{input,jdbcType=LONGVARCHAR},
@@ -274,14 +283,17 @@
       <if test="record.value != null">
         `value` = #{record.value,jdbcType=VARCHAR},
       </if>
+      <if test="record.receiveType != null">
+        receive_type = #{record.receiveType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.txInfo != null">
+        tx_info = #{record.txInfo,jdbcType=VARCHAR},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.receiveType != null">
-        receive_type = #{record.receiveType,jdbcType=VARCHAR},
       </if>
       <if test="record.input != null">
         `input` = #{record.input,jdbcType=LONGVARCHAR},
@@ -303,9 +315,10 @@
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       tx_type = #{record.txType,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
+      receive_type = #{record.receiveType,jdbcType=VARCHAR},
+      tx_info = #{record.txInfo,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      receive_type = #{record.receiveType,jdbcType=VARCHAR},
       `input` = #{record.input,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -323,9 +336,10 @@
       chain_id = #{record.chainId,jdbcType=VARCHAR},
       tx_type = #{record.txType,jdbcType=VARCHAR},
       `value` = #{record.value,jdbcType=VARCHAR},
+      receive_type = #{record.receiveType,jdbcType=VARCHAR},
+      tx_info = #{record.txInfo,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      receive_type = #{record.receiveType,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -360,14 +374,17 @@
       <if test="value != null">
         `value` = #{value,jdbcType=VARCHAR},
       </if>
+      <if test="receiveType != null">
+        receive_type = #{receiveType,jdbcType=VARCHAR},
+      </if>
+      <if test="txInfo != null">
+        tx_info = #{txInfo,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="receiveType != null">
-        receive_type = #{receiveType,jdbcType=VARCHAR},
       </if>
       <if test="input != null">
         `input` = #{input,jdbcType=LONGVARCHAR},
@@ -386,9 +403,10 @@
       chain_id = #{chainId,jdbcType=VARCHAR},
       tx_type = #{txType,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
+      receive_type = #{receiveType,jdbcType=VARCHAR},
+      tx_info = #{txInfo,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      receive_type = #{receiveType,jdbcType=VARCHAR},
       `input` = #{input,jdbcType=LONGVARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -403,9 +421,10 @@
       chain_id = #{chainId,jdbcType=VARCHAR},
       tx_type = #{txType,jdbcType=VARCHAR},
       `value` = #{value,jdbcType=VARCHAR},
+      receive_type = #{receiveType,jdbcType=VARCHAR},
+      tx_info = #{txInfo,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      receive_type = #{receiveType,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -416,14 +435,15 @@
     -->
     insert into pending_tx
     (hash, `from`, `to`, energon_used, energon_limit, energon_price, `timestamp`, chain_id, 
-      tx_type, `value`, create_time, update_time, receive_type, `input`)
+      tx_type, `value`, receive_type, tx_info, create_time, update_time, `input`)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, #{item.to,jdbcType=VARCHAR}, 
         #{item.energonUsed,jdbcType=VARCHAR}, #{item.energonLimit,jdbcType=VARCHAR}, #{item.energonPrice,jdbcType=VARCHAR}, 
         #{item.timestamp,jdbcType=TIMESTAMP}, #{item.chainId,jdbcType=VARCHAR}, #{item.txType,jdbcType=VARCHAR}, 
-        #{item.value,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.receiveType,jdbcType=VARCHAR}, #{item.input,jdbcType=LONGVARCHAR})
+        #{item.value,jdbcType=VARCHAR}, #{item.receiveType,jdbcType=VARCHAR}, #{item.txInfo,jdbcType=VARCHAR}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.input,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -471,14 +491,17 @@
         <if test="'value'.toString() == column.value">
           #{item.value,jdbcType=VARCHAR}
         </if>
+        <if test="'receive_type'.toString() == column.value">
+          #{item.receiveType,jdbcType=VARCHAR}
+        </if>
+        <if test="'tx_info'.toString() == column.value">
+          #{item.txInfo,jdbcType=VARCHAR}
+        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'receive_type'.toString() == column.value">
-          #{item.receiveType,jdbcType=VARCHAR}
         </if>
         <if test="'input'.toString() == column.value">
           #{item.input,jdbcType=LONGVARCHAR}
@@ -487,5 +510,7 @@
       )
     </foreach>
   </insert>
+
+
 
 </mapper>

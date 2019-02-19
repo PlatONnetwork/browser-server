@@ -233,8 +233,8 @@ public class DataGenTool extends TestData {
         for (int i=0;i<50;i++){
             PendingTx bean = new PendingTx();
             bean.setChainId(chainId);
-            bean.setEnergonLimit(String.valueOf(Math.abs(random.nextInt(500000))));
-            bean.setEnergonUsed(String.valueOf(Math.abs(random.nextInt(500000))));
+            //bean.setEnergonLimit(String.valueOf(Math.abs(random.nextInt(500000))));
+            //bean.setEnergonUsed(String.valueOf(Math.abs(random.nextInt(500000))));
             bean.setEnergonPrice(String.valueOf(Math.abs(random.nextInt(200000))));
             bean.setHash("0x"+UUID.randomUUID().toString().replace("-",""));
             bean.setValue(String.valueOf(Math.abs(random.nextInt(2000000))));

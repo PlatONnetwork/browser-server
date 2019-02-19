@@ -48,34 +48,33 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-        <table tableName="ticket" domainObjectName="Ticket">
+<!--        <table tableName="ticket" domainObjectName="Ticket">
              <columnRenamingRule searchString="^D_"
                                  replaceString=""/>
-        </table>
+        </table>-->
 
-<!--          <table tableName="pending_tx" domainObjectName="PendingTx">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                            replaceString=""/>&ndash;&gt;
-        </table>
-        <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
+      <table tableName="pending_tx" domainObjectName="PendingTx">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+      </table>
+        <!-- <table tableName="node" domainObjectName="Node">
+             <columnRenamingRule searchString="^D_"
+                                 replaceString=""/>
+         </table>
 
-                <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-        <table tableName="statistics" domainObjectName="Statistics">
-        <columnRenamingRule searchString="^D_"
-                            replaceString=""/>
-    </table>-->
-<!--
+                 <table tableName="node" domainObjectName="Node">
+             <columnRenamingRule searchString="^D_"
+                                 replaceString=""/>
+         </table>
+         <table tableName="statistics" domainObjectName="Statistics">
+         <columnRenamingRule searchString="^D_"
+                             replaceString=""/>
+     </table>
+
          <table tableName="node_ranking" domainObjectName="NodeRanking">
         <columnRenamingRule searchString="^D_"
                             replaceString=""/>
-    </table>
--->
+    </table>-->
+
 
 
 

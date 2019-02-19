@@ -25,11 +25,13 @@ public class PendingTx {
 
     private String value;
 
+    private String receiveType;
+
+    private String txInfo;
+
     private Date createTime;
 
     private Date updateTime;
-
-    private String receiveType;
 
     private String input;
 
@@ -113,6 +115,22 @@ public class PendingTx {
         this.value = value == null ? null : value.trim();
     }
 
+    public String getReceiveType() {
+        return receiveType;
+    }
+
+    public void setReceiveType(String receiveType) {
+        this.receiveType = receiveType == null ? null : receiveType.trim();
+    }
+
+    public String getTxInfo() {
+        return txInfo;
+    }
+
+    public void setTxInfo(String txInfo) {
+        this.txInfo = txInfo == null ? null : txInfo.trim();
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -127,14 +145,6 @@ public class PendingTx {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public String getReceiveType() {
-        return receiveType;
-    }
-
-    public void setReceiveType(String receiveType) {
-        this.receiveType = receiveType == null ? null : receiveType.trim();
     }
 
     public String getInput() {
@@ -163,9 +173,10 @@ public class PendingTx {
         chainId("chain_id", "chainId", "VARCHAR", false),
         txType("tx_type", "txType", "VARCHAR", false),
         value("value", "value", "VARCHAR", true),
+        receiveType("receive_type", "receiveType", "VARCHAR", false),
+        txInfo("tx_info", "txInfo", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        receiveType("receive_type", "receiveType", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true);
 
         /**
