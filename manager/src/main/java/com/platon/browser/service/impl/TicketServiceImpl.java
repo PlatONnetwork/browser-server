@@ -108,7 +108,7 @@ public class TicketServiceImpl implements TicketService {
                     Long timestamp = blockNumberToTimestamp.get(ticket.getBlockNumber());
                     // 所有票都有预计过期时间
                     if(timestamp!=null){
-                        timestamp += 1563000000;
+                        timestamp += 1536000000;
                         ticket.setEstimateExpireTime(new Date(timestamp));
                     }
                     TicketStatusEnum statusEnum = TicketStatusEnum.getEnum(ticket.getState());
