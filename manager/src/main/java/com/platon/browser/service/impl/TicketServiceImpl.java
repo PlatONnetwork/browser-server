@@ -4,13 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.ticket.Ticket;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.ticket.VoteTicket;
+import com.platon.browser.enums.TicketStatusEnum;
 import com.platon.browser.req.ticket.TicketListReq;
 import com.platon.browser.service.TicketService;
 import org.apache.commons.lang3.StringUtils;
@@ -21,8 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -33,6 +36,8 @@ public class TicketServiceImpl implements TicketService {
     private TransactionMapper transactionMapper;
     @Autowired
     private PlatonClient platon;
+    @Autowired
+    private BlockMapper blockMapper;
 
     /**
      * 通过账户信息获取交易列表, 以太坊账户有两种类型：外部账户-钱包地址，内部账户-合约地址
@@ -69,13 +74,56 @@ public class TicketServiceImpl implements TicketService {
                 List<VoteTicket> details = JSON.parseArray(str,VoteTicket.class);
 
                 List<Ticket> data = new ArrayList<>();
+
+                Set<Long> blockNumbers = new HashSet<>();
                 details.forEach(detail->{
                     Ticket ticket = new Ticket();
                     BeanUtils.copyProperties(detail,ticket);
                     ticket.setTxHash(transaction.getHash());
                     ticket.setState(detail.getState().intValue());
+                    blockNumbers.add(ticket.getBlockNumber());
+                    if(ticket.getRblockNumber()!=null) blockNumbers.add(ticket.getRblockNumber());
                     data.add(ticket);
                 });
+
+                /**
+                 * 关于预计过期时间和实际过期时间
+                 * 预计过期时间：通过blockNumber取到出块时间，再加1563000秒
+                 * 1、状态为正常时：只有预计过期时间；
+                 * 2、状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
+                 * 3、状态为掉榜或过期时：预计过期时间=实际过期时间
+                 */
+                BlockExample blockExample = new BlockExample();
+                blockExample.createCriteria().andChainIdEqualTo(req.getCid())
+                        .andNumberIn(new ArrayList<>(blockNumbers));
+                List<Block> blocks = blockMapper.selectByExample(blockExample);
+                Map<Long,Long> blockNumberToTimestamp = new HashMap<>();
+                blocks.forEach(block -> blockNumberToTimestamp.put(block.getNumber(),block.getTimestamp().getTime()));
+
+                data.forEach(ticket -> {
+                    Long timestamp = blockNumberToTimestamp.get(ticket.getBlockNumber());
+                    // 所有票都有预计过期时间
+                    if(timestamp!=null){
+                        timestamp += 1563000000;
+                        ticket.setEstimateExpireTime(new Date(timestamp));
+                    }
+                    TicketStatusEnum statusEnum = TicketStatusEnum.getEnum(ticket.getState());
+                    switch (statusEnum){
+                        case SELECTED:
+                            // 状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
+                            timestamp = blockNumberToTimestamp.get(ticket.getRblockNumber());
+                            if(timestamp!=null){
+                                ticket.setActualExpireTime(new Date(timestamp));
+                            }
+                            break;
+                        case OFF_LIST:
+                        case EXPIRED:
+                            // 状态为掉榜或过期时：预计过期时间=实际过期时间
+                            ticket.setActualExpireTime(ticket.getEstimateExpireTime());
+                            break;
+                    }
+                });
+
                 page.setTotal(data.size());
                 page.setPageSize(data.size());
                 returnData.init(page,data);
