@@ -9,5 +9,5 @@ import java.math.BigDecimal;
 public interface TicketService {
     RespPage<Ticket> getList(TicketListReq req);
 
-    BigDecimal getTicketIncome(String txHash);
+    BigDecimal getTicketIncome(String txHasH,String chainId);
 }

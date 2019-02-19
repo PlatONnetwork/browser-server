@@ -204,8 +204,9 @@ public class TransactionController {
      *                      1003：提取质押
      *                  }"//返回交易解析结构
      *           }
-     *           "ticketIds":[string1,string2]//区块内选票id列表
      *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "voteCount",33// 投票数（只有投票交易此字段才有值）
      * }
      */
     @PostMapping("transactionDetails")
@@ -550,7 +551,7 @@ public class TransactionController {
      *                "failReason":"",//失败原因
      *                "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
      *                "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
-     *                "deposit":"",//质押金
+     *                "deposit":"",//质押金 (竞选交易此字段才有值)
      *                ---------以下字段只有txType=voteTicket有效----------
      *                "ticketPrice":"",//票价
      *                "voteCount":"",//有效票/投票数

@@ -45,5 +45,5 @@ public class StatisticsCache {
     //占比
     private BigDecimal proportion;
     //当前票数
-    private long voteAmount;
+    private long voteCount;
 }

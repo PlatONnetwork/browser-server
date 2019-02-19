@@ -42,56 +42,54 @@ public class TicketServiceImpl implements TicketService {
     private BlockMapper blockMapper;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
-    @Value("${platon.chain.active}")
-    private String chainId;
+
 
 
     /**
      * 通过账户信息获取交易列表, 以太坊账户有两种类型：外部账户-钱包地址，内部账户-合约地址
-     *
      * @param req
      * @return
      */
     @Override
-    public RespPage <Ticket> getList ( TicketListReq req ) {
-        RespPage <Ticket> returnData = new RespPage <>();
+    public RespPage<Ticket> getList(TicketListReq req) {
+        RespPage<Ticket> returnData = new RespPage<>();
 
         TransactionExample condition = new TransactionExample();
         condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
-        Page page = PageHelper.startPage(1, 1);
-        List <Transaction> transactions = transactionMapper.selectByExample(condition);
+        Page page = PageHelper.startPage(1,1);
+        List<Transaction> transactions = transactionMapper.selectByExample(condition);
 
-        if (transactions.size() == 0) return returnData;
+        if(transactions.size()==0) return returnData;
         Transaction transaction = transactions.get(0);
         String txInfo = transaction.getTxInfo();
-        if (StringUtils.isNotBlank(txInfo)) {
-            TxInfo info = JSON.parseObject(txInfo, TxInfo.class);
+        if(StringUtils.isNotBlank(txInfo)){
+            TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
 
             TicketContract ticketContract = platon.getTicketContract(req.getCid());
-            List <String> ticketIds = ticketContract.VoteTicketIds(info.getParameters().getCount(), transaction.getHash());
-            if (ticketIds.size() == 0) return returnData;
+            List<String> ticketIds = ticketContract.VoteTicketIds(info.getParameters().getCount(),transaction.getHash());
+            if(ticketIds.size()==0) return returnData;
 
             StringBuilder sb = new StringBuilder();
-            String tail = ticketIds.get(ticketIds.size() - 1);
-            ticketIds.forEach(id -> {
+            String tail = ticketIds.get(ticketIds.size()-1);
+            ticketIds.forEach(id->{
                 sb.append(id);
-                if (!tail.equals(id)) sb.append(":");
+                if(!tail.equals(id)) sb.append(":");
             });
             try {
                 String str = ticketContract.GetBatchTicketDetail(sb.toString()).send();
-                List <VoteTicket> details = JSON.parseArray(str, VoteTicket.class);
+                List<VoteTicket> details = JSON.parseArray(str,VoteTicket.class);
 
-                List <Ticket> data = new ArrayList <>();
-                details.forEach(detail -> {
+                List<Ticket> data = new ArrayList<>();
+                details.forEach(detail->{
                     Ticket ticket = new Ticket();
-                    BeanUtils.copyProperties(detail, ticket);
+                    BeanUtils.copyProperties(detail,ticket);
                     ticket.setTxHash(transaction.getHash());
                     ticket.setState(detail.getState().intValue());
                     data.add(ticket);
                 });
                 page.setTotal(data.size());
                 page.setPageSize(data.size());
-                returnData.init(page, data);
+                returnData.init(page,data);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -101,9 +99,9 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public BigDecimal getTicketIncome ( String txHash ) {
+    public BigDecimal getTicketIncome ( String txHash ,String chainId) {
         Transaction transaction = transactionMapper.selectByPrimaryKey(txHash);
-        Map <String, VoteTicket> voteTicketMap = new HashMap <>();
+        Map<String, VoteTicket> voteTicketMap = new HashMap<>();
         TxInfo txInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter parameter = txInfo.getParameters();
         BigDecimal income = new BigDecimal("0");
@@ -121,7 +119,7 @@ public class TicketServiceImpl implements TicketService {
                     String str = ticketContract.GetBatchTicketDetail(sb.toString()).send();
                     List <VoteTicket> details = JSON.parseArray(str, VoteTicket.class);
                     details.forEach(voteTicket -> {
-                        if (voteTicket.getState().equals(2))
+                        if (voteTicket.getState() == 2)
                             voteTicketMap.put(voteTicket.getTicketId(), voteTicket);
                     });
                 } catch (Exception e) {
@@ -132,8 +130,8 @@ public class TicketServiceImpl implements TicketService {
                     return income;
                 } else {
                     //循环获取，分别求出收益
-                    ticketIds.forEach(ids -> {
-                        VoteTicket voteTicket = voteTicketMap.get(ids);
+                    for(String ignored : ticketIds){
+                        VoteTicket voteTicket = voteTicketMap.get(ignored);
                         if (!org.springframework.util.StringUtils.isEmpty(voteTicket)) {
                             double wheel = Math.floor(voteTicket.getBlockNumber() / 250);
                             BlockExample blockExample = new BlockExample();
@@ -157,14 +155,15 @@ public class TicketServiceImpl implements TicketService {
                                     .andNodeIdEqualTo(voteTicket.getCandidateId());
                             nodeRankingExample.setOrderByClause(" create_time desc ");
                             List <NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
-                            BigDecimal blockReward = new BigDecimal("0");
-                            blocks.forEach(block -> {
-                                blockReward.add(new BigDecimal(block.getBlockReward()));
-                            });
+                            BigDecimal blockReward = BigDecimal.ZERO;
+                            for(Block block : blocks){
+                                blockReward = blockReward.add(new BigDecimal(block.getBlockReward()));
+                            }
                             NodeRanking nodeRanking = nodeRankings.get(0);
-                            income.add(new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward));
+                            income = income.add(new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward));
                         }
-                    });
+                    }
+
                 }
             }
         }

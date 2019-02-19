@@ -44,8 +44,8 @@ public class TicketServiceTest extends ServiceTestBase {
 
     @Test
     public void getIncomeTicket() throws Exception{
-        String txHash = "0x49cfe3ca5b49341e7db7521c711e3f8bbefa62254033f9fbd5b09a470809db69";
-        BigDecimal res = ticketService.getTicketIncome(txHash);
+        String txHash = "0x3394160ff6a99e3cf2eb00df8f979ae6e9b05e3fcea7ca404e0e9828abde0c75";
+        BigDecimal res = ticketService.getTicketIncome(txHash,"1");
         logger.error("{}",res);
     }
 }

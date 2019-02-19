@@ -5,6 +5,7 @@ import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.block.BlockListItem;
@@ -70,11 +71,14 @@ public class NodeController {
      * {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
-     *      "voteRatio":"",//投票数/占比
-     *      "blockReward":"",//每个区块奖励
-     *      "votePrice":"",//票价
-     *      "node":"",//竞选节点
-     *      "deposit ":"",//最低/最高质押
+     *      "voteCount":90, // 投票数
+     *      "proportion":86,//占比
+     *      "blockReward":56.33,//每个区块奖励
+     *      "ticketPrice":3.66,//票价
+     *      "selectedNodeCount":33,//已选中节点数
+     *      "totalNodeCount":200,//总节点数
+     *      "lowestDeposit":545.44, // 最低质押（单位Energon）
+     *      "highestDeposit":545.44, // 最高质押（单位Energon）
      *      "data": [
      *           {
      *           "id": "0b9a39c791fdcbda987ff64717ef72f", // 节点ID
@@ -94,13 +98,13 @@ public class NodeController {
      * }
      */
     @PostMapping("list")
-    public RespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
+    public NodeRespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         req.setIsValid(1);
         req.setPageSize(200);
-        RespPage<NodeListItem> returnData = nodeService.getPage(req);
+        NodeRespPage<NodeListItem> returnData = nodeService.getPage(req);
         return returnData;
     }
 
