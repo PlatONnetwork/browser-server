@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -125,6 +126,7 @@ public class TicketServiceImpl implements TicketService {
                             ticket.setActualExpireTime(ticket.getEstimateExpireTime());
                             break;
                     }
+                    ticket.setIncome(Convert.fromWei(getTicketIncome(ticket.getTicketId(),req.getCid()), Convert.Unit.ETHER));
                 });
 
                 page.setTotal(data.size());
@@ -260,5 +262,4 @@ public class TicketServiceImpl implements TicketService {
         }
         return income;
     }
-
 }
