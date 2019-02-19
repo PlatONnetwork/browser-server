@@ -35,6 +35,7 @@ public class TransactionDetail {
     private long confirmNum;
     private String receiveType;
     private String txInfo;
+    private String nodeName;
     private String nodeId;
     private Integer voteCount;
     // 是否第一条
@@ -68,6 +69,21 @@ public class TransactionDetail {
                         if(parameter!=null){
                             this.setNodeId(parameter.getNodeId());
                             this.setVoteCount(parameter.getCount());
+                        }
+                    }
+                    break;
+                case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
+                case TRANSACTION_CANDIDATE_WITHDRAW:
+                case TRANSACTION_CANDIDATE_DEPOSIT:
+                    if(StringUtils.isNotBlank(txInfo)){
+                        CandidateTxInfo info = JSON.parseObject(txInfo,CandidateTxInfo.class);
+                        CandidateTxInfo.Parameter parameter = info.getParameters();
+                        if(parameter!=null){
+                            this.setNodeId(parameter.getNodeId());
+                            CandidateTxInfo.Extra extra = parameter.getExtra();
+                            if(extra!=null){
+                                this.setNodeName(parameter.getExtra().nodeName);
+                            }
                         }
                     }
                     break;
