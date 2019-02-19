@@ -62,6 +62,7 @@ public class TransactionDetail {
         try {
             TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(txType);
             switch (typeEnum){
+                // 投票交易
                 case TRANSACTION_VOTE_TICKET:
                     if(StringUtils.isNotBlank(txInfo)){
                         TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
@@ -72,6 +73,7 @@ public class TransactionDetail {
                         }
                     }
                     break;
+                // 竞选交易
                 case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
                 case TRANSACTION_CANDIDATE_WITHDRAW:
                 case TRANSACTION_CANDIDATE_DEPOSIT:
