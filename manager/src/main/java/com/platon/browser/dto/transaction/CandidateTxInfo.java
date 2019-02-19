@@ -18,7 +18,7 @@ public class CandidateTxInfo {
     @Data
     public static class Parameter{
         String owner;
-        Extra Extra;
+        String Extra;
         String port;
         BigDecimal fee;
         String host;

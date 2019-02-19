@@ -80,9 +80,12 @@ public class TransactionDetail {
                         CandidateTxInfo.Parameter parameter = info.getParameters();
                         if(parameter!=null){
                             this.setNodeId(parameter.getNodeId());
-                            CandidateTxInfo.Extra extra = parameter.getExtra();
-                            if(extra!=null){
-                                this.setNodeName(parameter.getExtra().nodeName);
+                            String extraStr = parameter.getExtra();
+                            if(StringUtils.isNotBlank(extraStr)){
+                                CandidateTxInfo.Extra extra = JSON.parseObject(extraStr, CandidateTxInfo.Extra.class);
+                                if(extra!=null){
+                                    this.setNodeName(extra.nodeName);
+                                }
                             }
                         }
                     }
