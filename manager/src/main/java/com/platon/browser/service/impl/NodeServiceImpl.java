@@ -189,7 +189,7 @@ public class NodeServiceImpl implements NodeService {
         if(req.getId()!=null){
             criteria.andIdEqualTo(req.getId());
         }else{
-            criteria.andNodeIdEqualTo(req.getNodeId());
+            criteria.andNodeIdEqualTo(req.getNodeId().replace("0x",""));
         }
         PageHelper.startPage(1,1);
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
