@@ -69,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
             if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
-            BigDecimal income = ticketService.getTicketIncome(bean.getTxHash(),req.getCid());
+            BigDecimal income = ticketService.getTicketIncomeSum(bean.getTxHash(),req.getCid());
             bean.setIncome(income);
             data.add(bean);
         });

@@ -139,7 +139,58 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public BigDecimal getTicketIncome ( String txHash ,String chainId) {
+    public BigDecimal getTicketIncome ( String ticketId,String chainId ) {
+        BigDecimal income = BigDecimal.ZERO;
+        if(StringUtils.isBlank(ticketId)){
+            return BigDecimal.ZERO;
+        }
+        if(StringUtils.isBlank(chainId)){
+            return BigDecimal.ZERO;
+        }
+        TicketContract ticketContract = platon.getTicketContract(chainId);
+        try {
+            String ticketInfo = ticketContract.GetTicketDetail(ticketId).send();
+            if(StringUtils.isNotBlank(ticketInfo)){
+                VoteTicket voteTicket = JSON.parseObject(ticketInfo,VoteTicket.class);
+                if(!org.springframework.util.StringUtils.isEmpty(voteTicket)){
+                    double wheel = Math.floor(voteTicket.getBlockNumber() / 250);
+                    BlockExample blockExample = new BlockExample();
+                    Long endNumber = 0L;
+                    Long beginNumber = 0L;
+                    if (wheel == 0.0) {
+                        endNumber = 250L;
+                        beginNumber = 1L;
+                    } else {
+                        endNumber = (long) wheel * 250;
+                        beginNumber = endNumber - 250;
+                    }
+                    blockExample.createCriteria()
+                            .andNumberBetween(beginNumber, endNumber)
+                            .andNodeIdEqualTo(voteTicket.getCandidateId())
+                            .andChainIdEqualTo(chainId);
+                    List <Block> blocks = blockMapper.selectByExample(blockExample);
+                    NodeRankingExample nodeRankingExample = new NodeRankingExample();
+                    nodeRankingExample.createCriteria()
+                            .andChainIdEqualTo(chainId)
+                            .andNodeIdEqualTo(voteTicket.getCandidateId());
+                    nodeRankingExample.setOrderByClause(" create_time desc ");
+                    List <NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
+                    BigDecimal blockReward = BigDecimal.ZERO;
+                    for(Block block : blocks){
+                        blockReward = blockReward.add(new BigDecimal(block.getBlockReward()));
+                    }
+                    NodeRanking nodeRanking = nodeRankings.get(0);
+                    income = new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return income;
+    }
+
+    @Override
+    public BigDecimal getTicketIncomeSum ( String txHash ,String chainId) {
         Transaction transaction = transactionMapper.selectByPrimaryKey(txHash);
         Map<String, VoteTicket> voteTicketMap = new HashMap<>();
         TxInfo txInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
