@@ -21,30 +21,28 @@ public class TxInfoResolver {
     public static void resolve(String txType,String txInfo,String value,Object target){
         ResolveResult rr = new ResolveResult();
         try {
-            TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(txType);
-            switch (typeEnum){
-                // 投票交易
-                case TRANSACTION_VOTE_TICKET:
-                    if(StringUtils.isNotBlank(txInfo)){
-                        TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
-                        TxInfo.Parameter parameter = info.getParameters();
-                        if(parameter!=null){
-                            rr.nodeId=parameter.getNodeId();
-                            rr.voteCount=parameter.getCount();
-                            rr.ticketPrice=Convert.fromWei(parameter.getPrice().toString(), Convert.Unit.ETHER);
+            if(StringUtils.isNotBlank(txInfo)){
+                TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(txType);
+                switch (typeEnum){
+                    // 投票交易
+                    case TRANSACTION_VOTE_TICKET:
+                        TxInfo ticketTxInfo = JSON.parseObject(txInfo,TxInfo.class);
+                        TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
+                        if(ticketParameter!=null){
+                            rr.nodeId=ticketParameter.getNodeId();
+                            rr.voteCount=ticketParameter.getCount();
+                            rr.ticketPrice=Convert.fromWei(ticketParameter.getPrice().toString(), Convert.Unit.ETHER);
                         }
-                    }
-                    break;
-                // 竞选交易
-                case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
-                case TRANSACTION_CANDIDATE_WITHDRAW:
-                case TRANSACTION_CANDIDATE_DEPOSIT:
-                    if(StringUtils.isNotBlank(txInfo)){
-                        CandidateTxInfo info = JSON.parseObject(txInfo,CandidateTxInfo.class);
-                        CandidateTxInfo.Parameter parameter = info.getParameters();
-                        if(parameter!=null){
-                            rr.nodeId=parameter.getNodeId();
-                            String extraStr = parameter.getExtra();
+                        break;
+                    // 竞选交易
+                    case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
+                    case TRANSACTION_CANDIDATE_WITHDRAW:
+                    case TRANSACTION_CANDIDATE_DEPOSIT:
+                        CandidateTxInfo candidateTxInfo = JSON.parseObject(txInfo,CandidateTxInfo.class);
+                        CandidateTxInfo.Parameter candidateParameter = candidateTxInfo.getParameters();
+                        if(candidateParameter!=null){
+                            rr.nodeId=candidateParameter.getNodeId();
+                            String extraStr = candidateParameter.getExtra();
                             if(StringUtils.isNotBlank(extraStr)){
                                 CandidateTxInfo.Extra extra = JSON.parseObject(extraStr, CandidateTxInfo.Extra.class);
                                 if(extra!=null){
@@ -52,12 +50,12 @@ public class TxInfoResolver {
                                 }
                             }
                         }
-                    }
-                    if(StringUtils.isNotBlank(value)){
-                        Double dep = Double.valueOf(value);
-                        rr.deposit=BigDecimal.valueOf(dep);
-                    }
-                    break;
+                        if(StringUtils.isNotBlank(value)){
+                            Double dep = Double.valueOf(value);
+                            rr.deposit=BigDecimal.valueOf(dep);
+                        }
+                        break;
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
