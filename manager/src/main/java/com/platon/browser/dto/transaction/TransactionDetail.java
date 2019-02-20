@@ -39,6 +39,7 @@ public class TransactionDetail {
     private String nodeId;
     private BigDecimal deposit;
     private Integer voteCount;
+    private BigDecimal ticketPrice;
     // 是否第一条
     private boolean first;
     // 是否最后一条
@@ -71,6 +72,7 @@ public class TransactionDetail {
                         if(parameter!=null){
                             this.setNodeId(parameter.getNodeId());
                             this.setVoteCount(parameter.getCount());
+                            this.setTicketPrice(Convert.fromWei(parameter.getPrice().toString(), Convert.Unit.ETHER));
                         }
                     }
                     break;

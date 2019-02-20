@@ -208,6 +208,7 @@ public class TransactionController {
      *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
      *           "voteCount",33// 投票数（只有投票交易此字段才有值）
      *           "deposit":445,//质押金 (竞选交易此字段才有值)
+     *           "ticketPrice":3333 // 票价
      * }
      */
     @PostMapping("transactionDetails")
