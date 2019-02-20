@@ -37,6 +37,7 @@ public class TransactionDetail {
     private String txInfo;
     private String nodeName;
     private String nodeId;
+    private BigDecimal deposit;
     private Integer voteCount;
     // 是否第一条
     private boolean first;
@@ -90,6 +91,12 @@ public class TransactionDetail {
                                 }
                             }
                         }
+                    }
+                    if(StringUtils.isNotBlank(this.value)){
+                        Double dep = Double.valueOf(this.value);
+                        this.setDeposit(BigDecimal.valueOf(dep));
+                    }else {
+                        this.setDeposit(BigDecimal.ZERO);
                     }
                     break;
             }
