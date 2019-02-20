@@ -57,7 +57,7 @@ public class DatabaseTool extends TestBase {
     public void importData() {
         chainsConfig.getChainIds().forEach(chainId->{
             try {
-                BlockExample blockExample = new BlockExample();
+                /*BlockExample blockExample = new BlockExample();
                 blockExample.createCriteria().andChainIdEqualTo(chainId);
                 blockMapper.deleteByExample(blockExample);
                 List<Block> blocks = DataGenTool.getTestData(chainId,TestDataFileNameEnum.BLOCK,Block.class);
@@ -73,7 +73,7 @@ public class DatabaseTool extends TestBase {
                 transactionExample.createCriteria().andChainIdEqualTo(chainId);
                 transactionMapper.deleteByExample(transactionExample);
                 List<TransactionWithBLOBs> transactions = DataGenTool.getTestData(chainId,TestDataFileNameEnum.TRANSACTION,TransactionWithBLOBs.class);
-                if(transactions.size()>0) transactionMapper.batchInsert(transactions);
+                if(transactions.size()>0) transactionMapper.batchInsert(transactions);*/
 
                 PendingTxExample pendingTxExample = new PendingTxExample();
                 pendingTxExample.createCriteria().andChainIdEqualTo(chainId);

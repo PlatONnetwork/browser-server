@@ -24,6 +24,8 @@ public class DataGenTool extends TestData {
     public static Web3j web3j;
 
     public static final void writeToFile(String chainId, TestDataFileNameEnum dataFileNameEnum, Collection data) {
+        File dir = new File(testDataDir);
+        if(!dir.exists()) dir.mkdirs();
         File file = new File(testDataDir+dataFileNameEnum.prefix+chainId+".json");
         if(file.exists()){
             file.delete();
@@ -233,8 +235,8 @@ public class DataGenTool extends TestData {
         for (int i=0;i<50;i++){
             PendingTx bean = new PendingTx();
             bean.setChainId(chainId);
-            //bean.setEnergonLimit(String.valueOf(Math.abs(random.nextInt(500000))));
-            //bean.setEnergonUsed(String.valueOf(Math.abs(random.nextInt(500000))));
+            bean.setEnergonLimit(String.valueOf(Math.abs(random.nextInt(500000))));
+            bean.setEnergonUsed(String.valueOf(Math.abs(random.nextInt(500000))));
             bean.setEnergonPrice(String.valueOf(Math.abs(random.nextInt(200000))));
             bean.setHash("0x"+UUID.randomUUID().toString().replace("-",""));
             bean.setValue(String.valueOf(Math.abs(random.nextInt(2000000))));
@@ -244,8 +246,33 @@ public class DataGenTool extends TestData {
             bean.setFrom("0x11c5a274ef2a924f59e7182abc7c031206cdcf66");
             bean.setTo("0x788641dc03b80240207f04bb1f8be5e10269ab8f");
             bean.setReceiveType("account");
-            bean.setTxType("transfer");
             bean.setInput("8888888");
+
+            if(i%2==0){
+                bean.setTxType("voteTicket");
+                bean.setTxInfo("{\"functionName\":\"VoteTicket\",\"parameters\":{\"price\":\"1000000000000000000\",\"count\":\"105\",\"nodeId\":\"fa147bc3625acc846a9f0e1e89172ca7470baa0f86516994f70860c6fb904ddbb1849e3cf2b40c58255e38401f40d2c3e4a3bd5c2f2849b98465a5bdb80ed6a0\"},\"type\":\"1000\"}");
+            }else
+            if(i%3==0){
+                bean.setTxType("candidateApplyWithdraw");
+                bean.setTxInfo("{\"functionName\":\"CandidateApplyWithdraw\",\"parameters\":{\"nodeId\":\"0xfa147bc3625acc846a9f0e1e89172ca7470baa0f86516994f70860c6fb904ddbb1849e3cf2b40c58255e38401f40d2c3e4a3bd5c2f2849b98465a5bdb80ed6a0\",\"withdraw\":\"999999999999999983222784\"},\"type\":\"1002\"}");
+            }else
+            if(i%5==0){
+                bean.setTxType("candidateWithdraw");
+                bean.setTxInfo("{\"functionName\":\"CandidateWithdraw\",\"parameters\":{\"nodeId\":\"0xfa147bc3625acc846a9f0e1e89172ca7470baa0f86516994f70860c6fb904ddbb1849e3cf2b40c58255e38401f40d2c3e4a3bd5c2f2849b98465a5bdb80ed6a0\"},\"type\":\"1003\"}");
+            }else
+            if(i%7==0){
+                bean.setTxType("candidateDeposit");
+                bean.setTxInfo("{\"functionName\":\"CandidateDeposit\",\"parameters\":{\"owner\":\"0x3b36c8cf428d15e7725affcc095d086cb2ecc754\",\"Extra\":\"{\\\"nodeName\\\":\\\"nodehuiyu\\\",\\\"nodePortrait\\\":\\\"01\\\",\\\"nodeDiscription\\\":\\\"\\\\u975e\\\\u5171\\\\u8bc6\\\\u8282\\\\u70b9\\\\u7684\\\\u66ff\\\\u6362\\\\uff0c\\\\u8d28\\\\u62bc\\\\u548c\\\\u6295\\\\u7968\\\\u64cd\\\\u4f5c11111111\\\",\\\"nodeDepartment\\\":\\\"\\\\u673a\\\\u6784111\\\",\\\"officialWebsite\\\":\\\"https://www.baidu.com\\\",\\\"time\\\":1550631713828}\",\"port\":\"16789\",\"fee\":\"2500\",\"host\":\"192.168.120.89\",\"nodeId\":\"0xfa147bc3625acc846a9f0e1e89172ca7470baa0f86516994f70860c6fb904ddbb1849e3cf2b40c58255e38401f40d2c3e4a3bd5c2f2849b98465a5bdb80ed6a0\"},\"type\":\"1001\"}");
+            }else {
+                bean.setTxType("transfer");
+                bean.setTxInfo("{\"parameters\":{}}");
+            }
+
+            if(i%9==0){
+                bean.setTxType("contractCreate");
+                bean.setTxInfo("{\"functionName\":\"contract deploy\",\"parameters\":{},\"type\":\"1\"}");
+            }
+
             returnData.add(bean);
         }
         if(writeToFile) writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,returnData);
@@ -276,9 +303,9 @@ public class DataGenTool extends TestData {
     }
 
     public static void main(String[] args) {
-        generateNode("1",true);
-        /*generatePendingTx("1",true);
-        generateTransaction("1",true);
-        generateBlock("1",true);*/
+        // generateNode("1",true);
+        generatePendingTx("1",true);
+        //generateTransaction("1",true);
+        //generateBlock("1",true);
     }
 }
