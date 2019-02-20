@@ -17,7 +17,7 @@ public class IndexInfo {
     private long currentTransaction;
     private long consensusNodeAmount;
     private long addressAmount;
-    private int voteAmount;
+    private int voteCount;
     private double proportion;
     private double ticketPrice;
     @JsonIgnore
