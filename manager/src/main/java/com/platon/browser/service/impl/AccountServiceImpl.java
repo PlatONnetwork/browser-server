@@ -89,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
 
         Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
         data.forEach(el->{
-            if(StringUtils.isNotBlank(el.getNodeId())) return;
+            if(StringUtils.isBlank(el.getNodeId())) return;
             String nodeId = el.getNodeId().replace("0x","");
             el.setNodeName(nodeIdToName.get(nodeId));
         });
