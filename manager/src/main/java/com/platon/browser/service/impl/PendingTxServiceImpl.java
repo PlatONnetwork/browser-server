@@ -16,6 +16,7 @@ import com.platon.browser.dto.transaction.PendingTxItem;
 import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxPageReq;
+import com.platon.browser.service.NodeService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PendingTxServiceImpl implements PendingTxService {
@@ -40,6 +42,8 @@ public class PendingTxServiceImpl implements PendingTxService {
     private TransactionMapper transactionMapper;
     @Autowired
     private I18nUtil i18n;
+    @Autowired
+    private NodeService nodeService;
 
     @Override
     public RespPage<PendingTxItem> getTransactionList(PendingTxPageReq req) {
@@ -93,6 +97,14 @@ public class PendingTxServiceImpl implements PendingTxService {
         PendingTxDetail returnData = new PendingTxDetail();
         PendingTx initData = transactions.get(0);
         returnData.init(initData);
+        // 获取节点名称
+        if(StringUtils.isNotBlank(returnData.getNodeId())){
+            String nodeId = returnData.getNodeId().replace("0x","");
+            // 查询节点名称
+            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(nodeId));
+            returnData.setNodeName(nameMap.get(nodeId));
+        }
+
         pot.setType("pending");
         pot.setPending(returnData);
         return pot;
