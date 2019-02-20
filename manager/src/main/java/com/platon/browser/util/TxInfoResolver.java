@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.transaction.CandidateTxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -11,6 +12,7 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 
 public class TxInfoResolver {
+    @Data
     private static class ResolveResult{
         String nodeId,nodeName;
         Integer voteCount=0;
