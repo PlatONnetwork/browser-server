@@ -8,7 +8,7 @@ dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_test?useUnicode
 dbuser: platon
 dbpass: platon
 # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-chain.config: MAIN_NET-1-http://10.10.8.209:6789
+chain.config: MAIN_NET-1-http://192.168.120.88:6789
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
