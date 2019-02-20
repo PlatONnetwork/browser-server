@@ -1,13 +1,16 @@
 package com.platon.browser.dto.transaction;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.util.EnergonUtil;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class PendingTxDetail {
@@ -28,6 +31,12 @@ public class PendingTxDetail {
     private String inputData;
     private long expectTime;
     private String receiveType;
+    private String txInfo;
+    private String nodeName;
+    private String nodeId;
+    private BigDecimal deposit;
+    private Integer voteCount;
+    private BigDecimal ticketPrice;
 
     public void init(PendingTx initData) {
         BeanUtils.copyProperties(initData,this);
@@ -38,5 +47,50 @@ public class PendingTxDetail {
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER);
         this.setPriceInEnergon(EnergonUtil.format(v));
+
+        try {
+            TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(txType);
+            switch (typeEnum){
+                // 投票交易
+                case TRANSACTION_VOTE_TICKET:
+                    if(StringUtils.isNotBlank(txInfo)){
+                        TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
+                        TxInfo.Parameter parameter = info.getParameters();
+                        if(parameter!=null){
+                            this.setNodeId(parameter.getNodeId());
+                            this.setVoteCount(parameter.getCount());
+                            this.setTicketPrice(Convert.fromWei(parameter.getPrice().toString(), Convert.Unit.ETHER));
+                        }
+                    }
+                    break;
+                // 竞选交易
+                case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
+                case TRANSACTION_CANDIDATE_WITHDRAW:
+                case TRANSACTION_CANDIDATE_DEPOSIT:
+                    if(StringUtils.isNotBlank(txInfo)){
+                        CandidateTxInfo info = JSON.parseObject(txInfo,CandidateTxInfo.class);
+                        CandidateTxInfo.Parameter parameter = info.getParameters();
+                        if(parameter!=null){
+                            this.setNodeId(parameter.getNodeId());
+                            String extraStr = parameter.getExtra();
+                            if(StringUtils.isNotBlank(extraStr)){
+                                CandidateTxInfo.Extra extra = JSON.parseObject(extraStr, CandidateTxInfo.Extra.class);
+                                if(extra!=null){
+                                    this.setNodeName(extra.nodeName);
+                                }
+                            }
+                        }
+                    }
+                    if(StringUtils.isNotBlank(this.value)){
+                        Double dep = Double.valueOf(this.value);
+                        this.setDeposit(BigDecimal.valueOf(dep));
+                    }else {
+                        this.setDeposit(BigDecimal.ZERO);
+                    }
+                    break;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
