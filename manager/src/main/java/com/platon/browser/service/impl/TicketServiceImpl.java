@@ -90,44 +90,46 @@ public class TicketServiceImpl implements TicketService {
                     data.add(ticket);
                 });
 
-                /**
-                 * 关于预计过期时间和实际过期时间
-                 * 预计过期时间：通过blockNumber取到出块时间，再加1563000秒
-                 * 1、状态为正常时：只有预计过期时间；
-                 * 2、状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
-                 * 3、状态为掉榜或过期时：预计过期时间=实际过期时间
-                 */
-                BlockExample blockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(req.getCid())
-                        .andNumberIn(new ArrayList<>(blockNumbers));
-                List<Block> blocks = blockMapper.selectByExample(blockExample);
-                Map<Long,Long> blockNumberToTimestamp = new HashMap<>();
-                blocks.forEach(block -> blockNumberToTimestamp.put(block.getNumber(),block.getTimestamp().getTime()));
+                if(blockNumbers.size()>0){
+                    /**
+                     * 关于预计过期时间和实际过期时间
+                     * 预计过期时间：通过blockNumber取到出块时间，再加1563000秒
+                     * 1、状态为正常时：只有预计过期时间；
+                     * 2、状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
+                     * 3、状态为掉榜或过期时：预计过期时间=实际过期时间
+                     */
+                    BlockExample blockExample = new BlockExample();
+                    blockExample.createCriteria().andChainIdEqualTo(req.getCid())
+                            .andNumberIn(new ArrayList<>(blockNumbers));
+                    List<Block> blocks = blockMapper.selectByExample(blockExample);
+                    Map<Long,Long> blockNumberToTimestamp = new HashMap<>();
+                    blocks.forEach(block -> blockNumberToTimestamp.put(block.getNumber(),block.getTimestamp().getTime()));
 
-                data.forEach(ticket -> {
-                    Long timestamp = blockNumberToTimestamp.get(ticket.getBlockNumber());
-                    // 所有票都有预计过期时间
-                    if(timestamp!=null){
-                        timestamp += 1536000000;
-                        ticket.setEstimateExpireTime(new Date(timestamp));
-                    }
-                    TicketStatusEnum statusEnum = TicketStatusEnum.getEnum(ticket.getState());
-                    switch (statusEnum){
-                        case SELECTED:
-                            // 状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
-                            timestamp = blockNumberToTimestamp.get(ticket.getRblockNumber());
-                            if(timestamp!=null){
-                                ticket.setActualExpireTime(new Date(timestamp));
-                            }
-                            break;
-                        case OFF_LIST:
-                        case EXPIRED:
-                            // 状态为掉榜或过期时：预计过期时间=实际过期时间
-                            ticket.setActualExpireTime(ticket.getEstimateExpireTime());
-                            break;
-                    }
-                    ticket.setIncome(Convert.fromWei(getTicketIncome(ticket.getTicketId(),req.getCid()), Convert.Unit.ETHER));
-                });
+                    data.forEach(ticket -> {
+                        Long timestamp = blockNumberToTimestamp.get(ticket.getBlockNumber());
+                        // 所有票都有预计过期时间
+                        if(timestamp!=null){
+                            timestamp += 1536000000;
+                            ticket.setEstimateExpireTime(new Date(timestamp));
+                        }
+                        TicketStatusEnum statusEnum = TicketStatusEnum.getEnum(ticket.getState());
+                        switch (statusEnum){
+                            case SELECTED:
+                                // 状态为选中时：通过rblockNumber查询区块信息，查到则有实际过期时间，其值等于预计过期时间；查不到则只有预计过期时间；
+                                timestamp = blockNumberToTimestamp.get(ticket.getRblockNumber());
+                                if(timestamp!=null){
+                                    ticket.setActualExpireTime(new Date(timestamp));
+                                }
+                                break;
+                            case OFF_LIST:
+                            case EXPIRED:
+                                // 状态为掉榜或过期时：预计过期时间=实际过期时间
+                                ticket.setActualExpireTime(ticket.getEstimateExpireTime());
+                                break;
+                        }
+                        ticket.setIncome(Convert.fromWei(getTicketIncome(ticket.getTicketId(),req.getCid()), Convert.Unit.ETHER));
+                    });
+                }
 
                 page.setTotal(data.size());
                 page.setPageSize(data.size());
