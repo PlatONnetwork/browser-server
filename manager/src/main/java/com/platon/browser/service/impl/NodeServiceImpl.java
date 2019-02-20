@@ -37,9 +37,7 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class NodeServiceImpl implements NodeService {
@@ -218,4 +216,14 @@ public class NodeServiceImpl implements NodeService {
         return returnData;
     }
 
+    @Override
+    public Map<String, String> getNodeNameMap(String chainId,List<String> nodeIds) {
+        Map<String, String> map = new HashMap<>();
+        if(nodeIds.size()==0) return map;
+        NodeRankingExample example = new NodeRankingExample();
+        example.createCriteria().andChainIdEqualTo(chainId).andNodeIdIn(nodeIds);
+        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(example);
+        nodes.forEach(node->map.put(node.getNodeId(),node.getName()));
+        return map;
+    }
 }

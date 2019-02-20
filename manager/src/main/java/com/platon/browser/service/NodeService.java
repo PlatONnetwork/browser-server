@@ -11,6 +11,7 @@ import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface NodeService {
@@ -20,4 +21,5 @@ public interface NodeService {
     void clearPushCache(String chainId);
     List<NodePushItem> getPushCache(String chainId);
     List<BlockListItem> getBlockList(BlockListReq req);
+    Map<String,String> getNodeNameMap(String chainId,List<String> nodeIds);
 }
