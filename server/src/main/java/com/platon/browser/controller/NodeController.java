@@ -196,7 +196,7 @@ public class NodeController {
      *           "intro":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // 节点简介
      *           "orgName":"platon", // 机构名称
      *           "orgWebsite":"https://www.platon.network", // 机构官网
-     *           "ticket ":"",//得票数
+     *           "ticketCount":"",//得票数
      *           "ticketAge" :""//票龄
      *           }
      * }
