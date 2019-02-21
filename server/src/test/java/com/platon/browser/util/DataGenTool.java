@@ -276,9 +276,11 @@ public class DataGenTool extends TestData {
     }
 
     public static void main(String[] args) {
-        generateNode("1",true);
+        //generateNode("1",true);
         /*generatePendingTx("1",true);
         generateTransaction("1",true);
         generateBlock("1",true);*/
+
+        generateTransaction("1",true);
     }
 }

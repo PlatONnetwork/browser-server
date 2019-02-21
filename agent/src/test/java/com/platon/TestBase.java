@@ -15,7 +15,7 @@ import org.web3j.protocol.Web3j;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootTest(classes= AgentApplication.class, value = "spring.profiles.active=agent-1")
+@SpringBootTest(classes= AgentApplication.class, value = "spring.profiles.active=dev")
 public class TestBase {
     @Autowired
     protected BlockFilter blockFilter;

@@ -5,7 +5,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
 public class TestData {
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.9.76:8793"));
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.88:6789"));
 
     public static final String testDataDir = TestData.class.getClassLoader().getResource("./").getPath()+"../../../testdata/";
 

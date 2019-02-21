@@ -116,7 +116,7 @@ public class TransactionAnalysis {
                     typeName = "candidateWithdraw";
                     break;
                 default:
-                    return typeName = "unknown";
+                    typeName = "unknown";
             }
         }
         return typeName;

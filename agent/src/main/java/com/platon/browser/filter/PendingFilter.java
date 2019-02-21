@@ -29,16 +29,10 @@ public class PendingFilter {
     private static Logger logger = LoggerFactory.getLogger(PendingFilter.class);
     @Autowired
     private PendingTxMapper pendingTxMapper;
-    @Autowired
-    private PlatonClient platon;
-    @Value("${platon.chain.active}")
-    private String chainId;
 
     @Transactional
-    public void analyse() {
+    public void analyse(List<Transaction> transactions,String chainId,PlatonClient platon) {
         try {
-            EthPendingTransactions ethPendingTransactions = platon.getWeb3j(chainId).ethPendingTx().send();
-            List <Transaction> transactions = ethPendingTransactions.getTransactions();
             List <PendingTx> pendingTxes = new ArrayList <>();
             transactions.forEach(initData -> {
                 PendingBean bean = new PendingBean();
@@ -64,7 +58,7 @@ public class PendingFilter {
             });
             if(pendingTxes.size()>0) pendingTxMapper.batchInsert(pendingTxes);
             logger.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
