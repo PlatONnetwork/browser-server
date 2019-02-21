@@ -72,9 +72,9 @@ public class NodeController {
      *      "errMsg": "",//描述信息
      *      "code": 0,//成功（0），失败则由相关失败码
      *      "voteCount":90, // 投票数
-     *      "proportion":86,//占比
-     *      "blockReward":56.33,//每个区块奖励
-     *      "ticketPrice":3.66,//票价
+     *      "proportion":86,//占比: 小数
+     *      "blockReward":56.33,//每个区块奖励（单位Energon）
+     *      "ticketPrice":3.66,//票价（单位Energon）
      *      "selectedNodeCount":33,//已选中节点数
      *      "totalNodeCount":200,//总节点数
      *      "lowestDeposit":545.44, // 最低质押（单位Energon）
