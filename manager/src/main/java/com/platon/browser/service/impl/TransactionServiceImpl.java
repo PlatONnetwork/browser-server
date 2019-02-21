@@ -86,10 +86,9 @@ public class TransactionServiceImpl implements TransactionService {
         returnData.init(initData);
 
         if(StringUtils.isNotBlank(returnData.getNodeId())){
-            String nodeId = returnData.getNodeId().replace("0x","");
             // 查询节点名称
-            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(nodeId));
-            returnData.setNodeName(nameMap.get(nodeId));
+            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
+            returnData.setNodeName(nameMap.get(returnData.getNodeId()));
         }
 
         return returnData;

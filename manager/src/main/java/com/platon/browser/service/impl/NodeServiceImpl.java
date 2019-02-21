@@ -1,5 +1,6 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
@@ -119,6 +120,8 @@ public class NodeServiceImpl implements NodeService {
             returnData.setVoteCount(0l);
             e.printStackTrace();
         }
+
+        StringBuilder nodeIds = new StringBuilder();
         nodes.forEach(initData -> {
             NodeListItem bean = new NodeListItem();
             bean.init(initData);
@@ -136,6 +139,7 @@ public class NodeServiceImpl implements NodeService {
                 holder.selectedCount++;
             }
             data.add(bean);
+            nodeIds.append(initData.getNodeId()).append(":");
         });
 
         returnData.setSelectedNodeCount(holder.selectedCount);
@@ -159,7 +163,25 @@ public class NodeServiceImpl implements NodeService {
             returnData.setBlockReward(BigDecimal.ZERO);
         }
 
-        // 设置竞选节点数
+        if(nodeIds.length()>0){
+            String ids = nodeIds.toString();
+            ids = ids.substring(0,ids.lastIndexOf(":"));
+            // 设置得票数
+            try {
+                String ticketIds = ticketContract.GetBatchCandidateTicketIds(ids).send();
+                if(StringUtils.isNotBlank(ticketIds)){
+                    Map<String,List<String>> map = JSON.parseObject(ticketIds,Map.class);
+                    data.forEach(node->{
+                        List<String> count = map.get(node.getNodeId());
+                        if(count!=null) node.setTicketCount(count.size());
+                    });
+                }
+                logger.error("{}",ticketIds);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return returnData;
     }
 
@@ -188,7 +210,7 @@ public class NodeServiceImpl implements NodeService {
         if(req.getId()!=null){
             criteria.andIdEqualTo(req.getId());
         }else{
-            criteria.andNodeIdEqualTo(req.getNodeId().replace("0x",""));
+            criteria.andNodeIdEqualTo(req.getNodeId());
         }
         //criteria.andIsValidEqualTo(1);
         PageHelper.startPage(1,1);
@@ -200,6 +222,20 @@ public class NodeServiceImpl implements NodeService {
         // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
+
+        TicketContract ticketContract = platon.getTicketContract(req.getCid());
+        // 设置得票数
+        try {
+            String ticketIds = ticketContract.GetCandidateTicketIds(returnData.getNodeId()).send();
+            if(StringUtils.isNotBlank(ticketIds)){
+                List<String> list = JSON.parseObject(ticketIds,List.class);
+                if(list!=null) returnData.setTicketCount(list.size());
+            }
+            logger.error("{}",ticketIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return returnData;
     }
 

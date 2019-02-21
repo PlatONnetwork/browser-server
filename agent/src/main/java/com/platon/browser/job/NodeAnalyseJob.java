@@ -82,8 +82,7 @@ public class NodeAnalyseJob {
                     .andChainIdEqualTo(chainId)
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-            dbNodes.forEach(n->NODEID_TO_NAME.put(n.getNodeId().replaceFirst("^0*", ""),n.getName()));
-
+            dbNodes.forEach(n->NODEID_TO_NAME.put(n.getNodeId(),n.getName()));
 
             EthBlock ethBlock = null;
             BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
@@ -118,6 +117,10 @@ public class NodeAnalyseJob {
                 key.setHash(ethBlock.getBlock().getHash());
                 Block block = blockMapper.selectByPrimaryKey(key);
                 for (CandidateDto candidateDto : nodes) {
+                    // 加上“0x”
+                    if(!candidateDto.getCandidateId().startsWith("0x")){
+                        candidateDto.setCandidateId("0x"+candidateDto.getCandidateId());
+                    }
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());

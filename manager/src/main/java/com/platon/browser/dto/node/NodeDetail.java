@@ -34,6 +34,7 @@ public class NodeDetail {
     private String intro;
     private String orgName;
     private String orgWebsite;
+    private int ticketCount;
 
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);

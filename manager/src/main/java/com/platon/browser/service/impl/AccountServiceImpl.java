@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
             BigDecimal income = ticketService.getTicketIncomeSum(bean.getTxHash(),req.getCid());
             bean.setIncome(income);
             data.add(bean);
@@ -75,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
             data.add(bean);
         });
 
@@ -90,8 +90,7 @@ public class AccountServiceImpl implements AccountService {
         Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
         data.forEach(el->{
             if(StringUtils.isBlank(el.getNodeId())) return;
-            String nodeId = el.getNodeId().replace("0x","");
-            el.setNodeName(nodeIdToName.get(nodeId));
+            el.setNodeName(nodeIdToName.get(el.getNodeId()));
         });
         returnData.setTrades(data);
         return returnData;

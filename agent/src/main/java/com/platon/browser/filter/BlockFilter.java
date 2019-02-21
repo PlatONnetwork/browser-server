@@ -10,6 +10,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.EventRes;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class BlockFilter {
             String publicKey = null;
             try{
                 publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
+                if(StringUtils.isNotBlank(publicKey)&&!publicKey.startsWith("0x")){
+                    publicKey="0x"+publicKey;
+                }
             }catch (Exception e){
                 publicKey = "";
             }
