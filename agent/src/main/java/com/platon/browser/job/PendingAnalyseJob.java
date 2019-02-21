@@ -1,11 +1,17 @@
 package com.platon.browser.job;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.filter.PendingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.methods.response.EthPendingTransactions;
+import org.web3j.protocol.core.methods.response.Transaction;
+
+import java.util.List;
 
 /**
  * User: dongqile
@@ -27,14 +33,23 @@ public class PendingAnalyseJob {
     @Autowired
     private PendingFilter pendingFilter;
 
+    @Autowired
+    private PlatonClient platon;
+
+    @Value("${platon.chain.active}")
+    private String chainId;
+
     /**
      * 分析待处理交易
      */
     @Scheduled(cron = "0/1 * * * * ?")
     protected void analysePending() {
+
         logger.debug("*** In the PendingAnalyseJob *** ");
         try {
-            pendingFilter.analyse();
+            EthPendingTransactions ethPendingTransactions = platon.getWeb3j(chainId).ethPendingTx().send();
+            List<Transaction> transactions = ethPendingTransactions.getTransactions();
+            pendingFilter.analyse(transactions ,chainId ,platon);
             logger.debug("**************PendingTx Analysis end ***************");
         } catch (Exception e) {
             logger.error("PendingTxSynchronizeJob Exception:{}", e.getMessage());
