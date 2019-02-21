@@ -18,7 +18,7 @@ public class PendingBean extends PendingTx {
         this.setTimestamp(new Date());
         this.setValue(FilterTool.valueConversion(initData.getValue()));
         this.setInput(initData.getInput());
-        AnalysisResult analysisResult = TransactionAnalysis.analysis(!initData.getInput().equals(null) ? initData.getInput() : "0x", true);
+        AnalysisResult analysisResult = TransactionAnalysis.analysis(!initData.getInput().equals(null) ? initData.getInput() : "0x", false);
         String type = TransactionAnalysis.getTypeName(analysisResult.getType());
         this.setTxType(type);
         String txinfo = JSON.toJSONString(analysisResult);
