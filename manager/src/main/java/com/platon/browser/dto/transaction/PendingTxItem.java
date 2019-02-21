@@ -7,7 +7,6 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class PendingTxItem {
@@ -23,6 +22,8 @@ public class PendingTxItem {
     private String txType;
     private long serverTime;
     private String receiveType;
+    private String txInfo;
+
 
     public void init(PendingTx initData){
         BeanUtils.copyProperties(initData,this);

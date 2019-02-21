@@ -123,9 +123,9 @@ public class HomeController {
      *      	    "currentTransaction": //当前交易笔数
      *      	    "consensusNodeAmount": //竞选节点数
      *      	    "addressAmount": //地址数
-     *      	    "voteAmount": //投票数
-     *      	    "proportion": //占比
-     *      	    "ticketPrice": //票价
+     *      	    "voteCount": //投票数
+     *      	    "proportion": //占比 (小数)
+     *      	    "ticketPrice": //票价 (单位: Energon)
      *           }
      *   }
      */

@@ -1,17 +1,12 @@
 package com.platon.browser.dto.transaction;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.ticket.TxInfo;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.TxInfoResolver;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
@@ -72,38 +67,6 @@ public class AccTransactionItem {
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
 
-        try{
-            TransactionTypeEnum typeEnum = TransactionTypeEnum.getEnum(this.getTxType());
-            switch (typeEnum){
-                case TRANSACTION_VOTE_TICKET:
-                    // 如果是投票交易，则解析投票参数信息
-                    if(StringUtils.isNotBlank(txInfo)){
-                        TxInfo info = JSON.parseObject(txInfo,TxInfo.class);
-                        TxInfo.Parameter parameter = info.getParameters();
-                        if (parameter!=null&&parameter.getPrice()!=null){
-                            this.setTicketPrice(Convert.fromWei(BigDecimal.valueOf(parameter.getPrice().longValue()), Convert.Unit.ETHER));
-                        }
-                        if (parameter!=null&&parameter.getCount()!=null){
-                            this.setVoteCount(parameter.getCount());
-                        }
-                        if(parameter!=null&&parameter.getNodeId()!=null){
-                            this.setNodeId(parameter.getNodeId());
-                        }
-                    }
-                    break;
-                case TRANSACTION_CANDIDATE_DEPOSIT:
-                case TRANSACTION_CANDIDATE_WITHDRAW:
-                case TRANSACTION_CANDIDATE_APPLY_WITHDRAW:
-                    if(StringUtils.isNotBlank(this.value)){
-                        Double dep = Double.valueOf(this.value);
-                        this.setDeposit(BigDecimal.valueOf(dep));
-                    }else {
-                        this.setDeposit(BigDecimal.ZERO);
-                    }
-                    break;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        TxInfoResolver.resolve(txType,txInfo,value,this);
     }
 }

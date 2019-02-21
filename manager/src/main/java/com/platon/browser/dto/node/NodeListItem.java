@@ -26,6 +26,7 @@ public class NodeListItem {
     private String address;
     private Integer isValid;
     private Date eliminateTime;
+    private int ticketCount;
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);
         if(initData.getIsValid()==0) this.setEliminateTime(initData.getUpdateTime());

@@ -65,4 +65,21 @@ public class ServiceTestBase extends TestBase {
             transactionService.updateCache(chainId,new HashSet<>(data));
         });
     }
+
+    /**
+     * 初始化交易表及缓存
+     */
+    protected void initPendingTxTable(){
+        chainsConfig.getChainIds().forEach(chainId -> {
+            PendingTxExample con = new PendingTxExample();
+            con.createCriteria().andChainIdEqualTo(chainId);
+            pendingTxMapper.deleteByExample(con);
+            List<PendingTx> data = DataTool.getTestData(chainId,TestDataFileNameEnum.PENDINGTX,PendingTx.class);
+            if(data.size()==0){
+                Assert.fail("No PendingTx data!");
+                return;
+            }
+            pendingTxMapper.batchInsert(data);
+        });
+    }
 }

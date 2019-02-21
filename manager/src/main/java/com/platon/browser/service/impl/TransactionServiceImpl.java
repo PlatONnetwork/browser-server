@@ -16,6 +16,7 @@ import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
+import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.I18nEnum;
@@ -27,10 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -42,6 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
     private I18nUtil i18n;
     @Autowired
     private RedisCacheService redisCacheService;
+    @Autowired
+    private NodeService nodeService;
 
     @Override
     public RespPage<TransactionListItem> getPage(TransactionPageReq req) {
@@ -84,6 +84,13 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionDetail returnData = new TransactionDetail();
         TransactionWithBLOBs initData = transactions.get(0);
         returnData.init(initData);
+
+        if(StringUtils.isNotBlank(returnData.getNodeId())){
+            // 查询节点名称
+            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
+            returnData.setNodeName(nameMap.get(returnData.getNodeId()));
+        }
+
         return returnData;
     }
 

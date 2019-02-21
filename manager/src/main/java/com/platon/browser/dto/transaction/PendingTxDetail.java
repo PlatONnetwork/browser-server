@@ -2,12 +2,12 @@ package com.platon.browser.dto.transaction;
 
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.TxInfoResolver;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Data
 public class PendingTxDetail {
@@ -28,6 +28,12 @@ public class PendingTxDetail {
     private String inputData;
     private long expectTime;
     private String receiveType;
+    private String txInfo;
+    private String nodeName;
+    private String nodeId;
+    private BigDecimal deposit;
+    private Integer voteCount;
+    private BigDecimal ticketPrice;
 
     public void init(PendingTx initData) {
         BeanUtils.copyProperties(initData,this);
@@ -38,5 +44,7 @@ public class PendingTxDetail {
         this.setPriceInE(initData.getEnergonPrice());
         v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER);
         this.setPriceInEnergon(EnergonUtil.format(v));
+
+        TxInfoResolver.resolve(txType,txInfo,value,this);
     }
 }

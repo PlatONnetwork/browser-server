@@ -3,18 +3,12 @@ package com.platon.browser.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.req.account.AddressDetailReq;
-import com.platon.browser.service.AccountService;
-import com.platon.browser.service.PendingTxService;
-import com.platon.browser.service.TicketService;
-import com.platon.browser.service.TransactionService;
+import com.platon.browser.service.*;
 import com.platon.browser.util.EnergonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,9 +36,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
     private TicketService ticketService;
+    @Autowired
+    private NodeService nodeService;
 
 
     @Override
@@ -68,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
             BigDecimal income = ticketService.getTicketIncomeSum(bean.getTxHash(),req.getCid());
             bean.setIncome(income);
             data.add(bean);
@@ -81,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().replace("0x",""));
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
             data.add(bean);
         });
 
@@ -93,18 +87,11 @@ public class AccountServiceImpl implements AccountService {
             return 0;
         });
 
-        Map<String,String> nodeIdToName=new HashMap<>();
-        if(nodeIds.size()>0){
-            NodeRankingExample nodeRankingExample = new NodeRankingExample();
-            nodeRankingExample.createCriteria().andChainIdEqualTo(req.getCid())
-                    .andNodeIdIn(new ArrayList<>(nodeIds));
-            List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-            nodes.forEach(node->{
-                if(!node.getNodeId().startsWith("0x")) node.setNodeId("0x"+node.getNodeId());
-                nodeIdToName.put(node.getNodeId(),node.getName());
-            });
-        }
-        data.forEach(el->el.setNodeName(nodeIdToName.get(el.getNodeId())));
+        Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
+        data.forEach(el->{
+            if(StringUtils.isBlank(el.getNodeId())) return;
+            el.setNodeName(nodeIdToName.get(el.getNodeId()));
+        });
         returnData.setTrades(data);
         return returnData;
     }

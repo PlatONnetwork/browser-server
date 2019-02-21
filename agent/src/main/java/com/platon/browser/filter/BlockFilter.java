@@ -8,7 +8,9 @@ import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.EventRes;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class BlockFilter {
             String publicKey = null;
             try{
                 publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
+                if(StringUtils.isNotBlank(publicKey)&&!publicKey.startsWith("0x")){
+                    publicKey="0x"+publicKey;
+                }
             }catch (Exception e){
                 publicKey = "";
             }
@@ -76,7 +81,7 @@ public class BlockFilter {
                     sum = sum.add(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                     AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
                     String type = TransactionAnalysis.getTypeName(analysisResult.getType());
-                    if ("voteTicket".equals(type)) {
+                    if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
                         voteAmount=voteAmount.add(BigInteger.ONE);
                         //get tickVoteContract vote event
                         List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = platon.getTicketContract(chainId).getVoteTicketEventEvents(receipt);
@@ -85,7 +90,7 @@ public class BlockFilter {
                         //event objcet is jsonString , transform jsonObject <EventRes>
                         //EventRes get Data
                         bean.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
-                    } else if ("candidateDeposit".equals(type)) {
+                    } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                         campaignAmount=campaignAmount.add(BigInteger.ONE);
                     }
                     bean.setBlockVoteAmount(voteAmount.longValue());

@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -17,9 +18,9 @@ public class IndexInfo {
     private long currentTransaction;
     private long consensusNodeAmount;
     private long addressAmount;
-    private int voteAmount;
-    private double proportion;
-    private double ticketPrice;
+    private long voteCount;
+    private BigDecimal proportion;
+    private BigDecimal ticketPrice;
     @JsonIgnore
     private boolean changed=false; // 是否有改动
     @JsonIgnore

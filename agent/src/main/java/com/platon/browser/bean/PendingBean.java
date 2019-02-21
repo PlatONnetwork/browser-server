@@ -1,5 +1,6 @@
 package com.platon.browser.bean;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.dto.AnalysisResult;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.PendingTx;
@@ -17,8 +18,10 @@ public class PendingBean extends PendingTx {
         this.setTimestamp(new Date());
         this.setValue(FilterTool.valueConversion(initData.getValue()));
         this.setInput(initData.getInput());
-        AnalysisResult analysisResult = TransactionAnalysis.analysis(!initData.getInput().equals(null) ? initData.getInput() : "0x", true);
+        AnalysisResult analysisResult = TransactionAnalysis.analysis(!initData.getInput().equals(null) ? initData.getInput() : "0x", false);
         String type = TransactionAnalysis.getTypeName(analysisResult.getType());
         this.setTxType(type);
+        String txinfo = JSON.toJSONString(analysisResult);
+        this.setTxInfo(txinfo);
     }
 }

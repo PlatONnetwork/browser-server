@@ -207,6 +207,8 @@ public class TransactionController {
      *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
      *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
      *           "voteCount",33// 投票数（只有投票交易此字段才有值）
+     *           "deposit":445,//质押金 (竞选交易此字段才有值)
+     *           "ticketPrice":3333 // 票价
      * }
      */
     @PostMapping("transactionDetails")
@@ -273,6 +275,25 @@ public class TransactionController {
      *           "first":false, // 是否第一条记录
      *           "last":true, // 是否最后一条记录
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *           "txInfo": "{
+     *                  "functionName":"",//方法名称
+     *                  "parameters":{},//参数
+     *                  "type":"1"//交易类型
+     *                      0：转账
+     *                      1：合约发布
+     *                      2：合约调用
+     *                      4：权限
+     *                      5：MPC交易
+     *                      1000：投票
+     *                      1001：竞选质押
+     *                      1002：减持质押
+     *                      1003：提取质押
+     *                  }"//返回交易解析结构
+     *           }
+     *           "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *           "voteCount",33// 投票数（只有投票交易此字段才有值）
+     *           "deposit":445,//质押金 (竞选交易此字段才有值)
      *     }
      * }
      */
@@ -349,6 +370,21 @@ public class TransactionController {
      *                  unknown ： 未知
      *           "serverTime": 1123123,//服务器时间
      *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *           "txInfo": "{
+     *                  "functionName":"",//方法名称
+     *                  "parameters":{},//参数
+     *                  "type":"1"//交易类型
+     *                      0：转账
+     *                      1：合约发布
+     *                      2：合约调用
+     *                      4：权限
+     *                      5：MPC交易
+     *                      1000：投票
+     *                      1001：竞选质押
+     *                      1002：减持质押
+     *                      1003：提取质押
+     *                  }"//返回交易解析结构
+     *           }
      *           }
      *       ]
      * }
@@ -415,6 +451,25 @@ public class TransactionController {
      *              "inputData": "",//附加输入数据
      *              "expectTime": 12312333, // 预计确认时间
      *              "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *              "txInfo": "{
+     *                     "functionName":"",//方法名称
+     *                     "parameters":{},//参数
+     *                     "type":"1"//交易类型
+     *                         0：转账
+     *                         1：合约发布
+     *                         2：合约调用
+     *                         4：权限
+     *                         5：MPC交易
+     *                         1000：投票
+     *                         1001：竞选质押
+     *                         1002：减持质押
+     *                         1003：提取质押
+     *                     }"//返回交易解析结构
+     *              }
+     *              "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *              "nodeId",""//节点Id（只有type=1000，1001，1002，1003时候，该字段才有值）
+     *              "voteCount",33// 投票数（只有投票交易此字段才有值）
+     *              "deposit":445,//质押金 (竞选交易此字段才有值)
      *          }
      *      }
      *  }
@@ -547,9 +602,11 @@ public class TransactionController {
      *                    candidateApplyWithdraw ： 减持质押
      *                    candidateWithdraw ： 提取质押
      *                    unknown ： 未知
+     *                "txInfo":"", // 交易参数
      *                "serverTime": 1123123,//服务器时间
      *                "failReason":"",//失败原因
      *                "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
+     *                "nodeId": "", // 节点ID
      *                "nodeName",""//节点名称（只有type=1000，1001，1002，1003时候，该字段才有值）
      *                "deposit":"",//质押金 (竞选交易此字段才有值)
      *                ---------以下字段只有txType=voteTicket有效----------
@@ -674,10 +731,16 @@ public class TransactionController {
      *                     voteTicket ： 投票
      *                     transactionExecute ： 合约执行
      *                     authorization ： 权限
+     *                 "txInfo":"", // 交易参数信息
      *                 "serverTime": 1123123,//服务器时间
      *                 "failReason":"",//失败原因
      *                 "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
-     *
+     *                 "ticketPrice": null, // 投票交易此字段才有值
+     *                 "income": 0, // 投票交易此字段才有值
+     *                 "voteCount": 0, // 投票交易此字段才有值
+     *                 "deposit": 1200000, // 质押金，竞选交易此字段才有值
+     *                 "nodeId": "", // 节点ID
+     *                 "nodeName": "Platon-Beijing" // 节点名称
      *                 }
      *             ]
      *      }

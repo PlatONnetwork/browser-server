@@ -53,7 +53,7 @@ public class TicketController {
      *           {
      *           "ticketId": "0x234234",//选票ID
      *           "txHash": "15566",//交易HASH
-     *           "candidateId": 18080899999,//候选人Id（节点Id）（投票给）
+     *           "candidateId": 18080899999,//候选节点Id（投票给）
      *           "owner": "0x667766",//票的所属者
      *           "blockNumber": "0x667766",//购票时的块高
      *           "rblockNumber": "222",//票被释放时的块高
