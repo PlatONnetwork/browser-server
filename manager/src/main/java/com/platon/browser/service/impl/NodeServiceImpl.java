@@ -176,7 +176,6 @@ public class NodeServiceImpl implements NodeService {
                         if(count!=null) node.setTicketCount(count.size());
                     });
                 }
-                logger.error("{}",ticketIds);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -231,7 +230,6 @@ public class NodeServiceImpl implements NodeService {
                 List<String> list = JSON.parseObject(ticketIds,List.class);
                 if(list!=null) returnData.setTicketCount(list.size());
             }
-            logger.error("{}",ticketIds);
         } catch (Exception e) {
             e.printStackTrace();
         }
