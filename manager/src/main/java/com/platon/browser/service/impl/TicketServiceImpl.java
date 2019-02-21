@@ -134,6 +134,7 @@ public class TicketServiceImpl implements TicketService {
                 page.setTotal(data.size());
                 page.setPageSize(data.size());
                 returnData.init(page, data);
+                returnData.setTotalPages(1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
