@@ -23,6 +23,7 @@ import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
+import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.util.PageUtil;
@@ -153,7 +154,7 @@ public class NodeServiceImpl implements NodeService {
         List<Block> blocks = blockMapper.selectByExample(blockExample);
         if(blocks.size()>0){
             Block block = blocks.get(0);
-            returnData.setBlockReward(new BigDecimal(block.getBlockReward()));
+            returnData.setBlockReward(new BigDecimal(EnergonUtil.format(Convert.fromWei(block.getBlockReward(), Convert.Unit.ETHER))));
         }else{
             returnData.setBlockReward(BigDecimal.ZERO);
         }
