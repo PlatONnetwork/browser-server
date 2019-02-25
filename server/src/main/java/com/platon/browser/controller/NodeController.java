@@ -165,8 +165,8 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "id": "0xsfjl34jfljsl435kd", // 数据库ID (id和nodeId必选一个)
-     *      "nodeId": "0xsfjl34jfljsl435kd", // 节点ID (id和nodeId必选一个)
+     *      "id": "0xsfjl34jfljsl435kd", // 数据库ID (查看历史节点详情必须传id)
+     *      "nodeId": "0xsfjl34jfljsl435kd", // 节点ID (必选)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -198,7 +198,10 @@ public class NodeController {
      *           "orgWebsite":"https://www.platon.network", // 机构官网
      *           "ticketCount":"",//得票数
      *           "ticketAge" :""//票龄
-     *           }
+     *           "beginNumber":343, // 开始区块
+     *           "endNumber":555, // 结束区块
+     *           "hitCount":555, // 中选次数
+     *        }
      * }
      */
     @PostMapping("detail")
@@ -228,7 +231,9 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "nodId": "0xsfjl34jfljsl435kd",// 节点Id(必填)
+     *      "id":"", // 数据库ID (必填)
+     *      "beginNumber":444, // 开始区块
+     *      "endNumber":555, // 结束区块
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK

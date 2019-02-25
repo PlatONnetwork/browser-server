@@ -178,6 +178,12 @@ public class BlockServiceImpl implements BlockService {
         if(req.getEndDate()!=null){
             criteria.andTimestampLessThanOrEqualTo(req.getEndDate());
         }
+        if(req.getBeginNumber()!=null){
+            criteria.andNumberGreaterThanOrEqualTo(req.getBeginNumber());
+        }
+        if(req.getEndNumber()!=null){
+            criteria.andNumberLessThanOrEqualTo(req.getEndNumber());
+        }
         condition.setOrderByClause("number desc");
         List<Block> blocks = blockMapper.selectByExample(condition);
         return blocks;

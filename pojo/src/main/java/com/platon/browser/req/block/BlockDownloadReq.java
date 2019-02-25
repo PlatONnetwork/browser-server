@@ -20,4 +20,6 @@ public class BlockDownloadReq {
     @NotNull(message = "{download.date.start.notnull}")
     @Past(message = "{download.date.start.must.less.than.now}")
     private Date endDate;
+    private Long beginNumber;
+    private Long endNumber;
 }
