@@ -92,7 +92,7 @@ public class NodeServiceImpl implements NodeService {
         if(nodes.size()==0) return returnData;
 
         class CountHolder{
-            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.ZERO;
+            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.valueOf(Long.MAX_VALUE);
             Long selectedCount=0l;
         }
         CountHolder holder = new CountHolder();
