@@ -1,12 +1,8 @@
 package com.platon.FilterTest;
 
-import com.alibaba.fastjson.JSON;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
