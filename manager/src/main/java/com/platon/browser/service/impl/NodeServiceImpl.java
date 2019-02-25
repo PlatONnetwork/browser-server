@@ -110,9 +110,9 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
         try {
-            String voteCount = ticketContract.GetPoolRemainder().send();
-            if (StringUtils.isNotBlank(voteCount)){
-                returnData.setVoteCount(Long.valueOf(voteCount));
+            String remain = ticketContract.GetPoolRemainder().send();
+            if (StringUtils.isNotBlank(remain)){
+                returnData.setVoteCount(51200-Long.valueOf(remain));
             }else{
                 returnData.setTicketPrice(BigDecimal.ZERO);
             }
