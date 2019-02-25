@@ -51,7 +51,7 @@ public class FilterTool {
         BigDecimal wheel = height.divide(blockSumOnYear, 0, BigDecimal.ROUND_HALF_DOWN);
         if (wheel.intValue() == 0) {
             //one period block
-            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear, 0, BigDecimal.ROUND_HALF_DOWN);
+            BigDecimal result = BigDecimal.valueOf(25000000L).multiply(rate).divide(blockSumOnYear, 0, BigDecimal.ROUND_DOWN);
             return result.setScale(0).toString();
         }
         BigDecimal thisRound = base.multiply(rate).multiply(definiteValue.pow(wheel.intValue()));
@@ -64,5 +64,11 @@ public class FilterTool {
         BigDecimal valueDiec = new BigDecimal(value.toString());
         BigDecimal conversionCoin = valueDiec.divide(new BigDecimal("1000000000000000000"));
         return  conversionCoin.toString();
+    }
+
+    public static void main ( String[] args ) {
+        BigDecimal height = new BigDecimal("3");
+        BigDecimal wheel = height.divide(new BigDecimal("2"), 0, BigDecimal.ROUND_DOWN);
+        System.out.println(wheel);
     }
 }

@@ -35,7 +35,6 @@ public class DataBuild {
                 transaction.setValue(String.valueOf(new Random().nextInt(30000)));
                 transaction.setGas(String.valueOf(new Random().nextInt(7000000)));
                 transaction.setGasPrice(String.valueOf(21000L));
-
                 T target = (T)transaction;
                 transactionList.add(target);
             }
