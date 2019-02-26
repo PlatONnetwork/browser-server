@@ -1,6 +1,7 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -16,6 +17,7 @@ import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -135,9 +137,16 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-//        IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
-        IndexInfo indexInfo = new IndexInfo();
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),indexInfo);
+
+        StatisticsCache cache = redisCacheService.getStatisticsCache(chainId);
+        // 如果前一次指标为null,或前一次指标的块高小于当前缓存块高，则推送
+        IndexInfo index = new IndexInfo();
+        BeanUtils.copyProperties(cache,index);
+        index.setConsensusNodeAmount(cache.getConsensusCount());
+        index.setCurrentTransaction(cache.getTransactionCount());
+        index.setAddressAmount(cache.getAddressCount());
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
+
         return resp;
     }
 
