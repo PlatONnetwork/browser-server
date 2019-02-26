@@ -1,7 +1,6 @@
 package com.platon.browser.job;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
@@ -82,33 +81,33 @@ public class NodeAnalyseJob {
                     .andChainIdEqualTo(chainId)
                     .andIsValidEqualTo(1);
             List <NodeRanking> dbNodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-            dbNodes.forEach(n->NODEID_TO_NAME.put(n.getNodeId(),n.getName()));
+            dbNodes.forEach(n -> NODEID_TO_NAME.put(n.getNodeId(), n.getName()));
 
             EthBlock ethBlock = null;
             BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
             while (beginNumber <= endNumber.longValue()) {
                 long startTime = System.currentTimeMillis();
                 ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
-                logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
                 //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
                 //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
-                logger.debug("candidate---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if (null == nodeInfo) return;
-                if (null == nodes && nodes.size() < 0)return;
+                if (null == nodes && nodes.size() < 0) return;
                 nodeRankingExample = new NodeRankingExample();
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-                logger.debug("find db list---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("find db list---------------------------------->{}", System.currentTimeMillis() - startTime);
                 // 把库中记录全部置为无效
               /*  NodeRanking node = new NodeRanking();
                 node.setIsValid(0);
                 nodeRankingMapper.updateByExampleSelective(node, nodeRankingExample);*/
-                logger.debug("update db list---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("update db list---------------------------------->{}", System.currentTimeMillis() - startTime);
 
                 List <NodeRanking> nodeList = new ArrayList <>();
                 int i = 1;
@@ -118,8 +117,8 @@ public class NodeAnalyseJob {
                 Block block = blockMapper.selectByPrimaryKey(key);
                 for (CandidateDto candidateDto : nodes) {
                     // 加上“0x”
-                    if(!candidateDto.getCandidateId().startsWith("0x")){
-                        candidateDto.setCandidateId("0x"+candidateDto.getCandidateId());
+                    if (!candidateDto.getCandidateId().startsWith("0x")) {
+                        candidateDto.setCandidateId("0x" + candidateDto.getCandidateId());
                     }
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
@@ -159,12 +158,14 @@ public class NodeAnalyseJob {
                 List <NodeRanking> updateList = new ArrayList <>();
                 //data form database and node status is vaild
 
-                Map<String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap<>();
+                Map <String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap <>();
                 nodeList.forEach(e -> {
                     dbNodeIdToNodeRankingMap.put(e.getNodeId(), e);
                     updateList.add(e);
                 });
 
+
+                NodeRanking targetNode = null;
                 if (dbList.size() > 0 && dbList != null) {
                     for (int j = 0; j < dbList.size(); j++) {
                         NodeRanking dbNode = dbList.get(j);
@@ -176,10 +177,8 @@ public class NodeAnalyseJob {
                             chainNode.setBeginNumber(dbNode.getBeginNumber());
                             chainNode.setId(dbNode.getId());
                             chainNode.setAvgTime(dbNode.getAvgTime());
-                            if(chainNode.getBlockCount() != dbNode.getBlockCount()){
-                                chainNode.setProfitAmount(new BigDecimal(dbNode.getProfitAmount()).add(new BigDecimal(chainNode.getProfitAmount())).toString());
-                                chainNode.setRewardAmount(new BigDecimal(dbNode.getRewardAmount()).add(new BigDecimal(chainNode.getRewardAmount())).toString());
-                                chainNode.setBlockReward(new BigDecimal(dbNode.getBlockReward()).add(new BigDecimal(chainNode.getBlockReward())).toString());
+                            if (publicKey.equals(new BigInteger(chainNode.getNodeId().replace("0x", ""), 16))) {
+                                targetNode = chainNode;
                             }
                         } else {
                             dbNode.setEndNumber(beginNumber);
@@ -188,29 +187,38 @@ public class NodeAnalyseJob {
                         }
                     }
                 }
-                String date = JSONArray.toJSONString(updateList);
                 //TODO:publickey 0.4.0解析存在问题
                 FilterTool.currentBlockOwner(updateList, publicKey);
+
+                for (NodeRanking n : updateList) {
+                    if (publicKey.equals(new BigInteger(n.getNodeId().replace("0x", ""), 16))) {
+                        n.setProfitAmount(new BigDecimal(n.getProfitAmount()).add(new BigDecimal(targetNode.getProfitAmount())).toString());
+                        n.setRewardAmount(new BigDecimal(n.getRewardAmount()).add(new BigDecimal(targetNode.getRewardAmount())).toString());
+                        n.setBlockReward(new BigDecimal(n.getBlockReward()).add(new BigDecimal(targetNode.getBlockReward())).toString());
+                    }
+                }
+
+
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
                 for (NodeRanking nodeRanking : updateList) {
-                    if (nodeRanking.getIsValid()==1) {
+                    if (nodeRanking.getIsValid() == 1) {
                         consensusCount++;
-                        NODEID_TO_NAME.put(nodeRanking.getNodeId(),nodeRanking.getName());
+                        NODEID_TO_NAME.put(nodeRanking.getNodeId(), nodeRanking.getName());
                     }
                 }
 
-                if(!updateList.isEmpty()){
+                if (!updateList.isEmpty()) {
                     customNodeRankingMapper.insertOrUpdate(updateList);
                 }
-                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis() - startTime);
 
-                Set <NodeRanking> redisNode = new HashSet<>(updateList);
+                Set <NodeRanking> redisNode = new HashSet <>(updateList);
                 redisCacheService.updateNodePushCache(chainId, redisNode);
                 beginNumber++;
-                logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis()-startTime);
+                logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis() - startTime);
             }
 
 
