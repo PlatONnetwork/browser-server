@@ -165,7 +165,7 @@ public class NodeAnalyseJob {
                 });
 
 
-                NodeRanking targetNode = null;
+
                 if (dbList.size() > 0 && dbList != null) {
                     for (int j = 0; j < dbList.size(); j++) {
                         NodeRanking dbNode = dbList.get(j);
@@ -191,7 +191,7 @@ public class NodeAnalyseJob {
                     }
                 }
                 //TODO:publickey 0.4.0解析存在问题
-                FilterTool.currentBlockOwner(updateList, publicKey);
+                //FilterTool.currentBlockOwner(updateList, publicKey);
 
                 //FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
 
