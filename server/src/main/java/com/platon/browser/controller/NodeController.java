@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -260,8 +259,6 @@ public class NodeController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            // 取20条最新记录
-            PageHelper.startPage(1,20);
             List<BlockListItem> blocks = nodeService.getBlockList(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){
