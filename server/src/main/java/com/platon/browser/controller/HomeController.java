@@ -12,6 +12,7 @@ import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.StatisticService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -50,6 +51,8 @@ public class HomeController {
 
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private StatisticService statisticService;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -135,9 +138,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-//        IndexInfo indexInfo = cacheService.getIndexInfo(chainId);
-        IndexInfo indexInfo = new IndexInfo();
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),indexInfo);
+        IndexInfo index = statisticService.getIndexInfo(chainId);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
         return resp;
     }
 
@@ -188,33 +190,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-//        StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
-        StatisticInfo statistic = new StatisticInfo();
-
-/*
-
-        LimitQueue<StatisticPushItem> limitQueue = statistic.getLimitQueue();
-        List<StatisticPushItem> itemList = limitQueue.list();
-        Collections.sort(itemList,(c1, c2)->{
-            // 按区块高度正排
-            if(c1.getHeight()>c2.getHeight()) return 1;
-            if(c1.getHeight()<c2.getHeight()) return -1;
-            return 0;
-        });
-
-        StatisticGraphData graphData = new StatisticGraphData();
-        for (int i=0;i<itemList.size();i++){
-            StatisticPushItem item = itemList.get(i);
-            if(i==0||i==itemList.size()-1) continue;
-            StatisticPushItem prevItem = itemList.get(i-1);
-            graphData.getX().add(item.getHeight());
-            graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
-            graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
-        }
-        statistic.setGraphData(graphData);
-*/
-
-
+        StatisticInfo statistic = statisticService.getStatisticInfo(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
         return resp;
     }

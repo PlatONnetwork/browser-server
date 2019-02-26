@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.base.BaseResp;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
@@ -165,8 +164,8 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "id": "0xsfjl34jfljsl435kd", // 数据库ID (id和nodeId必选一个)
-     *      "nodeId": "0xsfjl34jfljsl435kd", // 节点ID (id和nodeId必选一个)
+     *      "id": "0xsfjl34jfljsl435kd", // 数据库ID (查看历史节点详情必须传id)
+     *      "nodeId": "0xsfjl34jfljsl435kd", // 节点ID (必选)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -197,8 +196,11 @@ public class NodeController {
      *           "orgName":"platon", // 机构名称
      *           "orgWebsite":"https://www.platon.network", // 机构官网
      *           "ticketCount":"",//得票数
-     *           "ticketAge" :""//票龄
-     *           }
+     *           "ticketEpoch":555, // 票龄
+     *           "beginNumber":343, // 开始区块
+     *           "endNumber":555, // 结束区块
+     *           "hitCount":555 // 中选次数
+     *        }
      * }
      */
     @PostMapping("detail")
@@ -228,7 +230,9 @@ public class NodeController {
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
-     *      "nodId": "0xsfjl34jfljsl435kd",// 节点Id(必填)
+     *      "id":"", // 数据库ID (必填)
+     *      "beginNumber":444, // 开始区块
+     *      "endNumber":555, // 结束区块
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -255,8 +259,6 @@ public class NodeController {
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
         try{
-            // 取20条最新记录
-            PageHelper.startPage(1,20);
             List<BlockListItem> blocks = nodeService.getBlockList(req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         }catch (BusinessException be){

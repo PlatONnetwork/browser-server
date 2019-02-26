@@ -76,7 +76,7 @@ public class NodeControllerTest extends ControllerTestBase {
                 }
                 BlockListReq req = new BlockListReq();
                 req.setCid(chainId);
-                req.setNodeId(node.getNodeId());
+                //req.setNodeId(node.getNodeId());
                 sendPost("/node/blockList",req);
             } catch (Exception e) {
                 e.printStackTrace();

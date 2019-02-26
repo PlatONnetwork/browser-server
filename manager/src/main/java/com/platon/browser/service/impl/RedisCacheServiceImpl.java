@@ -582,9 +582,9 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
         // 投票数
         try {
-            String remainder = ticketContract.GetPoolRemainder().send();
-            if(StringUtils.isNotBlank(remainder)){
-                cache.setVoteCount(Long.valueOf(remainder));
+            String remain = ticketContract.GetPoolRemainder().send();
+            if(StringUtils.isNotBlank(remain)){
+                cache.setVoteCount(51200-Long.valueOf(remain));
             }else{
                 cache.setVoteCount(0);
             }
@@ -593,7 +593,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             e.printStackTrace();
         }
         // 占比
-        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.DOWN);
+        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
         cache.setProportion(proportion);
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);

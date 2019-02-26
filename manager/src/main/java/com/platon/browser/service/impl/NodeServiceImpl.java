@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.dao.entity.Block;
@@ -91,7 +92,7 @@ public class NodeServiceImpl implements NodeService {
         if(nodes.size()==0) return returnData;
 
         class CountHolder{
-            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.ZERO;
+            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.valueOf(Long.MAX_VALUE);
             Long selectedCount=0l;
         }
         CountHolder holder = new CountHolder();
@@ -110,9 +111,9 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
         try {
-            String voteCount = ticketContract.GetPoolRemainder().send();
-            if (StringUtils.isNotBlank(voteCount)){
-                returnData.setVoteCount(Long.valueOf(voteCount));
+            String remain = ticketContract.GetPoolRemainder().send();
+            if (StringUtils.isNotBlank(remain)){
+                returnData.setVoteCount(51200-Long.valueOf(remain));
             }else{
                 returnData.setTicketPrice(BigDecimal.ZERO);
             }
@@ -147,7 +148,7 @@ public class NodeServiceImpl implements NodeService {
         returnData.setLowestDeposit(holder.lowestDeposit);
 
         // 设置占比
-        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.DOWN);
+        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
         returnData.setProportion(proportion);
 
         // 取区块奖励
@@ -234,15 +235,62 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
 
+        // 设置票龄
+        returnData.setTicketEpoch(0l);
+        try {
+            String epochStr = ticketContract.GetCandidateEpoch(returnData.getNodeId()).send();
+            if(StringUtils.isNotBlank(epochStr)){
+                Long epoch = Long.valueOf(epochStr);
+                returnData.setTicketEpoch(epoch);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 设置平均出块时长
+        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
+        returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
+
+        // 中选次数
+        Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
+        if(endNumber==null){
+            // 到区块表查当前节点最新块的块号
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(initData.getChainId()).andNodeIdEqualTo(initData.getNodeId());
+            blockExample.setOrderByClause("number DESC");
+            PageHelper.startPage(1,1);
+            List<Block> bLocks = blockMapper.selectByExample(blockExample);
+            if(bLocks.size()>0){
+                Block block = bLocks.get(0);
+                endNumber=block.getNumber();
+            }
+        }
+
+        if(endNumber>beginNumber){
+            BigDecimal hitCount = BigDecimal.valueOf(endNumber-beginNumber).divide(BigDecimal.valueOf(250),0,RoundingMode.DOWN);
+            returnData.setHitCount(hitCount.longValue());
+        }
+
         return returnData;
     }
 
     @Override
     public List<BlockListItem> getBlockList(BlockListReq req) {
+        List<BlockListItem> returnData = new LinkedList<>();
+
         BlockDownloadReq downloadReq = new BlockDownloadReq();
         BeanUtils.copyProperties(req,downloadReq);
+        NodeRanking nodeRanking = nodeRankingMapper.selectByPrimaryKey(Long.valueOf(req.getId()));
+        if(nodeRanking==null) return returnData;
+
+        downloadReq.setNodeId(nodeRanking.getNodeId());
+        downloadReq.setBeginNumber(nodeRanking.getBeginNumber());
+        downloadReq.setEndNumber(nodeRanking.getEndNumber());
+
+        // 取20条最新记录
+        PageHelper.startPage(1,20);
         List<Block> blocks = blockService.getList(downloadReq);
-        List<BlockListItem> returnData = new LinkedList<>();
+
         blocks.forEach(initData -> {
             BlockListItem bean = new BlockListItem();
             bean.init(initData);

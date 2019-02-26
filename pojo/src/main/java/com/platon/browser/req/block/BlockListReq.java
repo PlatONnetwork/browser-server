@@ -12,5 +12,7 @@ public class BlockListReq {
     @NotBlank(message = "{chain.id.notnull}")
     private String cid;
     @NotNull(message = "{node.id.notnull}")
-    private String nodeId;
+    private String id;
+    private Long beginNumber;
+    private Long endNumber;
 }
