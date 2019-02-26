@@ -593,7 +593,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             e.printStackTrace();
         }
         // 占比
-        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.DOWN);
+        BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
         cache.setProportion(proportion);
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
