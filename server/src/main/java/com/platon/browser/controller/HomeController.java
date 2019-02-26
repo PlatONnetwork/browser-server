@@ -1,7 +1,6 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.common.base.BaseResp;
-import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.BlockMapper;
@@ -13,11 +12,11 @@ import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.StatisticService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -52,6 +51,8 @@ public class HomeController {
 
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private StatisticService statisticService;
 
     /**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
@@ -137,16 +138,8 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-
-        StatisticsCache cache = redisCacheService.getStatisticsCache(chainId);
-        // 如果前一次指标为null,或前一次指标的块高小于当前缓存块高，则推送
-        IndexInfo index = new IndexInfo();
-        BeanUtils.copyProperties(cache,index);
-        index.setConsensusNodeAmount(cache.getConsensusCount());
-        index.setCurrentTransaction(cache.getTransactionCount());
-        index.setAddressAmount(cache.getAddressCount());
+        IndexInfo index = statisticService.getIndexInfo(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
-
         return resp;
     }
 
@@ -197,33 +190,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-//        StatisticInfo statistic = cacheService.getStatisticInfo(chainId);
-        StatisticInfo statistic = new StatisticInfo();
-
-/*
-
-        LimitQueue<StatisticPushItem> limitQueue = statistic.getLimitQueue();
-        List<StatisticPushItem> itemList = limitQueue.list();
-        Collections.sort(itemList,(c1, c2)->{
-            // 按区块高度正排
-            if(c1.getHeight()>c2.getHeight()) return 1;
-            if(c1.getHeight()<c2.getHeight()) return -1;
-            return 0;
-        });
-
-        StatisticGraphData graphData = new StatisticGraphData();
-        for (int i=0;i<itemList.size();i++){
-            StatisticPushItem item = itemList.get(i);
-            if(i==0||i==itemList.size()-1) continue;
-            StatisticPushItem prevItem = itemList.get(i-1);
-            graphData.getX().add(item.getHeight());
-            graphData.getYa().add((item.getTime()-prevItem.getTime())/1000);
-            graphData.getYb().add(item.getTransaction()==null?0:item.getTransaction());
-        }
-        statistic.setGraphData(graphData);
-*/
-
-
+        StatisticInfo statistic = statisticService.getStatisticInfo(chainId);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),statistic);
         return resp;
     }
