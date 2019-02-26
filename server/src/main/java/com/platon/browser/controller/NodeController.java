@@ -197,11 +197,10 @@ public class NodeController {
      *           "orgName":"platon", // 机构名称
      *           "orgWebsite":"https://www.platon.network", // 机构官网
      *           "ticketCount":"",//得票数
-     *           "ticketAge" :""//票龄
+     *           "ticketEpoch":555, // 票龄
      *           "beginNumber":343, // 开始区块
      *           "endNumber":555, // 结束区块
-     *           "hitCount":555, // 中选次数
-     *           "ticketEpoch":555, // 票龄
+     *           "hitCount":555 // 中选次数
      *        }
      * }
      */
