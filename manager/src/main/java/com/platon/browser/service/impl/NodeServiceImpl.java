@@ -287,6 +287,8 @@ public class NodeServiceImpl implements NodeService {
         downloadReq.setBeginNumber(nodeRanking.getBeginNumber());
         downloadReq.setEndNumber(nodeRanking.getEndNumber());
 
+        // 取20条最新记录
+        PageHelper.startPage(1,20);
         List<Block> blocks = blockService.getList(downloadReq);
 
         blocks.forEach(initData -> {
