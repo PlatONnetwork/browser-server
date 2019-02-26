@@ -195,9 +195,9 @@ public class NodeAnalyseJob {
                     }
                 }
                 //TODO:publickey 0.4.0解析存在问题
-                //FilterTool.currentBlockOwner(updateList, publicKey);
+                FilterTool.currentBlockOwner(updateList, publicKey);
 
-                FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
+                //FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
