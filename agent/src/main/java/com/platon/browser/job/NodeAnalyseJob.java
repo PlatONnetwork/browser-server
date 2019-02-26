@@ -131,9 +131,11 @@ public class NodeAnalyseJob {
                      * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
                      * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
                      */
-                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
-                            multiply(rate).
-                            add(new BigDecimal(block.getActualTxCostSum())).toString());
+                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(rate).toString());
+                    if(block.getActualTxCostSum() != null){
+                        BigDecimal profit = new BigDecimal(nodeRanking.getProfitAmount()).add(new BigDecimal(block.getActualTxCostSum()));
+                        nodeRanking.setProfitAmount(profit.toString());
+                    }
                     nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                     nodeRanking.setRanking(i);
                     nodeRanking.setType(1);
@@ -178,7 +180,12 @@ public class NodeAnalyseJob {
                             chainNode.setId(dbNode.getId());
                             chainNode.setAvgTime(dbNode.getAvgTime());
                             if (publicKey.equals(new BigInteger(chainNode.getNodeId().replace("0x", ""), 16))) {
-                                targetNode = chainNode;
+                                chainNode.setBlockCount(chainNode.getBlockCount() + 1);
+                            }
+                            if (chainNode.getBlockCount() != dbNode.getBlockCount()) {
+                                chainNode.setProfitAmount(new BigDecimal(dbNode.getProfitAmount()).add(new BigDecimal(chainNode.getProfitAmount())).toString());
+                                chainNode.setRewardAmount(new BigDecimal(dbNode.getRewardAmount()).add(new BigDecimal(chainNode.getRewardAmount())).toString());
+                                chainNode.setBlockReward(new BigDecimal(dbNode.getBlockReward()).add(new BigDecimal(chainNode.getBlockReward())).toString());
                             }
                         } else {
                             dbNode.setEndNumber(beginNumber);
@@ -188,16 +195,7 @@ public class NodeAnalyseJob {
                     }
                 }
                 //TODO:publickey 0.4.0解析存在问题
-                FilterTool.currentBlockOwner(updateList, publicKey);
-
-                for (NodeRanking n : updateList) {
-                    if (targetNode.getBlockCount()!= n.getBlockCount()) {
-                        n.setProfitAmount(new BigDecimal(n.getProfitAmount()).add(new BigDecimal(targetNode.getProfitAmount())).toString());
-                        n.setRewardAmount(new BigDecimal(n.getRewardAmount()).add(new BigDecimal(targetNode.getRewardAmount())).toString());
-                        n.setBlockReward(new BigDecimal(n.getBlockReward()).add(new BigDecimal(targetNode.getBlockReward())).toString());
-                    }
-                }
-
+                //FilterTool.currentBlockOwner(updateList, publicKey);
 
                 FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
 
@@ -223,7 +221,7 @@ public class NodeAnalyseJob {
 
 
         } catch (Exception e) {
-            logger.error("NodeAnalyseJob Exception:{}", e.getMessage());
+            logger.error("NodeAnalyseJob Exception:{}", e.getStackTrace());
         }
         logger.debug("*** End the NodeAnalyseJob *** ");
     }
