@@ -191,7 +191,7 @@ public class NodeAnalyseJob {
                 FilterTool.currentBlockOwner(updateList, publicKey);
 
                 for (NodeRanking n : updateList) {
-                    if (publicKey.equals(new BigInteger(n.getNodeId().replace("0x", ""), 16))) {
+                    if (targetNode.getBlockCount()!= n.getBlockCount()) {
                         n.setProfitAmount(new BigDecimal(n.getProfitAmount()).add(new BigDecimal(targetNode.getProfitAmount())).toString());
                         n.setRewardAmount(new BigDecimal(n.getRewardAmount()).add(new BigDecimal(targetNode.getRewardAmount())).toString());
                         n.setBlockReward(new BigDecimal(n.getBlockReward()).add(new BigDecimal(targetNode.getBlockReward())).toString());
