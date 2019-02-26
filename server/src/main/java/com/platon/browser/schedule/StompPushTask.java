@@ -67,7 +67,6 @@ public class StompPushTask {
         });
     }
 
-    IndexInfo prevIndex;
     /**
      * 推送指标相关信息
      */
@@ -75,17 +74,14 @@ public class StompPushTask {
     public void pushIndex(){
         chainsConfig.getChainIds().forEach(chainId -> {
             StatisticsCache cache = redisCacheService.getStatisticsCache(chainId);
-            if((prevIndex!=null&&(prevIndex.getCurrentHeight() < cache.getCurrentHeight()))||prevIndex==null){
-                // 如果前一次指标为null,或前一次指标的块高小于当前缓存块高，则推送
-                IndexInfo index = new IndexInfo();
-                BeanUtils.copyProperties(cache,index);
-                index.setConsensusNodeAmount(cache.getConsensusCount());
-                index.setCurrentTransaction(cache.getTransactionCount());
-                index.setAddressAmount(cache.getAddressCount());
-                BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
-                messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
-                prevIndex=index;
-            }
+            // 如果前一次指标为null,或前一次指标的块高小于当前缓存块高，则推送
+            IndexInfo index = new IndexInfo();
+            BeanUtils.copyProperties(cache,index);
+            index.setConsensusNodeAmount(cache.getConsensusCount());
+            index.setCurrentTransaction(cache.getTransactionCount());
+            index.setAddressAmount(cache.getAddressCount());
+            BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),index);
+            messagingTemplate.convertAndSend("/topic/index/new?cid="+chainId, resp);
         });
     }
 
