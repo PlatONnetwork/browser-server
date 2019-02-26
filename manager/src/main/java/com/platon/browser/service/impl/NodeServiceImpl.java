@@ -148,7 +148,7 @@ public class NodeServiceImpl implements NodeService {
         returnData.setLowestDeposit(holder.lowestDeposit);
 
         // 设置占比
-        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),2, RoundingMode.DOWN);
+        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
         returnData.setProportion(proportion);
 
         // 取区块奖励
