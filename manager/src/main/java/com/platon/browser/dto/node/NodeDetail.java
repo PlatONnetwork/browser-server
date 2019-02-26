@@ -38,6 +38,7 @@ public class NodeDetail {
     private Long beginNumber;
     private Long endNumber;
     private Long hitCount;
+    private Long ticketEpoch;
 
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);

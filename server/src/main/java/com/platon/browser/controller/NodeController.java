@@ -201,6 +201,7 @@ public class NodeController {
      *           "beginNumber":343, // 开始区块
      *           "endNumber":555, // 结束区块
      *           "hitCount":555, // 中选次数
+     *           "ticketEpoch":555, // 票龄
      *        }
      * }
      */

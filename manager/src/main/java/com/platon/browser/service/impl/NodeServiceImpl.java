@@ -235,6 +235,18 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
 
+        // 设置票龄
+        returnData.setTicketEpoch(0l);
+        try {
+            String epochStr = ticketContract.GetCandidateEpoch(returnData.getNodeId()).send();
+            if(StringUtils.isNotBlank(epochStr)){
+                Long epoch = Long.valueOf(epochStr);
+                returnData.setTicketEpoch(epoch);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // 设置平均出块时长
         StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
         returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
