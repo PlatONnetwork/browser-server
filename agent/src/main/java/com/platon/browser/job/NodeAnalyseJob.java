@@ -131,11 +131,9 @@ public class NodeAnalyseJob {
                      * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
                      * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
                      */
-                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(rate).toString());
-                    if(block.getActualTxCostSum() != null){
-                        BigDecimal profit = new BigDecimal(nodeRanking.getProfitAmount()).add(new BigDecimal(block.getActualTxCostSum()));
-                        nodeRanking.setProfitAmount(profit.toString());
-                    }
+                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
+                            multiply(rate).
+                            add(new BigDecimal(block.getActualTxCostSum())).toString());
                     nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                     nodeRanking.setRanking(i);
                     nodeRanking.setType(1);
@@ -181,11 +179,9 @@ public class NodeAnalyseJob {
                             chainNode.setAvgTime(dbNode.getAvgTime());
                             if (publicKey.equals(new BigInteger(chainNode.getNodeId().replace("0x", ""), 16))) {
                                 chainNode.setBlockCount(chainNode.getBlockCount() + 1);
-                            }
-                            if (chainNode.getBlockCount() != dbNode.getBlockCount()) {
-                                chainNode.setProfitAmount(new BigDecimal(dbNode.getProfitAmount()).add(new BigDecimal(chainNode.getProfitAmount())).toString());
-                                chainNode.setRewardAmount(new BigDecimal(dbNode.getRewardAmount()).add(new BigDecimal(chainNode.getRewardAmount())).toString());
-                                chainNode.setBlockReward(new BigDecimal(dbNode.getBlockReward()).add(new BigDecimal(chainNode.getBlockReward())).toString());
+                                chainNode.setProfitAmount(new BigDecimal(chainNode.getProfitAmount()).add(new BigDecimal(dbNode.getProfitAmount())).toString());
+                                chainNode.setRewardAmount(new BigDecimal(chainNode.getRewardAmount()).add(new BigDecimal(dbNode.getRewardAmount())).toString());
+                                chainNode.setBlockReward(new BigDecimal(chainNode.getBlockReward()).add(new BigDecimal(dbNode.getBlockReward())).toString());
                             }
                         } else {
                             dbNode.setEndNumber(beginNumber);
