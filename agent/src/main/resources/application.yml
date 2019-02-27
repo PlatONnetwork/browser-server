@@ -1,13 +1,13 @@
 # ***************************通用配置**************************** #
 # 应用版本
-version: 0.4.2
+version: 0.5.0
 #服务器配置
 server:
   port: ${port}
   context-path: /browser-agent
 #Spring应用配置
 spring:
-  profiles.active: test
+  profiles.active: prod
   application.name: browser-agent
   #Redis集群配置
   redis:
