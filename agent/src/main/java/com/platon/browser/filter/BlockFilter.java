@@ -79,7 +79,7 @@ public class BlockFilter {
                 if (null != param.transactionReceiptMap.get(transaction.getHash())) {
                     TransactionReceipt receipt = (TransactionReceipt) param.transactionReceiptMap.get(transaction.getHash());
                     sum = sum.add(receipt.getGasUsed().multiply(transaction.getGasPrice()));
-                    AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), true);
+                    AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), false);
                     String type = TransactionAnalysis.getTypeName(analysisResult.getType());
                     if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
                         voteAmount=voteAmount.add(BigInteger.ONE);

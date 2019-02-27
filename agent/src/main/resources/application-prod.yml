@@ -11,7 +11,8 @@ dbuser: root
 dbpass: Juzhenyuan_123
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-  config: MAIN_NET-1-http://10.0.0.5:6792
+  #config: MAIN_NET-1-http://10.0.0.5:6792
+  config: MAIN_NET-1-http://54.252.202.130:6789
   # 要采集哪个ID的链
   active: 1
 # Redis集群节点
@@ -25,6 +26,6 @@ loglevel:
   platon.job: error
   platon.filter: error
 # 区块分析线程池大小
-thread.num: 200
+thread.num: 1
 # 区块批量采集大小
 batch.num: ${thread.num}

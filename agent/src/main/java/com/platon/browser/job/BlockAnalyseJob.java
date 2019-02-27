@@ -51,11 +51,12 @@ public class BlockAnalyseJob {
         List <Block> blocks = blockMapper.selectByExample(condition);
         // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
         // 2、如果查询不到则从0开始
-        if (blocks.size() == 0) {
+       /* if (blocks.size() == 0) {
             beginNumber = 1L;
         } else {
             beginNumber = blocks.get(0).getNumber()+1;
-        }
+        }*/
+        beginNumber = 11982L;
     }
 
     /**
