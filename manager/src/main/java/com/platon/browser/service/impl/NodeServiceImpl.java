@@ -219,9 +219,14 @@ public class NodeServiceImpl implements NodeService {
             logger.error("invalid node id:{}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
+
         // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
+
+        // 先设置一般的平均出块时长
+        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
+        returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
         // 设置得票数
@@ -247,9 +252,7 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
 
-        // 设置平均出块时长
-        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
-        returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
+
 
         // 中选次数
         Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
