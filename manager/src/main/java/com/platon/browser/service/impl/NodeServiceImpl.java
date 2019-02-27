@@ -233,7 +233,7 @@ public class NodeServiceImpl implements NodeService {
         try {
             String ticketIds = ticketContract.GetCandidateTicketIds(returnData.getNodeId()).send();
             if(StringUtils.isNotBlank(ticketIds)){
-                List<String> list = JSON.parseObject(ticketIds,List.class);
+                List<String> list = JSON.parseArray(ticketIds,String.class);
                 if(list!=null) returnData.setTicketCount(list.size());
             }
         } catch (Exception e) {
