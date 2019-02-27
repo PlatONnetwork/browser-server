@@ -173,7 +173,7 @@ public class NodeServiceImpl implements NodeService {
                 if(StringUtils.isNotBlank(ticketIds)){
                     Map<String,List<String>> map = JSON.parseObject(ticketIds,Map.class);
                     data.forEach(node->{
-                        List<String> count = map.get(node.getNodeId());
+                        List<String> count = map.get(node.getNodeId().replace("0x",""));
                         if(count!=null) node.setTicketCount(count.size());
                     });
                 }
