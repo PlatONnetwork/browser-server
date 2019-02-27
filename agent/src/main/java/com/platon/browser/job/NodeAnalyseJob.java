@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.dao.entity.*;
@@ -122,6 +123,11 @@ public class NodeAnalyseJob {
                     }
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
+
+                    // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
+                    StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(chainId);
+                    nodeRanking.setAvgTime(statisticsCache.getAvgTime().doubleValue());
+
                     BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
                     nodeRanking.setChainId(chainId);
                     nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));

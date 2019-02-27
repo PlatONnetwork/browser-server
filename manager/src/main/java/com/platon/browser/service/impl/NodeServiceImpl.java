@@ -173,7 +173,7 @@ public class NodeServiceImpl implements NodeService {
                 if(StringUtils.isNotBlank(ticketIds)){
                     Map<String,List<String>> map = JSON.parseObject(ticketIds,Map.class);
                     data.forEach(node->{
-                        List<String> count = map.get(node.getNodeId());
+                        List<String> count = map.get(node.getNodeId().replace("0x",""));
                         if(count!=null) node.setTicketCount(count.size());
                     });
                 }
@@ -219,16 +219,21 @@ public class NodeServiceImpl implements NodeService {
             logger.error("invalid node id:{}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
+
         // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
+
+        // 先设置一般的平均出块时长
+        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
+        returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
         // 设置得票数
         try {
             String ticketIds = ticketContract.GetCandidateTicketIds(returnData.getNodeId()).send();
             if(StringUtils.isNotBlank(ticketIds)){
-                List<String> list = JSON.parseObject(ticketIds,List.class);
+                List<String> list = JSON.parseArray(ticketIds,String.class);
                 if(list!=null) returnData.setTicketCount(list.size());
             }
         } catch (Exception e) {
@@ -247,9 +252,7 @@ public class NodeServiceImpl implements NodeService {
             e.printStackTrace();
         }
 
-        // 设置平均出块时长
-        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
-        returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
+
 
         // 中选次数
         Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
