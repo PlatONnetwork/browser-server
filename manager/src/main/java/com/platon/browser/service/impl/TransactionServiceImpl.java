@@ -4,9 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.enums.RetEnum;
 import com.platon.browser.common.exception.BusinessException;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
@@ -42,6 +41,8 @@ public class TransactionServiceImpl implements TransactionService {
     private RedisCacheService redisCacheService;
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private BlockMapper blockMapper;
 
     @Override
     public RespPage<TransactionListItem> getPage(TransactionPageReq req) {
@@ -85,7 +86,22 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionWithBLOBs initData = transactions.get(0);
         returnData.init(initData);
 
-        if(StringUtils.isNotBlank(returnData.getNodeId())){
+        returnData.setNodeName("Unknown");
+        String nodeId=returnData.getNodeId();
+        if(StringUtils.isBlank(nodeId)){
+            // 如果从txInfo中取不到节点ID，则从区块中取
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(initData.getBlockNumber());
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            if(blocks.size()>0){
+                Block block = blocks.get(0);
+                if(StringUtils.isNotBlank(block.getNodeId())){
+                    nodeId=block.getNodeId();
+                }
+            }
+        }
+
+        if(StringUtils.isNotBlank(nodeId)){
             // 查询节点名称
             Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
             returnData.setNodeName(nameMap.get(returnData.getNodeId()));
