@@ -222,6 +222,29 @@ public class TransactionServiceImpl implements TransactionService {
         returnData.init(initData);
         // 设置浏览前后标识
         setupNavigateFlag(req.getCid(),returnData);
+
+        returnData.setNodeName("Unknown");
+        String nodeId=returnData.getNodeId();
+        if(StringUtils.isBlank(nodeId)){
+            // 如果从txInfo中取不到节点ID，则从区块中取
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(initData.getBlockNumber());
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            if(blocks.size()>0){
+                Block block = blocks.get(0);
+                if(StringUtils.isNotBlank(block.getNodeId())){
+                    nodeId=block.getNodeId();
+                    returnData.setNodeId(nodeId);
+                }
+            }
+        }
+
+        if(StringUtils.isNotBlank(nodeId)){
+            // 查询节点名称
+            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
+            returnData.setNodeName(nameMap.get(returnData.getNodeId()));
+        }
+
         return returnData;
     }
 
