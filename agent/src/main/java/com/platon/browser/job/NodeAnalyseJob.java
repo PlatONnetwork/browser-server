@@ -188,6 +188,11 @@ public class NodeAnalyseJob {
                                 chainNode.setProfitAmount(new BigDecimal(chainNode.getProfitAmount()).add(new BigDecimal(dbNode.getProfitAmount())).toString());
                                 chainNode.setRewardAmount(new BigDecimal(chainNode.getRewardAmount()).add(new BigDecimal(dbNode.getRewardAmount())).toString());
                                 chainNode.setBlockReward(new BigDecimal(chainNode.getBlockReward()).add(new BigDecimal(dbNode.getBlockReward())).toString());
+                            }else {
+                                chainNode.setProfitAmount(dbNode.getProfitAmount());
+                                chainNode.setRewardAmount(dbNode.getRewardAmount());
+                                chainNode.setBlockReward(dbNode.getBlockReward());
+
                             }
                         } else {
                             dbNode.setEndNumber(beginNumber);

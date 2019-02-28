@@ -25,22 +25,6 @@ public class FilterTool {
         return list;
     }
 
-    public static  List <NodeRanking> dateStatistics ( List <NodeRanking> list, BigInteger publicKey, String blockReward ) throws Exception {
-        for (NodeRanking nodeRanking : list) {
-            if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16))) {
-                BigDecimal sum = new BigDecimal(nodeRanking.getBlockReward());
-                BigDecimal reward = new BigDecimal(blockReward);
-                sum = sum.add(reward);
-                nodeRanking.setBlockReward(sum.toString());
-                BigDecimal rate = new BigDecimal(String.valueOf(1 - nodeRanking.getRewardRatio()));
-                nodeRanking.setRewardAmount(sum.multiply(rate).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
-                BigDecimal fee = new BigDecimal(String.valueOf(nodeRanking.getRewardRatio()));
-                nodeRanking.setProfitAmount(sum.multiply(fee).multiply(BigDecimal.valueOf(nodeRanking.getBlockCount())).toString());
-            }
-        }
-        return list;
-    }
-
     public static  String getBlockReward ( String number ) {
         //ATP trasnfrom ADP
         BigDecimal rate = BigDecimal.valueOf(10L).pow(18);

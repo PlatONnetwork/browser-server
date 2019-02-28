@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 当前激活的配置名称(请不要修改)
-profile: prod
+profile: prodtest
 # 服务器端口号
 port: 39030
 # MySQL数据库连接地址
@@ -26,6 +26,6 @@ loglevel:
   platon.job: error
   platon.filter: error
 # 区块分析线程池大小
-thread.num: 1
+thread.num: 200
 # 区块批量采集大小
 batch.num: ${thread.num}
