@@ -67,6 +67,8 @@ public class AccTransactionItem {
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
 
+        v = Convert.fromWei(deposit, Convert.Unit.ETHER);
+        this.setDeposit(new BigDecimal(EnergonUtil.format(v)));
         TxInfoResolver.resolve(txType,txInfo,value,this);
     }
 }
