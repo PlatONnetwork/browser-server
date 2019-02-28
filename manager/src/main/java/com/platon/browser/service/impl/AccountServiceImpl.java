@@ -1,12 +1,19 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
+import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.transaction.AccTransactionItem;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.service.*;
 import com.platon.browser.util.EnergonUtil;
@@ -39,6 +46,8 @@ public class AccountServiceImpl implements AccountService {
     private TicketService ticketService;
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
 
     @Override
@@ -53,11 +62,19 @@ public class AccountServiceImpl implements AccountService {
         }
 
         Set<String> nodeIds = new HashSet<>();
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress());
+        TransactionExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress());
+        condition.or(second);
+        Long transactionCount = transactionMapper.countByExample(condition);
+        returnData.setTradeCount(transactionCount.intValue());
 
         // 取已完成交易
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
-        returnData.setTradeCount(Long.valueOf(page.getTotal()).intValue());
         List<AccTransactionItem> data = new ArrayList<>();
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
@@ -94,6 +111,37 @@ public class AccountServiceImpl implements AccountService {
         });
         returnData.setTrades(data);
         return returnData;
+    }
+
+    @Override
+    public AccountDetail getAccountDetail (String address,String chainId) {
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(chainId)
+                .andFromEqualTo(address).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+        TransactionExample.Criteria second = condition.createCriteria()
+                .andChainIdEqualTo(chainId)
+                .andToEqualTo(address).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+        condition.or(second);
+        List<Transaction> voteTransactionList = transactionMapper.selectByExample(condition);
+        Set<String> nodeIdList = new HashSet <>();
+        long voteSum = 0L;
+        for(Transaction transaction : voteTransactionList){
+            voteSum = voteSum + Long.valueOf(transaction.getValue());
+            String txInfo = transaction.getTxInfo();
+            try{
+                TxInfo txInfoObject =  JSON.parseObject(txInfo, TxInfo.class);
+                TxInfo.Parameter parameter  = txInfoObject.getParameters();
+                if(parameter != null && StringUtils.isNotBlank(parameter.getNodeId())){
+                    nodeIdList.add(parameter.getNodeId());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        AccountDetail accountDetail = new AccountDetail();
+        accountDetail.setNodeCount(nodeIdList.size());
+        accountDetail.setVotePledge(String.valueOf(voteSum));
+        return accountDetail;
     }
 
 }

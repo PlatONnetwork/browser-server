@@ -6,6 +6,7 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDetail;
@@ -626,7 +627,7 @@ public class TransactionController {
         try{
             req.setPageSize(20);
             AddressDetail initData = accountService.getAddressDetail(req);
-            AccountDetail returnData = new AccountDetail();
+            AccountDetail returnData = accountService.getAccountDetail(req.getAddress(),req.getCid());
             returnData.init(initData);
             List<AccTransactionItem> transactions = initData.getTrades();
             if(transactions.size()>20){
