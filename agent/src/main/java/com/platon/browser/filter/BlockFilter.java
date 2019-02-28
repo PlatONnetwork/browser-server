@@ -93,8 +93,8 @@ public class BlockFilter {
                     } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                         campaignAmount=campaignAmount.add(BigInteger.ONE);
                     }
-                    bean.setBlockVoteAmount(voteAmount.longValue());
-                    bean.setBlockCampaignAmount(campaignAmount.longValue());
+                    bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
+                    bean.setBlockCampaignAmount(voteAmount != null ?campaignAmount.longValue() : new BigInteger("0").longValue());
                     bean.setActualTxCostSum(sum.toString());
                 }
             }
