@@ -115,7 +115,6 @@ public class BlockController  {
      *      "data": {
      *           "height": 19988,//块高
      *           "timestamp": 123123123879,//出块时间
-     *           "transaction": 1288,//块内交易总数
      *           "hash": "0x1238",//区块hash
      *           "parentHash": "0x234",//父区块hash
      *           "miner": "0x234", // 出块节点地址
@@ -128,8 +127,10 @@ public class BlockController  {
      *           "extraData": "xxx",//附加数据
      *           "first":false, // 是否第一条记录
      *           "last":true // 是否最后一条记录
-     *           "voteNumber":"",//选票数
-     *           "voteTransaction":""//投票交易数
+     *           "transaction": 1288,//块内交易总数
+     *           "blockVoteAmount":,//区块内投票交易个数
+*                "blockVoteNumber":,//区块中包含的选票张数
+*                "blockCampaignAmount"://区块内竞选交易个数
      *           }
      * }
      */
