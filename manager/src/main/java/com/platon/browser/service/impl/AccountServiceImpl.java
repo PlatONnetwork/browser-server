@@ -3,6 +3,7 @@ package com.platon.browser.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.Transaction;
@@ -12,6 +13,7 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.dto.ticket.VoteTicket;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AddressDetailReq;
@@ -22,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.utils.Convert;
@@ -31,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -49,6 +53,8 @@ public class AccountServiceImpl implements AccountService {
     private NodeService nodeService;
     @Autowired
     private TransactionMapper transactionMapper;
+    @Autowired
+    private PlatonClient platonClient;
 
 
     @Override
@@ -105,11 +111,39 @@ public class AccountServiceImpl implements AccountService {
             return 0;
         });
 
+        // 取节点名称 和 有效票数
+        TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
         Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
         data.forEach(el->{
             if(StringUtils.isBlank(el.getNodeId())) return;
             el.setNodeName(nodeIdToName.get(el.getNodeId()));
+
+            // 取有效票数
+            el.setValidVoteCount(0);
+            List<String> ticketIds = ticketContract.VoteTicketIds(Integer.valueOf(String.valueOf(el.getVoteCount())),el.getTxHash());
+            if(ticketIds.size()>0){
+                StringBuilder sb = new StringBuilder();
+                ticketIds.forEach(id->{
+                    sb.append(id).append(":");
+                });
+                String param = sb.toString();
+                param=param.substring(0,param.lastIndexOf(":"));
+                try {
+                    String detailStr = ticketContract.GetBatchTicketDetail(param).send();
+                    List <VoteTicket> details = JSON.parseArray(detailStr, VoteTicket.class);
+                    AtomicInteger validCount=new AtomicInteger(0);
+                    if(details.size()>0){
+                        details.forEach(voteTicket -> {
+                            if(voteTicket.getState()==1) validCount.incrementAndGet();
+                        });
+                        el.setValidVoteCount(validCount.intValue());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         });
+
         returnData.setTrades(data);
         return returnData;
     }
