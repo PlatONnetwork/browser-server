@@ -110,6 +110,8 @@ public class NodeServiceImpl implements NodeService {
             returnData.setTicketPrice(BigDecimal.ZERO);
             e.printStackTrace();
         }
+
+        // 取投票数
         try {
             String remain = ticketContract.GetPoolRemainder().send();
             if (StringUtils.isNotBlank(remain)){
