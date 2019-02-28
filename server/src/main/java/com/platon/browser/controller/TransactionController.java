@@ -6,7 +6,6 @@ import com.platon.browser.common.exception.BusinessException;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDetail;
@@ -612,7 +611,8 @@ public class TransactionController {
      *                "deposit":"",//质押金 (竞选交易此字段才有值)
      *                ---------以下字段只有txType=voteTicket有效----------
      *                "ticketPrice":"",//票价
-     *                "voteCount":"",//有效票/投票数
+     *                "voteCount":"",//投票数
+     *                "validVoteCount":33,//有效票
      *                "income":"",//收益
      *             }
      *          ]

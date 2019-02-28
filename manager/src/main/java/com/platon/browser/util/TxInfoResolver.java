@@ -15,7 +15,7 @@ public class TxInfoResolver {
     @Data
     private static class ResolveResult{
         String nodeId,nodeName;
-        Integer voteCount=0;
+        long voteCount=0;
         BigDecimal ticketPrice=BigDecimal.ZERO,deposit=BigDecimal.ZERO;
     }
     public static void resolve(String txType,String txInfo,String value,Object target){

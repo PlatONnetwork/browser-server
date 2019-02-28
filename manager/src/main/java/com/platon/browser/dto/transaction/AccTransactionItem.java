@@ -33,6 +33,7 @@ public class AccTransactionItem {
     private BigDecimal ticketPrice;
     private BigDecimal income;
     private long voteCount;
+    private long validVoteCount;
     private BigDecimal deposit;
     private String nodeId;
     private String nodeName;
