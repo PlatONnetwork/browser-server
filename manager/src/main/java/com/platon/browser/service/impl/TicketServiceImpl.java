@@ -243,12 +243,14 @@ public class TicketServiceImpl implements TicketService {
                 .andNodeIdEqualTo(nodeId);
         nodeRankingExample.setOrderByClause(" create_time desc ");
         List <NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
-        BigDecimal blockReward = BigDecimal.ZERO;
-        for (Block block : blocks) {
-            blockReward = blockReward.add(new BigDecimal(block.getBlockReward()));
+        if(nodeRankings.size() > 0 ){
+            BigDecimal blockReward = BigDecimal.ZERO;
+            for (Block block : blocks) {
+                blockReward = blockReward.add(new BigDecimal(block.getBlockReward()));
+            }
+            NodeRanking nodeRanking = nodeRankings.get(0);
+            income = income.add(new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward));
         }
-        NodeRanking nodeRanking = nodeRankings.get(0);
-        income = income.add(new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward));
         return income;
     }
 }

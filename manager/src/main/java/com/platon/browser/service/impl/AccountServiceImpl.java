@@ -28,6 +28,7 @@ import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -124,9 +125,9 @@ public class AccountServiceImpl implements AccountService {
         condition.or(second);
         List<Transaction> voteTransactionList = transactionMapper.selectByExample(condition);
         Set<String> nodeIdList = new HashSet <>();
-        long voteSum = 0L;
+        BigInteger voteSum = BigInteger.ZERO;
         for(Transaction transaction : voteTransactionList){
-            voteSum = voteSum + Long.valueOf(transaction.getValue());
+            voteSum = voteSum.add(new BigInteger(transaction.getValue()));
             String txInfo = transaction.getTxInfo();
             try{
                 TxInfo txInfoObject =  JSON.parseObject(txInfo, TxInfo.class);
