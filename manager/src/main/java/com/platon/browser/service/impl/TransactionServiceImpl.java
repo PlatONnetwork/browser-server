@@ -97,6 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
                 Block block = blocks.get(0);
                 if(StringUtils.isNotBlank(block.getNodeId())){
                     nodeId=block.getNodeId();
+                    returnData.setNodeId(nodeId);
                 }
             }
         }
