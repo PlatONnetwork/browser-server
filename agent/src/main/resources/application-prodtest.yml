@@ -1,4 +1,6 @@
 # ***************************开发配置**************************** #
+# 应用版本
+version: 0.5.0
 # 当前激活的配置名称(请不要修改)
 profile: prodtest
 # 服务器端口号
@@ -12,7 +14,7 @@ dbpass: Juzhenyuan_123
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
   #config: MAIN_NET-1-http://10.0.0.5:6792
-  config: MAIN_NET-1-http://54.252.202.130:6789
+  config: MAIN_NET-1-http://10.0.0.5:6789
   # 要采集哪个ID的链
   active: 1
 # Redis集群节点
