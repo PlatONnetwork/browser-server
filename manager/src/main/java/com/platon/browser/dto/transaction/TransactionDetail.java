@@ -35,7 +35,7 @@ public class TransactionDetail {
     private String nodeName;
     private String nodeId;
     private BigDecimal deposit;
-    private Integer voteCount;
+    private long voteCount;
     private BigDecimal ticketPrice;
     // 是否第一条
     private boolean first;
