@@ -1,13 +1,13 @@
 # ***************************通用配置**************************** #
 # 应用版本
-version: 0.5.0
+version: 0.4.2
 #服务器配置
 server:
   port: ${port}
   context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles.active: pordtest
+  profiles.active: test
   application.name: browser-server
   #国际化配置
   messages.basename: messages
