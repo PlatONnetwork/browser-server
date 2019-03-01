@@ -175,7 +175,8 @@ public class AccountServiceImpl implements AccountService {
         }
         AccountDetail accountDetail = new AccountDetail();
         accountDetail.setNodeCount(nodeIdList.size());
-        accountDetail.setVotePledge(String.valueOf(voteSum));
+        accountDetail.setVotePledge(Convert.fromWei(voteSum.toString(), Convert.Unit.ETHER).toString());
+
         return accountDetail;
     }
 

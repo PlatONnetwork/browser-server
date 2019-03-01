@@ -549,7 +549,7 @@ public class TransactionController {
     }*/
 
     /**
-     * @api {post} transaction/addressDetails g.查询地址详情
+     * @api {post}  g.查询地址详情
      * @apiVersion 1.0.0
      * @apiName addressDetails
      * @apiGroup transaction
