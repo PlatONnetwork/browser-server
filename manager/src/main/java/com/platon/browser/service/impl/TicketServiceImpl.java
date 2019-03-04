@@ -85,6 +85,7 @@ public class TicketServiceImpl implements TicketService {
                     BeanUtils.copyProperties(detail, ticket);
                     ticket.setTxHash(transaction.getHash());
                     ticket.setState(detail.getState().intValue());
+                    if(!ticket.getCandidateId().startsWith("0x")) ticket.setCandidateId("0x"+ticket.getCandidateId());
                     blockNumbers.add(ticket.getBlockNumber());
                     if (ticket.getRblockNumber() != null) blockNumbers.add(ticket.getRblockNumber());
                     data.add(ticket);
