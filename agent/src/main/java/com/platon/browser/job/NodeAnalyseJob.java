@@ -92,9 +92,7 @@ public class NodeAnalyseJob {
                 logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
-                //String verifiers = candidateContract.VerifiersList(BigInteger.valueOf(maxNubmer)).send();
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
-                //List <CandidateDto> verifiernode = JSON.parseArray(verifiers, CandidateDto.class);
                 logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
                 List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if (null == nodeInfo) return;
