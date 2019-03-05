@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=test")
+@SpringBootTest(classes= ServerApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
     @Autowired
     protected NodeRankingMapper nodeRankingMapper;
