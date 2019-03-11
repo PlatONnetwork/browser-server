@@ -15,6 +15,7 @@ import com.platon.browser.dto.ticket.VoteTicket;
 import com.platon.browser.enums.TicketStatusEnum;
 import com.platon.browser.req.ticket.TicketListReq;
 import com.platon.browser.service.TicketService;
+import com.platon.browser.util.EnergonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.util.*;
+
+import static org.web3j.utils.Convert.Unit.ETHER;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -91,6 +94,9 @@ public class TicketServiceImpl implements TicketService {
                     data.add(ticket);
                 });
 
+
+                Map<String,BigDecimal> ticketIncomeMap = getTicketIncome(req.getCid(),ticketIds);
+
                 if(blockNumbers.size()>0){
                     /**
                      * 关于预计过期时间和实际过期时间
@@ -128,7 +134,13 @@ public class TicketServiceImpl implements TicketService {
                                 ticket.setActualExpireTime(ticket.getEstimateExpireTime());
                                 break;
                         }
-                        ticket.setIncome(Convert.fromWei(getTicketIncome(ticket.getTicketId(),req.getCid()), Convert.Unit.ETHER));
+
+                        ticket.setIncome(BigDecimal.ZERO);
+                        BigDecimal incomeInWei = ticketIncomeMap.get(ticket.getTicketId());
+                        if(incomeInWei!=null){
+                            BigDecimal income= Convert.fromWei(incomeInWei, ETHER);
+                            ticket.setIncome(new BigDecimal(EnergonUtil.format(income)));
+                        }
                     });
                 }
 
@@ -144,114 +156,64 @@ public class TicketServiceImpl implements TicketService {
         return returnData;
     }
 
+    /**
+     * 计算投票收益
+     * 找出票对应的所有区块，将区块按票ID分组，将每一组的每个块的（区块奖励x分红比例）累加，得出每张票的收益
+     */
     @Override
-    public BigDecimal getTicketIncome ( String ticketId, String chainId ) {
-        BigDecimal income = BigDecimal.ZERO;
-        if (StringUtils.isBlank(ticketId)) {
-            return BigDecimal.ZERO;
-        }
-        if (StringUtils.isBlank(chainId)) {
-            return BigDecimal.ZERO;
-        }
-        TicketContract ticketContract = platon.getTicketContract(chainId);
-        try {
-            String ticketInfo = ticketContract.GetTicketDetail(ticketId).send();
-            if (StringUtils.isNotBlank(ticketInfo)) {
-                VoteTicket voteTicket = JSON.parseObject(ticketInfo, VoteTicket.class);
-                if (!org.springframework.util.StringUtils.isEmpty(voteTicket)) {
-                    income = calculateIncome(voteTicket.getBlockNumber(), chainId, voteTicket.getCandidateId());
-                }
+    public Map<String,BigDecimal> getTicketIncome(String chainId, List<String> ticketIds) {
+        BlockExample blockExample=new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(chainId)
+                .andTicketIdIn(ticketIds);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        // 对区块按票ID分组
+        Map<String,Set<Block>> ticketIdToBlocks = new HashMap<>();
+        blocks.forEach(block -> {
+            Set<Block> set=ticketIdToBlocks.get(block.getTicketId());
+            if(set==null) {
+                set=new HashSet<>();
+                ticketIdToBlocks.put(block.getTicketId(),set);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return income;
+            set.add(block);
+        });
+        Map<String,BigDecimal> ticketIncomeMap = new HashMap<>();
+        ticketIdToBlocks.forEach((ticketId,blockSet)->{
+            // 统一设置默认值BigDecimal.ZERO
+            ticketIncomeMap.put(ticketId,BigDecimal.ZERO);
+            blockSet.forEach(block -> {
+                String blockRewardStr=block.getBlockReward();
+                if(StringUtils.isBlank(blockRewardStr)) return;
+                try{
+                    BigDecimal blockReward = new BigDecimal(blockRewardStr);
+                    Double nodeRewardRatio = block.getRewardRatio();
+                    if(nodeRewardRatio==null) nodeRewardRatio=0d;
+                    Double ticketRewardRatio = 1-nodeRewardRatio;
+                    BigDecimal ticketReward=blockReward.multiply(BigDecimal.valueOf(ticketRewardRatio));
+                    BigDecimal rewardSum = ticketIncomeMap.get(ticketId);
+                    rewardSum = rewardSum.add(ticketReward);
+                    ticketIncomeMap.put(ticketId,rewardSum);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            });
+        });
+        return ticketIncomeMap;
     }
 
     @Override
-    public BigDecimal getTicketIncomeSum ( String txHash, String chainId ) {
+    public Map<String,BigDecimal> getTicketIncome ( String chainId, String txHash ) {
+        Map<String,BigDecimal> incomeMap = new HashMap<>();
         Transaction transaction = transactionMapper.selectByPrimaryKey(txHash);
-        Map <String, VoteTicket> voteTicketMap = new HashMap <>();
         TxInfo txInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter parameter = txInfo.getParameters();
-        BigDecimal income = new BigDecimal("0");
         if (parameter != null) {
             if (parameter.getCount() != null) {
                 TicketContract ticketContract = platon.getTicketContract(chainId);
                 List <String> ticketIds = ticketContract.VoteTicketIds(parameter.getCount(), txHash);
-                StringBuilder sb = new StringBuilder();
-                String tail = ticketIds.get(ticketIds.size() - 1);
-                ticketIds.forEach(id -> {
-                    sb.append(id);
-                    if (!tail.equals(id)) sb.append(":");
-                });
-                try {
-                    String str = ticketContract.GetBatchTicketDetail(sb.toString()).send();
-                    List <VoteTicket> details = JSON.parseArray(str, VoteTicket.class);
-                    details.forEach(voteTicket -> {
-                        if (voteTicket.getState() == 2)
-                            voteTicketMap.put(voteTicket.getTicketId(), voteTicket);
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                //map为空说明该交易中没有幸运票
-                if (null == voteTicketMap || voteTicketMap.size() < 1) {
-                    return income;
-                } else {
-                    //循环获取，分别求出收益
-                    for (String ignored : ticketIds) {
-                        VoteTicket voteTicket = voteTicketMap.get(ignored);
-                        if (!org.springframework.util.StringUtils.isEmpty(voteTicket)) {
-                            income = calculateIncome(voteTicket.getBlockNumber(), chainId, voteTicket.getCandidateId());
-                        }
-                    }
-                }
+                incomeMap=getTicketIncome(chainId,ticketIds);
             }
         }
-        return income;
+        return incomeMap;
     }
 
-    private BigDecimal calculateIncome ( Long blockNumber, String chainId, String nodeId ) {
-
-        /**
-         * 计算幸运票收益，三个要素：
-         * 1.所投票节点所在周期出块个数
-         * 2.节点对投票用户的分红比例
-         * 3.每个区块的奖励，由于奖励是由算法决定的，不同周期会发生改变
-         *  幸运票收益 = 周期内节点出块的个数 * 每个区块的奖励 * 节点的分红比例
-         */
-        BigDecimal income = new BigDecimal("0");
-        double wheel = Math.floor(blockNumber / 250);
-        BlockExample blockExample = new BlockExample();
-        Long endNumber = 0L;
-        Long beginNumber = 0L;
-        if (wheel == 0.0) {
-            endNumber = 250L;
-            beginNumber = 1L;
-        } else {
-            endNumber = (long) wheel * 250;
-            beginNumber = endNumber - 250;
-        }
-        blockExample.createCriteria()
-                .andNumberBetween(beginNumber, endNumber)
-                .andNodeIdEqualTo(nodeId)
-                .andChainIdEqualTo(chainId);
-        List <Block> blocks = blockMapper.selectByExample(blockExample);
-        NodeRankingExample nodeRankingExample = new NodeRankingExample();
-        nodeRankingExample.createCriteria()
-                .andChainIdEqualTo(chainId)
-                .andNodeIdEqualTo(nodeId);
-        nodeRankingExample.setOrderByClause(" create_time desc ");
-        List <NodeRanking> nodeRankings = nodeRankingMapper.selectByExample(nodeRankingExample);
-        if(nodeRankings.size() > 0 ){
-            BigDecimal blockReward = BigDecimal.ZERO;
-            for (Block block : blocks) {
-                blockReward = blockReward.add(new BigDecimal(block.getBlockReward()));
-            }
-            NodeRanking nodeRanking = nodeRankings.get(0);
-            income = income.add(new BigDecimal(1 - nodeRanking.getRewardRatio()).multiply(blockReward));
-        }
-        return income;
-    }
 }

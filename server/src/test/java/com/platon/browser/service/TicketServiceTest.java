@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 public class TicketServiceTest extends ServiceTestBase {
@@ -45,7 +46,7 @@ public class TicketServiceTest extends ServiceTestBase {
     @Test
     public void getIncomeTicket() throws Exception{
         String txHash = "0x3394160ff6a99e3cf2eb00df8f979ae6e9b05e3fcea7ca404e0e9828abde0c75";
-        BigDecimal res = ticketService.getTicketIncome(txHash,"1");
+        Map<String,BigDecimal> res = ticketService.getTicketIncome("1",txHash);
         logger.error("{}",res);
     }
 }
