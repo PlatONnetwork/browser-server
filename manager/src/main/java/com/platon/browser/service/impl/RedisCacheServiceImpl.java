@@ -96,7 +96,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             NODEID_TO_FAKE_NODES.clear();
             nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Fake Location Config not found: {}",e.getMessage());
+            //e.printStackTrace();
         }
     }
 
