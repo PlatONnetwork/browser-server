@@ -4,7 +4,7 @@ version: 0.6.0
 # 当前激活的配置名称(请不要修改)
 profile: test
 # 服务器端口号
-port: 9042
+port: 9060
 # MySQL数据库连接地址
 dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_test?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
