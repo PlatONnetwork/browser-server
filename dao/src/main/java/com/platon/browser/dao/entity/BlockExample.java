@@ -1554,6 +1554,136 @@ public class BlockExample {
             addCriterion("node_id not between", value1, value2, "nodeId");
             return (Criteria) this;
         }
+
+        public Criteria andTicketIdIsNull() {
+            addCriterion("ticket_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdIsNotNull() {
+            addCriterion("ticket_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdEqualTo(String value) {
+            addCriterion("ticket_id =", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdNotEqualTo(String value) {
+            addCriterion("ticket_id <>", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdGreaterThan(String value) {
+            addCriterion("ticket_id >", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ticket_id >=", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdLessThan(String value) {
+            addCriterion("ticket_id <", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdLessThanOrEqualTo(String value) {
+            addCriterion("ticket_id <=", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdLike(String value) {
+            addCriterion("ticket_id like", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdNotLike(String value) {
+            addCriterion("ticket_id not like", value, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdIn(List<String> values) {
+            addCriterion("ticket_id in", values, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdNotIn(List<String> values) {
+            addCriterion("ticket_id not in", values, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdBetween(String value1, String value2) {
+            addCriterion("ticket_id between", value1, value2, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTicketIdNotBetween(String value1, String value2) {
+            addCriterion("ticket_id not between", value1, value2, "ticketId");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioIsNull() {
+            addCriterion("reward_ratio is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioIsNotNull() {
+            addCriterion("reward_ratio is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioEqualTo(Double value) {
+            addCriterion("reward_ratio =", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotEqualTo(Double value) {
+            addCriterion("reward_ratio <>", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioGreaterThan(Double value) {
+            addCriterion("reward_ratio >", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioGreaterThanOrEqualTo(Double value) {
+            addCriterion("reward_ratio >=", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioLessThan(Double value) {
+            addCriterion("reward_ratio <", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioLessThanOrEqualTo(Double value) {
+            addCriterion("reward_ratio <=", value, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioIn(List<Double> values) {
+            addCriterion("reward_ratio in", values, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotIn(List<Double> values) {
+            addCriterion("reward_ratio not in", values, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioBetween(Double value1, Double value2) {
+            addCriterion("reward_ratio between", value1, value2, "rewardRatio");
+            return (Criteria) this;
+        }
+
+        public Criteria andRewardRatioNotBetween(Double value1, Double value2) {
+            addCriterion("reward_ratio not between", value1, value2, "rewardRatio");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

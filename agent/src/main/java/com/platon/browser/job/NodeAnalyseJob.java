@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.common.dto.Candidate;
 import com.platon.browser.common.dto.StatisticsCache;
 import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
@@ -93,10 +94,16 @@ public class NodeAnalyseJob {
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
                 String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
+                List<String> candidateStrArr = JSON.parseArray(nodeInfo,String.class);
+                // 候选
+                List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
+                // 备选
+                List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);
+                nodes.addAll(alternates);
                 logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
-                List <CandidateDto> nodes = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if (null == nodeInfo) return;
                 if (null == nodes && nodes.size() < 0) return;
+
                 nodeRankingExample = new NodeRankingExample();
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.common.dto.AnalysisResult;
+import com.platon.browser.common.dto.agent.CandidateDto;
 import com.platon.browser.common.util.CalculatePublicKey;
 import com.platon.browser.common.util.TransactionAnalysis;
 import com.platon.browser.dao.entity.Block;
@@ -16,10 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -59,6 +62,17 @@ public class BlockFilter {
             // 设置节点名称
             String nodeName = NODEID_TO_NAME.get(bean.getNodeId());
             bean.setNodeName(nodeName);
+
+            //设置在当前区块高度中的节点分红比例
+            try {
+                CandidateContract candidateContract = platon.getCandidateContract(chainId);
+                String nodeInfo = candidateContract.CandidateDetails(bean.getNodeId(),new BigInteger(String.valueOf(bean.getNumber()))).send();
+                CandidateDto candidateDto = JSON.parseObject(nodeInfo,CandidateDto.class);
+                bean.setRewardRatio(BigDecimal.valueOf(candidateDto.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
+            }catch (Exception e){
+                bean.setRewardRatio(0.0);
+            }
+
 
             if (param.transactions.isEmpty() && param.transactionReceipts.isEmpty()) {
                 // 如果交易及

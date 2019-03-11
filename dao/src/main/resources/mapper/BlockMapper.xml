@@ -24,6 +24,8 @@
     <result column="block_campaign_amount" jdbcType="BIGINT" property="blockCampaignAmount" />
     <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="ticket_id" jdbcType="VARCHAR" property="ticketId" />
+    <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -87,7 +89,7 @@
     hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
     energon_limit, energon_average, transaction_number, `timestamp`, block_reward, create_time, 
     update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, block_campaign_amount, 
-    node_name, node_id
+    node_name, node_id, ticket_id, reward_ratio
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -129,7 +131,8 @@
       `timestamp`, block_reward, create_time, 
       update_time, actual_tx_cost_sum, block_vote_amount, 
       block_vote_number, block_campaign_amount, node_name, 
-      node_id)
+      node_id, ticket_id, reward_ratio
+      )
     values (#{hash,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, 
       #{parentHash,jdbcType=VARCHAR}, #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, 
       #{extraData,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, 
@@ -137,7 +140,8 @@
       #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR}, #{blockVoteAmount,jdbcType=BIGINT}, 
       #{blockVoteNumber,jdbcType=BIGINT}, #{blockCampaignAmount,jdbcType=BIGINT}, #{nodeName,jdbcType=VARCHAR}, 
-      #{nodeId,jdbcType=VARCHAR})
+      #{nodeId,jdbcType=VARCHAR}, #{ticketId,jdbcType=VARCHAR}, #{rewardRatio,jdbcType=DOUBLE}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
     insert into block
@@ -208,6 +212,12 @@
       <if test="nodeId != null">
         node_id,
       </if>
+      <if test="ticketId != null">
+        ticket_id,
+      </if>
+      <if test="rewardRatio != null">
+        reward_ratio,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -275,6 +285,12 @@
       </if>
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="ticketId != null">
+        #{ticketId,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardRatio != null">
+        #{rewardRatio,jdbcType=DOUBLE},
       </if>
     </trim>
   </insert>
@@ -353,6 +369,12 @@
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
+      <if test="record.ticketId != null">
+        ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rewardRatio != null">
+        reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -381,7 +403,9 @@
       block_vote_number = #{record.blockVoteNumber,jdbcType=BIGINT},
       block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT},
       node_name = #{record.nodeName,jdbcType=VARCHAR},
-      node_id = #{record.nodeId,jdbcType=VARCHAR}
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -449,6 +473,12 @@
       <if test="nodeId != null">
         node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
+      <if test="ticketId != null">
+        ticket_id = #{ticketId,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardRatio != null">
+        reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
       and chain_id = #{chainId,jdbcType=VARCHAR}
@@ -474,7 +504,9 @@
       block_vote_number = #{blockVoteNumber,jdbcType=BIGINT},
       block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT},
       node_name = #{nodeName,jdbcType=VARCHAR},
-      node_id = #{nodeId,jdbcType=VARCHAR}
+      node_id = #{nodeId,jdbcType=VARCHAR},
+      ticket_id = #{ticketId,jdbcType=VARCHAR},
+      reward_ratio = #{rewardRatio,jdbcType=DOUBLE}
     where hash = #{hash,jdbcType=VARCHAR}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
@@ -488,7 +520,7 @@
     (hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
       energon_limit, energon_average, transaction_number, `timestamp`, block_reward, 
       create_time, update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, 
-      block_campaign_amount, node_name, node_id)
+      block_campaign_amount, node_name, node_id, ticket_id, reward_ratio)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, 
@@ -499,7 +531,8 @@
         #{item.blockReward,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
         #{item.actualTxCostSum,jdbcType=VARCHAR}, #{item.blockVoteAmount,jdbcType=BIGINT}, 
         #{item.blockVoteNumber,jdbcType=BIGINT}, #{item.blockCampaignAmount,jdbcType=BIGINT}, 
-        #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR})
+        #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ticketId,jdbcType=VARCHAR}, 
+        #{item.rewardRatio,jdbcType=DOUBLE})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -583,9 +616,16 @@
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
         </if>
+        <if test="'ticket_id'.toString() == column.value">
+          #{item.ticketId,jdbcType=VARCHAR}
+        </if>
+        <if test="'reward_ratio'.toString() == column.value">
+          #{item.rewardRatio,jdbcType=DOUBLE}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 
 </mapper>
