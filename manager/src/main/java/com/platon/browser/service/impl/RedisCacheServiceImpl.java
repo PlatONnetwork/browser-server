@@ -92,6 +92,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             BufferedReader br = new BufferedReader(new FileReader(path));
             StringBuilder sb = new StringBuilder();
             br.lines().forEach(line->sb.append(line));
+            logger.info("Loading Fake Location Config: {}",sb.toString());
             List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
             NODEID_TO_FAKE_NODES.clear();
             nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
