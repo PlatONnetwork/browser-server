@@ -1,10 +1,8 @@
 # ***************************开发配置**************************** #
 # 应用版本
-version: 0.6.0
+version: 0.6.1
 # 当前激活的配置名称(请不要修改)
 profile: prod
-# 服务器端口号
-port: 39030
 # MySQL数据库连接地址
 dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
