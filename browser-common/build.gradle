@@ -1,0 +1,4 @@
+dependencies {
+    implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisSpringbootStarterVersion"
+    compile "com.github.pagehelper:pagehelper-spring-boot-starter:$pagehelperSpringbootStarterVersion"
+}

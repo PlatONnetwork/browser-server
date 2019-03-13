@@ -1,0 +1,12 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+	}
+}
+rootProject.name = 'browser-server'
+include 'browser-agent'
+include 'browser-api'
+include 'browser-common'
+include 'browser-generator'
+include 'browser-service'
+

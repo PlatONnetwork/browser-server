@@ -1,0 +1,32 @@
+group = 'com.platon.browser'
+version = "${projectVersion}"
+subprojects {
+    // 设置编译器使用的编码
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    apply plugin: 'java'
+    
+    group 'com.platon.browser'
+    version "${projectVersion}"
+    sourceCompatibility = '1.8'
+    
+    repositories {
+        maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        maven {url "https://oss.sonatype.org/content/repositories/releases/"}
+        maven {url "http://192.168.9.39:8081/repository/maven-public/"}
+        maven {url "http://192.168.9.39:8081/repository/maven-snapshots/"}
+        maven {url "http://192.168.9.39:8081/repository/maven-releases/"}
+        maven {url "http://192.168.10.40:8081/nexus/content/groups/public/"}
+        mavenCentral()
+    }
+    
+    dependencies {
+        testCompile "junit:junit:$junitVersion"
+        compile "com.alibaba:fastjson:$fastJsonVersion"
+        compile "org.apache.commons:commons-lang3:$commonLang3Version"
+        compile "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    }
+}

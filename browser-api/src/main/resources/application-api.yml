@@ -1,0 +1,21 @@
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.6.2
+# 当前激活的配置名称(请不要修改)
+profile: api
+# 服务器端口号
+port: 8042
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${prifile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dbuser: platon
+dbpass: platon
+# Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+chain.config: MAIN_NET-1-http://192.168.9.76:8793
+# Redis集群节点
+redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+# 日志文件存储文件
+logpath: ./logs/browser-server-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: debug
+  platon: debug
