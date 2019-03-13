@@ -16,7 +16,7 @@ chain.config: MAIN_NET-1-http://54.252.202.130:6789
 # Redis集群节点
 redis: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
 # 日志文件存储文件
-logpath: /data/logs/browser-server-${version}-${profile}.log
+logpath: /data/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: error

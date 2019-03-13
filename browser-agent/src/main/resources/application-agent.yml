@@ -17,7 +17,7 @@ chain:
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: ./logs/browser-agent-${version}-${profile}.log
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: debug
