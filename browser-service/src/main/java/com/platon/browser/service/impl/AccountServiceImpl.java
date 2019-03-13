@@ -47,8 +47,8 @@ public class AccountServiceImpl implements AccountService {
     private PendingTxService pendingTxService;
     @Autowired
     private ChainsConfig chainsConfig;
-    @Autowired
-    private TicketService ticketService;
+    /*@Autowired
+    private TicketService ticketService;*/
     @Autowired
     private NodeService nodeService;
     @Autowired
@@ -90,14 +90,14 @@ public class AccountServiceImpl implements AccountService {
 
             // 交易默认收益为0
             bean.setIncome(BigDecimal.ZERO);
-            if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(initData.getTxType())){
+            /*if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(initData.getTxType())){
                 // 如果是投票交易，则计算投票收益
                 Map<String,BigDecimal> incomeMap=ticketService.getTicketIncome(req.getCid(),initData.getHash());
                 // 累加每张票的收益
                 incomeMap.forEach((ticket,income)->bean.setIncome(bean.getIncome().add(income)));
                 // 把收益单位转换为ETH
                 bean.setIncome(Convert.fromWei(bean.getIncome(), Convert.Unit.ETHER));
-            }
+            }*/
             data.add(bean);
         });
 

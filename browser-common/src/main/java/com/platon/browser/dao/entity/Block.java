@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Block extends BlockKey {
-    private Long number;
-
     private String parentHash;
 
     private String nonce;
@@ -45,17 +43,9 @@ public class Block extends BlockKey {
 
     private String nodeId;
 
-    private String ticketId;
+    private String voteHash;
 
     private Double rewardRatio;
-
-    public Long getNumber() {
-        return number;
-    }
-
-    public void setNumber(Long number) {
-        this.number = number;
-    }
 
     public String getParentHash() {
         return parentHash;
@@ -209,12 +199,12 @@ public class Block extends BlockKey {
         this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getTicketId() {
-        return ticketId;
+    public String getVoteHash() {
+        return voteHash;
     }
 
-    public void setTicketId(String ticketId) {
-        this.ticketId = ticketId == null ? null : ticketId.trim();
+    public void setVoteHash(String voteHash) {
+        this.voteHash = voteHash == null ? null : voteHash.trim();
     }
 
     public Double getRewardRatio() {
@@ -234,8 +224,8 @@ public class Block extends BlockKey {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        chainId("chain_id", "chainId", "VARCHAR", false),
         number("number", "number", "BIGINT", true),
+        chainId("chain_id", "chainId", "VARCHAR", false),
         parentHash("parent_hash", "parentHash", "VARCHAR", false),
         nonce("nonce", "nonce", "VARCHAR", false),
         miner("miner", "miner", "VARCHAR", false),
@@ -255,7 +245,7 @@ public class Block extends BlockKey {
         blockCampaignAmount("block_campaign_amount", "blockCampaignAmount", "BIGINT", false),
         nodeName("node_name", "nodeName", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
-        ticketId("ticket_id", "ticketId", "VARCHAR", false),
+        voteHash("vote_hash", "voteHash", "VARCHAR", false),
         rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false);
 
         /**

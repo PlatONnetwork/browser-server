@@ -43,8 +43,8 @@ public class TestBase extends TestData {
     @Autowired
     protected PendingTxService pendingTxService;
 
-    @Autowired
-    protected TicketService ticketService;
+    /*@Autowired
+    protected TicketService ticketService;*/
 
     @Autowired
     protected PlatonClient platon;

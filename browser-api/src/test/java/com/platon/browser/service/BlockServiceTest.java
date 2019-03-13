@@ -4,10 +4,12 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.dto.ticket.Ticket;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.req.block.*;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockDownloadReq;
+import com.platon.browser.req.block.BlockPageReq;
+import com.platon.browser.req.block.BlockTransactionPageReq;
 import com.platon.browser.util.DataTool;
 import org.junit.Assert;
 import org.junit.Test;
@@ -73,7 +75,7 @@ public class BlockServiceTest extends ServiceTestBase {
             Assert.assertTrue(result.getData().size()>=0);
         });
     }
-
+/*
     @Test
     public void getBlockTicketList(){
         chainsConfig.getChainIds().forEach(chainId -> {
@@ -83,5 +85,5 @@ public class BlockServiceTest extends ServiceTestBase {
             RespPage<Ticket> result = blockService.getBlockTicketList(req);
             Assert.assertTrue(result.getData().size()>=0);
         });
-    }
+    }*/
 }

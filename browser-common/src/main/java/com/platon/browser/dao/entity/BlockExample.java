@@ -175,6 +175,66 @@ public class BlockExample {
             return (Criteria) this;
         }
 
+        public Criteria andNumberIsNull() {
+            addCriterion("`number` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberIsNotNull() {
+            addCriterion("`number` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberEqualTo(Long value) {
+            addCriterion("`number` =", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotEqualTo(Long value) {
+            addCriterion("`number` <>", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberGreaterThan(Long value) {
+            addCriterion("`number` >", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("`number` >=", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberLessThan(Long value) {
+            addCriterion("`number` <", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberLessThanOrEqualTo(Long value) {
+            addCriterion("`number` <=", value, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberIn(List<Long> values) {
+            addCriterion("`number` in", values, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotIn(List<Long> values) {
+            addCriterion("`number` not in", values, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberBetween(Long value1, Long value2) {
+            addCriterion("`number` between", value1, value2, "number");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberNotBetween(Long value1, Long value2) {
+            addCriterion("`number` not between", value1, value2, "number");
+            return (Criteria) this;
+        }
+
         public Criteria andChainIdIsNull() {
             addCriterion("chain_id is null");
             return (Criteria) this;
@@ -242,66 +302,6 @@ public class BlockExample {
 
         public Criteria andChainIdNotBetween(String value1, String value2) {
             addCriterion("chain_id not between", value1, value2, "chainId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberIsNull() {
-            addCriterion("`number` is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberIsNotNull() {
-            addCriterion("`number` is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberEqualTo(Long value) {
-            addCriterion("`number` =", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberNotEqualTo(Long value) {
-            addCriterion("`number` <>", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberGreaterThan(Long value) {
-            addCriterion("`number` >", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberGreaterThanOrEqualTo(Long value) {
-            addCriterion("`number` >=", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberLessThan(Long value) {
-            addCriterion("`number` <", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberLessThanOrEqualTo(Long value) {
-            addCriterion("`number` <=", value, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberIn(List<Long> values) {
-            addCriterion("`number` in", values, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberNotIn(List<Long> values) {
-            addCriterion("`number` not in", values, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberBetween(Long value1, Long value2) {
-            addCriterion("`number` between", value1, value2, "number");
-            return (Criteria) this;
-        }
-
-        public Criteria andNumberNotBetween(Long value1, Long value2) {
-            addCriterion("`number` not between", value1, value2, "number");
             return (Criteria) this;
         }
 
@@ -1555,73 +1555,73 @@ public class BlockExample {
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdIsNull() {
-            addCriterion("ticket_id is null");
+        public Criteria andVoteHashIsNull() {
+            addCriterion("vote_hash is null");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdIsNotNull() {
-            addCriterion("ticket_id is not null");
+        public Criteria andVoteHashIsNotNull() {
+            addCriterion("vote_hash is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdEqualTo(String value) {
-            addCriterion("ticket_id =", value, "ticketId");
+        public Criteria andVoteHashEqualTo(String value) {
+            addCriterion("vote_hash =", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdNotEqualTo(String value) {
-            addCriterion("ticket_id <>", value, "ticketId");
+        public Criteria andVoteHashNotEqualTo(String value) {
+            addCriterion("vote_hash <>", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdGreaterThan(String value) {
-            addCriterion("ticket_id >", value, "ticketId");
+        public Criteria andVoteHashGreaterThan(String value) {
+            addCriterion("vote_hash >", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdGreaterThanOrEqualTo(String value) {
-            addCriterion("ticket_id >=", value, "ticketId");
+        public Criteria andVoteHashGreaterThanOrEqualTo(String value) {
+            addCriterion("vote_hash >=", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdLessThan(String value) {
-            addCriterion("ticket_id <", value, "ticketId");
+        public Criteria andVoteHashLessThan(String value) {
+            addCriterion("vote_hash <", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdLessThanOrEqualTo(String value) {
-            addCriterion("ticket_id <=", value, "ticketId");
+        public Criteria andVoteHashLessThanOrEqualTo(String value) {
+            addCriterion("vote_hash <=", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdLike(String value) {
-            addCriterion("ticket_id like", value, "ticketId");
+        public Criteria andVoteHashLike(String value) {
+            addCriterion("vote_hash like", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdNotLike(String value) {
-            addCriterion("ticket_id not like", value, "ticketId");
+        public Criteria andVoteHashNotLike(String value) {
+            addCriterion("vote_hash not like", value, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdIn(List<String> values) {
-            addCriterion("ticket_id in", values, "ticketId");
+        public Criteria andVoteHashIn(List<String> values) {
+            addCriterion("vote_hash in", values, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdNotIn(List<String> values) {
-            addCriterion("ticket_id not in", values, "ticketId");
+        public Criteria andVoteHashNotIn(List<String> values) {
+            addCriterion("vote_hash not in", values, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdBetween(String value1, String value2) {
-            addCriterion("ticket_id between", value1, value2, "ticketId");
+        public Criteria andVoteHashBetween(String value1, String value2) {
+            addCriterion("vote_hash between", value1, value2, "voteHash");
             return (Criteria) this;
         }
 
-        public Criteria andTicketIdNotBetween(String value1, String value2) {
-            addCriterion("ticket_id not between", value1, value2, "ticketId");
+        public Criteria andVoteHashNotBetween(String value1, String value2) {
+            addCriterion("vote_hash not between", value1, value2, "voteHash");
             return (Criteria) this;
         }
 

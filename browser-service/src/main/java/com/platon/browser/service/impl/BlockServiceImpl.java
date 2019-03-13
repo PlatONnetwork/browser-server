@@ -22,7 +22,6 @@ import com.platon.browser.req.block.*;
 import com.platon.browser.req.ticket.TicketListReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.service.TicketService;
 import com.platon.browser.util.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -52,8 +51,8 @@ public class BlockServiceImpl implements BlockService {
 
     @Autowired
     private RedisCacheService redisCacheService;
-    @Autowired
-    private TicketService ticketService;
+   /* @Autowired
+    private TicketService ticketService;*/
 
     @Override
     public RespPage<BlockListItem> getPage(BlockPageReq req) {
@@ -228,7 +227,7 @@ public class BlockServiceImpl implements BlockService {
         return returnData;
     }
 
-    @Override
+    /*@Override
     public RespPage<Ticket> getBlockTicketList(BlockTicketPageReq req) {
         BlockTransactionPageReq transactionPageReq = new BlockTransactionPageReq();
         BeanUtils.copyProperties(req,transactionPageReq);
@@ -248,7 +247,7 @@ public class BlockServiceImpl implements BlockService {
         RespPage<Ticket> returnData = new RespPage<>();
         returnData.init(page,tickets);
         return returnData;
-    }
+    }*/
 
 
 }

@@ -6,6 +6,8 @@ import java.util.Arrays;
 public class BlockKey {
     private String hash;
 
+    private Long number;
+
     private String chainId;
 
     public String getHash() {
@@ -14,6 +16,14 @@ public class BlockKey {
 
     public void setHash(String hash) {
         this.hash = hash == null ? null : hash.trim();
+    }
+
+    public Long getNumber() {
+        return number;
+    }
+
+    public void setNumber(Long number) {
+        this.number = number;
     }
 
     public String getChainId() {
@@ -33,8 +43,8 @@ public class BlockKey {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        chainId("chain_id", "chainId", "VARCHAR", false),
         number("number", "number", "BIGINT", true),
+        chainId("chain_id", "chainId", "VARCHAR", false),
         parentHash("parent_hash", "parentHash", "VARCHAR", false),
         nonce("nonce", "nonce", "VARCHAR", false),
         miner("miner", "miner", "VARCHAR", false),
@@ -54,7 +64,7 @@ public class BlockKey {
         blockCampaignAmount("block_campaign_amount", "blockCampaignAmount", "BIGINT", false),
         nodeName("node_name", "nodeName", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
-        ticketId("ticket_id", "ticketId", "VARCHAR", false),
+        voteHash("vote_hash", "voteHash", "VARCHAR", false),
         rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false);
 
         /**

@@ -53,17 +53,17 @@ public class FilterTool {
         return  conversionCoin.toString();
     }
 
-    public static String ticketIdAnalysis(String exetraDate){
+    public static String voteHashAnalysis(String exetraDate){
         if(StringUtils.isNotBlank(exetraDate)){
             byte[] exetraByte = Hex.decode(exetraDate.replace("0x",""));
-            byte[] ticketIdByte = new byte[]{};
-            ticketIdByte = Arrays.copyOfRange(exetraByte,97,exetraByte.length);
+            byte[] voteHashdByte = new byte[]{};
+            voteHashdByte = Arrays.copyOfRange(exetraByte,97,exetraByte.length);
             StringBuilder stringBuilder = new StringBuilder("");
-            if (ticketIdByte == null || ticketIdByte.length <= 0) {
+            if (voteHashdByte == null || voteHashdByte.length <= 0) {
                 return " ";
             }
-            for (int i = 0; i < ticketIdByte.length; i++) {
-                int v = ticketIdByte[i] & 0xFF;
+            for (int i = 0; i < voteHashdByte.length; i++) {
+                int v = voteHashdByte[i] & 0xFF;
                 String hv = Integer.toHexString(v);
                 if (hv.length() < 2) {
                     stringBuilder.append(0);

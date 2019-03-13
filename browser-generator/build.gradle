@@ -19,7 +19,8 @@ def itfswMybatisGeneratorPlugin = 'com.itfsw:mybatis-generator-plugin:1.2.20'
 
 mybatisGenerator {
     verbose = false
-    configFile = "generatorConfig.xml"
+//    configFile = "logs.xml"
+    configFile = "browser-common.xml"
 
     dependencies {
         mybatisGenerator project(':browser-generator')

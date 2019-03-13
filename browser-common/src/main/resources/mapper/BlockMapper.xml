@@ -3,8 +3,8 @@
 <mapper namespace="com.platon.browser.dao.mapper.BlockMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Block">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
+    <id column="number" jdbcType="BIGINT" property="number" />
     <id column="chain_id" jdbcType="VARCHAR" property="chainId" />
-    <result column="number" jdbcType="BIGINT" property="number" />
     <result column="parent_hash" jdbcType="VARCHAR" property="parentHash" />
     <result column="nonce" jdbcType="VARCHAR" property="nonce" />
     <result column="miner" jdbcType="VARCHAR" property="miner" />
@@ -24,7 +24,7 @@
     <result column="block_campaign_amount" jdbcType="BIGINT" property="blockCampaignAmount" />
     <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="ticket_id" jdbcType="VARCHAR" property="ticketId" />
+    <result column="vote_hash" jdbcType="VARCHAR" property="voteHash" />
     <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -86,10 +86,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
+    hash, `number`, chain_id, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
     energon_limit, energon_average, transaction_number, `timestamp`, block_reward, create_time, 
     update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, block_campaign_amount, 
-    node_name, node_id, ticket_id, reward_ratio
+    node_name, node_id, vote_hash, reward_ratio
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.BlockExample" resultMap="BaseResultMap">
     select
@@ -110,11 +110,13 @@
     <include refid="Base_Column_List" />
     from block
     where hash = #{hash,jdbcType=VARCHAR}
+      and `number` = #{number,jdbcType=BIGINT}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.BlockKey">
     delete from block
     where hash = #{hash,jdbcType=VARCHAR}
+      and `number` = #{number,jdbcType=BIGINT}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.BlockExample">
@@ -124,23 +126,23 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Block">
-    insert into block (hash, chain_id, `number`, 
+    insert into block (hash, `number`, chain_id, 
       parent_hash, nonce, miner, 
       extra_data, `size`, energon_used, 
       energon_limit, energon_average, transaction_number, 
       `timestamp`, block_reward, create_time, 
       update_time, actual_tx_cost_sum, block_vote_amount, 
       block_vote_number, block_campaign_amount, node_name, 
-      node_id, ticket_id, reward_ratio
+      node_id, vote_hash, reward_ratio
       )
-    values (#{hash,jdbcType=VARCHAR}, #{chainId,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, 
+    values (#{hash,jdbcType=VARCHAR}, #{number,jdbcType=BIGINT}, #{chainId,jdbcType=VARCHAR}, 
       #{parentHash,jdbcType=VARCHAR}, #{nonce,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, 
       #{extraData,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER}, #{energonUsed,jdbcType=VARCHAR}, 
       #{energonLimit,jdbcType=VARCHAR}, #{energonAverage,jdbcType=VARCHAR}, #{transactionNumber,jdbcType=INTEGER}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{blockReward,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{actualTxCostSum,jdbcType=VARCHAR}, #{blockVoteAmount,jdbcType=BIGINT}, 
       #{blockVoteNumber,jdbcType=BIGINT}, #{blockCampaignAmount,jdbcType=BIGINT}, #{nodeName,jdbcType=VARCHAR}, 
-      #{nodeId,jdbcType=VARCHAR}, #{ticketId,jdbcType=VARCHAR}, #{rewardRatio,jdbcType=DOUBLE}
+      #{nodeId,jdbcType=VARCHAR}, #{voteHash,jdbcType=VARCHAR}, #{rewardRatio,jdbcType=DOUBLE}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
@@ -149,11 +151,11 @@
       <if test="hash != null">
         hash,
       </if>
-      <if test="chainId != null">
-        chain_id,
-      </if>
       <if test="number != null">
         `number`,
+      </if>
+      <if test="chainId != null">
+        chain_id,
       </if>
       <if test="parentHash != null">
         parent_hash,
@@ -212,8 +214,8 @@
       <if test="nodeId != null">
         node_id,
       </if>
-      <if test="ticketId != null">
-        ticket_id,
+      <if test="voteHash != null">
+        vote_hash,
       </if>
       <if test="rewardRatio != null">
         reward_ratio,
@@ -223,11 +225,11 @@
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="chainId != null">
-        #{chainId,jdbcType=VARCHAR},
-      </if>
       <if test="number != null">
         #{number,jdbcType=BIGINT},
+      </if>
+      <if test="chainId != null">
+        #{chainId,jdbcType=VARCHAR},
       </if>
       <if test="parentHash != null">
         #{parentHash,jdbcType=VARCHAR},
@@ -286,8 +288,8 @@
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="ticketId != null">
-        #{ticketId,jdbcType=VARCHAR},
+      <if test="voteHash != null">
+        #{voteHash,jdbcType=VARCHAR},
       </if>
       <if test="rewardRatio != null">
         #{rewardRatio,jdbcType=DOUBLE},
@@ -306,11 +308,11 @@
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
-      <if test="record.chainId != null">
-        chain_id = #{record.chainId,jdbcType=VARCHAR},
-      </if>
       <if test="record.number != null">
         `number` = #{record.number,jdbcType=BIGINT},
+      </if>
+      <if test="record.chainId != null">
+        chain_id = #{record.chainId,jdbcType=VARCHAR},
       </if>
       <if test="record.parentHash != null">
         parent_hash = #{record.parentHash,jdbcType=VARCHAR},
@@ -369,8 +371,8 @@
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="record.ticketId != null">
-        ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      <if test="record.voteHash != null">
+        vote_hash = #{record.voteHash,jdbcType=VARCHAR},
       </if>
       <if test="record.rewardRatio != null">
         reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE},
@@ -383,8 +385,8 @@
   <update id="updateByExample" parameterType="map">
     update block
     set hash = #{record.hash,jdbcType=VARCHAR},
-      chain_id = #{record.chainId,jdbcType=VARCHAR},
       `number` = #{record.number,jdbcType=BIGINT},
+      chain_id = #{record.chainId,jdbcType=VARCHAR},
       parent_hash = #{record.parentHash,jdbcType=VARCHAR},
       nonce = #{record.nonce,jdbcType=VARCHAR},
       miner = #{record.miner,jdbcType=VARCHAR},
@@ -404,7 +406,7 @@
       block_campaign_amount = #{record.blockCampaignAmount,jdbcType=BIGINT},
       node_name = #{record.nodeName,jdbcType=VARCHAR},
       node_id = #{record.nodeId,jdbcType=VARCHAR},
-      ticket_id = #{record.ticketId,jdbcType=VARCHAR},
+      vote_hash = #{record.voteHash,jdbcType=VARCHAR},
       reward_ratio = #{record.rewardRatio,jdbcType=DOUBLE}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -413,9 +415,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Block">
     update block
     <set>
-      <if test="number != null">
-        `number` = #{number,jdbcType=BIGINT},
-      </if>
       <if test="parentHash != null">
         parent_hash = #{parentHash,jdbcType=VARCHAR},
       </if>
@@ -473,20 +472,20 @@
       <if test="nodeId != null">
         node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="ticketId != null">
-        ticket_id = #{ticketId,jdbcType=VARCHAR},
+      <if test="voteHash != null">
+        vote_hash = #{voteHash,jdbcType=VARCHAR},
       </if>
       <if test="rewardRatio != null">
         reward_ratio = #{rewardRatio,jdbcType=DOUBLE},
       </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
+      and `number` = #{number,jdbcType=BIGINT}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Block">
     update block
-    set `number` = #{number,jdbcType=BIGINT},
-      parent_hash = #{parentHash,jdbcType=VARCHAR},
+    set parent_hash = #{parentHash,jdbcType=VARCHAR},
       nonce = #{nonce,jdbcType=VARCHAR},
       miner = #{miner,jdbcType=VARCHAR},
       extra_data = #{extraData,jdbcType=VARCHAR},
@@ -505,9 +504,10 @@
       block_campaign_amount = #{blockCampaignAmount,jdbcType=BIGINT},
       node_name = #{nodeName,jdbcType=VARCHAR},
       node_id = #{nodeId,jdbcType=VARCHAR},
-      ticket_id = #{ticketId,jdbcType=VARCHAR},
+      vote_hash = #{voteHash,jdbcType=VARCHAR},
       reward_ratio = #{rewardRatio,jdbcType=DOUBLE}
     where hash = #{hash,jdbcType=VARCHAR}
+      and `number` = #{number,jdbcType=BIGINT}
       and chain_id = #{chainId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -517,13 +517,13 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into block
-    (hash, chain_id, `number`, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
+    (hash, `number`, chain_id, parent_hash, nonce, miner, extra_data, `size`, energon_used, 
       energon_limit, energon_average, transaction_number, `timestamp`, block_reward, 
       create_time, update_time, actual_tx_cost_sum, block_vote_amount, block_vote_number, 
-      block_campaign_amount, node_name, node_id, ticket_id, reward_ratio)
+      block_campaign_amount, node_name, node_id, vote_hash, reward_ratio)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.chainId,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, 
+      (#{item.hash,jdbcType=VARCHAR}, #{item.number,jdbcType=BIGINT}, #{item.chainId,jdbcType=VARCHAR}, 
         #{item.parentHash,jdbcType=VARCHAR}, #{item.nonce,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, 
         #{item.extraData,jdbcType=VARCHAR}, #{item.size,jdbcType=INTEGER}, #{item.energonUsed,jdbcType=VARCHAR}, 
         #{item.energonLimit,jdbcType=VARCHAR}, #{item.energonAverage,jdbcType=VARCHAR}, 
@@ -531,7 +531,7 @@
         #{item.blockReward,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
         #{item.actualTxCostSum,jdbcType=VARCHAR}, #{item.blockVoteAmount,jdbcType=BIGINT}, 
         #{item.blockVoteNumber,jdbcType=BIGINT}, #{item.blockCampaignAmount,jdbcType=BIGINT}, 
-        #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ticketId,jdbcType=VARCHAR}, 
+        #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.voteHash,jdbcType=VARCHAR}, 
         #{item.rewardRatio,jdbcType=DOUBLE})
     </foreach>
   </insert>
@@ -553,11 +553,11 @@
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
         </if>
-        <if test="'chain_id'.toString() == column.value">
-          #{item.chainId,jdbcType=VARCHAR}
-        </if>
         <if test="'number'.toString() == column.value">
           #{item.number,jdbcType=BIGINT}
+        </if>
+        <if test="'chain_id'.toString() == column.value">
+          #{item.chainId,jdbcType=VARCHAR}
         </if>
         <if test="'parent_hash'.toString() == column.value">
           #{item.parentHash,jdbcType=VARCHAR}
@@ -616,8 +616,8 @@
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="'ticket_id'.toString() == column.value">
-          #{item.ticketId,jdbcType=VARCHAR}
+        <if test="'vote_hash'.toString() == column.value">
+          #{item.voteHash,jdbcType=VARCHAR}
         </if>
         <if test="'reward_ratio'.toString() == column.value">
           #{item.rewardRatio,jdbcType=DOUBLE}
@@ -626,6 +626,4 @@
       )
     </foreach>
   </insert>
-
-
 </mapper>

@@ -30,8 +30,8 @@ public class BlockBean extends Block {
         this.setMiner(initData.getBlock().getMiner());
         this.setExtraData(initData.getBlock().getExtraData());
         this.setParentHash(initData.getBlock().getParentHash());
-        String ticketId = FilterTool.ticketIdAnalysis(this.getExtraData());
-        this.setTicketId(ticketId);
+        String voteHash = FilterTool.voteHashAnalysis(this.getExtraData());
+        this.setVoteHash(voteHash);
         this.setNonce(initData.getBlock().getNonce().toString());
         String rewardWei = FilterTool.getBlockReward(initData.getBlock().getNumber().toString());
         this.setBlockReward(rewardWei);
