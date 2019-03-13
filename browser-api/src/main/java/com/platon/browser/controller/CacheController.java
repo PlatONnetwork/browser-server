@@ -43,7 +43,7 @@ public class CacheController {
                 case NODE:redisCacheService.resetNodePushCache(chainId,clearOld);break;
                 case BLOCK:redisCacheService.resetBlockCache(chainId,clearOld);break;
                 case TRANSACTION:redisCacheService.resetTransactionCache(chainId,clearOld);break;
-                case STATICSTICS:redisCacheService.clearStatisticsCache(chainId);break;
+                case STATISTICS:redisCacheService.clearStatisticsCache(chainId);break;
             }
         }catch (Exception ex){
             return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";

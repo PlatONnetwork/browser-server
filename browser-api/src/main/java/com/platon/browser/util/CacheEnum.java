@@ -4,7 +4,5 @@ public enum CacheEnum {
     NODE,
     BLOCK,
     TRANSACTION,
-    STATICSTICS,
-
-
+    STATISTICS,
 }
