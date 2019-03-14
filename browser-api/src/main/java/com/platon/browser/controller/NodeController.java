@@ -58,7 +58,6 @@ public class NodeController {
      * @apiName list
      * @apiGroup node
      * @apiDescription 节点列表
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -113,7 +112,6 @@ public class NodeController {
      * @apiName historyList
      * @apiGroup node
      * @apiDescription 节点列表
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -160,7 +158,6 @@ public class NodeController {
      * @apiName detail
      * @apiGroup node
      * @apiDescription 节点详情
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -226,7 +223,6 @@ public class NodeController {
      * @apiName blockList
      * @apiGroup node
      * @apiDescription 节点区块列表
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -284,7 +280,6 @@ public class NodeController {
      * @apiName blockDownload
      * @apiGroup node
      * @apiDescription 导出节点区块详情
-     * @apiUse CommonHeaderFiled
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 节点地址
      * @apiParam {String} date 数据起始日期

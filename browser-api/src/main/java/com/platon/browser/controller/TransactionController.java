@@ -70,7 +70,6 @@ public class TransactionController {
       * @apiGroup transaction
       * @apiDescription 交易列表
       * @apiParam {String} cid 链ID.
-      * @apiUse CommonHeaderFiled
       * @apiParamExample {json} Request-Example:
       * {
       *      "cid":"", // 链ID (必填)
@@ -146,7 +145,6 @@ public class TransactionController {
      * @apiGroup transaction
      * @apiDescription 交易详情
      * @apiParam {String} cid 链ID.
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -232,7 +230,6 @@ public class TransactionController {
      * @apiGroup transaction
      * @apiDescription 交易详情前后跳转浏览
      * @apiParam {String} cid 链ID.
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -330,7 +327,6 @@ public class TransactionController {
      * @apiGroup transaction
      * @apiDescription 待处理交易列表
      * @apiParam {String} cid 链ID.
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -406,7 +402,6 @@ public class TransactionController {
      * @apiGroup transaction
      * @apiDescription 待处理交易详情
      * @apiParam {String} cid 链ID.
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -494,7 +489,6 @@ public class TransactionController {
      * @apiGroup transaction
      * @apiDescription 待处理交易详情前后跳转浏览
      * @apiParam {String} cid 链ID.
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -554,7 +548,6 @@ public class TransactionController {
      * @apiName addressDetails
      * @apiGroup transaction
      * @apiDescription 查询地址详情
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -657,7 +650,6 @@ public class TransactionController {
      * @apiName addressDownload
      * @apiGroup transaction
      * @apiDescription 导出地址详情
-     * @apiUse CommonHeaderFiled
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
@@ -691,7 +683,6 @@ public class TransactionController {
      * @apiName contractDetails
      * @apiGroup transaction
      * @apiDescription 查询合约详情
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -785,7 +776,6 @@ public class TransactionController {
      * @apiName contractDownload
      * @apiGroup transaction
      * @apiDescription 导出合约详情
-     * @apiUse CommonHeaderFiled
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据起始日期
@@ -804,7 +794,6 @@ public class TransactionController {
      * @apiName blockTransaction
      * @apiGroup transaction
      * @apiDescription 查询区块交易信息
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)

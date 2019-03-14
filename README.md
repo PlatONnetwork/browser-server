@@ -26,3 +26,17 @@
          |browser-common|
           --------------
 ```
+
+### 五、接口文档生成说明
+###### 1、安装NodeJs
+```
+https://nodejs.org/dist/v10.15.3/node-v10.15.3-x64.msi
+```
+###### 2、安装apidoc
+```
+npm install apidoc -g
+```
+###### 3、生成文档
+```
+apidoc -i browser-api/ -o apidoc/
+```

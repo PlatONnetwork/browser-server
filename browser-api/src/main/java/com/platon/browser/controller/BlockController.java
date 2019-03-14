@@ -52,7 +52,6 @@ public class BlockController  {
       @apiName blockList
       @apiGroup block
       @apiDescription 区块列表
-      @apiUse CommonHeaderFiled
       @apiParamExample {json} Request-Example:
       {
            "cid":"", // 链ID (必填)
@@ -103,7 +102,6 @@ public class BlockController  {
      * @apiName blockDetails
      * @apiGroup block
      * @apiDescription 区块详情
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -156,7 +154,6 @@ public class BlockController  {
      * @apiName blockDetailNavigate
      * @apiGroup block
      * @apiDescription 区块详情前后跳转浏览
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -205,7 +202,6 @@ public class BlockController  {
      * @apiName transactionList
      * @apiGroup block
      * @apiDescription 区块交易列表
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      * "cid":"", // 链ID (必填)
