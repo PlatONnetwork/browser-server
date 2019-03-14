@@ -41,7 +41,6 @@ public class SearchController {
      * @apiName search
      * @apiGroup home
      * @apiDescription 根据区块高度，区块hash，交易hash等查询信息
-     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      *   {
      *       "cid":"", // 链ID (必填)

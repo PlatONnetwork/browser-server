@@ -69,7 +69,6 @@ public class TransactionController {
       * @apiName transactionList
       * @apiGroup transaction
       * @apiDescription 交易列表
-      * @apiParam {String} cid 链ID.
       * @apiParamExample {json} Request-Example:
       * {
       *      "cid":"", // 链ID (必填)
@@ -144,7 +143,6 @@ public class TransactionController {
      * @apiName transactionDetails
      * @apiGroup transaction
      * @apiDescription 交易详情
-     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -229,7 +227,6 @@ public class TransactionController {
      * @apiName transactionDetailNavigate
      * @apiGroup transaction
      * @apiDescription 交易详情前后跳转浏览
-     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -326,7 +323,6 @@ public class TransactionController {
      * @apiName pendingList
      * @apiGroup transaction
      * @apiDescription 待处理交易列表
-     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -401,7 +397,6 @@ public class TransactionController {
      * @apiName pendingDetails
      * @apiGroup transaction
      * @apiDescription 待处理交易详情
-     * @apiParam {String} cid 链ID.
      * @apiParamExample {json} Request-Example:
      * {
      *      "cid":"", // 链ID (必填)
@@ -481,66 +476,6 @@ public class TransactionController {
             throw new ResponseException(be.getMessage());
         }
     }
-
-    /**
-     * @api {post} transaction/pendingDetailNavigate f.待处理交易详情前后跳转浏览 (已废弃，因为待处理交易块还未生成，随时在变，前后浏览没有意义)
-     * @apiVersion 1.0.0
-     * @apiName pendingDetailNavigate
-     * @apiGroup transaction
-     * @apiDescription 待处理交易详情前后跳转浏览
-     * @apiParam {String} cid 链ID.
-     * @apiParamExample {json} Request-Example:
-     * {
-     *      "cid":"", // 链ID (必填)
-     *      "direction":"", // 方向：prev-上一个，next-下一个 (必填)
-     *      "index": "",// 当前记录索引，从1开始(必填)
-     * }
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *      "errMsg": "",//描述信息
-     *      "code": 0,//成功（0），失败则由相关失败码
-     *      "data": {
-     *           "txHash": "0x234234",//交易hash
-     *           "timestamp": 123123123879,//交易接收时间
-     *           "txReceiptStatus": 1,//交易状态 -1 pending 1 成功  0 失败
-     *           "blockHeight": "15566",//交易所在区块高度
-     *           "from": "0x667766",//发送者
-     *           "to": "0x667766",//接收方, 此字段存储的可能是钱包地址，也可能是合约地址，需要使用receiveType来进一步区分：
-     *                            // 如果receiveType的值为account，则是钱包地址；如果receiveType的值为contract，则是合约地址
-     *           "txType": "", // 交易类型
-     *               transfer ：转账
-     *               MPCtransaction ： MPC交易
-     *               contractCreate ： 合约创建
-     *               voteTicket ： 投票
-     *               transactionExecute ： 合约执行
-     *               authorization ： 权限
-     *               authorization ： 权限
-     *               candidateDeposit ： 竞选质押
-     *               candidateApplyWithdraw ： 减持质押
-     *               candidateWithdraw ： 提取质押
-     *               unknown ： 未知
-     *           "value": "222",//数额(单位:Energon)
-     *           "actualTxCost": "22",//实际交易手续费(单位:Energon)
-     *           "energonLimit": 232,//能量限制
-     *           "energonUsed": 122,//能量消耗
-     *           "priceInE":"1000000000000000000", // 能量价格(单位:E)
-     *           "priceInEnergon":"0.1", // 能量价格(单位:Energon)
-     *           "inputData": "",//附加输入数据
-     *           "expectTime": 12312333, // 预计确认时间
-     *           "receiveType":"account" // 此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址
-     *           }
-     * }
-     */
-    /*@PostMapping("pendingDetailNavigate")
-    public BaseResp pendingDetailNavigate (@Valid @RequestBody PendingTxDetailNavigateReq req) {
-        try{
-            PendingTxDetailNavigate pendingTxDetailNavigate = pendingTxService.getPendingTxDetailNavigate(req);
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),RetEnum.RET_SUCCESS.getName(),pendingTxDetailNavigate);
-        }catch (BusinessException be){
-            return BaseResp.build(be.getErrorCode(),be.getErrorMessage(),null);
-        }
-    }*/
 
     /**
      * @api {post}  g.查询地址详情
