@@ -13,11 +13,13 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.ticket.TxInfo;
-import com.platon.browser.dto.ticket.VoteTicket;
 import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AddressDetailReq;
-import com.platon.browser.service.*;
+import com.platon.browser.service.AccountService;
+import com.platon.browser.service.NodeService;
+import com.platon.browser.service.PendingTxService;
+import com.platon.browser.service.TransactionService;
 import com.platon.browser.util.EnergonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,7 +36,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -129,7 +130,8 @@ public class AccountServiceImpl implements AccountService {
 
             // 取有效票数
             el.setValidVoteCount(0);
-            List<String> ticketIds = ticketContract.VoteTicketIds(Integer.valueOf(String.valueOf(el.getVoteCount())),el.getTxHash());
+            // TODO: 获取投票交易的有效票数
+            /*List<String> ticketIds = ticketContract.VoteTicketIds(Integer.valueOf(String.valueOf(el.getVoteCount())),el.getTxHash());
             if(ticketIds.size()>0){
                 StringBuilder sb = new StringBuilder();
                 ticketIds.forEach(id->{
@@ -150,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+            }*/
         });
 
         returnData.setTrades(data);

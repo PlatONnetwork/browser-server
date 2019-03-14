@@ -1,6 +1,5 @@
 package com.platon.browser.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
@@ -17,6 +16,7 @@ import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.req.block.BlockDownloadReq;
@@ -26,7 +26,6 @@ import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -166,7 +165,7 @@ public class NodeServiceImpl implements NodeService {
             returnData.setBlockReward(BigDecimal.ZERO);
         }
 
-        if(nodeIds.length()>0){
+        /*if(nodeIds.length()>0){
             String ids = nodeIds.toString();
             ids = ids.substring(0,ids.lastIndexOf(":"));
             // 设置得票数
@@ -182,7 +181,7 @@ public class NodeServiceImpl implements NodeService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         return returnData;
     }
@@ -232,7 +231,8 @@ public class NodeServiceImpl implements NodeService {
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
         // 设置得票数
-        try {
+        // TODO: 取节点的得票数
+        /*try {
             String ticketIds = ticketContract.GetCandidateTicketIds(returnData.getNodeId()).send();
             if(StringUtils.isNotBlank(ticketIds)){
                 List<String> list = JSON.parseArray(ticketIds,String.class);
@@ -240,7 +240,7 @@ public class NodeServiceImpl implements NodeService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
         // 设置票龄
         returnData.setTicketEpoch(0l);
