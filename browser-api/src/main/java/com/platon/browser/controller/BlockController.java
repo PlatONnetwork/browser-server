@@ -15,7 +15,7 @@ import com.platon.browser.req.block.BlockTransactionPageReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

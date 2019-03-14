@@ -1,4 +1,4 @@
-package com.platon.browser.util;
+package com.platon.browser.enums;
 
 public enum I18nEnum {
 

@@ -18,7 +18,7 @@ import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.TransactionService;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

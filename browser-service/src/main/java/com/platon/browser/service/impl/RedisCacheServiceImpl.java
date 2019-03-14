@@ -18,7 +18,7 @@ import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

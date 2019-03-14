@@ -14,7 +14,7 @@ import com.platon.browser.service.AccountService;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;

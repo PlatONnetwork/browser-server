@@ -18,7 +18,7 @@ import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.PendingTxPageReq;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.PendingTxService;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

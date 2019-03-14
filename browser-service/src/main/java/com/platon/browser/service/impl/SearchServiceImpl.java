@@ -24,7 +24,7 @@ import com.platon.browser.req.search.SearchReq;
 import com.platon.browser.req.transaction.PendingTxDetailReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.service.*;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

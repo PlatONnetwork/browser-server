@@ -1,4 +1,4 @@
-package com.platon.browser.schedule;
+package com.platon.browser.job;
 
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
@@ -11,7 +11,7 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StatisticService;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,9 @@ import java.util.List;
 import static com.platon.browser.service.impl.RedisCacheServiceImpl.NODEID_TO_FAKE_NODES;
 
 @Component
-public class StompPushTask {
+public class StompPushJob {
 
-    private final Logger logger = LoggerFactory.getLogger(StompPushTask.class);
+    private final Logger logger = LoggerFactory.getLogger(StompPushJob.class);
 
     @Autowired
     private ChainsConfig chainsConfig;

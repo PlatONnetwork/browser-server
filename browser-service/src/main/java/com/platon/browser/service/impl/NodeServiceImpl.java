@@ -26,7 +26,7 @@ import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;

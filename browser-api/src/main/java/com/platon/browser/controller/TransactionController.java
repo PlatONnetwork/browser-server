@@ -20,7 +20,7 @@ import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.transaction.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.*;
-import com.platon.browser.util.I18nEnum;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
