@@ -39,6 +39,11 @@ apidoc -i browser-api/ -o apidoc/
 ```
 
 ### 六、IDEA Docker开发环境设置
+###### 0、docker-machine安装
+```
+http://192.168.9.85:10080/tools/docker-machine.exe
+docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.9.85:10080/tools/rancheros.iso --virtualbox-memory 2048 m1
+```
 ###### 1、Docker服务端配置
 ![avatar](doc/docker-daemon-config.png)
 ###### 2、browser-agent部署配置
