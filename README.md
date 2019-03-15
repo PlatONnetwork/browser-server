@@ -40,3 +40,11 @@ npm install apidoc -g
 ```
 apidoc -i browser-api/ -o apidoc/
 ```
+
+### 六、IDEA Docker开发环境设置
+###### 1、Docker服务端配置
+![avatar](doc/docker-daemon-config.png)
+###### 2、browser-agent部署配置
+![avatar](doc/browser-agent-docker-run-config.png)
+###### 3、browser-api部署配置
+![avatar](doc/browser-api-docker-run-config.png)
