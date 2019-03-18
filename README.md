@@ -42,7 +42,11 @@ apidoc -i browser-api/ -o apidoc/
 ###### 0、docker-machine安装
 ```
 http://192.168.9.85:10080/tools/docker-machine.exe
-docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.9.85:10080/tools/rancheros.iso --virtualbox-memory 2048 m1
+安装容器操作系统，rancheros和boot2docker任选一个即可
+# 创建虚拟机并安装rancheros容器操作系统
+docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.9.85:10080/tools/rancheros.iso --virtualbox-memory 1024 mc01
+# 创建虚拟机并安装boot2docker容器操作系统
+docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.9.85:10080/tools/boot2docker.iso --virtualbox-memory 1024 mc01
 ```
 ###### 1、Docker服务端配置
 ![avatar](doc/docker-daemon-config.png)
@@ -50,3 +54,6 @@ docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.
 ![avatar](doc/browser-agent-docker-run-config.png)
 ###### 3、browser-api部署配置
 ![avatar](doc/browser-api-docker-run-config.png)
+
+
+docker-machine create -d virtualbox --virtualbox-boot2docker-url http://localhost/osimage/rancheros.iso --virtualbox-memory 1024 mc01
