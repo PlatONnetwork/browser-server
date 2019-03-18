@@ -54,6 +54,3 @@ docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.
 ![avatar](doc/browser-agent-docker-run-config.png)
 ###### 3、browser-api部署配置
 ![avatar](doc/browser-api-docker-run-config.png)
-
-
-docker-machine create -d virtualbox --virtualbox-boot2docker-url http://localhost/osimage/rancheros.iso --virtualbox-memory 1024 mc01
