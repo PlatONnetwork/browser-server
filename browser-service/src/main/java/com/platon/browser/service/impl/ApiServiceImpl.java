@@ -1,0 +1,238 @@
+package com.platon.browser.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.VoteTxMapper;
+import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.transaction.TransactionVoteReq;
+import com.platon.browser.dto.transaction.VoteInfo;
+import com.platon.browser.dto.transaction.VoteSummary;
+import com.platon.browser.dto.transaction.VoteTransaction;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.service.ApiService;
+import com.platon.browser.service.NodeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.TicketContract;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+/**
+ * User: dongqile
+ * Date: 2019/3/19
+ * Time: 11:42
+ */
+@Service
+public class ApiServiceImpl implements ApiService {
+
+    private final Logger logger = LoggerFactory.getLogger(ApiServiceImpl.class);
+    @Autowired
+    private PlatonClient platon;
+    @Autowired
+    private VoteTxMapper txMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
+    @Autowired
+    private BlockMapper blockMapper;
+    @Autowired
+    private NodeService nodeService;
+
+
+    @Override
+    public List<VoteSummary> getVoteSummary (List <String> addressList , String chainId ) {
+        List<VoteSummary> voteSummaryList = new ArrayList<>();
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(chainId).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
+                .andFromIn(addressList);
+        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<String> hashList = new ArrayList <>();
+        transactionList.forEach(transaction -> {
+            hashList.add(transaction.getHash());
+            VoteSummary bean = new VoteSummary();
+            bean.init(transaction);
+            voteSummaryList.add(bean);
+        });
+
+        Map<String,BigDecimal> incomeMap = getIncome(chainId,hashList);
+
+        Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
+
+        for(VoteSummary voteSummary : voteSummaryList){
+            BigDecimal inCome = incomeMap.get(voteSummary.getHash());
+            if(null == inCome) voteSummary.setEarnings(BigDecimal.ZERO.toString());
+            else voteSummary.setEarnings(inCome.toString());
+            Integer vaildSum = validVoteMap.get(voteSummary.getHash());
+            voteSummary.setValidNum(String.valueOf(vaildSum));
+        }
+        return  voteSummaryList;
+    }
+
+    @Override
+    public RespPage<VoteTransaction> getVoteTransaction (TransactionVoteReq req ) {
+        //查询交易信息
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        List<VoteTransaction> voteTransactions = new ArrayList <>();
+        TransactionExample transactionExample = new TransactionExample();
+        transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
+                .andFromIn(req.getWalletAddrs());
+        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<String> hashList = new ArrayList <>();
+        transactionList.forEach(e->{
+            hashList.add(e.getHash());
+            VoteTransaction bean = new VoteTransaction();
+            bean.init(e);
+            voteTransactions.add(bean);
+        });
+
+        Map<String,BigDecimal> incomeMap = getIncome(req.getCid(),hashList);
+
+        Map<String,Integer> validVoteMap = getVailInfo(hashList, req.getCid());
+
+        for(VoteTransaction voteTransaction : voteTransactions){
+            BigDecimal inCome = incomeMap.get(voteTransaction.getTransactionHash());
+            if(null == inCome) voteTransaction.setEarnings(BigDecimal.ZERO.toString());
+            else voteTransaction.setEarnings(inCome.toString());
+            Integer vaildSum = validVoteMap.get(voteTransaction.getTransactionHash());
+            voteTransaction.setValidNum(String.valueOf(vaildSum));
+        }
+        RespPage<VoteTransaction> returnData = new RespPage<>();
+        returnData.init(page,voteTransactions);
+
+        return returnData;
+    }
+
+    @Override
+    public Map <String, Integer> getCandidateTicketCount ( List <String> nodeIds,String chainId ) {
+        if(nodeIds.size() > 0) {
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            StringBuffer str = new StringBuffer();
+            nodeIds.forEach(id ->{
+                str.append(id).append(":");
+            });
+            String ids = str.toString();
+            try {
+                String countStr = ticketContract.GetCandidateTicketCount(ids).send();
+                Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
+                return map;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return new HashMap<>();
+    }
+
+    @Override
+    public RespPage<VoteInfo> getTicketCountByTxHash (List <String> hashList , String chainId ) {
+        if(hashList.size() > 0){
+            TransactionExample transactionExample = new TransactionExample();
+            transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
+            List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+            List<VoteInfo> bean = new ArrayList <>();
+            Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
+            transactionList.forEach(transaction -> {
+                VoteInfo date = new VoteInfo();
+                date.init(transaction);
+                date.setVailVoteCount(validVoteMap.get(transaction.getHash()));
+                bean.add(date);
+            });
+
+            List<String> nodeIds = new ArrayList <>();
+            bean.forEach(voteInfo ->  {
+                nodeIds.add(voteInfo.getNodeId());
+            });
+
+            Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
+            Map<String,Date> deadDate = new HashMap <>();
+            List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
+            voteTxes.forEach(voteTx -> {
+                if(voteTx.getDeadLine() != null){
+                    deadDate.put(voteTx.getHash(),voteTx.getDeadLine());
+                }
+            });
+
+            bean.forEach(voteInfo -> {
+                String nodeName = nodeIdToName.get(voteInfo.getNodeId());
+                Date date = deadDate.get(voteInfo.getHash());
+                if(date != null) voteInfo.setDeadLine(deadDate.get(voteInfo.getHash()));
+                if(null != nodeName){
+                    voteInfo.setNodeName(nodeName);
+                }else {
+                    voteInfo.setNodeName(" ");
+                }
+            });
+
+            RespPage<VoteInfo> resDate = new RespPage<>();
+            resDate.setData(bean);
+            return resDate;
+        }
+
+        return new RespPage<>();
+    }
+
+
+    private Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
+        if (hashList.size() > 0){
+            //根据hash分组计算收益
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashNotIn(hashList);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            Map<String, List<Block>> groupMap = new HashMap <>();
+            blocks.forEach(block -> {
+                List<Block> group=groupMap.get(block.getVoteHash());
+                if(group==null){
+                    group=new ArrayList <>();
+                    groupMap.put(block.getVoteHash(),group);
+                }
+                group.add(block);
+            });
+
+            //分组计算收益
+            Map<String,BigDecimal> incomeMap = new HashMap <>();
+            groupMap.forEach((txHash,group)->{
+                BigDecimal txIncome = BigDecimal.ZERO;
+                for (Block block:group){
+                    txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
+                }
+                incomeMap.put(txHash,txIncome);
+            });
+            return incomeMap;
+        }
+
+        return  new HashMap <>();
+
+    }
+
+
+    private Map<String,Integer> getVailInfo(List<String> hashList,String chainId){
+        if (hashList.size() > 0) {
+            //根据hash分析每笔交易有效票数
+            Map <String, Integer> validVoteMap = new HashMap <>();
+
+            StringBuffer stringBuffer = new StringBuffer();
+            hashList.forEach(hash -> {
+                stringBuffer.append(hash).append(":");
+            });
+            try {
+                TicketContract ticketContract = platon.getTicketContract(chainId);
+                String hash = stringBuffer.toString();
+                String vaildTicketList = ticketContract.GetTicketCountByTxHash(hash).send();
+                validVoteMap = JSON.parseObject(vaildTicketList, Map.class);
+            } catch (Exception e) {
+                for (String a : hashList) {
+                    validVoteMap.put(a, 0);
+                }
+                logger.error("get transaction voteNumber Exception !!!");
+            }
+            return validVoteMap;
+        }
+        return new HashMap <>();
+    }
+}
