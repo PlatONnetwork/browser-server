@@ -48,7 +48,6 @@ public class ApiController {
      * @apiName GetBatchVoteSummary
      * @apiGroup api
      * @apiDescription 获取统计统计信息
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *     "cid":"", // 链ID (必填)
@@ -90,7 +89,6 @@ public class ApiController {
      * @apiName getBatchVoteTransaction
      * @apiGroup api
      * @apiDescription 批量获选票交易
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *      "pageNo": 1,//页数(必填)默认1
@@ -134,7 +132,6 @@ public class ApiController {
      * @apiName getCandidateTicketCount
      * @apiGroup api
      * @apiDescription 批量获取节点有效选票
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *
@@ -171,7 +168,6 @@ public class ApiController {
      * @apiName getTicketCountByTxHash
      * @apiGroup api
      * @apiDescription 批量获取投票交易相关信息
-     * @apiUse CommonHeaderFiled
      * @apiParamExample {json} Request-Example:
      * {
      *       "hashList" :
