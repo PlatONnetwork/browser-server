@@ -1,5 +1,6 @@
 package com.platon.browser.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
@@ -165,23 +166,22 @@ public class NodeServiceImpl implements NodeService {
             returnData.setBlockReward(BigDecimal.ZERO);
         }
 
-        /*if(nodeIds.length()>0){
+        if(nodeIds.length()>0){
             String ids = nodeIds.toString();
-            ids = ids.substring(0,ids.lastIndexOf(":"));
             // 设置得票数
             try {
-                String ticketIds = ticketContract.GetBatchCandidateTicketIds(ids).send();
-                if(StringUtils.isNotBlank(ticketIds)){
-                    Map<String,List<String>> map = JSON.parseObject(ticketIds,Map.class);
+                String numberOfVote = ticketContract.GetCandidateTicketCount(ids).send();
+                if(StringUtils.isNotBlank(numberOfVote)){
+                    Map<String,Integer> map = JSON.parseObject(numberOfVote,Map.class);
                     data.forEach(node->{
-                        List<String> count = map.get(node.getNodeId().replace("0x",""));
-                        if(count!=null) node.setTicketCount(count.size());
+                        Integer count = map.get(node.getNodeId().replace("0x",""));
+                        if(count!=null) node.setTicketCount(count);
                     });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }*/
+        }
 
         return returnData;
     }
@@ -231,16 +231,16 @@ public class NodeServiceImpl implements NodeService {
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
         // 设置得票数
-        // TODO: 取节点的得票数
-        /*try {
-            String ticketIds = ticketContract.GetCandidateTicketIds(returnData.getNodeId()).send();
-            if(StringUtils.isNotBlank(ticketIds)){
-                List<String> list = JSON.parseArray(ticketIds,String.class);
-                if(list!=null) returnData.setTicketCount(list.size());
+        try {
+            String numberOfVotes = ticketContract.GetCandidateTicketCount(returnData.getNodeId()).send();
+            if(StringUtils.isNotBlank(numberOfVotes)){
+                Map<String,Integer> map = JSON.parseObject(numberOfVotes,Map.class);
+                Integer count = map.get(returnData.getNodeId().replace("0x",""));
+                returnData.setTicketCount(count);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
 
         // 设置票龄
         returnData.setTicketEpoch(0l);

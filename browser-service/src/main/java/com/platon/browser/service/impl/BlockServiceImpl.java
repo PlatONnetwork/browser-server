@@ -223,28 +223,4 @@ public class BlockServiceImpl implements BlockService {
         returnData.init(page,data);
         return returnData;
     }
-
-    /*@Override
-    public RespPage<Ticket> getBlockTicketList(BlockTicketPageReq req) {
-        BlockTransactionPageReq transactionPageReq = new BlockTransactionPageReq();
-        BeanUtils.copyProperties(req,transactionPageReq);
-        transactionPageReq.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
-        RespPage<TransactionListItem> transactions = getBlockTransactionList(transactionPageReq);
-        List<Ticket> tickets = new ArrayList<>();
-        if(transactions.getData().size()>0){
-            TicketListReq ticketListReq = new TicketListReq();
-            ticketListReq.setCid(req.getCid());
-            transactions.getData().forEach(transaction->{
-                ticketListReq.setTxHash(transaction.getTxHash());
-                RespPage<Ticket> ticketPage = ticketService.getList(ticketListReq);
-                if(ticketPage.getData().size()>0) tickets.addAll(ticketPage.getData());
-            });
-        }
-        Page page = PageHelper.startPage(1,1);
-        RespPage<Ticket> returnData = new RespPage<>();
-        returnData.init(page,tickets);
-        return returnData;
-    }*/
-
-
 }

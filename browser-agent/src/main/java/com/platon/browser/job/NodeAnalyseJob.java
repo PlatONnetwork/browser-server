@@ -1,15 +1,18 @@
 package com.platon.browser.job;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockKey;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.StatisticsCache;
 import com.platon.browser.dto.agent.CandidateDto;
+import com.platon.browser.enums.NodeTypeEnum;
 import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.utils.FilterTool;
@@ -20,10 +23,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
-import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -51,8 +53,7 @@ public class NodeAnalyseJob {
     private PlatonClient platon;
     @Value("${platon.chain.active}")
     private String chainId;
-
-    @PostConstruct
+    /*@PostConstruct
     public void init () {
         BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
@@ -66,7 +67,8 @@ public class NodeAnalyseJob {
         } else {
             beginNumber = blocks.get(0).getNumber() + 1;
         }
-    }
+    }*/
+
 
     /**
      * 分析节点数据
@@ -85,20 +87,58 @@ public class NodeAnalyseJob {
             dbNodes.forEach(n -> NODEID_TO_NAME.put(n.getNodeId(), n.getName()));
 
             EthBlock ethBlock = null;
-            BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
-            while (beginNumber <= endNumber.longValue()) {
+            //BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
+            //while (beginNumber <= endNumber.longValue()) {
+                Map<String,String> nodeTypeMap = new HashMap <>();
+
                 long startTime = System.currentTimeMillis();
-                ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(beginNumber)), true).send();
+                ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
                 logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
                 BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
-                String nodeInfo = candidateContract.CandidateList(BigInteger.valueOf(beginNumber)).send();
+                String nodeInfo = candidateContract.CandidateList().send();
                 List<String> candidateStrArr = JSON.parseArray(nodeInfo,String.class);
                 // 候选
                 List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
+                nodes.forEach(candidate -> {
+                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                    nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
+                });
+
                 // 备选
                 List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);
+                alternates.forEach(candidate -> {
+                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                    nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
+                });
+
+                //当前轮验证人
+                String verifiers = candidateContract.VerifiersList().send();
+                List<CandidateDto> verifierList = JSON.parseArray(verifiers,CandidateDto.class);
+
+
+                Map<String,CandidateDto> allMap = new HashMap <>();
+                List <CandidateDto> nList = new ArrayList <>();
+                nList.addAll(nodes);
+                nList.addAll(alternates);
+                nList.forEach(allNode->{
+                    allMap.put(allNode.getCandidateId(),allNode);
+                });
+
+                verifierList.forEach(candidateNode -> {
+                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                    nodeTypeMap.put(candidateNode.getCandidateId(), NodeTypeEnum.VALIDATOR.name().toLowerCase());
+
+                    //判断验证人列表是否在当前的（候选+备选）池中，如果没有则将验证人的信息天骄到候选列表最后
+                    CandidateDto node = allMap.get(candidateNode.getCandidateId());
+                    if(node.equals(null)){
+                        nodes.add(candidateNode);
+                    }
+                });
+
+                //处理完以上逻辑才将所有的节点信息汇总
                 nodes.addAll(alternates);
+
                 logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
                 if (null == nodeInfo) return;
                 if (null == nodes && nodes.size() < 0) return;
@@ -107,17 +147,12 @@ public class NodeAnalyseJob {
                 nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
                 //find NodeRanking info by condition on database
                 List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-                logger.debug("find db list---------------------------------->{}", System.currentTimeMillis() - startTime);
-                // 把库中记录全部置为无效
-              /*  NodeRanking node = new NodeRanking();
-                node.setIsValid(0);
-                nodeRankingMapper.updateByExampleSelective(node, nodeRankingExample);*/
-                logger.debug("update db list---------------------------------->{}", System.currentTimeMillis() - startTime);
 
                 List <NodeRanking> nodeList = new ArrayList <>();
                 int i = 1;
                 BlockKey key = new BlockKey();
                 key.setChainId(chainId);
+                //logger.error("hash  {} ", ethBlock.getBlock().getHash());
                 key.setHash(ethBlock.getBlock().getHash());
                 Block block = blockMapper.selectByPrimaryKey(key);
                 for (CandidateDto candidateDto : nodes) {
@@ -127,6 +162,11 @@ public class NodeAnalyseJob {
                     }
                     NodeRankingBean nodeRanking = new NodeRankingBean();
                     nodeRanking.init(candidateDto);
+
+                    //设置节点类型
+                    String nodeType = nodeTypeMap.get(candidateDto.getCandidateId());
+                    nodeRanking.setNodeType(nodeType != null ? nodeType : " ");
+
 
                     // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
                     StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(chainId);
@@ -160,7 +200,7 @@ public class NodeAnalyseJob {
                     if (i >= 100) electionStatus = 4;
                     nodeRanking.setElectionStatus(electionStatus);
                     nodeRanking.setIsValid(1);
-                    nodeRanking.setBeginNumber(beginNumber);
+                    nodeRanking.setBeginNumber(ethBlock.getBlock().getNumber().longValue());
                     nodeList.add(nodeRanking);
                     i = i + 1;
                 }
@@ -199,7 +239,7 @@ public class NodeAnalyseJob {
 
                             }
                         } else {
-                            dbNode.setEndNumber(beginNumber);
+                            dbNode.setEndNumber(ethBlock.getBlock().getNumber().longValue());
                             dbNode.setIsValid(0);
                             updateList.add(dbNode);
                         }
@@ -212,10 +252,17 @@ public class NodeAnalyseJob {
 
                 //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
                 int consensusCount = 0;
+
+                Set <NodeRanking> redisNode = new HashSet <>();
+
                 for (NodeRanking nodeRanking : updateList) {
                     if (nodeRanking.getIsValid() == 1) {
                         consensusCount++;
                         NODEID_TO_NAME.put(nodeRanking.getNodeId(), nodeRanking.getName());
+                    }
+                    if(NodeTypeEnum.VALIDATOR.name().toLowerCase().equals(nodeRanking.getNodeType())){
+                        // 把验证节点放到redis缓存，让browser-api推送给websocket端
+                        redisNode.add(nodeRanking);
                     }
                 }
 
@@ -224,16 +271,16 @@ public class NodeAnalyseJob {
                 }
                 logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis() - startTime);
 
-                Set <NodeRanking> redisNode = new HashSet <>(updateList);
                 redisCacheService.updateNodePushCache(chainId, redisNode);
-                beginNumber++;
+                //beginNumber++;
                 logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis() - startTime);
-            }
+            //}
 
 
         } catch (Exception e) {
             logger.error("NodeAnalyseJob Exception:{}", e.getMessage());
-        }
+            e.printStackTrace();
+         }
         logger.debug("*** End the NodeAnalyseJob *** ");
     }
 

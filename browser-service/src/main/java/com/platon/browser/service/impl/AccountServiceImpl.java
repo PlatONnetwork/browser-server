@@ -5,10 +5,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.PendingTx;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
@@ -56,6 +54,8 @@ public class AccountServiceImpl implements AccountService {
     private TransactionMapper transactionMapper;
     @Autowired
     private PlatonClient platonClient;
+    @Autowired
+    private BlockMapper blockMapper;
 
 
     @Override
@@ -83,22 +83,14 @@ public class AccountServiceImpl implements AccountService {
         // 取已完成交易
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
+
         List<AccTransactionItem> data = new ArrayList<>();
+        List<String> hashList = new ArrayList <>();
         transactions.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
+            hashList.add(initData.getHash());
             if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
-
-            // 交易默认收益为0
-            bean.setIncome(BigDecimal.ZERO);
-            /*if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(initData.getTxType())){
-                // 如果是投票交易，则计算投票收益
-                Map<String,BigDecimal> incomeMap=ticketService.getTicketIncome(req.getCid(),initData.getHash());
-                // 累加每张票的收益
-                incomeMap.forEach((ticket,income)->bean.setIncome(bean.getIncome().add(income)));
-                // 把收益单位转换为ETH
-                bean.setIncome(Convert.fromWei(bean.getIncome(), Convert.Unit.ETHER));
-            }*/
             data.add(bean);
         });
 
@@ -121,38 +113,67 @@ public class AccountServiceImpl implements AccountService {
             return 0;
         });
 
-        // 取节点名称 和 有效票数
+        // 取节点名称
         TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
         Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
-        data.forEach(el->{
-            if(StringUtils.isBlank(el.getNodeId())) return;
-            el.setNodeName(nodeIdToName.get(el.getNodeId()));
 
-            // 取有效票数
-            el.setValidVoteCount(0);
-            // TODO: 获取投票交易的有效票数
-            /*List<String> ticketIds = ticketContract.VoteTicketIds(Integer.valueOf(String.valueOf(el.getVoteCount())),el.getTxHash());
-            if(ticketIds.size()>0){
-                StringBuilder sb = new StringBuilder();
-                ticketIds.forEach(id->{
-                    sb.append(id).append(":");
-                });
-                String param = sb.toString();
-                param=param.substring(0,param.lastIndexOf(":"));
-                try {
-                    String detailStr = ticketContract.GetBatchTicketDetail(param).send();
-                    List <VoteTicket> details = JSON.parseArray(detailStr, VoteTicket.class);
-                    AtomicInteger validCount=new AtomicInteger(0);
-                    if(details.size()>0){
-                        details.forEach(voteTicket -> {
-                            if(voteTicket.getState()==1) validCount.incrementAndGet();
-                        });
-                        el.setValidVoteCount(validCount.intValue());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }*/
+        //根据交易hash列表获取所有hash对应的交易有效票列表
+        Map<String,Integer> voteHashMap = new HashMap <>();
+        try {
+            StringBuffer txHash = new StringBuffer();
+            for(AccTransactionItem accTransactionItem : data){
+                txHash.append(accTransactionItem.getTxHash()).append(":");
+            }
+            if(null != txHash){
+                String hashs = txHash.toString();
+                String voteNumber = ticketContract.GetTicketCountByTxHash(hashs).send();
+                voteHashMap = JSON.parseObject(voteNumber,Map.class);
+            }
+        }catch (Exception e){
+            for(AccTransactionItem accTransactionItem : data){
+                voteHashMap.put(accTransactionItem.getTxHash(),0);
+            }
+            logger.error("get transaction voteNumber Exception !!!");
+        }
+
+        for(AccTransactionItem accTransactionItem : data){
+            String nodeName = nodeIdToName.get(accTransactionItem.getNodeId());
+            if(null != nodeName) accTransactionItem.setNodeName(nodeName);
+            else accTransactionItem.setNodeName(" ");
+
+            Integer number = voteHashMap.get(accTransactionItem.getTxHash());
+            accTransactionItem.setValidVoteCount(number);
+        }
+
+        //设置交易收益
+        //根据投票交易hash查询区块列表
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        Map<String,List<Block>> groupMap = new HashMap <>();
+        //根据hash分组hash-block
+        blocks.forEach(block->{
+            List<Block> group=groupMap.get(block.getVoteHash());
+            if(group==null){
+                group=new ArrayList <>();
+                groupMap.put(block.getVoteHash(),group);
+            }
+            group.add(block);
+        });
+        //分组计算收益
+        Map<String,BigDecimal> incomeMap = new HashMap <>();
+        groupMap.forEach((txHash,group)->{
+            BigDecimal txIncome = BigDecimal.ZERO;
+            for (Block block:group){
+                txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
+            }
+            incomeMap.put(txHash,txIncome);
+        });
+
+        data.forEach(transations -> {
+            BigDecimal inCome = incomeMap.get(transations.getTxHash());
+            if(null == inCome) transations.setIncome(BigDecimal.ZERO);
+            else transations.setIncome(inCome);
         });
 
         returnData.setTrades(data);

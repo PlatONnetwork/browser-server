@@ -1,11 +1,12 @@
 package com.platon.browser.service;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.BlockMissingExample;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.BlockMissingMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.entity.VoteTx;
+import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,12 +33,13 @@ public class DBService {
     protected RedisCacheService redisCacheService;
     @Autowired
     private CustomBlockMapper customBlockMapper;
+    @Autowired
+    private VoteTxMapper voteTxMapper;
 //    @Autowired
 //    private CustomNodeRankingMapper customNodeRankingMapper;
 
     @Transactional
     public void flush(AnalyseThread.AnalyseResult result){
-
         if(result.blocks.size()>0){
             blockMapper.batchInsert(result.blocks);
             // 更新区块中的节点名称字段：node_name
@@ -47,6 +49,21 @@ public class DBService {
 
         if(result.transactions.size()>0){
             transactionMapper.batchInsert(result.transactions);
+            List<VoteTx> voteTxes = new ArrayList <>();
+            result.transactions.forEach(transaction ->{
+                if(transaction.getTxType().equals(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)){
+                    TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(),TxInfo.class);
+                    TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
+                    VoteTx voteTx = new VoteTx();
+                    voteTx.setHash(transaction.getHash());
+                    voteTx.setTotals(ticketParameter.getCount().longValue());
+                    voteTx.setCompleteFlag("N");
+                    voteTxes.add(voteTx);
+                }
+            });
+            if(voteTxes.size() > 0){
+                voteTxMapper.batchInsert(voteTxes);
+            }
             redisCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
         }
 

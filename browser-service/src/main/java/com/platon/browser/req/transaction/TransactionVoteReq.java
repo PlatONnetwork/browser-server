@@ -3,8 +3,8 @@ package com.platon.browser.req.transaction;
 import com.platon.browser.req.PageReq;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 

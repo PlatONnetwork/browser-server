@@ -17,8 +17,9 @@ import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.NodeTypeEnum;
+import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -428,7 +429,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         clearNodePushCache(chainId);
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria().andChainIdEqualTo(chainId)
-                .andIsValidEqualTo(1);
+                .andIsValidEqualTo(1).andNodeTypeEqualTo(NodeTypeEnum.VALIDATOR.name().toLowerCase());
         List<NodeRanking> data = nodeRankingMapper.selectByExample(condition);
         if(data.size()==0) return;
 
@@ -513,7 +514,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
 
         List<NodePushItem> nodes = getNodePushCache(chainId);
-        //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正，共识节点数为verifierList的长度
         /************* 设置共识节点数*************/
         cache.setConsensusCount(nodes.size());
 
