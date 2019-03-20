@@ -21,7 +21,8 @@ public class VoteInfo {
     private Integer voteSum;
     private Date deadLine;
     private String walletAddress;
-    public  void init( Transaction transaction){
+    private String price;
+    public  void init(Transaction transaction){
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
         this.nodeId = ticketParameter.getNodeId();

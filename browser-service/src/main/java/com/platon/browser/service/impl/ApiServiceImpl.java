@@ -151,8 +151,10 @@ public class ApiServiceImpl implements ApiService {
 
             Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
             Map<String,Date> deadDate = new HashMap <>();
+            Map<String,String> priceMap = new HashMap <>();
             List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
             voteTxes.forEach(voteTx -> {
+                priceMap.put(voteTx.getHash(),voteTx.getPrice());
                 if(voteTx.getDeadLine() != null){
                     deadDate.put(voteTx.getHash(),voteTx.getDeadLine());
                 }
@@ -167,14 +169,21 @@ public class ApiServiceImpl implements ApiService {
                 }else {
                     voteInfo.setNodeName(" ");
                 }
+                String price = priceMap.get(voteInfo.getHash());
+                if(null != price) {
+                    voteInfo.setPrice(price);
+                }else {
+                    voteInfo.setPrice(BigDecimal.ZERO.toString());
+                }
+
             });
 
-            RespPage<VoteInfo> resDate = new RespPage<>();
+            RespPage<VoteInfo> resDate = new RespPage <>();
             resDate.setData(bean);
             return resDate;
         }
 
-        return new RespPage<>();
+        return new RespPage <>();
     }
 
 

@@ -7,10 +7,12 @@ import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
 import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.transaction.CandidateTicketCountReq;
 import com.platon.browser.req.transaction.TicketCountByTxHashReq;
 import com.platon.browser.req.transaction.VoteSummaryReq;
+import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -156,8 +158,9 @@ public class ApiController {
      * }
      */
     @PostMapping("getCandidateTicketCount")
-    public Map<String,Integer> getCandidateTicketCount( @Valid @RequestBody CandidateTicketCountReq req){
-        return apiService.getCandidateTicketCount(req.getNodeIds(), req.getCid());
+    public BaseResp getCandidateTicketCount( @Valid @RequestBody CandidateTicketCountReq req){
+        Map<String,Integer> map = apiService.getCandidateTicketCount(req.getNodeIds(), req.getCid());
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),map);
     }
 
 

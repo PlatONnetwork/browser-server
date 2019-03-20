@@ -8,6 +8,7 @@
     <result column="dead_line" jdbcType="TIMESTAMP" property="deadLine" />
     <result column="hash" jdbcType="VARCHAR" property="hash" />
     <result column="complete_flag" jdbcType="VARCHAR" property="completeFlag" />
+    <result column="price" jdbcType="VARCHAR" property="price" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -68,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, vaild_count, totals, dead_line, hash, complete_flag
+    id, vaild_count, totals, dead_line, hash, complete_flag, price
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.VoteTxExample" resultMap="BaseResultMap">
     select
@@ -102,11 +103,11 @@
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.VoteTx">
     insert into vote_tx (id, vaild_count, totals, 
-      dead_line, hash, complete_flag
-      )
+      dead_line, hash, complete_flag, 
+      price)
     values (#{id,jdbcType=BIGINT}, #{vaildCount,jdbcType=BIGINT}, #{totals,jdbcType=BIGINT}, 
-      #{deadLine,jdbcType=TIMESTAMP}, #{hash,jdbcType=VARCHAR}, #{completeFlag,jdbcType=VARCHAR}
-      )
+      #{deadLine,jdbcType=TIMESTAMP}, #{hash,jdbcType=VARCHAR}, #{completeFlag,jdbcType=VARCHAR}, 
+      #{price,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.VoteTx">
     insert into vote_tx
@@ -129,6 +130,9 @@
       <if test="completeFlag != null">
         complete_flag,
       </if>
+      <if test="price != null">
+        price,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -148,6 +152,9 @@
       </if>
       <if test="completeFlag != null">
         #{completeFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -178,6 +185,9 @@
       <if test="record.completeFlag != null">
         complete_flag = #{record.completeFlag,jdbcType=VARCHAR},
       </if>
+      <if test="record.price != null">
+        price = #{record.price,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -190,7 +200,8 @@
       totals = #{record.totals,jdbcType=BIGINT},
       dead_line = #{record.deadLine,jdbcType=TIMESTAMP},
       hash = #{record.hash,jdbcType=VARCHAR},
-      complete_flag = #{record.completeFlag,jdbcType=VARCHAR}
+      complete_flag = #{record.completeFlag,jdbcType=VARCHAR},
+      price = #{record.price,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -213,6 +224,9 @@
       <if test="completeFlag != null">
         complete_flag = #{completeFlag,jdbcType=VARCHAR},
       </if>
+      <if test="price != null">
+        price = #{price,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -222,7 +236,8 @@
       totals = #{totals,jdbcType=BIGINT},
       dead_line = #{deadLine,jdbcType=TIMESTAMP},
       hash = #{hash,jdbcType=VARCHAR},
-      complete_flag = #{completeFlag,jdbcType=VARCHAR}
+      complete_flag = #{completeFlag,jdbcType=VARCHAR},
+      price = #{price,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -232,12 +247,12 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into vote_tx
-    (id, vaild_count, totals, dead_line, hash, complete_flag)
+    (id, vaild_count, totals, dead_line, hash, complete_flag, price)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.vaildCount,jdbcType=BIGINT}, #{item.totals,jdbcType=BIGINT}, 
-        #{item.deadLine,jdbcType=TIMESTAMP}, #{item.hash,jdbcType=VARCHAR}, #{item.completeFlag,jdbcType=VARCHAR}
-        )
+        #{item.deadLine,jdbcType=TIMESTAMP}, #{item.hash,jdbcType=VARCHAR}, #{item.completeFlag,jdbcType=VARCHAR}, 
+        #{item.price,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -273,8 +288,12 @@
         <if test="'complete_flag'.toString() == column.value">
           #{item.completeFlag,jdbcType=VARCHAR}
         </if>
+        <if test="'price'.toString() == column.value">
+          #{item.price,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

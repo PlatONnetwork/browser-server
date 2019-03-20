@@ -34,7 +34,7 @@ public class CalculatePublicKey {
 
         String extraData = tBlock.getBlock().getExtraData();
 
-        String signature = extraData.substring(extraData.length() - 130, extraData.length());
+        String signature = extraData.substring(extraData.length() - 130 - 64, extraData.length() - 64);
 
         byte[] msgHash = getMsgHash(tBlock.getBlock());
 
@@ -60,7 +60,7 @@ public class CalculatePublicKey {
         return RlpEncoder.encode(rlpList);
     }
 
-    static List <RlpType> asRlpValues (EthBlock.Block block ) {
+    static List <RlpType> asRlpValues ( EthBlock.Block block ) {
         List <RlpType> result = new ArrayList <>();
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));
@@ -89,6 +89,7 @@ public class CalculatePublicKey {
         result.add(RlpString.create(block.getTimestamp()));
         //Extra       []byte         `json:"extraData"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getExtraData().substring(0, 66))));
+
         //MixDigest   common.Hash    `json:"mixHash"`
         result.add(RlpString.create(decodeHash(block.getMixHash())));
         //Nonce       BlockNonce     `json:"nonce"`

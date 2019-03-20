@@ -26,9 +26,11 @@ import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 
@@ -53,9 +55,9 @@ public class NodeAnalyseJob {
     private PlatonClient platon;
     @Value("${platon.chain.active}")
     private String chainId;
-    /*@PostConstruct
+    @PostConstruct
     public void init () {
-        BlockExample condition = new BlockExample();
+        /*BlockExample condition = new BlockExample();
         condition.createCriteria().andChainIdEqualTo(chainId);
         condition.setOrderByClause("number desc");
         PageHelper.startPage(1, 1);
@@ -66,8 +68,13 @@ public class NodeAnalyseJob {
             beginNumber = 1L;
         } else {
             beginNumber = blocks.get(0).getNumber() + 1;
+        }*/
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-    }*/
+    }
 
 
     /**
@@ -181,9 +188,14 @@ public class NodeAnalyseJob {
                      * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
                      * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
                      */
+                    //todo:数据不一致的问题
+                    if(block != null){
+                        BigDecimal actualTxCostsum = new BigDecimal(block.getActualTxCostSum());
+                    }
                     nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
                             multiply(rate).
-                            add(new BigDecimal(block.getActualTxCostSum())).toString());
+                            add(BigDecimal.ZERO).toString());
+
                     nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                     nodeRanking.setRanking(i);
                     nodeRanking.setType(1);

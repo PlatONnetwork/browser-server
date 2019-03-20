@@ -67,6 +67,7 @@ public class DBService {
                     voteTx.setHash(transaction.getHash());
                     voteTx.setTotals(ticketParameter.getCount().longValue());
                     voteTx.setCompleteFlag("N");
+                    voteTx.setPrice(ticketParameter.getPrice().toString());
                     voteTxes.add(voteTx);
                 }
             });
