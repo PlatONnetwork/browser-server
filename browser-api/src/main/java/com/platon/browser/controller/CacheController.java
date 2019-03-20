@@ -50,4 +50,26 @@ public class CacheController {
         }
         return "Cache ["+cacheName+"] of Chain ["+chainId+"] reset successfully!";
     }
+
+    @GetMapping("setup/{chainId}/{cacheName}/{value}")
+    public String setup(@PathVariable String chainId, @PathVariable String cacheName, @PathVariable String value){
+        if(StringUtils.isBlank(chainId)){
+            return "Please provide the chain id.";
+        }
+        if(!chainsConfig.getChainIds().contains(chainId.trim())){
+            return "Chain id ["+chainId+"] incorrect.";
+        }
+        if(StringUtils.isBlank(cacheName)){
+            return "Please provide the cache name.";
+        }
+        try {
+            CacheEnum cacheEnum = CacheEnum.valueOf(cacheName.toUpperCase());
+            switch (cacheEnum){
+                case MAXTPS:redisCacheService.updateMaxTps(chainId,value);break;
+            }
+        }catch (Exception ex){
+            return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";
+        }
+        return "Cache ["+cacheName+"] of Chain ["+chainId+"] reset successfully!";
+    }
 }

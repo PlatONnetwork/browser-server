@@ -47,4 +47,7 @@ public interface RedisCacheService {
     BigDecimal getTicketPrice(String chainId);
     boolean updateVoteCount(String chainId);
     long getVoteCount(String chainId);
+
+    boolean updateMaxTps(String chainId, String value);
+    long getMaxTps(String chainId);
 }

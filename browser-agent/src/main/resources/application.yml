@@ -53,6 +53,8 @@ platon:
       ticket-price: browser:${version}:${profile}:chain{}:ticket-price
       #投票数
       vote-count: browser:${version}:${profile}:chain{}:vote-count
+      #MaxTps
+      max-tps: browser:${version}:${profile}:chain{}:max-tps
     max-item: 500000
 #日志配置
 logging:

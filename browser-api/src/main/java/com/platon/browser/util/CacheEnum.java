@@ -5,4 +5,5 @@ public enum CacheEnum {
     BLOCK,
     TRANSACTION,
     STATISTICS,
+    MAXTPS,
 }

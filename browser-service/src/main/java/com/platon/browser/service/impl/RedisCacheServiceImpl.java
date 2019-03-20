@@ -70,6 +70,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String ticketPriceCacheKeyTemplate;
     @Value("${platon.redis.key.vote-count}")
     private String voteCountCacheKeyTemplate;
+    @Value("${platon.redis.key.max-tps}")
+    private String maxTpsCacheKeyTemplate;
     @Value("${platon.fake.location.filename}")
     private String fakeLocationFilename;
 
@@ -519,6 +521,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(cache.getMaxTps()<cache.getCurrent()){
             cache.setMaxTps(cache.getCurrent());
         }
+        long fakeMaxTps = getMaxTps(chainId);
+        if(fakeMaxTps>0){
+            // 如果设置了假的MAX_TPS,则以假的为准
+            cache.setMaxTps(fakeMaxTps);
+        }
 
         List<NodePushItem> nodes = getNodePushCache(chainId);
         /************* 设置共识节点数*************/
@@ -744,6 +751,27 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     @Override
     public long getVoteCount(String chainId) {
         String cacheKey = voteCountCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
+        return 0;
+    }
+
+    /**
+     * 设置最高TPS
+     * @param chainId
+     * @param value
+     */
+    @Override
+    public boolean updateMaxTps(String chainId, String value) {
+        if(StringUtils.isBlank(value)) return false;
+        String cacheKey = maxTpsCacheKeyTemplate.replace("{}",chainId);
+        redisTemplate.opsForValue().set(cacheKey,value);
+        return true;
+    }
+
+    @Override
+    public long getMaxTps(String chainId) {
+        String cacheKey = maxTpsCacheKeyTemplate.replace("{}",chainId);
         String res = redisTemplate.opsForValue().get(cacheKey);
         if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
         return 0;
