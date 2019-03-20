@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -42,28 +41,32 @@ public class BlockAnalyseJob {
     @Autowired
     private AnalyseThread analyseThread;
 
-    @PostConstruct
-    public void init () {
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("number desc");
-        PageHelper.startPage(1, 1);
-        List <Block> blocks = blockMapper.selectByExample(condition);
-        // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
-        // 2、如果查询不到则从0开始
-        if (blocks.size() == 0) {
-            beginNumber = 1L;
-        } else {
-            beginNumber = blocks.get(0).getNumber()+1;
-        }
-
-    }
+    // 起始区块号是否初始化了
+    private boolean isBeginNumberInit=false;
 
     /**
      * 分析区块及其内部的交易数据
      */
     @Scheduled(cron="0/1 * * * * ?")
     protected void analyseBlock () {
+
+        if(!isBeginNumberInit){
+            BlockExample condition = new BlockExample();
+            condition.createCriteria().andChainIdEqualTo(chainId);
+            condition.setOrderByClause("number desc");
+            PageHelper.startPage(1, 1);
+            List <Block> blocks = blockMapper.selectByExample(condition);
+            // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
+            // 2、如果查询不到则从0开始
+            if (blocks.size() == 0) {
+                beginNumber = 1L;
+            } else {
+                beginNumber = blocks.get(0).getNumber()+1;
+            }
+            isBeginNumberInit=true;
+        }
+
+
         logger.debug("*** In the BlockAnalyseJob *** ");
         try {
             // 需要并发处理的区块数据

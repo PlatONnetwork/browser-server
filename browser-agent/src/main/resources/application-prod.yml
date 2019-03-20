@@ -25,6 +25,8 @@ loglevel:
   platon: error
   platon.job: error
   platon.filter: error
+  platon.service: error
+  platon.thread: error
 # 区块分析线程池大小
 thread.num: 1
 # 区块批量采集大小

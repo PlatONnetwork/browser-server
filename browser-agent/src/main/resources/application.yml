@@ -33,10 +33,26 @@ platon:
   # 区块列表缓存和交易列表缓存配置
   redis:
     key:
+      #验证节点列表
       node: browser:${version}:${profile}:chain{}:nodes
+      #区块列表
       block: browser:${version}:${profile}:chain{}:blocks
+      #交易列表
       transaction: browser:${version}:${profile}:chain{}:transactions
+      #统计信息
       staticstics: browser:${version}:${profile}:chain{}:staticstics
+      #总交易笔数
+      trans-count: browser:${version}:${profile}:chain{}:trans-count
+      #24小时内的交易数
+      trans-count-24-hours: browser:${version}:${profile}:chain{}:trans-count-24-hours
+      #地址数
+      address-count: browser:${version}:${profile}:chain{}:address-count
+      #平均区块交易数
+      avg-block-trans-count: browser:${version}:${profile}:chain{}:avg-block-trans-count
+      #票价
+      ticket-price: browser:${version}:${profile}:chain{}:ticket-price
+      #投票数
+      vote-count: browser:${version}:${profile}:chain{}:vote-count
     max-item: 500000
 #日志配置
 logging:
@@ -44,8 +60,10 @@ logging:
   level:
     org.springframework: ${loglevel.spring}
     com.platon.browser: ${loglevel.platon}
-    com.platon.browser.job: ${loglevel.platon.job}
     com.platon.browser.filter: ${loglevel.platon.filter}
+    com.platon.browser.job: ${loglevel.platon.job}
+    com.platon.browser.service: ${loglevel.platon.service}
+    com.platon.browser.thread: ${loglevel.platon.thread}
 
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:

@@ -28,6 +28,8 @@ loglevel:
   platon: debug
   platon.job: debug
   platon.filter: debug
+  platon.service: debug
+  platon.thread: debug
 # 区块分析线程池大小
 thread.num: 50
 # 区块批量采集大小

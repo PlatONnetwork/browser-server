@@ -19,6 +19,7 @@ import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class TestBase extends TestData {
     protected TransactionService transactionService;
     @Autowired
     protected PendingTxService pendingTxService;
+
+    @Autowired
+    protected RedisTemplate<String,String> redisTemplate;
 
     /*@Autowired
     protected TicketService ticketService;*/

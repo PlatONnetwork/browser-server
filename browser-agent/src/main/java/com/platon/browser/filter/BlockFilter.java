@@ -42,6 +42,7 @@ public class BlockFilter {
     private String chainId;
 
     public Block analyse ( AnalyseThread.AnalyseParam param ) {
+        long beginTime = System.currentTimeMillis();
         BlockBean bean = new BlockBean();
         if (param.ethBlock!=null) {
             bean.init(param.ethBlock);
@@ -114,6 +115,7 @@ public class BlockFilter {
             }
 
         }
+        logger.debug("Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return bean;
     }
 }

@@ -37,6 +37,7 @@ public class TransactionFilter {
     private String chainId;
 
     public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
+        long beginTime = System.currentTimeMillis();
         Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
         List<TransactionBean> transactions = new ArrayList <>();
         param.transactions.forEach(initData -> {
@@ -77,6 +78,7 @@ public class TransactionFilter {
                 transactions.add(bean);
             }
         });
+        log.debug("Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return transactions;
     }
 

@@ -5,24 +5,29 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.VoteTx;
 import com.platon.browser.dao.entity.VoteTxExample;
 import com.platon.browser.dao.mapper.VoteTxMapper;
+import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * User: dongqile
  * Date: 2019/3/18
  * Time: 11:20
  */
-//@Component
+@Component
 public class StatisticsJob {
 
     private static Logger logger = LoggerFactory.getLogger(StatisticsJob.class);
@@ -34,7 +39,7 @@ public class StatisticsJob {
     @Value("${platon.chain.active}")
     private String chainId;
 
-    @Scheduled(cron = "0/1 * * * * ?")
+    //@Scheduled(cron = "0/1 * * * * ?")
     protected void doJob () {
         //查询数据库未完成的投票交易列表
         VoteTxExample voteTxExample = new VoteTxExample();
@@ -70,5 +75,21 @@ public class StatisticsJob {
             }
             voteTxMapper.batchInsert(voteTxList);
         }
+    }
+
+
+    @Autowired
+    private RedisCacheService redisCacheService;
+    public static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(6);
+    @Scheduled(cron = "0/10 * * * * ?")
+    protected void updateTransCount () {
+        CountDownLatch latch = new CountDownLatch(6);
+        THREAD_POOL.submit(()->{try {redisCacheService.updateTransCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {redisCacheService.updateTransCount24Hours(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {redisCacheService.updateAddressCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {redisCacheService.updateAvgBlockTransCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {redisCacheService.updateTicketPrice(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {redisCacheService.updateVoteCount(chainId);}finally {latch.countDown();}});
+        try {latch.await();} catch (InterruptedException e) {e.printStackTrace();}
     }
 }

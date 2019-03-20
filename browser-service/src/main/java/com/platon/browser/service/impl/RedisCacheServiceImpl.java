@@ -58,8 +58,21 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.staticstics}")
     private String staticsticsCacheKeyTemplate;
+    @Value("${platon.redis.key.trans-count}")
+    private String transCountCacheKeyTemplate;
+    @Value("${platon.redis.key.trans-count-24-hours}")
+    private String transCount24HoursCacheKeyTemplate;
+    @Value("${platon.redis.key.address-count}")
+    private String addressCountCacheKeyTemplate;
+    @Value("${platon.redis.key.avg-block-trans-count}")
+    private String avgBlockTransCountCacheKeyTemplate;
+    @Value("${platon.redis.key.ticket-price}")
+    private String ticketPriceCacheKeyTemplate;
+    @Value("${platon.redis.key.vote-count}")
+    private String voteCountCacheKeyTemplate;
     @Value("${platon.fake.location.filename}")
     private String fakeLocationFilename;
+
     @Autowired
     private PlatonClient platon;
 
@@ -362,7 +375,8 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         });
         page.setData(transactions);
         // 设置总记录大小
-        Long displayCount = transactionMapper.countByExample(new TransactionExample());
+//        Long displayCount = transactionMapper.countByExample(new TransactionExample());
+        Long displayCount = getTransCount(chainId);
         page.setDisplayTotalCount(displayCount.intValue());
         return page;
     }
@@ -476,37 +490,30 @@ public class RedisCacheServiceImpl implements RedisCacheService {
      */
     @Override
     public boolean updateStatisticsCache(String chainId){
+        long beginTime = System.currentTimeMillis();
 
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        RespPage<BlockListItem> cacheBlocks = getBlockPage(chainId,1,1);
-        if(cacheBlocks.getData().size()>0){
-            BlockListItem block = cacheBlocks.getData().get(0);
-            if(cache.getCurrentHeight()>block.getHeight()){
+        RespPage<BlockListItem> blockPage = getBlockPage(chainId,1,1);
+        List<BlockListItem> sampleBlocks = blockPage.getData();
+        if(sampleBlocks.size()>0){
+            BlockListItem cachedHighestBlock = sampleBlocks.get(0);
+            if(cache.getCurrentHeight()>cachedHighestBlock.getHeight()){
                 // 如果参数的块高比缓存中的块高小，则不作更新
                 return false;
             }
-
             /************* 设置当前块高、出块节点、节点名称、节点ID*************/
-            if(cache.getCurrentHeight()<block.getHeight()){
-                cache.setMiner(block.getMiner());
-                cache.setCurrentHeight(block.getHeight());
-                cache.setNodeName(StringUtils.isBlank(block.getNodeName())?"Unknown":block.getNodeName());
-                cache.setNodeId(block.getNodeId());
+            if(cache.getCurrentHeight()<cachedHighestBlock.getHeight()){
+                cache.setMiner(cachedHighestBlock.getMiner());
+                cache.setCurrentHeight(cachedHighestBlock.getHeight());
+                cache.setNodeName(StringUtils.isBlank(cachedHighestBlock.getNodeName())?"Unknown":cachedHighestBlock.getNodeName());
+                cache.setNodeId(cachedHighestBlock.getNodeId());
             }
-
-            /************** 计算当前TPS ************/
-            Date endDate = new Date(block.getTimestamp());
-            Date startDate = new Date(block.getTimestamp()-1000);
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId).andTimestampBetween(startDate,endDate);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
-            cache.setCurrent(0);
-            if(blocks.size()>0){
-                for (Block e : blocks) cache.setCurrent(cache.getCurrent()+e.getTransactionNumber());
-            }
+            /************** 计算当前TPS: 因为链上每秒出一个块，所以最高块中的交易数就是TPS ************/
+            cache.setCurrent(cachedHighestBlock.getTransaction());
         }
+        logger.debug("  |-Time Consuming(updateStatisticsCache()[TPS]): {}ms",System.currentTimeMillis()-beginTime);
 
         /************** 计算最大TPS ************/
         if(cache.getMaxTps()<cache.getCurrent()){
@@ -518,27 +525,18 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         cache.setConsensusCount(nodes.size());
 
 
-        /************* 设置总交易笔数***********/
-        TransactionExample transactionCon = new TransactionExample();
-        transactionCon.createCriteria().andChainIdEqualTo(chainId);
-        long totalTransaction = transactionMapper.countByExample(transactionCon);
-        cache.setTransactionCount(totalTransaction);
-
-
+        long querySummaryBeginTime = System.currentTimeMillis();
+        /************* 总交易数*************/
+        cache.setTransactionCount(getTransCount(chainId));
         /************* 设置地址数*************/
-        long addressCount = customStatisticsMapper.countAddress(chainId);
-        cache.setAddressCount(addressCount);
-
+        cache.setAddressCount(getAddressCount(chainId));
         /************** 计算24小时内的交易数 ************/
-        long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
-        cache.setDayTransaction(dayTransactionCount);
-
+        cache.setDayTransaction(getTransCount24Hours(chainId));
         /************** 计算平均区块交易数 ************/
-        BigDecimal avgBlockTrans = customStatisticsMapper.countAvgTransactionPerBlock(chainId);
-        cache.setAvgTransaction(avgBlockTrans);
+        cache.setAvgTransaction(getAvgBlockTransCount(chainId));
+        logger.debug("  |-Time Consuming(updateStatisticsCache()[COUNT]): {}ms",System.currentTimeMillis()-querySummaryBeginTime);
 
-
-
+        long avgBlockTimeBeginTime = System.currentTimeMillis();
         /************** 计算平均出块时长 *************/
         String blockCacheKey = blockCacheKeyTemplate.replace("{}",chainId);
         Set<String> oldest = redisTemplate.opsForZSet().reverseRange(blockCacheKey,3599,3599);
@@ -566,40 +564,22 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         divider = divider*1000;
         BigDecimal avgTime=BigDecimal.valueOf(highestBlockTimestamp-lowestBlockTimestamp).divide(BigDecimal.valueOf(divider),4,BigDecimal.ROUND_HALF_UP);
         cache.setAvgTime(avgTime);
+        logger.debug("  |-Time Consuming(updateStatisticsCache()[AVG_BLOCK_TIME]): {}ms",System.currentTimeMillis()-avgBlockTimeBeginTime);
 
+
+        long ticketContractBeginTime = System.currentTimeMillis();
         /*********************** 获取当前投票数、占比、票价 ***********************/
-        TicketContract ticketContract = platon.getTicketContract(chainId);
-
-        // 票价
-        try {
-            String ticketPrice = ticketContract.GetTicketPrice().send();
-            if(StringUtils.isNotBlank(ticketPrice)){
-                cache.setTicketPrice(Convert.fromWei(ticketPrice, Convert.Unit.ETHER));
-            }else{
-                cache.setTicketPrice(BigDecimal.ZERO);
-            }
-        } catch (Exception e) {
-            cache.setTicketPrice(BigDecimal.ZERO);
-            e.printStackTrace();
-        }
-        // 投票数
-        try {
-            String remain = ticketContract.GetPoolRemainder().send();
-            if(StringUtils.isNotBlank(remain)){
-                cache.setVoteCount(51200-Long.valueOf(remain));
-            }else{
-                cache.setVoteCount(0);
-            }
-        } catch (Exception e) {
-            cache.setVoteCount(0);
-            e.printStackTrace();
-        }
+        cache.setTicketPrice(getTicketPrice(chainId));
+        cache.setVoteCount(getVoteCount(chainId));
         // 占比
         BigDecimal proportion = BigDecimal.valueOf(cache.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
         cache.setProportion(proportion);
+        logger.debug("  |-Time Consuming(updateStatisticsCache()[TICKET_CONTRACT]): {}ms",System.currentTimeMillis()-ticketContractBeginTime);
 
         String cacheKey = staticsticsCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.opsForValue().set(cacheKey, JSON.toJSONString(cache));
+
+        logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
 
         return true;
     }
@@ -621,4 +601,153 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         }
         return cache;
     }
+
+    /**
+     * 更新总交易笔数
+     */
+    @Override
+    public boolean updateTransCount(String chainId) {
+        /************* 设置总交易笔数***********/
+        String cacheKey = transCountCacheKeyTemplate.replace("{}",chainId);
+        TransactionExample transactionCon = new TransactionExample();
+        transactionCon.createCriteria().andChainIdEqualTo(chainId);
+        long totalTransaction = transactionMapper.countByExample(transactionCon);
+        redisTemplate.opsForValue().set(cacheKey,String.valueOf(totalTransaction));
+        return true;
+    }
+
+    @Override
+    public long getTransCount(String chainId) {
+        String cacheKey = transCountCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
+        return 0;
+    }
+
+    /**
+     * 更新24小时内的交易笔数
+     */
+    @Override
+    public boolean updateTransCount24Hours(String chainId) {
+        /************** 计算24小时内的交易数 ************/
+        String cacheKey = transCount24HoursCacheKeyTemplate.replace("{}",chainId);
+        long dayTransactionCount = customStatisticsMapper.countTransactionIn24Hours(chainId);
+        redisTemplate.opsForValue().set(cacheKey,String.valueOf(dayTransactionCount));
+        return true;
+    }
+
+    @Override
+    public long getTransCount24Hours(String chainId) {
+        String cacheKey = transCount24HoursCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
+        return 0;
+    }
+
+    /**
+     * 更新地址数
+     */
+    @Override
+    public boolean updateAddressCount(String chainId) {
+        /************* 设置地址数*************/
+        String cacheKey = addressCountCacheKeyTemplate.replace("{}",chainId);
+        long addressCount = customStatisticsMapper.countAddress(chainId);
+        redisTemplate.opsForValue().set(cacheKey,String.valueOf(addressCount));
+        return true;
+    }
+
+    @Override
+    public long getAddressCount(String chainId) {
+        String cacheKey = addressCountCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
+        return 0;
+    }
+
+    /**
+     * 更新区块平均交易数
+     */
+    @Override
+    public boolean updateAvgBlockTransCount(String chainId) {
+        /************** 计算平均区块交易数 ************/
+        String cacheKey = avgBlockTransCountCacheKeyTemplate.replace("{}",chainId);
+        BigDecimal avgBlockTrans = customStatisticsMapper.countAvgTransactionPerBlock(chainId);
+        redisTemplate.opsForValue().set(cacheKey,String.valueOf(avgBlockTrans));
+        return true;
+    }
+
+    @Override
+    public BigDecimal getAvgBlockTransCount(String chainId) {
+        String cacheKey = avgBlockTransCountCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return new BigDecimal(res);
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * 更新票价
+     * @param chainId
+     * @return
+     */
+    @Override
+    public boolean updateTicketPrice(String chainId) {
+        String cacheKey = ticketPriceCacheKeyTemplate.replace("{}",chainId);
+        /*********************** 获取当前投票数、占比、票价 ***********************/
+        TicketContract ticketContract = platon.getTicketContract(chainId);
+        // 票价
+        try {
+            String ticketPrice = ticketContract.GetTicketPrice().send();
+            if(StringUtils.isNotBlank(ticketPrice)){
+                redisTemplate.opsForValue().set(cacheKey,Convert.fromWei(ticketPrice, Convert.Unit.ETHER).toString());
+            }else{
+                redisTemplate.opsForValue().set(cacheKey,"0");
+            }
+        } catch (Exception e) {
+            redisTemplate.opsForValue().set(cacheKey,"0");
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
+    public BigDecimal getTicketPrice(String chainId) {
+        String cacheKey = ticketPriceCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return new BigDecimal(res);
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * 更新投票数
+     * @param chainId
+     * @return
+     */
+    @Override
+    public boolean updateVoteCount(String chainId) {
+        String cacheKey = voteCountCacheKeyTemplate.replace("{}",chainId);
+        // 投票数
+        TicketContract ticketContract = platon.getTicketContract(chainId);
+        try {
+            String remain = ticketContract.GetPoolRemainder().send();
+            if(StringUtils.isNotBlank(remain)){
+                redisTemplate.opsForValue().set(cacheKey,String.valueOf(51200-Long.valueOf(remain)));
+            }else{
+                redisTemplate.opsForValue().set(cacheKey,"0");
+            }
+        } catch (Exception e) {
+            redisTemplate.opsForValue().set(cacheKey,"0");
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
+    public long getVoteCount(String chainId) {
+        String cacheKey = voteCountCacheKeyTemplate.replace("{}",chainId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
+        return 0;
+    }
+
+
 }

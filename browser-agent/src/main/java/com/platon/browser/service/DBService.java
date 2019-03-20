@@ -8,6 +8,8 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @Component
 public class DBService {
+    private static Logger logger = LoggerFactory.getLogger(DBService.class);
     @Autowired
     private PlatonClient platon;
     @Value("${platon.chain.active}")
@@ -40,11 +43,17 @@ public class DBService {
 
     @Transactional
     public void flush(AnalyseThread.AnalyseResult result){
+        long beginTime = System.currentTimeMillis();
         if(result.blocks.size()>0){
+            long blockInertBeginTime = beginTime;
             blockMapper.batchInsert(result.blocks);
+            logger.debug("  |-Time Consuming(blockMapper.batchInsert()): {}ms",System.currentTimeMillis()-blockInertBeginTime);
             // 更新区块中的节点名称字段：node_name
-            customBlockMapper.updateBlockNodeName(chainId);
+            //customBlockMapper.updateBlockNodeName(chainId);
+
+            long updateBlockCacheBeginTime = System.currentTimeMillis();
             redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
+            logger.debug("  |-Time Consuming(redisCacheService.updateBlockCache): {}ms",System.currentTimeMillis()-updateBlockCacheBeginTime);
         }
 
         if(result.transactions.size()>0){
@@ -81,6 +90,11 @@ public class DBService {
             blockMissingMapper.deleteByExample(example);
             blockMissingMapper.batchInsert(result.errorBlocks);
         }
+
+        long updateStatisticsCache = System.currentTimeMillis();
         redisCacheService.updateStatisticsCache(chainId);
+        logger.debug("  |-Time Consuming(redisCacheService.updateStatisticsCache()): {}ms",System.currentTimeMillis()-updateStatisticsCache);
+
+        logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
 }
