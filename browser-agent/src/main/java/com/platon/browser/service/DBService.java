@@ -48,9 +48,6 @@ public class DBService {
             long blockInertBeginTime = beginTime;
             blockMapper.batchInsert(result.blocks);
             logger.debug("  |-Time Consuming(blockMapper.batchInsert()): {}ms",System.currentTimeMillis()-blockInertBeginTime);
-            // 更新区块中的节点名称字段：node_name
-            //customBlockMapper.updateBlockNodeName(chainId);
-
             long updateBlockCacheBeginTime = System.currentTimeMillis();
             redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
             logger.debug("  |-Time Consuming(redisCacheService.updateBlockCache): {}ms",System.currentTimeMillis()-updateBlockCacheBeginTime);

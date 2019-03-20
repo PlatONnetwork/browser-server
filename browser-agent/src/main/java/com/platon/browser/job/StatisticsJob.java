@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.VoteTx;
 import com.platon.browser.dao.entity.VoteTxExample;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.VoteTxMapper;
 import com.platon.browser.service.RedisCacheService;
 import org.slf4j.Logger;
@@ -80,6 +81,8 @@ public class StatisticsJob {
 
     @Autowired
     private RedisCacheService redisCacheService;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
     public static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(6);
     @Scheduled(cron = "0/10 * * * * ?")
     protected void updateTransCount () {
@@ -91,5 +94,13 @@ public class StatisticsJob {
         THREAD_POOL.submit(()->{try {redisCacheService.updateTicketPrice(chainId);}finally {latch.countDown();}});
         THREAD_POOL.submit(()->{try {redisCacheService.updateVoteCount(chainId);}finally {latch.countDown();}});
         try {latch.await();} catch (InterruptedException e) {e.printStackTrace();}
+    }
+
+    @Scheduled(cron = "0/30 * * * * ?")
+    protected void updateBlockNodeName(){
+        // 更新区块中的节点名称字段：node_name
+        long updateBlockNodeNameBeginTime = System.currentTimeMillis();
+        customBlockMapper.updateBlockNodeName(chainId);
+        logger.debug("  |-Time Consuming(customBlockMapper.updateBlockNodeName()): {}ms",System.currentTimeMillis()-updateBlockNodeNameBeginTime);
     }
 }
