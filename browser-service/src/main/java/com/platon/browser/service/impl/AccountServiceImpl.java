@@ -146,34 +146,38 @@ public class AccountServiceImpl implements AccountService {
         }
 
         //设置交易收益
-        //根据投票交易hash查询区块列表
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
-        List<Block> blocks = blockMapper.selectByExample(blockExample);
-        Map<String,List<Block>> groupMap = new HashMap <>();
-        //根据hash分组hash-block
-        blocks.forEach(block->{
-            List<Block> group=groupMap.get(block.getVoteHash());
-            if(group==null){
-                group=new ArrayList <>();
-                groupMap.put(block.getVoteHash(),group);
-            }
-            group.add(block);
-        });
         //分组计算收益
         Map<String,BigDecimal> incomeMap = new HashMap <>();
-        groupMap.forEach((txHash,group)->{
-            BigDecimal txIncome = BigDecimal.ZERO;
-            for (Block block:group){
-                txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
-            }
-            incomeMap.put(txHash,txIncome);
-        });
 
-        data.forEach(transations -> {
-            BigDecimal inCome = incomeMap.get(transations.getTxHash());
-            if(null == inCome) transations.setIncome(BigDecimal.ZERO);
-            else transations.setIncome(inCome);
+        //根据投票交易hash查询区块列表
+        if(hashList.size()>0){
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            Map<String,List<Block>> groupMap = new HashMap <>();
+            //根据hash分组hash-block
+            blocks.forEach(block->{
+                List<Block> group=groupMap.get(block.getVoteHash());
+                if(group==null){
+                    group=new ArrayList <>();
+                    groupMap.put(block.getVoteHash(),group);
+                }
+                group.add(block);
+            });
+
+            groupMap.forEach((txHash,group)->{
+                BigDecimal txIncome = BigDecimal.ZERO;
+                for (Block block:group){
+                    txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
+                }
+                incomeMap.put(txHash,txIncome);
+            });
+        }
+
+        data.forEach(transaction -> {
+            BigDecimal inCome = incomeMap.get(transaction.getTxHash());
+            if(null == inCome) transaction.setIncome(BigDecimal.ZERO);
+            else transaction.setIncome(inCome);
         });
 
         returnData.setTrades(data);
