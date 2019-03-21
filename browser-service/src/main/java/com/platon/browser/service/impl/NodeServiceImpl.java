@@ -117,7 +117,7 @@ public class NodeServiceImpl implements NodeService {
             if (StringUtils.isNotBlank(remain)){
                 returnData.setVoteCount(51200-Long.valueOf(remain));
             }else{
-                returnData.setTicketPrice(BigDecimal.ZERO);
+                returnData.setVoteCount(0);
             }
         } catch (Exception e) {
             returnData.setVoteCount(0l);
