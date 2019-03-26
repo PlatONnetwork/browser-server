@@ -105,29 +105,34 @@ public class NodeAnalyseJob {
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
                 String nodeInfo = candidateContract.CandidateList().send();
                 List<String> candidateStrArr = JSON.parseArray(nodeInfo,String.class);
+                List <CandidateDto> nList = new ArrayList <>();
                 // 候选
                 List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
-                nodes.forEach(candidate -> {
-                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                    nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
-                });
+                if(null != nodes && nodes.size() > 0){
+                    nodes.forEach(candidate -> {
+                        //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                        nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
+                        nList.addAll(nodes);
+                    });
+                }
+
 
                 // 备选
                 List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);
-                alternates.forEach(candidate -> {
-                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                    nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
-                });
+                if(null != alternates && alternates.size() > 0){
+                    alternates.forEach(candidate -> {
+                        //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                        nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
+                        nList.addAll(alternates);
+                    });
+                }
+
 
                 //当前轮验证人
                 String verifiers = candidateContract.VerifiersList().send();
                 List<CandidateDto> verifierList = JSON.parseArray(verifiers,CandidateDto.class);
-
-
                 Map<String,CandidateDto> allMap = new HashMap <>();
-                List <CandidateDto> nList = new ArrayList <>();
-                nList.addAll(nodes);
-                nList.addAll(alternates);
+
                 nList.forEach(allNode->{
                     allMap.put(allNode.getCandidateId(),allNode);
                 });
@@ -144,7 +149,10 @@ public class NodeAnalyseJob {
                 });
 
                 //处理完以上逻辑才将所有的节点信息汇总
-                nodes.addAll(alternates);
+                if(null != alternates && alternates.size() > 0){
+                    nodes.addAll(alternates);
+
+                }
 
                 logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
                 if (null == nodeInfo) return;

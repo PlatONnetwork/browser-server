@@ -104,7 +104,10 @@ public class BlockFilter {
                         EventRes eventRes = JSON.parseObject(event, EventRes.class);
                         //event objcet is jsonString , transform jsonObject <EventRes>
                         //EventRes get Data
-                        bean.setBlockVoteNumber(Long.valueOf(eventRes.getData()));
+                        String res = eventRes.getData();
+                        String[] strs = res.split(":");
+                        bean.setBlockVoteNumber(Long.valueOf(strs[0]));
+                        bean.setVotePrice(strs[1]);
                     } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                         campaignAmount=campaignAmount.add(BigInteger.ONE);
                     }
