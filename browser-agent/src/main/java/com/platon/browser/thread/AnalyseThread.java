@@ -104,7 +104,7 @@ public class AnalyseThread {
         try {
             dbService.flush(result);
         } catch (Exception e) {
-            logger.error("Flush DB error:{}",e.getMessage());
+            logger.error("Flush db error:{}",e.getMessage());
             List<Long> numbers = new ArrayList<>();
             result.blocks.forEach(block -> {
                 numbers.add(block.getNumber());
