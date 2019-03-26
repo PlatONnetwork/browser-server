@@ -79,6 +79,7 @@ public class AnalyseThread {
                     List<TransactionBean> transactions = transactionFilter.analyse(param, block.getTimestamp().getTime());
                     result.transactions.addAll(transactions);
                 } catch (Exception e) {
+                    logger.error("Block analyse error:{}",e.getMessage());
                     // 出错之后记录下出错的区块号，并返回
                     BlockMissing err = new BlockMissing();
                     err.setChainId(chainId);
@@ -103,6 +104,7 @@ public class AnalyseThread {
         try {
             dbService.flush(result);
         } catch (Exception e) {
+            logger.error("Flush DB error:{}",e.getMessage());
             List<Long> numbers = new ArrayList<>();
             result.blocks.forEach(block -> {
                 numbers.add(block.getNumber());
