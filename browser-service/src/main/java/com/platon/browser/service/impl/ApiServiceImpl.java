@@ -137,11 +137,13 @@ public class ApiServiceImpl implements ApiService {
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
+            List<Long> blockNumberList = new ArrayList <>();
             transactionList.forEach(transaction -> {
                 VoteInfo date = new VoteInfo();
                 date.init(transaction);
                 date.setVailVoteCount(validVoteMap.get(transaction.getHash()));
                 bean.add(date);
+                blockNumberList.add(transaction.getBlockNumber());
             });
 
             List<String> nodeIds = new ArrayList <>();
@@ -152,9 +154,16 @@ public class ApiServiceImpl implements ApiService {
             Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
             Map<String,Date> deadDate = new HashMap <>();
             Map<String,String> priceMap = new HashMap <>();
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId).andNumberIn(blockNumberList);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+
+            blocks.forEach(block -> {
+                priceMap.put(block.getHash(),block.getVotePrice());
+            });
+
             List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
-            voteTxes.forEach(voteTx -> {
-                priceMap.put(voteTx.getHash(),voteTx.getPrice());
+            voteTxes.forEach(voteTx ->{
                 if(voteTx.getDeadLine() != null){
                     deadDate.put(voteTx.getHash(),voteTx.getDeadLine());
                 }

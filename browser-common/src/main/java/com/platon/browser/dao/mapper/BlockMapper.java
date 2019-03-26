@@ -47,5 +47,5 @@ public interface BlockMapper {
      * @mbg.generated
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
-    int batchInsertSelective(@Param("list") List<Block> list, @Param("selective") Block.Column ... selective);
+    int batchInsertSelective(@Param("list") List<Block> list, @Param("selective") Block.Column... selective);
 }

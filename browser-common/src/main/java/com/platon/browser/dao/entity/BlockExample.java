@@ -1684,6 +1684,76 @@ public class BlockExample {
             addCriterion("reward_ratio not between", value1, value2, "rewardRatio");
             return (Criteria) this;
         }
+
+        public Criteria andVotePriceIsNull() {
+            addCriterion("vote_price is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceIsNotNull() {
+            addCriterion("vote_price is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceEqualTo(String value) {
+            addCriterion("vote_price =", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceNotEqualTo(String value) {
+            addCriterion("vote_price <>", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceGreaterThan(String value) {
+            addCriterion("vote_price >", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceGreaterThanOrEqualTo(String value) {
+            addCriterion("vote_price >=", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceLessThan(String value) {
+            addCriterion("vote_price <", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceLessThanOrEqualTo(String value) {
+            addCriterion("vote_price <=", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceLike(String value) {
+            addCriterion("vote_price like", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceNotLike(String value) {
+            addCriterion("vote_price not like", value, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceIn(List<String> values) {
+            addCriterion("vote_price in", values, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceNotIn(List<String> values) {
+            addCriterion("vote_price not in", values, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceBetween(String value1, String value2) {
+            addCriterion("vote_price between", value1, value2, "votePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andVotePriceNotBetween(String value1, String value2) {
+            addCriterion("vote_price not between", value1, value2, "votePrice");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

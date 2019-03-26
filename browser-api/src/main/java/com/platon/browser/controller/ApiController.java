@@ -45,7 +45,7 @@ public class ApiController {
     private ApiService apiService;
 
     /**
-     * @api {get} api/getBatchVoteSummary a.获取统计统计信息
+     * @api {post} api/getBatchVoteSummary a.获取统计统计信息
      * @apiVersion 1.0.0
      * @apiName GetBatchVoteSummary
      * @apiGroup api
@@ -86,7 +86,7 @@ public class ApiController {
 
 
     /**
-     * @api {get} api/getBatchVoteTransaction b.批量获选票交易
+     * @api {post} api/getBatchVoteTransaction b.批量获选票交易
      * @apiVersion 1.0.0
      * @apiName getBatchVoteTransaction
      * @apiGroup api
@@ -129,7 +129,7 @@ public class ApiController {
     }
 
     /**
-     * @api {get} api/getCandidateTicketCount c.批量获取节点有效选票
+     * @api {post} api/getCandidateTicketCount c.批量获取节点有效选票
      * @apiVersion 1.0.0
      * @apiName getCandidateTicketCount
      * @apiGroup api
@@ -166,7 +166,7 @@ public class ApiController {
 
 
     /**
-     * @api {get} api/getTicketCountByTxHash d.批量获取投票交易相关信息
+     * @api {post} api/getTicketCountByTxHash d.批量获取投票交易相关信息
      * @apiVersion 1.0.0
      * @apiName getTicketCountByTxHash
      * @apiGroup api
@@ -193,6 +193,7 @@ public class ApiController {
      *           "voteSum":22,//总票数
      *           "deadLine":"1231231233".//实际过期时间
      *           "walletAddress":"0xbbbbbb",//钱包地址
+     *           "price":"100"//票价
      *       }
      *       ]
      * }
