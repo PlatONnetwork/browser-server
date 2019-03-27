@@ -3,7 +3,7 @@
     {
       "cid": "1",
       "en": "A网",
-      "zh": "MainNet(主网络)",
+      "zh": "Alpha(A网)",
       "http": "http://192.168.9.190:10061/newversion_test",
       "context":"b-api"
     },
