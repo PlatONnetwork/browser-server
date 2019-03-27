@@ -2,15 +2,15 @@
   "chainList":[
     {
       "cid": "1",
-      "en": "A网",
+      "en": "Alpha",
       "zh": "Alpha(A网)",
       "http": "http://192.168.9.190:10061/newversion_test",
       "context":"a-api"
     },
     {
       "cid": "203",
-      "en": "B网",
-      "zh": "Beta(B网)",
+      "en": "Batalla",
+      "zh": "Batalla(B网)",
       "http": "http://192.168.9.190:10061/newversion_test",
       "context":"b-api"
     }
