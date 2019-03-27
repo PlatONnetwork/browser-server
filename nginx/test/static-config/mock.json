@@ -2,9 +2,17 @@
   "chainList":[
     {
       "cid": "1",
-      "en": "MainNet",
+      "en": "A网",
       "zh": "MainNet(主网络)",
-      "http": "http://192.168.9.190:10061/newversion_test"
+      "http": "http://192.168.9.190:10061/newversion_test",
+      "context":"b-api"
+    },
+    {
+      "cid": "203",
+      "en": "B网",
+      "zh": "Beta(B网)",
+      "http": "http://192.168.9.190:10061/newversion_test",
+      "context":"b-api"
     }
   ]
 }
