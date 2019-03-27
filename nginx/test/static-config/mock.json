@@ -5,7 +5,7 @@
       "en": "A网",
       "zh": "Alpha(A网)",
       "http": "http://192.168.9.190:10061/newversion_test",
-      "context":"b-api"
+      "context":"a-api"
     },
     {
       "cid": "203",
