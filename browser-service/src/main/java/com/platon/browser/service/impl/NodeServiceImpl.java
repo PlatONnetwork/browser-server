@@ -18,6 +18,7 @@ import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.NodeTypeEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.req.block.BlockDownloadReq;
@@ -142,7 +143,9 @@ public class NodeServiceImpl implements NodeService {
                 holder.selectedCount++;
             }
             data.add(bean);
-            nodeIds.append(initData.getNodeId()).append(":");
+            if(initData.getNodeType() != NodeTypeEnum.VALIDATOR.name().toLowerCase()){
+                nodeIds.append(initData.getNodeId()).append(":");
+            }
         });
 
         returnData.setSelectedNodeCount(holder.selectedCount);
@@ -230,17 +233,24 @@ public class NodeServiceImpl implements NodeService {
         returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
-        // 设置得票数
-        try {
-            String numberOfVotes = ticketContract.GetCandidateTicketCount(returnData.getNodeId()).send();
-            if(StringUtils.isNotBlank(numberOfVotes)){
-                Map<String,Integer> map = JSON.parseObject(numberOfVotes,Map.class);
-                Integer count = map.get(returnData.getNodeId().replace("0x",""));
-                returnData.setTicketCount(count);
+
+        if(initData.getNodeType().equals(NodeTypeEnum.VALIDATOR.name().toLowerCase())){
+            returnData.setTicketCount(initData.getCount().intValue());
+        }else {
+            // 设置得票数
+            try {
+                String numberOfVotes = ticketContract.GetCandidateTicketCount(returnData.getNodeId()).send();
+                if(StringUtils.isNotBlank(numberOfVotes)){
+                    Map<String,Integer> map = JSON.parseObject(numberOfVotes,Map.class);
+                    Integer count = map.get(returnData.getNodeId().replace("0x",""));
+                    returnData.setTicketCount(count);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+
 
         // 设置票龄
         returnData.setTicketEpoch(0l);

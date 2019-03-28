@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
+import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
@@ -30,6 +31,7 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
@@ -56,26 +58,13 @@ public class NodeAnalyseJob {
     @Value("${platon.chain.active}")
     private String chainId;
     @PostConstruct
-    public void init () {
-        /*BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("number desc");
-        PageHelper.startPage(1, 1);
-        List <Block> blocks = blockMapper.selectByExample(condition);
-        // 1、首先从数据库查询当前链的最高块号，作为采集起始块号
-        // 2、如果查询不到则从0开始
-        if (blocks.size() == 0) {
-            beginNumber = 1L;
-        } else {
-            beginNumber = blocks.get(0).getNumber() + 1;
-        }*/
+    private void init(){
         try {
             TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * 分析节点数据
@@ -96,211 +85,233 @@ public class NodeAnalyseJob {
             EthBlock ethBlock = null;
             //BigInteger endNumber = platon.getWeb3j(chainId).ethBlockNumber().send().getBlockNumber();
             //while (beginNumber <= endNumber.longValue()) {
-                Map<String,String> nodeTypeMap = new HashMap <>();
+            //节点id对应节点类型名称Map
+            Map <String, String> nodeTypeMap = new HashMap <>();
 
-                long startTime = System.currentTimeMillis();
-                ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
-                logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
-                BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
-                CandidateContract candidateContract = platon.getCandidateContract(chainId);
-                String nodeInfo = candidateContract.CandidateList().send();
-                List<String> candidateStrArr = JSON.parseArray(nodeInfo,String.class);
-                List <CandidateDto> nList = new ArrayList <>();
-                // 候选
-                List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
-                if(null != nodes && nodes.size() > 0){
-                    nodes.forEach(candidate -> {
-                        //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                        nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
-                        nList.addAll(nodes);
-                    });
-                }
-
-
-                // 备选
-                List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);
-                if(null != alternates && alternates.size() > 0){
-                    alternates.forEach(candidate -> {
-                        //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                        nodeTypeMap.put(candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
-                        nList.addAll(alternates);
-                    });
-                }
-
-
-                //当前轮验证人
-                String verifiers = candidateContract.VerifiersList().send();
-                List<CandidateDto> verifierList = JSON.parseArray(verifiers,CandidateDto.class);
-                Map<String,CandidateDto> allMap = new HashMap <>();
-
-                nList.forEach(allNode->{
-                    allMap.put(allNode.getCandidateId(),allNode);
-                });
-
-                verifierList.forEach(candidateNode -> {
+            long startTime = System.currentTimeMillis();
+            ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
+            logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
+            BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
+            CandidateContract candidateContract = platon.getCandidateContract(chainId);
+            String nodeInfo = candidateContract.CandidateList().send();
+            List <String> candidateStrArr = JSON.parseArray(nodeInfo, String.class);
+            List <CandidateDto> nList = new ArrayList <>();
+            //候选人+被选人Map
+            Map <String, CandidateDto> allMap = new HashMap <>();
+            // 候选
+            List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
+            if (null != nodes && nodes.size() > 0) {
+                nodes.forEach(candidate -> {
                     //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                    nodeTypeMap.put(candidateNode.getCandidateId(), NodeTypeEnum.VALIDATOR.name().toLowerCase());
-
-                    //判断验证人列表是否在当前的（候选+备选）池中，如果没有则将验证人的信息天骄到候选列表最后
-                    CandidateDto node = allMap.get(candidateNode.getCandidateId());
-                    if(node.equals(null)){
-                        nodes.add(candidateNode);
-                    }
+                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
+                    nList.add(candidate);
+                    allMap.put("0x" + candidate.getCandidateId(), candidate);
                 });
+            }
 
-                //处理完以上逻辑才将所有的节点信息汇总
-                if(null != alternates && alternates.size() > 0){
-                    nodes.addAll(alternates);
 
+            // 备选
+            List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);
+            if (null != alternates && alternates.size() > 0) {
+                alternates.forEach(candidate -> {
+                    //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
+                    nList.add(candidate);
+                    allMap.put("0x" + candidate.getCandidateId(), candidate);
+                });
+            }
+
+            if (null != alternates && alternates.size() > 0) {
+                alternates.forEach(candidate -> {
+                    nodes.add(candidate);
+                });
+            }
+
+            //当前轮验证人
+            String verifiers = candidateContract.VerifiersList().send();
+            List <CandidateDto> verifierList = JSON.parseArray(verifiers, CandidateDto.class);
+
+
+            verifierList.forEach(candidateNode -> {
+                //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
+                nodeTypeMap.put("0x" + candidateNode.getCandidateId(), NodeTypeEnum.VALIDATOR.name().toLowerCase());
+
+                //判断验证人列表是否在当前的（候选+备选）池中，如果没有则将验证人的信息天骄到候选列表最后
+                CandidateDto node = allMap.get("0x" + candidateNode.getCandidateId());
+                if (node == null) {
+                    nodes.add(candidateNode);
                 }
 
-                logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
-                if (null == nodeInfo) return;
-                if (null == nodes && nodes.size() < 0) return;
+            });
 
-                nodeRankingExample = new NodeRankingExample();
-                nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
-                //find NodeRanking info by condition on database
-                List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
-
-                List <NodeRanking> nodeList = new ArrayList <>();
-                int i = 1;
-                BlockKey key = new BlockKey();
-                key.setChainId(chainId);
-                //logger.error("hash  {} ", ethBlock.getBlock().getHash());
-                key.setHash(ethBlock.getBlock().getHash());
-                Block block = blockMapper.selectByPrimaryKey(key);
-                for (CandidateDto candidateDto : nodes) {
-                    // 加上“0x”
-                    if (!candidateDto.getCandidateId().startsWith("0x")) {
-                        candidateDto.setCandidateId("0x" + candidateDto.getCandidateId());
-                    }
-                    NodeRankingBean nodeRanking = new NodeRankingBean();
-                    nodeRanking.init(candidateDto);
-
-                    //设置节点类型
-                    String nodeType = nodeTypeMap.get(candidateDto.getCandidateId());
-                    nodeRanking.setNodeType(nodeType != null ? nodeType : " ");
+            nList.forEach(allNode -> {
+                allNode.setCandidateId("0x" + allNode.getCandidateId());
+                allMap.put(allNode.getCandidateId(), allNode);
+            });
 
 
-                    // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
-                    StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(chainId);
-                    nodeRanking.setAvgTime(statisticsCache.getAvgTime().doubleValue());
+            //查询有效票
+            StringBuffer strBuffer = new StringBuffer();
+            nodes.forEach(node -> {
+                strBuffer.append(node.getCandidateId()).append(":");
+            });
+            String nodeIds = strBuffer.toString();
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            String res = ticketContract.GetCandidateTicketCount(nodeIds).send();
+            Map <String, Integer> countMap = JSON.parseObject(res, Map.class);
 
-                    BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
-                    nodeRanking.setChainId(chainId);
-                    nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
-                    nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
-                    /*
-                     * 统计当前块中：
-                     * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
-                     * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
-                     */
-                    //todo:数据不一致的问题
-                    if(block != null){
-                        BigDecimal actualTxCostsum = new BigDecimal(block.getActualTxCostSum());
-                    }
-                    nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
-                            multiply(rate).
-                            add(BigDecimal.ZERO).toString());
 
-                    nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
-                    nodeRanking.setRanking(i);
-                    nodeRanking.setType(1);
+            logger.debug("candidate---------------------------------->{}", System.currentTimeMillis() - startTime);
+            if (null == nodeInfo) return;
+            if (null == nodes && nodes.size() < 0) return;
 
-                    // Set the node election status according to the ranking
-                    // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
-                    /**
-                     * The first 100：candidate nodes
-                     * After 100：alternative nodes
-                     * **/
-                    int electionStatus = 1;
-                    if (1 <= i && i < 25) electionStatus = 3;
-                    if (26 <= i && i < 100) electionStatus = 1;
-                    if (i >= 100) electionStatus = 4;
-                    nodeRanking.setElectionStatus(electionStatus);
-                    nodeRanking.setIsValid(1);
-                    nodeRanking.setBeginNumber(ethBlock.getBlock().getNumber().longValue());
-                    nodeList.add(nodeRanking);
-                    i = i + 1;
+            nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
+            //find NodeRanking info by condition on database
+            List <NodeRanking> dbList = nodeRankingMapper.selectByExample(nodeRankingExample);
+
+            List <NodeRanking> nodeList = new ArrayList <>();
+            int i = 1;
+            BlockKey key = new BlockKey();
+            key.setChainId(chainId);
+            //logger.error("hash  {} ", ethBlock.getBlock().getHash());
+            key.setHash(ethBlock.getBlock().getHash());
+            Block block = blockMapper.selectByPrimaryKey(key);
+            for (CandidateDto candidateDto : nodes) {
+                NodeRankingBean nodeRanking = new NodeRankingBean();
+                nodeRanking.init(candidateDto);
+
+                //设置节点类型
+                String nodeType = nodeTypeMap.get(candidateDto.getCandidateId());
+                nodeRanking.setNodeType(nodeType != null ? nodeType : " ");
+
+
+                // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
+                StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(chainId);
+                nodeRanking.setAvgTime(statisticsCache.getAvgTime().doubleValue());
+
+                BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
+                nodeRanking.setChainId(chainId);
+                nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
+                nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
+                /*
+                 * 统计当前块中：
+                 * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
+                 * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
+                 */
+                //todo:数据不一致的问题
+                if (block != null) {
+                    BigDecimal actualTxCostsum = new BigDecimal(block.getActualTxCostSum());
                 }
-                //this time update database struct
-                List <NodeRanking> updateList = new ArrayList <>();
-                //data form database and node status is vaild
+                nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
+                        multiply(rate).
+                        add(BigDecimal.ZERO).toString());
 
-                Map <String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap <>();
-                nodeList.forEach(e -> {
-                    dbNodeIdToNodeRankingMap.put(e.getNodeId(), e);
-                    updateList.add(e);
-                });
+                nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
+                nodeRanking.setRanking(i);
+                nodeRanking.setType(1);
+                logger.error("nodeId {}", nodeRanking.getNodeId());
+                Long count = countMap.get(nodeRanking.getNodeId().replace("0x", "")).longValue();
+                if (null == count) {
+                    nodeRanking.setCount(0L);
+                } else {
+                    nodeRanking.setCount(count);
+                }
+
+                // Set the node election status according to the ranking
+                // 竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名
+                /**
+                 * The first 100：candidate nodes
+                 * After 100：alternative nodes
+                 * **/
+                int electionStatus = 1;
+                if (1 <= i && i < 25) electionStatus = 3;
+                if (26 <= i && i < 100) electionStatus = 1;
+                if (i >= 100) electionStatus = 4;
+                nodeRanking.setElectionStatus(electionStatus);
+                nodeRanking.setIsValid(1);
+                nodeRanking.setBeginNumber(ethBlock.getBlock().getNumber().longValue());
+                nodeList.add(nodeRanking);
+                i = i + 1;
+            }
+            //this time update database struct
+            List <NodeRanking> updateList = new ArrayList <>();
+            //data form database and node status is vaild
+
+            Map <String, NodeRanking> dbNodeIdToNodeRankingMap = new HashMap <>();
+            nodeList.forEach(e -> {
+                dbNodeIdToNodeRankingMap.put(e.getNodeId(), e);
+                updateList.add(e);
+            });
 
 
-
-                if (dbList.size() > 0 && dbList != null) {
-                    for (int j = 0; j < dbList.size(); j++) {
-                        NodeRanking dbNode = dbList.get(j);
-                        NodeRanking chainNode = dbNodeIdToNodeRankingMap.get(dbNode.getNodeId());
-                        if (chainNode != null) {
-                            // 库里有效属性保留
-                            chainNode.setBlockCount(dbNode.getBlockCount());
-                            chainNode.setJoinTime(dbNode.getJoinTime());
-                            chainNode.setBeginNumber(dbNode.getBeginNumber());
-                            chainNode.setId(dbNode.getId());
-                            chainNode.setAvgTime(dbNode.getAvgTime());
-                            if (publicKey.equals(new BigInteger(chainNode.getNodeId().replace("0x", ""), 16))) {
-                                chainNode.setBlockCount(chainNode.getBlockCount() + 1);
-                                chainNode.setProfitAmount(new BigDecimal(chainNode.getProfitAmount()).add(new BigDecimal(dbNode.getProfitAmount())).toString());
-                                chainNode.setRewardAmount(new BigDecimal(chainNode.getRewardAmount()).add(new BigDecimal(dbNode.getRewardAmount())).toString());
-                                chainNode.setBlockReward(new BigDecimal(chainNode.getBlockReward()).add(new BigDecimal(dbNode.getBlockReward())).toString());
-                            }else {
-                                chainNode.setProfitAmount(dbNode.getProfitAmount());
-                                chainNode.setRewardAmount(dbNode.getRewardAmount());
-                                chainNode.setBlockReward(dbNode.getBlockReward());
-
-                            }
+            if (dbList.size() > 0 && dbList != null) {
+                for (int j = 0; j < dbList.size(); j++) {
+                    NodeRanking dbNode = dbList.get(j);
+                    NodeRanking chainNode = dbNodeIdToNodeRankingMap.get(dbNode.getNodeId());
+                    if (chainNode != null) {
+                        // 库里有效属性保留
+                        chainNode.setBlockCount(dbNode.getBlockCount());
+                        chainNode.setJoinTime(dbNode.getJoinTime());
+                        chainNode.setBeginNumber(dbNode.getBeginNumber());
+                        chainNode.setId(dbNode.getId());
+                        chainNode.setAvgTime(dbNode.getAvgTime());
+                        if (publicKey.equals(new BigInteger(chainNode.getNodeId().replace("0x", ""), 16))) {
+                            chainNode.setBlockCount(chainNode.getBlockCount() + 1);
+                            chainNode.setProfitAmount(new BigDecimal(chainNode.getProfitAmount()).add(new BigDecimal(dbNode.getProfitAmount())).toString());
+                            chainNode.setRewardAmount(new BigDecimal(chainNode.getRewardAmount()).add(new BigDecimal(dbNode.getRewardAmount())).toString());
+                            chainNode.setBlockReward(new BigDecimal(chainNode.getBlockReward()).add(new BigDecimal(dbNode.getBlockReward())).toString());
                         } else {
-                            dbNode.setEndNumber(ethBlock.getBlock().getNumber().longValue());
-                            dbNode.setIsValid(0);
-                            updateList.add(dbNode);
+                            chainNode.setProfitAmount(dbNode.getProfitAmount());
+                            chainNode.setRewardAmount(dbNode.getRewardAmount());
+                            chainNode.setBlockReward(dbNode.getBlockReward());
                         }
+                        if (chainNode.getNodeType().equals(NodeTypeEnum.VALIDATOR.name().toLowerCase()) && null != dbNode.getCount()) {
+                            chainNode.setCount(dbNode.getCount());
+                        }
+                    } else {
+                        dbNode.setEndNumber(ethBlock.getBlock().getNumber().longValue());
+                        dbNode.setIsValid(0);
+                        updateList.add(dbNode);
                     }
                 }
-                //TODO:publickey 0.4.0解析存在问题
-                //FilterTool.currentBlockOwner(updateList, publicKey);
+            }
+            //TODO:publickey 0.4.0解析存在问题
+            //FilterTool.currentBlockOwner(updateList, publicKey);
 
-                //FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
+            //FilterTool.dateStatistics(updateList, publicKey, ethBlock.getBlock().getNumber().toString());
 
-                //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
-                int consensusCount = 0;
+            //TODO:verifierList存在问题，目前错误解决办法，待底层链修复完毕后在进行修正
+            int consensusCount = 0;
 
-                Set <NodeRanking> redisNode = new HashSet <>();
+            Set <NodeRanking> redisNode = new HashSet <>();
 
-                for (NodeRanking nodeRanking : updateList) {
-                    if (nodeRanking.getIsValid() == 1) {
-                        consensusCount++;
-                        NODEID_TO_NAME.put(nodeRanking.getNodeId(), nodeRanking.getName());
-                    }
-                    if(NodeTypeEnum.VALIDATOR.name().toLowerCase().equals(nodeRanking.getNodeType())){
-                        // 把验证节点放到redis缓存，让browser-api推送给websocket端
-                        redisNode.add(nodeRanking);
-                    }
+            for (NodeRanking nodeRanking : updateList) {
+                if (nodeRanking.getIsValid() == 1) {
+                    consensusCount++;
+                    NODEID_TO_NAME.put(nodeRanking.getNodeId(), nodeRanking.getName());
                 }
-
-                if (!updateList.isEmpty()) {
-                    customNodeRankingMapper.insertOrUpdate(updateList);
+                if (NodeTypeEnum.VALIDATOR.name().toLowerCase().equals(nodeRanking.getNodeType())) {
+                    // 把验证节点放到redis缓存，让browser-api推送给websocket端
+                    redisNode.add(nodeRanking);
                 }
-                logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis() - startTime);
+            }
 
-                redisCacheService.updateNodePushCache(chainId, redisNode);
-                //beginNumber++;
-                logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis() - startTime);
+            if (!updateList.isEmpty()) {
+                customNodeRankingMapper.insertOrUpdate(updateList);
+            }
+            logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis() - startTime);
+
+            redisCacheService.updateNodePushCache(chainId, redisNode);
+            //beginNumber++;
+            logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis() - startTime);
             //}
 
 
         } catch (Exception e) {
             logger.error("NodeAnalyseJob Exception:{}", e.getMessage());
             e.printStackTrace();
-         }
+        }
         logger.debug("*** End the NodeAnalyseJob *** ");
     }
 

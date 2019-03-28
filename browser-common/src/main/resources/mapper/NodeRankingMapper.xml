@@ -34,6 +34,7 @@
     <result column="latitude" jdbcType="VARCHAR" property="latitude" />
     <result column="avg_time" jdbcType="DOUBLE" property="avgTime" />
     <result column="node_type" jdbcType="VARCHAR" property="nodeType" />
+    <result column="count" jdbcType="BIGINT" property="count" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -97,7 +98,8 @@
     id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, 
     chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status, 
     is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount, 
-    block_reward, country_code, `location`, longitude, latitude, avg_time, node_type
+    block_reward, country_code, `location`, longitude, latitude, avg_time, node_type, 
+    `count`
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeRankingExample" resultMap="BaseResultMap">
     select
@@ -140,7 +142,7 @@
       block_count, reward_amount, profit_amount, 
       block_reward, country_code, `location`, 
       longitude, latitude, avg_time, 
-      node_type)
+      node_type, `count`)
     values (#{id,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, 
       #{port,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{intro,jdbcType=VARCHAR}, 
       #{address,jdbcType=VARCHAR}, #{deposit,jdbcType=VARCHAR}, #{orgName,jdbcType=VARCHAR}, 
@@ -151,7 +153,7 @@
       #{blockCount,jdbcType=BIGINT}, #{rewardAmount,jdbcType=VARCHAR}, #{profitAmount,jdbcType=VARCHAR}, 
       #{blockReward,jdbcType=VARCHAR}, #{countryCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, 
       #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR}, #{avgTime,jdbcType=DOUBLE}, 
-      #{nodeType,jdbcType=VARCHAR})
+      #{nodeType,jdbcType=VARCHAR}, #{count,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NodeRanking">
     insert into node_ranking
@@ -252,6 +254,9 @@
       <if test="nodeType != null">
         node_type,
       </if>
+      <if test="count != null">
+        `count`,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -349,6 +354,9 @@
       </if>
       <if test="nodeType != null">
         #{nodeType,jdbcType=VARCHAR},
+      </if>
+      <if test="count != null">
+        #{count,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -457,6 +465,9 @@
       <if test="record.nodeType != null">
         node_type = #{record.nodeType,jdbcType=VARCHAR},
       </if>
+      <if test="record.count != null">
+        `count` = #{record.count,jdbcType=BIGINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -495,7 +506,8 @@
       longitude = #{record.longitude,jdbcType=VARCHAR},
       latitude = #{record.latitude,jdbcType=VARCHAR},
       avg_time = #{record.avgTime,jdbcType=DOUBLE},
-      node_type = #{record.nodeType,jdbcType=VARCHAR}
+      node_type = #{record.nodeType,jdbcType=VARCHAR},
+      `count` = #{record.count,jdbcType=BIGINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -596,6 +608,9 @@
       <if test="nodeType != null">
         node_type = #{nodeType,jdbcType=VARCHAR},
       </if>
+      <if test="count != null">
+        `count` = #{count,jdbcType=BIGINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -631,7 +646,8 @@
       longitude = #{longitude,jdbcType=VARCHAR},
       latitude = #{latitude,jdbcType=VARCHAR},
       avg_time = #{avgTime,jdbcType=DOUBLE},
-      node_type = #{nodeType,jdbcType=VARCHAR}
+      node_type = #{nodeType,jdbcType=VARCHAR},
+      `count` = #{count,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -644,8 +660,8 @@
     (id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website, 
       chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status, 
       is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount, 
-      block_reward, country_code, `location`, longitude, latitude, avg_time, node_type
-      )
+      block_reward, country_code, `location`, longitude, latitude, avg_time, node_type, 
+      `count`)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR}, 
@@ -658,7 +674,8 @@
         #{item.endNumber,jdbcType=BIGINT}, #{item.blockCount,jdbcType=BIGINT}, #{item.rewardAmount,jdbcType=VARCHAR}, 
         #{item.profitAmount,jdbcType=VARCHAR}, #{item.blockReward,jdbcType=VARCHAR}, #{item.countryCode,jdbcType=VARCHAR}, 
         #{item.location,jdbcType=VARCHAR}, #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR}, 
-        #{item.avgTime,jdbcType=DOUBLE}, #{item.nodeType,jdbcType=VARCHAR})
+        #{item.avgTime,jdbcType=DOUBLE}, #{item.nodeType,jdbcType=VARCHAR}, #{item.count,jdbcType=BIGINT}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -771,6 +788,9 @@
         </if>
         <if test="'node_type'.toString() == column.value">
           #{item.nodeType,jdbcType=VARCHAR}
+        </if>
+        <if test="'count'.toString() == column.value">
+          #{item.count,jdbcType=BIGINT}
         </if>
       </foreach>
       )

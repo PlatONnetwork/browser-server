@@ -117,7 +117,7 @@ public class TransactionAnalysis {
                     typeName = "unknown";
             }
         }
-        return typeName;
+        return typeName = "unknown";
     }
 
 

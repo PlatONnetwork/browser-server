@@ -58,7 +58,7 @@ public class StatisticsJob {
         TicketContract ticketContract = platon.getTicketContract(chainId);
         Map<String,Integer> resMap = new HashMap <>();
         try {
-            String res = ticketContract.GetCandidateTicketCount(hashs).send();
+            String res = ticketContract.GetTicketCountByTxHash(hashs).send();
             resMap = JSON.parseObject(res,Map.class);
         } catch (Exception e) {
             logger.error("根据hash列表查询有效票信息失败! ...");

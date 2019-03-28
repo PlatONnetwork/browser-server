@@ -2204,6 +2204,66 @@ public class NodeRankingExample {
             addCriterion("node_type not between", value1, value2, "nodeType");
             return (Criteria) this;
         }
+
+        public Criteria andCountIsNull() {
+            addCriterion("`count` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountIsNotNull() {
+            addCriterion("`count` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountEqualTo(Long value) {
+            addCriterion("`count` =", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountNotEqualTo(Long value) {
+            addCriterion("`count` <>", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountGreaterThan(Long value) {
+            addCriterion("`count` >", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountGreaterThanOrEqualTo(Long value) {
+            addCriterion("`count` >=", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountLessThan(Long value) {
+            addCriterion("`count` <", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountLessThanOrEqualTo(Long value) {
+            addCriterion("`count` <=", value, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountIn(List<Long> values) {
+            addCriterion("`count` in", values, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountNotIn(List<Long> values) {
+            addCriterion("`count` not in", values, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountBetween(Long value1, Long value2) {
+            addCriterion("`count` between", value1, value2, "count");
+            return (Criteria) this;
+        }
+
+        public Criteria andCountNotBetween(Long value1, Long value2) {
+            addCriterion("`count` not between", value1, value2, "count");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

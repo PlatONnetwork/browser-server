@@ -39,6 +39,7 @@ public class NodeDetail {
     private Long endNumber;
     private Long hitCount;
     private Long ticketEpoch;
+    private String nodeType;
 
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);
@@ -61,5 +62,6 @@ public class NodeDetail {
         v = BigDecimal.ONE.subtract(BigDecimal.valueOf(initData.getRewardRatio())).setScale(2, RoundingMode.DOWN);
         this.setRewardRatio(v.doubleValue());
         this.setLogo(initData.getUrl());
+        this.setNodeType(initData.getNodeType());
     }
 }

@@ -27,6 +27,7 @@ public class NodeListItem {
     private Integer isValid;
     private Date eliminateTime;
     private int ticketCount;
+    private String nodeType;
     public void init(NodeRanking initData) {
         BeanUtils.copyProperties(initData,this);
         if(initData.getIsValid()==0) this.setEliminateTime(initData.getUpdateTime());
@@ -36,5 +37,11 @@ public class NodeListItem {
         this.setRewardRatio(v.doubleValue());
         v = Convert.fromWei(initData.getDeposit(), Convert.Unit.ETHER);
         this.setDeposit(EnergonUtil.format(v));
+        if(initData.getCount() != null){
+            this.setTicketCount(initData.getCount().intValue());
+        }
+        if(null !=  initData.getNodeType()){
+            this.setNodeType(initData.getNodeType());
+        }
     }
 }

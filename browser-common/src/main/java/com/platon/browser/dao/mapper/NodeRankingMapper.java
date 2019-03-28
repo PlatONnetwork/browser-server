@@ -2,10 +2,11 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 @Mapper
 public interface NodeRankingMapper {
     long countByExample(NodeRankingExample example);
@@ -46,5 +47,5 @@ public interface NodeRankingMapper {
      * @mbg.generated
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
-    int batchInsertSelective(@Param("list") List<NodeRanking> list, @Param("selective") NodeRanking.Column... selective);
+    int batchInsertSelective(@Param("list") List<NodeRanking> list, @Param("selective") NodeRanking.Column ... selective);
 }

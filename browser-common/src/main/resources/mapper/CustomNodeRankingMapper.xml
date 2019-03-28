@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomNodeRankingMapper">
-  <insert id="insertOrUpdate" parameterType="map">
+  <insert id="insertOrUpdate" parameterType="com.platon.browser.dao.entity.NodeRanking">
     replace  into node_ranking
     (id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website,
     chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status,
     is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount,
-    block_reward, country_code, `location`, longitude, latitude, avg_time)
+    block_reward, country_code, `location`, longitude, latitude, avg_time,node_type,
+    `count`)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.ip,jdbcType=VARCHAR},
@@ -19,7 +20,7 @@
       #{item.endNumber,jdbcType=BIGINT}, #{item.blockCount,jdbcType=BIGINT}, #{item.rewardAmount,jdbcType=VARCHAR},
       #{item.profitAmount,jdbcType=VARCHAR}, #{item.blockReward,jdbcType=VARCHAR}, #{item.countryCode,jdbcType=VARCHAR},
       #{item.location,jdbcType=VARCHAR}, #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR},
-      #{item.avgTime,jdbcType=DOUBLE})
+      #{item.avgTime,jdbcType=DOUBLE},#{item.nodeType,jdbcType=VARCHAR}, #{item.count,jdbcType=BIGINT})
     </foreach>
   </insert>
 

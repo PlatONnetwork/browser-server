@@ -90,7 +90,11 @@ public class NodeController {
      *           "blockCount": 252125,// 产生的总区块数
      *           "rewardRatio": 0.02,// 分红比例:小数
      *           "address": "0xsfjl34jfljsl435kd", // 节点地址
-     *           "ticketCount":""//得票数
+     *           "ticketCount":"",//得票数
+     *           "nodeType":""//节点类型
+     *              candidates—候选节点
+     *              nominees—提名节点
+     *              validator—验证节点
      *           }
      *       ]
      * }

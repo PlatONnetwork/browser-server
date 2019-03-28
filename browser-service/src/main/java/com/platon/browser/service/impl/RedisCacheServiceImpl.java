@@ -679,6 +679,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         /************** 计算平均区块交易数 ************/
         String cacheKey = avgBlockTransCountCacheKeyTemplate.replace("{}",chainId);
         BigDecimal avgBlockTrans = customStatisticsMapper.countAvgTransactionPerBlock(chainId);
+        if(avgBlockTrans==null) avgBlockTrans = BigDecimal.ZERO;
         redisTemplate.opsForValue().set(cacheKey,String.valueOf(avgBlockTrans));
         return true;
     }
