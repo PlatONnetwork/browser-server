@@ -34,7 +34,7 @@ public class CalculatePublicKey {
 
         String extraData = tBlock.getBlock().getExtraData();
 
-        String signature = extraData.substring(extraData.length() - 130, extraData.length());
+        String signature = extraData.substring(66, extraData.length());
 
         byte[] msgHash = getMsgHash(tBlock.getBlock());
 

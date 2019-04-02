@@ -24,14 +24,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
@@ -43,7 +44,7 @@ import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
  */
 @Component
 public class NodeAnalyseJob {
-    private static Logger logger = LoggerFactory.getLogger(NodeAnalyseJob.class);
+    private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
     private static Long beginNumber = 0L;
     @Autowired
     private BlockMapper blockMapper;
@@ -89,8 +90,12 @@ public class NodeAnalyseJob {
             Map <String, String> nodeTypeMap = new HashMap <>();
 
             long startTime = System.currentTimeMillis();
-            ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
+            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1L)));
+            //ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
+            ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(defaultBlockParameter, true).send();
             logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
+            EthBlock.Block block1 = ethBlock.getBlock();
+            block1.getNumber();
             BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
             CandidateContract candidateContract = platon.getCandidateContract(chainId);
             String nodeInfo = candidateContract.CandidateList().send();
@@ -103,7 +108,7 @@ public class NodeAnalyseJob {
             if (null != nodes && nodes.size() > 0) {
                 nodes.forEach(candidate -> {
                     //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
+                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
                     nList.add(candidate);
                     allMap.put("0x" + candidate.getCandidateId(), candidate);
                 });
@@ -115,7 +120,7 @@ public class NodeAnalyseJob {
             if (null != alternates && alternates.size() > 0) {
                 alternates.forEach(candidate -> {
                     //根据节点不同类型将节点id-节点类型形式放入nodeTypeMap中
-                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.NOMINEES.name().toLowerCase());
+                    nodeTypeMap.put("0x" + candidate.getCandidateId(), NodeTypeEnum.CANDIDATES.name().toLowerCase());
                     nList.add(candidate);
                     allMap.put("0x" + candidate.getCandidateId(), candidate);
                 });
@@ -210,7 +215,6 @@ public class NodeAnalyseJob {
                 nodeRanking.setRewardAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).multiply(BigDecimal.ONE.subtract(rate)).toString());
                 nodeRanking.setRanking(i);
                 nodeRanking.setType(1);
-                logger.error("nodeId {}", nodeRanking.getNodeId());
                 Long count = countMap.get(nodeRanking.getNodeId().replace("0x", "")).longValue();
                 if (null == count) {
                     nodeRanking.setCount(0L);

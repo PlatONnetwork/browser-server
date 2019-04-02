@@ -10,8 +10,10 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 chain:
-  # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-  config: MAIN_NET-203-http://192.168.120.88:6789
+  # Platon链配置,格式【{chainName1}-{chainIdA}-[http://nodeIPA1:portA1,http://nodeIPA2:portA2]】
+  # 同一条链匹配多个节点错容
+  config: MAIN_NET-203-["http://192.168.120.88:6789","http://192.168.120.85:6789"]
+  # config: MAIN_NET-203-http://192.168.120.85:6789
   # 要采集哪个ID的链
   active: 203
 # Redis集群节点

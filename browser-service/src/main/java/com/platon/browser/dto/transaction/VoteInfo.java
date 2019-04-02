@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.ticket.TxInfo;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -22,6 +23,7 @@ public class VoteInfo {
     private Date deadLine;
     private String walletAddress;
     private String price;
+    private BigDecimal income;
     public  void init(Transaction transaction){
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();

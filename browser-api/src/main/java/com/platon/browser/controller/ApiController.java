@@ -194,6 +194,7 @@ public class ApiController {
      *           "deadLine":"1231231233".//实际过期时间
      *           "walletAddress":"0xbbbbbb",//钱包地址
      *           "price":"100"//票价
+     *           "income":,//收益
      *       }
      *       ]
      * }

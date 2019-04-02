@@ -131,7 +131,9 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public RespPage<VoteInfo> getTicketCountByTxHash (List <String> hashList , String chainId ) {
+        long beginTime = System.currentTimeMillis();
         if(hashList.size() > 0){
+            logger.debug("Time Consuming-begin: {}ms",System.currentTimeMillis()-beginTime);
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
@@ -186,12 +188,53 @@ public class ApiServiceImpl implements ApiService {
                 }
 
             });
+            logger.debug("Time Consuming-middle: {}ms",System.currentTimeMillis()-beginTime);
+
+
+
+
+            //设置交易收益
+            //分组计算收益
+            Map<String,BigDecimal> incomeMap = new HashMap <>();
+
+            //根据投票交易hash查询区块列表
+            if(hashList.size()>0){
+                BlockExample hashBlockExample = new BlockExample();
+                blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashIn(hashList);
+                List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
+                Map<String,List<Block>> groupMap = new HashMap <>();
+                //根据hash分组hash-block
+                hashBlockList.forEach(block->{
+                    List<Block> group=groupMap.get(block.getVoteHash());
+                    if(group==null){
+                        group=new ArrayList <>();
+                        groupMap.put(block.getVoteHash(),group);
+                    }
+                    group.add(block);
+                });
+
+                groupMap.forEach((txHash,group)->{
+                    BigDecimal txIncome = BigDecimal.ZERO;
+                    for (Block block:group){
+                        txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
+                    }
+                    incomeMap.put(txHash,txIncome);
+                });
+            }
+
+            bean.forEach(b -> {
+                BigDecimal inCome = incomeMap.get(b.getHash());
+                if(null == inCome) b.setIncome(BigDecimal.ZERO);
+                else b.setIncome(inCome);
+            });
+
+
 
             RespPage<VoteInfo> resDate = new RespPage <>();
             resDate.setData(bean);
             return resDate;
         }
-
+        logger.debug("Time Consuming-last: {}ms",System.currentTimeMillis()-beginTime);
         return new RespPage <>();
     }
 
