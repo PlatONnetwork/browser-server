@@ -60,6 +60,7 @@ public class BlockFilter {
             }
             bean.setNodeId(publicKey);
 
+
             // 设置节点名称
             String nodeName = NODEID_TO_NAME.get(bean.getNodeId());
             bean.setNodeName(nodeName);
@@ -90,6 +91,15 @@ public class BlockFilter {
             BigInteger voteAmount = new BigInteger("0");
             //blockCampaignAmount
             BigInteger campaignAmount = new BigInteger("0");
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            String price = null;
+            try{
+                price = ticketContract.GetTicketPrice().send();
+            }catch (Exception e){
+                logger.error("获取票价异常");
+            }
+
+
             for(Transaction transaction:param.transactions){
                 if (null != param.transactionReceiptMap.get(transaction.getHash())) {
                     TransactionReceipt receipt = (TransactionReceipt) param.transactionReceiptMap.get(transaction.getHash());
@@ -99,7 +109,7 @@ public class BlockFilter {
                     if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
                         voteAmount=voteAmount.add(BigInteger.ONE);
                         //get tickVoteContract vote event
-                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = platon.getTicketContract(chainId).getVoteTicketEventEvents(receipt);
+                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = ticketContract.getVoteTicketEventEvents(receipt);
                         String event = eventEventResponses.get(0).param1;
                         EventRes eventRes = JSON.parseObject(event, EventRes.class);
                         //event objcet is jsonString , transform jsonObject <EventRes>
@@ -107,13 +117,13 @@ public class BlockFilter {
                         String res = eventRes.getData();
                         String[] strs = res.split(":");
                         bean.setBlockVoteNumber(Long.valueOf(strs[0]));
-                        bean.setVotePrice(strs[1]);
                     } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                         campaignAmount=campaignAmount.add(BigInteger.ONE);
                     }
                     bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
                     bean.setBlockCampaignAmount(voteAmount != null ?campaignAmount.longValue() : new BigInteger("0").longValue());
                     bean.setActualTxCostSum(sum.toString());
+                    bean.setVotePrice(null != price ? price : "0");
                 }
             }
 

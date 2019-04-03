@@ -90,12 +90,10 @@ public class NodeAnalyseJob {
             Map <String, String> nodeTypeMap = new HashMap <>();
 
             long startTime = System.currentTimeMillis();
-            DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1L)));
-            //ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
-            ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(defaultBlockParameter, true).send();
+            //DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1L)));
+            ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
+            //ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(defaultBlockParameter, true).send();
             logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
-            EthBlock.Block block1 = ethBlock.getBlock();
-            block1.getNumber();
             BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
             CandidateContract candidateContract = platon.getCandidateContract(chainId);
             String nodeInfo = candidateContract.CandidateList().send();

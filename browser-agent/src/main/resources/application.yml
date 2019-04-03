@@ -2,7 +2,7 @@
 
 #Spring应用配置
 spring:
-  profiles.active: local
+  profiles.active: testa
   application.name: browser-agent
   #Redis集群配置
   redis:
