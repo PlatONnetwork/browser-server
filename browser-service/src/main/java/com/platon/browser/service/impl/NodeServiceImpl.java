@@ -267,8 +267,10 @@ public class NodeServiceImpl implements NodeService {
 
 
         // 中选次数
+        returnData.setHitCount(0l);
         Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
         if(endNumber==null){
+            endNumber=0l;
             // 到区块表查当前节点最新块的块号
             BlockExample blockExample = new BlockExample();
             blockExample.createCriteria().andChainIdEqualTo(initData.getChainId()).andNodeIdEqualTo(initData.getNodeId());
@@ -285,6 +287,8 @@ public class NodeServiceImpl implements NodeService {
             BigDecimal hitCount = BigDecimal.valueOf(endNumber-beginNumber).divide(BigDecimal.valueOf(250),0,RoundingMode.DOWN);
             returnData.setHitCount(hitCount.longValue());
         }
+
+
 
         return returnData;
     }

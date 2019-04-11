@@ -72,6 +72,13 @@ public class ApiServiceImpl implements ApiService {
             Integer vaildSum = validVoteMap.get(voteSummary.getHash());
             voteSummary.setValidNum(String.valueOf(vaildSum));
         }
+
+        voteSummaryList.forEach(voteSummary -> {
+            Integer vaildSum = validVoteMap.get(voteSummary.getHash());
+            String lock = new BigDecimal(vaildSum).multiply(voteSummary.getTicketPrice()).toString();
+            voteSummary.setLocked(lock);
+        });
+
         return  voteSummaryList;
     }
 
@@ -103,6 +110,41 @@ public class ApiServiceImpl implements ApiService {
             Integer vaildSum = validVoteMap.get(voteTransaction.getTransactionHash());
             voteTransaction.setValidNum(String.valueOf(vaildSum));
         }
+
+
+        //设置交易收益
+        //分组计算收益
+        //根据投票交易hash查询区块列表
+        if(hashList.size()>0){
+            BlockExample hashBlockExample = new BlockExample();
+            hashBlockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
+            List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
+            Map<String,List<Block>> groupMap = new HashMap <>();
+            //根据hash分组hash-block
+            hashBlockList.forEach(block->{
+                List<Block> group=groupMap.get(block.getVoteHash());
+                if(group==null){
+                    group=new ArrayList <>();
+                    groupMap.put(block.getVoteHash(),group);
+                }
+                group.add(block);
+            });
+
+            groupMap.forEach((txHash,group)->{
+                BigDecimal txIncome = BigDecimal.ZERO;
+                for (Block block:group){
+                    txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
+                }
+                incomeMap.put(txHash,txIncome);
+            });
+        }
+
+        voteTransactions.forEach(b -> {
+            BigDecimal inCome = incomeMap.get(b.getTransactionHash());
+            if(null == inCome) b.setEarnings(BigDecimal.ZERO.toString());
+            else b.setEarnings(inCome.toString());
+        });
+
         RespPage<VoteTransaction> returnData = new RespPage<>();
         returnData.init(page,voteTransactions);
 
@@ -114,13 +156,13 @@ public class ApiServiceImpl implements ApiService {
         if(nodeIds.size() > 0) {
             TicketContract ticketContract = platon.getTicketContract(chainId);
             StringBuffer str = new StringBuffer();
-            nodeIds.forEach(id ->{
-                str.append(id).append(":");
-            });
+            nodeIds.forEach(id ->str.append(id).append(":"));
             String ids = str.toString();
+            ids = ids.substring(0,ids.lastIndexOf(":"));
             try {
                 String countStr = ticketContract.GetCandidateTicketCount(ids).send();
                 Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
+
                 return map;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,14 +181,27 @@ public class ApiServiceImpl implements ApiService {
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
-            List<Long> blockNumberList = new ArrayList <>();
+            List<String> blockHashList = new ArrayList <>();
             transactionList.forEach(transaction -> {
                 VoteInfo date = new VoteInfo();
                 date.init(transaction);
                 date.setVailVoteCount(validVoteMap.get(transaction.getHash()));
                 bean.add(date);
-                blockNumberList.add(transaction.getBlockNumber());
+                blockHashList.add(transaction.getBlockHash());
             });
+
+
+            Map<String,String> priceMap = new HashMap <>();
+            BlockExample blockExample = new BlockExample();
+            blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
+            List<Block> blocks = blockMapper.selectByExample(blockExample);
+            blockHashList.forEach(blockNumber->{
+                blocks.forEach(block -> {
+                    if(blockNumber.equals(block.getNumber())){}
+                    priceMap.put(block.getHash(),block.getVotePrice());
+                });
+            });
+
 
             List<String> nodeIds = new ArrayList <>();
             bean.forEach(voteInfo ->  {
@@ -155,14 +210,9 @@ public class ApiServiceImpl implements ApiService {
 
             Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
             Map<String,Date> deadDate = new HashMap <>();
-            Map<String,String> priceMap = new HashMap <>();
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId).andNumberIn(blockNumberList);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
 
-            blocks.forEach(block -> {
-                priceMap.put(block.getHash(),block.getVotePrice());
-            });
+
+
 
             List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
             voteTxes.forEach(voteTx ->{
@@ -180,7 +230,7 @@ public class ApiServiceImpl implements ApiService {
                 }else {
                     voteInfo.setNodeName(" ");
                 }
-                String price = priceMap.get(voteInfo.getHash());
+                String price = priceMap.get(voteInfo.getBlockHash());
                 if(null != price) {
                     voteInfo.setPrice(price);
                 }else {
@@ -243,7 +293,7 @@ public class ApiServiceImpl implements ApiService {
         if (hashList.size() > 0){
             //根据hash分组计算收益
             BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashNotIn(hashList);
+            blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashIn(hashList);
             List<Block> blocks = blockMapper.selectByExample(blockExample);
             Map<String, List<Block>> groupMap = new HashMap <>();
             blocks.forEach(block -> {
@@ -278,13 +328,12 @@ public class ApiServiceImpl implements ApiService {
             Map <String, Integer> validVoteMap = new HashMap <>();
 
             StringBuffer stringBuffer = new StringBuffer();
-            hashList.forEach(hash -> {
-                stringBuffer.append(hash).append(":");
-            });
+            hashList.forEach(hash -> stringBuffer.append(hash).append(":"));
+            String hashs = stringBuffer.toString();
+            hashs=hashs.substring(0,hashs.lastIndexOf(":"));
             try {
                 TicketContract ticketContract = platon.getTicketContract(chainId);
-                String hash = stringBuffer.toString();
-                String vaildTicketList = ticketContract.GetTicketCountByTxHash(hash).send();
+                String vaildTicketList = ticketContract.GetTicketCountByTxHash(hashs).send();
                 validVoteMap = JSON.parseObject(vaildTicketList, Map.class);
             } catch (Exception e) {
                 for (String a : hashList) {
@@ -296,4 +345,5 @@ public class ApiServiceImpl implements ApiService {
         }
         return new HashMap <>();
     }
+
 }

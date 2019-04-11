@@ -36,16 +36,17 @@ public class TransactionFilter {
     @Value("${platon.chain.active}")
     private String chainId;
 
-    public List<TransactionBean> analyse(AnalyseThread.AnalyseParam param, long time) {
+
+    public List <TransactionBean> analyse ( AnalyseThread.AnalyseParam param, long time ) {
         long beginTime = System.currentTimeMillis();
-        Map<String,Object> transactionReceiptMap = param.transactionReceiptMap;
-        List<TransactionBean> transactions = new ArrayList <>();
+        Map <String, Object> transactionReceiptMap = param.transactionReceiptMap;
+        List <TransactionBean> transactions = new ArrayList <>();
         param.transactions.forEach(initData -> {
-            if(null != transactionReceiptMap.get(initData.getHash())){
+            if (null != transactionReceiptMap.get(initData.getHash())) {
                 TransactionBean bean = new TransactionBean();
                 TransactionReceipt receipt = (TransactionReceipt) transactionReceiptMap.get(initData.getHash());
                 // Initialize the entity with the raw transaction and receipt
-                bean.init(initData,receipt);
+                bean.init(initData, receipt);
                 // Convert timestamp into milliseconds
                 if (String.valueOf(time).length() == 10) {
                     bean.setTimestamp(new Date(time * 1000L));
@@ -55,30 +56,27 @@ public class TransactionFilter {
                 // Setup the chain id
                 bean.setChainId(chainId);
                 // Setup the receiver type
-                if (null != initData.getTo()) {
-                    bean.setTo(initData.getTo());
-                    //judge `to` address is accountAddress or contractAddress
-                    if(null != RECEIVER_TO_TYPE.get(initData.getTo())){
-                        bean.setReceiveType(RECEIVER_TO_TYPE.get(initData.getTo()));
-                    }else {
-                        try {
-                            EthGetCode ethGetCode = platon.getWeb3j(chainId).ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
-                            if ("0x".equals(ethGetCode.getCode())) {
-                                bean.setReceiveType("account");
-                            } else {
-                                bean.setReceiveType("contract");
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                //judge `to` address is accountAddress or contractAddress
+                if (null != RECEIVER_TO_TYPE.get(initData.getTo())) {
+                    bean.setReceiveType(RECEIVER_TO_TYPE.get(initData.getTo()));
+                } else {
+                    try {
+                        EthGetCode ethGetCode = platon.getWeb3j(chainId).ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                        if ("0x".equals(ethGetCode.getCode())) {
+                            bean.setReceiveType("account");
+                        } else {
+                            bean.setReceiveType("contract");
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
                 // Cache the receiver type for later use
-                RECEIVER_TO_TYPE.put(initData.getTo(),bean.getReceiveType());
+                RECEIVER_TO_TYPE.put(initData.getTo(), bean.getReceiveType());
                 transactions.add(bean);
             }
         });
-        log.debug("Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        log.debug("Time Consuming: {}ms", System.currentTimeMillis() - beginTime);
         return transactions;
     }
 

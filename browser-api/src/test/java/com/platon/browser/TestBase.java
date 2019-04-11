@@ -23,7 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 
-@SpringBootTest(classes= ApiApplication.class, value = "spring.profiles.active=dev")
+@SpringBootTest(classes= ApiApplication.class, value = "spring.profiles.active=testa")
 public class TestBase extends TestData {
     @Autowired
     protected NodeRankingMapper nodeRankingMapper;

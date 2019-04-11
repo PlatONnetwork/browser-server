@@ -6,7 +6,9 @@ import java.util.Map;
 
 public enum NodeType {
     CONSENSUS(1,"共识节点"),
-    NON_CONSENSUS(2,"非共识节点");
+    NON_CONSENSUS(2,"非共识节点"),
+    VALID_NODE(3,"有效节点"),
+    UNVALID_NODE(4,"无效节点");
     public int code;
     public String desc;
 

@@ -47,6 +47,15 @@ public class BlockFilter {
         if (param.ethBlock!=null) {
             bean.init(param.ethBlock);
 
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            String price = null;
+            try{
+                price = ticketContract.GetTicketPrice().send();
+                bean.setVotePrice(null != price ? price : "0");
+            }catch (Exception e){
+                logger.error("获取票价异常");
+            }
+
             // 设置需要使用当前上下文的属性
             bean.setChainId(chainId);
             String publicKey = null;
@@ -63,7 +72,9 @@ public class BlockFilter {
 
             // 设置节点名称
             String nodeName = NODEID_TO_NAME.get(bean.getNodeId());
-            bean.setNodeName(nodeName);
+            if(null != nodeName)bean.setNodeName(nodeName);
+            else bean.setNodeName("GenesisNode");
+
 
             //设置在当前区块高度中的节点分红比例
             try {
@@ -91,13 +102,7 @@ public class BlockFilter {
             BigInteger voteAmount = new BigInteger("0");
             //blockCampaignAmount
             BigInteger campaignAmount = new BigInteger("0");
-            TicketContract ticketContract = platon.getTicketContract(chainId);
-            String price = null;
-            try{
-                price = ticketContract.GetTicketPrice().send();
-            }catch (Exception e){
-                logger.error("获取票价异常");
-            }
+            bean.setBlockVoteNumber(0L);
 
 
             for(Transaction transaction:param.transactions){
@@ -106,27 +111,27 @@ public class BlockFilter {
                     sum = sum.add(receipt.getGasUsed().multiply(transaction.getGasPrice()));
                     AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(), false);
                     String type = TransactionAnalysis.getTypeName(analysisResult.getType());
-                    if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
-                        voteAmount=voteAmount.add(BigInteger.ONE);
-                        //get tickVoteContract vote event
-                        List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = ticketContract.getVoteTicketEventEvents(receipt);
-                        String event = eventEventResponses.get(0).param1;
-                        EventRes eventRes = JSON.parseObject(event, EventRes.class);
-                        //event objcet is jsonString , transform jsonObject <EventRes>
-                        //EventRes get Data
-                        String res = eventRes.getData();
-                        String[] strs = res.split(":");
-                        bean.setBlockVoteNumber(Long.valueOf(strs[0]));
-                    } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
-                        campaignAmount=campaignAmount.add(BigInteger.ONE);
+                        if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
+                            voteAmount=voteAmount.add(BigInteger.ONE);
+                            if(receipt.getStatus().equals("0x1")){
+                                //get tickVoteContract vote event
+                                List<TicketContract.VoteTicketEventEventResponse> eventEventResponses = ticketContract.getVoteTicketEventEvents(receipt);
+                                String event = eventEventResponses.get(0).param1;
+                                EventRes eventRes = JSON.parseObject(event, EventRes.class);
+                                //event objcet is jsonString , transform jsonObject <EventRes>
+                                //EventRes get Data
+                                String res = eventRes.getData();
+                                String[] strs = res.split(":");
+                                bean.setBlockVoteNumber(Long.valueOf(strs[0]));
+                            }
+                        } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
+                            campaignAmount=campaignAmount.add(BigInteger.ONE);
+                        }
+                        bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
+                        bean.setBlockCampaignAmount(voteAmount != null ?campaignAmount.longValue() : new BigInteger("0").longValue());
+                        bean.setActualTxCostSum(sum.toString());
                     }
-                    bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
-                    bean.setBlockCampaignAmount(voteAmount != null ?campaignAmount.longValue() : new BigInteger("0").longValue());
-                    bean.setActualTxCostSum(sum.toString());
-                    bean.setVotePrice(null != price ? price : "0");
                 }
-            }
-
         }
         logger.debug("Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return bean;

@@ -5,14 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
@@ -104,20 +102,21 @@ public class ChainsConfig {
             chainsConfig.forEach((chainId,nodeInfo)->{
                 nodeInfo.validWeb3jList.clear();
                 nodeInfo.allWeb3jList.forEach(web3j -> {
-                    Thread t = new Thread(){
+                    try {
+/*                    Thread t = new Thread(){
                         @Override
                         public void run () {
-                            web3j.ethBlockNumber();
+                                EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().send();
                         }
                     };
                     t.start();
-                    try {
-                        TimeUnit.SECONDS.sleep(10);
-                        if (!t.isAlive()){
+                    TimeUnit.SECONDS.sleep(10);
+                        if (!t.isAlive()){*/
+                            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().send();
                             nodeInfo.validWeb3jList.add(web3j);
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                      /* }*/
+                    } catch (IOException e) {
+                        e.getMessage();
                     }
                 });
             });

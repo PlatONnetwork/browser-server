@@ -1,15 +1,21 @@
 package com.platon.browser.FilterTest;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.client.PlatonClient;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterNumber;
 import org.web3j.protocol.core.methods.response.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,9 @@ import java.util.Optional;
  */
 @RunWith(SpringRunner.class)
 public class TransactionFilterTest extends TestBase {
+
+    @Autowired
+    private PlatonClient platonClient;
 
     private static Logger logger = LoggerFactory.getLogger(TransactionFilterTest.class);
 
@@ -53,6 +62,19 @@ public class TransactionFilterTest extends TestBase {
     }
 
 
+    @Test
+    public void transationAsly(){
+        String hash = "0x16bfff398601bfff76a25a80e02ea580a34d8dd471bd9a1be28e6606cdb5c6ad";
+        web3j = platonClient.getWeb3j("203");
+        try {
+            EthGetTransactionReceipt ethGetTransactionReceipt = web3j.ethGetTransactionReceipt(hash).send();
+            Optional <TransactionReceipt> transactionReceipt = ethGetTransactionReceipt.getTransactionReceipt();
+            TransactionReceipt receipt = transactionReceipt.get();
+            logger.error(receipt.getContractAddress());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

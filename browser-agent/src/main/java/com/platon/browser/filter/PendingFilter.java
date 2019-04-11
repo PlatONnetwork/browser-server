@@ -80,7 +80,9 @@ public class PendingFilter {
                         }
                     });
                 }
-                pendingTxMapper.batchInsert(newList);
+                if(newList.size() > 0){
+                    pendingTxMapper.batchInsert(newList);
+                }
             }
             logger.debug("PendingTxSynchronizeJob is null ,Synchronization is complete !!!...");
         } catch (Exception e) {

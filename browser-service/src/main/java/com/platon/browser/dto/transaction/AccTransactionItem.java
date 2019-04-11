@@ -37,6 +37,7 @@ public class AccTransactionItem {
     private BigDecimal deposit;
     private String nodeId;
     private String nodeName;
+    private int flag;
 
     @JsonIgnore
     private Date timestamp;
@@ -75,5 +76,6 @@ public class AccTransactionItem {
             this.setDeposit(new BigDecimal("0"));
         }
         TxInfoResolver.resolve(txType,txInfo,value,this);
+        this.flag = 2;
     }
 }

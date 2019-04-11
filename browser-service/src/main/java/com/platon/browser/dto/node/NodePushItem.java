@@ -13,7 +13,7 @@ public class NodePushItem {
     private String ip;
     private String longitude;
     private String latitude;
-    private Integer nodeType;
+    private String nodeType;
     private Integer netState;
     private String nodeName;
     private String nodeId;
@@ -21,7 +21,6 @@ public class NodePushItem {
 
     public void init(NodeRanking initData){
         BeanUtils.copyProperties(initData,this);
-        this.setNodeType(initData.getType());
         this.setNodeName(initData.getName());
         this.setNetState(1);
     }

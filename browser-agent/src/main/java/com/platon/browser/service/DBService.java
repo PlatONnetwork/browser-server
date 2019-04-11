@@ -3,19 +3,24 @@ package com.platon.browser.service;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.BlockMissingExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.entity.VoteTx;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,8 +43,10 @@ public class DBService {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private VoteTxMapper voteTxMapper;
-//    @Autowired
-//    private CustomNodeRankingMapper customNodeRankingMapper;
+    @Value("${platon.redis.key.tran-list-prefix}")
+    private String tranListPrefix;
+    @Autowired
+    protected RedisTemplate <String,String> redisTemplate;
 
     @Transactional
     public void flush(AnalyseThread.AnalyseResult result){
@@ -71,6 +78,8 @@ public class DBService {
                 voteTxMapper.batchInsert(voteTxes);
             }
             redisCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
+            //批量更新redis
+            batchInsertTransactionList(result.transactions);
         }
 
 //        if(result.nodes.size()>0){
@@ -93,5 +102,21 @@ public class DBService {
         logger.debug("  |-Time Consuming(redisCacheService.updateStatisticsCache()): {}ms",System.currentTimeMillis()-updateStatisticsCache);
 
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
+    }
+
+    private void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
+        //tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
+        String cakey = tranListPrefix.replace("{}",chainId);
+        transactions.forEach(transaction -> {
+            SimpleDateFormat time = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+            String CacheKey = cakey.replace("{from}",transaction.getFrom())
+                    .replace("{to}",transaction.getTo())
+                    .replace("{txType}",transaction.getTxType())
+                    .replace("{txHash}",transaction.getHash())
+                    .replace("{createTime}",time.format(transaction.getCreateTime()));
+            redisTemplate.delete(CacheKey);
+            redisTemplate.opsForValue().set(CacheKey,JSON.toJSONString(transaction));
+        });
+
     }
 }

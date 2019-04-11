@@ -12,7 +12,7 @@ dbpass: platon
 chain:
   # Platon链配置,格式【{chainName1}-{chainIdA}-[http://nodeIPA1:portA1,http://nodeIPA2:portA2]】
   # 同一条链匹配多个节点错容
-  config: MAIN_NET-203-["http://192.168.120.88:6789","http://192.168.120.85:6789"]
+  config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:6789","http://192.168.120.83:6789","http://192.168.120.84:6789"]
   # config: MAIN_NET-203-http://192.168.120.85:6789
   # 要采集哪个ID的链
   active: 203

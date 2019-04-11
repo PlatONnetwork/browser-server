@@ -49,11 +49,9 @@ public class StatisticsJob {
 
         //根据hash组成string作为入参
         StringBuffer str = new StringBuffer();
-        voteTxList.forEach(voteTx ->  {
-           str.append(voteTx.getHash()).append(":");
-        });
+        voteTxList.forEach(voteTx -> str.append(voteTx.getHash()).append(":"));
         String hashs = str.toString();
-
+        hashs = hashs.substring(0,hashs.lastIndexOf(":"));
         //查询链上投票交易有效票
         TicketContract ticketContract = platon.getTicketContract(chainId);
         Map<String,Integer> resMap = new HashMap <>();

@@ -24,6 +24,7 @@ public class VoteInfo {
     private String walletAddress;
     private String price;
     private BigDecimal income;
+    private String blockHash;
     public  void init(Transaction transaction){
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
@@ -31,5 +32,6 @@ public class VoteInfo {
         this.voteSum = ticketParameter.getCount();
         this.walletAddress = transaction.getFrom();
         this.hash = transaction.getHash();
+        this.blockHash = transaction.getBlockHash();
     }
 }

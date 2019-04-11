@@ -28,5 +28,7 @@ public class BlockPushItem {
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));
         this.setServerTime(System.currentTimeMillis());
+        if(null != initData.getNodeName()) this.setNodeName(initData.getNodeName());
+        else this.setNodeName("GenesisNode");
     }
 }

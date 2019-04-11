@@ -7,7 +7,7 @@ server:
     context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles.active: testa
+  profiles.active: online
   application.name: browser-api
   #国际化配置
   messages.basename: messages
@@ -56,6 +56,8 @@ platon:
       vote-count: browser:${version}:${profile}:chain{}:vote-count
       #MaxTps
       max-tps: browser:${version}:${profile}:chain{}:max-tps
+      #批量交易表
+      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
     max-item: 500000
 #日志配置
 logging:

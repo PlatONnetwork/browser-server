@@ -20,16 +20,15 @@ public class VoteSummary {
     private String earnings;
     private String validNum;
     private String totalTicketNum;
+    private BigDecimal ticketPrice;
     public void init( Transaction transaction){
         this.hash = transaction.getHash();
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
         if(ticketParameter!=null){
             BigDecimal ticketPrice= Convert.fromWei(ticketParameter.getPrice().toString(), Convert.Unit.ETHER);
-            BigDecimal total = new BigDecimal(ticketParameter.getCount());
-            BigDecimal sum = ticketPrice.multiply(total);
+            this.ticketPrice = ticketPrice;
             this.totalTicketNum = ticketParameter.getCount().toString();
-            this.locked = sum.toString();
         }
     }
 }

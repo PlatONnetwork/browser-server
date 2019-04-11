@@ -445,7 +445,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         clearNodePushCache(chainId);
         NodeRankingExample condition = new NodeRankingExample();
         condition.createCriteria().andChainIdEqualTo(chainId)
-                .andIsValidEqualTo(1).andNodeTypeEqualTo(NodeTypeEnum.VALIDATOR.name().toLowerCase());
+                .andIsValidEqualTo(1);
         List<NodeRanking> data = nodeRankingMapper.selectByExample(condition);
         if(data.size()==0) return;
 
@@ -509,7 +509,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             if(cache.getCurrentHeight()<cachedHighestBlock.getHeight()){
                 cache.setMiner(cachedHighestBlock.getMiner());
                 cache.setCurrentHeight(cachedHighestBlock.getHeight());
-                cache.setNodeName(StringUtils.isBlank(cachedHighestBlock.getNodeName())?"Unknown":cachedHighestBlock.getNodeName());
+                cache.setNodeName(StringUtils.isBlank(cachedHighestBlock.getNodeName())?"GenesisNode":cachedHighestBlock.getNodeName());
                 cache.setNodeId(cachedHighestBlock.getNodeId());
             }
             /************** 计算当前TPS: 因为链上每秒出一个块，所以最高块中的交易数就是TPS ************/

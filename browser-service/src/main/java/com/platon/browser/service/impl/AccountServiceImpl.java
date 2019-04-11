@@ -7,11 +7,13 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.transaction.AccTransactionItem;
+import com.platon.browser.enums.NodeType;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.service.AccountService;
@@ -56,10 +58,14 @@ public class AccountServiceImpl implements AccountService {
     private PlatonClient platonClient;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private NodeRankingMapper nodeRankingMapper;
 
 
     @Override
     public AddressDetail getAddressDetail(AddressDetailReq req) {
+        long startTime = System.currentTimeMillis();
+
         AddressDetail returnData = new AddressDetail();
         try {
             EthGetBalance balance = chainsConfig.getWeb3j(req.getCid()).ethGetBalance(req.getAddress(), DefaultBlockParameterName.LATEST).send();
@@ -68,6 +74,8 @@ public class AccountServiceImpl implements AccountService {
         } catch (IOException e) {
             returnData.setBalance("0(error)");
         }
+
+
 
         Set<String> nodeIds = new HashSet<>();
         TransactionExample condition = new TransactionExample();
@@ -80,6 +88,8 @@ public class AccountServiceImpl implements AccountService {
         Long transactionCount = transactionMapper.countByExample(condition);
         returnData.setTradeCount(transactionCount.intValue());
 
+
+
         // 取已完成交易
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> transactions = transactionService.getList(req);
@@ -90,9 +100,37 @@ public class AccountServiceImpl implements AccountService {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
             hashList.add(initData.getHash());
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
             data.add(bean);
         });
+
+
+
+        //返回标识用于判断跳转
+        // 0——历史节点详情
+        // 1——共识节点详情
+        // 2——异常情况不跳转
+        List<String> idList = new ArrayList<>(nodeIds);
+        Map<String,String> consensusMap = new HashMap <>();
+        Map<String,String> historyMap = new HashMap <>();
+        NodeRankingExample nodeRankingExample = new NodeRankingExample();
+        NodeRankingExample.Criteria criteria =nodeRankingExample.createCriteria().andChainIdEqualTo(req.getCid());
+        if(idList.size() > 0){
+            criteria.andNodeIdIn(idList);
+        }
+        List<NodeRanking> allNodeList = nodeRankingMapper.selectByExample(nodeRankingExample);
+        if(allNodeList.size() > 0){
+            allNodeList.forEach(allNode->{
+                //有效节点，放入consensucMap
+                if(allNode.getIsValid().equals(1)){
+                    consensusMap.put(allNode.getNodeId(), NodeType.VALID_NODE.desc.trim());
+                }
+                //无效节点，放入historyMap
+                else if(allNode.getIsValid().equals(0)){
+                    historyMap.put(allNode.getNodeId(),NodeType.UNVALID_NODE.desc.trim());
+                }
+            });
+        }
 
         // 取待处理交易
         page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
@@ -101,9 +139,12 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId());
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
+
             data.add(bean);
         });
+
+
 
         // 按时间倒排
         Collections.sort(data,(c1,c2)->{
@@ -112,6 +153,12 @@ public class AccountServiceImpl implements AccountService {
             if(t1>t2) return -1;
             return 0;
         });
+
+
+        data.forEach(accTransactionItem -> {
+            accTransactionItem.setNodeId("0x" + accTransactionItem.getNodeId());
+        });
+
 
         // 取节点名称
         TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
@@ -126,6 +173,7 @@ public class AccountServiceImpl implements AccountService {
             }
             if(null != txHash){
                 String hashs = txHash.toString();
+                hashs = hashs.substring(0,hashs.lastIndexOf(":"));
                 String voteNumber = ticketContract.GetTicketCountByTxHash(hashs).send();
                 voteHashMap = JSON.parseObject(voteNumber,Map.class);
             }
@@ -138,12 +186,17 @@ public class AccountServiceImpl implements AccountService {
 
         for(AccTransactionItem accTransactionItem : data){
             String nodeName = nodeIdToName.get(accTransactionItem.getNodeId());
-            if(null != nodeName) accTransactionItem.setNodeName(nodeName);
-            else accTransactionItem.setNodeName(" ");
+            if(null != nodeName)accTransactionItem.setNodeName(nodeName);
+             else accTransactionItem.setNodeName(" ");
+
 
             Integer number = voteHashMap.get(accTransactionItem.getTxHash());
             accTransactionItem.setValidVoteCount(number);
         }
+
+
+        logger.error("node vote part one about vaildVote select time---------------------------------->{}", System.currentTimeMillis() - startTime);
+
 
         //设置交易收益
         //分组计算收益
@@ -174,10 +227,18 @@ public class AccountServiceImpl implements AccountService {
             });
         }
 
-        data.forEach(transaction -> {
-            BigDecimal inCome = incomeMap.get(transaction.getTxHash());
-            if(null == inCome) transaction.setIncome(BigDecimal.ZERO);
-            else transaction.setIncome(inCome);
+        logger.error("node vote part two about vaildVote income select time---------------------------------->{}", System.currentTimeMillis() - startTime);
+
+
+        data.forEach(datas -> {
+            BigDecimal inCome = incomeMap.get(datas.getTxHash());
+            if(null == inCome) datas.setIncome(BigDecimal.ZERO);
+            else datas.setIncome(inCome);
+           /* if(null != consensusMap.get(datas.getNodeId())) {
+                datas.setFlag(1);
+            }else {
+                if(null != historyMap.get(datas.getNodeId())) datas.setFlag(0);
+            }*/
         });
 
         returnData.setTrades(data);
