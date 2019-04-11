@@ -56,8 +56,10 @@ platon:
       vote-count: browser:${version}:${profile}:chain{}:vote-count
       #MaxTps
       max-tps: browser:${version}:${profile}:chain{}:max-tps
-      #批量交易表
-      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
+      # 按地址存储的交易的键模板
+      address-trans-key-template: browser:${version}:${profile}:chain{}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
+      # 按地址存储的交易数量限制
+      address-trans-max-item: 200
     max-item: 500000
 #日志配置
 logging:

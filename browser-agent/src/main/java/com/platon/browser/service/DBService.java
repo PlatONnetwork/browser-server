@@ -49,8 +49,6 @@ public class DBService {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private VoteTxMapper voteTxMapper;
-    @Value("${platon.redis.key.tran-list-prefix}")
-    private String tranListPrefix;
     @Autowired
     protected RedisTemplate <String,String> redisTemplate;
 
@@ -84,8 +82,8 @@ public class DBService {
                 voteTxMapper.batchInsert(voteTxes);
             }
             transactionCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
-            //批量更新redis
-            batchInsertTransactionList(result.transactions);
+            // 按地址对交易分类并存储到缓存中
+            transactionCacheService.classifyByAddress(chainId,result.transactions);
         }
 
 //        if(result.nodes.size()>0){
@@ -110,18 +108,5 @@ public class DBService {
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
 
-    private void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
-        //tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
-        String cakey = tranListPrefix.replace("{}",chainId);
-        transactions.forEach(transaction -> {
-            SimpleDateFormat time = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-            String CacheKey = cakey.replace("{from}",transaction.getFrom())
-                    .replace("{to}",transaction.getTo())
-                    .replace("{txType}",transaction.getTxType())
-                    .replace("{txHash}",transaction.getHash())
-                    .replace("{createTime}",String.valueOf(transaction.getCreateTime().getTime()));
-            redisTemplate.delete(CacheKey);
-            redisTemplate.opsForValue().set(CacheKey,JSON.toJSONString(transaction));
-        });
-    }
+
 }

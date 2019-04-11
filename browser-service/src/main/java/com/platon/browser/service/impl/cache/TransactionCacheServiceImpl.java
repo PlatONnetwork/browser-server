@@ -2,9 +2,11 @@ package com.platon.browser.service.impl.cache;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.util.StringUtil;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionListItem;
@@ -12,17 +14,17 @@ import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Component
@@ -34,6 +36,10 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     private String transactionCacheKeyTemplate;
     @Value("${platon.redis.max-item}")
     private long maxItemNum;
+    @Value("${platon.redis.key.address-trans-key-template}")
+    private String addressTransTemplate;
+    @Value("${platon.redis.key.address-trans-max-item}")
+    private String addressTransMaxItem;
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -132,5 +138,51 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             returnData.add(bean);
         });
         return returnData;
+    }
+
+    /**
+     * 交易类型按地址分类存储到缓存中
+     * @param chainId
+     * @param transactions
+     */
+    @Override
+    public void classifyByAddress(String chainId, List<TransactionWithBLOBs> transactions ){
+        /**
+         * # 按地址存储交易的键前缀
+           address-trans-prefix: browser:${version}:${profile}:chain{}:tran-list
+           # 按地址存储的交易的键模板
+           address-trans-key-template: ${platon.redis.key.address-trans-prefix}:{address}:{txType}:{txHash}:{timestamp}
+         */
+        String keyTemplate = addressTransTemplate.replace("{}",chainId);
+        transactions.forEach(transaction -> {
+            String commonKeyTemplate = keyTemplate.replace("{txType}",transaction.getTxType())
+                    .replace("txHash",transaction.getHash())
+                    .replace("{timestamp}",String.valueOf(transaction.getTimestamp().getTime()));
+
+            String fromCacheKey = commonKeyTemplate.replace("{address}",transaction.getFrom());
+            redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(transaction));
+
+            String toCacheKey = commonKeyTemplate.replace("{address}",transaction.getTo());
+
+            Transaction tmp = new Transaction();
+            BeanUtils.copyProperties(transaction,tmp);
+            redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
+        });
+    }
+
+    /**
+     * 从缓存中模糊查询符合传参条件的交易列表
+     * @param chainId
+     */
+    @Override
+    public Collection<Transaction> fuzzyQuery(String chainId, String addressPattern, String txTypePattern, String txHashPattern,String timestampPattern){
+        String queryPattern = addressTransTemplate.replace("{}",chainId);
+        queryPattern=StringUtils.isNotBlank(addressPattern)?queryPattern.replace("{address}",addressPattern):queryPattern.replace("{address}","*");
+        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txType}",txTypePattern):queryPattern.replace("{txType}","*");
+        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txHash}",txHashPattern):queryPattern.replace("{txHash}","*");
+        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{timestamp}",timestampPattern):queryPattern.replace("{timestamp}","*");
+        Set<String> keys = redisTemplate.keys(queryPattern);
+        Map<String,Transaction> result = batchQueryByKeys(new ArrayList<>(keys),false,Transaction.class,redisTemplate);
+        return result.values();
     }
 }
