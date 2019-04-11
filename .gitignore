@@ -31,3 +31,5 @@ HELP.md
 /browser-api/logs
 /logs/*
 /apidoc/
+/out/*
+/build/*
