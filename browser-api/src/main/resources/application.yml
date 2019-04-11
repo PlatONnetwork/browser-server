@@ -57,7 +57,7 @@ platon:
       #MaxTps
       max-tps: browser:${version}:${profile}:chain{}:max-tps
       #批量交易表
-      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
+      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{address}:{txType}:{txHash}:{createTime}
     max-item: 500000
 #日志配置
 logging:

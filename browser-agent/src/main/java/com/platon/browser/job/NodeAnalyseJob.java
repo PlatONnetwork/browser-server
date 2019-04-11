@@ -58,8 +58,9 @@ public class NodeAnalyseJob {
     private PlatonClient platon;
     @Value("${platon.chain.active}")
     private String chainId;
+
     @PostConstruct
-    private void init(){
+    private void init () {
         try {
             TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
@@ -68,11 +69,11 @@ public class NodeAnalyseJob {
     }
 
     @Data
-    private static final class ChainInfo{
+    private static final class ChainInfo {
         Map <String, CandidateDto> allMap = new HashMap <>();
         List <CandidateDto> nodes = new ArrayList <>();
         Map <String, String> nodeTypeMap = new HashMap <>();
-        Map <String, Integer> countMap = new HashMap<>();
+        Map <String, Integer> countMap = new HashMap <>();
     }
 
     /**
@@ -225,15 +226,15 @@ public class NodeAnalyseJob {
             }
 
             if (!updateList.isEmpty()) {
-                Map<String,Integer> countMap = new HashMap <>();
+                Map <String, Integer> countMap = new HashMap <>();
                 updateList.forEach(nodeRanking -> {
                     Integer count = countMap.get(nodeRanking.getNodeId());
-                    if(count==null) count = 0;
-                    countMap.put(nodeRanking.getNodeId(),++count);
+                    if (count == null) count = 0;
+                    countMap.put(nodeRanking.getNodeId(), ++count);
                 });
-                countMap.forEach((nodeId,count)->{
-                    if(count>1) {
-                        logger.error("Node [{}] 节点数：{}", nodeId,count);
+                countMap.forEach(( nodeId, count ) -> {
+                    if (count > 1) {
+                        logger.error("Node [{}] 节点数：{}", nodeId, count);
                     }
                 });
                 customNodeRankingMapper.insertOrUpdate(updateList);
@@ -254,7 +255,7 @@ public class NodeAnalyseJob {
     }
 
 
-    private ChainInfo getChainInfo( EthBlock ethBlock )throws Exception{
+    private ChainInfo getChainInfo ( EthBlock ethBlock ) throws Exception {
         //节点id对应节点类型名称Map
         Map <String, String> nodeTypeMap = new HashMap <>();
         CandidateContract candidateContract = platon.getCandidateContract(chainId);
@@ -314,21 +315,22 @@ public class NodeAnalyseJob {
             allMap.put(allNode.getCandidateId(), allNode);
         });
 
-
-        //查询有效票
-        StringBuffer strBuffer = new StringBuffer();
-        nodes.forEach(node -> strBuffer.append(node.getCandidateId()).append(":"));
-        String nodeIds = strBuffer.toString();
-        nodeIds = nodeIds.substring(0,nodeIds.lastIndexOf(":"));
-        TicketContract ticketContract = platon.getTicketContract(chainId);
-        String res = ticketContract.GetCandidateTicketCount(nodeIds).send();
-        Map <String, Integer> countMap = JSON.parseObject(res, Map.class);
-
         ChainInfo chainInfo = new ChainInfo();
         chainInfo.setAllMap(allMap);
-        chainInfo.setCountMap(countMap);
-        chainInfo.setNodes(nodes);
         chainInfo.setNodeTypeMap(nodeTypeMap);
+        //查询有效票
+        StringBuffer strBuffer = new StringBuffer();
+        if (nodes.size() > 0) {
+            nodes.forEach(node -> strBuffer.append(node.getCandidateId()).append(":"));
+            String nodeIds = strBuffer.toString();
+            nodeIds = nodeIds.substring(0, nodeIds.lastIndexOf(":"));
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            String res = ticketContract.GetCandidateTicketCount(nodeIds).send();
+            Map <String, Integer> countMap = JSON.parseObject(res, Map.class);
+            chainInfo.setCountMap(countMap);
+            chainInfo.setNodes(nodes);
+            return chainInfo;
+        }
         return chainInfo;
     }
 

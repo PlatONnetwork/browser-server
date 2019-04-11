@@ -104,18 +104,24 @@ public class DBService {
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
 
-    private void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
-        //tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
+    public void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
+        //      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{address}:{txType}:{txHash}:{createTime}
         String cakey = tranListPrefix.replace("{}",chainId);
         transactions.forEach(transaction -> {
-            SimpleDateFormat time = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-            String CacheKey = cakey.replace("{from}",transaction.getFrom())
-                    .replace("{to}",transaction.getTo())
+            String fromCacheKey = cakey.replace("{address}",transaction.getFrom())
                     .replace("{txType}",transaction.getTxType())
                     .replace("{txHash}",transaction.getHash())
-                    .replace("{createTime}",time.format(transaction.getCreateTime()));
-            redisTemplate.delete(CacheKey);
-            redisTemplate.opsForValue().set(CacheKey,JSON.toJSONString(transaction));
+                    .replace("{createTime}",String.valueOf(transaction.getCreateTime().getTime()));
+            redisTemplate.delete(fromCacheKey);
+            redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(transaction));
+
+            String toCacheKey = cakey.replace("{address}",transaction.getTo())
+                    .replace("{txType}",transaction.getTxType())
+                    .replace("{txHash}",transaction.getHash())
+                    .replace("{createTime}",String.valueOf(transaction.getCreateTime().getTime()));
+            redisTemplate.delete(toCacheKey);
+            redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(transaction));
+
         });
     }
 }

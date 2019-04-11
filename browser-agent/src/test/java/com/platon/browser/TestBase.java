@@ -3,9 +3,12 @@ package com.platon.browser;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.PendingFilter;
 import com.platon.browser.filter.TransactionFilter;
+import com.platon.browser.service.DBService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +43,13 @@ public class TestBase {
 
     @Autowired
     protected NodeRankingMapper nodeRankingMapper;
+
+    @Autowired
+    protected TransactionMapper transactionMapper;
+
+    @Autowired
+    protected DBService dbService;
+
 
     @Value("${platon.redis.key.transaction}")
     protected String transactionCacheKeyTemplate;
