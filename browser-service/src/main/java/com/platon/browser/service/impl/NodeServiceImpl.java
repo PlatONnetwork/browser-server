@@ -27,6 +27,8 @@ import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
+import com.platon.browser.service.cache.NodeCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.util.PageUtil;
@@ -53,7 +55,9 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     private I18nUtil i18n;
     @Autowired
-    private RedisCacheServiceImpl redisCacheService;
+    private NodeCacheService nodeCacheService;
+    @Autowired
+    private StatisticCacheService statisticCacheService;
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
@@ -191,17 +195,17 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public void updatePushData(String chainId,Set<NodeRanking> data) {
-        redisCacheService.updateNodePushCache(chainId,data);
+        nodeCacheService.updateNodePushCache(chainId,data);
     }
 
     @Override
     public void clearPushCache(String chainId) {
-        redisCacheService.clearNodePushCache(chainId);
+        nodeCacheService.clearNodePushCache(chainId);
     }
 
     @Override
     public List<NodePushItem> getPushCache(String chainId) {
-        List<NodePushItem> returnData = redisCacheService.getNodePushCache(chainId);
+        List<NodePushItem> returnData = nodeCacheService.getNodePushCache(chainId);
         return returnData;
     }
 
@@ -229,7 +233,7 @@ public class NodeServiceImpl implements NodeService {
         returnData.init(initData);
 
         // 先设置一般的平均出块时长
-        StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(req.getCid());
+        StatisticsCache statisticsCache = statisticCacheService.getStatisticsCache(req.getCid());
         returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
 
         TicketContract ticketContract = platon.getTicketContract(req.getCid());

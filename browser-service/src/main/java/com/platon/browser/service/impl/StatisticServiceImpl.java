@@ -1,8 +1,8 @@
 package com.platon.browser.service.impl;
 
 import com.platon.browser.dto.*;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StatisticService;
+import com.platon.browser.service.cache.StatisticCacheService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,11 @@ import java.util.List;
 public class StatisticServiceImpl implements StatisticService {
 
     @Autowired
-    private RedisCacheService redisCacheService;
+    private StatisticCacheService statisticCacheService;
 
     @Override
     public IndexInfo getIndexInfo(String chainId) {
-        StatisticsCache cache = redisCacheService.getStatisticsCache(chainId);
+        StatisticsCache cache = statisticCacheService.getStatisticsCache(chainId);
         IndexInfo index = new IndexInfo();
         BeanUtils.copyProperties(cache,index);
         index.setConsensusNodeAmount(cache.getConsensusCount());
@@ -29,11 +29,11 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Override
     public StatisticInfo getStatisticInfo(String chainId) {
-        StatisticsCache cache = redisCacheService.getStatisticsCache(chainId);
+        StatisticsCache cache = statisticCacheService.getStatisticsCache(chainId);
         StatisticInfo statistic = new StatisticInfo();
         BeanUtils.copyProperties(cache,statistic);
         /************** 组装图表数据 ************/
-        List<StatisticPushItem> items = redisCacheService.getStatisticPushCache(chainId,1,50);
+        List<StatisticPushItem> items = statisticCacheService.getStatisticPushCache(chainId,1,50);
         StatisticGraphData graphData = new StatisticGraphData();
         for (int i=0;i<items.size();i++){
             StatisticPushItem currentBlock = items.get(i);

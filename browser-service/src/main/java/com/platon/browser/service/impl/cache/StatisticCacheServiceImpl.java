@@ -1,61 +1,44 @@
-package com.platon.browser.service.impl;
+package com.platon.browser.service.impl.cache;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.CustomStatisticsMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticPushItem;
 import com.platon.browser.dto.StatisticsCache;
 import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
-import com.platon.browser.dto.transaction.TransactionListItem;
-import com.platon.browser.dto.transaction.TransactionPushItem;
-import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.enums.NodeTypeEnum;
-import com.platon.browser.service.RedisCacheService;
-import com.platon.browser.util.I18nUtil;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.NodeCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.utils.Convert;
 
-import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 
 @Component
-public class RedisCacheServiceImpl implements RedisCacheService {
+public class StatisticCacheServiceImpl extends CacheBase implements StatisticCacheService {
 
-    private final Logger logger = LoggerFactory.getLogger(RedisCacheServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(StatisticCacheServiceImpl.class);
 
     @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
-    @Value("${platon.redis.key.transaction}")
-    private String transactionCacheKeyTemplate;
-    @Value("${platon.redis.max-item}")
-    private long maxItemNum;
-    @Value("${platon.redis.key.node}")
-    private String nodeCacheKeyTemplate;
     @Value("${platon.redis.key.staticstics}")
     private String staticsticsCacheKeyTemplate;
     @Value("${platon.redis.key.trans-count}")
@@ -72,258 +55,19 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     private String voteCountCacheKeyTemplate;
     @Value("${platon.redis.key.max-tps}")
     private String maxTpsCacheKeyTemplate;
-    @Value("${platon.fake.location.filename}")
-    private String fakeLocationFilename;
 
     @Autowired
     private PlatonClient platon;
-
-    @Autowired
-    private BlockMapper blockMapper;
-
     @Autowired
     private CustomStatisticsMapper customStatisticsMapper;
-
-    @Autowired
-    private I18nUtil i18n;
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
-    private ChainsConfig chainsConfig;
-    @Autowired
     private RedisTemplate<String,String> redisTemplate;
-
-    public final static Map<String,NodePushItem> NODEID_TO_FAKE_NODES = new HashMap<>();
-
-    @PostConstruct
-    private void init(){loadFakeLocation();}
-
-    private void loadFakeLocation() {
-        // 加载虚假节点地理位置
-
-        String path = System.getProperty("user.home") + File.separator + fakeLocationFilename;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            StringBuilder sb = new StringBuilder();
-            br.lines().forEach(line->sb.append(line));
-            logger.info("Loading Fake Location Config: {}",sb.toString());
-            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
-            NODEID_TO_FAKE_NODES.clear();
-            nodes.forEach(node->NODEID_TO_FAKE_NODES.put(node.getNodeId(),node));
-        } catch (FileNotFoundException e) {
-            logger.error("Fake Location Config not found: {}",e.getMessage());
-            //e.printStackTrace();
-        }
-    }
-
-    private boolean validateParam(String chainId,Collection items){
-        if (!chainsConfig.getChainIds().contains(chainId)){
-            // 非法链ID
-            logger.debug("Invalid Chain ID: {}", chainId);
-            return false;
-        }
-        if(items.size()==0){
-            // 无更新内容
-            logger.debug("Empty Content");
-            return false;
-        }
-        return true;
-    }
-
-    private static class CachePageInfo<T>{
-        Set<String> data;
-        RespPage<T> page;
-    }
-
-    private <T> void updateCache(String cacheKey,Collection<T> data){
-        long size = redisTemplate.opsForZSet().size(cacheKey);
-        Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
-        data.forEach(item -> {
-            Long startOffset=0l,endOffset=0l,score=0l;
-            if(item instanceof Block) startOffset=endOffset=score = ((Block)item).getTimestamp().getTime();
-            if(item instanceof Transaction) startOffset=endOffset=score = ((Transaction)item).getTimestamp().getTime();
-            // 根据score来判断缓存中的记录是否已经存在
-            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
-            if(exist.size()==0){
-                // 在缓存中不存在的才放入缓存
-                tupleSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));
-            }
-        });
-        if(tupleSet.size()>0){
-            redisTemplate.opsForZSet().add(cacheKey, tupleSet);
-        }
-        if(size>maxItemNum){
-            // 更新后的缓存条目数量大于所规定的数量，则需要删除最旧的 (size-maxItemNum)个
-            redisTemplate.opsForZSet().removeRange(cacheKey,0,size-maxItemNum);
-        }
-    }
-
-    private <T> CachePageInfo getCachePageInfo(String cacheKey,int pageNum,int pageSize,T target){
-        RespPage<T> page = new RespPage<>();
-        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
-
-        CachePageInfo<T> cpi = new CachePageInfo<>();
-        Long size = redisTemplate.opsForZSet().size(cacheKey);
-        Long pagingTotalCount = size;
-        if(pagingTotalCount>maxItemNum){
-            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
-            pagingTotalCount = maxItemNum;
-        }
-        page.setTotalCount(pagingTotalCount.intValue());
-
-        Long pageCount = pagingTotalCount/pageSize;
-        if(pagingTotalCount%pageSize!=0){
-            pageCount+=1;
-        }
-        page.setTotalPages(pageCount.intValue());
-
-        // Redis的缓存分页从索引0开始
-        if(pageNum<=0){
-            pageNum=1;
-        }
-        if(pageSize<=0){
-            pageSize=1;
-        }
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
-        cpi.data = cache;
-        cpi.page = page;
-        return cpi;
-    }
-
-    /**
-     * 清除区块缓存
-     * @param chainId
-     */
-    @Override
-    public void clearBlockCache(String chainId) {
-        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
-    }
-
-    /**
-     * 更新区块缓存
-     * @param chainId
-     */
-    @Override
-    public void updateBlockCache(String chainId, Set<Block> items){
-        if(!validateParam(chainId,items))return;
-        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        updateCache(cacheKey,items);
-    }
-
-    /**
-     * 重置区块缓存
-     * @param chainId
-     */
-    @Override
-    public void resetBlockCache(String chainId, boolean clearOld) {
-        if(clearOld) clearBlockCache(chainId);
-        BlockExample condition = new BlockExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("number desc");
-        for(int i=0;i<1000;i++){
-            PageHelper.startPage(i+1,500);
-            List<Block> data = blockMapper.selectByExample(condition);
-            if(data.size()==0) break;
-            updateBlockCache(chainId,new HashSet<>(data));
-        }
-    }
-
-    /**
-     * 清除首页统计缓存
-     * @param chainId
-     */
-    @Override
-    public void clearTransactionCache(String chainId) {
-        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
-    }
-
-    /**
-     * 更新交易缓存
-     * @param chainId
-     */
-    @Override
-    public void updateTransactionCache(String chainId, Set<Transaction> items){
-        if(!validateParam(chainId,items))return;
-        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        updateCache(cacheKey,items);
-    }
-
-    /**
-     * 重置交易缓存
-     * @param chainId
-     */
-    @Override
-    public void resetTransactionCache(String chainId,boolean clearOld) {
-        if(clearOld) clearTransactionCache(chainId);
-        TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
-        condition.setOrderByClause("block_number desc,transaction_index desc");
-        for(int i=0;i<500;i++){
-            PageHelper.startPage(i+1,1000);
-            List<Transaction> data = transactionMapper.selectByExample(condition);
-            if(data.size()==0) break;
-            updateTransactionCache(chainId,new HashSet<>(data));
-        }
-    }
-
-
-    /**
-     * 根据页数和每页大小获取区块的缓存分页
-     * @param chainId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @Override
-    public RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize){
-        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        CachePageInfo<BlockListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, BlockListItem.class);
-        RespPage<BlockListItem> page = cpi.page;
-        List<BlockListItem> blocks = new LinkedList<>();
-        long serverTime = System.currentTimeMillis();
-        cpi.data.forEach(str -> {
-            Block initData = JSON.parseObject(str, Block.class);
-            BlockListItem bean = new BlockListItem();
-            bean.init(initData);
-            bean.setServerTime(serverTime);
-            blocks.add(bean);
-        });
-        page.setData(blocks);
-        // 设置总记录大小
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,0,0);
-        if(cache.size()>0){
-            Block block = JSON.parseObject(cache.iterator().next(), Block.class);
-            page.setDisplayTotalCount(block.getNumber()==null?0:block.getNumber().intValue());
-        }else{
-            page.setDisplayTotalCount(0);
-        }
-        return page;
-    }
-
-    /**
-     * 获取区块推送数据
-     * @param chainId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @Override
-    public List<BlockPushItem> getBlockPushCache(String chainId, int pageNum, int pageSize){
-        String cacheKey = blockCacheKeyTemplate.replace("{}",chainId);
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
-        List<BlockPushItem> returnData = new LinkedList<>();
-        cache.forEach(str -> {
-            Block initData = JSON.parseObject(str, Block.class);
-            BlockPushItem bean = new BlockPushItem();
-            bean.init(initData);
-            returnData.add(bean);
-        });
-        return returnData;
-    }
+    @Autowired
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private NodeCacheService nodeCacheService;
 
     /**
      * 获取统计推送数据
@@ -355,128 +99,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
     }
 
     /**
-     * 根据页数和每页大小获取交易的缓存分页
-     * @param chainId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @Override
-    public RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize){
-        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        CachePageInfo<TransactionListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, TransactionListItem.class);
-        RespPage<TransactionListItem> page = cpi.page;
-        List<TransactionListItem> transactions = new LinkedList<>();
-        long serverTime = System.currentTimeMillis();
-        cpi.data.forEach(str->{
-            TransactionListItem bean = new TransactionListItem();
-            Transaction transaction = JSON.parseObject(str, Transaction.class);
-            bean.init(transaction);
-            bean.setServerTime(serverTime);
-            transactions.add(bean);
-        });
-        page.setData(transactions);
-        // 设置总记录大小
-//        Long displayCount = transactionMapper.countByExample(new TransactionExample());
-        Long displayCount = getTransCount(chainId);
-        page.setDisplayTotalCount(displayCount.intValue());
-        return page;
-    }
-
-    /**
-     * 获取区块推送数据
-     * @param chainId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @Override
-    public List<TransactionPushItem> getTransactionPushCache(String chainId, int pageNum, int pageSize){
-        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
-        List<TransactionPushItem> returnData = new LinkedList<>();
-        cache.forEach(str -> {
-            Transaction initData = JSON.parseObject(str, Transaction.class);
-            TransactionPushItem bean = new TransactionPushItem();
-            bean.init(initData);
-            returnData.add(bean);
-        });
-        return returnData;
-    }
-
-    /**
-     * 清除节点推送缓存
-     * @param chainId
-     */
-    @Override
-    public void clearNodePushCache(String chainId) {
-        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
-    }
-
-    /**
-     * 更新节点推送缓存
-     * @param chainId
-     */
-    @Override
-    public void updateNodePushCache(String chainId, Set<NodeRanking> items) {
-        if(!validateParam(chainId,items))return;
-        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        redisTemplate.delete(cacheKey);
-        List<String> nodes = new ArrayList<>();
-        items.forEach(initData -> {
-            NodePushItem bean = new NodePushItem();
-            bean.init(initData);
-            nodes.add(JSON.toJSONString(bean));
-        });
-        if(nodes.size()>0){
-            redisTemplate.opsForList().leftPushAll(cacheKey,nodes);
-        }
-    }
-
-    /**
-     * 重置节点推送缓存
-     * @param chainId
-     */
-    @Override
-    public void resetNodePushCache(String chainId, boolean clearOld) {
-        loadFakeLocation();
-
-        clearNodePushCache(chainId);
-        NodeRankingExample condition = new NodeRankingExample();
-        condition.createCriteria().andChainIdEqualTo(chainId)
-                .andIsValidEqualTo(1);
-        List<NodeRanking> data = nodeRankingMapper.selectByExample(condition);
-        if(data.size()==0) return;
-
-        updateNodePushCache(chainId,new HashSet<>(data));
-    }
-
-    /**
-     * 获取节点推送缓存
-     * @param chainId
-     */
-    @Override
-    public List<NodePushItem> getNodePushCache(String chainId) {
-        List<NodePushItem> returnData = new LinkedList<>();
-        String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
-        List<String> cacheData = redisTemplate.opsForList().range(cacheKey,0,-1);
-        if(cacheData.size()==0){
-            return returnData;
-        }
-        cacheData.forEach(nodeStr -> {
-            NodePushItem bean = JSON.parseObject(nodeStr,NodePushItem.class);
-            returnData.add(bean);
-        });
-        Collections.sort(returnData,(n1,n2)->{
-            if(n1.getRanking()>n2.getRanking()) return 1;
-            if(n1.getRanking()<n2.getRanking()) return -1;
-            return 0;
-        });
-        return returnData;
-    }
-
-    /**
      * 清除统计缓存
      * @param chainId
      */
@@ -497,7 +119,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         StatisticsCache cache = getStatisticsCache(chainId);
         if(cache==null) cache = new StatisticsCache();
 
-        RespPage<BlockListItem> blockPage = getBlockPage(chainId,1,1);
+        RespPage<BlockListItem> blockPage = blockCacheService.getBlockPage(chainId,1,1);
         List<BlockListItem> sampleBlocks = blockPage.getData();
         if(sampleBlocks.size()>0){
             BlockListItem cachedHighestBlock = sampleBlocks.get(0);
@@ -527,7 +149,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
             cache.setMaxTps(fakeMaxTps);
         }
 
-        List<NodePushItem> nodes = getNodePushCache(chainId);
+        List<NodePushItem> nodes = nodeCacheService.getNodePushCache(chainId);
         /************* 设置共识节点数*************/
         cache.setConsensusCount(nodes.size());
 
@@ -777,6 +399,4 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         if(StringUtils.isNotBlank(res)) return Long.valueOf(res);
         return 0;
     }
-
-
 }

@@ -18,8 +18,8 @@ import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.req.block.*;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -45,15 +45,14 @@ public class BlockServiceImpl implements BlockService {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private I18nUtil i18n;
-
     @Autowired
-    private RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
    /* @Autowired
     private TicketService ticketService;*/
 
     @Override
     public RespPage<BlockListItem> getPage(BlockPageReq req) {
-        RespPage<BlockListItem> returnData = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<BlockListItem> returnData = blockCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return returnData;
 
         /*
@@ -187,12 +186,12 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public void clearCache(String chainId) {
-        redisCacheService.clearBlockCache(chainId);
+        blockCacheService.clearBlockCache(chainId);
     }
 
     @Override
     public void updateCache(String chainId,Set<Block> data) {
-        redisCacheService.updateBlockCache(chainId,data);
+        blockCacheService.updateBlockCache(chainId,data);
     }
 
     @Override

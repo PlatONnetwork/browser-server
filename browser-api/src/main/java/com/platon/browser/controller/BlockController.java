@@ -14,8 +14,8 @@ import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.block.BlockTransactionPageReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class BlockController  {
     @Autowired
     private BlockService blockService;
     @Autowired
-    private RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
     /**
@@ -93,7 +93,7 @@ public class BlockController  {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        RespPage<BlockListItem> page = redisCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<BlockListItem> page = blockCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 

@@ -21,6 +21,8 @@ import com.platon.browser.req.transaction.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.*;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,9 @@ public class TransactionController {
     @Autowired
     private PendingTxService pendingTxService;
     @Autowired
-    private RedisCacheService redisCacheService;
+    private TransactionCacheService transactionCacheService;
+    @Autowired
+    private BlockCacheService blockCacheService;
     @Autowired
     private TransactionService transactionService;
     @Autowired
@@ -133,7 +137,7 @@ public class TransactionController {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
-        RespPage<TransactionListItem> page = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<TransactionListItem> page = transactionCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return page;
     }
 
@@ -308,7 +312,7 @@ public class TransactionController {
     private void setupConfirmNum(TransactionDetail transactionDetail, String chainId){
         // 设置区块确认数
         // 为加快速度，从缓存获取
-        RespPage<BlockListItem> page = redisCacheService.getBlockPage(chainId,1,1);
+        RespPage<BlockListItem> page = blockCacheService.getBlockPage(chainId,1,1);
         if(page.getData()==null||page.getData().size()==0){
             transactionDetail.setConfirmNum(0l);
             return;

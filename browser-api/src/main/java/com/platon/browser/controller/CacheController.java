@@ -1,7 +1,10 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.NodeCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.CacheEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CacheController {
     private static Logger logger = LoggerFactory.getLogger(CacheController.class);
     @Autowired
-    private RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private NodeCacheService nodeCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
+    @Autowired
+    private StatisticCacheService statisticCacheService;
     @Autowired
     private ChainsConfig chainsConfig;
 
@@ -40,10 +49,10 @@ public class CacheController {
         try {
             CacheEnum cacheEnum = CacheEnum.valueOf(cacheName.toUpperCase());
             switch (cacheEnum){
-                case NODE:redisCacheService.resetNodePushCache(chainId,clearOld);break;
-                case BLOCK:redisCacheService.resetBlockCache(chainId,clearOld);break;
-                case TRANSACTION:redisCacheService.resetTransactionCache(chainId,clearOld);break;
-                case STATISTICS:redisCacheService.clearStatisticsCache(chainId);break;
+                case NODE:nodeCacheService.resetNodePushCache(chainId,clearOld);break;
+                case BLOCK:blockCacheService.resetBlockCache(chainId,clearOld);break;
+                case TRANSACTION:transactionCacheService.resetTransactionCache(chainId,clearOld);break;
+                case STATISTICS:statisticCacheService.clearStatisticsCache(chainId);break;
             }
         }catch (Exception ex){
             return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";
@@ -65,7 +74,7 @@ public class CacheController {
         try {
             CacheEnum cacheEnum = CacheEnum.valueOf(cacheName.toUpperCase());
             switch (cacheEnum){
-                case MAXTPS:redisCacheService.updateMaxTps(chainId,value);break;
+                case MAXTPS:statisticCacheService.updateMaxTps(chainId,value);break;
             }
         }catch (Exception ex){
             return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";

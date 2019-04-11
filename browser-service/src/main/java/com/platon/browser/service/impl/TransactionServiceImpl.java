@@ -16,9 +16,9 @@ import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.NodeService;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private I18nUtil i18n;
     @Autowired
-    private RedisCacheService redisCacheService;
+    private TransactionCacheService transactionCacheService;
     @Autowired
     private NodeService nodeService;
     @Autowired
@@ -46,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public RespPage<TransactionListItem> getPage(TransactionPageReq req) {
-        RespPage<TransactionListItem> returnData = redisCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
+        RespPage<TransactionListItem> returnData = transactionCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return returnData;
     }
 
@@ -250,12 +250,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void clearCache(String chainId) {
-        redisCacheService.clearTransactionCache(chainId);
+        transactionCacheService.clearTransactionCache(chainId);
     }
 
     @Override
     public void updateCache(String chainId,Set<Transaction> data) {
-        redisCacheService.updateTransactionCache(chainId,data);
+        transactionCacheService.updateTransactionCache(chainId,data);
     }
 
 }

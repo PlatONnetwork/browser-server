@@ -11,9 +11,10 @@ import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.NodeService;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StatisticService;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,9 @@ public class HomeController {
     private RedisTemplate<String,String> redisTemplate;
 
     @Autowired
-    private RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -239,7 +242,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
+        List<BlockPushItem> blocks = blockCacheService.getBlockPushCache(chainId,1,10);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
         return resp;
     }
@@ -302,7 +305,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
+        List<TransactionPushItem> transactions = transactionCacheService.getTransactionPushCache(chainId,1,10);
         BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
         return resp;
     }
