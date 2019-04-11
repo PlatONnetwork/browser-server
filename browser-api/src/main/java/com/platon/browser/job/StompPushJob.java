@@ -6,12 +6,13 @@ import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.NodeService;
-import com.platon.browser.service.RedisCacheService;
 import com.platon.browser.service.StatisticService;
-import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.platon.browser.service.impl.RedisCacheServiceImpl.NODEID_TO_FAKE_NODES;
+import static com.platon.browser.service.impl.cache.NodeCacheServiceImpl.NODEID_TO_FAKE_NODES;
+
 
 @Component
 public class StompPushJob {
@@ -35,7 +37,9 @@ public class StompPushJob {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-    private RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
     @Autowired
     private I18nUtil i18n;
     @Value("${platon.redis.key.block}")
@@ -96,7 +100,7 @@ public class StompPushJob {
     public void pushBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 全量推送区块信息
-            List<BlockPushItem> blocks = redisCacheService.getBlockPushCache(chainId,1,10);
+            List<BlockPushItem> blocks = blockCacheService.getBlockPushCache(chainId,1,10);
             BaseResp blockResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
         });
@@ -109,7 +113,7 @@ public class StompPushJob {
     public void pushTransaction(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 全量推送交易信息
-            List<TransactionPushItem> transactions = redisCacheService.getTransactionPushCache(chainId,1,10);
+            List<TransactionPushItem> transactions = transactionCacheService.getTransactionPushCache(chainId,1,10);
             BaseResp transactionResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
             messagingTemplate.convertAndSend("/topic/transaction/new?cid="+chainId, transactionResp);
         });

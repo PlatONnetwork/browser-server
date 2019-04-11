@@ -6,7 +6,7 @@ import com.platon.browser.dao.entity.VoteTx;
 import com.platon.browser.dao.entity.VoteTxExample;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.VoteTxMapper;
-import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,19 +78,19 @@ public class StatisticsJob {
 
 
     @Autowired
-    private RedisCacheService redisCacheService;
+    private StatisticCacheService statisticCacheService;
     @Autowired
     private CustomBlockMapper customBlockMapper;
     public static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(6);
     @Scheduled(cron = "0/10 * * * * ?")
     protected void updateTransCount () {
         CountDownLatch latch = new CountDownLatch(6);
-        THREAD_POOL.submit(()->{try {redisCacheService.updateTransCount(chainId);}finally {latch.countDown();}});
-        THREAD_POOL.submit(()->{try {redisCacheService.updateTransCount24Hours(chainId);}finally {latch.countDown();}});
-        THREAD_POOL.submit(()->{try {redisCacheService.updateAddressCount(chainId);}finally {latch.countDown();}});
-        THREAD_POOL.submit(()->{try {redisCacheService.updateAvgBlockTransCount(chainId);}finally {latch.countDown();}});
-        THREAD_POOL.submit(()->{try {redisCacheService.updateTicketPrice(chainId);}finally {latch.countDown();}});
-        THREAD_POOL.submit(()->{try {redisCacheService.updateVoteCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateTransCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateTransCount24Hours(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateAddressCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateAvgBlockTransCount(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateTicketPrice(chainId);}finally {latch.countDown();}});
+        THREAD_POOL.submit(()->{try {statisticCacheService.updateVoteCount(chainId);}finally {latch.countDown();}});
         try {latch.await();} catch (InterruptedException e) {e.printStackTrace();}
     }
 

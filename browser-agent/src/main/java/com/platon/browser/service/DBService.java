@@ -8,6 +8,9 @@ import com.platon.browser.dao.entity.VoteTx;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.thread.AnalyseThread;
 import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
@@ -38,7 +41,12 @@ public class DBService {
     @Autowired
     private BlockMissingMapper blockMissingMapper;
     @Autowired
-    protected RedisCacheService redisCacheService;
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
+    @Autowired
+    private StatisticCacheService statisticCacheService;
+
     @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
@@ -56,7 +64,7 @@ public class DBService {
             blockMapper.batchInsert(result.blocks);
             logger.debug("  |-Time Consuming(blockMapper.batchInsert()): {}ms",System.currentTimeMillis()-blockInertBeginTime);
             long updateBlockCacheBeginTime = System.currentTimeMillis();
-            redisCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
+            blockCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
             logger.debug("  |-Time Consuming(redisCacheService.updateBlockCache): {}ms",System.currentTimeMillis()-updateBlockCacheBeginTime);
         }
 
@@ -77,9 +85,9 @@ public class DBService {
             if(voteTxes.size() > 0){
                 voteTxMapper.batchInsert(voteTxes);
             }
-            redisCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
-            //批量更新redis
-            batchInsertTransactionList(result.transactions);
+            transactionCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
+            // 按地址对交易分类并存储到缓存中
+            transactionCacheService.classifyByAddress(chainId,result.transactions);
         }
 
 //        if(result.nodes.size()>0){
@@ -98,30 +106,24 @@ public class DBService {
         }
 
         long updateStatisticsCache = System.currentTimeMillis();
-        redisCacheService.updateStatisticsCache(chainId);
+        statisticCacheService.updateStatisticsCache(chainId);
         logger.debug("  |-Time Consuming(redisCacheService.updateStatisticsCache()): {}ms",System.currentTimeMillis()-updateStatisticsCache);
 
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
 
-    public void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
-        //      tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{address}:{txType}:{txHash}:{createTime}
+    private void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
+        //tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
         String cakey = tranListPrefix.replace("{}",chainId);
         transactions.forEach(transaction -> {
-            String fromCacheKey = cakey.replace("{address}",transaction.getFrom())
+            SimpleDateFormat time = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+            String CacheKey = cakey.replace("{from}",transaction.getFrom())
+                    .replace("{to}",transaction.getTo())
                     .replace("{txType}",transaction.getTxType())
                     .replace("{txHash}",transaction.getHash())
-                    .replace("{createTime}",String.valueOf(transaction.getCreateTime().getTime()));
-            redisTemplate.delete(fromCacheKey);
-            redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(transaction));
-
-            String toCacheKey = cakey.replace("{address}",transaction.getTo())
-                    .replace("{txType}",transaction.getTxType())
-                    .replace("{txHash}",transaction.getHash())
-                    .replace("{createTime}",String.valueOf(transaction.getCreateTime().getTime()));
-            redisTemplate.delete(toCacheKey);
-            redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(transaction));
-
+                    .replace("{createTime}",time.format(transaction.getCreateTime()));
+            redisTemplate.delete(CacheKey);
+            redisTemplate.opsForValue().set(CacheKey,JSON.toJSONString(transaction));
         });
     }
 }

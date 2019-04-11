@@ -13,7 +13,8 @@ import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.StatisticsCache;
 import com.platon.browser.dto.agent.CandidateDto;
 import com.platon.browser.enums.NodeTypeEnum;
-import com.platon.browser.service.RedisCacheService;
+import com.platon.browser.service.cache.NodeCacheService;
+import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.utils.FilterTool;
 import lombok.Data;
@@ -27,7 +28,6 @@ import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -53,7 +53,9 @@ public class NodeAnalyseJob {
     @Autowired
     private CustomNodeRankingMapper customNodeRankingMapper;
     @Autowired
-    private RedisCacheService redisCacheService;
+    private StatisticCacheService statisticCacheService;
+    @Autowired
+    private NodeCacheService nodeCacheService;
     @Autowired
     private PlatonClient platon;
     @Value("${platon.chain.active}")
@@ -119,7 +121,7 @@ public class NodeAnalyseJob {
                 nodeRanking.setNodeType(nodeType != null ? nodeType : " ");
 
                 // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
-                StatisticsCache statisticsCache = redisCacheService.getStatisticsCache(chainId);
+                StatisticsCache statisticsCache = statisticCacheService.getStatisticsCache(chainId);
                 nodeRanking.setAvgTime(statisticsCache.getAvgTime().doubleValue());
 
                 BigDecimal rate = new BigDecimal(nodeRanking.getRewardRatio());
@@ -241,7 +243,7 @@ public class NodeAnalyseJob {
             }
             logger.debug("insertOrUpdate---------------------------------->{}", System.currentTimeMillis() - startTime);
 
-            redisCacheService.updateNodePushCache(chainId, redisNode);
+            nodeCacheService.updateNodePushCache(chainId, redisNode);
             //beginNumber++;
             logger.debug("NodeInfoSynJob---------------------------------->{}", System.currentTimeMillis() - startTime);
             //}
