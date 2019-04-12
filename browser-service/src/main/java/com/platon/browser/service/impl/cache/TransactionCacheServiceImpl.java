@@ -148,10 +148,8 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     @Override
     public void classifyByAddress(String chainId, List<TransactionWithBLOBs> transactions ){
         /**
-         * # 按地址存储交易的键前缀
-           address-trans-prefix: browser:${version}:${profile}:chain{}:tran-list
            # 按地址存储的交易的键模板
-           address-trans-key-template: ${platon.redis.key.address-trans-prefix}:{address}:{txType}:{txHash}:{timestamp}
+           address-trans-key-template: browser:{version}:dev:chain{}:address-trans-list::{address}:{txType}:{txHash}:{timestamp}
          */
         String keyTemplate = addressTransTemplate.replace("{}",chainId);
         transactions.forEach(transaction -> {
@@ -159,7 +157,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             BeanUtils.copyProperties(transaction,tmp);
 
             String commonKeyTemplate = keyTemplate.replace("{txType}",transaction.getTxType())
-                    .replace("txHash",transaction.getHash())
+                    .replace("{txHash}",transaction.getHash())
                     .replace("{timestamp}",String.valueOf(transaction.getTimestamp().getTime()));
 
             String fromCacheKey = commonKeyTemplate.replace("{address}",transaction.getFrom());
