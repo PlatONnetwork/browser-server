@@ -183,7 +183,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         queryPattern=StringUtils.isNotBlank(txHashPattern)?queryPattern.replace("{txHash}",txHashPattern):queryPattern.replace("{txHash}","*");
         queryPattern=StringUtils.isNotBlank(timestampPattern)?queryPattern.replace("{timestamp}",timestampPattern):queryPattern.replace("{timestamp}","*");
         Set<String> keys = redisTemplate.keys(queryPattern);
-        // 相同txHash键去重
+        // 带有相同txHash的键去重
         Map<String,String> uniqueMap = new HashMap<>();
         keys.forEach(key->uniqueMap.put(key.split(":")[8],key));
         // 降序排序
