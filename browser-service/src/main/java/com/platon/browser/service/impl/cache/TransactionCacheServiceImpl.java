@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.query.SortQuery;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -185,4 +186,15 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         Map<String,Transaction> result = batchQueryByKeys(new ArrayList<>(keys),false,Transaction.class,redisTemplate);
         return result.values();
     }
+
+    /**
+     * 交易列表保留有效数据200条
+     * @param chainId
+     */
+    @Override
+    public void retentionValidData ( String chainId ) {
+    }
+
+
+
 }
