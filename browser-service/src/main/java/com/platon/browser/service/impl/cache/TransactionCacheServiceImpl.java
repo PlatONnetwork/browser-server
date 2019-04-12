@@ -257,7 +257,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      *
      * @param address chainId
      */
-    @Override
+   /* @Override
     public void retentionValidData ( String address, String chainId ) {
         String caKey = addressTransTemplate.replace("{}", chainId);
         caKey.replace("{address}", address)
@@ -280,7 +280,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         //todo:delete
 
         //RedisPipleTool.batchDeleteByKeys();
-    }
+    }*/
 
 
 }
