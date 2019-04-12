@@ -140,6 +140,17 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         return returnData;
     }
 
+
+    enum KeyTemplatePlaceholders{
+        ADDRESS("{address}"),
+        TX_TYPE("{txType}"),
+        TX_HASH("{txHash}"),
+        TIMESTAMP("{timestamp}");
+        public String code;
+        KeyTemplatePlaceholders(String code){
+            this.code=code;
+        }
+    }
     /**
      * 交易类型按地址分类存储到缓存中
      * @param chainId
@@ -156,15 +167,15 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             Transaction tmp = new Transaction();
             BeanUtils.copyProperties(transaction,tmp);
 
-            String commonKeyTemplate = keyTemplate.replace("{txType}",transaction.getTxType())
-                    .replace("{txHash}",transaction.getHash())
-                    .replace("{timestamp}",String.valueOf(transaction.getTimestamp().getTime()));
+            String commonKeyTemplate = keyTemplate.replace(KeyTemplatePlaceholders.TX_TYPE.code,transaction.getTxType())
+                    .replace(KeyTemplatePlaceholders.TX_HASH.code,transaction.getHash())
+                    .replace(KeyTemplatePlaceholders.TIMESTAMP.code,String.valueOf(transaction.getTimestamp().getTime()));
 
-            String fromCacheKey = commonKeyTemplate.replace("{address}",transaction.getFrom());
+            String fromCacheKey = commonKeyTemplate.replace(KeyTemplatePlaceholders.ADDRESS.code,transaction.getFrom());
             redisTemplate.delete(fromCacheKey);
             redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(tmp));
 
-            String toCacheKey = commonKeyTemplate.replace("{address}",transaction.getTo());
+            String toCacheKey = commonKeyTemplate.replace(KeyTemplatePlaceholders.ADDRESS.code,transaction.getTo());
             redisTemplate.delete(toCacheKey);
             redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
         });
@@ -177,11 +188,15 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      */
     @Override
     public Collection<TransactionWithBLOBs> fuzzyQuery(String chainId, String addressPattern, String txTypePattern, String txHashPattern,String timestampPattern){
-        String queryPattern = addressTransTemplate.replace("{}",chainId);
-        queryPattern=StringUtils.isNotBlank(addressPattern)?queryPattern.replace("{address}",addressPattern):queryPattern.replace("{address}","*");
-        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txType}",txTypePattern):queryPattern.replace("{txType}","*");
-        queryPattern=StringUtils.isNotBlank(txHashPattern)?queryPattern.replace("{txHash}",txHashPattern):queryPattern.replace("{txHash}","*");
-        queryPattern=StringUtils.isNotBlank(timestampPattern)?queryPattern.replace("{timestamp}",timestampPattern):queryPattern.replace("{timestamp}","*");
+        addressPattern=StringUtils.isNotBlank(addressPattern)?addressPattern:"*";
+        txTypePattern=StringUtils.isNotBlank(txTypePattern)?txTypePattern:"*";
+        txHashPattern=StringUtils.isNotBlank(txHashPattern)?txHashPattern:"*";
+        timestampPattern=StringUtils.isNotBlank(timestampPattern)?timestampPattern:"*";
+        String queryPattern = addressTransTemplate.replace("{}",chainId)
+                .replace(KeyTemplatePlaceholders.ADDRESS.code,addressPattern)
+                .replace(KeyTemplatePlaceholders.TX_TYPE.code,txTypePattern)
+                .replace(KeyTemplatePlaceholders.TX_HASH.code,txHashPattern)
+                .replace(KeyTemplatePlaceholders.TIMESTAMP.code,timestampPattern);
         Set<String> keys = redisTemplate.keys(queryPattern);
         // 带有相同txHash的键去重
         Map<String,String> uniqueMap = new HashMap<>();
