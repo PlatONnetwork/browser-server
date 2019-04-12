@@ -210,7 +210,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             Collections.sort(keyList,((k1, k2) -> Long.valueOf(k2.substring(k2.lastIndexOf(":")+1)).compareTo(Long.valueOf(k1.substring(k1.lastIndexOf(":")+1)))));
             int index = 1;
             for (String key:keyList){
-                if(index>200) invalidKeyList.add(key);
+                if(index>addressTransMaxItem) invalidKeyList.add(key);
                 index++;
             }
         });
