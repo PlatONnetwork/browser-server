@@ -137,4 +137,18 @@ public class CacheBase {
         }
         return  resultMap;
     }
+
+    /**
+     * 通过多个键值批量删除值
+     */
+    protected Integer batchDeleteByKeys(List<String> keys, Boolean useParallel,RedisTemplate<String,String> redisTemplate){
+        if(null == keys || keys.size() == 0 ) return null;
+        if(null == useParallel) useParallel = true;
+        List<Object> results = redisTemplate.executePipelined( (RedisCallback<Object>) connection -> {
+            StringRedisConnection stringRedisConn = (StringRedisConnection)connection;
+            keys.forEach(key->stringRedisConn.del(key));
+            return null;
+        });
+        return results.size();
+    }
 }
