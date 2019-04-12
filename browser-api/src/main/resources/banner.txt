@@ -4,3 +4,5 @@ ___.                                                                  .__
  | \_\ \  | \(  <_> )     /\___ \\  ___/|  | \/ /_____/  / __ \|  |_> >  |
  |___  /__|   \____/ \/\_//____  >\___  >__|            (____  /   __/|__|
      \/                        \/     \/                     \/|__|
+Spring Boot Version: ${spring-boot.version}
+Application Version: ${version}
