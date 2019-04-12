@@ -36,7 +36,7 @@ public class TransactionBean extends TransactionWithBLOBs {
             analysisResult.setFunctionName("contractCreate");
             this.setTo(receipt.getContractAddress());
             this.setReceiveType("contract");
-        }
+        }else this.setTo(transaction.getTo());
         String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
         this.setTxType(type == null ? "transfer" : type);
         String txinfo = JSON.toJSONString(analysisResult);

@@ -48,6 +48,7 @@ public class TransactionFilter {
                 // Initialize the entity with the raw transaction and receipt
                 bean.init(initData, receipt);
                 // Convert timestamp into milliseconds
+
                 if (String.valueOf(time).length() == 10) {
                     bean.setTimestamp(new Date(time * 1000L));
                 } else {
