@@ -98,43 +98,4 @@ public class CacheBase {
         cpi.page = page;
         return cpi;
     }
-
-    /**
-     * 通过多个键值批量查询值
-     * @param keys
-     * @param useParallel
-     * @param clazz
-     * @param redisTemplate
-     * @param <T>
-     * @return
-     */
-    protected <T> Map<String,T> batchQueryByKeys(List<String> keys, Boolean useParallel, Class<T> clazz,RedisTemplate<String,String> redisTemplate){
-        if(null == keys || keys.size() == 0 ) return null;
-        if(null == useParallel) useParallel = true;
-
-        List<Object> results = redisTemplate.executePipelined( (RedisCallback<Object>) connection -> {
-            StringRedisConnection stringRedisConn = (StringRedisConnection)connection;
-            keys.forEach(key->stringRedisConn.get(key));
-            return null;
-        });
-        if(null == results || results.size() == 0 ) return null;
-
-        Map<String,T> resultMap  =  null;
-        if(useParallel){
-            Map<String,T> resultMapOne  = Collections.synchronizedMap(new HashMap<>());
-            keys.parallelStream().forEach(key -> {
-                String res = (String)results.get(keys.indexOf(key));
-                resultMapOne.put(key, JSON.parseObject(res,clazz));
-            });
-            resultMap = resultMapOne;
-        }else{
-            Map<String,T> resultMapTwo  = new HashMap<>();
-            keys.forEach(key-> {
-                String res = (String)results.get(keys.indexOf(key));
-                resultMapTwo.put(key,JSON.parseObject(res,clazz));
-            });
-            resultMap = resultMapTwo;
-        }
-        return  resultMap;
-    }
 }
