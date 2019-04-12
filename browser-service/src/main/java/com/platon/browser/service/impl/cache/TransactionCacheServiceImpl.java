@@ -164,6 +164,8 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
            address-trans-key-template: browser:{version}:dev:chain{}:address-trans-list::{address}:{txType}:{txHash}:{timestamp}
          */
         String keyTemplate = addressTransTemplate.replace("{}",chainId);
+
+        Set<String> addressSet = new HashSet<>();
         transactions.forEach(transaction -> {
             Transaction tmp = new Transaction();
             BeanUtils.copyProperties(transaction,tmp);
@@ -179,8 +181,42 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             String toCacheKey = commonKeyTemplate.replace(KeyTemplatePlaceholders.ADDRESS.code,transaction.getTo());
             redisTemplate.delete(toCacheKey);
             redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
+
+            // 记录from 和to地址到addressSet，方便后面对地址交易数量的控制
+            addressSet.add(transaction.getFrom());
+            addressSet.add(transaction.getTo());
         });
+
+        // 删除旧缓存
+        deleteOldCache(chainId,addressSet);
     }
+
+    /**
+     * 删除旧缓存
+     * @param chainId
+     * @param addressSet
+     */
+    private void deleteOldCache(String chainId,Set<String> addressSet) {
+        String queryPatternTemplate = addressTransTemplate.replace("{}",chainId)
+                .replace(KeyTemplatePlaceholders.TX_TYPE.code,"*")
+                .replace(KeyTemplatePlaceholders.TX_HASH.code,"*")
+                .replace(KeyTemplatePlaceholders.TIMESTAMP.code,"*");
+        List<String> invalidKeyList = new ArrayList<>();
+        addressSet.forEach(address->{
+            String queryPattern = queryPatternTemplate.replace(KeyTemplatePlaceholders.ADDRESS.code,address);
+            Set<String> keys = redisTemplate.keys(queryPattern);
+            List<String> keyList = new ArrayList<>(keys);
+            // 倒排
+            Collections.sort(keyList,((k1, k2) -> Long.valueOf(k2.substring(k2.lastIndexOf(":")+1)).compareTo(Long.valueOf(k1.substring(k1.lastIndexOf(":")+1)))));
+            int index = 1;
+            for (String key:keyList){
+                if(index>200) invalidKeyList.add(key);
+                index++;
+            }
+        });
+        if(invalidKeyList.size()>0) RedisPipleTool.batchDeleteByKeys(invalidKeyList,false,redisTemplate);
+    }
+
 
     /**
      * 从缓存中模糊查询符合传参条件的交易列表
@@ -201,7 +237,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         Set<String> keys = redisTemplate.keys(queryPattern);
         // 带有相同txHash的键去重
         Map<String,String> uniqueMap = new HashMap<>();
-        keys.forEach(key->uniqueMap.put(key.split(":")[8],key));
+        keys.forEach(key->uniqueMap.put(key.split(":")[7],key));
         // 降序排序
         List<String> keyList = new ArrayList<>(uniqueMap.values());
         Collections.sort(keyList,((k1, k2) -> Long.valueOf(k2.substring(k2.lastIndexOf(":")+1)).compareTo(Long.valueOf(k1.substring(k1.lastIndexOf(":")+1)))));
