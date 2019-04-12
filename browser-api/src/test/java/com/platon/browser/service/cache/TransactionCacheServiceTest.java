@@ -47,12 +47,16 @@ public class TransactionCacheServiceTest extends TestBase {
     @Test
     public void queryData () throws FileNotFoundException {
 
-        Collection<Transaction> transactions;
+        Collection<TransactionWithBLOBs> transactions;
 
         // 查所有交易
         //transactions = transactionCacheService.fuzzyQuery("100",null,null,null,null);
         // 查投票交易
         transactions = transactionCacheService.fuzzyQuery("100",null, TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,null,null);
+        // 查转账交易
+        transactions = transactionCacheService.fuzzyQuery("100",null, TransactionTypeEnum.TRANSACTION_TRANSFER.code,null,null);
+        // 查创建合约交易
+        transactions = transactionCacheService.fuzzyQuery("100",null, TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code,null,null);
         logger.error("query done");
     }
 }

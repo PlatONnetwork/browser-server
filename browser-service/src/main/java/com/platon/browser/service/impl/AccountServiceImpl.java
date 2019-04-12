@@ -20,6 +20,7 @@ import com.platon.browser.service.AccountService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
+import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.EnergonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class AccountServiceImpl implements AccountService {
     private BlockMapper blockMapper;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
 
 
     @Override
@@ -90,10 +93,8 @@ public class AccountServiceImpl implements AccountService {
 
 
 
-        // 取已完成交易
-        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        List<TransactionWithBLOBs> transactions = transactionService.getList(req);
-
+        // 取已完成交易(查询缓存中的200条记录)
+        Collection<TransactionWithBLOBs> transactions = transactionCacheService.fuzzyQuery(req.getCid(),req.getAddress(),req.getTxType(),null,null);
         List<AccTransactionItem> data = new ArrayList<>();
         List<String> hashList = new ArrayList <>();
         transactions.forEach(initData -> {
@@ -133,7 +134,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         // 取待处理交易
-        page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<PendingTx> pendingTxes = pendingTxService.getList(req);
         returnData.setTradeCount(returnData.getTradeCount()+Long.valueOf(page.getTotal()).intValue());
         pendingTxes.forEach(initData -> {

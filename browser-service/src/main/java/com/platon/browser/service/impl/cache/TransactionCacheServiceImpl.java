@@ -164,11 +164,11 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
 
             String fromCacheKey = commonKeyTemplate.replace("{address}",transaction.getFrom());
             redisTemplate.delete(fromCacheKey);
-            //redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(tmp));
+            redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(tmp));
 
             String toCacheKey = commonKeyTemplate.replace("{address}",transaction.getTo());
             redisTemplate.delete(toCacheKey);
-            //redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
+            redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
         });
     }
 
@@ -178,7 +178,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      * @param chainId
      */
     @Override
-    public Collection<Transaction> fuzzyQuery(String chainId, String addressPattern, String txTypePattern, String txHashPattern,String timestampPattern){
+    public Collection<TransactionWithBLOBs> fuzzyQuery(String chainId, String addressPattern, String txTypePattern, String txHashPattern,String timestampPattern){
         String queryPattern = addressTransTemplate.replace("{}",chainId);
         queryPattern=StringUtils.isNotBlank(addressPattern)?queryPattern.replace("{address}",addressPattern):queryPattern.replace("{address}","*");
         queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txType}",txTypePattern):queryPattern.replace("{txType}","*");
@@ -196,8 +196,8 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         keyList.forEach(key->{
             if(validKeys.size()<addressTransMaxItem) validKeys.add(key);
         });
-        Map<String,Transaction> result = batchQueryByKeys(validKeys,false,Transaction.class,redisTemplate);
-        List<Transaction> returnData = new ArrayList<>(result.values());
+        Map<String,TransactionWithBLOBs> result = batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
+        List<TransactionWithBLOBs> returnData = new ArrayList<>(result.values());
         Collections.sort(returnData,((t1, t2) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
         return returnData;
     }
