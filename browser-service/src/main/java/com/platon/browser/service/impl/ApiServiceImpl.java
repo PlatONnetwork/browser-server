@@ -6,9 +6,12 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.VoteTxMapper;
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -44,6 +47,8 @@ public class ApiServiceImpl implements ApiService {
     private BlockMapper blockMapper;
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private NodeRankingMapper nodeRankingMapper;
 
 
     @Override
@@ -182,13 +187,16 @@ public class ApiServiceImpl implements ApiService {
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
             List<String> blockHashList = new ArrayList <>();
+
             transactionList.forEach(transaction -> {
                 VoteInfo date = new VoteInfo();
                 date.init(transaction);
                 date.setVailVoteCount(validVoteMap.get(transaction.getHash()));
                 bean.add(date);
                 blockHashList.add(transaction.getBlockHash());
+
             });
+
 
 
             Map<String,String> priceMap = new HashMap <>();

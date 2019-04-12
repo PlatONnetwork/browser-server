@@ -18,5 +18,5 @@ public interface TransactionCacheService {
     List<TransactionPushItem> getTransactionPushCache(String chainId, int pageNum, int pageSize);
     void classifyByAddress(String chainId, List<TransactionWithBLOBs> transactions );
     Collection<Transaction> fuzzyQuery(String chainId, String addressPattern, String txTypePattern, String txHashPattern, String timestampPattern);
-    void retentionValidData(String chainId);
+    void retentionValidData(String address,String chainId);
 }
