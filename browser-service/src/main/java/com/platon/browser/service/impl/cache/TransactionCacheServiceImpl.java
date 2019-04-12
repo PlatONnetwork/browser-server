@@ -39,7 +39,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     @Value("${platon.redis.key.address-trans-key-template}")
     private String addressTransTemplate;
     @Value("${platon.redis.key.address-trans-max-item}")
-    private String addressTransMaxItem;
+    private Integer addressTransMaxItem;
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -155,23 +155,26 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
          */
         String keyTemplate = addressTransTemplate.replace("{}",chainId);
         transactions.forEach(transaction -> {
+            Transaction tmp = new Transaction();
+            BeanUtils.copyProperties(transaction,tmp);
+
             String commonKeyTemplate = keyTemplate.replace("{txType}",transaction.getTxType())
                     .replace("txHash",transaction.getHash())
                     .replace("{timestamp}",String.valueOf(transaction.getTimestamp().getTime()));
 
             String fromCacheKey = commonKeyTemplate.replace("{address}",transaction.getFrom());
-            redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(transaction));
+            redisTemplate.delete(fromCacheKey);
+            //redisTemplate.opsForValue().set(fromCacheKey,JSON.toJSONString(tmp));
 
             String toCacheKey = commonKeyTemplate.replace("{address}",transaction.getTo());
-
-            Transaction tmp = new Transaction();
-            BeanUtils.copyProperties(transaction,tmp);
-            redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
+            redisTemplate.delete(toCacheKey);
+            //redisTemplate.opsForValue().set(toCacheKey,JSON.toJSONString(tmp));
         });
     }
 
     /**
      * 从缓存中模糊查询符合传参条件的交易列表
+     * 结果按时间倒排
      * @param chainId
      */
     @Override
@@ -179,10 +182,23 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         String queryPattern = addressTransTemplate.replace("{}",chainId);
         queryPattern=StringUtils.isNotBlank(addressPattern)?queryPattern.replace("{address}",addressPattern):queryPattern.replace("{address}","*");
         queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txType}",txTypePattern):queryPattern.replace("{txType}","*");
-        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{txHash}",txHashPattern):queryPattern.replace("{txHash}","*");
-        queryPattern=StringUtils.isNotBlank(txTypePattern)?queryPattern.replace("{timestamp}",timestampPattern):queryPattern.replace("{timestamp}","*");
+        queryPattern=StringUtils.isNotBlank(txHashPattern)?queryPattern.replace("{txHash}",txHashPattern):queryPattern.replace("{txHash}","*");
+        queryPattern=StringUtils.isNotBlank(timestampPattern)?queryPattern.replace("{timestamp}",timestampPattern):queryPattern.replace("{timestamp}","*");
         Set<String> keys = redisTemplate.keys(queryPattern);
-        Map<String,Transaction> result = batchQueryByKeys(new ArrayList<>(keys),false,Transaction.class,redisTemplate);
-        return result.values();
+        // 相同txHash键去重
+        Map<String,String> uniqueMap = new HashMap<>();
+        keys.forEach(key->uniqueMap.put(key.split(":")[8],key));
+        // 降序排序
+        List<String> keyList = new ArrayList<>(uniqueMap.values());
+        Collections.sort(keyList,((k1, k2) -> Long.valueOf(k2.substring(k2.lastIndexOf(":")+1)).compareTo(Long.valueOf(k1.substring(k1.lastIndexOf(":")+1)))));
+        // 取中前addressTransMaxItem条记录作为批量查询值的目标键
+        List<String> validKeys = new ArrayList<>();
+        keyList.forEach(key->{
+            if(validKeys.size()<addressTransMaxItem) validKeys.add(key);
+        });
+        Map<String,Transaction> result = batchQueryByKeys(validKeys,false,Transaction.class,redisTemplate);
+        List<Transaction> returnData = new ArrayList<>(result.values());
+        Collections.sort(returnData,((t1, t2) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
+        return returnData;
     }
 }
