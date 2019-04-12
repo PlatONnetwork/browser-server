@@ -195,6 +195,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
             if(validKeys.size()<addressTransMaxItem) validKeys.add(key);
         });
         Map<String,TransactionWithBLOBs> result = batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
+        if(result==null) return Collections.EMPTY_LIST;
         List<TransactionWithBLOBs> returnData = new ArrayList<>(result.values());
         Collections.sort(returnData,((t1, t2) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
         return returnData;
