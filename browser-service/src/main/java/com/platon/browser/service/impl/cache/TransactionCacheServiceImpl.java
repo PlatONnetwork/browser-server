@@ -14,6 +14,7 @@ import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.util.RedisPipleTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,7 +210,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         keyList.forEach(key->{
             if(validKeys.size()<addressTransMaxItem) validKeys.add(key);
         });
-        Map<String,TransactionWithBLOBs> result = batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
+        Map<String,TransactionWithBLOBs> result = RedisPipleTool.batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
         if(result==null) return Collections.EMPTY_LIST;
         List<TransactionWithBLOBs> returnData = new ArrayList<>(result.values());
         Collections.sort(returnData,((t1, t2) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
