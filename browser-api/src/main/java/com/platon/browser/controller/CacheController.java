@@ -7,6 +7,7 @@ import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.CacheEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jcajce.provider.symmetric.CAST5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class CacheController {
                 case BLOCK:blockCacheService.resetBlockCache(chainId,clearOld);break;
                 case TRANSACTION:transactionCacheService.resetTransactionCache(chainId,clearOld);break;
                 case STATISTICS:statisticCacheService.clearStatisticsCache(chainId);break;
+                case LIST:transactionCacheService.clearTranListCache(chainId);break;
             }
         }catch (Exception ex){
             return "Reset cache ["+cacheName+"] of chain ["+chainId+"] failed";

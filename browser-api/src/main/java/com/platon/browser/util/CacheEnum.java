@@ -6,4 +6,6 @@ public enum CacheEnum {
     TRANSACTION,
     STATISTICS,
     MAXTPS,
+    LIST,
+
 }

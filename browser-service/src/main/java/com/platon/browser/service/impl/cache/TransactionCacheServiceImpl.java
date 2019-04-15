@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -252,35 +251,24 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         return returnData;
     }
 
-    /**
-     * 交易列表保留有效数据200条
-     *
-     * @param address chainId
-     */
-   /* @Override
-    public void retentionValidData ( String address, String chainId ) {
-        String caKey = addressTransTemplate.replace("{}", chainId);
-        caKey.replace("{address}", address)
-                .replace("{txType}", "*")
-                .replace("{txHash}", "*")
-                .replace("{timestamp}", "*");
+    @Override
+    public void clearTranListCache ( String chainId ) {
+        //browser:${version}:${profile}:chain{}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
+        String cacheKey = addressTransTemplate.replace("{}",chainId);
+        cacheKey.replace("{address}","*")
+                .replace("{txType}","*")
+                .replace("{txHash}","*")
+                .replace("{timestamp}","*");
         List <String> keys = new ArrayList <>();
-        keys.add(caKey);
-        Map <String, Transaction> result = RedisPipleTool.batchQueryByKeys(keys, false, Transaction.class, redisTemplate);
-        List <Transaction> returnData = new ArrayList <>(result.values());
-        //时间降排序
-        Collections.sort(returnData, (( t1, t2 ) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
-        //删除多余的
-        List<String> hashList = new ArrayList <>();
-        for (int i = 0; i < returnData.size(); i++) {
-            if (i >= 200) {
-                hashList.add(returnData.get(i).getHash());
-            }
+        keys.add(cacheKey);
+        Map<String,TransactionWithBLOBs> result = RedisPipleTool.batchQueryByKeys(keys,false,TransactionWithBLOBs.class,redisTemplate);
+        List<String> keyList = new ArrayList <>();
+        if(null != result){
+            result.forEach((k,v)->{
+                keyList.add(k);
+            });
         }
-        //todo:delete
-
-        //RedisPipleTool.batchDeleteByKeys();
-    }*/
-
+        if(keyList.size() > 0) RedisPipleTool.batchDeleteByKeys(keyList,false,redisTemplate);
+    }
 
 }
