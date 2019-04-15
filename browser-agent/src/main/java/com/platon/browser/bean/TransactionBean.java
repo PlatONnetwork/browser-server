@@ -33,7 +33,7 @@ public class TransactionBean extends TransactionWithBLOBs {
         }
         AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
         if("1".equals(analysisResult.getType())){
-            analysisResult.setFunctionName("contractCreate");
+            analysisResult.setFunctionName("contract deploy");
             this.setTo(receipt.getContractAddress());
             this.setReceiveType("contract");
         }else this.setTo(transaction.getTo());
