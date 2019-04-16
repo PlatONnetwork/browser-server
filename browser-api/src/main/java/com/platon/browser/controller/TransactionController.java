@@ -690,7 +690,7 @@ public class TransactionController {
 
             // 取合约开发者地址，取创建合约交易中的from地址
             TransactionExample trEx = new TransactionExample();
-            trEx.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+            trEx.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
             List<Transaction> trans = transactionMapper.selectByExample(trEx);
             if(trans.size()!=0){
                 Transaction transaction = trans.get(0);

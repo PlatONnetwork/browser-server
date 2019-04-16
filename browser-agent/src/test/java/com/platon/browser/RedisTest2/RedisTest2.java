@@ -41,7 +41,7 @@ public class RedisTest2 extends TestBase {
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo("203");
         List <TransactionWithBLOBs> list =  transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        dbService.batchInsertTransactionList(list);
+        //dbService.batchInsertTransactionList(list);
     }
 
     @Test

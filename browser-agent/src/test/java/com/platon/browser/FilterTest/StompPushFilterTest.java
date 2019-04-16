@@ -30,7 +30,7 @@ public class StompPushFilterTest extends TestBase {
     public void StompPushFilterTest(){
         try{
             CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
-            String nodeInfoList = candidateContract.CandidateList().send();
+            String nodeInfoList = candidateContract.GetCandidateList().send();
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(1073L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
             List<EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();

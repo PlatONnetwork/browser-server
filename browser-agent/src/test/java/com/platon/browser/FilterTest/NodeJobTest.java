@@ -57,7 +57,7 @@ public class NodeJobTest extends TestBase {
     @Test
     public void nodeJobTest() throws Exception {
         CandidateContract candidateContract = platonClient.getCandidateContract("203");
-        String nodelist = candidateContract.CandidateList().send();
+        String nodelist = candidateContract.GetCandidateList().send();
         List <String> candidateStrArr = JSON.parseArray(nodelist, String.class);
         List <CandidateDto> nodes = JSON.parseArray(candidateStrArr.get(0), CandidateDto.class);
         List <CandidateDto> alternates = JSON.parseArray(candidateStrArr.get(1), CandidateDto.class);

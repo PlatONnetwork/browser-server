@@ -38,7 +38,7 @@ public class NodeFilterTest extends TestBase {
             CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(400L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
-            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(400L))).send();
+            String nodeInfoList = candidateContract.GetCandidateList(new BigInteger(String.valueOf(400L))).send();
             List <EthBlock.TransactionResult> list = ethBlock.getBlock().getTransactions();
             List <Transaction> list1 = new ArrayList <>();
             List <TransactionReceipt> list2 = new ArrayList <>();
@@ -72,7 +72,7 @@ public class NodeFilterTest extends TestBase {
             CandidateContract candidateContract = web3jClient.getCandidateContract(chainId);
             DefaultBlockParameter defaultBlockParameter = new DefaultBlockParameterNumber(new BigInteger(String.valueOf(2985L)));
             EthBlock ethBlock = web3j.ethGetBlockByNumber(defaultBlockParameter, true).send();
-            String nodeInfoList = candidateContract.CandidateList(new BigInteger(String.valueOf(2985L))).send();
+            String nodeInfoList = candidateContract.GetCandidateList(new BigInteger(String.valueOf(2985L))).send();
             List <CandidateDto> list = JSON.parseArray(nodeInfoList, CandidateDto.class);
             BigInteger a = CalculatePublicKey.testBlock(ethBlock);
             String node38793 = new BigInteger("65093423df6a0050ca9143f6150f2061932f9b26bf3ae30330e167d4c475d8039ce7b8467dfd706f59a1c625f54deb821048d725f84fe8a9091e98d2f350f9f9", 16).toString();

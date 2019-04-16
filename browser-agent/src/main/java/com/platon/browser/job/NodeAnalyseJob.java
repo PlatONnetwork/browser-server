@@ -261,7 +261,7 @@ public class NodeAnalyseJob {
         //节点id对应节点类型名称Map
         Map <String, String> nodeTypeMap = new HashMap <>();
         CandidateContract candidateContract = platon.getCandidateContract(chainId);
-        String nodeInfo = candidateContract.CandidateList().send();
+        String nodeInfo = candidateContract.GetCandidateList().send();
         List <String> candidateStrArr = JSON.parseArray(nodeInfo, String.class);
         List <CandidateDto> nList = new ArrayList <>();
         //候选人+被选人Map
@@ -296,7 +296,7 @@ public class NodeAnalyseJob {
         }
 
         //当前轮验证人
-        String verifiers = candidateContract.VerifiersList().send();
+        String verifiers = candidateContract.GetVerifiersList().send();
         List <CandidateDto> verifierList = JSON.parseArray(verifiers, CandidateDto.class);
 
 

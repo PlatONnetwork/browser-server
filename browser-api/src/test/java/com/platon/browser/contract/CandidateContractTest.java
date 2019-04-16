@@ -25,7 +25,7 @@ public class CandidateContractTest extends TestBase {
     public void CandidateList(){
         chainsConfig.getChainIds().forEach(chainId->{
             try {
-                String res = platon.getCandidateContract(chainId).CandidateList().send();
+                String res = platon.getCandidateContract(chainId).GetCandidateList().send();
                 List<String> candidateStrArr = JSON.parseArray(res,String.class);
                 // 候选
                 List<Candidate> candidates = JSON.parseArray(candidateStrArr.get(0),Candidate.class);
