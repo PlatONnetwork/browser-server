@@ -65,16 +65,11 @@ public class AccTransactionItem {
 
         this.setTxHash(txHash);
         BigDecimal v = Convert.fromWei(value, Convert.Unit.ETHER);
+        this.setDeposit(v);
         this.setValue(EnergonUtil.format(v));
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
-
-        if(deposit != null){
-            v = Convert.fromWei(deposit, Convert.Unit.ETHER);
-            this.setDeposit(new BigDecimal(EnergonUtil.format(v)));
-        }else {
-            this.setDeposit(new BigDecimal("0"));
-        }
+        if(deposit == null)this.setDeposit(new BigDecimal("0"));
         TxInfoResolver.resolve(txType,txInfo,value,this);
         this.flag = 2;
     }

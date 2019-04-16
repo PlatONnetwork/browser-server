@@ -196,7 +196,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
 
-        logger.error("node vote part one about vaildVote select time---------------------------------->{}", System.currentTimeMillis() - startTime);
 
 
         //设置交易收益
@@ -228,18 +227,17 @@ public class AccountServiceImpl implements AccountService {
             });
         }
 
-        logger.error("node vote part two about vaildVote income select time---------------------------------->{}", System.currentTimeMillis() - startTime);
 
 
         data.forEach(datas -> {
             BigDecimal inCome = incomeMap.get(datas.getTxHash());
             if(null == inCome) datas.setIncome(BigDecimal.ZERO);
             else datas.setIncome(inCome);
-           /* if(null != consensusMap.get(datas.getNodeId())) {
+            if(null != consensusMap.get(datas.getNodeId())) {
                 datas.setFlag(1);
             }else {
                 if(null != historyMap.get(datas.getNodeId())) datas.setFlag(0);
-            }*/
+            }
         });
 
         returnData.setTrades(data);

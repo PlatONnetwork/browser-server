@@ -51,7 +51,7 @@ public class DBService {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private VoteTxMapper voteTxMapper;
-    @Value("${platon.redis.key.tran-list-prefix}")
+    @Value("${platon.redis.key.address-trans-key-template}")
     private String tranListPrefix;
     @Autowired
     protected RedisTemplate <String,String> redisTemplate;
@@ -112,18 +112,5 @@ public class DBService {
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
 
-    private void batchInsertTransactionList( List<TransactionWithBLOBs> transactions ){
-        //tran-list-prefix: browser:${version}:${profile}:chain{}:tran-list:{from}:{to}:{txType}:{txHash}:{createTime}
-        String cakey = tranListPrefix.replace("{}",chainId);
-        transactions.forEach(transaction -> {
-            SimpleDateFormat time = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-            String CacheKey = cakey.replace("{from}",transaction.getFrom())
-                    .replace("{to}",transaction.getTo())
-                    .replace("{txType}",transaction.getTxType())
-                    .replace("{txHash}",transaction.getHash())
-                    .replace("{createTime}",time.format(transaction.getCreateTime()));
-            redisTemplate.delete(CacheKey);
-            redisTemplate.opsForValue().set(CacheKey,JSON.toJSONString(transaction));
-        });
-    }
+
 }
