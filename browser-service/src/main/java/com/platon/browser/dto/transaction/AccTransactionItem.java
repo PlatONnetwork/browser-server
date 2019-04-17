@@ -55,6 +55,12 @@ public class AccTransactionItem {
             value = transaction.getValue();
             cost = transaction.getActualTxCost();
         }
+        String deposit = Convert.fromWei(value, Convert.Unit.ETHER).toString();
+        this.setValue(deposit);
+        this.setDeposit(new BigDecimal(deposit));
+        if(deposit == null)this.setDeposit(new BigDecimal("0"));
+        TxInfoResolver.resolve(txType,txInfo,deposit,this);
+        this.flag = 2;
 
         if(initData instanceof PendingTx){
             PendingTx pendingTx = (PendingTx)initData;
@@ -64,13 +70,9 @@ public class AccTransactionItem {
         }
 
         this.setTxHash(txHash);
-        BigDecimal v = Convert.fromWei(value, Convert.Unit.ETHER);
-        this.setDeposit(v);
-        this.setValue(EnergonUtil.format(v));
+        BigDecimal v = Convert.fromWei(value, Convert.Unit.WEI);
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
-        if(deposit == null)this.setDeposit(new BigDecimal("0"));
-        TxInfoResolver.resolve(txType,txInfo,value,this);
-        this.flag = 2;
+
     }
 }

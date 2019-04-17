@@ -51,8 +51,7 @@ public class TxInfoResolver {
                             }
                         }
                         if(StringUtils.isNotBlank(value)){
-                            Double dep = Double.valueOf(value);
-                            rr.deposit=BigDecimal.valueOf(dep);
+                            rr.deposit=new BigDecimal(value);
                         }
                         break;
                 }

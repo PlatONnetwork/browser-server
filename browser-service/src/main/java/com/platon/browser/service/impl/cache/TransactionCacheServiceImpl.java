@@ -255,20 +255,14 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     public void clearTranListCache ( String chainId ) {
         //browser:${version}:${profile}:chain{}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
         String cacheKey = addressTransTemplate.replace("{}",chainId);
-        cacheKey.replace("{address}","*")
-                .replace("{txType}","*")
-                .replace("{txHash}","*")
-                .replace("{timestamp}","*");
-        List <String> keys = new ArrayList <>();
-        keys.add(cacheKey);
-        Map<String,TransactionWithBLOBs> result = RedisPipleTool.batchQueryByKeys(keys,false,TransactionWithBLOBs.class,redisTemplate);
-        List<String> keyList = new ArrayList <>();
-        if(null != result){
-            result.forEach((k,v)->{
-                keyList.add(k);
-            });
-        }
-        if(keyList.size() > 0) RedisPipleTool.batchDeleteByKeys(keyList,false,redisTemplate);
+        String addressPattern = "*",txTypePattern= "*",txHashPattern= "*",timestampPattern = "*";
+        cacheKey=cacheKey.replace(KeyTemplatePlaceholders.ADDRESS.code,addressPattern)
+                .replace(KeyTemplatePlaceholders.TX_TYPE.code,txTypePattern)
+                .replace(KeyTemplatePlaceholders.TX_HASH.code,txHashPattern)
+                .replace(KeyTemplatePlaceholders.TIMESTAMP.code,timestampPattern);
+        Set<String> keys = redisTemplate.keys(cacheKey);
+        List<String> deleteKeyList = new ArrayList <>(keys);
+        if(deleteKeyList.size() > 0) RedisPipleTool.batchDeleteByKeys(deleteKeyList,false,redisTemplate);
     }
 
 }

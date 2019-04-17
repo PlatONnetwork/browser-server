@@ -156,9 +156,7 @@ public class AccountServiceImpl implements AccountService {
         });
 
 
-        data.forEach(accTransactionItem -> {
-            accTransactionItem.setNodeId("0x" + accTransactionItem.getNodeId());
-        });
+
 
 
         // 取节点名称
