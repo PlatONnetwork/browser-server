@@ -32,7 +32,7 @@ public class VoteTransaction {
         }
         this.owner = transaction.getFrom();
         this.transactionHash = transaction.getHash();
-        String dateStr = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(transaction.getTimestamp());
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(transaction.getTimestamp());
         this.transactiontime = dateStr;
     }
 
