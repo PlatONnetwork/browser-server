@@ -25,51 +25,56 @@ import java.util.Map;
  */
 public class TransactionAnalysis {
 
-    public static AnalysisResult analysis (String input , boolean onlyType) {
-        AnalysisResult analysisResult = new AnalysisResult();
-        if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
-            RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
-            List <RlpType> rlpTypes = rlpList.getValues();
-            RlpList rlpList1 = (RlpList) rlpTypes.get(0);
-            if(onlyType){
-                RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
-                String typecode = Hex.toHexString(rlpString.getBytes());
-                byte[] hexByte = Numeric.hexStringToByteArray(typecode);
-                Type transactionType = PlatOnTypeDecoder.decode(hexByte, Uint64.class);
-                analysisResult.setType(transactionType.toString());
-                return analysisResult;
-            }
-            Map <Integer, ClassName> paramTypeMap = new HashMap <>();
-            for (int i = 0; i < rlpList1.getValues().size(); i++) {
-                RlpString rlpString = (RlpString) rlpList1.getValues().get(i);
-                String typecode = Hex.toHexString(rlpString.getBytes());
-                byte[] hexByte = Numeric.hexStringToByteArray(typecode);
-                switch (i) {
-                    case 0:
-                        Type transactionType = PlatOnTypeDecoder.decode(hexByte, Uint64.class);
-                        analysisResult.setType(transactionType.getValue().toString());
-                        break;
-                    case 1:
-                        Type functionName = PlatOnTypeDecoder.decode(hexByte, Utf8String.class);
-                        analysisResult.setFunctionName(functionName.getValue().toString());
-                        paramTypeMap = TransactionType.functionNameToParamTypeMap.get(functionName.getValue().toString());
-                        //paramTypeMap =  TransactionType.functionNameToParamTypeMap.get(functionName.getValue().toString());
-                    default:
-                        if (paramTypeMap != null && paramTypeMap.size() > 0 && i > 1) {
-                            ClassName className = paramTypeMap.get(i);
-                            if (!org.springframework.util.StringUtils.isEmpty(className)) {
-                                Type par = PlatOnTypeDecoder.decode(hexByte, paramTypeMap.get(i).getClazz());
-                                analysisResult.getParameters().put(paramTypeMap.get(i).getName(), par.getValue().toString());
-                                break;
-                            } else {
-                                throw new NullPointerException();
-                            }
+    public static AnalysisResult analysis (String input , boolean onlyType) throws Exception{
+        try {
+            AnalysisResult analysisResult = new AnalysisResult();
+            if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
+                RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
+                List <RlpType> rlpTypes = rlpList.getValues();
+                RlpList rlpList1 = (RlpList) rlpTypes.get(0);
+                if(onlyType){
+                    RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
+                    String typecode = Hex.toHexString(rlpString.getBytes());
+                    byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+                    Type transactionType = PlatOnTypeDecoder.decode(hexByte, Uint64.class);
+                    analysisResult.setType(transactionType.toString());
+                    return analysisResult;
+                }
+                Map <Integer, ClassName> paramTypeMap = new HashMap <>();
+                for (int i = 0; i < rlpList1.getValues().size(); i++) {
+                    RlpString rlpString = (RlpString) rlpList1.getValues().get(i);
+                    String typecode = Hex.toHexString(rlpString.getBytes());
+                    byte[] hexByte = Numeric.hexStringToByteArray(typecode);
+                    switch (i) {
+                        case 0:
+                            Type transactionType = PlatOnTypeDecoder.decode(hexByte, Uint64.class);
+                            analysisResult.setType(transactionType.getValue().toString());
+                            break;
+                        case 1:
+                            Type functionName = PlatOnTypeDecoder.decode(hexByte, Utf8String.class);
+                            analysisResult.setFunctionName(functionName.getValue().toString());
+                            paramTypeMap = TransactionType.functionNameToParamTypeMap.get(functionName.getValue().toString());
+                            //paramTypeMap =  TransactionType.functionNameToParamTypeMap.get(functionName.getValue().toString());
+                        default:
+                            if (paramTypeMap != null && paramTypeMap.size() > 0 && i > 1) {
+                                ClassName className = paramTypeMap.get(i);
+                                if (!org.springframework.util.StringUtils.isEmpty(className)) {
+                                    Type par = PlatOnTypeDecoder.decode(hexByte, paramTypeMap.get(i).getClazz());
+                                    analysisResult.getParameters().put(paramTypeMap.get(i).getName(), par.getValue().toString());
+                                    break;
+                                } else {
+                                    throw new NullPointerException();
+                                }
 
-                        }
+                            }
+                    }
                 }
             }
+            return analysisResult;
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
         }
-        return analysisResult;
+
     }
 
 

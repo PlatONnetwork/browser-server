@@ -31,17 +31,23 @@ public class TransactionBean extends TransactionWithBLOBs {
         if(transaction.getInput().equals("0x") && transaction.getValue() != null){
             this.setTxType("transfer");
         }
-        AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
-        if("1".equals(analysisResult.getType())){
-            analysisResult.setFunctionName("contract deploy");
-            this.setTo(receipt.getContractAddress());
-            this.setReceiveType("contract");
-        }else this.setTo(transaction.getTo());
-        String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
-        this.setTxType(type == null ? "transfer" : type);
-        String txinfo = JSON.toJSONString(analysisResult);
-        this.setTxInfo(txinfo);
-
+        try {
+            AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
+            if("1".equals(analysisResult.getType())){
+                analysisResult.setFunctionName("contract deploy");
+                this.setTo(receipt.getContractAddress());
+                this.setReceiveType("contract");
+            }else this.setTo(transaction.getTo());
+            String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
+            this.setTxType(type == null ? "transfer" : type);
+            String txinfo = JSON.toJSONString(analysisResult);
+            this.setTxInfo(txinfo);
+        }catch (Exception e){
+            this.setReceiveType("unknown");
+            this.setTxType("unknown");
+            this.setTxInfo("{}");
+            e.getMessage();
+        }
         // 使用交易接收者信息填充交易实体
         this.setTransactionIndex(receipt.getTransactionIndex().intValue());
         this.setEnergonUsed(receipt.getGasUsed().toString());
