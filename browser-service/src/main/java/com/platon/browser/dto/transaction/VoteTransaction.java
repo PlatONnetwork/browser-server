@@ -32,6 +32,7 @@ public class VoteTransaction {
         }
         this.owner = transaction.getFrom();
         this.transactionHash = transaction.getHash();
+        //todo:0.7版本修改成时间戳
         String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(transaction.getTimestamp());
         this.transactiontime = dateStr;
     }

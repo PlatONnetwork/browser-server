@@ -46,6 +46,7 @@ public class TransactionBean extends TransactionWithBLOBs {
             this.setReceiveType("unknown");
             this.setTxType("unknown");
             this.setTxInfo("{}");
+            this.setTo(transaction.getTo());
             e.getMessage();
         }
         // 使用交易接收者信息填充交易实体
