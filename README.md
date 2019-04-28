@@ -56,7 +56,7 @@ docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.
 ###### 3、browser-api部署配置
 ![avatar](doc/browser-api-docker-run-config.png)
 
-### 七、虚拟节点设置，解决同一Linux操作系统部署多个Platon节点导致浏览器地图显示节点数缺失的问题
+### 七、节点地理位置偏移设置，解决同一Linux操作系统部署多个Platon节点导致浏览器地图显示节点数缺失的问题
 ###### 1、进入浏览器部署目录，本说明以/opt/console_0.6.0/server/为例，查看内容：
 ```
 [juzhen@Platon-Resource ~]$ cd /opt/console_0.6.0/server
