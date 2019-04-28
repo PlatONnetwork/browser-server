@@ -49,8 +49,12 @@ docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.
 docker-machine create -d virtualbox --virtualbox-boot2docker-url http://192.168.9.85:10080/tools/boot2docker.iso --virtualbox-memory 1024 mc01
 ```
 ###### 1、Docker服务端配置
+![file](nginx\test\0.6.1.conf)
 ![avatar](doc/docker-daemon-config.png)
 ###### 2、browser-agent部署配置
 ![avatar](doc/browser-agent-docker-run-config.png)
 ###### 3、browser-api部署配置
 ![avatar](doc/browser-api-docker-run-config.png)
+
+
+[下载文件](./multisig.wasm)

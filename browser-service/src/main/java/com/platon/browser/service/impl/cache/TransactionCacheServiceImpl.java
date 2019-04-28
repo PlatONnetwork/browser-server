@@ -13,7 +13,7 @@ import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
-import com.platon.browser.util.RedisPipleTool;
+import com.platon.browser.util.RedisPipelineTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +212,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
                 index++;
             }
         });
-        if(invalidKeyList.size()>0) RedisPipleTool.batchDeleteByKeys(invalidKeyList,false,redisTemplate);
+        if(invalidKeyList.size()>0) RedisPipelineTool.batchDeleteByKeys(invalidKeyList,false,redisTemplate);
     }
 
 
@@ -244,7 +244,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         keyList.forEach(key->{
             if(validKeys.size()<addressTransMaxItem) validKeys.add(key);
         });
-        Map<String,TransactionWithBLOBs> result = RedisPipleTool.batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
+        Map<String,TransactionWithBLOBs> result = RedisPipelineTool.batchQueryByKeys(validKeys,false,TransactionWithBLOBs.class,redisTemplate);
         if(result==null) return Collections.EMPTY_LIST;
         List<TransactionWithBLOBs> returnData = new ArrayList<>(result.values());
         Collections.sort(returnData,((t1, t2) -> Long.valueOf(t2.getTimestamp().getTime()).compareTo(t1.getTimestamp().getTime())));
@@ -262,7 +262,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
                 .replace(KeyTemplatePlaceholders.TIMESTAMP.code,timestampPattern);
         Set<String> keys = redisTemplate.keys(cacheKey);
         List<String> deleteKeyList = new ArrayList <>(keys);
-        if(deleteKeyList.size() > 0) RedisPipleTool.batchDeleteByKeys(deleteKeyList,false,redisTemplate);
+        if(deleteKeyList.size() > 0) RedisPipelineTool.batchDeleteByKeys(deleteKeyList,false,redisTemplate);
     }
 
 }
