@@ -28,5 +28,7 @@ subprojects {
         compile "org.apache.commons:commons-lang3:$commonLang3Version"
         compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        compile "commons-io:commons-io:$commonIoVersion"
+
     }
 }
