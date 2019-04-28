@@ -15,7 +15,7 @@ import java.util.Map;
  * @Date: 2019/4/12 16:46
  * @Description:
  */
-public class RedisPipleTool {
+public class RedisPipelineTool {
     /**
      * 通过多个键值批量查询值
      * @param keys

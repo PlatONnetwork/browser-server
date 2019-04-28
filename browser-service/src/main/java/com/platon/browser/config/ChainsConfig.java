@@ -1,6 +1,7 @@
 package com.platon.browser.config;
 
 import com.alibaba.fastjson.JSON;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,15 +19,18 @@ public class ChainsConfig {
 
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
+    @Data
     public static class ChainInfo{
         public String chainName;
         public String chainId;
         private List<Web3j> allWeb3jList;
         private List<Web3j> validWeb3jList=new ArrayList <>();
-        public ChainInfo(String chainName,String chainId,List<Web3j> web3jList){
+        private List<String> web3jAddressList=new ArrayList <>();
+        public ChainInfo(String chainName,String chainId,List<Web3j> web3jList,List<String> web3jAddressList){
             this.chainName = chainName;
             this.chainId = chainId;
             this.allWeb3jList = web3jList;
+            this.web3jAddressList.addAll(web3jAddressList);
         }
     }
 
@@ -54,11 +58,13 @@ public class ChainsConfig {
                         if(parts!=null&&parts.length==3){
                             List<String> ipStr = JSON.parseArray(parts[2],String.class);
                             List<Web3j> web3js = new ArrayList <>();
+                            List<String> web3jAddressList = new ArrayList <>();
                             ipStr.forEach(ip->{
                                 Web3j web3j = Web3j.build(new HttpService(ip));
                                 web3js.add(web3j);
+                                web3jAddressList.add(ip);
                             });
-                            chainsConfig.put(parts[1],new ChainInfo(parts[0],parts[1],web3js));
+                            chainsConfig.put(parts[1],new ChainInfo(parts[0],parts[1],web3js,web3jAddressList));
                         }
                     });
                 }

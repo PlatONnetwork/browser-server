@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dao.entity.NodeRanking;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.node.NodeDetail;
 import com.platon.browser.dto.node.NodeListItem;
@@ -55,5 +56,12 @@ public class NodeServiceTest extends ServiceTestBase {
             List<NodePushItem> result = nodeService.getPushCache(chainId);
             Assert.assertTrue(result.size()>=0);
         });
+    }
+
+    @Test
+    public void nodes(){
+        PageHelper.startPage(1000000,1000000000);
+        List<Transaction> blocks = transactionMapper.selectByExample(new TransactionExample());
+        System.out.println(blocks.size());
     }
 }
