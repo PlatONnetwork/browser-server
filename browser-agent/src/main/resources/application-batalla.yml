@@ -1,22 +1,22 @@
 # ***************************开发配置**************************** #
 # 应用版本
-version: 0.6.1
+version: 0.6.0
 # 当前激活的配置名称(请不要修改)
-profile: testb
+profile: batalla
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://127.0.0.1:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
-dbuser: platon
+dbuser: root
 # MySQL数据库密码
-dbpass: platon
+dbpass: Juzhen123!
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-  config: MAIN_NET-204-["http://192.168.9.76:6789","http://192.168.9.76:6790","http://192.168.120.76:6789","http://192.168.120.76:6790"]
+  # 同一条链匹配多个节点错容
+  config: MAIN_NET-104-["http://127.0.0.1:6792","http://127.0.0.1:6791","http://13.56.15.181:6791","http://13.56.15.181:6792"]
   # 要采集哪个ID的链
-  active: 204
+  active: 104
 # Redis集群节点
-#redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
-redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+redis: 127.0.0.1:7001,127.0.0.1:7002,127.0.0.1:7003,127.0.0.1:7004,127.0.0.1:7005,127.0.0.1:7006
 # 日志文件存储文件
 logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别

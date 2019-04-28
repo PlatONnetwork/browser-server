@@ -12,11 +12,11 @@ dbpass: Juzhen123!
 chain:
   # Platon链配置,格式【{chainName1}-{chainIdA}-[http://nodeIPA1:portA1,http://nodeIPA2:portA2]】
   # 同一条链匹配多个节点错容
-  config: MAIN_NET-103-["http://127.0.0.1:6790","http://13.67.44.50:6791","http://13.67.44.50:6792"]
+  config: MAIN_NET-103-["http://10.0.0.5:6791","http://13.67.44.50:6791","http://13.67.44.50:6792"]
   # 要采集哪个ID的链
   active: 103
 # Redis集群节点
-redis: 127.0.0.1:7001,127.0.0.1:7002,127.0.0.1:7003,127.0.0.1:7004,127.0.0.1:7005,127.0.0.1:7006
+redis: 127.0.0.1:21006,127.0.0.1:21007,127.0.0.1:21008,127.0.0.1:21009,127.0.0.1:21010,127.0.0.1:21011
 # 日志文件存储文件
 logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
