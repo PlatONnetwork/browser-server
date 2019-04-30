@@ -180,6 +180,7 @@ public class ExportServiceImpl implements ExportService {
             row[1]= ymdhms.format(new Date(transaction.getBlockTime()));
             switch (req.getTab()){
                 case 0:
+                case 3:
                     row[2]= transactionType;
                     row[3]= transaction.getFrom();
                     row[4]= transaction.getTo();
