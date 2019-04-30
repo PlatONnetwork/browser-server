@@ -492,7 +492,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "txTypes":['transfer','MPCtransaction'], // 交易类型, 字符串数组
+     *      "txTypes":['transfer','MPCtransaction'], // 交易类型, 字符串数组, 可取值如下所示：
      *           transfer ：转账
      *           MPCtransaction ： MPC交易
      *           contractCreate ： 合约创建
@@ -640,7 +640,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "txType":"", // 交易类型 (可选)
+     *      "txTypes":["transfer","MPCtransaction"], // 交易类型, 字符串数组, 可取值如下所示：
      *           voteTicket ： 投票
      *           transactionExecute ： 合约执行
      *           authorization ： 权限
