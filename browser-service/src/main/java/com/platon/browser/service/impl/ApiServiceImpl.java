@@ -217,22 +217,10 @@ public class ApiServiceImpl implements ApiService {
             });
 
             Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
-            Map<String,Date> deadDate = new HashMap <>();
 
-
-
-
-            List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
-            voteTxes.forEach(voteTx ->{
-                if(voteTx.getDeadLine() != null){
-                    deadDate.put(voteTx.getHash(),voteTx.getDeadLine());
-                }
-            });
 
             bean.forEach(voteInfo -> {
                 String nodeName = nodeIdToName.get(voteInfo.getNodeId());
-                Date date = deadDate.get(voteInfo.getHash());
-                if(date != null) voteInfo.setDeadLine(deadDate.get(voteInfo.getHash()));
                 if(null != nodeName){
                     voteInfo.setNodeName(nodeName);
                 }else {
@@ -248,37 +236,7 @@ public class ApiServiceImpl implements ApiService {
             });
             logger.debug("Time Consuming-middle: {}ms",System.currentTimeMillis()-beginTime);
 
-
-
-
-            //设置交易收益
-            //分组计算收益
-            Map<String,BigDecimal> incomeMap = new HashMap <>();
-
-            //根据投票交易hash查询区块列表
-            if(hashList.size()>0){
-                BlockExample hashBlockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashIn(hashList);
-                List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
-                Map<String,List<Block>> groupMap = new HashMap <>();
-                //根据hash分组hash-block
-                hashBlockList.forEach(block->{
-                    List<Block> group=groupMap.get(block.getVoteHash());
-                    if(group==null){
-                        group=new ArrayList <>();
-                        groupMap.put(block.getVoteHash(),group);
-                    }
-                    group.add(block);
-                });
-
-                groupMap.forEach((txHash,group)->{
-                    BigDecimal txIncome = BigDecimal.ZERO;
-                    for (Block block:group){
-                        txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
-                    }
-                    incomeMap.put(txHash,txIncome);
-                });
-            }
+            Map<String,BigDecimal> incomeMap = getIncome(chainId,hashList);
 
             bean.forEach(b -> {
                 BigDecimal inCome = incomeMap.get(b.getHash());

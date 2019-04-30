@@ -101,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
             hashList.add(initData.getHash());
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
+            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().startsWith("0x") ? bean.getNodeId() : "0x" + bean.getNodeId());
             data.add(bean);
         });
 
