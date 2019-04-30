@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.block.BlockDownload;
+import com.platon.browser.dto.transaction.AccTransactionItem;
 import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDownloadReq;
@@ -55,10 +56,81 @@ public class ExportServiceImpl implements ExportService {
         accountDetailReq.setPageSize(Integer.MAX_VALUE);
         BeanUtils.copyProperties(req,accountDetailReq);
 
-        AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
-
         List<Object[]> rows = new ArrayList<>();
-        addressDetail.getTrades().forEach(transaction->{
+        List<AccTransactionItem> transactionItems = new ArrayList<>();
+        List<TransactionTypeEnum> types = new ArrayList<>();
+        String[] headers = null;
+        String downloadFileName = "";
+        switch (req.getTab()){
+            case 0:
+                // 交易
+                logger.debug("下载类型：交易");
+                types.add(TransactionTypeEnum.TRANSACTION_TRANSFER);
+                types.add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE);
+                types.add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE);
+                types.add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION);
+                // 表头
+                headers = new String[]{
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
+                };
+                downloadFileName="transaction-";
+                break;
+            case 1:
+                // 投票
+                logger.debug("下载类型：投票");
+                types.add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET);
+                // 表头
+                headers = new String[]{
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TARGET),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TICKET_COUNT),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TICKET_PRICE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VOTE_VALUE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_REWARD)
+                };
+                downloadFileName="vote-";
+                break;
+            case 2:
+                logger.debug("下载类型：声明(质押、减持质押、提取质押)");
+                // 声明(质押、减持质押、提取质押)
+                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT);
+                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW);
+                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW);
+                // 表头
+                headers = new String[]{
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_NODE_NAME),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_DEPOSIT_VALUE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
+                };
+                downloadFileName="declaration-";
+                break;
+        }
+
+        if(headers==null){
+            throw new RuntimeException("Header is null!");
+        }
+
+        // 遍历取交易
+        types.forEach(type->{
+            accountDetailReq.setTxType(type.code);
+            AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
+            transactionItems.addAll(addressDetail.getTrades());
+        });
+
+        int columnNum = headers.length;
+        // 生成Markdown格式内容
+        transactionItems.forEach(transaction->{
             String transactionType;
             try {
                 TransactionTypeEnum type = TransactionTypeEnum.getEnum(transaction.getTxType());
@@ -75,37 +147,45 @@ public class ExportServiceImpl implements ExportService {
                 transactionStatus = i18n.i(I18nEnum.UNKNOWN_STATUS);
             }
 
-            Object[] row = {
-                    transaction.getTxHash(),
-                    ymdhms.format(new Date(transaction.getBlockTime())),
-                    transactionType,
-                    transaction.getFrom(),
-                    transaction.getTo(),
-                    EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon",
-                    EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon",
-                    transactionStatus
-            };
-            rows.add(row);
+            Object[] row = new Object[columnNum];
+            // 设置通用属性
+            row[0]= transaction.getTxHash();
+            row[1]= ymdhms.format(new Date(transaction.getBlockTime()));
+            switch (req.getTab()){
+                case 0:
+                    row[2]= transactionType;
+                    row[3]= transaction.getFrom();
+                    row[4]= transaction.getTo();
+                    row[5]= EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon";
+                    row[6]= EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon";
+                    row[7]= transactionStatus;
+                    break;
+                case 1:
+                    row[2]=  transaction.getNodeName();// 投票给
+                    row[3]=  transaction.getValidVoteCount()+"/"+transaction.getVoteCount();// 有效票/投票数
+                    row[4]=  transaction.getTicketPrice();// 票价
+                    row[5]=  EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon";;// 投票质押
+                    row[6]=  transaction.getIncome(); // 奖励
+                    break;
+                case 2:
+                    row[2]= transactionType;
+                    row[3]= transaction.getNodeName(); // 节点名称
+                    row[4]= EnergonUtil.format(Convert.fromWei(transaction.getDeposit(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon"; // 质押金
+                    row[5]= EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon"; // 交易费用
+                    break;
+            }
+            if(row!=null) rows.add(row);
         });
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer outputWriter = new OutputStreamWriter(baos);
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
-        writer.writeHeaders(
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
-        );
+        writer.writeHeaders(headers);
         writer.writeRowsAndClose(rows);
         AccountDownload accountDownload = new AccountDownload();
         accountDownload.setData(baos.toByteArray());
         SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        accountDownload.setFilename("transaction-"+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
+        accountDownload.setFilename(downloadFileName+req.getAddress()+"-"+ymd.format(req.getEndDate())+".csv");
         accountDownload.setLength(baos.size());
         return accountDownload;
     }
