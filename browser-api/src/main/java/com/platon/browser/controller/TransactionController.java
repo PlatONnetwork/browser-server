@@ -593,7 +593,7 @@ public class TransactionController {
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
-     * @apiParam {String} tab 标签页索引：0-交易，1-投票，2-声明
+     * @apiParam {Integer} tab 标签页索引：0-交易，1-投票，2-声明
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
