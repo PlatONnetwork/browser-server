@@ -191,7 +191,7 @@ public class ExportServiceImpl implements ExportService {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
         // 限制最多导出6万条记录
-        PageHelper.startPage(1,60000);
+        PageHelper.startPage(1,30000);
         List<Block> blockList = blockService.getList(req);
 
         List<Object[]> rows = new ArrayList<>();

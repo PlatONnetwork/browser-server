@@ -22,6 +22,7 @@ import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.TxInfoResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,12 @@ public class AccountServiceImpl implements AccountService {
                 AccTransactionItem bean = new AccTransactionItem();
                 bean.init(initData);
                 hashList.add(initData.getHash());
-                if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().startsWith("0x") ? bean.getNodeId() : "0x" + bean.getNodeId());
+                TxInfoResolver.resolve(initData.getTxType(),initData.getTxInfo(),null,bean);
+
+                if(StringUtils.isNotBlank(bean.getNodeId())) {
+                    bean.setNodeId(bean.getNodeId().startsWith("0x")?bean.getNodeId():"0x"+bean.getNodeId());
+                    nodeIds.add(bean.getNodeId());
+                }
                 data.add(bean);
             });
         });
@@ -140,8 +146,10 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
-
+            if(StringUtils.isNotBlank(bean.getNodeId())) {
+                bean.setNodeId(bean.getNodeId().startsWith("0x")?bean.getNodeId():"0x"+bean.getNodeId());
+                nodeIds.add(bean.getNodeId());
+            }
             data.add(bean);
         });
 
@@ -156,14 +164,8 @@ public class AccountServiceImpl implements AccountService {
         });
 
 
-
-
-
-        // 取节点名称
-        TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
-        Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
-
         //根据交易hash列表获取所有hash对应的交易有效票列表
+        TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
         Map<String,Integer> voteHashMap = new HashMap <>();
         try {
             StringBuffer txHash = new StringBuffer();
@@ -183,17 +185,16 @@ public class AccountServiceImpl implements AccountService {
             logger.error("get transaction voteNumber Exception !!!");
         }
 
-        for(AccTransactionItem accTransactionItem : data){
-            String nodeName = nodeIdToName.get(accTransactionItem.getNodeId());
-            if(null != nodeName)accTransactionItem.setNodeName(nodeName);
-             else accTransactionItem.setNodeName(" ");
-
-
-            Integer number = voteHashMap.get(accTransactionItem.getTxHash());
-            accTransactionItem.setValidVoteCount(number);
-        }
-
-
+        // 设置节点名称
+        Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
+        Map<String,Integer> voteHashMapRef = voteHashMap;
+        data.forEach(item->{
+            String nodeName = nodeIdToName.get(item.getNodeId());
+            if(StringUtils.isNotBlank(nodeName)) item.setNodeName(nodeName);
+            else item.setNodeName("");
+            Integer number = voteHashMapRef.get(item.getTxHash());
+            item.setValidVoteCount(number);
+        });
 
 
         //设置交易收益
