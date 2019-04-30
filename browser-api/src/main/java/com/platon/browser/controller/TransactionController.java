@@ -604,7 +604,7 @@ public class TransactionController {
         req.setCid(cid);
         req.setAddress(address);
 
-        if(tab<0||tab>2){
+        if(tab<0||tab>3){
             try {
                 response.getWriter().write("tab参数有误！");
             } catch (IOException e) {
@@ -739,7 +739,7 @@ public class TransactionController {
     @GetMapping("contractDownload")
     public void contractDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date, HttpServletResponse response) {
         // 合约交易列表默认取tab值为0
-        addressDownload(cid,address,date,0,response);
+        addressDownload(cid,address,date,3,response);
     }
 
     /**

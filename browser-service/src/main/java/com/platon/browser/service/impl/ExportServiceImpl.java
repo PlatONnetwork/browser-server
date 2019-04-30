@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.CandidateContract;
+import org.web3j.platon.contracts.TicketContract;
 import org.web3j.utils.Convert;
 
 import java.io.ByteArrayOutputStream;
@@ -115,10 +117,39 @@ public class ExportServiceImpl implements ExportService {
                 };
                 downloadFileName="declaration-";
                 break;
+            case 3:
+                // 交易
+                logger.debug("下载类型：所有");
+                // 用于查询合约详情中的交易
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
+                // 表头
+                headers = new String[]{
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
+                };
+                downloadFileName="declaration-";
+                break;
         }
 
         if(headers==null){
             throw new RuntimeException("Header is null!");
+        }
+
+        if(TicketContract.CONTRACT_ADDRESS.equals(accountDetailReq.getAddress())|| CandidateContract.CONTRACT_ADDRESS.equals(accountDetailReq.getAddress())){
+            // 内置合约则在查询参数中加上完整类型
         }
 
         AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
