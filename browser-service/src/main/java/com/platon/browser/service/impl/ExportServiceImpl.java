@@ -152,22 +152,22 @@ public class ExportServiceImpl implements ExportService {
                     row[2]= transactionType;
                     row[3]= transaction.getFrom();
                     row[4]= transaction.getTo();
-                    row[5]= EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon";
-                    row[6]= EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon";
+                    row[5]= transaction.getValue()+"Energon";
+                    row[6]= transaction.getActualTxCost()+"Energon";
                     row[7]= transactionStatus;
                     break;
                 case 1:
                     row[2]=  transaction.getNodeName();// 投票给
                     row[3]=  transaction.getValidVoteCount()+"/"+transaction.getVoteCount();// 有效票/投票数
                     row[4]=  transaction.getTicketPrice();// 票价
-                    row[5]=  EnergonUtil.format(Convert.fromWei(transaction.getValue(), Convert.Unit.ETHER).setScale(18, RoundingMode.DOWN))+"Energon";;// 投票质押
+                    row[5]=  transaction.getValue()+"Energon";;// 投票质押
                     row[6]=  transaction.getIncome(); // 奖励
                     break;
                 case 2:
                     row[2]= transactionType;
                     row[3]= transaction.getNodeName(); // 节点名称
-                    row[4]= EnergonUtil.format(Convert.fromWei(transaction.getDeposit(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon"; // 质押金
-                    row[5]= EnergonUtil.format(Convert.fromWei(transaction.getActualTxCost(), Convert.Unit.ETHER).setScale(18,RoundingMode.DOWN))+"Energon"; // 交易费用
+                    row[4]= transaction.getDeposit()+"Energon"; // 质押金
+                    row[5]= transaction.getActualTxCost()+"Energon"; // 交易费用
                     break;
             }
             if(row!=null) rows.add(row);
