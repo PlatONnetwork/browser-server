@@ -65,10 +65,10 @@ public class ExportServiceImpl implements ExportService {
             case 0:
                 // 交易
                 logger.debug("下载类型：交易");
-                types.add(TransactionTypeEnum.TRANSACTION_TRANSFER);
-                types.add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE);
-                types.add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE);
-                types.add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -85,7 +85,7 @@ public class ExportServiceImpl implements ExportService {
             case 1:
                 // 投票
                 logger.debug("下载类型：投票");
-                types.add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -101,9 +101,9 @@ public class ExportServiceImpl implements ExportService {
             case 2:
                 logger.debug("下载类型：声明(质押、减持质押、提取质押)");
                 // 声明(质押、减持质押、提取质押)
-                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT);
-                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW);
-                types.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
+                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -121,12 +121,8 @@ public class ExportServiceImpl implements ExportService {
             throw new RuntimeException("Header is null!");
         }
 
-        // 遍历取交易
-        types.forEach(type->{
-            accountDetailReq.setTxType(type.code);
-            AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
-            transactionItems.addAll(addressDetail.getTrades());
-        });
+        AddressDetail addressDetail = accountService.getAddressDetail(accountDetailReq);
+        transactionItems.addAll(addressDetail.getTrades());
 
         int columnNum = headers.length;
         // 生成Markdown格式内容

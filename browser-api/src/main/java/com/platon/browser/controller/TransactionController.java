@@ -492,7 +492,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "txType":"", // 交易类型 (可选), 可以设置多个类型，使用逗号“,”分隔
+     *      "txTypes":['transfer','MPCtransaction'], // 交易类型 (可选), 字符串数组
      *           transfer ：转账
      *           MPCtransaction ： MPC交易
      *           contractCreate ： 合约创建

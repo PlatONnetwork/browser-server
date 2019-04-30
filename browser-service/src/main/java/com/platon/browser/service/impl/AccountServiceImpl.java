@@ -92,19 +92,19 @@ public class AccountServiceImpl implements AccountService {
         returnData.setTradeCount(transactionCount.intValue());
 
 
-
-        // 取已完成交易(查询缓存中的200条记录)
-        Collection<TransactionWithBLOBs> transactions = transactionCacheService.fuzzyQuery(req.getCid(),req.getAddress(),req.getTxType(),null,null);
         List<AccTransactionItem> data = new ArrayList<>();
         List<String> hashList = new ArrayList <>();
-        transactions.forEach(initData -> {
-            AccTransactionItem bean = new AccTransactionItem();
-            bean.init(initData);
-            hashList.add(initData.getHash());
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().startsWith("0x") ? bean.getNodeId() : "0x" + bean.getNodeId());
-            data.add(bean);
+        req.getTxTypes().forEach(txType->{
+            // 取已完成交易(查询缓存中的200条记录)
+            Collection<TransactionWithBLOBs> transactions = transactionCacheService.fuzzyQuery(req.getCid(),req.getAddress(),txType,null,null);
+            transactions.forEach(initData -> {
+                AccTransactionItem bean = new AccTransactionItem();
+                bean.init(initData);
+                hashList.add(initData.getHash());
+                if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add(bean.getNodeId().startsWith("0x") ? bean.getNodeId() : "0x" + bean.getNodeId());
+                data.add(bean);
+            });
         });
-
 
 
         //返回标识用于判断跳转
