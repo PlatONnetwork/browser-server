@@ -285,7 +285,7 @@ public class NodeController {
      * @apiGroup node
      * @apiDescription 导出节点区块详情
      * @apiParam {String} cid 链ID
-     * @apiParam {String} address 节点地址
+     * @apiParam {String} nodeId 节点地址
      * @apiParam {String} date 数据起始日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
