@@ -161,7 +161,7 @@ public class ExportServiceImpl implements ExportService {
                     row[3]=  transaction.getValidVoteCount()+"/"+transaction.getVoteCount();// 有效票/投票数
                     row[4]=  transaction.getTicketPrice();// 票价
                     row[5]=  transaction.getValue()+"Energon";;// 投票质押
-                    row[6]=  transaction.getIncome(); // 奖励
+                    row[6]=  EnergonUtil.format(Convert.fromWei(transaction.getIncome(), Convert.Unit.ETHER))+"Energon"; // 奖励
                     break;
                 case 2:
                     row[2]= transactionType;
