@@ -102,7 +102,6 @@ public class AccountServiceImpl implements AccountService {
                 AccTransactionItem bean = new AccTransactionItem();
                 bean.init(initData);
                 hashList.add(initData.getHash());
-                TxInfoResolver.resolve(initData.getTxType(),initData.getTxInfo(),null,bean);
 
                 if(StringUtils.isNotBlank(bean.getNodeId())) {
                     bean.setNodeId(bean.getNodeId().startsWith("0x")?bean.getNodeId():"0x"+bean.getNodeId());
@@ -227,17 +226,18 @@ public class AccountServiceImpl implements AccountService {
         }
 
 
-
-        data.forEach(datas -> {
-            BigDecimal inCome = incomeMap.get(datas.getTxHash());
-            if(null == inCome) datas.setIncome(BigDecimal.ZERO);
-            else datas.setIncome(inCome);
-            if(null != consensusMap.get(datas.getNodeId())) {
-                datas.setFlag(1);
+        data.forEach(item -> {
+            BigDecimal inCome = incomeMap.get(item.getTxHash());
+            if(null == inCome) item.setIncome(BigDecimal.ZERO);
+            else item.setIncome(inCome);
+            if(null != consensusMap.get(item.getNodeId())) {
+                item.setFlag(1);
             }else {
-                if(null != historyMap.get(datas.getNodeId())) datas.setFlag(0);
+                if(null != historyMap.get(item.getNodeId())) item.setFlag(0);
             }
         });
+
+
 
         returnData.setTrades(data);
         return returnData;
