@@ -79,8 +79,7 @@ public class ExportServiceImpl implements ExportService {
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
-                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
-                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE)
                 };
                 downloadFileName="transaction-";
                 break;
@@ -137,8 +136,7 @@ public class ExportServiceImpl implements ExportService {
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE),
-                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE),
-                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_STATUS)
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE)
                 };
                 downloadFileName="declaration-";
                 break;
@@ -158,20 +156,21 @@ public class ExportServiceImpl implements ExportService {
         int columnNum = headers.length;
         // 生成Markdown格式内容
         transactionItems.forEach(transaction->{
-            String transactionType;
+            String transactionType = i18n.i(I18nEnum.UNKNOWN_TYPE);
             try {
                 TransactionTypeEnum type = TransactionTypeEnum.getEnum(transaction.getTxType());
-                transactionType = i18n.i(I18nEnum.valueOf(type.name()));
+                if (type==TransactionTypeEnum.TRANSACTION_TRANSFER){
+                    if (transaction.getFrom().equals(req.getAddress())){
+                        transactionType=i18n.i(I18nEnum.TRANSACTION_TRANSFER_SEND);
+                    }
+                    if (transaction.getTo().equals(req.getAddress())){
+                        transactionType=i18n.i(I18nEnum.TRANSACTION_TRANSFER_RECEIVE);
+                    }
+                }else{
+                    transactionType = i18n.i(I18nEnum.valueOf(type.name()));
+                }
             }catch (IllegalArgumentException iae){
-                transactionType = i18n.i(I18nEnum.UNKNOWN_TYPE);
-            }
-
-            String transactionStatus;
-            try{
-                TransactionStatusEnum status = TransactionStatusEnum.getEnum(transaction.getTxReceiptStatus());
-                transactionStatus = i18n.i(I18nEnum.valueOf(status.name()));
-            }catch (IllegalArgumentException iae){
-                transactionStatus = i18n.i(I18nEnum.UNKNOWN_STATUS);
+                logger.error("Transaction type error:{}",iae.getMessage());
             }
 
             Object[] row = new Object[columnNum];
@@ -186,7 +185,6 @@ public class ExportServiceImpl implements ExportService {
                     row[4]= transaction.getTo();
                     row[5]= transaction.getValue()+"Energon";
                     row[6]= transaction.getActualTxCost()+"Energon";
-                    row[7]= transactionStatus;
                     break;
                 case 1:
                     row[2]=  transaction.getNodeName();// 投票给
