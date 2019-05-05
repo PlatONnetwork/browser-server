@@ -95,7 +95,8 @@ public class ExportServiceImpl implements ExportService {
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TICKET_COUNT),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TICKET_PRICE),
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VOTE_VALUE),
-                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_REWARD)
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_REWARD),
+                        i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE)
                 };
                 downloadFileName="vote-";
                 break;
@@ -192,6 +193,7 @@ public class ExportServiceImpl implements ExportService {
                     row[4]=  transaction.getTicketPrice();// 票价
                     row[5]=  transaction.getValue()+"Energon";;// 投票质押
                     row[6]=  EnergonUtil.format(Convert.fromWei(transaction.getIncome(), Convert.Unit.ETHER))+"Energon"; // 奖励
+                    row[7]= transaction.getActualTxCost()+"Energon"; // 交易费用
                     break;
                 case 2:
                     row[2]= transactionType;
