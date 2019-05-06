@@ -21,10 +21,11 @@ pipeline {
                 sh 'echo "Build image completed."'
             }
         }
-        stage('ListImage'){
+        stage('Start'){
             agent any
             steps {
                 sh 'docker images'
+                sh 'docker run -d -p 8061:8061 browser-api-0.6.1'
             }
         }
     }
