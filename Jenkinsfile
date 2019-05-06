@@ -4,7 +4,7 @@ pipeline {
         stage('BuildImage') {
             agent {
                 dockerfile {
-                    filename 'Dockerfile'
+                    filename '../../../Dockerfile'
                     dir 'browser-api/build/libs'
                 }
             }
