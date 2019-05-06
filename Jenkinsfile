@@ -6,6 +6,7 @@ pipeline {
                 dockerfile {
                     filename '../../../Dockerfile'
                     dir 'browser-api/build/libs'
+                    additionalBuildArgs  '-t browser-api-0.6.1'
                 }
             }
             steps {
