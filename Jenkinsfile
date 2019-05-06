@@ -8,5 +8,10 @@ pipeline {
                 sh 'gradle -x test build'
             }
         }
+        stage('deploy') {
+            steps {
+                sh 'docker build -f ./Dockerfile ./browser-api/build/libs'
+            }
+        }
     }
 }
