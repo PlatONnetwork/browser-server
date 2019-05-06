@@ -17,6 +17,9 @@ pipeline {
                     additionalBuildArgs  '-t browser-api-0.6.1'
                 }
             }
+        }
+        stage('ListImage'){
+            agent any
             steps {
                 sh 'docker images'
             }
