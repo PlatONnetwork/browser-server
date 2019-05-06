@@ -17,6 +17,7 @@ pipeline {
                     additionalBuildArgs  '-t browser-api-0.6.1'
                 }
             }
+            steps {}
         }
         stage('ListImage'){
             agent any
