@@ -10,7 +10,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'echo "Build docker image completed"'
+                sh 'docker images'
             }
         }
     }
