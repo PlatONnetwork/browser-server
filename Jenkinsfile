@@ -18,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'Build image completed.'
+                sh 'echo "Build image completed."'
             }
         }
         stage('ListImage'){
