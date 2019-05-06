@@ -18,6 +18,9 @@ pipeline {
                     additionalBuildArgs  '-t platon:browser-api'
                 }
             }
+            steps {
+                sh 'echo "Build docker image..."'
+            }
         }
     }
 }
