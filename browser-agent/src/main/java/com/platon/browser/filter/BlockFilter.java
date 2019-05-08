@@ -79,9 +79,13 @@ public class BlockFilter {
             //设置在当前区块高度中的节点分红比例
             try {
                 CandidateContract candidateContract = platon.getCandidateContract(chainId);
-                String nodeInfo = candidateContract.GetCandidateDetails(bean.getNodeId(), new BigInteger(String.valueOf(bean.getNumber()))).send();
-                CandidateDto candidateDto = JSON.parseObject(nodeInfo, CandidateDto.class);
-                bean.setRewardRatio(BigDecimal.valueOf(candidateDto.getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
+                String nodeInfo = candidateContract.GetCandidateDetails(bean.getNodeId()).send();
+                List<CandidateDto> candidateDtos = JSON.parseArray(nodeInfo, CandidateDto.class);
+                if(candidateDtos.size()>0){
+                    bean.setRewardRatio(BigDecimal.valueOf(candidateDtos.get(0).getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
+                }else {
+                    bean.setRewardRatio(0.0);
+                }
             } catch (Exception e) {
                 bean.setRewardRatio(0.0);
             }
