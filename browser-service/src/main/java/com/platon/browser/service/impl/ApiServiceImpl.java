@@ -212,7 +212,6 @@ public class ApiServiceImpl implements ApiService {
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
 
-            Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
@@ -277,8 +276,8 @@ public class ApiServiceImpl implements ApiService {
 
 
             RespPage<VoteInfo> returnData = new RespPage <>();
-            returnData.setTotalCount(page.getTotal());
-            returnData.setTotalPages(page.getPages());
+            returnData.setTotalCount(bean.size());
+            returnData.setTotalPages(bean.size()/req.getPageSize());
             returnData.setData(bean);
             return returnData;
         }
