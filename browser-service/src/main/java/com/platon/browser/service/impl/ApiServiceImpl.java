@@ -178,15 +178,18 @@ public class ApiServiceImpl implements ApiService {
             long currentTime = System.currentTimeMillis();
             nodeIds.forEach(nodeId->{
                 TicketCount tc = TICKET_COUNT_MAP.get(nodeId);
-                boolean expired = (currentTime-tc.getTimestamp())>=5*60*1000;
+                long prevTime = 0;
+                if(tc!=null) prevTime = tc.getTimestamp();
+                boolean expired = (currentTime-prevTime)>=30*1000;
                 if(expired){
                     // 查最新数据
-                    String countStr = null;
                     try {
-                        countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
+                        String countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
                         Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
                         if(map.size()==1){
-                            tc = new TicketCount(map.get(nodeId),currentTime);
+                            String key = nodeId.replace("0x","");
+                            Integer count = map.get(key);
+                            tc = new TicketCount(count,currentTime);
                             TICKET_COUNT_MAP.put(nodeId,tc);
                         }
                     } catch (Exception e) {
