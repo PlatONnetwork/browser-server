@@ -198,21 +198,6 @@ public class ApiServiceImpl implements ApiService {
                 }
                 returnData.put(nodeId,tc.getCount());
             });
-
-/*
-            TicketContract ticketContract = platon.getTicketContract(chainId);
-            StringBuffer str = new StringBuffer();
-            nodeIds.forEach(id ->str.append(id).append(":"));
-            String ids = str.toString();
-            ids = ids.substring(0,ids.lastIndexOf(":"));
-            try {
-                String countStr = ticketContract.GetCandidateTicketCount(ids).send();
-                Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
-
-                return map;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
         }
         return returnData;
     }
