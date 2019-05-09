@@ -1,14 +1,14 @@
 pipeline {
     agent any
     stages {
-        //stage('Compile') {
-        //    agent {
-        //        docker { image 'gradle' }
-        //    }
-        //    steps {
-        //        sh 'gradle -x test build'
-        //    }
-        //}
+        stage('Compile') {
+            agent {
+                docker { image 'gradle' }
+            }
+            steps {
+                sh 'gradle -x test build'
+            }
+        }
         stage('BuildImage') {
             agent {
                 dockerfile {

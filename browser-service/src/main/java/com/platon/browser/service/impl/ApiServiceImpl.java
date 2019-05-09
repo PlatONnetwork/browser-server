@@ -17,8 +17,10 @@ import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
 import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.transaction.TicketCountByTxHashReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: dongqile
@@ -49,6 +52,17 @@ public class ApiServiceImpl implements ApiService {
     private NodeService nodeService;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+
+    @Data
+    static class TicketCount{
+        public TicketCount(Integer count,long timestamp){
+            this.count = count;
+            this.timestamp = timestamp;
+        }
+        private Integer count;
+        private long timestamp;
+    }
+    private final static Map<String,TicketCount> TICKET_COUNT_MAP = new ConcurrentHashMap<>();
 
 
     @Override
@@ -158,7 +172,31 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map <String, Integer> getCandidateTicketCount ( List <String> nodeIds,String chainId ) {
+        Map<String,Integer> returnData = new HashMap<>();
         if(nodeIds.size() > 0) {
+            TicketContract ticketContract = platon.getTicketContract(chainId);
+            long currentTime = System.currentTimeMillis();
+            nodeIds.forEach(nodeId->{
+                TicketCount tc = TICKET_COUNT_MAP.get(nodeId);
+                boolean expired = (currentTime-tc.getTimestamp())>=5*60*1000;
+                if(expired){
+                    // 查最新数据
+                    String countStr = null;
+                    try {
+                        countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
+                        Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
+                        if(map.size()==1){
+                            tc = new TicketCount(map.get(nodeId),currentTime);
+                            TICKET_COUNT_MAP.put(nodeId,tc);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                returnData.put(nodeId,tc.getCount());
+            });
+
+/*
             TicketContract ticketContract = platon.getTicketContract(chainId);
             StringBuffer str = new StringBuffer();
             nodeIds.forEach(id ->str.append(id).append(":"));
@@ -171,18 +209,22 @@ public class ApiServiceImpl implements ApiService {
                 return map;
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
         }
-        return new HashMap<>();
+        return returnData;
     }
 
     @Override
-    public RespPage<VoteInfo> getTicketCountByTxHash (List <String> hashList , String chainId ) {
+    public RespPage<VoteInfo> getTicketCountByTxHash (TicketCountByTxHashReq req) {
         long beginTime = System.currentTimeMillis();
+        List<String> hashList = req.getHashList();
+        String chainId = req.getCid();
         if(hashList.size() > 0){
             logger.debug("Time Consuming-begin: {}ms",System.currentTimeMillis()-beginTime);
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
+
+            Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
@@ -246,9 +288,11 @@ public class ApiServiceImpl implements ApiService {
 
 
 
-            RespPage<VoteInfo> resDate = new RespPage <>();
-            resDate.setData(bean);
-            return resDate;
+            RespPage<VoteInfo> returnData = new RespPage <>();
+            returnData.setTotalCount(page.getTotal());
+            returnData.setTotalPages(page.getPages());
+            returnData.setData(bean);
+            return returnData;
         }
         logger.debug("Time Consuming-last: {}ms",System.currentTimeMillis()-beginTime);
         return new RespPage <>();
