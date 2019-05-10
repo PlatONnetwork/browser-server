@@ -228,17 +228,20 @@ public class ApiServiceImpl implements ApiService {
 
 
 
-            Map<String,String> priceMap = new HashMap <>();
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
-            blockHashList.forEach(blockNumber->{
-                blocks.forEach(block -> {
-                    if(blockNumber.equals(block.getNumber())){}
-                    priceMap.put(block.getHash(),block.getVotePrice());
-                });
-            });
 
+            Map<String,String> priceMap = new HashMap <>();
+
+            if(blockHashList.size()>0){
+                BlockExample blockExample = new BlockExample();
+                blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
+                List<Block> blocks = blockMapper.selectByExample(blockExample);
+                blockHashList.forEach(blockNumber->{
+                    blocks.forEach(block -> {
+                        if(blockNumber.equals(block.getNumber())){}
+                        priceMap.put(block.getHash(),block.getVotePrice());
+                    });
+                });
+            }
 
             List<String> nodeIds = new ArrayList <>();
             bean.forEach(voteInfo ->  {
