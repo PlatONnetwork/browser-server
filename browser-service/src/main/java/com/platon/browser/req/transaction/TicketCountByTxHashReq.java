@@ -1,5 +1,6 @@
 package com.platon.browser.req.transaction;
 
+import com.platon.browser.req.PageReq;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TicketCountByTxHashReq {
+public class TicketCountByTxHashReq  extends PageReq {
     @NotNull(message = "{hashList is not null}")
     private List<String> hashList;
     @NotBlank(message = "{chain.id.notnull}")
