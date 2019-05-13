@@ -122,16 +122,14 @@ public class PendingTxServiceImpl implements PendingTxService {
         PendingTxExample.Criteria second = condition.createCriteria()
                 .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
-        if(StringUtils.isNotBlank(req.getTxType())){
+        if(req.getTxTypes().size()>0){
             // 根据交易类型查询
-            if(req.getTxType().contains(",")){
-                String [] txTypes = req.getTxType().split(",");
-                List<String> txTypesList = Arrays.asList(txTypes);
-                first.andTxTypeIn(txTypesList);
-                second.andTxTypeIn(txTypesList);
+            if(req.getTxTypes().size()>1){
+                first.andTxTypeIn(req.getTxTypes());
+                second.andTxTypeIn(req.getTxTypes());
             }else{
-                first.andTxTypeEqualTo(req.getTxType());
-                second.andTxTypeEqualTo(req.getTxType());
+                first.andTxTypeEqualTo(req.getTxTypes().get(0));
+                second.andTxTypeEqualTo(req.getTxTypes().get(0));
             }
         }
         if(req.getStartDate()!=null){

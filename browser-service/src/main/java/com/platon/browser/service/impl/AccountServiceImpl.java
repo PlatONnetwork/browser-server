@@ -22,6 +22,7 @@ import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.TxInfoResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,19 +93,23 @@ public class AccountServiceImpl implements AccountService {
         returnData.setTradeCount(transactionCount.intValue());
 
 
-
-        // 取已完成交易(查询缓存中的200条记录)
-        Collection<TransactionWithBLOBs> transactions = transactionCacheService.fuzzyQuery(req.getCid(),req.getAddress(),req.getTxType(),null,null);
         List<AccTransactionItem> data = new ArrayList<>();
         List<String> hashList = new ArrayList <>();
-        transactions.forEach(initData -> {
-            AccTransactionItem bean = new AccTransactionItem();
-            bean.init(initData);
-            hashList.add(initData.getHash());
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
-            data.add(bean);
-        });
+        req.getTxTypes().forEach(txType->{
+            // 取已完成交易(查询缓存中的200条记录)
+            Collection<TransactionWithBLOBs> transactions = transactionCacheService.fuzzyQuery(req.getCid(),req.getAddress(),txType,null,null);
+            transactions.forEach(initData -> {
+                AccTransactionItem bean = new AccTransactionItem();
+                bean.init(initData);
+                hashList.add(initData.getHash());
 
+                if(StringUtils.isNotBlank(bean.getNodeId())) {
+                    bean.setNodeId(bean.getNodeId().startsWith("0x")?bean.getNodeId():"0x"+bean.getNodeId());
+                    nodeIds.add(bean.getNodeId());
+                }
+                data.add(bean);
+            });
+        });
 
 
         //返回标识用于判断跳转
@@ -140,8 +145,10 @@ public class AccountServiceImpl implements AccountService {
         pendingTxes.forEach(initData -> {
             AccTransactionItem bean = new AccTransactionItem();
             bean.init(initData);
-            if(StringUtils.isNotBlank(bean.getNodeId())) nodeIds.add("0x" + bean.getNodeId());
-
+            if(StringUtils.isNotBlank(bean.getNodeId())) {
+                bean.setNodeId(bean.getNodeId().startsWith("0x")?bean.getNodeId():"0x"+bean.getNodeId());
+                nodeIds.add(bean.getNodeId());
+            }
             data.add(bean);
         });
 
@@ -156,14 +163,8 @@ public class AccountServiceImpl implements AccountService {
         });
 
 
-
-
-
-        // 取节点名称
-        TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
-        Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
-
         //根据交易hash列表获取所有hash对应的交易有效票列表
+        TicketContract ticketContract = platonClient.getTicketContract(req.getCid());
         Map<String,Integer> voteHashMap = new HashMap <>();
         try {
             StringBuffer txHash = new StringBuffer();
@@ -183,17 +184,16 @@ public class AccountServiceImpl implements AccountService {
             logger.error("get transaction voteNumber Exception !!!");
         }
 
-        for(AccTransactionItem accTransactionItem : data){
-            String nodeName = nodeIdToName.get(accTransactionItem.getNodeId());
-            if(null != nodeName)accTransactionItem.setNodeName(nodeName);
-             else accTransactionItem.setNodeName(" ");
-
-
-            Integer number = voteHashMap.get(accTransactionItem.getTxHash());
-            accTransactionItem.setValidVoteCount(number);
-        }
-
-
+        // 设置节点名称
+        Map<String,String> nodeIdToName=nodeService.getNodeNameMap(req.getCid(),new ArrayList<>(nodeIds));
+        Map<String,Integer> voteHashMapRef = voteHashMap;
+        data.forEach(item->{
+            String nodeName = nodeIdToName.get(item.getNodeId());
+            if(StringUtils.isNotBlank(nodeName)) item.setNodeName(nodeName);
+            else item.setNodeName("");
+            Integer number = voteHashMapRef.get(item.getTxHash());
+            item.setValidVoteCount(number);
+        });
 
 
         //设置交易收益
@@ -226,17 +226,18 @@ public class AccountServiceImpl implements AccountService {
         }
 
 
-
-        data.forEach(datas -> {
-            BigDecimal inCome = incomeMap.get(datas.getTxHash());
-            if(null == inCome) datas.setIncome(BigDecimal.ZERO);
-            else datas.setIncome(inCome);
-            if(null != consensusMap.get(datas.getNodeId())) {
-                datas.setFlag(1);
+        data.forEach(item -> {
+            BigDecimal inCome = incomeMap.get(item.getTxHash());
+            if(null == inCome) item.setIncome(BigDecimal.ZERO);
+            else item.setIncome(inCome);
+            if(null != consensusMap.get(item.getNodeId())) {
+                item.setFlag(1);
             }else {
-                if(null != historyMap.get(datas.getNodeId())) datas.setFlag(0);
+                if(null != historyMap.get(item.getNodeId())) item.setFlag(0);
             }
         });
+
+
 
         returnData.setTrades(data);
         return returnData;

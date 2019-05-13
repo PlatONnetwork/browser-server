@@ -17,8 +17,10 @@ import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
 import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.transaction.TicketCountByTxHashReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: dongqile
@@ -49,6 +52,17 @@ public class ApiServiceImpl implements ApiService {
     private NodeService nodeService;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+
+    @Data
+    static class TicketCount{
+        public TicketCount(Integer count,long timestamp){
+            this.count = count;
+            this.timestamp = timestamp;
+        }
+        private Integer count;
+        private long timestamp;
+    }
+    private final static Map<String,TicketCount> TICKET_COUNT_MAP = new ConcurrentHashMap<>();
 
 
     @Override
@@ -158,31 +172,46 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Map <String, Integer> getCandidateTicketCount ( List <String> nodeIds,String chainId ) {
+        Map<String,Integer> returnData = new HashMap<>();
         if(nodeIds.size() > 0) {
             TicketContract ticketContract = platon.getTicketContract(chainId);
-            StringBuffer str = new StringBuffer();
-            nodeIds.forEach(id ->str.append(id).append(":"));
-            String ids = str.toString();
-            ids = ids.substring(0,ids.lastIndexOf(":"));
-            try {
-                String countStr = ticketContract.GetCandidateTicketCount(ids).send();
-                Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
-
-                return map;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            long currentTime = System.currentTimeMillis();
+            nodeIds.forEach(nodeId->{
+                TicketCount tc = TICKET_COUNT_MAP.get(nodeId);
+                long prevTime = 0;
+                if(tc!=null) prevTime = tc.getTimestamp();
+                boolean expired = (currentTime-prevTime)>=30*1000;
+                if(expired){
+                    // 查最新数据
+                    try {
+                        String countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
+                        Map<String,Integer> map = JSON.parseObject(countStr,Map.class);
+                        if(map.size()==1){
+                            String key = nodeId.replace("0x","");
+                            Integer count = map.get(key);
+                            tc = new TicketCount(count,currentTime);
+                            TICKET_COUNT_MAP.put(nodeId,tc);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                returnData.put(nodeId,tc.getCount());
+            });
         }
-        return new HashMap<>();
+        return returnData;
     }
 
     @Override
-    public RespPage<VoteInfo> getTicketCountByTxHash (List <String> hashList , String chainId ) {
+    public RespPage<VoteInfo> getTicketCountByTxHash (TicketCountByTxHashReq req) {
         long beginTime = System.currentTimeMillis();
+        List<String> hashList = req.getHashList();
+        String chainId = req.getCid();
         if(hashList.size() > 0){
             logger.debug("Time Consuming-begin: {}ms",System.currentTimeMillis()-beginTime);
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
+
             List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
@@ -199,17 +228,20 @@ public class ApiServiceImpl implements ApiService {
 
 
 
-            Map<String,String> priceMap = new HashMap <>();
-            BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
-            List<Block> blocks = blockMapper.selectByExample(blockExample);
-            blockHashList.forEach(blockNumber->{
-                blocks.forEach(block -> {
-                    if(blockNumber.equals(block.getNumber())){}
-                    priceMap.put(block.getHash(),block.getVotePrice());
-                });
-            });
 
+            Map<String,String> priceMap = new HashMap <>();
+
+            if(blockHashList.size()>0){
+                BlockExample blockExample = new BlockExample();
+                blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
+                List<Block> blocks = blockMapper.selectByExample(blockExample);
+                blockHashList.forEach(blockNumber->{
+                    blocks.forEach(block -> {
+                        if(blockNumber.equals(block.getNumber())){}
+                        priceMap.put(block.getHash(),block.getVotePrice());
+                    });
+                });
+            }
 
             List<String> nodeIds = new ArrayList <>();
             bean.forEach(voteInfo ->  {
@@ -217,22 +249,10 @@ public class ApiServiceImpl implements ApiService {
             });
 
             Map<String,String> nodeIdToName=nodeService.getNodeNameMap(chainId,new ArrayList<>(nodeIds));
-            Map<String,Date> deadDate = new HashMap <>();
 
-
-
-
-            List<VoteTx> voteTxes = txMapper.selectByExample(new VoteTxExample());
-            voteTxes.forEach(voteTx ->{
-                if(voteTx.getDeadLine() != null){
-                    deadDate.put(voteTx.getHash(),voteTx.getDeadLine());
-                }
-            });
 
             bean.forEach(voteInfo -> {
                 String nodeName = nodeIdToName.get(voteInfo.getNodeId());
-                Date date = deadDate.get(voteInfo.getHash());
-                if(date != null) voteInfo.setDeadLine(deadDate.get(voteInfo.getHash()));
                 if(null != nodeName){
                     voteInfo.setNodeName(nodeName);
                 }else {
@@ -248,37 +268,7 @@ public class ApiServiceImpl implements ApiService {
             });
             logger.debug("Time Consuming-middle: {}ms",System.currentTimeMillis()-beginTime);
 
-
-
-
-            //设置交易收益
-            //分组计算收益
-            Map<String,BigDecimal> incomeMap = new HashMap <>();
-
-            //根据投票交易hash查询区块列表
-            if(hashList.size()>0){
-                BlockExample hashBlockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId).andVoteHashIn(hashList);
-                List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
-                Map<String,List<Block>> groupMap = new HashMap <>();
-                //根据hash分组hash-block
-                hashBlockList.forEach(block->{
-                    List<Block> group=groupMap.get(block.getVoteHash());
-                    if(group==null){
-                        group=new ArrayList <>();
-                        groupMap.put(block.getVoteHash(),group);
-                    }
-                    group.add(block);
-                });
-
-                groupMap.forEach((txHash,group)->{
-                    BigDecimal txIncome = BigDecimal.ZERO;
-                    for (Block block:group){
-                        txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
-                    }
-                    incomeMap.put(txHash,txIncome);
-                });
-            }
+            Map<String,BigDecimal> incomeMap = getIncome(chainId,hashList);
 
             bean.forEach(b -> {
                 BigDecimal inCome = incomeMap.get(b.getHash());
@@ -288,9 +278,11 @@ public class ApiServiceImpl implements ApiService {
 
 
 
-            RespPage<VoteInfo> resDate = new RespPage <>();
-            resDate.setData(bean);
-            return resDate;
+            RespPage<VoteInfo> returnData = new RespPage <>();
+            returnData.setTotalCount(bean.size());
+            returnData.setTotalPages(bean.size()/req.getPageSize());
+            returnData.setData(bean);
+            return returnData;
         }
         logger.debug("Time Consuming-last: {}ms",System.currentTimeMillis()-beginTime);
         return new RespPage <>();

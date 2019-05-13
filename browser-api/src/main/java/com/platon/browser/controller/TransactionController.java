@@ -35,6 +35,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -491,7 +492,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "txType":"", // 交易类型 (可选), 可以设置多个类型，使用逗号“,”分隔
+     *      "txTypes":['transfer','MPCtransaction'], // 交易类型, 字符串数组, 可取值如下所示：
      *           transfer ：转账
      *           MPCtransaction ： MPC交易
      *           contractCreate ： 合约创建
@@ -584,7 +585,7 @@ public class TransactionController {
         }
     }
     /**
-     * @api {get} transaction/addressDownload?cid=:cid&address=:address&date=:date h.导出地址详情
+     * @api {get} transaction/addressDownload?cid=:cid&address=:address&date=:date&tab=:tab h.导出地址详情
      * @apiVersion 1.0.0
      * @apiName addressDownload
      * @apiGroup transaction
@@ -592,15 +593,28 @@ public class TransactionController {
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
+     * @apiParam {Integer} tab 标签页索引：0-交易，1-投票，2-声明
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
      */
     @GetMapping("addressDownload")
-    public void addressDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date, HttpServletResponse response) {
+    public void addressDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date,@RequestParam int tab, HttpServletResponse response) {
         AccountDownloadReq req = new AccountDownloadReq();
         req.setCid(cid);
         req.setAddress(address);
+
+        if(tab<0||tab>3){
+            try {
+                response.getWriter().write("tab参数有误！");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        req.setTab(tab);
+
         try {
             SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -626,7 +640,7 @@ public class TransactionController {
      * {
      *      "cid":"", // 链ID (必填)
      *      "address": "0xdE41ad9010ED7ae4a7bBc42b55665151dcc8DEf4",// 账户地址(必填)
-     *      "txType":"", // 交易类型 (可选)
+     *      "txTypes":["transfer","MPCtransaction"], // 交易类型, 字符串数组, 可取值如下所示：
      *           voteTicket ： 投票
      *           transactionExecute ： 合约执行
      *           authorization ： 权限
@@ -724,7 +738,8 @@ public class TransactionController {
      */
     @GetMapping("contractDownload")
     public void contractDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date, HttpServletResponse response) {
-        addressDownload(cid,address,date,response);
+        // 合约交易列表默认取tab值为0
+        addressDownload(cid,address,date,3,response);
     }
 
     /**

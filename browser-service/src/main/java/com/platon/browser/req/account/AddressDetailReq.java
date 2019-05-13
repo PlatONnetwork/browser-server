@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 账户详情查询请求对象
@@ -19,7 +21,7 @@ public class AddressDetailReq {
     private String cid;
     @NotBlank(message = "{address.notnull}")
     private String address;
-    private String txType;
+    private List<String> txTypes=new ArrayList<>();
     // 数据开始日期
     private Date startDate;
     // 数据结束日期

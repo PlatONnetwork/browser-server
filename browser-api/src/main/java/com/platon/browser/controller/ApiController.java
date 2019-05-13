@@ -201,6 +201,6 @@ public class ApiController {
      */
     @PostMapping("getTicketCountByTxHash")
     public RespPage<VoteInfo> getTicketCountByTxHash(@Valid @RequestBody TicketCountByTxHashReq req){
-        return apiService.getTicketCountByTxHash(req.getHashList(),req.getCid());
+        return apiService.getTicketCountByTxHash(req);
     }
 }
