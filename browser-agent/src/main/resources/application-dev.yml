@@ -31,6 +31,6 @@ loglevel:
   platon.service: debug
   platon.thread: debug
 # 区块分析线程池大小
-thread.num: 50
+thread.num: 500
 # 区块批量采集大小
 batch.num: ${thread.num}
