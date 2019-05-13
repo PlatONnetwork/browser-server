@@ -18,6 +18,7 @@ import com.platon.browser.dto.transaction.VoteSummary;
 import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.transaction.TicketCountByTxHashReq;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
 import lombok.Data;
@@ -288,6 +289,22 @@ public class ApiServiceImpl implements ApiService {
         return new RespPage <>();
     }
 
+    @Override
+    public List<Transaction> transactionList(TransactionListReq req) {
+        TransactionExample condition = new TransactionExample();
+        TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
+                .andFromEqualTo(req.getAddress())
+                .andSequenceGreaterThanOrEqualTo(req.getBeginSequence());
+        TransactionExample.Criteria second = condition.createCriteria().andChainIdEqualTo(req.getCid())
+                .andToEqualTo(req.getAddress())
+                .andSequenceGreaterThanOrEqualTo(req.getBeginSequence());
+        condition.or(second);
+        condition.setOrderByClause("sequence desc");
+        PageHelper.startPage(1,req.getListSize());
+        List<Transaction> returnData = transactionMapper.selectByExample(condition);
+        return returnData;
+    }
+
 
     private Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
         if (hashList.size() > 0){
@@ -345,5 +362,7 @@ public class ApiServiceImpl implements ApiService {
         }
         return new HashMap <>();
     }
+
+
 
 }

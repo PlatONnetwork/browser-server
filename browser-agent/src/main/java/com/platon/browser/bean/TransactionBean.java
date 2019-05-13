@@ -51,6 +51,11 @@ public class TransactionBean extends TransactionWithBLOBs {
         }
         // 使用交易接收者信息填充交易实体
         this.setTransactionIndex(receipt.getTransactionIndex().intValue());
+
+        // 记录序号=交易所在区块号拼上交易索引
+        String sequence = this.getBlockNumber().toString()+this.getTransactionIndex().toString();
+        this.setSequence(Long.valueOf(sequence));
+
         this.setEnergonUsed(receipt.getGasUsed().toString());
         this.setActualTxCost(receipt.getGasUsed().multiply(transaction.getGasPrice()).toString());
         if(null == receipt.getBlockNumber() ){
