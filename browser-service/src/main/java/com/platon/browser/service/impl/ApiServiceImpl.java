@@ -181,7 +181,7 @@ public class ApiServiceImpl implements ApiService {
         long beginTime = System.currentTimeMillis();
         Map<String,Integer> returnData = new HashMap<>();
         if(nodeIds.size() > 0) {
-            TicketContract ticketContract = platon.getTicketContract(chainId);
+
             long currentTime = System.currentTimeMillis();
             nodeIds.forEach(nodeId->{
                 TicketCount tc = TICKET_COUNT_MAP.get(nodeId);
@@ -189,6 +189,7 @@ public class ApiServiceImpl implements ApiService {
                 if(tc!=null) prevTime = tc.getTimestamp();
                 boolean expired = (currentTime-prevTime)>=30*1000;
                 if(expired){
+                    TicketContract ticketContract = platon.getTicketContract(chainId);
                     // 查最新数据
                     try {
                         String countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
