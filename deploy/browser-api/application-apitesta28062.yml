@@ -2,7 +2,7 @@
 # 应用版本
 version: 0.6.1
 # 当前激活的配置名称(请不要修改)
-profile: apitesta28062
+profile: testa
 # 服务器端口号
 port: 28062
 # MySQL数据库连接地址
@@ -14,7 +14,7 @@ chain.config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: /opt/browser/logs/${spring.application.name}-${profile}28062.log
+logpath: /opt/browser/logs/${spring.application.name}-api${profile}${port}.log
 # 日志级别
 loglevel:
   spring: error
