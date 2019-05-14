@@ -1,18 +1,18 @@
 {
   "chainList":[
-    {
-      "cid": "1",
-      "en": "Alpha",
-      "zh": "Alpha(A网)",
-      "http": "http://192.168.9.190:10061/newversion_test",
-      "context":"a-api"
-    },
-    {
+   {
       "cid": "203",
+      "en": "Amigo",
+      "zh": "Amigo(测试网络)",
+      "http": "http://192.168.9.190:10061/",
+      "context":"api-203"
+    },
+   {
+      "cid": "204",
       "en": "Batalla",
-      "zh": "Batalla(B网)",
-      "http": "http://192.168.9.190:10061/newversion_test",
-      "context":"b-api"
+      "zh": "Batalla(测试网络)",
+      "http": "http://192.168.9.190:10061/",
+      "context":"api-204"
     }
   ]
 }
