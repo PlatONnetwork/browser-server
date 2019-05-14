@@ -7,18 +7,17 @@ subprojects {
     }
 
     apply plugin: 'java'
-    
+
     group 'com.platon.browser'
     version "${projectVersion}"
     sourceCompatibility = '1.8'
-    
+
     repositories {
-        maven {url "http://192.168.9.39:8081/repository/maven-public/"}
         maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
-        maven {url "https://oss.sonatype.org/content/repositories/releases/"}
+        maven {url "http://192.168.9.39:8081/repository/maven-public/"}
         mavenCentral()
     }
-    
+
     dependencies {
         testCompile "junit:junit:$junitVersion"
         compile "com.alibaba:fastjson:$fastJsonVersion"
