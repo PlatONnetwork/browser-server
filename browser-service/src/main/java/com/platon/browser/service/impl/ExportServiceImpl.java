@@ -70,10 +70,7 @@ public class ExportServiceImpl implements ExportService {
         SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logger.info("导出数据起始日期：{},结束日期：{}",ymdhms.format(req.getStartDate()),ymdhms.format(req.getEndDate()));
 
-        AddressDetailReq accountDetailReq = new AddressDetailReq();
-        // 一页取完所有数据
-        accountDetailReq.setPageSize(Integer.MAX_VALUE);
-        BeanUtils.copyProperties(req,accountDetailReq);
+        List<String> txTypes = new ArrayList<>();
 
         List<Object[]> rows = new ArrayList<>();
         List<TransactionTypeEnum> types = new ArrayList<>();
@@ -83,10 +80,10 @@ public class ExportServiceImpl implements ExportService {
             case 0:
                 // 交易
                 logger.debug("下载类型：交易");
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -102,7 +99,7 @@ public class ExportServiceImpl implements ExportService {
             case 1:
                 // 投票
                 logger.debug("下载类型：投票");
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -119,9 +116,9 @@ public class ExportServiceImpl implements ExportService {
             case 2:
                 logger.debug("下载类型：声明(质押、减持质押、提取质押)");
                 // 声明(质押、减持质押、提取质押)
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -137,14 +134,14 @@ public class ExportServiceImpl implements ExportService {
                 // 交易
                 logger.debug("下载类型：所有");
                 // 用于查询合约详情中的交易
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
-                accountDetailReq.getTxTypes().add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_TRANSFER.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CONTRACT_CREATE.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_TRANSACTION_EXECUTE.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_MPC_TRANSACTION.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
+                txTypes.add(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code);
                 // 表头
                 headers = new String[]{
                         i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
@@ -163,6 +160,8 @@ public class ExportServiceImpl implements ExportService {
             throw new RuntimeException("Header is null!");
         }
 
+
+
         // 临时数据变量
         List<AccTransactionItem> transactionItems = new ArrayList<>();
         List<String> hashList = new ArrayList <>();
@@ -170,9 +169,11 @@ public class ExportServiceImpl implements ExportService {
         // 根据条件查询已完成交易信息
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress())
-                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate());
+                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate())
+                .andTxTypeIn(txTypes);
         TransactionExample.Criteria tsecond = transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress())
-                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate());
+                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate())
+                .andTxTypeIn(txTypes);
         transactionExample.or(tsecond);
         List<Transaction> transactions = transactionMapper.selectByExample(transactionExample);
         transactions.forEach(initData -> {
@@ -190,9 +191,11 @@ public class ExportServiceImpl implements ExportService {
         // 根据条件查询待处理交易信息
         PendingTxExample pendingTxExample = new PendingTxExample();
         pendingTxExample.createCriteria().andChainIdEqualTo(req.getCid()).andFromEqualTo(req.getAddress())
-                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate());
+                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate())
+                .andTxTypeIn(txTypes);
         PendingTxExample.Criteria psecond = pendingTxExample.createCriteria().andChainIdEqualTo(req.getCid()).andToEqualTo(req.getAddress())
-                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate());
+                .andTimestampGreaterThanOrEqualTo(req.getStartDate()).andTimestampLessThanOrEqualTo(req.getEndDate())
+                .andTxTypeIn(txTypes);
         pendingTxExample.or(psecond);
         List<PendingTx> pendingTxes = pendingTxMapper.selectByExample(pendingTxExample);
         pendingTxes.forEach(initData -> {

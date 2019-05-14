@@ -192,7 +192,7 @@ public class AccountServiceImpl implements AccountService {
             if(StringUtils.isNotBlank(nodeName)) item.setNodeName(nodeName);
             else item.setNodeName("");
             Integer number = voteHashMapRef.get(item.getTxHash());
-            item.setValidVoteCount(number);
+            item.setValidVoteCount(number==null?0:number);
         });
 
 
