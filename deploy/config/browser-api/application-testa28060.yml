@@ -1,0 +1,25 @@
+# ***************************测试配置**************************** #
+# 应用版本
+version: 0.6.1
+# 当前激活的配置名称(请不要修改)
+profile: testa
+# 服务器端口号
+port: 28060
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dbuser: platon
+dbpass: platon
+# Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+chain.config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:6789","http://192.168.120.83:6789","http://192.168.120.84:6789"]
+# Redis集群节点
+redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+# 日志文件存储文件
+logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}28060.log
+# 日志级别
+loglevel:
+  spring: error
+  platon: error
+
+spring.datasource.test-on-borrow: false
+spring.datasource.test-while-idle: true
+spring.datasource.time-between-eviction-runs-millis: 18800
