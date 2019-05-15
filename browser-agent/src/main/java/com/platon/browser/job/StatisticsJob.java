@@ -82,7 +82,7 @@ public class StatisticsJob {
     @Autowired
     private CustomBlockMapper customBlockMapper;
     public static ExecutorService THREAD_POOL = Executors.newFixedThreadPool(6);
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     protected void updateTransCount () {
         CountDownLatch latch = new CountDownLatch(6);
         THREAD_POOL.submit(()->{try {statisticCacheService.updateTransCount(chainId);}finally {latch.countDown();}});
