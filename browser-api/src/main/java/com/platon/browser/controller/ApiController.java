@@ -250,4 +250,159 @@ public class ApiController {
     public List<Transaction> transactionList(@Valid @RequestBody TransactionListReq req){
         return apiService.transactionList(req);
     }
+
+    /**
+     * @api {post} api/node/list f.获取节点列表
+     * @apiVersion 1.0.0
+     * @apiName node/list
+     * @apiGroup api
+     * @apiDescription 获取节点列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *       "cid":"",                        //链ID (必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg":"",                      //描述信息
+     *      "code":0,                         //成功（0），失败则由相关失败码
+     *      "voteCount":90,                   //已投票
+     *      "proportion":86,                  //投票率:小数
+     *      "ticketPrice":3.66,               //票价（单位Energon）
+     *      "data":[
+     *           {
+     *           "nodeId":"0x",               //节点ID
+     *           "ranking":1,                 //质押排名
+     *           "name":"node-1",             //节点名称
+     *           "countryCode":"CN",          //国家代码
+     *           "countryEnName":"",          //国家英文名称
+     *           "countryCnName":"",          //国家中文名称
+     *           "countrySpellName":"",       //国家拼音名称，中文环境下，区域进行排序
+     *           "deposit":"1.254555555",     //质押金(单位:Energon)
+     *           "rewardRatio":0.02           //投票激励:小数
+     *           }
+     *       ]
+     * }
+     */
+    @PostMapping("transaction/list11")
+    public List<Transaction> transactionList11(){
+        return null;
+    }
+    
+    /**
+     * @api {post} api/node/details g.获取节点详情
+     * @apiVersion 1.0.0
+     * @apiName node/details
+     * @apiGroup api
+     * @apiDescription 获取节点详情
+     * @apiParamExample {json} Request-Example:
+     * {
+     *       "cid":"",                        //链ID (必填)
+     *       "nodeId":"0x",                   //节点ID
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg":"",                      //描述信息
+     *      "code":0,                         //成功（0），失败则由相关失败码
+     *      "data": {
+     *           "nodeId":"0x",               //节点ID
+     *           "ranking":1,                 //质押排名
+     *           "name":"node-1",             //节点名称
+     *           "deposit":"1.254555555",     //质押金(单位:Energon)
+     *           "rewardRatio":0.02           //投票激励:小数
+     *           "orgName":"",                //机构名称
+     *           "orgWebsite":"",             //机构官网
+     *           "intro":"",                  //节点简介
+     *           "nodeUrl":"",                //节点地址
+     *           "ticketCount":"",            //得票数
+     *           "joinTime":199880011,        //加入时间，单位-毫秒
+     *           "electionStatus":1,          //竞选状态:1-候选前100名,2-出块中,3-验证节点,4-备选前100名 ？
+     *      }
+     * }
+     */
+    @PostMapping("transaction/list12")
+    public List<Transaction> transactionList12(){
+        return null;
+    }
+    
+    /**
+     * @api {post} api/vote/groupByNode h.获取投票列表
+     * @apiVersion 1.0.0
+     * @apiName vote/groupByNode
+     * @apiGroup api
+     * @apiDescription 获取投票列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *       "cid":"",                        //链ID (必填)
+     *       "walletAddrs":[                  //地址列表
+     *          "address1",
+     *          "address2" 
+     *       ]
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg":"",                      //描述信息
+     *      "code":0,                         //成功（0），失败则由相关失败码
+     *      "data":[
+     *           {
+     *           "nodeId":"0x",               //节点ID
+     *           "name":"node-1",             //节点名称
+     *           "countryCode":"CN",          //国家代码
+     *           "countryEnName":"",          //国家英文名称
+     *           "countryCnName":"",          //国家中文名称
+     *           "validNum":"50",             //有效票
+     *           "totalTicketNum":"100",      //总票数
+     *           "locked":"",                 //投票锁定,单位Energon
+     *           "earnings":"",               //投票收益,单位Energon
+     *           "transactiontime":""         //最新投票时间，单位-毫秒
+     *           }
+     *       ]
+     * }
+     */
+    @PostMapping("transaction/list13")
+    public List<Transaction> transactionList13(){
+        return null;
+    }
+    
+    /**
+     * @api {post} api/vote/listTxByNodeAndAdress i.获取投票交易列表通过节点和地址
+     * @apiVersion 1.0.0
+     * @apiName vote/listTxByNodeAndAdress
+     * @apiGroup api
+     * @apiDescription 获取投票列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *       "cid":"",                        //链ID (必填)
+     *       "nodeId":"0x",                   //节点ID
+     *       "walletAddrs":[                  //地址列表
+     *          "address1",
+     *          "address2" 
+     *       ]
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *      "errMsg":"",                      //描述信息
+     *      "code":0,                         //成功（0），失败则由相关失败码
+     *      "data":[
+     *           {
+     *           "nodeId":"0x",               //节点ID
+     *           "name":"node-1",             //节点名称
+     *           "validNum":"50",             //有效票
+     *           "totalTicketNum":"100",      //总票数
+     *           "locked":"",                 //投票锁定,单位Energon
+     *           "earnings":"",               //投票收益,单位Energon
+     *           "transactiontime":""         //最新投票时间，单位-毫秒
+     *           "deposit":"1000000000000",   //当时的购票价格，单位Energon
+     *           "owner":"0x..."              //投票人钱包地址
+     *           }
+     *       ]
+     * }
+     */
+    @PostMapping("transaction/list14")
+    public List<Transaction> transactionList14(){
+        return null;
+    }
 }
