@@ -135,34 +135,6 @@ public class ApiServiceImpl implements ApiService {
             voteTransaction.setValidNum(String.valueOf(vaildSum));
         }
 
-
-        //设置交易收益
-        //分组计算收益
-        //根据投票交易hash查询区块列表
-        if(hashList.size()>0){
-            BlockExample hashBlockExample = new BlockExample();
-            hashBlockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
-            List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
-            Map<String,List<Block>> groupMap = new HashMap <>();
-            //根据hash分组hash-block
-            hashBlockList.forEach(block->{
-                List<Block> group=groupMap.get(block.getVoteHash());
-                if(group==null){
-                    group=new ArrayList <>();
-                    groupMap.put(block.getVoteHash(),group);
-                }
-                group.add(block);
-            });
-
-            groupMap.forEach((txHash,group)->{
-                BigDecimal txIncome = BigDecimal.ZERO;
-                for (Block block:group){
-                    txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
-                }
-                incomeMap.put(txHash,txIncome);
-            });
-        }
-
         voteTransactions.forEach(b -> {
             BigDecimal inCome = incomeMap.get(b.getTransactionHash());
             if(null == inCome) b.setEarnings(BigDecimal.ZERO.toString());
