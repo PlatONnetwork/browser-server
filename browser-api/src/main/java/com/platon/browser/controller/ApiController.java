@@ -379,7 +379,9 @@ public class ApiController {
      *       "walletAddrs":[                  //地址列表
      *          "address1",
      *          "address2" 
-     *       ]
+     *       ],
+     *       "beginSequence":120,             //起始序号 (必填)
+     *       "listSize":100,                  //列表大小 (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
