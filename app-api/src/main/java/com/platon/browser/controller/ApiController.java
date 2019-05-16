@@ -116,7 +116,7 @@ public class ApiController {
      *           "candidateId":"0xffffff....",//候选人Id
      *           "owner":"0xbbb..."//投票人钱包地址，
      *           "earnings":"90000000000000000",//此次交易投票获得的收益，单位Energon
-     *           "transactiontime":"1231231233".//Unix时间戳，毫秒级,交易时间
+     *           "transactionTime":"1231231233".//Unix时间戳，毫秒级,交易时间
      *           "deposit":"1000000000000",// 当时的购票价格，单位Energon
      *           "totalTicketNum": "100",// 总票数
      *           "validNum": "50",// 有效票

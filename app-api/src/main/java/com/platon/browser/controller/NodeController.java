@@ -48,22 +48,24 @@ public class NodeController {
      * {
      *      "errMsg":"",                         //描述信息
      *      "code":0,                            //成功（0），失败则由相关失败码
-     *      "voteCount":90,                      //已投票
-     *      "proportion":86,                     //投票率:小数
-     *      "ticketPrice":3.66,                  //票价（单位Energon）
-     *      "data":[
-     *           {
-     *              "nodeId":"0x",               //节点ID
-     *              "ranking":1,                 //质押排名
-     *              "name":"node-1",             //节点名称
-     *              "countryCode":"CN",          //国家代码
-     *              "countryEnName":"",          //国家英文名称
-     *              "countryCnName":"",          //国家中文名称
-     *              "countrySpellName":"",       //国家拼音名称，中文环境下，区域进行排序
-     *              "deposit":"1.254555555",     //质押金(单位:Energon)
-     *              "rewardRatio":0.02           //投票激励:小数
-     *           }
-     *       ]
+     *      "data": {
+     *          "voteCount":90,                      //已投票
+     *          "proportion":86,                     //投票率:小数
+     *          "ticketPrice":3.66,                  //票价（单位Energon）
+     *          "list":[
+     *             {
+     *                "nodeId":"0x",               //节点ID
+     *                "ranking":1,                 //质押排名
+     *                "name":"node-1",             //节点名称
+     *                "countryCode":"CN",          //国家代码
+     *                "countryEnName":"",          //国家英文名称
+     *                "countryCnName":"",          //国家中文名称
+     *                "countrySpellName":"",       //国家拼音名称，中文环境下，区域进行排序
+     *                "deposit":"1.254555555",     //质押金(单位:Energon)
+     *                "rewardRatio":0.02           //投票激励:小数
+     *             }
+     *         ]
+     *      }
      * }
      */
     @PostMapping("list")

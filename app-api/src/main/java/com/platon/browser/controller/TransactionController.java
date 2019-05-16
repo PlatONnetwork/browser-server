@@ -146,10 +146,12 @@ public class TransactionController {
      *              "nodeId":"0x",               //节点ID
      *              "name":"node-1",             //节点名称
      *              "validNum":"50",             //有效票
+     *              "deadLine":"1231231233".//实际过期时间
      *              "totalTicketNum":"100",      //总票数
      *              "locked":"",                 //投票锁定,单位Energon
      *              "earnings":"",               //投票收益,单位Energon
      *              "transactionTime":""         //最新投票时间，单位-毫秒
+     *              "sequence":153,               //排列序号：由区块号和交易索引拼接而成
      *              "deposit":"1000000000000",   //当时的购票价格，单位Energon
      *              "owner":"0x..."              //投票人钱包地址
      *           }
