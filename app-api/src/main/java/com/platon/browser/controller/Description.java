@@ -36,9 +36,8 @@ import java.util.Map;
 public class Description {
     /**
      * @api 接口请求头设置说明
-     * @apiGroup about
+     * @apiGroup 接口请求头设置说明
      * @apiName 接口请求头设置说明
-     * @apiDescription 接口请求头设置说明
      * @apiParamExample :
      *
      * 本接口文档中定义的接口中的通用参数统一使用请求头传输，例如每个接口都需要传链ID，例如访问交易列表接口：
