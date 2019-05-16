@@ -17,6 +17,7 @@ public class VoteTransactionDto {
     private int totalTicketNum;
     private long locked;
     private long earnings;
+    private long deadLine;
     private long transactionTime;
     private String deposit;
     private String owner;
