@@ -8,7 +8,6 @@ import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.PendingFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +16,7 @@ import org.web3j.protocol.Web3j;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootTest(classes= AgentApplication.class, value = "spring.profiles.active=dev")
+@SpringBootTest(classes= BrowserAgentApplication.class, value = "spring.profiles.active=dev")
 public class TestBase {
     @Autowired
     protected BlockFilter blockFilter;
