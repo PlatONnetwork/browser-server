@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "description": "PlatON区块链浏览器",
   "title": "PlatON区块链浏览器接口文档",
-  "url" : "http://localhost:8080/browser_api/"
+  "url" : "http://192.168.9.190:20060/app-api/v060/"
 }
