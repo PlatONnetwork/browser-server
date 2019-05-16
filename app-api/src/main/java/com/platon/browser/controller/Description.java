@@ -45,7 +45,7 @@ public class Description {
      *   http://localhost:28060/browser-server/transaction/list \
      *   -H 'Accept: application/json' \
             -H 'Content-Type: application/json' \
-            -H 'x-aton-cid: 2055555' \ # 链ID
+            -H 'xatoncid: 2055555' \ # 链ID
             -H 'content-length: 136' \
             -d '{
                 "beginSequence":1,

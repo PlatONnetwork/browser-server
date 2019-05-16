@@ -109,7 +109,7 @@ public class TransactionController {
      *
      */
     @PostMapping("list")
-    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req, @RequestHeader String cid){
+    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req, @RequestHeader String xatoncid){
         List<TransactionDto> transactions = apiService.transactionList(req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
