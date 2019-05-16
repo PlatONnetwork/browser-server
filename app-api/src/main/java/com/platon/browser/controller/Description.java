@@ -36,7 +36,8 @@ import java.util.Map;
 public class Description {
     /**
      * @api 接口请求头设置说明
-     * @apiGroup request
+     * @apiGroup about
+     * @apiName 接口请求头设置说明
      * @apiDescription 接口请求头设置说明
      * @apiParamExample :
      *
