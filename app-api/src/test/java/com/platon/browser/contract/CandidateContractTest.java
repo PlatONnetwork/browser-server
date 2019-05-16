@@ -25,14 +25,18 @@ public class CandidateContractTest extends TestBase {
     public void CandidateList(){
         chainsConfig.getChainIds().forEach(chainId->{
             try {
-                String res = platon.getCandidateContract(chainId).GetCandidateList().send();
-                List<String> candidateStrArr = JSON.parseArray(res,String.class);
-                // 候选
-                List<Candidate> candidates = JSON.parseArray(candidateStrArr.get(0),Candidate.class);
-                // 备选
-                List<Candidate> alternates = JSON.parseArray(candidateStrArr.get(1),Candidate.class);
-                logger.error("候选：{}",candidates);
-                logger.error("备选：{}",alternates);
+                // 节点类型:nominees—提名节点(候选，前100名),validator-验证节点(前100名中的25名), candidates—候选节点(备选，后100名)
+
+                   String verifies = platon.getCandidateContract(chainId).GetVerifiersList().send();
+
+                   String res = platon.getCandidateContract(chainId).GetCandidateList().send();
+                   List<String> candidateStrArr = JSON.parseArray(res,String.class);
+                   // 提名节点
+                   List<Candidate> nominees = JSON.parseArray(candidateStrArr.get(0),Candidate.class);
+                   // 候选节点
+                   List<Candidate> candidates = JSON.parseArray(candidateStrArr.get(1),Candidate.class);
+                   logger.error("提名节点：{}",nominees);
+                   logger.error("候选节点：{}",candidates);
             } catch (Exception e) {
                 e.printStackTrace();
             }

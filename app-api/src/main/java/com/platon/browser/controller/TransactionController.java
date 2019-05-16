@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
+import com.platon.browser.res.BaseResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +70,7 @@ public class TransactionController {
      *             "transactionIndex":0,         //交易在区块中位置
      *             "txInfo":"{json}",            //交易详细信息
      *             "txReceiptStatus":1,          //交易状态 1 成功 0 失败
-     *             "txType":"transfer",          //交易类型 
+     *             "txType":"transfer",          //交易类型
      *                                           transfer：转账
      *                                           MPCtransaction：MPC交易
      *                                           contractCreate：合约创建
@@ -80,7 +84,7 @@ public class TransactionController {
      *           }
      *       ]
      * }
-     * 
+     *
      * txType = voteTicket时：txInfo信息：
      * {
      *   "functionName":"VoteTicket",            //方法名称
@@ -109,13 +113,14 @@ public class TransactionController {
      *}
      *
      */
-    @PostMapping("transaction/list")
-    public List<Transaction> transactionList(@Valid @RequestBody TransactionListReq req){
-        return apiService.transactionList(req);
+    @PostMapping("list")
+    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req){
+        List<TransactionDto> transactions = apiService.transactionList(req);
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
-    
+
     /**
-     * @api {post} transaction/listVote b.获取投票交易列表通过节点和地址
+     * @api {post} transaction/listVote b.通过【节点ID和地址】参数查询投票交易列表
      * @apiVersion 1.0.0
      * @apiName transaction/listVote
      * @apiGroup transaction
@@ -128,7 +133,7 @@ public class TransactionController {
      *      "nodeId":"0x",                       //节点ID
      *      "walletAddrs":[                      //地址列表
      *         "address1",
-     *         "address2" 
+     *         "address2"
      *      ]
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -144,15 +149,15 @@ public class TransactionController {
      *              "totalTicketNum":"100",      //总票数
      *              "locked":"",                 //投票锁定,单位Energon
      *              "earnings":"",               //投票收益,单位Energon
-     *              "transactiontime":""         //最新投票时间，单位-毫秒
+     *              "transactionTime":""         //最新投票时间，单位-毫秒
      *              "deposit":"1000000000000",   //当时的购票价格，单位Energon
      *              "owner":"0x..."              //投票人钱包地址
      *           }
      *       ]
      * }
      */
-    @PostMapping("transaction/listVote")
-    public List<Transaction> transactionList14(){
+    @PostMapping("listVote")
+    public List<Transaction> listVote(){
         return null;
     }
 }

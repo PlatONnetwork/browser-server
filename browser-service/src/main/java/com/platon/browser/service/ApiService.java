@@ -2,6 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -23,5 +24,5 @@ public interface ApiService {
     RespPage<VoteTransaction> getVoteTransaction(TransactionVoteReq req);
     Map<String,Integer> getCandidateTicketCount(List<String> nodeIds, String chainId);
     RespPage<VoteInfo> getTicketCountByTxHash(TicketCountByTxHashReq req);
-    List<Transaction> transactionList(TransactionListReq req);
+    List<TransactionDto> transactionList(TransactionListReq req);
 }

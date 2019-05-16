@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.VoteTxMapper;
 import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
@@ -24,6 +25,7 @@ import com.platon.browser.service.NodeService;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
@@ -271,7 +273,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public List<Transaction> transactionList(TransactionListReq req) {
+    public List<TransactionDto> transactionList(TransactionListReq req) {
         logger.debug("transactionList begin");
         long beginTime = System.currentTimeMillis();
 
@@ -285,7 +287,13 @@ public class ApiServiceImpl implements ApiService {
         condition.or(second);
         condition.setOrderByClause("sequence desc");
         PageHelper.startPage(1,req.getListSize());
-        List<Transaction> returnData = transactionMapper.selectByExample(condition);
+        List<Transaction> rawData = transactionMapper.selectByExample(condition);
+
+        List<TransactionDto> returnData = new ArrayList<>();
+        rawData.forEach(bean->{
+            TransactionDto dto = new TransactionDto();
+            BeanUtils.copyProperties(bean,dto);
+        });
 
         logger.debug("transactionList Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;

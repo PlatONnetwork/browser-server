@@ -34,7 +34,7 @@ public class NodeController {
     private ApiService apiService;
 
     /**
-     * @api {post} node/listAll a.获取节点列表
+     * @api {post} node/list a.获取节点列表
      * @apiVersion 1.0.0
      * @apiName node/listAll
      * @apiGroup node
@@ -66,11 +66,11 @@ public class NodeController {
      *       ]
      * }
      */
-    @PostMapping("node/listAll")
-    public List<Transaction> transactionList11(){
+    @PostMapping("list")
+    public List<Transaction> list(){
         return null;
     }
-    
+
     /**
      * @api {post} node/details b.获取节点详情
      * @apiVersion 1.0.0
@@ -87,7 +87,7 @@ public class NodeController {
      * {
      *      "errMsg":"",                         //描述信息
      *      "code":0,                            //成功（0），失败则由相关失败码
-     *      "data": {                          
+     *      "data": {
      *           "nodeId":"0x",                  //节点ID
      *           "ranking":1,                    //质押排名
      *           "name":"node-1",                //节点名称
@@ -100,17 +100,17 @@ public class NodeController {
      *           "ticketCount":"",               //得票数
      *           "joinTime":199880011,           //加入时间，单位-毫秒
      *           "nodeType":""                   //竞选状态:
-     *                                           nominees—提名节点   
-     *                                           validator-验证节点  
+     *                                           nominees—提名节点
+     *                                           validator-验证节点
      *                                           candidates—候选节点
      *      }
      * }
      */
-    @PostMapping("node/details")
-    public List<Transaction> transactionList12(){
+    @PostMapping("detail")
+    public List<Transaction> detail(){
         return null;
     }
-    
+
     /**
      * @api {post} node/listUserVoteNode c.获得用户有投票的节点列表
      * @apiVersion 1.0.0
@@ -122,7 +122,7 @@ public class NodeController {
      *      "cid":"",                            //链ID (必填)
      *      "walletAddrs":[                      //地址列表
      *          "address1",
-     *          "address2" 
+     *          "address2"
      *      ]
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -130,8 +130,8 @@ public class NodeController {
      * {
      *      "errMsg":"",                       //描述信息
      *      "code":0,                          //成功（0），失败则由相关失败码
-     *      "data":[                        
-     *           {                          
+     *      "data":[
+     *           {
      *              "nodeId":"0x",             //节点ID
      *              "name":"node-1",           //节点名称
      *              "countryCode":"CN",        //国家代码
@@ -141,13 +141,13 @@ public class NodeController {
      *              "totalTicketNum":"100",    //总票数
      *              "locked":"",               //投票锁定,单位Energon
      *              "earnings":"",             //投票收益,单位Energon
-     *              "transactiontime":""       //最新投票时间，单位-毫秒
+     *              "transactionTime":""       //最新投票时间，单位-毫秒
      *           }
      *       ]
      * }
      */
-    @PostMapping("node/listUserVoteNode")
-    public List<Transaction> transactionList13(){
+    @PostMapping("listUserVoteNode")
+    public List<Transaction> listUserVoteNode(){
         return null;
     }
 }
