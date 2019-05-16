@@ -39,7 +39,7 @@ public class TransactionController {
      * @api {post} transaction/list a.通过地址和指定交易序号查询交易列表
      * @apiVersion 1.0.0
      * @apiName transaction/list
-     * @apiGroup api
+     * @apiGroup transaction
      * @apiDescription 通过地址和指定交易序号查询交易列表
      * @apiParamExample {json} Request-Example:
      * {
