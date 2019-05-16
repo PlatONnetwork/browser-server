@@ -1,26 +1,21 @@
 package com.platon.browser.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
+import com.platon.browser.config.ChainsConfig;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.service.ApiService;
+import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.req.transaction.TransactionListReq;
-import com.platon.browser.service.ApiService;
-import com.platon.browser.util.I18nUtil;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -114,7 +109,7 @@ public class TransactionController {
      *
      */
     @PostMapping("list")
-    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req){
+    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req, @RequestHeader String cid){
         List<TransactionDto> transactions = apiService.transactionList(req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
