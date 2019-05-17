@@ -8,7 +8,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class NodeDetailDto {
+public class AppNodeDetailDto {
     private String nodeId;
     private int ranking;
     private String name;

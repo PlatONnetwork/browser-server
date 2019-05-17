@@ -2,8 +2,15 @@ package com.platon.browser.controller;
 
 import java.util.List;
 
+import com.platon.browser.dto.app.node.AppNodeDto;
+import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.ResponseException;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.NodeService;
+import com.platon.browser.service.app.AppNodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +41,12 @@ public class NodeController extends BaseController{
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private NodeService nodeService;
+    private AppNodeService appNodeService;
 
     /**
      * @api {post} node/list a.获取节点列表
      * @apiVersion 1.0.0
-     * @apiName node/listAll
+     * @apiName node/list
      * @apiGroup node
      * @apiDescription 获取节点列表
      * @apiSuccessExample {json} Success-Response:
@@ -66,8 +73,15 @@ public class NodeController extends BaseController{
      */
     @PostMapping("list")
     public BaseResp list(@RequestHeader(CID) String chainId){
-        //nodeService.getPage()
-        return null;
+        if(!chainsConfig.isValid(chainId)){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
+        }
+        try{
+            List<AppNodeDto> nodes = appNodeService.list(chainId);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
+        }catch (BusinessException be){
+            throw new ResponseException(be.getMessage());
+        }
     }
 
     /**

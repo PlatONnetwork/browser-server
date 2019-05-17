@@ -3,7 +3,7 @@ package com.platon.browser.controller;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -254,7 +254,7 @@ public class ApiController {
         ]
      */
     @PostMapping("transaction/list")
-    public List<TransactionDto> transactionList(@Valid @RequestBody TransactionListReq req){
+    public List<AppTransactionDto> transactionList(@Valid @RequestBody TransactionListReq req){
         AppTransactionListReq appReq = new AppTransactionListReq();
         BeanUtils.copyProperties(req,appReq);
         return appTransactionService.list(req.getCid(),appReq);

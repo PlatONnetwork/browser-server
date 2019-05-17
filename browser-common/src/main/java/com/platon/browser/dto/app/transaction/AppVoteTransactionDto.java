@@ -9,7 +9,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class VoteTransactionDto {
+public class AppVoteTransactionDto {
     @JsonIgnore
     private String hash;
     private String nodeId;

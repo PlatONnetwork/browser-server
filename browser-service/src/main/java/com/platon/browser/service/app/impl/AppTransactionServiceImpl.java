@@ -1,26 +1,21 @@
 package com.platon.browser.service.app.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.app.transaction.TransactionDto;
-import com.platon.browser.dto.app.transaction.VoteTransactionDto;
-import com.platon.browser.dto.transaction.VoteTransaction;
+import com.platon.browser.dto.app.transaction.AppTransactionDto;
+import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.app.AppTransactionListVoteReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppTransactionService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -58,19 +53,19 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     private ApiService apiService;
 
     @Override
-    public List<TransactionDto> list(String chainId, AppTransactionListReq req) {
+    public List<AppTransactionDto> list(String chainId, AppTransactionListReq req) {
         logger.debug("list() begin");
         long beginTime = System.currentTimeMillis();
-        List<TransactionDto> returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequence(chainId,req.getAddress(),req.getBeginSequence(),req.getListSize());
+        List<AppTransactionDto> returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequence(chainId,req.getAddress(),req.getBeginSequence(),req.getListSize());
         logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }
 
     @Override
-    public List<VoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
+    public List<AppVoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
         logger.debug("listVote() begin");
         long beginTime = System.currentTimeMillis();
-        List<VoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence(
+        List<AppVoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence(
                 chainId,
                 TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,
                 req.getNodeId(),

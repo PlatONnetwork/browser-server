@@ -64,7 +64,7 @@
     ORDER BY `block_number` DESC,`transaction_index` DESC LIMIT #{page.pageSize};
   </select>
 
-  <select id="selectByChainIdAndAddressAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.TransactionDto">
+  <select id="selectByChainIdAndAddressAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.AppTransactionDto">
     SELECT
     actual_tx_cost AS actualTxCost,
     block_number AS blockNumber,
@@ -84,7 +84,7 @@
     ORDER BY sequence DESC LIMIT #{listSize}
   </select>
 
-  <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.VoteTransactionDto">
+  <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">
     SELECT
     hash,
     col4 AS nodeId,
