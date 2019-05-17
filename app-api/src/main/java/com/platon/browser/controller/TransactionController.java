@@ -59,13 +59,13 @@ public class TransactionController extends BaseController{
      *      "code":0,                            //成功（0），失败则由相关失败码
      *      "data":[
      *           {
-     *             "actualTxCost":"211680",      //交易实际花费值(手续费)，单位：wei
+     *             "actualTxCost":"211680",      //交易实际花费值(手续费)，单位：E
      *             "blockNumber":187566,         //区块高度
      *             "chainId":"203",              //链id
      *             "from":"0x...",               //交易发起方地址
      *             "hash":"0x...",               //交易hash
      *             "sequence":153,               //排列序号：由区块号和交易索引拼接而成
-     *             "timestamp":1557484976000,    //交易时间（单位：毫秒）
+     *             "timestamp":"1557484976000",  //交易时间（单位：毫秒）
      *             "to":"0x...",                 //交易接收方地址
      *             "transactionIndex":0,         //交易在区块中位置
      *             "txInfo":"{json}",            //交易详细信息
@@ -93,7 +93,7 @@ public class TransactionController extends BaseController{
      *      "count":"19",                        //投票数
      *      "nodeId":"0x...",                    //节点id
      *      "nodeName":"",                       //节点名称
-     *      "deposit":"1.254555555"              //质押金(单位:Energon)
+     *      "deposit":"10000"                    //质押金(单位:E)
      *   },
      *   "type":"1000"                           //交易类型
      *}
@@ -154,8 +154,8 @@ public class TransactionController extends BaseController{
      *              "validNum":"50",             //有效票
      *              "deadLine":"1231231233",     //实际过期时间
      *              "totalTicketNum":"100",      //总票数
-     *              "locked":"",                 //投票锁定,单位Energon
-     *              "earnings":"",               //投票收益,单位Energon
+     *              "locked":"",                 //投票锁定,单位E
+     *              "earnings":"",               //投票收益,单位E
      *              "transactionTime":""         //最新投票时间，单位-毫秒
      *              "sequence":153,              //排列序号：由区块号和交易索引拼接而成
      *              "price":"1000000000000",     //当时的购票价格，单位E
