@@ -18,6 +18,7 @@ import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
 import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.transaction.TicketCountByTxHashReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.service.ApiService;
@@ -271,34 +272,6 @@ public class ApiServiceImpl implements ApiService {
         logger.debug("getTicketCountByTxHash Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return new RespPage <>();
     }
-
-    @Override
-    public List<TransactionDto> transactionList(TransactionListReq req) {
-        logger.debug("transactionList begin");
-        long beginTime = System.currentTimeMillis();
-
-        TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
-                .andFromEqualTo(req.getAddress())
-                .andSequenceGreaterThanOrEqualTo(req.getBeginSequence());
-        TransactionExample.Criteria second = condition.createCriteria().andChainIdEqualTo(req.getCid())
-                .andToEqualTo(req.getAddress())
-                .andSequenceGreaterThanOrEqualTo(req.getBeginSequence());
-        condition.or(second);
-        condition.setOrderByClause("sequence desc");
-        PageHelper.startPage(1,req.getListSize());
-        List<Transaction> rawData = transactionMapper.selectByExample(condition);
-
-        List<TransactionDto> returnData = new ArrayList<>();
-        rawData.forEach(bean->{
-            TransactionDto dto = new TransactionDto();
-            BeanUtils.copyProperties(bean,dto);
-        });
-
-        logger.debug("transactionList Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
-        return returnData;
-    }
-
 
     private Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
         logger.debug("getIncome begin");

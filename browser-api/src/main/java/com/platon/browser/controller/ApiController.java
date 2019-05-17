@@ -3,6 +3,7 @@ package com.platon.browser.controller;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -10,15 +11,18 @@ import com.platon.browser.dto.transaction.VoteTransaction;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
+import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.transaction.CandidateTicketCountReq;
 import com.platon.browser.req.transaction.TicketCountByTxHashReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.req.transaction.VoteSummaryReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.ApiService;
+import com.platon.browser.service.app.AppTransactionService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +49,9 @@ public class ApiController {
     private ChainsConfig chainsConfig;
     @Autowired
     private ApiService apiService;
+
+    @Autowired
+    private AppTransactionService appTransactionService;
 
     /**
      * @api {post} api/getBatchVoteSummary a.获取统计统计信息
@@ -247,8 +254,10 @@ public class ApiController {
         ]
      */
     @PostMapping("transaction/list")
-    public List<Transaction> transactionList(@Valid @RequestBody TransactionListReq req){
-        return apiService.transactionList(req);
+    public List<TransactionDto> transactionList(@Valid @RequestBody TransactionListReq req){
+        AppTransactionListReq appReq = new AppTransactionListReq();
+        BeanUtils.copyProperties(req,appReq);
+        return appTransactionService.list(req.getCid(),appReq);
     }
 
     /**
@@ -288,7 +297,7 @@ public class ApiController {
     public List<Transaction> transactionList11(){
         return null;
     }
-    
+
     /**
      * @api {post} api/node/details g.获取节点详情
      * @apiVersion 1.0.0
@@ -325,7 +334,7 @@ public class ApiController {
     public List<Transaction> transactionList12(){
         return null;
     }
-    
+
     /**
      * @api {post} api/vote/groupByNode h.获取投票列表
      * @apiVersion 1.0.0
@@ -337,7 +346,7 @@ public class ApiController {
      *       "cid":"",                        //链ID (必填)
      *       "walletAddrs":[                  //地址列表
      *          "address1",
-     *          "address2" 
+     *          "address2"
      *       ]
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -365,7 +374,7 @@ public class ApiController {
     public List<Transaction> transactionList13(){
         return null;
     }
-    
+
     /**
      * @api {post} api/vote/listTxByNodeAndAdress i.获取投票交易列表通过节点和地址
      * @apiVersion 1.0.0
@@ -378,7 +387,7 @@ public class ApiController {
      *       "nodeId":"0x",                   //节点ID
      *       "walletAddrs":[                  //地址列表
      *          "address1",
-     *          "address2" 
+     *          "address2"
      *       ],
      *       "beginSequence":120,             //起始序号 (必填)
      *       "listSize":100,                  //列表大小 (必填)

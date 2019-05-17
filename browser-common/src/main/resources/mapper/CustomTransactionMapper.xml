@@ -22,6 +22,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="receive_type" jdbcType="VARCHAR" property="receiveType" />
   </resultMap>
+
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TransactionWithBLOBs">
     <result column="input" jdbcType="LONGVARCHAR" property="input" />
     <result column="fail_reason" jdbcType="LONGVARCHAR" property="failReason" />
@@ -62,4 +63,25 @@
     </if>
     ORDER BY `block_number` DESC,`transaction_index` DESC LIMIT #{page.pageSize};
   </select>
+
+  <select id="selectByChainIdAndAddressAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.TransactionDto">
+    SELECT
+    actual_tx_cost AS actualTxCost,
+    block_number AS blockNumber,
+    chain_id AS chainId,
+    `from`,
+    `hash`,
+    sequence,
+    `timestamp`,
+    `to`,
+    transaction_index AS transactionIndex,
+    tx_info AS txInfo,
+    tx_receipt_status AS txReceiptStatus,
+    tx_type AS txType,
+    `value`
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND sequence>=#{beginSequence} AND (`from`=#{address} OR `to`=#{address})
+    ORDER BY sequence DESC LIMIT #{listSize}
+  </select>
+
 </mapper>

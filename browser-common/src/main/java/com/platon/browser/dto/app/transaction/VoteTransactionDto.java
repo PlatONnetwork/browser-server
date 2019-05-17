@@ -2,8 +2,6 @@ package com.platon.browser.dto.app.transaction;
 
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/5/16 16:58

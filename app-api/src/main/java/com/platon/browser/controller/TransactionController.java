@@ -5,12 +5,16 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.req.app.AppTransactionListReq;
+import com.platon.browser.req.app.AppTransactionListVoteReq;
 import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.ApiService;
+import com.platon.browser.service.app.AppTransactionService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +38,7 @@ public class TransactionController extends BaseController{
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private ApiService apiService;
+    private AppTransactionService appTransactionService;
 
     /**
      * @api {post} transaction/list a.通过地址和指定交易序号查询交易列表
@@ -110,8 +114,8 @@ public class TransactionController extends BaseController{
      *
      */
     @PostMapping("list")
-    public BaseResp transactionList(@RequestHeader(CID) String chainId, @Valid @RequestBody TransactionListReq req){
-        List<TransactionDto> transactions = apiService.transactionList(req);
+    public BaseResp transactionList(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListReq req){
+        List<TransactionDto> transactions = appTransactionService.list(chainId,req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
 
@@ -154,7 +158,7 @@ public class TransactionController extends BaseController{
      * }
      */
     @PostMapping("listVote")
-    public List<Transaction> listVote(@RequestHeader(CID) String chainId){
+    public List<Transaction> listVote(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListVoteReq req){
         return null;
     }
 }

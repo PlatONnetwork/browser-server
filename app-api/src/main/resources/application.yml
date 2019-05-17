@@ -4,11 +4,11 @@
 server:
   port: ${port}
   servlet:
-    context-path: /browser-server
+    context-path: /app-api
 #Spring应用配置
 spring:
   profiles.active: testb
-  application.name: browser-api
+  application.name: app-api
   #国际化配置
   messages.basename: messages
   #Redis集群配置
