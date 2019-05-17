@@ -2,6 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.ticket.TxInfo;
 import lombok.Data;
 import org.web3j.utils.Convert;
@@ -21,7 +22,7 @@ public class VoteSummary {
     private String validNum;
     private String totalTicketNum;
     private BigDecimal ticketPrice;
-    public void init( Transaction transaction){
+    public void init( TransactionWithBLOBs transaction){
         this.hash = transaction.getHash();
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();

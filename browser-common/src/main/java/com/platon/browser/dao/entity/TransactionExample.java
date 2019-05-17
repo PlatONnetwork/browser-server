@@ -1375,76 +1375,6 @@ public class TransactionExample {
             return (Criteria) this;
         }
 
-        public Criteria andTxInfoIsNull() {
-            addCriterion("tx_info is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoIsNotNull() {
-            addCriterion("tx_info is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoEqualTo(String value) {
-            addCriterion("tx_info =", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoNotEqualTo(String value) {
-            addCriterion("tx_info <>", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoGreaterThan(String value) {
-            addCriterion("tx_info >", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoGreaterThanOrEqualTo(String value) {
-            addCriterion("tx_info >=", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoLessThan(String value) {
-            addCriterion("tx_info <", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoLessThanOrEqualTo(String value) {
-            addCriterion("tx_info <=", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoLike(String value) {
-            addCriterion("tx_info like", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoNotLike(String value) {
-            addCriterion("tx_info not like", value, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoIn(List<String> values) {
-            addCriterion("tx_info in", values, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoNotIn(List<String> values) {
-            addCriterion("tx_info not in", values, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoBetween(String value1, String value2) {
-            addCriterion("tx_info between", value1, value2, "txInfo");
-            return (Criteria) this;
-        }
-
-        public Criteria andTxInfoNotBetween(String value1, String value2) {
-            addCriterion("tx_info not between", value1, value2, "txInfo");
-            return (Criteria) this;
-        }
-
         public Criteria andSequenceIsNull() {
             addCriterion("`sequence` is null");
             return (Criteria) this;
@@ -1502,6 +1432,356 @@ public class TransactionExample {
 
         public Criteria andSequenceNotBetween(Long value1, Long value2) {
             addCriterion("`sequence` not between", value1, value2, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1IsNull() {
+            addCriterion("col1 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1IsNotNull() {
+            addCriterion("col1 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1EqualTo(String value) {
+            addCriterion("col1 =", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1NotEqualTo(String value) {
+            addCriterion("col1 <>", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1GreaterThan(String value) {
+            addCriterion("col1 >", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1GreaterThanOrEqualTo(String value) {
+            addCriterion("col1 >=", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1LessThan(String value) {
+            addCriterion("col1 <", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1LessThanOrEqualTo(String value) {
+            addCriterion("col1 <=", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1Like(String value) {
+            addCriterion("col1 like", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1NotLike(String value) {
+            addCriterion("col1 not like", value, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1In(List<String> values) {
+            addCriterion("col1 in", values, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1NotIn(List<String> values) {
+            addCriterion("col1 not in", values, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1Between(String value1, String value2) {
+            addCriterion("col1 between", value1, value2, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol1NotBetween(String value1, String value2) {
+            addCriterion("col1 not between", value1, value2, "col1");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2IsNull() {
+            addCriterion("col2 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2IsNotNull() {
+            addCriterion("col2 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2EqualTo(String value) {
+            addCriterion("col2 =", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2NotEqualTo(String value) {
+            addCriterion("col2 <>", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2GreaterThan(String value) {
+            addCriterion("col2 >", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2GreaterThanOrEqualTo(String value) {
+            addCriterion("col2 >=", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2LessThan(String value) {
+            addCriterion("col2 <", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2LessThanOrEqualTo(String value) {
+            addCriterion("col2 <=", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2Like(String value) {
+            addCriterion("col2 like", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2NotLike(String value) {
+            addCriterion("col2 not like", value, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2In(List<String> values) {
+            addCriterion("col2 in", values, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2NotIn(List<String> values) {
+            addCriterion("col2 not in", values, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2Between(String value1, String value2) {
+            addCriterion("col2 between", value1, value2, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol2NotBetween(String value1, String value2) {
+            addCriterion("col2 not between", value1, value2, "col2");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3IsNull() {
+            addCriterion("col3 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3IsNotNull() {
+            addCriterion("col3 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3EqualTo(String value) {
+            addCriterion("col3 =", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3NotEqualTo(String value) {
+            addCriterion("col3 <>", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3GreaterThan(String value) {
+            addCriterion("col3 >", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3GreaterThanOrEqualTo(String value) {
+            addCriterion("col3 >=", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3LessThan(String value) {
+            addCriterion("col3 <", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3LessThanOrEqualTo(String value) {
+            addCriterion("col3 <=", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3Like(String value) {
+            addCriterion("col3 like", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3NotLike(String value) {
+            addCriterion("col3 not like", value, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3In(List<String> values) {
+            addCriterion("col3 in", values, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3NotIn(List<String> values) {
+            addCriterion("col3 not in", values, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3Between(String value1, String value2) {
+            addCriterion("col3 between", value1, value2, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol3NotBetween(String value1, String value2) {
+            addCriterion("col3 not between", value1, value2, "col3");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4IsNull() {
+            addCriterion("col4 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4IsNotNull() {
+            addCriterion("col4 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4EqualTo(String value) {
+            addCriterion("col4 =", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4NotEqualTo(String value) {
+            addCriterion("col4 <>", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4GreaterThan(String value) {
+            addCriterion("col4 >", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4GreaterThanOrEqualTo(String value) {
+            addCriterion("col4 >=", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4LessThan(String value) {
+            addCriterion("col4 <", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4LessThanOrEqualTo(String value) {
+            addCriterion("col4 <=", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4Like(String value) {
+            addCriterion("col4 like", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4NotLike(String value) {
+            addCriterion("col4 not like", value, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4In(List<String> values) {
+            addCriterion("col4 in", values, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4NotIn(List<String> values) {
+            addCriterion("col4 not in", values, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4Between(String value1, String value2) {
+            addCriterion("col4 between", value1, value2, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol4NotBetween(String value1, String value2) {
+            addCriterion("col4 not between", value1, value2, "col4");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5IsNull() {
+            addCriterion("col5 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5IsNotNull() {
+            addCriterion("col5 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5EqualTo(String value) {
+            addCriterion("col5 =", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5NotEqualTo(String value) {
+            addCriterion("col5 <>", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5GreaterThan(String value) {
+            addCriterion("col5 >", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5GreaterThanOrEqualTo(String value) {
+            addCriterion("col5 >=", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5LessThan(String value) {
+            addCriterion("col5 <", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5LessThanOrEqualTo(String value) {
+            addCriterion("col5 <=", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5Like(String value) {
+            addCriterion("col5 like", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5NotLike(String value) {
+            addCriterion("col5 not like", value, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5In(List<String> values) {
+            addCriterion("col5 in", values, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5NotIn(List<String> values) {
+            addCriterion("col5 not in", values, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5Between(String value1, String value2) {
+            addCriterion("col5 between", value1, value2, "col5");
+            return (Criteria) this;
+        }
+
+        public Criteria andCol5NotBetween(String value1, String value2) {
+            addCriterion("col5 not between", value1, value2, "col5");
             return (Criteria) this;
         }
     }

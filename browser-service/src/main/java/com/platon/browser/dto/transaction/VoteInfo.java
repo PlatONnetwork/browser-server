@@ -2,6 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.ticket.TxInfo;
 import lombok.Data;
 
@@ -25,7 +26,7 @@ public class VoteInfo {
     private String price;
     private BigDecimal income;
     private String blockHash;
-    public  void init(Transaction transaction){
+    public  void init(TransactionWithBLOBs transaction){
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
         this.nodeId = ticketParameter.getNodeId();

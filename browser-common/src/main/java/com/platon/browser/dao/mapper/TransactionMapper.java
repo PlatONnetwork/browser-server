@@ -3,10 +3,10 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 @Mapper
 public interface TransactionMapper {
@@ -54,5 +54,5 @@ public interface TransactionMapper {
      * @mbg.generated
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
-    int batchInsertSelective(@Param("list") List<TransactionWithBLOBs> list, @Param("selective") TransactionWithBLOBs.Column... selective);
+    int batchInsertSelective(@Param("list") List<TransactionWithBLOBs> list, @Param("selective") TransactionWithBLOBs.Column ... selective);
 }

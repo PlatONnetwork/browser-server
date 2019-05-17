@@ -1,9 +1,12 @@
 package com.platon.browser.service;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.entity.*;
+import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.util.DataTool;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.List;
@@ -82,4 +85,6 @@ public class ServiceTestBase extends TestBase {
             pendingTxMapper.batchInsert(data);
         });
     }
+
+
 }

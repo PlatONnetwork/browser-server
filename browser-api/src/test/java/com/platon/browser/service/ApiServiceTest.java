@@ -22,18 +22,18 @@ public class ApiServiceTest extends ServiceTestBase {
 
     @Test
     public void list(){
-        chainsConfig.getChainIds().forEach(chainId -> {
-            TransactionListReq tlr = new TransactionListReq();
-            tlr.setBeginSequence(153);
-            tlr.setListSize(100);
-            tlr.setCid("203");
-            tlr.setAddress("0xbae514b5f89a90e16535c87bcc72ea0619046a62");
-
-            List<Transaction> result = apiService.transactionList(tlr);
-
-
-            logger.info("{}",JSON.toJSONString(result,true));
-        });
+//        chainsConfig.getChainIds().forEach(chainId -> {
+//            TransactionListReq tlr = new TransactionListReq();
+//            tlr.setBeginSequence(153);
+//            tlr.setListSize(100);
+//            tlr.setCid("203");
+//            tlr.setAddress("0xbae514b5f89a90e16535c87bcc72ea0619046a62");
+//
+//            List<Transaction> result = apiService.transactionList(tlr);
+//
+//
+//            logger.info("{}",JSON.toJSONString(result,true));
+//        });
     }
 
 }

@@ -77,7 +77,7 @@ public class ApiServiceImpl implements ApiService {
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(chainId).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(addressList);
-        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
         transactionList.forEach(transaction -> {
             hashList.add(transaction.getHash());
@@ -117,7 +117,7 @@ public class ApiServiceImpl implements ApiService {
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(req.getWalletAddrs());
-        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
         transactionList.forEach(e->{
             hashList.add(e.getHash());
@@ -197,7 +197,7 @@ public class ApiServiceImpl implements ApiService {
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
 
-            List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+            List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
             List<String> blockHashList = new ArrayList <>();
