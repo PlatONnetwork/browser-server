@@ -49,9 +49,9 @@ public class TransactionController extends BaseController{
      * @apiParamExample {json} Request-Example:
      * {
      *      "address":"0x...",                   //地址 (必填)
-     *      "beginSequence":120,                 //起始序号 (必填) 0：代表最旧记录   -1：代表最新记录
+     *      "beginSequence":120,                 //起始序号 (必填) 客户端本地没有最新序号记录时填 0， 0：代表最旧记录 
      *      "listSize":100,                      //列表大小 (必填)
-     *      "direction":""                       //方向 (必填) new：朝最新记录方向     old：朝最旧记录方向
+     *      "direction":""                       //方向 (必填) new：朝最新记录方向,客户端写死 
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -135,10 +135,10 @@ public class TransactionController extends BaseController{
      * @apiDescription 获取投票交易列表通过节点和地址
      * @apiParamExample {json} Request-Example:
      * {
-     *      "beginSequence":120,                 //起始序号 (必填) 0：代表最旧记录   -1：代表最新记录
+     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录 
      *      "listSize":100,                      //列表大小 (必填)
      *      "nodeId":"0x",                       //节点ID
-     *      "direction":""                       //方向 (必填) new：朝最新记录方向     old：朝最旧记录方向
+     *      "direction":""                       //方向 (必填) old：朝最旧记录方向 ,客户端写死
      *      "walletAddrs":[                      //地址列表
      *         "address1",
      *         "address2"
