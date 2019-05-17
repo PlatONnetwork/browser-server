@@ -37,4 +37,22 @@
     ORDER BY ranking ASC
   </select>
 
+  <select id="detailByChainIdAndNodeId" resultType="com.platon.browser.dto.app.node.AppNodeDetailDto">
+    SELECT
+    node_id AS nodeId,
+    ranking,
+    `name`,
+    deposit,
+    reward_ratio AS rewardRatio,
+    org_name AS orgName,
+    org_website AS orgWebsite,
+    intro,
+    CONCAT('http://',ip,':',port) AS nodeUrl,
+    `count` AS ticketCount,
+    UNIX_TIMESTAMP(`join_time`)*1000 AS joinTime,
+    node_type AS nodeType
+    FROM `node_ranking`
+    WHERE `chain_id`=#{chainId} AND node_id=#{nodeId} AND is_valid=1 LIMIT 1
+  </select>
+
 </mapper>
