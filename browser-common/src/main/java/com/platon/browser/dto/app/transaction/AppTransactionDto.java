@@ -12,16 +12,16 @@ import java.util.Date;
 @Data
 public class AppTransactionDto {
     private String actualTxCost;
-    private Long blockNumber;
+    private String blockNumber;
     private String chainId;
     private String from;
     private String hash;
-    private Long sequence;
-    private Date timestamp;
+    private String sequence;
+    private String timestamp;
     private String to;
-    private Integer transactionIndex;
+    private String transactionIndex;
     private String txInfo;
-    private Integer txReceiptStatus;
+    private String txReceiptStatus;
     private String txType;
     private String value;
 }

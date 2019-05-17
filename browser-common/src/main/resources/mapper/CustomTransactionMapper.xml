@@ -72,7 +72,7 @@
     `from`,
     `hash`,
     sequence,
-    `timestamp`,
+    UNIX_TIMESTAMP(`timestamp`)*1000 AS `timestamp`,
     `to`,
     transaction_index AS transactionIndex,
     tx_info AS txInfo,
