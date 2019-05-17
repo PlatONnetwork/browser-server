@@ -1,20 +1,32 @@
 package com.platon.browser.service.app.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.app.transaction.TransactionDto;
 import com.platon.browser.dto.app.transaction.VoteTransactionDto;
+import com.platon.browser.dto.transaction.VoteTransaction;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.app.AppTransactionListVoteReq;
+import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppTransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.TicketContract;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: dongqile
@@ -41,6 +53,9 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     @Autowired
     private CustomTransactionMapper customTransactionMapper;
 
+    @Autowired
+    private ApiService apiService;
+
     @Override
     public List<TransactionDto> list(String chainId, AppTransactionListReq req) {
         logger.debug("list() begin");
@@ -54,7 +69,50 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     public List<VoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
         logger.debug("listVote() begin");
         long beginTime = System.currentTimeMillis();
-        List<VoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndNodeIdAndAddressesAndBeginSequence(chainId,req.getNodeId(),req.getWalletAddrs(),req.getBeginSequence(),req.getListSize());
+        List<VoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence(
+                chainId,
+                TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,
+                req.getNodeId(),
+                req.getWalletAddrs(),
+                req.getBeginSequence(),
+                req.getListSize());
+
+
+        if(returnData.size()>0){
+            List<String> hashList = new ArrayList<>();
+            List<String> nodeIds = new ArrayList<>();
+            returnData.forEach(voteTransactionDto -> {
+                hashList.add(voteTransactionDto.getHash());
+                nodeIds.add(voteTransactionDto.getNodeId());
+            });
+
+            // 取节点名称
+            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+            nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
+                    .andNodeIdEqualTo(req.getNodeId());
+            List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
+            Map<String,String> nodeIdToNodeNameMap = new HashMap<>();
+            nodes.forEach(node->nodeIdToNodeNameMap.put(node.getNodeId(),node.getName()));
+
+            Map<String, BigDecimal> incomeMap = apiService.getIncome(chainId,hashList);
+            Map<String,Integer> validVoteMap = apiService.getVailInfo(hashList, chainId);
+
+            returnData.forEach(voteTransaction->{
+                // 设置收益
+                BigDecimal inCome = incomeMap.get(voteTransaction.getHash());
+                if(null == inCome) voteTransaction.setEarnings(BigDecimal.ZERO.toString());
+                else voteTransaction.setEarnings(inCome.toString());
+                // 设置交易有效票数
+                Integer validSum = validVoteMap.get(voteTransaction.getHash());
+                voteTransaction.setValidNum(String.valueOf(validSum));
+                // 设置节点名称
+                String nodeName = nodeIdToNodeNameMap.get(voteTransaction.getNodeId());
+                if(nodeName!=null) voteTransaction.setName(nodeName);
+                // 设置锁定金额
+                String lock = new BigDecimal(validSum).multiply(new BigDecimal(voteTransaction.getPrice())).toString();
+                voteTransaction.setLocked(lock);
+            });
+        }
         logger.debug("listVote() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }

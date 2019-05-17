@@ -2,10 +2,13 @@ package com.platon.browser.controller;
 
 import java.util.List;
 
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +34,7 @@ public class NodeController extends BaseController{
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private ApiService apiService;
+    private NodeService nodeService;
 
     /**
      * @api {post} node/list a.获取节点列表
@@ -65,7 +68,8 @@ public class NodeController extends BaseController{
      * }
      */
     @PostMapping("list")
-    public List<Transaction> list(){
+    public BaseResp list(@RequestHeader(CID) String chainId){
+        //nodeService.getPage()
         return null;
     }
 

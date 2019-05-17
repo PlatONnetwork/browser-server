@@ -9,15 +9,16 @@ import lombok.Data;
  */
 @Data
 public class VoteTransactionDto {
+    private String hash;
     private String nodeId;
     private String name;
-    private int validNum;
-    private int totalTicketNum;
-    private long locked;
-    private long earnings;
-    private long deadLine;
-    private long transactionTime;
-    private String deposit;
-    private String owner;
-    private long sequence;
+    private String validNum;
+    private String totalTicketNum;
+    private String locked;
+    private String earnings;
+    private String deadLine;
+    private String transactionTime;
+    private String price;
+    private String walletAddress;
+    private String sequence;
 }

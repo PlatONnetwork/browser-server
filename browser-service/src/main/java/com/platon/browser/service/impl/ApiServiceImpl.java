@@ -273,7 +273,7 @@ public class ApiServiceImpl implements ApiService {
         return new RespPage <>();
     }
 
-    private Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
+    public Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
         logger.debug("getIncome begin");
         long beginTime = System.currentTimeMillis();
         if (hashList.size() > 0){
@@ -311,7 +311,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
 
-    private Map<String,Integer> getVailInfo(List<String> hashList,String chainId){
+    public Map<String,Integer> getVailInfo(List<String> hashList,String chainId){
         logger.debug("getVailInfo begin");
         long beginTime = System.currentTimeMillis();
 
