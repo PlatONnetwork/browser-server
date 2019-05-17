@@ -84,4 +84,27 @@
     ORDER BY sequence DESC LIMIT #{listSize}
   </select>
 
+  <select id="selectByChainIdAndNodeIdAndAddressesAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.VoteTransactionDto">
+    SELECT
+    col4 AS nodeId,
+    col4 AS name,
+    "" AS validNum,
+    "" AS deadLine,
+    "" AS totalTicketNum,
+    "" AS locked,
+    "" AS earnings,
+    UNIX_TIMESTAMP(`timestamp`) AS transactionTime,
+    sequence,
+    `value` AS deposit,
+    `from` AS owner
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND sequence>=#{beginSequence} AND
+    (
+      `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+      OR
+      `to` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    )
+    ORDER BY sequence DESC LIMIT #{listSize}
+  </select>
+
 </mapper>

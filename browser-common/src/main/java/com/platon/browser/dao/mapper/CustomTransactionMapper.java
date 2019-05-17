@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.PageParam;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.dto.app.transaction.VoteTransactionDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,4 +22,11 @@ public interface CustomTransactionMapper {
             @Param("beginSequence") Long beginSequence,
             @Param("listSize") Integer listSize
     );
+
+    List<VoteTransactionDto> selectByChainIdAndNodeIdAndAddressesAndBeginSequence(
+            @Param("chainId") String chainId,
+            @Param("nodeId") String nodeId,
+            @Param("walletAddrs") List<String> walletAddrs,
+            @Param("beginSequence") long beginSequence,
+            @Param("listSize") int listSize);
 }

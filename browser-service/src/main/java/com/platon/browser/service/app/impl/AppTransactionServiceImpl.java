@@ -3,7 +3,9 @@ package com.platon.browser.service.app.impl;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.dto.app.transaction.VoteTransactionDto;
 import com.platon.browser.req.app.AppTransactionListReq;
+import com.platon.browser.req.app.AppTransactionListVoteReq;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppTransactionService;
 import org.slf4j.Logger;
@@ -41,10 +43,19 @@ public class AppTransactionServiceImpl implements AppTransactionService {
 
     @Override
     public List<TransactionDto> list(String chainId, AppTransactionListReq req) {
-        logger.debug("transactionList begin");
+        logger.debug("list() begin");
         long beginTime = System.currentTimeMillis();
         List<TransactionDto> returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequence(chainId,req.getAddress(),req.getBeginSequence(),req.getListSize());
-        logger.debug("transactionList Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        return returnData;
+    }
+
+    @Override
+    public List<VoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
+        logger.debug("listVote() begin");
+        long beginTime = System.currentTimeMillis();
+        List<VoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndNodeIdAndAddressesAndBeginSequence(chainId,req.getNodeId(),req.getWalletAddrs(),req.getBeginSequence(),req.getListSize());
+        logger.debug("listVote() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }
 

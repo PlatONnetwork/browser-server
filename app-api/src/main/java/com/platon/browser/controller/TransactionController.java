@@ -3,6 +3,7 @@ package com.platon.browser.controller;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.dto.app.transaction.VoteTransactionDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.req.app.AppTransactionListReq;
@@ -158,7 +159,8 @@ public class TransactionController extends BaseController{
      * }
      */
     @PostMapping("listVote")
-    public List<Transaction> listVote(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListVoteReq req){
-        return null;
+    public BaseResp listVote(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListVoteReq req){
+        List<VoteTransactionDto> transactions = appTransactionService.listVote(chainId,req);
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
 }

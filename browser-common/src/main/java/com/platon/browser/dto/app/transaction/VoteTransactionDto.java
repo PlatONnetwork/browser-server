@@ -19,4 +19,5 @@ public class VoteTransactionDto {
     private long transactionTime;
     private String deposit;
     private String owner;
+    private long sequence;
 }

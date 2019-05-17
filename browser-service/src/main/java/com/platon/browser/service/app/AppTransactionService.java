@@ -1,7 +1,9 @@
 package com.platon.browser.service.app;
 
 import com.platon.browser.dto.app.transaction.TransactionDto;
+import com.platon.browser.dto.app.transaction.VoteTransactionDto;
 import com.platon.browser.req.app.AppTransactionListReq;
+import com.platon.browser.req.app.AppTransactionListVoteReq;
 
 import java.util.List;
 
@@ -11,5 +13,7 @@ import java.util.List;
  * @Description:
  */
 public interface AppTransactionService {
-    public List<TransactionDto> list(String chainId, AppTransactionListReq req);
+    List<TransactionDto> list(String chainId, AppTransactionListReq req);
+
+    List<VoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req);
 }
