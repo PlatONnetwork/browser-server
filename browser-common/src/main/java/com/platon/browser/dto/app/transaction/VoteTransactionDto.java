@@ -1,5 +1,6 @@
 package com.platon.browser.dto.app.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class VoteTransactionDto {
+    @JsonIgnore
     private String hash;
     private String nodeId;
     private String name;

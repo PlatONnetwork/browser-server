@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,6 +112,10 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                 // 设置锁定金额
                 String lock = new BigDecimal(validSum).multiply(new BigDecimal(voteTransaction.getPrice())).toString();
                 voteTransaction.setLocked(lock);
+                // 设置预计过期时间，出块时间+26天
+                BigInteger diff = BigInteger.valueOf(26*24*60).multiply(BigInteger.valueOf(60*1000));
+                BigInteger deadLine = new BigInteger(voteTransaction.getTransactionTime()).add(diff);
+                voteTransaction.setDeadLine(deadLine.toString());
             });
         }
         logger.debug("listVote() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
