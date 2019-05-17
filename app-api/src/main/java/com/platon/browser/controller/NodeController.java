@@ -3,15 +3,13 @@ package com.platon.browser.controller;
 import java.util.List;
 
 import com.platon.browser.dto.app.node.AppNodeDetailDto;
-import com.platon.browser.dto.app.node.AppNodeDto;
-import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
+import com.platon.browser.dto.app.node.AppNodeListWrapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.app.AppNodeDetailReq;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppNodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.service.ApiService;
 import com.platon.browser.util.I18nUtil;
 
 /**
@@ -70,15 +67,16 @@ public class NodeController extends BaseController{
      *      }
      * }
      */
+
     @PostMapping("list")
     public BaseResp list(@RequestHeader(CID) String chainId){
         if(!chainsConfig.isValid(chainId)){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
         }
         try{
-            List<AppNodeDto> nodes = appNodeService.list(chainId);
+            AppNodeListWrapper nodes = appNodeService.list(chainId);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
-        }catch (BusinessException be){
+        }catch (Exception be){
             throw new ResponseException(be.getMessage());
         }
     }

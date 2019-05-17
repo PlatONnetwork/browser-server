@@ -1,29 +1,23 @@
 package com.platon.browser.service.app.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.app.node.AppNodeDetailDto;
 import com.platon.browser.dto.app.node.AppNodeDto;
-import com.platon.browser.dto.app.transaction.AppTransactionDto;
-import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
-import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.req.app.AppTransactionListReq;
-import com.platon.browser.req.app.AppTransactionListVoteReq;
+import com.platon.browser.dto.app.node.AppNodeListWrapper;
+import com.platon.browser.dto.app.node.AppNodeVoteSummaryDto;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppNodeService;
-import com.platon.browser.service.app.AppTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.contracts.CandidateContract;
+import org.web3j.platon.contracts.TicketContract;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,12 +50,36 @@ public class AppNodeServiceImpl implements AppNodeService {
     private ApiService apiService;
 
     @Override
-    public List<AppNodeDto> list(String chainId) {
+    public AppNodeListWrapper list(String chainId) throws Exception {
         logger.debug("list() begin");
         long beginTime = System.currentTimeMillis();
         List<AppNodeDto> returnData = customNodeRankingMapper.selectByChainIdAndIsValidOrderByRanking(chainId,1);
         logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
-        return returnData;
+        AppNodeListWrapper nodes = new AppNodeListWrapper();
+        nodes.setList(returnData);
+
+        TicketContract ticketContract = platon.getTicketContract(chainId);
+        String price = ticketContract.GetTicketPrice().send();
+        nodes.setTicketPrice(price);
+
+        // 从链上查投票数
+        StringBuilder ids = new StringBuilder();
+        List<String> nodeIds = new ArrayList<>();
+        returnData.forEach(node->{
+            ids.append(node.getNodeId()).append(":");
+            nodeIds.add(node.getNodeId());
+        });
+        String idsStr = ids.toString();
+        idsStr = idsStr.substring(0,idsStr.lastIndexOf(":"));
+        String countInfo = ticketContract.GetCandidateTicketCount(idsStr).send();
+        Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
+        countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
+        // 从交易表中查询总投票数量
+        long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
+        nodes.setTotalCount(totalVoteCount);
+
+
+        return nodes;
     }
 
     @Override
