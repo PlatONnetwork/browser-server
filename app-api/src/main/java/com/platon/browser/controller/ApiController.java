@@ -20,10 +20,7 @@ import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -36,7 +33,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api")
-public class ApiController {
+public class ApiController extends BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
     @Autowired
@@ -54,7 +51,6 @@ public class ApiController {
      * @apiDescription 获取统计统计信息
      * @apiParamExample {json} Request-Example:
      * {
-     *     "cid":"", // 链ID (必填)
      *      "addressList":[
      *       addlist1,      //地址列表list<String>
      *       addlist2
@@ -76,7 +72,7 @@ public class ApiController {
      */
 
     @PostMapping("getBatchVoteSummary")
-    public RespPage<VoteSummary> getBatchVoteSummary(@Valid @RequestBody VoteSummaryReq req){
+    public RespPage<VoteSummary> getBatchVoteSummary(@RequestHeader(CID) String chainId, @Valid @RequestBody VoteSummaryReq req){
         if(req.getAddressList().size() < 0){
             throw new ResponseException(i18n.i(I18nEnum.FAILURE));
         }
@@ -97,7 +93,6 @@ public class ApiController {
      * {
      *      "pageNo": 1,//页数(必填)默认1
      *      "pageSize": 10,//页大小(必填)默认10,
-     *        "cid":"", // 链ID (必填)
      *       "walletAddrs" :
      *          [
      *          addlist1,      //地址列表list<String>
@@ -125,7 +120,7 @@ public class ApiController {
      * }
      */
     @PostMapping("getBatchVoteTransaction")
-    public RespPage<VoteTransaction> getBatchVoteTransaction(@Valid @RequestBody TransactionVoteReq req){
+    public RespPage<VoteTransaction> getBatchVoteTransaction(@RequestHeader(CID) String chainId,@Valid @RequestBody TransactionVoteReq req){
         RespPage<VoteTransaction> res = apiService.getVoteTransaction(req);
         return res;
     }
@@ -144,7 +139,6 @@ public class ApiController {
      *          nodeId1,      //节点id列表list<String>
      *          nodeId2
      *          ],
-     *         "cid":"", // 链ID (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * {
@@ -160,7 +154,7 @@ public class ApiController {
      * }
      */
     @PostMapping("getCandidateTicketCount")
-    public BaseResp getCandidateTicketCount( @Valid @RequestBody CandidateTicketCountReq req){
+    public BaseResp getCandidateTicketCount(@RequestHeader(CID) String chainId, @Valid @RequestBody CandidateTicketCountReq req){
         Map<String,Integer> map = apiService.getCandidateTicketCount(req.getNodeIds(), req.getCid());
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),map);
     }
@@ -179,7 +173,6 @@ public class ApiController {
      *          [
      *          "0xqew1652131d3...."      //hash列表list<String>
      *          ]
-     *       "cid":"", // 链ID (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * {
@@ -202,7 +195,7 @@ public class ApiController {
      * }
      */
     @PostMapping("getTicketCountByTxHash")
-    public RespPage<VoteInfo> getTicketCountByTxHash(@Valid @RequestBody TicketCountByTxHashReq req){
+    public RespPage<VoteInfo> getTicketCountByTxHash(@RequestHeader(CID) String chainId,@Valid @RequestBody TicketCountByTxHashReq req){
         return apiService.getTicketCountByTxHash(req);
     }
 }

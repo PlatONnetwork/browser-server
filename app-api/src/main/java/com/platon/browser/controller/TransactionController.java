@@ -24,7 +24,9 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/transaction")
-public class TransactionController {
+public class TransactionController extends BaseController{
+
+
 
     private static Logger logger = LoggerFactory.getLogger(TransactionController.class);
     @Autowired
@@ -45,7 +47,6 @@ public class TransactionController {
      *      "address":"0x...",                   //地址 (必填)
      *      "beginSequence":120,                 //起始序号 (必填)
      *      "listSize":100,                      //列表大小 (必填)
-     *      "cid":"",                            //链ID (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -109,7 +110,7 @@ public class TransactionController {
      *
      */
     @PostMapping("list")
-    public BaseResp transactionList(@Valid @RequestBody TransactionListReq req, @RequestHeader String xatoncid){
+    public BaseResp transactionList(@RequestHeader(CID) String chainId, @Valid @RequestBody TransactionListReq req){
         List<TransactionDto> transactions = apiService.transactionList(req);
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
     }
@@ -122,7 +123,6 @@ public class TransactionController {
      * @apiDescription 获取投票交易列表通过节点和地址
      * @apiParamExample {json} Request-Example:
      * {
-     *      "cid":"",                            //链ID (必填)
      *      "beginSequence":120,                 //起始序号 (必填)
      *      "listSize":100,                      //列表大小 (必填)
      *      "nodeId":"0x",                       //节点ID
@@ -154,7 +154,7 @@ public class TransactionController {
      * }
      */
     @PostMapping("listVote")
-    public List<Transaction> listVote(){
+    public List<Transaction> listVote(@RequestHeader(CID) String chainId){
         return null;
     }
 }
