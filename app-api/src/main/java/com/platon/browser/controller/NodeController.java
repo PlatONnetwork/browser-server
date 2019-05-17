@@ -2,22 +2,21 @@ package com.platon.browser.controller;
 
 import java.util.List;
 
+import com.platon.browser.dto.app.node.AppNodeDetailDto;
 import com.platon.browser.dto.app.node.AppNodeDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ResponseException;
+import com.platon.browser.req.app.AppNodeDetailReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppNodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
@@ -119,8 +118,16 @@ public class NodeController extends BaseController{
      * }
      */
     @PostMapping("detail")
-    public List<Transaction> detail(){
-        return null;
+    public BaseResp detail(@RequestHeader(CID) String chainId, @RequestBody AppNodeDetailReq req){
+        if(!chainsConfig.isValid(chainId)){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
+        }
+        try{
+            AppNodeDetailDto node = appNodeService.detail(chainId,req.getNodeId());
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),node);
+        }catch (BusinessException be){
+            throw new ResponseException(be.getMessage());
+        }
     }
 
     /**

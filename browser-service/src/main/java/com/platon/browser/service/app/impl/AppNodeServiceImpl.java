@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dto.app.node.AppNodeDetailDto;
 import com.platon.browser.dto.app.node.AppNodeDto;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
@@ -62,5 +63,12 @@ public class AppNodeServiceImpl implements AppNodeService {
         logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }
+
+    @Override
+    public AppNodeDetailDto detail(String chainId, String nodeId) {
+        AppNodeDetailDto node = customNodeRankingMapper.detailByChainIdAndNodeId(chainId,nodeId);
+        return node;
+    }
+
 
 }

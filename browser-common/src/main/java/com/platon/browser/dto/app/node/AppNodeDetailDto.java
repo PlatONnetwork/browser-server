@@ -10,16 +10,16 @@ import lombok.Data;
 @Data
 public class AppNodeDetailDto {
     private String nodeId;
-    private int ranking;
+    private String ranking;
     private String name;
     private String deposit;
-    private double rewardRatio;
+    private String rewardRatio;
     private String orgName;
     private String orgWebsite;
     private String intro;
     private String nodeUrl;
-    private int ticketCount;
-    private long joinTime;
+    private String ticketCount;
+    private String joinTime;
     private String nodeType;
 
 }

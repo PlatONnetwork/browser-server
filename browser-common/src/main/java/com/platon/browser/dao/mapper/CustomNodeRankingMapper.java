@@ -12,4 +12,6 @@ import java.util.List;
 public interface CustomNodeRankingMapper {
     int insertOrUpdate(@Param("list") List<NodeRanking> list);
     List<AppNodeDto> selectByChainIdAndIsValidOrderByRanking(@Param("chainId") String chainId, @Param("isValid") int isValid);
+
+    AppNodeDetailDto detailByChainIdAndNodeId(@Param("chainId")String chainId, @Param("nodeId") String nodeId);
 }
