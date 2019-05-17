@@ -45,20 +45,20 @@ public class NodeController extends BaseController{
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * {
-     *      "errMsg":"",                         //描述信息
-     *      "code":0,                            //成功（0），失败则由相关失败码
+     *      "errMsg":"",                           //描述信息
+     *      "code":0,                              //成功（0），失败则由相关失败码
      *      "data": {
-     *          "voteCount":90,                      //已投票
-     *          "proportion":86,                     //投票率:小数
-     *          "ticketPrice":3.66,                  //票价（单位Energon）
+     *          "voteCount":90,                    //已投票
+     *          "totalCount":86,                   //总票数
+     *          "ticketPrice":"100",               //票价（单位E）
      *          "list":[
      *             {
      *                "nodeId":"0x",               //节点ID
      *                "ranking":1,                 //质押排名
      *                "name":"node-1",             //节点名称
      *                "countryCode":"CN",          //国家代码
-     *                "deposit":"1.254555555",     //质押金(单位:Energon)
-     *                "rewardRatio":0.02           //投票激励:小数
+     *                "deposit":"100",             //质押金(单位:E)
+     *                "rewardRatio":"9500"         //投票激励,已经乘以10000。500/10000 = 0.95 = 95%
      *             }
      *         ]
      *      }
@@ -89,8 +89,8 @@ public class NodeController extends BaseController{
      *           "nodeId":"0x",                  //节点ID
      *           "ranking":1,                    //质押排名
      *           "name":"node-1",                //节点名称
-     *           "deposit":"1.254555555",        //质押金(单位:Energon)
-     *           "rewardRatio":0.02              //投票激励:小数
+     *           "deposit":"100",                //质押金(单位:E)
+     *           "rewardRatio":"9500"            //投票激励,已经乘以10000。500/10000 = 0.95 = 95%
      *           "orgName":"",                   //机构名称
      *           "orgWebsite":"",                //机构官网
      *           "intro":"",                     //节点简介
@@ -134,8 +134,8 @@ public class NodeController extends BaseController{
      *              "countryCode":"CN",        //国家代码
      *              "validNum":"50",           //有效票
      *              "totalTicketNum":"100",    //总票数
-     *              "locked":"",               //投票锁定,单位Energon
-     *              "earnings":"",             //投票收益,单位Energon
+     *              "locked":"",               //投票锁定,单位E
+     *              "earnings":"",             //投票收益,单位E
      *              "transactionTime":""       //最新投票时间，单位-毫秒
      *           }
      *       ]
