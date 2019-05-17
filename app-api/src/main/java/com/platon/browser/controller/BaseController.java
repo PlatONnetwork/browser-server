@@ -13,7 +13,7 @@ public class BaseController {
      * @apiName 接口请求头设置说明
      * @apiParamExample :
      *
-     * 本接口文档中定义的接口中的通用参数统一使用请求头传输，例如每个接口都需要传链ID，例如访问交易列表接口：
+     * 本接口文档中定义的接口中的通用参数统一使用请求头传输，例如访问交易列表接口：
      * curl -X POST \
      *   http://192.168.9.190:20060/app-203/v060//transaction/list \
      *   -H 'Accept: application/json' \
