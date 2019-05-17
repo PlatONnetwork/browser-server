@@ -57,9 +57,6 @@ public class NodeController extends BaseController{
      *                "ranking":1,                 //质押排名
      *                "name":"node-1",             //节点名称
      *                "countryCode":"CN",          //国家代码
-     *                "countryEnName":"",          //国家英文名称
-     *                "countryCnName":"",          //国家中文名称
-     *                "countrySpellName":"",       //国家拼音名称，中文环境下，区域进行排序
      *                "deposit":"1.254555555",     //质押金(单位:Energon)
      *                "rewardRatio":0.02           //投票激励:小数
      *             }
@@ -135,8 +132,6 @@ public class NodeController extends BaseController{
      *              "nodeId":"0x",             //节点ID
      *              "name":"node-1",           //节点名称
      *              "countryCode":"CN",        //国家代码
-     *              "countryEnName":"",        //国家英文名称
-     *              "countryCnName":"",        //国家中文名称
      *              "validNum":"50",           //有效票
      *              "totalTicketNum":"100",    //总票数
      *              "locked":"",               //投票锁定,单位Energon
