@@ -58,7 +58,7 @@ public class NodeController extends BaseController{
      *                "name":"node-1",             //节点名称
      *                "countryCode":"CN",          //国家代码
      *                "deposit":"100",             //质押金(单位:E)
-     *                "rewardRatio":"9500"         //投票激励,已经乘以10000。500/10000 = 0.95 = 95%
+     *                "rewardRatio":"9500"         //投票激励, 9500/10000 = 0.95 = 95%
      *             }
      *         ]
      *      }
@@ -90,13 +90,13 @@ public class NodeController extends BaseController{
      *           "ranking":1,                    //质押排名
      *           "name":"node-1",                //节点名称
      *           "deposit":"100",                //质押金(单位:E)
-     *           "rewardRatio":"9500"            //投票激励,已经乘以10000。500/10000 = 0.95 = 95%
+     *           "rewardRatio":"9500"            //投票激励, 9500/10000 = 0.95 = 95%
      *           "orgName":"",                   //机构名称
      *           "orgWebsite":"",                //机构官网
      *           "intro":"",                     //节点简介
      *           "nodeUrl":"",                   //节点地址
      *           "ticketCount":"",               //得票数
-     *           "joinTime":199880011,           //加入时间，单位-毫秒
+     *           "joinTime":"",                  //加入时间，单位-毫秒
      *           "nodeType":""                   //竞选状态:
      *                                           nominees—提名节点
      *                                           validator-验证节点
