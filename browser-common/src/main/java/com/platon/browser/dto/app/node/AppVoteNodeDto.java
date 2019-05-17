@@ -8,7 +8,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class VoteNodeDto {
+public class AppVoteNodeDto {
     private String nodeId;
     private String name;
     private String countryCode;

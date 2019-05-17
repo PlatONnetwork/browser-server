@@ -1,21 +1,20 @@
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dto.app.transaction.TransactionDto;
-import com.platon.browser.dto.app.transaction.VoteTransactionDto;
+import com.platon.browser.dto.app.transaction.AppTransactionDto;
+import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
+import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.app.AppTransactionListVoteReq;
-import com.platon.browser.req.transaction.TransactionListReq;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.service.ApiService;
 import com.platon.browser.service.app.AppTransactionService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -116,8 +115,15 @@ public class TransactionController extends BaseController{
      */
     @PostMapping("list")
     public BaseResp transactionList(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListReq req){
-        List<TransactionDto> transactions = appTransactionService.list(chainId,req);
-        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
+        if(!chainsConfig.isValid(chainId)){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
+        }
+        try{
+            List<AppTransactionDto> transactions = appTransactionService.list(chainId,req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
+        }catch (BusinessException be){
+            throw new ResponseException(be.getMessage());
+        }
     }
 
     /**
@@ -160,7 +166,14 @@ public class TransactionController extends BaseController{
      */
     @PostMapping("listVote")
     public BaseResp listVote(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListVoteReq req){
-        List<VoteTransactionDto> transactions = appTransactionService.listVote(chainId,req);
-        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
+        if(!chainsConfig.isValid(chainId)){
+            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
+        }
+        try{
+            List<AppVoteTransactionDto> transactions = appTransactionService.listVote(chainId,req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
+        }catch (BusinessException be){
+            throw new ResponseException(be.getMessage());
+        }
     }
 }

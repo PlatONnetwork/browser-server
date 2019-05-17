@@ -10,7 +10,7 @@ import java.util.Date;
  * @Description:
  */
 @Data
-public class TransactionDto {
+public class AppTransactionDto {
     private String actualTxCost;
     private Long blockNumber;
     private String chainId;

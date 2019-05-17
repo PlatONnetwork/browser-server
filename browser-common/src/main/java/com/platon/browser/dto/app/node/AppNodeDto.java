@@ -8,14 +8,11 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class NodeDto {
+public class AppNodeDto {
     private String nodeId;
     private int ranking;
     private String name;
     private String countryCode;
-    private String countryEnName;
-    private String countryCnName;
-    private String countrySpellName;
     private String deposit;
     private double rewardRatio;
 }

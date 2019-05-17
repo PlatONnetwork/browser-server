@@ -24,4 +24,17 @@
     </foreach>
   </insert>
 
+  <select id="selectByChainIdAndIsValidOrderByRanking" resultType="com.platon.browser.dto.app.node.AppNodeDto">
+    SELECT
+    node_id AS nodeId,
+    ranking,
+    `name`,
+    country_code AS countryCode,
+    deposit,
+    reward_ratio AS rewardRatio
+    FROM `node_ranking`
+    WHERE `chain_id`=#{chainId} AND is_valid=#{isValid}
+    ORDER BY ranking ASC
+  </select>
+
 </mapper>
