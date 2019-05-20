@@ -48,10 +48,14 @@ public class TransactionController extends BaseController{
      * @apiDescription 通过地址和指定交易序号查询交易列表
      * @apiParamExample {json} Request-Example:
      * {
-     *      "address":"0x...",                   //地址 (必填)
-     *      "beginSequence":120,                 //起始序号 (必填) 客户端本地没有最新序号记录时填 0， 0：代表最旧记录 
+     *      "walletAddrs":[                      //地址列表 (必填)
+     *         "address1",
+     *         "address2"
+     *      ]
+     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录 
      *      "listSize":100,                      //列表大小 (必填)
-     *      "direction":""                       //方向 (必填) new：朝最新记录方向,客户端写死 
+     *      "direction":""                       //方向 (必填) new：朝最新记录方向, old：朝最旧记录方向, 
+     *                                           客户端首次进入页面时或者上拉时传old。客户端自动获取最新记录时传new。 
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
