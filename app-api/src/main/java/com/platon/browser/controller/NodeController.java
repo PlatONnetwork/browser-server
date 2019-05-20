@@ -92,7 +92,7 @@ public class NodeController extends BaseController{
     }
 
     /**
-     * @api {post} node/details b.获取节点详情
+     * @api {post} node/detail b.获取节点详情
      * @apiVersion 1.0.0
      * @apiName node/details
      * @apiGroup node
