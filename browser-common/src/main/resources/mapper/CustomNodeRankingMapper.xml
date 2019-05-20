@@ -69,7 +69,7 @@
   <select id="getNodeListByNodeIds" resultType="com.platon.browser.dto.app.node.AppUserNodeDto">
     SELECT
     node_id AS nodeId,
-    MAX(`name`),
+    MAX(`name`) AS `name`,
     MAX(country_code) AS countryCode,
     CASE WHEN SUM(is_valid)>0 THEN '1' ELSE '0' END AS isValid
     FROM `node_ranking`
