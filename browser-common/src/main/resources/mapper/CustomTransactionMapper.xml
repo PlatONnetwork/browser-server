@@ -128,7 +128,9 @@
   <select id="summaryByAddress" resultType="com.platon.browser.dto.app.transaction.AppTransactionSummaryDto">
     SELECT
     col4 AS nodeId,
-    SUM(CONVERT(col3,signed)) AS voteCountSum
+    GROUP_CONCAT(CONCAT(`hash`,'-',col2)) AS hashes,
+    SUM(CONVERT(col3,signed)) AS voteCountSum,
+    UNIX_TIMESTAMP(MAX(`timestamp`))*1000 AS lastVoteTime
     FROM `transaction`
     WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
     `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)

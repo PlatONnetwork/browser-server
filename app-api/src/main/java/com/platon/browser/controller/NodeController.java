@@ -5,6 +5,7 @@ import java.util.List;
 import com.platon.browser.dto.app.node.AppNodeDetailDto;
 import com.platon.browser.dto.app.node.AppNodeDto;
 import com.platon.browser.dto.app.node.AppNodeListWrapper;
+import com.platon.browser.dto.app.node.AppUserNodeDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -165,7 +166,11 @@ public class NodeController extends BaseController{
      */
     @PostMapping("listUserVoteNode")
     public BaseResp listUserVoteNode(@RequestHeader(CID) String chainId, @RequestBody AppUserNodeListReq req){
-        List<AppNodeDto> nodeDtos = appNodeService.getUserNodeList(chainId,req);
-        return null;
+        try{
+            List<AppUserNodeDto> nodes = appNodeService.getUserNodeList(chainId,req);
+            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodes);
+        }catch (Exception be){
+            throw new ResponseException(be.getMessage());
+        }
     }
 }

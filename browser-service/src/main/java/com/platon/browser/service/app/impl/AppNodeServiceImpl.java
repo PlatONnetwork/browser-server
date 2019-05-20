@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -90,18 +90,75 @@ public class AppNodeServiceImpl implements AppNodeService {
     }
 
     @Override
-    public List<AppNodeDto> getUserNodeList(String chainId, AppUserNodeListReq req) {
+    public List<AppUserNodeDto> getUserNodeList(String chainId, AppUserNodeListReq req) throws Exception {
 
         // 从交易表中统计出请求中的钱包列表参与投票的节点总票数，按节点ID分组
         List<AppTransactionSummaryDto> summaries = customTransactionMapper.summaryByAddress(chainId, TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,req.getWalletAddrs());
         List<String> nodeIds = new ArrayList<>();
-        summaries.forEach(summary->{
+
+        List<AppUserNodeDto> userNodeDtos = Collections.EMPTY_LIST;
+        if(summaries.size()>0){
+
+            Map<String,AppTransactionSummaryDto> summaryMap = new HashMap<>();
+            summaries.forEach(summary->{
                 summary.setNodeId(summary.getNodeId().startsWith("0x")?summary.getNodeId():"0x"+summary.getNodeId());
                 nodeIds.add(summary.getNodeId());
-        });
+                summaryMap.put(summary.getNodeId(),summary);
+            });
 
-        //
 
-        return null;
+            // 查询
+            Map<String,Long> validCountMap = new HashMap<>();
+            summaries.forEach(summary->{
+                try {
+                    Map<String,String> hashPriceMap = new HashMap<>();
+                    String [] hashes = summary.getHashes().split(",");
+                    Arrays.asList(hashes).forEach(hashPrice->{
+                        String [] tmp = hashPrice.split("-");
+                        hashPriceMap.put(tmp[0],tmp[1]);
+                    });
+
+                    List<String> txHashes = new ArrayList<>(hashPriceMap.keySet());
+
+                    // 取有效票数
+                    Map<String,Integer> validVoteMap = apiService.getVailInfo(txHashes, chainId);
+                    validVoteMap.forEach((k,v)->summary.setValidCountSum(summary.getValidCountSum()+v));
+
+                    // 计算锁定金额
+                    validCountMap.forEach((txHash,ticketCount)->{
+                        String priceStr = hashPriceMap.get(txHash);
+                        if(priceStr!=null){
+                            BigInteger locked = BigInteger.valueOf(ticketCount).multiply(new BigInteger(priceStr));
+                            summary.setLocked(summary.getLocked().add(locked));
+                        }
+                    });
+
+                    // 计算收益
+                    Map<String, BigDecimal> incomeMap = apiService.getIncome(chainId,txHashes);
+                    incomeMap.forEach((hash,income)->summary.setEarnings(summary.getEarnings().add(income)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                validCountMap.put(summary.getNodeId(),summary.getValidCountSum());
+            });
+
+            // 从节点表查询节点名称和国家代码
+            if(nodeIds.size()>0){
+                userNodeDtos = customNodeRankingMapper.getNodeListByNodeIds(chainId,nodeIds);
+            }
+
+            // 设置与当前钱包相关的总投票数
+            userNodeDtos.forEach(node->{
+                AppTransactionSummaryDto summary = summaryMap.get(node.getNodeId());
+                if(summary!=null){
+                    node.setTotalTicketNum(String.valueOf(summary.getVoteCountSum()));
+                    node.setValidNum(String.valueOf(summary.getValidCountSum()));
+                    node.setTransactionTime(summary.getLastVoteTime());
+                    node.setLocked(summary.getLocked().toString());
+                    node.setEarnings(summary.getEarnings().toString());
+                }
+            });
+        }
+        return userNodeDtos;
     }
 }
