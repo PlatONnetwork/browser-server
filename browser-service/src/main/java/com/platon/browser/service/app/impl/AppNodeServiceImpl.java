@@ -2,13 +2,16 @@ package com.platon.browser.service.app.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.app.node.*;
+import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
+import com.platon.browser.dao.mapper.CustomTransactionMapper;
+import com.platon.browser.dto.app.node.AppNodeDetailDto;
+import com.platon.browser.dto.app.node.AppNodeDto;
+import com.platon.browser.dto.app.node.AppNodeListWrapper;
+import com.platon.browser.dto.app.node.AppUserNodeDto;
 import com.platon.browser.dto.app.transaction.AppTransactionSummaryDto;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.app.AppUserNodeListReq;
 import com.platon.browser.service.ApiService;
-import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppNodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +34,6 @@ public class AppNodeServiceImpl implements AppNodeService {
     private final Logger logger = LoggerFactory.getLogger(AppNodeServiceImpl.class);
     @Autowired
     private PlatonClient platon;
-    @Autowired
-    private VoteTxMapper txMapper;
-    @Autowired
-    private TransactionMapper transactionMapper;
-    @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
-    private NodeService nodeService;
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-
     @Autowired
     private CustomNodeRankingMapper customNodeRankingMapper;
     @Autowired

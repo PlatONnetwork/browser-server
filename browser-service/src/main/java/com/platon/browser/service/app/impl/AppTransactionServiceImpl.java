@@ -1,9 +1,9 @@
 package com.platon.browser.service.app.impl;
 
-import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomTransactionMapper;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.enums.TransactionTypeEnum;
@@ -11,7 +11,6 @@ import com.platon.browser.enums.app.DirectionEnum;
 import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.app.AppTransactionListVoteReq;
 import com.platon.browser.service.ApiService;
-import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +30,7 @@ import java.util.*;
 public class AppTransactionServiceImpl implements AppTransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(AppTransactionServiceImpl.class);
-    @Autowired
-    private PlatonClient platon;
-    @Autowired
-    private VoteTxMapper txMapper;
-    @Autowired
-    private TransactionMapper transactionMapper;
-    @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
-    private NodeService nodeService;
+
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
 
