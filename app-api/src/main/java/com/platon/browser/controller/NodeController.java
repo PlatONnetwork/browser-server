@@ -160,6 +160,7 @@ public class NodeController extends BaseController{
      *              "locked":"",               //投票锁定,单位E
      *              "earnings":"",             //投票收益,单位E
      *              "transactionTime":""       //最新投票时间，单位-毫秒
+     *              "isValid":""       // 是否有效：0-无效，1-有效
      *           }
      *       ]
      * }

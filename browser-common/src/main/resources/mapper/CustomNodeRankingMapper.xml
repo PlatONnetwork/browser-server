@@ -31,7 +31,10 @@
     `name`,
     country_code AS countryCode,
     deposit,
-    CONVERT((1-reward_ratio)*10000,signed) AS reward
+    CONVERT((1-reward_ratio)*10000,signed) AS reward,
+    `count` AS ticketCount,
+    UNIX_TIMESTAMP(`join_time`)*1000 AS joinTime,
+    node_type AS nodeType
     FROM `node_ranking`
     WHERE `chain_id`=#{chainId} AND is_valid=#{isValid}
     ORDER BY ranking ASC
@@ -67,7 +70,8 @@
     SELECT
     node_id AS nodeId,
     `name`,
-    country_code AS countryCode
+    country_code AS countryCode,
+    is_valid AS isValid
     FROM `node_ranking`
     WHERE `chain_id`=#{chainId}
     AND node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)

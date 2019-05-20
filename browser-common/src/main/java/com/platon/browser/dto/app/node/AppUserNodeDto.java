@@ -17,4 +17,5 @@ public class AppUserNodeDto {
     private String locked;
     private String earnings;
     private String transactionTime;
+    private String isValid;
 }
