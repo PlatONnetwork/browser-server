@@ -46,7 +46,7 @@
     ranking,
     `name`,
     deposit,
-    reward_ratio AS rewardRatio,
+    CONVERT((1-reward_ratio)*10000,signed) AS reward,
     org_name AS orgName,
     org_website AS orgWebsite,
     intro,

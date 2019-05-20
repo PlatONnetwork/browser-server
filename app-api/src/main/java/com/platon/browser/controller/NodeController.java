@@ -111,7 +111,7 @@ public class NodeController extends BaseController{
      *           "ranking":1,                    //质押排名
      *           "name":"node-1",                //节点名称
      *           "deposit":"100",                //质押金(单位:E)
-     *           "rewardRatio":"9500"            //投票激励, 9500/10000 = 0.95 = 95%
+     *           "reward":"9500"            //投票激励, 9500/10000 = 0.95 = 95%
      *           "orgName":"",                   //机构名称
      *           "orgWebsite":"",                //机构官网
      *           "intro":"",                     //节点简介
