@@ -31,7 +31,7 @@
     `name`,
     country_code AS countryCode,
     deposit,
-    reward_ratio AS rewardRatio
+    (1-reward_ratio)*10000 AS reward
     FROM `node_ranking`
     WHERE `chain_id`=#{chainId} AND is_valid=#{isValid}
     ORDER BY ranking ASC
@@ -56,6 +56,14 @@
   </select>
 
   <select id="getVoteCountByNodeIds" resultType="java.lang.Long">
+    SELECT
+    SUM(CONVERT(col3,signed)) AS totalVoteCount
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type='voteTicket'
+    AND col4 IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+
+  <select id="getNodeListByNodeIds" resultType="java.lang.Long">
     SELECT
     SUM(CONVERT(col3,signed)) AS totalVoteCount
     FROM `transaction`

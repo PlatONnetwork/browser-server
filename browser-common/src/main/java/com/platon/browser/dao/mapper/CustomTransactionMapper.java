@@ -3,6 +3,7 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.PageParam;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dto.app.transaction.AppTransactionSummaryDto;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -30,4 +31,10 @@ public interface CustomTransactionMapper {
             @Param("walletAddrs") List<String> walletAddrs,
             @Param("beginSequence") long beginSequence,
             @Param("listSize") int listSize);
+
+    List<AppTransactionSummaryDto> summaryByAddress(
+            @Param("chainId") String chainId,
+            @Param("txType") String txType,
+            @Param("walletAddrs") List<String> walletAddrs
+    );
 }

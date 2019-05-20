@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class AppNodeDto {
     private String nodeId;
-    private int ranking;
+    private Integer ranking;
     private String name;
     private String countryCode;
     private String deposit;
-    private double rewardRatio;
+    private String reward;
 }

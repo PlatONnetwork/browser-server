@@ -124,4 +124,14 @@
     ORDER BY sequence DESC LIMIT #{listSize}
   </select>
 
+
+  <select id="summaryByAddress" resultType="com.platon.browser.dto.app.transaction.AppTransactionSummaryDto">
+    SELECT
+    col4 AS nodeId,
+    SUM(CONVERT(col3,signed)) AS voteCountSum
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
+    `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    GROUP BY col4
+  </select>
 </mapper>

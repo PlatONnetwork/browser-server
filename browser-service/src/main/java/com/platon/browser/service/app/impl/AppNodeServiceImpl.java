@@ -3,10 +3,10 @@ package com.platon.browser.service.app.impl;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.app.node.AppNodeDetailDto;
-import com.platon.browser.dto.app.node.AppNodeDto;
-import com.platon.browser.dto.app.node.AppNodeListWrapper;
-import com.platon.browser.dto.app.node.AppNodeVoteSummaryDto;
+import com.platon.browser.dto.app.node.*;
+import com.platon.browser.dto.app.transaction.AppTransactionSummaryDto;
+import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.req.app.AppUserNodeListReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.app.AppNodeService;
@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 
 import java.util.ArrayList;
@@ -45,6 +44,8 @@ public class AppNodeServiceImpl implements AppNodeService {
 
     @Autowired
     private CustomNodeRankingMapper customNodeRankingMapper;
+    @Autowired
+    private CustomTransactionMapper customTransactionMapper;
 
     @Autowired
     private ApiService apiService;
@@ -88,5 +89,19 @@ public class AppNodeServiceImpl implements AppNodeService {
         return node;
     }
 
+    @Override
+    public List<AppNodeDto> getUserNodeList(String chainId, AppUserNodeListReq req) {
 
+        // 从交易表中统计出请求中的钱包列表参与投票的节点总票数，按节点ID分组
+        List<AppTransactionSummaryDto> summaries = customTransactionMapper.summaryByAddress(chainId, TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,req.getWalletAddrs());
+        List<String> nodeIds = new ArrayList<>();
+        summaries.forEach(summary->{
+                summary.setNodeId(summary.getNodeId().startsWith("0x")?summary.getNodeId():"0x"+summary.getNodeId());
+                nodeIds.add(summary.getNodeId());
+        });
+
+        //
+
+        return null;
+    }
 }

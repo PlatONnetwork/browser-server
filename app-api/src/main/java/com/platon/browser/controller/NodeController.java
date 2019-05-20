@@ -3,14 +3,17 @@ package com.platon.browser.controller;
 import java.util.List;
 
 import com.platon.browser.dto.app.node.AppNodeDetailDto;
+import com.platon.browser.dto.app.node.AppNodeDto;
 import com.platon.browser.dto.app.node.AppNodeListWrapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.app.AppNodeDetailReq;
+import com.platon.browser.req.app.AppUserNodeListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.service.app.AppNodeService;
+import com.platon.browser.service.app.AppTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +64,7 @@ public class NodeController extends BaseController{
      *                "name":"node-1",             //节点名称
      *                "countryCode":"CN",          //国家代码
      *                "deposit":"100",             //质押金(单位:E)
-     *                "rewardRatio":"9500"         //投票激励, 9500/10000 = 0.95 = 95%
+     *                "reward":"9500"         //投票激励, 9500/10000 = 0.95 = 95%
      *             }
      *         ]
      *      }
@@ -161,7 +164,8 @@ public class NodeController extends BaseController{
      * }
      */
     @PostMapping("listUserVoteNode")
-    public List<Transaction> listUserVoteNode(){
+    public BaseResp listUserVoteNode(@RequestHeader(CID) String chainId, @RequestBody AppUserNodeListReq req){
+        List<AppNodeDto> nodeDtos = appNodeService.getUserNodeList(chainId,req);
         return null;
     }
 }
