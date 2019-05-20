@@ -13,7 +13,7 @@ public class AppNodeDetailDto {
     private String ranking;
     private String name;
     private String deposit;
-    private String rewardRatio;
+    private String reward;
     private String orgName;
     private String orgWebsite;
     private String intro;
