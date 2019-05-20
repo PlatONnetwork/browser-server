@@ -15,10 +15,11 @@ public interface CustomTransactionMapper {
     List<TransactionWithBLOBs> selectByPageWithBLOBs(@Param("page") PageParam page);
     List<Transaction> selectByPage(@Param("page") PageParam page);
 
-    List<AppTransactionDto> selectByChainIdAndAddressAndBeginSequence(
+    List<AppTransactionDto> selectByChainIdAndAddressAndBeginSequenceAndDirection(
             @Param("chainId") String chainId,
-            @Param("address") String address,
+            @Param("walletAddrs") List<String> walletAddrs,
             @Param("beginSequence") Long beginSequence,
+            @Param("direction") String direction,
             @Param("listSize") Integer listSize
     );
 

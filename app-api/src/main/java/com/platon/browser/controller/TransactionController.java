@@ -6,6 +6,7 @@ import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.enums.app.DirectionEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.req.app.AppTransactionListReq;
@@ -52,10 +53,10 @@ public class TransactionController extends BaseController{
      *         "address1",
      *         "address2"
      *      ]
-     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录 
+     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录
      *      "listSize":100,                      //列表大小 (必填)
-     *      "direction":""                       //方向 (必填) new：朝最新记录方向, old：朝最旧记录方向, 
-     *                                           客户端首次进入页面时或者上拉时传old。客户端自动获取最新记录时传new。 
+     *      "direction":""                       //方向 (必填) new：朝最新记录方向, old：朝最旧记录方向,
+     *                                           客户端首次进入页面时或者上拉时传old。客户端自动获取最新记录时传new。
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -123,7 +124,9 @@ public class TransactionController extends BaseController{
         if(!chainsConfig.isValid(chainId)){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
         }
+
         try{
+            DirectionEnum.valueOf(req.getDirection().toUpperCase());
             List<AppTransactionDto> transactions = appTransactionService.list(chainId,req);
             return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactions);
         }catch (BusinessException be){
@@ -139,7 +142,7 @@ public class TransactionController extends BaseController{
      * @apiDescription 获取投票交易列表通过节点和地址
      * @apiParamExample {json} Request-Example:
      * {
-     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录 
+     *      "beginSequence":120,                 //起始序号 (必填) 客户端首次进入页面时传-1，-1：代表最新记录
      *      "listSize":100,                      //列表大小 (必填)
      *      "nodeId":"0x",                       //节点ID
      *      "direction":""                       //方向 (必填) old：朝最旧记录方向 ,客户端写死

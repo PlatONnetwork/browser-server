@@ -64,7 +64,7 @@
     ORDER BY `block_number` DESC,`transaction_index` DESC LIMIT #{page.pageSize};
   </select>
 
-  <select id="selectByChainIdAndAddressAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.AppTransactionDto">
+  <select id="selectByChainIdAndAddressAndBeginSequenceAndDirection" resultType="com.platon.browser.dto.app.transaction.AppTransactionDto">
     SELECT
     actual_tx_cost AS actualTxCost,
     block_number AS blockNumber,
@@ -80,8 +80,28 @@
     tx_type AS txType,
     `value`
     FROM `transaction`
-    WHERE `chain_id`=#{chainId} AND sequence>=#{beginSequence} AND (`from`=#{address} OR `to`=#{address})
-    ORDER BY sequence DESC LIMIT #{listSize}
+    WHERE `chain_id`=#{chainId}
+    AND (
+      `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+      OR
+      `to` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    )
+    AND sequence
+    <if test="direction == 'new'">
+      >
+    </if>
+    <if test="direction == 'old'">
+      <![CDATA[<]]>
+    </if>
+    #{beginSequence}
+    ORDER BY sequence
+    <if test="direction == 'new'">
+      ASC
+    </if>
+    <if test="direction == 'old'">
+      DESC
+    </if>
+    LIMIT #{listSize}
   </select>
 
   <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">

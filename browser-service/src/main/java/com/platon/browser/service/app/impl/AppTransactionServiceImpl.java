@@ -7,6 +7,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.enums.app.DirectionEnum;
 import com.platon.browser.req.app.AppTransactionListReq;
 import com.platon.browser.req.app.AppTransactionListVoteReq;
 import com.platon.browser.service.ApiService;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: dongqile
@@ -55,9 +53,33 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     @Override
     public List<AppTransactionDto> list(String chainId, AppTransactionListReq req) {
         logger.debug("list() begin");
-        long beginTime = System.currentTimeMillis();
-        List<AppTransactionDto> returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequence(chainId,req.getAddress(),req.getBeginSequence(),req.getListSize());
-        logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        List<AppTransactionDto> returnData;
+        try {
+            DirectionEnum directionEnum = DirectionEnum.valueOf(req.getDirection().toUpperCase());
+
+            long beginTime = System.currentTimeMillis();
+            returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequenceAndDirection(
+                    chainId,
+                    req.getWalletAddrs(),
+                    req.getBeginSequence(),
+                    req.getDirection(),
+                    req.getListSize()
+            );
+
+            if(DirectionEnum.NEW==directionEnum){
+                // 取新记录，因为数据库中是顺排的，所以需要倒排
+                Collections.sort(returnData,(c1,c2)->{
+                    long s1=Long.valueOf(c1.getSequence()),s2=Long.valueOf(c2.getSequence());
+                    if(s1>s2) return -1;
+                    if(s1<s2) return 1;
+                    return 0;
+                });
+            }
+            logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+
         return returnData;
     }
 
