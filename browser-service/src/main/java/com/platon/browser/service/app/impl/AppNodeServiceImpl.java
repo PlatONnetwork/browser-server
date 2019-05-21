@@ -68,8 +68,8 @@ public class AppNodeServiceImpl implements AppNodeService {
         Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
         countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
         // 从交易表中查询总投票数量
-        long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
-        nodes.setTotalCount(totalVoteCount);
+        Long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
+        nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
 
 
         return nodes;
