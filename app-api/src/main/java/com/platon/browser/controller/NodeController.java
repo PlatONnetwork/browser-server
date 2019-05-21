@@ -96,53 +96,6 @@ public class NodeController extends BaseController{
     }
 
     /**
-     * @api {post} node/detail b.获取节点详情
-     * @apiVersion 1.0.0
-     * @apiName node/details
-     * @apiGroup node
-     * @apiDescription 获取节点详情
-     * @apiParamExample {json} Request-Example:
-     * {
-     *      "nodeId":"0x",                       //节点ID
-     * }
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *      "errMsg":"",                         //描述信息
-     *      "code":0,                            //成功（0），失败则由相关失败码
-     *      "data": {
-     *           "nodeId":"0x",                  //节点ID
-     *           "ranking":1,                    //质押排名
-     *           "name":"node-1",                //节点名称
-     *           "deposit":"100",                //质押金(单位:E)
-     *           "reward":"9500"            //投票激励, 9500/10000 = 0.95 = 95%
-     *           "orgName":"",                   //机构名称
-     *           "orgWebsite":"",                //机构官网
-     *           "intro":"",                     //节点简介
-     *           "nodeUrl":"",                   //节点地址
-     *           "ticketCount":"",               //得票数
-     *           "joinTime":"",                  //加入时间，单位-毫秒
-     *           "nodeType":""                   //竞选状态:
-     *                                           nominees—提名节点
-     *                                           validator-验证节点
-     *                                           candidates—候选节点
-     *      }
-     * }
-     */
-    @PostMapping("detail")
-    public BaseResp detail(@RequestHeader(CID) String chainId, @RequestBody AppNodeDetailReq req){
-        if(!chainsConfig.isValid(chainId)){
-            throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
-        }
-        try{
-            AppNodeDetailDto node = appNodeService.detail(chainId,req.getNodeId());
-            return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),node);
-        }catch (BusinessException be){
-            throw new ResponseException(be.getMessage());
-        }
-    }
-
-    /**
      * @api {post} node/listUserVoteNode c.获得用户有投票的节点列表
      * @apiVersion 1.0.0
      * @apiName node/listUserVoteNode
