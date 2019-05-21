@@ -8,7 +8,6 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dao.mapper.VoteTxMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
@@ -40,8 +39,6 @@ public class ApiServiceImpl implements ApiService {
     private final Logger logger = LoggerFactory.getLogger(ApiServiceImpl.class);
     @Autowired
     private PlatonClient platon;
-    @Autowired
-    private VoteTxMapper txMapper;
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired

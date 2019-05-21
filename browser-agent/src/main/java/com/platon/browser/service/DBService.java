@@ -1,18 +1,14 @@
 package com.platon.browser.service;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.BlockMissingExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dao.entity.VoteTx;
-import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.ticket.TxInfo;
-import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.BlockMissingMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.thread.AnalyseThread;
-import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -47,10 +41,6 @@ public class DBService {
     @Autowired
     private StatisticCacheService statisticCacheService;
 
-    @Autowired
-    private CustomBlockMapper customBlockMapper;
-    @Autowired
-    private VoteTxMapper voteTxMapper;
     @Value("${platon.redis.key.address-trans-key-template}")
     private String tranListPrefix;
     @Autowired
@@ -70,21 +60,6 @@ public class DBService {
 
         if(result.transactions.size()>0){
             transactionMapper.batchInsert(result.transactions);
-            List<VoteTx> voteTxes = new ArrayList <>();
-            result.transactions.forEach(transaction ->{
-                if(transaction.getTxType().equals(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)){
-                    TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(),TxInfo.class);
-                    TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
-                    VoteTx voteTx = new VoteTx();
-                    voteTx.setHash(transaction.getHash());
-                    voteTx.setTotals(ticketParameter.getCount().longValue());
-                    voteTx.setCompleteFlag("N");
-                    voteTxes.add(voteTx);
-                }
-            });
-            if(voteTxes.size() > 0){
-                voteTxMapper.batchInsert(voteTxes);
-            }
             transactionCacheService.updateTransactionCache(chainId,new HashSet<>(result.transactions));
             // 按地址对交易分类并存储到缓存中
             transactionCacheService.classifyByAddress(chainId,result.transactions);
