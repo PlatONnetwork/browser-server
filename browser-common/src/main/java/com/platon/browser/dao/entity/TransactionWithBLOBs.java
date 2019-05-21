@@ -65,8 +65,6 @@ public class TransactionWithBLOBs extends Transaction {
         col1("col1", "col1", "VARCHAR", false),
         col2("col2", "col2", "VARCHAR", false),
         col3("col3", "col3", "VARCHAR", false),
-        col4("col4", "col4", "VARCHAR", false),
-        col5("col5", "col5", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false),
         txInfo("tx_info", "txInfo", "LONGVARCHAR", false);

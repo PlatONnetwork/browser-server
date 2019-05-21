@@ -101,8 +101,8 @@
   <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">
     SELECT
     hash,
-    col4 AS nodeId,
-    col4 AS name,
+    col1 AS nodeId,
+    "" AS name,
     "" AS validNum,
     "" AS deadLine,
     col3 AS totalTicketNum,
@@ -131,13 +131,13 @@
 
   <select id="summaryByAddress" resultType="com.platon.browser.dto.app.transaction.AppTransactionSummaryDto">
     SELECT
-    col4 AS nodeId,
+    col1 AS nodeId,
     GROUP_CONCAT(CONCAT(`hash`,'-',col2)) AS hashes,
     SUM(CONVERT(col3,signed)) AS voteCountSum,
     UNIX_TIMESTAMP(MAX(`timestamp`))*1000 AS lastVoteTime
     FROM `transaction`
     WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
     `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
-    GROUP BY col4
+    GROUP BY col1
   </select>
 </mapper>

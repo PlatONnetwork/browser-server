@@ -67,7 +67,7 @@
     SUM(CONVERT(col3,signed)) AS totalVoteCount
     FROM `transaction`
     WHERE `chain_id`=#{chainId} AND tx_type='voteTicket'
-    AND col4 IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    AND col1 IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
 
   <select id="getNodeListByNodeIds" resultType="com.platon.browser.dto.app.node.AppUserNodeDto">
