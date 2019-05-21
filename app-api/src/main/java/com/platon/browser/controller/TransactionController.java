@@ -3,7 +3,6 @@ package com.platon.browser.controller;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
-import com.platon.browser.dto.block.BlockDetail;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.app.DirectionEnum;
@@ -161,7 +160,7 @@ public class TransactionController extends BaseController{
      *              "nodeId":"0x",               //节点ID
      *              "name":"node-1",             //节点名称
      *              "validNum":"50",             //有效票
-     *              "deadLine":"1231231233",     //实际过期时间
+     *              "deadLine":"1231231233",     //实际过期时间（交易时间+26天）
      *              "totalTicketNum":"100",      //总票数
      *              "locked":"",                 //投票锁定,单位E
      *              "earnings":"",               //投票收益,单位E

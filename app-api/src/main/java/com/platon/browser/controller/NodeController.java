@@ -66,6 +66,10 @@ public class NodeController extends BaseController{
      *                "countryCode":"CN",          //国家代码
      *                "deposit":"100",             //质押金(单位:E)
      *                "reward":"9500"         //投票激励, 9500/10000 = 0.95 = 95%
+     *                "orgName":"",                   //机构名称
+     *                "orgWebsite":"",                //机构官网
+     *                "intro":"",                     //节点简介
+     *                "nodeUrl":"",                   //节点地址
      *                "ticketCount":"",               //得票数
      *                "joinTime":"",                  //加入时间，单位-毫秒
      *                "nodeType":""                   //竞选状态:

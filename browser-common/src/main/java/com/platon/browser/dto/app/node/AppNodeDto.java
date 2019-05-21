@@ -15,6 +15,10 @@ public class AppNodeDto {
     private String countryCode;
     private String deposit;
     private String reward;
+    private String orgName;
+    private String orgWebsite;
+    private String intro;
+    private String nodeUrl;
     private String ticketCount;
     private String joinTime;
     private String nodeType;
