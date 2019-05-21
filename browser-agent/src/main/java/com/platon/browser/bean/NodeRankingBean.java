@@ -42,7 +42,8 @@ public class NodeRankingBean extends NodeRanking {
 
 
         this.setIp(initData.getHost());
-        this.setNodeId(initData.getCandidateId());
+        // 节点ID统一以“0x”开头
+        this.setNodeId(initData.getCandidateId().startsWith("0x")?initData.getCandidateId():"0x"+initData.getCandidateId());
         this.setPort(Integer.valueOf(initData.getPort()));
         this.setAddress(initData.getOwner());
         this.setUpdateTime(new Date());

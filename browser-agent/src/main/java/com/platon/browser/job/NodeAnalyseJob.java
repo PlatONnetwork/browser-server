@@ -17,6 +17,7 @@ import com.platon.browser.service.cache.NodeCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.utils.FilterTool;
+import jnr.ffi.annotations.In;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 @Component
 public class NodeAnalyseJob {
     private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
-    private static Long beginNumber = 0L;
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
@@ -156,7 +156,6 @@ public class NodeAnalyseJob {
         NodeInfoFromChain nodeInfoFromChain = getNodeInfoFromChain(ethBlock);
         if (nodeInfoFromChain.getMergedNodes().size()==0) return Collections.EMPTY_LIST;
         List<CandidateDto> nodesFromChain = nodeInfoFromChain.mergedNodes;
-        Map<String,CandidateDto> nodeIdToNodeMap4NomineeOrCandidate = nodeInfoFromChain.nodeIdToNodeMap4NomineeOrCandidate;
         Map<String,String> nodeIdToNodeTypeMap = nodeInfoFromChain.nodeIdToNodeTypeMap;
         Map<String,Integer> nodeIdToValidTicketCountMap = nodeInfoFromChain.nodeIdToValidTicketCountMap;
 
@@ -178,8 +177,10 @@ public class NodeAnalyseJob {
             NodeRankingBean nodeRanking = new NodeRankingBean();
             nodeRanking.init(nodeFromChain);
 
+            String nodeId = nodeRanking.getNodeId();
+
             //设置节点类型
-            String nodeType = nodeIdToNodeTypeMap.get(nodeFromChain.getCandidateId());
+            String nodeType = nodeIdToNodeTypeMap.get(nodeId);
             nodeRanking.setNodeType(nodeType!=null?nodeType:NodeTypeEnum.UNKNOWN.name().toLowerCase());
 
             // nodeRanking.init()中获取不到平均出块时间时，把平均出块时间设置为全局的(redis统计缓存中的平均出块时间)
@@ -203,14 +204,14 @@ public class NodeAnalyseJob {
             nodeRanking.setRanking(rankingIndex);
             nodeRanking.setType(1);
 
-            String nodeId = nodeRanking.getNodeId();
+
 
             // 设置节点有效票数
-            Long count = nodeIdToValidTicketCountMap.get(nodeId).longValue();
+            Integer count = nodeIdToValidTicketCountMap.get(nodeId);
             if (null == count) {
                 nodeRanking.setCount(0L);
             } else {
-                nodeRanking.setCount(count);
+                nodeRanking.setCount(count.longValue());
             }
 
             nodeRanking.setElectionStatus(0); // 此字段已废除，使用node_type代替

@@ -10,26 +10,27 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 chain:
-  # Platon链配置,格式【{chainName1}-{chainIdA}-[http://nodeIPA1:portA1,http://nodeIPA2:portA2]】
-  # 同一条链匹配多个节点错容
-  config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:6789","http://192.168.120.83:6789","http://192.168.120.84:6789"]
-  # config: MAIN_NET-203-http://192.168.120.85:6789
+  # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+#  config: MAIN_NET-1-http://10.10.8.151:7793
+#  config: MAIN_NET-1-http://192.168.9.76:8793
+  config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:6789"]
+#  config: MAIN_NET-203-http://192.168.120.88:6789
+#  config: MAIN_NET-1-https://syde.platon.network/test
   # 要采集哪个ID的链
   active: 203
 # Redis集群节点
-#redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: /opt/browser/logs/${spring.application.name}-agent${profile}.log
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: error
-  platon: error
-  platon.job: error
-  platon.filter: error
-  platon.service: error
-  platon.thread: error
+  spring: debug
+  platon: debug
+  platon.job: debug
+  platon.filter: debug
+  platon.service: debug
+  platon.thread: debug
 # 区块分析线程池大小
-thread.num: 200
+thread.num: 500
 # 区块批量采集大小
 batch.num: ${thread.num}
