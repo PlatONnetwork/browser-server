@@ -96,7 +96,7 @@ public class NodeController extends BaseController{
     }
 
     /**
-     * @api {post} node/listUserVoteNode c.获得用户有投票的节点列表
+     * @api {post} node/listUserVoteNode b.获得用户有投票的节点列表
      * @apiVersion 1.0.0
      * @apiName node/listUserVoteNode
      * @apiGroup node
