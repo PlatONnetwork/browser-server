@@ -49,13 +49,11 @@ public class TransactionBean extends TransactionWithBLOBs {
             if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)){
                 // 投票交易，则把投票参数拆分存储到col1-col5字段，方便查询
                 TxInfo bean = JSON.parseObject(txinfo,TxInfo.class);
-                this.setCol1(bean.getFunctionName());
                 TxInfo.Parameter param = bean.getParameters();
                 if(param!=null){
+                    this.setCol1(bean.getParameters().getNodeId());
                     this.setCol2(bean.getParameters().getPrice().toString());
                     this.setCol3(bean.getParameters().getCount().toString());
-                    this.setCol4(bean.getParameters().getNodeId());
-                    this.setCol5(bean.getType());
                 }
             }
 
