@@ -120,7 +120,7 @@ public class TransactionController extends BaseController{
      *
      */
     @PostMapping("list")
-    public BaseResp transactionList(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListReq req){
+    public BaseResp list(@RequestHeader(CID) String chainId, @Valid @RequestBody AppTransactionListReq req){
         if(!chainsConfig.isValid(chainId)){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId));
         }

@@ -19,4 +19,6 @@ public class AppTransactionListVoteReq {
      // 列表大小
      private int listSize;
      private List<String> walletAddrs;
+    @NotBlank(message = "{transaction.direction.notnull}")
+    private String direction;
 }

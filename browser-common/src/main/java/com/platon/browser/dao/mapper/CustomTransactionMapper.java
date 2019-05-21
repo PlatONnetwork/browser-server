@@ -24,12 +24,13 @@ public interface CustomTransactionMapper {
             @Param("listSize") Integer listSize
     );
 
-    List<AppVoteTransactionDto> selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence(
+    List<AppVoteTransactionDto> selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection(
             @Param("chainId") String chainId,
             @Param("txType") String txType,
             @Param("nodeId") String nodeId,
             @Param("walletAddrs") List<String> walletAddrs,
             @Param("beginSequence") long beginSequence,
+            @Param("direction") String direction,
             @Param("listSize") int listSize);
 
     List<AppTransactionSummaryDto> summaryByAddress(

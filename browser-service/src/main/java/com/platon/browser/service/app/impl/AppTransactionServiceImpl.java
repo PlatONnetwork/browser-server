@@ -77,12 +77,13 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     public List<AppVoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
         logger.debug("listVote() begin");
         long beginTime = System.currentTimeMillis();
-        List<AppVoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence(
+        List<AppVoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection(
                 chainId,
                 TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,
                 req.getNodeId(),
                 req.getWalletAddrs(),
                 req.getBeginSequence(),
+                req.getDirection(),
                 req.getListSize());
 
 
@@ -125,6 +126,22 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                 voteTransaction.setDeadLine(deadLine.toString());
             });
         }
+
+        try {
+            DirectionEnum directionEnum = DirectionEnum.valueOf(req.getDirection().toUpperCase());
+            if(DirectionEnum.NEW==directionEnum){
+                // 取新记录，因为数据库中是顺排的，所以需要倒排
+                Collections.sort(returnData,(c1,c2)->{
+                    long s1=Long.valueOf(c1.getSequence()),s2=Long.valueOf(c2.getSequence());
+                    if(s1>s2) return -1;
+                    if(s1<s2) return 1;
+                    return 0;
+                });
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+
         logger.debug("listVote() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }

@@ -86,25 +86,19 @@
       OR
       `to` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
     )
-    AND sequence
-    <if test="direction == 'new'">
-      >
+    <if test="beginSequence == -1">
+        <!-- 取最新 -->
+        ORDER BY `sequence` DESC
     </if>
-    <if test="direction == 'old'">
-      <![CDATA[<]]>
-    </if>
-    #{beginSequence}
-    ORDER BY sequence
-    <if test="direction == 'new'">
-      ASC
-    </if>
-    <if test="direction == 'old'">
-      DESC
+    <if test="beginSequence != -1">
+      <!-- 按指定条件取 -->
+      <if test="direction == 'new'">AND `sequence` > #{beginSequence} ORDER BY `sequence` ASC</if>
+      <if test="direction == 'old'">AND `sequence` <![CDATA[<]]> #{beginSequence} ORDER BY `sequence` DESC</if>
     </if>
     LIMIT #{listSize}
   </select>
 
-  <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequence" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">
+  <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">
     SELECT
     hash,
     col4 AS nodeId,
@@ -119,11 +113,21 @@
     `col2` AS price,
     `from` AS walletAddress
     FROM `transaction`
-    WHERE `chain_id`=#{chainId} AND sequence>=#{beginSequence} AND tx_type=#{txType} AND
+    WHERE `chain_id`=#{chainId}
+    AND tx_type=#{txType} AND
     `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
-    ORDER BY sequence DESC LIMIT #{listSize}
-  </select>
 
+    <if test="beginSequence == -1">
+      <!-- 取最新 -->
+      ORDER BY `sequence` DESC
+    </if>
+    <if test="beginSequence != -1">
+      <!-- 按指定条件取 -->
+      <if test="direction == 'new'">AND `sequence` > #{beginSequence} ORDER BY `sequence` ASC</if>
+      <if test="direction == 'old'">AND `sequence` <![CDATA[<]]> #{beginSequence} ORDER BY `sequence` DESC</if>
+    </if>
+    LIMIT #{listSize}
+  </select>
 
   <select id="summaryByAddress" resultType="com.platon.browser.dto.app.transaction.AppTransactionSummaryDto">
     SELECT
