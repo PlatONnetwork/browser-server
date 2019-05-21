@@ -46,6 +46,9 @@ public class TransactionBean extends TransactionWithBLOBs {
             this.setTxInfo(txinfo);
 
             // 设置col1-col5
+            this.setCol1("");
+            this.setCol2("");
+            this.setCol3("");
             if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)){
                 // 投票交易，则把投票参数拆分存储到col1-col5字段，方便查询
                 TxInfo bean = JSON.parseObject(txinfo,TxInfo.class);
@@ -56,7 +59,6 @@ public class TransactionBean extends TransactionWithBLOBs {
                     this.setCol3(bean.getParameters().getCount().toString());
                 }
             }
-
         }catch (Exception e){
             this.setReceiveType("unknown");
             this.setTxType("unknown");

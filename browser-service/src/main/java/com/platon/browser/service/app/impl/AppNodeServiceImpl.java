@@ -56,22 +56,22 @@ public class AppNodeServiceImpl implements AppNodeService {
         nodes.setTicketPrice(price);
 
         // 从链上查投票数
-        StringBuilder ids = new StringBuilder();
-        List<String> nodeIds = new ArrayList<>();
-        returnData.forEach(node->{
-            ids.append(node.getNodeId()).append(":");
-            nodeIds.add(node.getNodeId());
-        });
-        String idsStr = ids.toString();
-        idsStr = idsStr.substring(0,idsStr.lastIndexOf(":"));
-        String countInfo = ticketContract.GetCandidateTicketCount(idsStr).send();
-        Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
-        countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
-        // 从交易表中查询总投票数量
-        Long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
-        nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
-
-
+        if(returnData.size()>0){
+            StringBuilder ids = new StringBuilder();
+            List<String> nodeIds = new ArrayList<>();
+            returnData.forEach(node->{
+                ids.append(node.getNodeId()).append(":");
+                nodeIds.add(node.getNodeId());
+            });
+            String idsStr = ids.toString();
+            idsStr = idsStr.substring(0,idsStr.lastIndexOf(":"));
+            String countInfo = ticketContract.GetCandidateTicketCount(idsStr).send();
+            Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
+            countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
+            // 从交易表中查询总投票数量
+            Long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
+            nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
+        }
         return nodes;
     }
 
