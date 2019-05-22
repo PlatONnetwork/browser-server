@@ -14,9 +14,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ControllerTestBase extends TestBase {
@@ -34,12 +36,16 @@ public class ControllerTestBase extends TestBase {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
     }
 
-    protected void sendPost(String url, Object req) throws Exception {
+    protected final static String CID = "x-aton-cid";
+
+    protected void sendPost(String url, String chainId, Object req) throws Exception {
         MockHttpServletRequestBuilder builder = post(url)
+                .header(CID,chainId)
                 .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(req))
                 .accept(MediaType.APPLICATION_JSON);
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"errMsg\":\"Success\"")))
                 .andDo(print());
     }
 
