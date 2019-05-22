@@ -4,10 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
-import com.platon.browser.dao.mapper.PendingTxMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.node.NodeListItem;
@@ -23,7 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 
-@SpringBootTest(classes= AppApiApplication.class, value = "spring.profiles.active=deva")
+@SpringBootTest(classes= AppApiApplication.class, value = "spring.profiles.active=unittest")
 public class TestBase extends TestData {
     @Autowired
     protected NodeRankingMapper nodeRankingMapper;
@@ -33,6 +30,8 @@ public class TestBase extends TestData {
     protected TransactionMapper transactionMapper;
     @Autowired
     protected PendingTxMapper pendingTxMapper;
+    @Autowired
+    protected TestMapper testMapper;
     @Autowired
     protected ChainsConfig chainsConfig;
     @Autowired

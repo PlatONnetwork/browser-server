@@ -27,8 +27,6 @@ public class ApiServiceTest extends ServiceTestBase {
                 transaction.setCol1(txInfo.getFunctionName());
                 transaction.setCol2(txInfo.getParameters().getPrice().toString());
                 transaction.setCol3(txInfo.getParameters().getCount().toString());
-                transaction.setCol4(txInfo.getParameters().getNodeId());
-                transaction.setCol5(txInfo.getType());
                 transactionMapper.updateByPrimaryKeyWithBLOBs(transaction);
             }
         });
