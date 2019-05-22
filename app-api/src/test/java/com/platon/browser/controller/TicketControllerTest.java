@@ -12,18 +12,5 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class TicketControllerTest extends ControllerTestBase {
     private static final Logger logger = LoggerFactory.getLogger(TicketControllerTest.class);
 
-    @Test
-    public void getPage() {
-        chainsConfig.getChainIds().forEach(chainId->{
-            try {
-                Transaction transaction = getOneVoteTransaction(chainId);
-                TicketListReq req = new TicketListReq();
-                req.setCid(chainId);
-                req.setTxHash(transaction.getHash());
-                sendPost("/ticket/list",req);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
+
 }

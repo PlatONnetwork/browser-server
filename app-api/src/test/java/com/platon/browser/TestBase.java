@@ -14,6 +14,8 @@ import com.platon.browser.req.block.BlockPageReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.req.transaction.TransactionPageReq;
 import com.platon.browser.service.*;
+import com.platon.browser.service.app.AppNodeService;
+import com.platon.browser.service.app.AppTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,78 +24,18 @@ import java.util.List;
 
 @SpringBootTest(classes= AppApiApplication.class, value = "spring.profiles.active=unittest")
 public class TestBase extends TestData {
-    @Autowired
-    protected NodeRankingMapper nodeRankingMapper;
-    @Autowired
-    protected BlockMapper blockMapper;
-    @Autowired
-    protected TransactionMapper transactionMapper;
-    @Autowired
-    protected PendingTxMapper pendingTxMapper;
-    @Autowired
-    protected TestMapper testMapper;
+
     @Autowired
     protected ChainsConfig chainsConfig;
     @Autowired
-    protected NodeService nodeService;
+    protected AppNodeService appNodeService;
     @Autowired
-    protected BlockService blockService;
-    @Autowired
-    protected TransactionService transactionService;
-    @Autowired
-    protected PendingTxService pendingTxService;
+    protected AppTransactionService appTransactionService;
 
     @Autowired
     protected RedisTemplate<String,String> redisTemplate;
 
-    /*@Autowired
-    protected TicketService ticketService;*/
-
     @Autowired
     protected PlatonClient platon;
 
-    protected NodeListItem getOneNode(String chainId){
-        NodePageReq req = new NodePageReq();
-        req.setCid(chainId);
-        req.setPageNo(1);
-        req.setPageSize(1);
-        RespPage<NodeListItem> nodes = nodeService.getPage(req);
-        if(nodes.getData().size()>0){
-            return nodes.getData().get(0);
-        }else{
-            return null;
-        }
-    }
-
-    protected BlockListItem getOneBlock(String chainId){
-        BlockPageReq req = new BlockPageReq();
-        req.setCid(chainId);
-        req.setPageSize(1);
-        req.setPageSize(1);
-        RespPage<BlockListItem> data = blockService.getPage(req);
-        if(data.getData().size()==0){
-            return null;
-        }
-        return data.getData().get(0);
-    }
-
-    protected TransactionListItem getOneTransaction(String chainId){
-        TransactionPageReq req = new TransactionPageReq();
-        req.setCid(chainId);
-        req.setPageSize(1);
-        req.setPageSize(1);
-        RespPage<TransactionListItem> data = transactionService.getPage(req);
-        if(data.getData().size()==0){
-            return null;
-        }
-        return data.getData().get(0);
-    }
-
-    protected Transaction getOneVoteTransaction(String chainId){
-        TransactionExample example = new TransactionExample();
-        example.createCriteria().andChainIdEqualTo(chainId).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
-        List<Transaction> transactions = transactionMapper.selectByExample(example);
-        if(transactions.size()==0) return null;
-        return transactions.get(0);
-    }
 }

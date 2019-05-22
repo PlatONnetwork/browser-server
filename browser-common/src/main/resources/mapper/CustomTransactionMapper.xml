@@ -102,12 +102,7 @@
     SELECT
     hash,
     col1 AS nodeId,
-    "" AS name,
-    "" AS validNum,
-    "" AS deadLine,
     col3 AS totalTicketNum,
-    "" AS locked,
-    "" AS earnings,
     UNIX_TIMESTAMP(`timestamp`)*1000 AS transactionTime,
     sequence,
     `col2` AS price,
