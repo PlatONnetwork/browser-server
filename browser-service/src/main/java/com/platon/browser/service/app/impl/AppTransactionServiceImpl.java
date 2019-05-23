@@ -44,10 +44,11 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     public List<AppTransactionDto> list(String chainId, AppTransactionListReq req) {
         logger.debug("list() begin");
         List<AppTransactionDto> returnData;
+
+        long beginTime = System.currentTimeMillis();
+        long startTime = beginTime;
         try {
             DirectionEnum directionEnum = DirectionEnum.valueOf(req.getDirection().toUpperCase());
-
-            long beginTime = System.currentTimeMillis();
             returnData = customTransactionMapper.selectByChainIdAndAddressAndBeginSequenceAndDirection(
                     chainId,
                     req.getWalletAddrs(),
@@ -55,7 +56,9 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                     req.getDirection(),
                     req.getListSize()
             );
+            logger.debug("selectByChainIdAndAddressAndBeginSequenceAndDirection() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
+            beginTime = System.currentTimeMillis();
             if(DirectionEnum.NEW==directionEnum){
                 // 取新记录，因为数据库中是顺排的，所以需要倒排
                 Collections.sort(returnData,(c1,c2)->{
@@ -65,11 +68,11 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                     return 0;
                 });
             }
-            logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+            logger.debug("Sorting result Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
-
+        logger.debug("Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         return returnData;
     }
 
@@ -77,6 +80,8 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     public List<AppVoteTransactionDto> listVote(String chainId, AppTransactionListVoteReq req) {
         logger.debug("listVote() begin");
         long beginTime = System.currentTimeMillis();
+        long startTime = beginTime;
+
         List<AppVoteTransactionDto> returnData = customTransactionMapper.selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection(
                 chainId,
                 TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,
@@ -85,6 +90,7 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                 req.getBeginSequence(),
                 req.getDirection(),
                 req.getListSize());
+        logger.debug("selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
 
         if(returnData.size()>0){
@@ -96,16 +102,24 @@ public class AppTransactionServiceImpl implements AppTransactionService {
             });
 
             // 取节点名称
+            beginTime = System.currentTimeMillis();
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
                     .andNodeIdEqualTo(req.getNodeId());
             List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             Map<String,String> nodeIdToNodeNameMap = new HashMap<>();
             nodes.forEach(node->nodeIdToNodeNameMap.put(node.getNodeId(),node.getName()));
+            logger.debug("nodeRankingMapper.selectByExample(nodeRankingExample) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
+            beginTime = System.currentTimeMillis();
             Map<String, BigDecimal> incomeMap = apiService.getIncome(chainId,hashList);
-            Map<String,Integer> validVoteMap = apiService.getVailInfo(hashList, chainId);
+            logger.debug("apiService.getIncome(chainId,hashList) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
+            beginTime = System.currentTimeMillis();
+            Map<String,Integer> validVoteMap = apiService.getVailInfo(hashList, chainId);
+            logger.debug("apiService.getVailInfo(hashList, chainId) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
+            beginTime = System.currentTimeMillis();
             returnData.forEach(voteTransaction->{
                 // 设置收益
                 BigDecimal inCome = incomeMap.get(voteTransaction.getHash());
@@ -125,9 +139,11 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                 BigInteger deadLine = new BigInteger(voteTransaction.getTransactionTime()).add(diff);
                 voteTransaction.setDeadLine(deadLine.toString());
             });
+            logger.debug("Setup other data Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         }
 
         try {
+            beginTime = System.currentTimeMillis();
             DirectionEnum directionEnum = DirectionEnum.valueOf(req.getDirection().toUpperCase());
             if(DirectionEnum.NEW==directionEnum){
                 // 取新记录，因为数据库中是顺排的，所以需要倒排
@@ -138,11 +154,11 @@ public class AppTransactionServiceImpl implements AppTransactionService {
                     return 0;
                 });
             }
+            logger.debug("Sorting result Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
-
-        logger.debug("listVote() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        logger.debug("Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         return returnData;
     }
 

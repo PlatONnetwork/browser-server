@@ -46,17 +46,21 @@ public class AppNodeServiceImpl implements AppNodeService {
     public AppNodeListWrapper list(String chainId) throws Exception {
         logger.debug("list() begin");
         long beginTime = System.currentTimeMillis();
+        long startTime = beginTime;
         List<AppNodeDto> returnData = customNodeRankingMapper.selectByChainIdAndIsValidOrderByRanking(chainId,1);
-        logger.debug("list() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+        logger.debug("selectByChainIdAndIsValidOrderByRanking() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         AppNodeListWrapper nodes = new AppNodeListWrapper();
         nodes.setList(returnData);
 
+        beginTime = System.currentTimeMillis();
         TicketContract ticketContract = platon.getTicketContract(chainId);
         String price = ticketContract.GetTicketPrice().send();
         nodes.setTicketPrice(price);
+        logger.debug("GetTicketPrice() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
         // 从链上查投票数
         if(returnData.size()>0){
+            beginTime = System.currentTimeMillis();
             StringBuilder ids = new StringBuilder();
             List<String> nodeIds = new ArrayList<>();
             returnData.forEach(node->{
@@ -65,13 +69,24 @@ public class AppNodeServiceImpl implements AppNodeService {
             });
             String idsStr = ids.toString();
             idsStr = idsStr.substring(0,idsStr.lastIndexOf(":"));
+            logger.debug("Construct node ids Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
+            beginTime = System.currentTimeMillis();
             String countInfo = ticketContract.GetCandidateTicketCount(idsStr).send();
+            logger.debug("GetCandidateTicketCount() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
+            beginTime = System.currentTimeMillis();
             Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
             countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
+            logger.debug("JSON.parseObject(countInfo, Map.class) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
+            beginTime = System.currentTimeMillis();
             // 从交易表中查询总投票数量
             Long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
             nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
+            logger.debug("getVoteCountByNodeIds() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         }
+        logger.debug("Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         return nodes;
     }
 
@@ -84,8 +99,11 @@ public class AppNodeServiceImpl implements AppNodeService {
     @Override
     public List<AppUserNodeDto> getUserNodeList(String chainId, AppUserNodeListReq req) throws Exception {
 
+        long beginTime = System.currentTimeMillis();
+        long startTime = beginTime;
         // 从交易表中统计出请求中的钱包列表参与投票的节点总票数，按节点ID分组
         List<AppTransactionSummaryDto> summaries = customTransactionMapper.summaryByAddress(chainId, TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code,req.getWalletAddrs());
+        logger.debug("summaryByAddress() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         List<String> nodeIds = new ArrayList<>();
 
         List<AppUserNodeDto> userNodeDtos = Collections.EMPTY_LIST;
@@ -113,10 +131,13 @@ public class AppNodeServiceImpl implements AppNodeService {
                     List<String> txHashes = new ArrayList<>(hashPriceMap.keySet());
 
                     // 取有效票数
+                    long timeMillis = System.currentTimeMillis();
                     Map<String,Integer> validVoteMap = apiService.getVailInfo(txHashes, chainId);
+                    logger.debug("apiService.getVailInfo(txHashes, chainId) Time Consuming: {}ms",System.currentTimeMillis()-timeMillis);
                     validVoteMap.forEach((k,v)->summary.setValidCountSum(summary.getValidCountSum()+v));
 
                     // 计算锁定金额
+                    timeMillis = System.currentTimeMillis();
                     validCountMap.forEach((txHash,ticketCount)->{
                         String priceStr = hashPriceMap.get(txHash);
                         if(priceStr!=null){
@@ -124,10 +145,13 @@ public class AppNodeServiceImpl implements AppNodeService {
                             summary.setLocked(summary.getLocked().add(locked));
                         }
                     });
+                    logger.debug("Calculate locked amount Time Consuming: {}ms",System.currentTimeMillis()-timeMillis);
 
+                    timeMillis = System.currentTimeMillis();
                     // 计算收益
                     Map<String, BigDecimal> incomeMap = apiService.getIncome(chainId,txHashes);
                     incomeMap.forEach((hash,income)->summary.setEarnings(summary.getEarnings().add(income)));
+                    logger.debug("Calculate income amount Time Consuming: {}ms",System.currentTimeMillis()-timeMillis);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -136,10 +160,13 @@ public class AppNodeServiceImpl implements AppNodeService {
 
             // 从节点表查询节点名称和国家代码
             if(nodeIds.size()>0){
+                beginTime = System.currentTimeMillis();
                 userNodeDtos = customNodeRankingMapper.getNodeListByNodeIds(chainId,nodeIds);
+                logger.debug("getNodeListByNodeIds() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             }
 
             // 设置与当前钱包相关的总投票数
+            beginTime = System.currentTimeMillis();
             userNodeDtos.forEach(node->{
                 AppTransactionSummaryDto summary = summaryMap.get(node.getNodeId());
                 if(summary!=null){
@@ -150,7 +177,10 @@ public class AppNodeServiceImpl implements AppNodeService {
                     node.setEarnings(summary.getEarnings().toString());
                 }
             });
+            logger.debug("Total ticket count setup Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         }
+
+        logger.debug("Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         return userNodeDtos;
     }
 }

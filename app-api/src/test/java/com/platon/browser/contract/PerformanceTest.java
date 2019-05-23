@@ -1,5 +1,6 @@
 package com.platon.browser.contract;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,10 +8,12 @@ import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
 
 import java.math.BigDecimal;
+import java.net.ConnectException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,10 +31,18 @@ public class PerformanceTest {
 
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(clientNum*timesNum);
 
-    private static final Web3j web3j = Web3j.build(new HttpService("http://192.168.112.183:6789"));
+    private Web3j web3j;
 
-    private static final TicketContract ticketContract = TicketContract.load(web3j,new ReadonlyTransactionManager(web3j, TicketContract.CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-    private static final CandidateContract candidateContract = CandidateContract.load(web3j,new ReadonlyTransactionManager(web3j, CandidateContract.CONTRACT_ADDRESS), new DefaultWasmGasProvider());
+    private TicketContract ticketContract;
+
+    @Before
+    public void init() throws ConnectException {
+        WebSocketService ws = new WebSocketService("ws://192.168.112.183:6790",true);
+        ws.connect();
+        web3j = Web3j.build(ws);
+        web3j = Web3j.build(new HttpService("http://192.168.112.183:6789"));
+        ticketContract = TicketContract.load(web3j,new ReadonlyTransactionManager(web3j, TicketContract.CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+    }
 
     class Calculator{
         public long totalMilliseconds=0;
