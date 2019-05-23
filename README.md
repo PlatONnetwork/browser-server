@@ -131,7 +131,7 @@ location /api-103{
 }
     
 现在我们就可以通过如下命令访问刷新接口了：
-curl http://192.168.1.100/api-103/reset/103/node/true
+curl http://192.168.1.100/api-103/cache/reset/103/node/true
 
 说明：上述url的“/reset/103/node/true”中的“103”是链id，请根据实际情况替换
 
