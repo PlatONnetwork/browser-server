@@ -1,7 +1,13 @@
 package com.platon.browser.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.NodeRanking;
+import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.mapper.NodeRankingMapper;
+import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +41,9 @@ public class TransactionFilter {
     private PlatonClient platon;
     @Value("${platon.chain.active}")
     private String chainId;
+
+    @Autowired
+    private NodeRankingMapper nodeRankingMapper;
 
 
     public List <TransactionBean> analyse ( AnalyseThread.AnalyseParam param, long time ) {
@@ -75,7 +84,32 @@ public class TransactionFilter {
                 // Cache the receiver type for later use
                 RECEIVER_TO_TYPE.put(initData.getTo(), bean.getReceiveType());
                 transactions.add(bean);
+
+
+                if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(bean.getTxType())){
+                    // 投票交易，则从节点中查询质押金并设置到交易信息中
+                    TxInfo info = JSON.parseObject(bean.getTxInfo(),TxInfo.class);
+                    TxInfo.Parameter tp = info.getParameters();
+                    if(tp!=null){
+                        // 查询对应节点的质押金，放到txinfo
+                        NodeRankingExample nodeRankingExample = new NodeRankingExample();
+                        nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
+                                .andBeginNumberGreaterThanOrEqualTo(bean.getBlockNumber()).andEndNumberLessThanOrEqualTo(bean.getBlockNumber());
+                        NodeRankingExample.Criteria second = nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
+                                .andBeginNumberGreaterThanOrEqualTo(bean.getBlockNumber()).andEndNumberIsNull();
+                        nodeRankingExample.or(second);
+                        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
+                        if(nodes.size()>0){
+                            NodeRanking nodeRanking = nodes.get(0);
+                            tp.setDeposit(nodeRanking.getDeposit());
+                        }else {
+                            tp.setDeposit("0");
+                        }
+                        bean.setTxInfo(JSON.toJSONString(info));
+                    }
+                }
             }
+
         });
         log.debug("Time Consuming: {}ms", System.currentTimeMillis() - beginTime);
         return transactions;
