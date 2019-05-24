@@ -111,9 +111,18 @@ public class AppNodeServiceImpl implements AppNodeService {
 
             Map<String,AppTransactionSummaryDto> summaryMap = new HashMap<>();
             summaries.forEach(summary->{
-                summary.setNodeId(summary.getNodeId().startsWith("0x")?summary.getNodeId():"0x"+summary.getNodeId());
-                nodeIds.add(summary.getNodeId());
-                summaryMap.put(summary.getNodeId(),summary);
+                String nodeId = summary.getNodeId().startsWith("0x")?summary.getNodeId():"0x"+summary.getNodeId();
+                AppTransactionSummaryDto atsd = summaryMap.get(nodeId);
+                if(atsd!=null){
+                    // 合并节点ID相同的记录
+                    summary.setEarnings(summary.getEarnings().add(atsd.getEarnings()));
+                    summary.setValidCountSum(summary.getValidCountSum()+atsd.getValidCountSum());
+                    summary.setLocked(summary.getLocked().add(atsd.getLocked()));
+                    summary.setVoteCountSum(summary.getVoteCountSum()+atsd.getVoteCountSum());
+                }
+                summary.setNodeId(nodeId);
+                nodeIds.add(nodeId);
+                summaryMap.put(nodeId,summary);
             });
 
 
