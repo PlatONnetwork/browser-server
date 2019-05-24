@@ -11,6 +11,7 @@ public class TxInfo{
         BigInteger price;
         Integer count;
         String nodeId;
+        String deposit;
     }
     String functionName,type;
     Parameter parameters;
