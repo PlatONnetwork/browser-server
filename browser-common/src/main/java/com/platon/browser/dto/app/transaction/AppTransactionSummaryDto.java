@@ -1,9 +1,12 @@
 package com.platon.browser.dto.app.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Auther: Chendongming
@@ -19,4 +22,6 @@ public class AppTransactionSummaryDto {
     private long validCountSum;
     private BigDecimal earnings = BigDecimal.ZERO;
     private BigInteger locked = BigInteger.ZERO;
+    @JsonIgnore
+    private Set<String> hashSet = new HashSet<>();
 }
