@@ -4,11 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.app.transaction.TxIncomeSumDto;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -25,7 +30,10 @@ import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,6 +55,8 @@ public class ApiServiceImpl implements ApiService {
     private NodeService nodeService;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
 
     @Data
     static class TicketCount{
@@ -266,7 +276,7 @@ public class ApiServiceImpl implements ApiService {
 
     public Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
         logger.debug("getIncome begin");
-        long beginTime = System.currentTimeMillis();
+        /*long beginTime = System.currentTimeMillis();
         if (hashList.size() > 0){
             //根据hash分组计算收益
             BlockExample blockExample = new BlockExample();
@@ -294,10 +304,12 @@ public class ApiServiceImpl implements ApiService {
 
             logger.debug("getIncome Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             return incomeMap;
-        }
+        }*/
 
-
-        return  new HashMap <>();
+        List<TxIncomeSumDto> res = customBlockMapper.getIncomeByVoteHash(chainId,hashList);
+        Map<String,BigDecimal> map = new HashMap<>();
+        res.forEach(dto -> map.put(dto.getTxHash(),dto.getIncome()));
+        return map;
 
     }
 
