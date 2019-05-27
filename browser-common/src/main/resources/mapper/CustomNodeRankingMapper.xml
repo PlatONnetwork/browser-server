@@ -127,9 +127,6 @@
 
   <select id="selectByBlockNumber" resultMap="BaseResultMap">
     SELECT
-    <if test="distinct">
-      distinct
-    </if>
     <include refid="Base_Column_List" />
     FROM
     `node_ranking`
