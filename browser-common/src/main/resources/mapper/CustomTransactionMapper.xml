@@ -109,8 +109,9 @@
     `from` AS walletAddress
     FROM `transaction`
     WHERE `chain_id`=#{chainId}
-    AND tx_type=#{txType} AND
-    `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    AND `col1` = #{nodeId}
+    AND tx_type=#{txType}
+    AND `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
 
     <if test="beginSequence == -1">
       <!-- 取最新 -->
