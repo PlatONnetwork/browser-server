@@ -176,22 +176,12 @@ public class AppNodeServiceImpl implements AppNodeService {
 
             CacheTool.TICKET_PRICE_MAP.put(chainId,price);
 
-            // 从链上查投票数
-            if(returnData.size()>0){
-                beginTime = System.currentTimeMillis();
-                StringBuilder ids = new StringBuilder();
-                List<String> nodeIds = new ArrayList<>();
-                returnData.forEach(node->{
-                    ids.append(node.getNodeId()).append(":");
-                    nodeIds.add(node.getNodeId());
-                    nodes.setVoteCount(nodes.getVoteCount()+Long.valueOf(node.getTicketCount()));
-                });
+            // 设置总投票数量
+            nodes.setTotalCount(51200);
 
-                beginTime = System.currentTimeMillis();
-                // 从交易表中查询总投票数量
-                Long totalVoteCount = customTransactionMapper.getTotalVoteCountByNodeIds(chainId,nodeIds);
-                nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
-                logger.debug("getVoteCountByNodeIds() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+            if(returnData.size()>0){
+                List<String> nodeIds = new ArrayList<>();
+                returnData.forEach(node->nodes.setVoteCount(nodes.getVoteCount()+Long.valueOf(node.getTicketCount())));
             }
             logger.debug("Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         } catch (Exception e) {
