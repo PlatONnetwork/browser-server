@@ -3,13 +3,15 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.PageParam;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.app.transaction.AppTransactionSummaryDto;
+import com.platon.browser.dto.app.transaction.AppUserNodeDto;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
+import com.platon.browser.dto.app.transaction.AppUserNodeTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CustomTransactionMapper {
@@ -33,7 +35,13 @@ public interface CustomTransactionMapper {
             @Param("direction") String direction,
             @Param("listSize") int listSize);
 
-    List<AppTransactionSummaryDto> summaryByAddress(
+    List<AppUserNodeDto> getUserNodeByWalletAddress(
+            @Param("chainId") String chainId,
+            @Param("txType") String txType,
+            @Param("walletAddrs") List<String> walletAddrs
+    );
+
+    List<AppUserNodeTransactionDto> getUserNodeTransactionByWalletAddress(
             @Param("chainId") String chainId,
             @Param("txType") String txType,
             @Param("walletAddrs") List<String> walletAddrs
