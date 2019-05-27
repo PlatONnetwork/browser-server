@@ -6,6 +6,7 @@ import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NodeRanking;
 import com.platon.browser.dao.entity.NodeRankingExample;
+import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
@@ -45,6 +46,8 @@ public class TransactionFilter {
 
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    private CustomNodeRankingMapper customNodeRankingMapper;
 
 
     public List <TransactionBean> analyse ( AnalyseThread.AnalyseParam param, long time ) {
@@ -93,14 +96,9 @@ public class TransactionFilter {
                     TxInfo.Parameter tp = info.getParameters();
                     if(tp!=null){
                         // 查询对应节点的质押金，放到txinfo
-                        NodeRankingExample nodeRankingExample = new NodeRankingExample();
-                        nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
-                                .andBeginNumberLessThanOrEqualTo(bean.getBlockNumber());
-                        nodeRankingExample.setOrderByClause("begin_number DESC");
-                        PageHelper.startPage(1,1);
-                        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
-                        if(nodes.size()>0){
-                            NodeRanking nodeRanking = nodes.get(0);
+                        NodeRanking nodeRanking = customNodeRankingMapper.selectByBlockNumber(chainId,bean.getBlockNumber());
+
+                        if(nodeRanking!=null){
                             tp.setDeposit(nodeRanking.getDeposit());
                         }else {
                             tp.setDeposit("0");

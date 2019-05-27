@@ -85,6 +85,7 @@ public class AppNodeServiceImpl implements AppNodeService {
                 // 交易hash与当时票价的映射
                 String [] hashes = summary.getHashes().split(",");
                 Arrays.asList(hashes).forEach(hashPrice->{
+                    if(!hashPrice.contains("-")) return;
                     String [] tmp = hashPrice.split("-");
                     hashPriceMap.put(tmp[0],tmp[1]);
                 });
