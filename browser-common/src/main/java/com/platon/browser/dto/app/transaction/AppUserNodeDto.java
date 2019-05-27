@@ -14,9 +14,8 @@ import java.util.Set;
  * @Description:
  */
 @Data
-public class AppTransactionSummaryDto {
+public class AppUserNodeDto {
     private String nodeId;
-    private String hashes;
     private long voteCountSum;
     private String lastVoteTime;
     private long validCountSum;

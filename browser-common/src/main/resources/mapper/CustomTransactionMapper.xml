@@ -125,16 +125,25 @@
     LIMIT #{listSize}
   </select>
 
-  <select id="summaryByAddress" resultType="com.platon.browser.dto.app.transaction.AppTransactionSummaryDto">
+  <select id="getUserNodeByWalletAddress" resultType="com.platon.browser.dto.app.transaction.AppUserNodeDto">
     SELECT
     col1 AS nodeId,
-    GROUP_CONCAT(CONCAT(`hash`,'-',col2)) AS hashes,
     SUM(CONVERT(col3,signed)) AS voteCountSum,
     UNIX_TIMESTAMP(MAX(`timestamp`))*1000 AS lastVoteTime
     FROM `transaction`
     WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
     `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
     GROUP BY col1
+  </select>
+
+  <select id="getUserNodeTransactionByWalletAddress" resultType="com.platon.browser.dto.app.transaction.AppUserNodeTransactionDto">
+    SELECT
+    col1 AS nodeId,
+    `hash` AS txHash,
+    `col2` AS price
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
+    `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
 
   <select id="getTotalVoteCountByNodeIds" resultType="java.lang.Long">
