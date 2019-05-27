@@ -1,0 +1,21 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+}
+apply plugin: 'io.spring.dependency-management'
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+//	compile.exclude module: "spring-boot-starter-tomcat"
+}
+dependencies {
+	compile project(":browser-service")
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//	implementation 'org.springframework.boot:spring-boot-starter-jetty'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	testCompile group: 'com.h2database', name: 'h2', version: '1.4.199'
+
+
+}

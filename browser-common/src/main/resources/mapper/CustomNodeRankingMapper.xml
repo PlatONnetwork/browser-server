@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomNodeRankingMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.NodeRanking">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="port" jdbcType="INTEGER" property="port" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="deposit" jdbcType="VARCHAR" property="deposit" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="org_website" jdbcType="VARCHAR" property="orgWebsite" />
+    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
+    <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="reward_ratio" jdbcType="DOUBLE" property="rewardRatio" />
+    <result column="ranking" jdbcType="INTEGER" property="ranking" />
+    <result column="election_status" jdbcType="INTEGER" property="electionStatus" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="begin_number" jdbcType="BIGINT" property="beginNumber" />
+    <result column="end_number" jdbcType="BIGINT" property="endNumber" />
+    <result column="block_count" jdbcType="BIGINT" property="blockCount" />
+    <result column="reward_amount" jdbcType="VARCHAR" property="rewardAmount" />
+    <result column="profit_amount" jdbcType="VARCHAR" property="profitAmount" />
+    <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
+    <result column="country_code" jdbcType="VARCHAR" property="countryCode" />
+    <result column="location" jdbcType="VARCHAR" property="location" />
+    <result column="longitude" jdbcType="VARCHAR" property="longitude" />
+    <result column="latitude" jdbcType="VARCHAR" property="latitude" />
+    <result column="avg_time" jdbcType="DOUBLE" property="avgTime" />
+    <result column="node_type" jdbcType="VARCHAR" property="nodeType" />
+    <result column="count" jdbcType="BIGINT" property="count" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website,
+    chain_id, join_time, create_time, update_time, reward_ratio, ranking, election_status,
+    is_valid, url, begin_number, end_number, block_count, reward_amount, profit_amount,
+    block_reward, country_code, `location`, longitude, latitude, avg_time, node_type,
+    `count`
+  </sql>
+
   <insert id="insertOrUpdate" parameterType="com.platon.browser.dao.entity.NodeRanking">
     replace  into node_ranking
     (id, node_id, ip, port, `name`, `type`, intro, address, deposit, org_name, org_website,
@@ -24,4 +67,76 @@
     </foreach>
   </insert>
 
+  <select id="selectByChainIdAndIsValidOrderByRanking" resultType="com.platon.browser.dto.app.node.AppNodeDto">
+    SELECT
+    node_id AS nodeId,
+    ranking,
+    `name`,
+    country_code AS countryCode,
+    deposit,
+    CONVERT((1-reward_ratio)*10000,signed) AS reward,
+    org_name AS orgName,
+    org_website AS orgWebsite,
+    intro,
+    CONCAT('http://',ip,':',port) AS nodeUrl,
+    `count` AS ticketCount,
+    UNIX_TIMESTAMP(`join_time`)*1000 AS joinTime,
+    node_type AS nodeType
+    FROM `node_ranking`
+    WHERE `chain_id`=#{chainId} AND is_valid=#{isValid}
+    ORDER BY ranking ASC
+  </select>
+
+  <select id="detailByChainIdAndNodeId" resultType="com.platon.browser.dto.app.node.AppNodeDetailDto">
+    SELECT
+    node_id AS nodeId,
+    ranking,
+    `name`,
+    deposit,
+    CONVERT((1-reward_ratio)*10000,signed) AS reward,
+    org_name AS orgName,
+    org_website AS orgWebsite,
+    intro,
+    CONCAT('http://',ip,':',port) AS nodeUrl,
+    `count` AS ticketCount,
+    UNIX_TIMESTAMP(`join_time`)*1000 AS joinTime,
+    node_type AS nodeType
+    FROM `node_ranking`
+    WHERE `chain_id`=#{chainId} AND node_id=#{nodeId} AND is_valid=1 LIMIT 1
+  </select>
+
+  <select id="getVoteCountByNodeIds" resultType="java.lang.Long">
+    SELECT
+    case when SUM(CONVERT(col3,signed)) is null then 0 else SUM(CONVERT(col3,signed)) end AS totalVoteCount
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type='voteTicket'
+    AND col1 IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+
+  <select id="getNodeListByNodeIds" resultType="com.platon.browser.dto.app.node.AppUserNodeDto">
+    SELECT
+    node_id AS nodeId,
+    MAX(`name`) AS `name`,
+    MAX(country_code) AS countryCode,
+    CASE WHEN SUM(is_valid)>0 THEN '1' ELSE '0' END AS isValid
+    FROM `node_ranking`
+    WHERE `chain_id`=#{chainId}
+    AND node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    GROUP BY node_id
+  </select>
+
+  <select id="selectByBlockNumber" resultMap="BaseResultMap">
+    SELECT
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    FROM
+    `node_ranking`
+    WHERE `chain_id`=#{chainId}
+    AND `begin_number` <![CDATA[<=]]> #{blockNumber}
+    AND (`end_number` >= #{blockNumber} OR `end_number` IS NULL)
+    ORDER BY `begin_number` DESC
+    LIMIT 1
+  </select>
 </mapper>

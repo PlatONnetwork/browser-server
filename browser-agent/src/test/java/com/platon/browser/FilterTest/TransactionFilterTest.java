@@ -1,7 +1,9 @@
 package com.platon.browser.FilterTest;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.thread.AnalyseThread;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,6 +76,18 @@ public class TransactionFilterTest extends TestBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    @Test
+    public void insert() throws IOException {
+        EthBlock initData = platonClient.getWeb3j("203").ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(
+                187566)),true).send();
+        AnalyseThread.AnalyseParam param = new AnalyseThread.AnalyseParam(initData,web3j);
+        List<TransactionBean> list = transactionFilter.analyse(param,1557484976000l);
+        AnalyseThread.AnalyseResult result = new AnalyseThread.AnalyseResult();
+        result.transactions.addAll(list);
+        dbService.flush(result);
     }
 
 

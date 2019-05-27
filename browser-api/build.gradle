@@ -6,12 +6,12 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	compile.exclude module: "spring-boot-starter-tomcat"
+//	compile.exclude module: "spring-boot-starter-tomcat"
 }
 dependencies {
 	compile project(":browser-service")
 	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.springframework.boot:spring-boot-starter-jetty'
+//	implementation 'org.springframework.boot:spring-boot-starter-jetty'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }

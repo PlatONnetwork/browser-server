@@ -3,6 +3,8 @@ package com.platon.browser.bean;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.AnalysisResult;
+import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.util.TransactionAnalysis;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -42,6 +44,21 @@ public class TransactionBean extends TransactionWithBLOBs {
             this.setTxType(type == null ? "transfer" : type);
             String txinfo = JSON.toJSONString(analysisResult);
             this.setTxInfo(txinfo);
+
+            // 设置col1-col5
+            this.setCol1("");
+            this.setCol2("");
+            this.setCol3("");
+            if(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)){
+                // 投票交易，则把投票参数拆分存储到col1-col5字段，方便查询
+                TxInfo bean = JSON.parseObject(txinfo,TxInfo.class);
+                TxInfo.Parameter param = bean.getParameters();
+                if(param!=null){
+                    this.setCol1(bean.getParameters().getNodeId());
+                    this.setCol2(bean.getParameters().getPrice().toString());
+                    this.setCol3(bean.getParameters().getCount().toString());
+                }
+            }
         }catch (Exception e){
             this.setReceiveType("unknown");
             this.setTxType("unknown");
@@ -51,6 +68,11 @@ public class TransactionBean extends TransactionWithBLOBs {
         }
         // 使用交易接收者信息填充交易实体
         this.setTransactionIndex(receipt.getTransactionIndex().intValue());
+
+        // 记录序号=交易所在区块号拼上交易索引
+        String sequence = this.getBlockNumber().toString()+this.getTransactionIndex().toString();
+        this.setSequence(Long.valueOf(sequence));
+
         this.setEnergonUsed(receipt.getGasUsed().toString());
         this.setActualTxCost(receipt.getGasUsed().multiply(transaction.getGasPrice()).toString());
         if(null == receipt.getBlockNumber() ){

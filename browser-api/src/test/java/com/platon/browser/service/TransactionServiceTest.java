@@ -48,7 +48,7 @@ public class TransactionServiceTest extends ServiceTestBase {
                     .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code).append(",")
                     .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code).append(",")
                     .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
-            req.setTxType(sb.toString());
+            //req.setTxType(sb.toString());
             List<TransactionWithBLOBs> result = transactionService.getList(req);
             Assert.assertTrue(result.size()>0);
         });

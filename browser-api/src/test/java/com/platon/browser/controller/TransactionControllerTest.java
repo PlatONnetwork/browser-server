@@ -80,7 +80,7 @@ public class TransactionControllerTest extends ControllerTestBase {
                 sendPost("/transaction/addressDetails",req);
 
                 // 投票交易查询
-                req.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+                //req.setTxType(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
                 sendPost("/transaction/addressDetails",req);
 
                 // 质押交易查询
@@ -88,11 +88,11 @@ public class TransactionControllerTest extends ControllerTestBase {
                 sb.append(TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code).append(",")
                         .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_WITHDRAW.code).append(",")
                         .append(TransactionTypeEnum.TRANSACTION_CANDIDATE_APPLY_WITHDRAW.code);
-                req.setTxType(sb.toString());
+                //req.setTxType(sb.toString());
                 sendPost("/transaction/addressDetails",req);
 
                 // 指定交易类型查询
-                req.setTxType(data.getTxType());
+                //req.setTxType(data.getTxType());
                 sendPost("/transaction/addressDetails",req);
             } catch (Exception e) {
                 e.printStackTrace();

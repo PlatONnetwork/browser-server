@@ -192,7 +192,7 @@ public class AccountServiceImpl implements AccountService {
             if(StringUtils.isNotBlank(nodeName)) item.setNodeName(nodeName);
             else item.setNodeName("");
             Integer number = voteHashMapRef.get(item.getTxHash());
-            item.setValidVoteCount(number);
+            item.setValidVoteCount(number==null?0:number);
         });
 
 
@@ -252,10 +252,10 @@ public class AccountServiceImpl implements AccountService {
                 .andChainIdEqualTo(chainId)
                 .andToEqualTo(address).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
         condition.or(second);
-        List<Transaction> voteTransactionList = transactionMapper.selectByExample(condition);
+        List<TransactionWithBLOBs> voteTransactionList = transactionMapper.selectByExampleWithBLOBs(condition);
         Set<String> nodeIdList = new HashSet <>();
         BigInteger voteSum = BigInteger.ZERO;
-        for(Transaction transaction : voteTransactionList){
+        for(TransactionWithBLOBs transaction : voteTransactionList){
             voteSum = voteSum.add(new BigInteger(transaction.getValue()));
             String txInfo = transaction.getTxInfo();
             try{

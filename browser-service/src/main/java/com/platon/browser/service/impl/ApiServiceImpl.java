@@ -4,14 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dao.mapper.VoteTxMapper;
-import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.dto.app.transaction.TxIncomeSumDto;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -28,7 +30,10 @@ import org.springframework.stereotype.Service;
 import org.web3j.platon.contracts.TicketContract;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,8 +48,6 @@ public class ApiServiceImpl implements ApiService {
     @Autowired
     private PlatonClient platon;
     @Autowired
-    private VoteTxMapper txMapper;
-    @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
     private BlockMapper blockMapper;
@@ -52,6 +55,8 @@ public class ApiServiceImpl implements ApiService {
     private NodeService nodeService;
     @Autowired
     private NodeRankingMapper nodeRankingMapper;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
 
     @Data
     static class TicketCount{
@@ -67,11 +72,13 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public List<VoteSummary> getVoteSummary (List <String> addressList , String chainId ) {
+        logger.debug("getVoteSummary begin");
+        long beginTime = System.currentTimeMillis();
         List<VoteSummary> voteSummaryList = new ArrayList<>();
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(chainId).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(addressList);
-        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
         transactionList.forEach(transaction -> {
             hashList.add(transaction.getHash());
@@ -97,19 +104,21 @@ public class ApiServiceImpl implements ApiService {
             String lock = new BigDecimal(vaildSum).multiply(voteSummary.getTicketPrice()).toString();
             voteSummary.setLocked(lock);
         });
-
+        logger.debug("getVoteSummary Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return  voteSummaryList;
     }
 
     @Override
     public RespPage<VoteTransaction> getVoteTransaction (TransactionVoteReq req ) {
+        logger.debug("getVoteTransaction begin");
+        long beginTime = System.currentTimeMillis();
         //查询交易信息
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<VoteTransaction> voteTransactions = new ArrayList <>();
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(req.getWalletAddrs());
-        List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+        List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
         transactionList.forEach(e->{
             hashList.add(e.getHash());
@@ -130,34 +139,6 @@ public class ApiServiceImpl implements ApiService {
             voteTransaction.setValidNum(String.valueOf(vaildSum));
         }
 
-
-        //设置交易收益
-        //分组计算收益
-        //根据投票交易hash查询区块列表
-        if(hashList.size()>0){
-            BlockExample hashBlockExample = new BlockExample();
-            hashBlockExample.createCriteria().andChainIdEqualTo(req.getCid()).andVoteHashIn(hashList);
-            List<Block> hashBlockList = blockMapper.selectByExample(hashBlockExample);
-            Map<String,List<Block>> groupMap = new HashMap <>();
-            //根据hash分组hash-block
-            hashBlockList.forEach(block->{
-                List<Block> group=groupMap.get(block.getVoteHash());
-                if(group==null){
-                    group=new ArrayList <>();
-                    groupMap.put(block.getVoteHash(),group);
-                }
-                group.add(block);
-            });
-
-            groupMap.forEach((txHash,group)->{
-                BigDecimal txIncome = BigDecimal.ZERO;
-                for (Block block:group){
-                    txIncome=txIncome.add(new BigDecimal(block.getBlockReward()).multiply(BigDecimal.valueOf(1-block.getRewardRatio())));
-                }
-                incomeMap.put(txHash,txIncome);
-            });
-        }
-
         voteTransactions.forEach(b -> {
             BigDecimal inCome = incomeMap.get(b.getTransactionHash());
             if(null == inCome) b.setEarnings(BigDecimal.ZERO.toString());
@@ -166,15 +147,17 @@ public class ApiServiceImpl implements ApiService {
 
         RespPage<VoteTransaction> returnData = new RespPage<>();
         returnData.init(page,voteTransactions);
-
+        logger.debug("getVoteTransaction Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }
 
     @Override
     public Map <String, Integer> getCandidateTicketCount ( List <String> nodeIds,String chainId ) {
+        logger.debug("getCandidateTicketCount begin");
+        long beginTime = System.currentTimeMillis();
         Map<String,Integer> returnData = new HashMap<>();
         if(nodeIds.size() > 0) {
-            TicketContract ticketContract = platon.getTicketContract(chainId);
+
             long currentTime = System.currentTimeMillis();
             nodeIds.forEach(nodeId->{
                 TicketCount tc = TICKET_COUNT_MAP.get(nodeId);
@@ -182,6 +165,7 @@ public class ApiServiceImpl implements ApiService {
                 if(tc!=null) prevTime = tc.getTimestamp();
                 boolean expired = (currentTime-prevTime)>=30*1000;
                 if(expired){
+                    TicketContract ticketContract = platon.getTicketContract(chainId);
                     // 查最新数据
                     try {
                         String countStr = ticketContract.GetCandidateTicketCount(nodeId).send();
@@ -199,11 +183,13 @@ public class ApiServiceImpl implements ApiService {
                 returnData.put(nodeId,tc.getCount());
             });
         }
+        logger.debug("getCandidateTicketCount Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return returnData;
     }
 
     @Override
     public RespPage<VoteInfo> getTicketCountByTxHash (TicketCountByTxHashReq req) {
+        logger.debug("getTicketCountByTxHash begin");
         long beginTime = System.currentTimeMillis();
         List<String> hashList = req.getHashList();
         String chainId = req.getCid();
@@ -212,7 +198,7 @@ public class ApiServiceImpl implements ApiService {
             TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
 
-            List<Transaction> transactionList = transactionMapper.selectByExample(transactionExample);
+            List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
             Map<String,Integer> validVoteMap = getVailInfo(hashList,chainId);
             List<String> blockHashList = new ArrayList <>();
@@ -284,12 +270,13 @@ public class ApiServiceImpl implements ApiService {
             returnData.setData(bean);
             return returnData;
         }
-        logger.debug("Time Consuming-last: {}ms",System.currentTimeMillis()-beginTime);
+        logger.debug("getTicketCountByTxHash Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
         return new RespPage <>();
     }
 
-
-    private Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
+    public Map<String,BigDecimal> getIncome(String chainId,List<String> hashList){
+        logger.debug("getIncome begin");
+        /*long beginTime = System.currentTimeMillis();
         if (hashList.size() > 0){
             //根据hash分组计算收益
             BlockExample blockExample = new BlockExample();
@@ -314,15 +301,23 @@ public class ApiServiceImpl implements ApiService {
                 }
                 incomeMap.put(txHash,txIncome);
             });
-            return incomeMap;
-        }
 
-        return  new HashMap <>();
+            logger.debug("getIncome Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+            return incomeMap;
+        }*/
+
+        List<TxIncomeSumDto> res = customBlockMapper.getIncomeByVoteHash(chainId,hashList);
+        Map<String,BigDecimal> map = new HashMap<>();
+        res.forEach(dto -> map.put(dto.getTxHash(),dto.getIncome()));
+        return map;
 
     }
 
 
-    private Map<String,Integer> getVailInfo(List<String> hashList,String chainId){
+    public Map<String,Integer> getVailInfo(List<String> hashList,String chainId){
+        logger.debug("getVailInfo begin");
+        long beginTime = System.currentTimeMillis();
+
         if (hashList.size() > 0) {
             //根据hash分析每笔交易有效票数
             Map <String, Integer> validVoteMap = new HashMap <>();
@@ -341,9 +336,14 @@ public class ApiServiceImpl implements ApiService {
                 }
                 logger.error("get transaction voteNumber Exception !!!");
             }
+
+            logger.debug("getVailInfo Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
             return validVoteMap;
         }
         return new HashMap <>();
     }
+
+
 
 }

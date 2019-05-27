@@ -2,7 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.PendingTx;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.TxInfoResolver;
 import lombok.Data;
@@ -47,8 +47,8 @@ public class AccTransactionItem {
         this.setServerTime(System.currentTimeMillis());
 
         String txHash = "",value = "0",cost = "0";
-        if(initData instanceof TransactionWithBLOBs){
-            TransactionWithBLOBs transaction = (TransactionWithBLOBs)initData;
+        if(initData instanceof Transaction){
+            Transaction transaction = (Transaction)initData;
             // 交易生成的时间就是出块时间
             this.setBlockTime(transaction.getTimestamp().getTime());
             txHash = transaction.getHash();

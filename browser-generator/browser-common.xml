@@ -24,7 +24,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.6.1_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.6.2_deva?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
@@ -53,7 +53,7 @@
         </table>-->
 
 
-    <table tableName="node_ranking" domainObjectName="NodeRanking">
+    <table tableName="transaction" domainObjectName="Transaction">
         <columnRenamingRule searchString="^D_"
                             replaceString=""/>
     </table>

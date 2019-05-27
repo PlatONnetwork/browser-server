@@ -51,4 +51,13 @@
     WHERE bl.`chain_id`=#{chainId} AND bl.`node_name` IS NULL
   </update>
 
+  <select id="getIncomeByVoteHash" resultType="com.platon.browser.dto.app.transaction.TxIncomeSumDto">
+    SELECT
+      bl.`vote_hash` AS txHash,
+      SUM(bl.`block_reward`*(1-bl.`reward_ratio`)) AS income
+    FROM block bl WHERE bl.`chain_id`=#{chainId}
+    AND bl.`vote_hash` IN (<foreach collection="txHashes" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    GROUP BY bl.`vote_hash`
+  </select>
+
 </mapper>

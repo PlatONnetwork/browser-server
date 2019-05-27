@@ -61,6 +61,8 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public SearchResult<?> search (SearchReq param ) {
+
+        long beginTime = System.currentTimeMillis();
         //以太坊内部和外部账户都是20个字节，0x开头，string长度40,加上0x，【外部账户-钱包地址，内部账户-合约地址】
         //以太坊区块hash和交易hash都是0x打头长度33
         //1.判断是否是块高
@@ -155,6 +157,8 @@ public class SearchServiceImpl implements SearchService {
                     return result;
                 }
             }
+
+            logger.debug("if (isAccountOrContract) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             return result;
         }
 
@@ -199,6 +203,7 @@ public class SearchServiceImpl implements SearchService {
                     PendingOrTransaction pendingOrTransaction = pendingTxService.getDetail(pendingTxDetailReq);
                     result.setType(pendingOrTransaction.getType());
                     result.setStruct(pendingOrTransaction.getPending());
+                    logger.debug("if (isTransactionOrBlock) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
                     return result;
                 }catch (BusinessException be2){
                     throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
@@ -217,6 +222,7 @@ public class SearchServiceImpl implements SearchService {
                 result.setType("node");
                 result.setStruct(nodes.getData().get(0));
             }
+            logger.debug("if (isNodeIdOrName) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             return result;
         }
 
@@ -230,6 +236,8 @@ public class SearchServiceImpl implements SearchService {
                 BlockDetail blockDetail = blockService.getDetail(req);
                 result.setStruct(blockDetail);
                 result.setType("block");
+                logger.debug("if (isNumber) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
+
                 return result;
             }catch (BusinessException be){
                 throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
