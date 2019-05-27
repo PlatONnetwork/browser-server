@@ -88,12 +88,11 @@ public class AppNodeServiceImpl implements AppNodeService {
                     if(!hashPrice.contains("-")) return;
                     String [] tmp = hashPrice.split("-");
                     hashPriceMap.put(tmp[0],tmp[1]);
+                    // 把交易hash存储于每个汇总中，方便后面取有效票数累加
+                    summary.getHashSet().add(tmp[0]);
                 });
-
                 // 收集所有交易HASh，用于批量查询投票数
                 hashSet.addAll(hashPriceMap.keySet());
-                // 把hash存储于每个汇总中，方便后面取有效票数累加
-                summary.getHashSet().addAll(hashPriceMap.keySet());
             });
 
             List<String> txHashes = new ArrayList<>(hashSet);
