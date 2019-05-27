@@ -184,23 +184,12 @@ public class AppNodeServiceImpl implements AppNodeService {
                 returnData.forEach(node->{
                     ids.append(node.getNodeId()).append(":");
                     nodeIds.add(node.getNodeId());
+                    nodes.setVoteCount(nodes.getVoteCount()+Long.valueOf(node.getTicketCount()));
                 });
-                String idsStr = ids.toString();
-                idsStr = idsStr.substring(0,idsStr.lastIndexOf(":"));
-                logger.debug("Construct node ids Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
-
-                beginTime = System.currentTimeMillis();
-                String countInfo = ticketContract.GetCandidateTicketCount(idsStr).send();
-                logger.debug("GetCandidateTicketCount() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
-
-                beginTime = System.currentTimeMillis();
-                Map<String,Integer> countMap = JSON.parseObject(countInfo, Map.class);
-                countMap.forEach((k,v)->nodes.setVoteCount(nodes.getVoteCount()+v));
-                logger.debug("JSON.parseObject(countInfo, Map.class) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
                 beginTime = System.currentTimeMillis();
                 // 从交易表中查询总投票数量
-                Long totalVoteCount = customNodeRankingMapper.getVoteCountByNodeIds(chainId,nodeIds);
+                Long totalVoteCount = customTransactionMapper.getTotalVoteCountByNodeIds(chainId,nodeIds);
                 nodes.setTotalCount(totalVoteCount==null?0:totalVoteCount);
                 logger.debug("getVoteCountByNodeIds() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             }

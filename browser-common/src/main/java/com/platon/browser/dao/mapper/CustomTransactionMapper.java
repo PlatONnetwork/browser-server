@@ -38,4 +38,9 @@ public interface CustomTransactionMapper {
             @Param("txType") String txType,
             @Param("walletAddrs") List<String> walletAddrs
     );
+
+    long getTotalVoteCountByNodeIds(
+            @Param("chainId")String chainId,
+            @Param("nodeIds") List<String> nodeIds
+    );
 }

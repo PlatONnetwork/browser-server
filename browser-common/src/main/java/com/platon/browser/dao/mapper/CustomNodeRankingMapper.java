@@ -22,7 +22,7 @@ public interface CustomNodeRankingMapper {
             @Param("chainId")String chainId,
             @Param("nodeId") String nodeId
     );
-    long getVoteCountByNodeIds(
+    long getValidVoteCountByNodeIds(
             @Param("chainId")String chainId,
             @Param("nodeIds") List<String> nodeIds
     );
