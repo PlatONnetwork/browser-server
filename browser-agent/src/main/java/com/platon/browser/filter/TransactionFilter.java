@@ -1,6 +1,7 @@
 package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NodeRanking;
@@ -94,10 +95,9 @@ public class TransactionFilter {
                         // 查询对应节点的质押金，放到txinfo
                         NodeRankingExample nodeRankingExample = new NodeRankingExample();
                         nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
-                                .andBeginNumberGreaterThanOrEqualTo(bean.getBlockNumber()).andEndNumberLessThanOrEqualTo(bean.getBlockNumber());
-                        NodeRankingExample.Criteria second = nodeRankingExample.createCriteria().andChainIdEqualTo(chainId)
-                                .andBeginNumberGreaterThanOrEqualTo(bean.getBlockNumber()).andEndNumberIsNull();
-                        nodeRankingExample.or(second);
+                                .andBeginNumberLessThanOrEqualTo(bean.getBlockNumber());
+                        nodeRankingExample.setOrderByClause("begin_number DESC");
+                        PageHelper.startPage(1,1);
                         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
                         if(nodes.size()>0){
                             NodeRanking nodeRanking = nodes.get(0);
