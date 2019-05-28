@@ -45,7 +45,7 @@ public class TransactionBean extends TransactionWithBLOBs {
             String txinfo = JSON.toJSONString(analysisResult);
             this.setTxInfo(txinfo);
 
-            // 设置col1-col5
+            // 设置col1-col3
             this.setCol1("");
             this.setCol2("");
             this.setCol3("");
@@ -56,9 +56,12 @@ public class TransactionBean extends TransactionWithBLOBs {
                 if(param!=null){
                     // 节点ID统一添加0x
                     param.setNodeId(param.getNodeId().startsWith("0x")?param.getNodeId():"0x"+param.getNodeId());
-                    this.setCol1(bean.getParameters().getNodeId());
-                    this.setCol2(bean.getParameters().getPrice().toString());
-                    this.setCol3(bean.getParameters().getCount().toString());
+                    // 重新设置tx_info
+                    this.setTxInfo(txinfo);
+                    // 设置col1-col3
+                    this.setCol1(param.getNodeId());
+                    this.setCol2(param.getPrice().toString());
+                    this.setCol3(param.getCount().toString());
                 }
             }
         }catch (Exception e){
