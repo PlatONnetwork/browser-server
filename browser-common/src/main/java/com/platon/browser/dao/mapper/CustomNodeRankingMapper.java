@@ -31,8 +31,9 @@ public interface CustomNodeRankingMapper {
             @Param("nodeIds") List<String> nodeIds
     );
 
-    NodeRanking selectByBlockNumber(
+    NodeRanking selectByNodeIdAndBlockNumber(
             @Param("chainId")String chainId,
+            @Param("nodeId")String nodeId,
             @Param("blockNumber") long blockNumber
     );
 }

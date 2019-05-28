@@ -54,6 +54,8 @@ public class TransactionBean extends TransactionWithBLOBs {
                 TxInfo bean = JSON.parseObject(txinfo,TxInfo.class);
                 TxInfo.Parameter param = bean.getParameters();
                 if(param!=null){
+                    // 节点ID统一添加0x
+                    param.setNodeId(param.getNodeId().startsWith("0x")?param.getNodeId():"0x"+param.getNodeId());
                     this.setCol1(bean.getParameters().getNodeId());
                     this.setCol2(bean.getParameters().getPrice().toString());
                     this.setCol3(bean.getParameters().getCount().toString());

@@ -123,12 +123,13 @@
     GROUP BY node_id
   </select>
 
-  <select id="selectByBlockNumber" resultMap="BaseResultMap">
+  <select id="selectByNodeIdAndBlockNumber" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
     FROM
     `node_ranking`
     WHERE `chain_id`=#{chainId}
+    AND `node_id`=#{nodeId}
     AND `begin_number` <![CDATA[<=]]> #{blockNumber}
     AND (`end_number` >= #{blockNumber} OR `end_number` IS NULL)
     ORDER BY `begin_number` DESC

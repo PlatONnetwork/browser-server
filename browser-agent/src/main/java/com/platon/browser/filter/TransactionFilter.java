@@ -96,8 +96,8 @@ public class TransactionFilter {
                     TxInfo.Parameter tp = info.getParameters();
                     if(tp!=null){
                         // 查询对应节点的质押金，放到txinfo
-                        NodeRanking nodeRanking = customNodeRankingMapper.selectByBlockNumber(chainId,bean.getBlockNumber());
-
+                        NodeRanking nodeRanking = customNodeRankingMapper.selectByNodeIdAndBlockNumber(chainId,tp.getNodeId(),bean.getBlockNumber());
+                        // 查询节点
                         if(nodeRanking!=null){
                             tp.setDeposit(nodeRanking.getDeposit());
                             tp.setNodeName(nodeRanking.getName());
