@@ -100,8 +100,10 @@ public class TransactionFilter {
 
                         if(nodeRanking!=null){
                             tp.setDeposit(nodeRanking.getDeposit());
+                            tp.setNodeName(nodeRanking.getName());
                         }else {
                             tp.setDeposit("0");
+                            tp.setNodeName("Unknown");
                         }
                         bean.setTxInfo(JSON.toJSONString(info));
                     }
