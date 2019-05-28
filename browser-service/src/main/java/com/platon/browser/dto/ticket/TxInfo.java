@@ -12,6 +12,7 @@ public class TxInfo{
         Integer count;
         String nodeId;
         String deposit;
+        String nodeName;
     }
     String functionName,type;
     Parameter parameters;
