@@ -57,7 +57,7 @@ public class TransactionBean extends TransactionWithBLOBs {
                     // 节点ID统一添加0x
                     param.setNodeId(param.getNodeId().startsWith("0x")?param.getNodeId():"0x"+param.getNodeId());
                     // 重新设置tx_info
-                    this.setTxInfo(txinfo);
+                    this.setTxInfo(JSON.toJSONString(bean));
                     // 设置col1-col3
                     this.setCol1(param.getNodeId());
                     this.setCol2(param.getPrice().toString());
