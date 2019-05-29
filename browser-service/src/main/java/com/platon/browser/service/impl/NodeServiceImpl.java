@@ -197,7 +197,7 @@ public class NodeServiceImpl implements NodeService {
                 endNumber=block.getNumber();
             }*/
             // 更换为从缓存中获取当前节点最新块号
-            String maxBlockNum = nodeCacheService.getNodeMaxBlockNum(req.getCid(),req.getNodeId());
+            String maxBlockNum = nodeCacheService.getNodeMaxBlockNum(req.getCid(),returnData.getNodeId());
             if(StringUtils.isNotBlank(maxBlockNum)) endNumber = Long.valueOf(maxBlockNum);
         }
 
