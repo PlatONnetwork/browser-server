@@ -186,17 +186,7 @@ public class NodeServiceImpl implements NodeService {
         Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
         if(endNumber==null){
             endNumber=0l;
-            // 到区块表查当前节点最新块的块号
-            /*BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(initData.getChainId()).andNodeIdEqualTo(initData.getNodeId());
-            blockExample.setOrderByClause("number DESC");
-            PageHelper.startPage(1,1);
-            List<Block> bLocks = blockMapper.selectByExample(blockExample);
-            if(bLocks.size()>0){
-                Block block = bLocks.get(0);
-                endNumber=block.getNumber();
-            }*/
-            // 更换为从缓存中获取当前节点最新块号
+            // 从缓存中获取当前节点最新块号
             String maxBlockNum = nodeCacheService.getNodeMaxBlockNum(req.getCid(),returnData.getNodeId());
             if(StringUtils.isNotBlank(maxBlockNum)) endNumber = Long.valueOf(maxBlockNum);
         }
