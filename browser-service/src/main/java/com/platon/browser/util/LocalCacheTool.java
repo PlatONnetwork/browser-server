@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2019/5/24 11:13
  * @Description:
  */
-public class CacheTool {
+public class LocalCacheTool {
     public static final Map<String,String> TICKET_PRICE_MAP = new ConcurrentHashMap<>();
     public static final Map<String,String> NODEID_TICKETCOUNT_MAP = new ConcurrentHashMap<>();
-    public static final Map<String, AppNodeListWrapper> APP_NODEID_NODES_MAP = new ConcurrentHashMap<>();
-    public static final Map<String, NodeRespPage> API_NODEID_NODES_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, AppNodeListWrapper> APP_CHAINID_NODES_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, NodeRespPage> API_CHAINID_NODES_MAP = new ConcurrentHashMap<>();
 }
