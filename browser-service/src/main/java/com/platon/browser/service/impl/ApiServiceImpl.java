@@ -134,7 +134,7 @@ public class ApiServiceImpl implements ApiService {
         for(VoteTransaction voteTransaction : voteTransactions){
             BigDecimal inCome = incomeMap.get(voteTransaction.getTransactionHash());
             if(null == inCome) voteTransaction.setEarnings(BigDecimal.ZERO.toString());
-            else voteTransaction.setEarnings(inCome.toString());
+            else voteTransaction.setEarnings(inCome.toPlainString());
             Integer vaildSum = validVoteMap.get(voteTransaction.getTransactionHash());
             voteTransaction.setValidNum(String.valueOf(vaildSum));
         }
@@ -142,7 +142,7 @@ public class ApiServiceImpl implements ApiService {
         voteTransactions.forEach(b -> {
             BigDecimal inCome = incomeMap.get(b.getTransactionHash());
             if(null == inCome) b.setEarnings(BigDecimal.ZERO.toString());
-            else b.setEarnings(inCome.toString());
+            else b.setEarnings(inCome.toPlainString());
         });
 
         RespPage<VoteTransaction> returnData = new RespPage<>();
