@@ -36,6 +36,8 @@ platon:
     key:
       #验证节点列表
       node: browser:${version}:${profile}:chain{}:nodes
+      #节点ID与最大其所出最大区号的映射
+      nodeid-maxblocknum: browser:${version}:${profile}:chain{}:nodeid-maxblocknum:{nodeId}
       #区块列表
       block: browser:${version}:${profile}:chain{}:blocks
       #交易列表
