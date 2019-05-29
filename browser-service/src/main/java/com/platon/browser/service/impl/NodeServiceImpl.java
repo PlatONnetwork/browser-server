@@ -67,17 +67,27 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public NodeRespPage<NodeListItem> getPage(NodePageReq req) {
 
-        NodeRespPage returnData;
-        if(StringUtils.isBlank(req.getKeyword())){
-            // 查询关键字为空，则取缓存中的数据
+        NodeRespPage returnData = LocalCacheTool.API_CHAINID_NODES_MAP.get(req.getCid());
+        if(returnData==null){
+            updateLocalNodeCache(req.getCid());
             returnData = LocalCacheTool.API_CHAINID_NODES_MAP.get(req.getCid());
-            if(returnData==null){
-                updateLocalNodeCache(req.getCid());
-                returnData = LocalCacheTool.API_CHAINID_NODES_MAP.get(req.getCid());
-            }
-        }else{
-            // 查询关键字不为空，则实时查库
-            returnData = getNodePage(req);
+        }
+
+        // 根据关键字过滤数据
+        String keyword = req.getKeyword();
+        if(StringUtils.isNotBlank(keyword)){
+            List<NodeListItem> oriData = returnData.getData();
+            List<NodeListItem> tarData = new ArrayList<>();
+            oriData.forEach(node->{
+                if(req.getKeyword().startsWith("0x")){
+                    // 根据节点ID查询
+                    if(keyword.equals(node.getNodeId())) tarData.add(node);
+                }else{
+                    // 根据节点名称查询
+                    if(StringUtils.isNotBlank(node.getName()) && node.getName().contains(keyword)) tarData.add(node);
+                }
+            });
+            returnData.setData(tarData);
         }
         return returnData;
     }
