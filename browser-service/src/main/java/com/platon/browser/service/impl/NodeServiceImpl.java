@@ -87,6 +87,9 @@ public class NodeServiceImpl implements NodeService {
                     if(StringUtils.isNotBlank(node.getName()) && node.getName().contains(keyword)) tarData.add(node);
                 }
             });
+            NodeRespPage oldReturnData = returnData;
+            returnData = new NodeRespPage();
+            BeanUtils.copyProperties(oldReturnData,returnData);
             returnData.setData(tarData);
         }
         return returnData;
