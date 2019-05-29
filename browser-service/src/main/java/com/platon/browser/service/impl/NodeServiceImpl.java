@@ -70,10 +70,10 @@ public class NodeServiceImpl implements NodeService {
         NodeRespPage returnData;
         if(StringUtils.isBlank(req.getKeyword())){
             // 查询关键字为空，则取缓存中的数据
-            returnData = CacheTool.API_NODEID_NODES_MAP.get(req.getCid());
+            returnData = CacheTool.API_CHAINID_NODES_MAP.get(req.getCid());
             if(returnData==null){
                 updateLocalNodeCache(req.getCid());
-                returnData = CacheTool.API_NODEID_NODES_MAP.get(req.getCid());
+                returnData = CacheTool.API_CHAINID_NODES_MAP.get(req.getCid());
             }
         }else{
             // 查询关键字不为空，则实时查库
@@ -366,6 +366,6 @@ public class NodeServiceImpl implements NodeService {
         req.setPageNo(1);
         req.setPageSize(200);
         NodeRespPage returnData = getNodePage(req);
-        CacheTool.API_NODEID_NODES_MAP.put(chainId,returnData);
+        CacheTool.API_CHAINID_NODES_MAP.put(chainId,returnData);
     }
 }

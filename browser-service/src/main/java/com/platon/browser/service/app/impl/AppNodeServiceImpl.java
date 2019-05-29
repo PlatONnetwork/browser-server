@@ -44,10 +44,10 @@ public class AppNodeServiceImpl implements AppNodeService {
 
     @Override
     public AppNodeListWrapper list(String chainId) throws Exception {
-        AppNodeListWrapper nodes = CacheTool.APP_NODEID_NODES_MAP.get(chainId);
+        AppNodeListWrapper nodes = CacheTool.APP_CHAINID_NODES_MAP.get(chainId);
         if(nodes==null) {
             updateLocalNodeCache(chainId);
-            nodes = CacheTool.APP_NODEID_NODES_MAP.get(chainId);
+            nodes = CacheTool.APP_CHAINID_NODES_MAP.get(chainId);
         }
         return nodes;
     }
@@ -198,6 +198,6 @@ public class AppNodeServiceImpl implements AppNodeService {
             e.printStackTrace();
         }
 
-        CacheTool.APP_NODEID_NODES_MAP.put(chainId,nodes);
+        CacheTool.APP_CHAINID_NODES_MAP.put(chainId,nodes);
     }
 }
