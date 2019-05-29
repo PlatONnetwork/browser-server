@@ -12,7 +12,7 @@ import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.app.AppUserNodeListReq;
 import com.platon.browser.service.ApiService;
 import com.platon.browser.service.app.AppNodeService;
-import com.platon.browser.util.CacheTool;
+import com.platon.browser.util.LocalCacheTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +44,10 @@ public class AppNodeServiceImpl implements AppNodeService {
 
     @Override
     public AppNodeListWrapper list(String chainId) throws Exception {
-        AppNodeListWrapper nodes = CacheTool.APP_CHAINID_NODES_MAP.get(chainId);
+        AppNodeListWrapper nodes = LocalCacheTool.APP_CHAINID_NODES_MAP.get(chainId);
         if(nodes==null) {
             updateLocalNodeCache(chainId);
-            nodes = CacheTool.APP_CHAINID_NODES_MAP.get(chainId);
+            nodes = LocalCacheTool.APP_CHAINID_NODES_MAP.get(chainId);
         }
         return nodes;
     }
@@ -185,7 +185,7 @@ public class AppNodeServiceImpl implements AppNodeService {
             nodes.setTicketPrice(price);
             logger.debug("GetTicketPrice() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
-            CacheTool.TICKET_PRICE_MAP.put(chainId,price);
+            LocalCacheTool.TICKET_PRICE_MAP.put(chainId,price);
 
             // 设置总投票数量
             nodes.setTotalCount(51200);
@@ -198,6 +198,6 @@ public class AppNodeServiceImpl implements AppNodeService {
             e.printStackTrace();
         }
 
-        CacheTool.APP_CHAINID_NODES_MAP.put(chainId,nodes);
+        LocalCacheTool.APP_CHAINID_NODES_MAP.put(chainId,nodes);
     }
 }
