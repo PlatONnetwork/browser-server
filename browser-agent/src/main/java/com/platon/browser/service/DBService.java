@@ -6,9 +6,11 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.service.cache.BlockCacheService;
+import com.platon.browser.service.cache.NodeCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.thread.AnalyseThread;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class DBService {
@@ -36,6 +36,8 @@ public class DBService {
     private BlockMissingMapper blockMissingMapper;
     @Autowired
     private BlockCacheService blockCacheService;
+    @Autowired
+    private NodeCacheService nodeCacheService;
     @Autowired
     private TransactionCacheService transactionCacheService;
     @Autowired
@@ -56,6 +58,13 @@ public class DBService {
             long updateBlockCacheBeginTime = System.currentTimeMillis();
             blockCacheService.updateBlockCache(chainId, new HashSet<>(result.blocks));
             logger.debug("  |-Time Consuming(redisCacheService.updateBlockCache): {}ms",System.currentTimeMillis()-updateBlockCacheBeginTime);
+            Map<String,Long> nodeIdMaxBlockNumMap = new HashMap<>();
+            result.blocks.forEach(block->{
+                Long num = nodeIdMaxBlockNumMap.get(block.getNodeId());
+                // 如果num为空或num小于当前块号
+                if(num==null || (num!=null&&num<block.getNumber())) nodeIdMaxBlockNumMap.put(block.getNodeId(),block.getNumber());
+            });
+            if(nodeIdMaxBlockNumMap.size()>0) nodeCacheService.updateNodeIdMaxBlockNum(chainId,nodeIdMaxBlockNumMap);
         }
 
         if(result.transactions.size()>0){

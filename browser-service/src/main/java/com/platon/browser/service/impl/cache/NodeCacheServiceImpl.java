@@ -29,6 +29,8 @@ public class NodeCacheServiceImpl extends CacheBase implements NodeCacheService 
 
     @Value("${platon.redis.key.node}")
     private String nodeCacheKeyTemplate;
+    @Value("${platon.redis.key.nodeid-maxblocknum}")
+    private String nodeidMaxblocknumCacheKeyTemplate;
     @Value("${platon.fake.location.filename}")
     private String fakeLocationFilename;
 
@@ -70,6 +72,23 @@ public class NodeCacheServiceImpl extends CacheBase implements NodeCacheService 
     public void clearNodePushCache(String chainId) {
         String cacheKey = nodeCacheKeyTemplate.replace("{}",chainId);
         redisTemplate.delete(cacheKey);
+    }
+
+    @Override
+    public void updateNodeIdMaxBlockNum(String chainId,Map<String,Long> nodeIdMaxBlockNumMap){
+        String cacheKeyTemplate = nodeidMaxblocknumCacheKeyTemplate.replace("{}",chainId);
+        nodeIdMaxBlockNumMap.forEach((nodeId,blockNumber)->{
+            String cacheKey = cacheKeyTemplate.replace("{nodeId}",nodeId);
+            redisTemplate.opsForValue().set(cacheKey,blockNumber.toString());
+        });
+    }
+
+    @Override
+    public String getNodeMaxBlockNum(String chainId,String nodeId){
+        String cacheKeyTemplate = nodeidMaxblocknumCacheKeyTemplate.replace("{}",chainId);
+        String cacheKey = cacheKeyTemplate.replace("{nodeId}",nodeId);
+        String res = redisTemplate.opsForValue().get(cacheKey);
+        return res;
     }
 
     /**
