@@ -22,4 +22,6 @@ public interface NodeService {
     List<NodePushItem> getPushCache(String chainId);
     List<BlockListItem> getBlockList(BlockListReq req);
     Map<String,String> getNodeNameMap(String chainId, List<String> nodeIds);
+
+    void updateLocalNodeCache(String chainId);
 }

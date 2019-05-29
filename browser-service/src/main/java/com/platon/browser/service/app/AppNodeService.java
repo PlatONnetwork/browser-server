@@ -17,5 +17,5 @@ public interface AppNodeService {
     AppNodeListWrapper list(String chainId) throws Exception;
     AppNodeDetailDto detail(String chainId, String nodeId);
     List<AppUserNodeDto> getUserNodeList(String chainId, AppUserNodeListReq req) throws Exception;
-    void updateNodeCache(String chainId);
+    void updateLocalNodeCache(String chainId);
 }
