@@ -18,4 +18,4 @@ logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: error
-  platon: error
+  platon: debug

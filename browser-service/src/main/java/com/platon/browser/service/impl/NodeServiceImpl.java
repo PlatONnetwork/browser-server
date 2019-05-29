@@ -113,6 +113,8 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeDetail getDetail(NodeDetailReq req) {
+        long beginTime = System.currentTimeMillis();
+        long startTime = beginTime;
         NodeDetail returnData = new NodeDetail();
         NodeRankingExample condition = new NodeRankingExample();
         condition.setOrderByClause(" create_time desc ");
@@ -129,17 +131,20 @@ public class NodeServiceImpl implements NodeService {
             logger.error("invalid node id:{}",req.getId());
             throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
         }
+        logger.debug("nodeRankingMapper.selectByExample(condition) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
         // 取第一条
         NodeRanking initData = nodes.get(0);
         returnData.init(initData);
 
         // 先设置一般的平均出块时长
+        beginTime = System.currentTimeMillis();
         StatisticsCache statisticsCache = statisticCacheService.getStatisticsCache(req.getCid());
         returnData.setAvgBlockTime(statisticsCache.getAvgTime().doubleValue());
+        logger.debug("statisticCacheService.getStatisticsCache(req.getCid()) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
+        beginTime = System.currentTimeMillis();
         TicketContract ticketContract = platon.getTicketContract(req.getCid());
-
         if(initData.getNodeType().equals(NodeTypeEnum.VALIDATOR.name().toLowerCase())){
             returnData.setTicketCount(initData.getCount().intValue());
         }else {
@@ -155,10 +160,12 @@ public class NodeServiceImpl implements NodeService {
                 e.printStackTrace();
             }
         }
+        logger.debug("GetCandidateTicketCount() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
 
 
         // 设置票龄
+        beginTime = System.currentTimeMillis();
         returnData.setTicketEpoch(0l);
         try {
             String epochStr = ticketContract.GetCandidateEpoch(returnData.getNodeId()).send();
@@ -169,16 +176,18 @@ public class NodeServiceImpl implements NodeService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.debug("GetCandidateEpoch() Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
 
 
         // 中选次数
+        beginTime = System.currentTimeMillis();
         returnData.setHitCount(0l);
         Long beginNumber=returnData.getBeginNumber(),endNumber=returnData.getEndNumber();
         if(endNumber==null){
             endNumber=0l;
             // 到区块表查当前节点最新块的块号
-            BlockExample blockExample = new BlockExample();
+            /*BlockExample blockExample = new BlockExample();
             blockExample.createCriteria().andChainIdEqualTo(initData.getChainId()).andNodeIdEqualTo(initData.getNodeId());
             blockExample.setOrderByClause("number DESC");
             PageHelper.startPage(1,1);
@@ -186,16 +195,20 @@ public class NodeServiceImpl implements NodeService {
             if(bLocks.size()>0){
                 Block block = bLocks.get(0);
                 endNumber=block.getNumber();
-            }
+            }*/
+            // 更换为从缓存中获取当前节点最新块号
+            String maxBlockNum = nodeCacheService.getNodeMaxBlockNum(req.getCid(),req.getNodeId());
+            if(StringUtils.isNotBlank(maxBlockNum)) endNumber = Long.valueOf(maxBlockNum);
         }
 
         if(endNumber>beginNumber){
             BigDecimal hitCount = BigDecimal.valueOf(endNumber-beginNumber).divide(BigDecimal.valueOf(250),0,RoundingMode.DOWN);
             returnData.setHitCount(hitCount.longValue());
         }
+        logger.debug("setHitCount(hitCount.longValue()) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
 
 
-
+        logger.debug("*********Total Time Consuming: {}ms",System.currentTimeMillis()-startTime);
         return returnData;
     }
 
