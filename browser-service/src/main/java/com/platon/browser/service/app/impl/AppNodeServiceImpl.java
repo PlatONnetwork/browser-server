@@ -44,10 +44,10 @@ public class AppNodeServiceImpl implements AppNodeService {
 
     @Override
     public AppNodeListWrapper list(String chainId) throws Exception {
-        AppNodeListWrapper nodes = CacheTool.CHAINID_NODES_MAP.get(chainId);
+        AppNodeListWrapper nodes = CacheTool.APP_NODEID_NODES_MAP.get(chainId);
         if(nodes==null) {
-            updateNodeCache(chainId);
-            nodes = CacheTool.CHAINID_NODES_MAP.get(chainId);
+            updateLocalNodeCache(chainId);
+            nodes = CacheTool.APP_NODEID_NODES_MAP.get(chainId);
         }
         return nodes;
     }
@@ -164,8 +164,12 @@ public class AppNodeServiceImpl implements AppNodeService {
         return userNodeDtos;
     }
 
+    /**
+     * 更新本地进程缓存
+     * @param chainId
+     */
     @Override
-    public void updateNodeCache(String chainId){
+    public void updateLocalNodeCache(String chainId){
         logger.debug("list() begin");
         long beginTime = System.currentTimeMillis();
         long startTime = beginTime;
@@ -194,6 +198,6 @@ public class AppNodeServiceImpl implements AppNodeService {
             e.printStackTrace();
         }
 
-        CacheTool.CHAINID_NODES_MAP.put(chainId,nodes);
+        CacheTool.APP_NODEID_NODES_MAP.put(chainId,nodes);
     }
 }

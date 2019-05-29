@@ -29,6 +29,7 @@ import com.platon.browser.service.BlockService;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.service.cache.NodeCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
+import com.platon.browser.util.CacheTool;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.platon.browser.util.PageUtil;
@@ -65,131 +66,19 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeRespPage<NodeListItem> getPage(NodePageReq req) {
-        NodeRankingExample condition = new NodeRankingExample();
-        NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
-        if(StringUtils.isNotBlank(req.getKeyword())){
-            if(req.getKeyword().startsWith("0x")){
-                // 根据节点ID查询
-                criteria.andNodeIdEqualTo(req.getKeyword());
-            }else{
-                // 根据账户名称查询
-                criteria.andNameLike("%"+req.getKeyword()+"%");
+
+        NodeRespPage returnData;
+        if(StringUtils.isBlank(req.getKeyword())){
+            // 查询关键字为空，则取缓存中的数据
+            returnData = CacheTool.API_NODEID_NODES_MAP.get(req.getCid());
+            if(returnData==null){
+                updateLocalNodeCache(req.getCid());
+                returnData = CacheTool.API_NODEID_NODES_MAP.get(req.getCid());
             }
-        }
-        if(req.getIsValid()!=null){
-            // 根据是否有效属性查询
-            criteria.andIsValidEqualTo(req.getIsValid());
-        }
-        if(req.getNodeType()!=null){
-            // 根据节点类型查询
-            criteria.andTypeEqualTo(req.getNodeType());
-        }
-        condition.setOrderByClause("ranking asc");
-
-        Page<NodeListItem> page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
-        List<NodeListItem> data = new LinkedList<>();
-
-        RespPage<NodeListItem> pageData = PageUtil.getRespPage(page,data);
-        NodeRespPage returnData = new NodeRespPage();
-        BeanUtils.copyProperties(pageData,returnData);
-
-        if(nodes.size()==0) return returnData;
-
-        class CountHolder{
-            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.valueOf(Long.MAX_VALUE);
-            Long selectedCount=0l;
-        }
-        CountHolder holder = new CountHolder();
-
-        // 取票价
-        TicketContract ticketContract = platon.getTicketContract(req.getCid());
-        try {
-            String price = ticketContract.GetTicketPrice().send();
-            if (StringUtils.isNotBlank(price)){
-                returnData.setTicketPrice(Convert.fromWei(price, Convert.Unit.ETHER));
-            }else {
-                returnData.setTicketPrice(BigDecimal.ZERO);
-            }
-        } catch (Exception e) {
-            returnData.setTicketPrice(BigDecimal.ZERO);
-            e.printStackTrace();
-        }
-
-        // 取投票数
-        try {
-            String remain = ticketContract.GetPoolRemainder().send();
-            if (StringUtils.isNotBlank(remain)){
-                returnData.setVoteCount(51200-Long.valueOf(remain));
-            }else{
-                returnData.setVoteCount(0);
-            }
-        } catch (Exception e) {
-            returnData.setVoteCount(0l);
-            e.printStackTrace();
-        }
-
-        StringBuilder nodeIds = new StringBuilder();
-        nodes.forEach(initData -> {
-            NodeListItem bean = new NodeListItem();
-            bean.init(initData);
-            // 计算最低、最高质押金
-            if(StringUtils.isNotBlank(bean.getDeposit())&&bean.getIsValid()==1){
-                BigDecimal deposit = new BigDecimal(bean.getDeposit());
-                if(holder.highestDeposit.compareTo(deposit)<0){
-                    holder.highestDeposit=deposit;
-                }
-                if(holder.lowestDeposit.compareTo(deposit)>0){
-                    holder.lowestDeposit=deposit;
-                }
-            }
-            if(bean.getIsValid()==1){
-                holder.selectedCount++;
-            }
-            data.add(bean);
-            if(initData.getNodeType() != NodeTypeEnum.VALIDATOR.name().toLowerCase()){
-                nodeIds.append(initData.getNodeId()).append(":");
-            }
-        });
-
-        returnData.setSelectedNodeCount(holder.selectedCount);
-        returnData.setHighestDeposit(holder.highestDeposit);
-        returnData.setLowestDeposit(holder.lowestDeposit);
-
-        // 设置占比
-        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
-        returnData.setProportion(proportion);
-
-        // 取区块奖励
-        BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(req.getCid());
-        blockExample.setOrderByClause("number DESC");
-        PageHelper.startPage(1,1);
-        List<Block> blocks = blockMapper.selectByExample(blockExample);
-        if(blocks.size()>0){
-            Block block = blocks.get(0);
-            returnData.setBlockReward(new BigDecimal(EnergonUtil.format(Convert.fromWei(block.getBlockReward(), Convert.Unit.ETHER))));
         }else{
-            returnData.setBlockReward(BigDecimal.ZERO);
+            // 查询关键字不为空，则实时查库
+            returnData = getNodePage(req);
         }
-
-        if(nodeIds.length()>0){
-            String ids = nodeIds.toString();
-            // 设置得票数
-            try {
-                String numberOfVote = ticketContract.GetCandidateTicketCount(ids).send();
-                if(StringUtils.isNotBlank(numberOfVote)){
-                    Map<String,Integer> map = JSON.parseObject(numberOfVote,Map.class);
-                    data.forEach(node->{
-                        Integer count = map.get(node.getNodeId().replace("0x",""));
-                        if(count!=null) node.setTicketCount(count);
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         return returnData;
     }
 
@@ -331,5 +220,152 @@ public class NodeServiceImpl implements NodeService {
         List<NodeRanking> nodes = nodeRankingMapper.selectByExample(example);
         nodes.forEach(node->map.put(node.getNodeId(),node.getName()));
         return map;
+    }
+
+    /**
+     * 根据请求参数查询节点列表
+     * @param req
+     */
+    private NodeRespPage getNodePage(NodePageReq req){
+        NodeRankingExample condition = new NodeRankingExample();
+        NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        if(StringUtils.isNotBlank(req.getKeyword())){
+            if(req.getKeyword().startsWith("0x")){
+                // 根据节点ID查询
+                criteria.andNodeIdEqualTo(req.getKeyword());
+            }else{
+                // 根据账户名称查询
+                criteria.andNameLike("%"+req.getKeyword()+"%");
+            }
+        }
+        if(req.getIsValid()!=null){
+            // 根据是否有效属性查询
+            criteria.andIsValidEqualTo(req.getIsValid());
+        }
+        if(req.getNodeType()!=null){
+            // 根据节点类型查询
+            criteria.andTypeEqualTo(req.getNodeType());
+        }
+        condition.setOrderByClause("ranking asc");
+
+        Page<NodeListItem> page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        List<NodeRanking> nodes = nodeRankingMapper.selectByExample(condition);
+        List<NodeListItem> data = new LinkedList<>();
+
+        RespPage<NodeListItem> pageData = PageUtil.getRespPage(page,data);
+        NodeRespPage returnData = new NodeRespPage();
+        BeanUtils.copyProperties(pageData,returnData);
+
+        if(nodes.size()==0) return returnData;
+
+        class CountHolder{
+            BigDecimal highestDeposit=BigDecimal.ZERO,lowestDeposit=BigDecimal.valueOf(Long.MAX_VALUE);
+            Long selectedCount=0l;
+        }
+        CountHolder holder = new CountHolder();
+
+        // 取票价
+        TicketContract ticketContract = platon.getTicketContract(req.getCid());
+        try {
+            String price = ticketContract.GetTicketPrice().send();
+            if (StringUtils.isNotBlank(price)){
+                returnData.setTicketPrice(Convert.fromWei(price, Convert.Unit.ETHER));
+            }else {
+                returnData.setTicketPrice(BigDecimal.ZERO);
+            }
+        } catch (Exception e) {
+            returnData.setTicketPrice(BigDecimal.ZERO);
+            e.printStackTrace();
+        }
+
+        // 取投票数
+        try {
+            String remain = ticketContract.GetPoolRemainder().send();
+            if (StringUtils.isNotBlank(remain)){
+                returnData.setVoteCount(51200-Long.valueOf(remain));
+            }else{
+                returnData.setVoteCount(0);
+            }
+        } catch (Exception e) {
+            returnData.setVoteCount(0l);
+            e.printStackTrace();
+        }
+
+        StringBuilder nodeIds = new StringBuilder();
+        nodes.forEach(initData -> {
+            NodeListItem bean = new NodeListItem();
+            bean.init(initData);
+            // 计算最低、最高质押金
+            if(StringUtils.isNotBlank(bean.getDeposit())&&bean.getIsValid()==1){
+                BigDecimal deposit = new BigDecimal(bean.getDeposit());
+                if(holder.highestDeposit.compareTo(deposit)<0){
+                    holder.highestDeposit=deposit;
+                }
+                if(holder.lowestDeposit.compareTo(deposit)>0){
+                    holder.lowestDeposit=deposit;
+                }
+            }
+            if(bean.getIsValid()==1){
+                holder.selectedCount++;
+            }
+            data.add(bean);
+            if(initData.getNodeType() != NodeTypeEnum.VALIDATOR.name().toLowerCase()){
+                nodeIds.append(initData.getNodeId()).append(":");
+            }
+        });
+
+        returnData.setSelectedNodeCount(holder.selectedCount);
+        returnData.setHighestDeposit(holder.highestDeposit);
+        returnData.setLowestDeposit(holder.lowestDeposit);
+
+        // 设置占比
+        BigDecimal proportion = BigDecimal.valueOf(returnData.getVoteCount()).divide(BigDecimal.valueOf(51200),4, RoundingMode.DOWN);
+        returnData.setProportion(proportion);
+
+        // 取区块奖励
+        BlockExample blockExample = new BlockExample();
+        blockExample.createCriteria().andChainIdEqualTo(req.getCid());
+        blockExample.setOrderByClause("number DESC");
+        PageHelper.startPage(1,1);
+        List<Block> blocks = blockMapper.selectByExample(blockExample);
+        if(blocks.size()>0){
+            Block block = blocks.get(0);
+            returnData.setBlockReward(new BigDecimal(EnergonUtil.format(Convert.fromWei(block.getBlockReward(), Convert.Unit.ETHER))));
+        }else{
+            returnData.setBlockReward(BigDecimal.ZERO);
+        }
+
+        if(nodeIds.length()>0){
+            String ids = nodeIds.toString();
+            // 设置得票数
+            try {
+                String numberOfVote = ticketContract.GetCandidateTicketCount(ids).send();
+                if(StringUtils.isNotBlank(numberOfVote)){
+                    Map<String,Integer> map = JSON.parseObject(numberOfVote,Map.class);
+                    data.forEach(node->{
+                        Integer count = map.get(node.getNodeId().replace("0x",""));
+                        if(count!=null) node.setTicketCount(count);
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return returnData;
+    }
+
+    /**
+     * 更新本地进程缓存
+     * @param chainId
+     */
+    @Override
+    public void updateLocalNodeCache(String chainId) {
+        NodePageReq req = new NodePageReq();
+        req.setCid(chainId);
+        req.setIsValid(1);
+        req.setPageNo(1);
+        req.setPageSize(200);
+        NodeRespPage returnData = getNodePage(req);
+        CacheTool.API_NODEID_NODES_MAP.put(chainId,returnData);
     }
 }

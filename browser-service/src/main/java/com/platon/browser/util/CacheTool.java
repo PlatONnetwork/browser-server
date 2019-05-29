@@ -1,7 +1,10 @@
 package com.platon.browser.util;
 
+import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.app.node.AppNodeListWrapper;
+import com.platon.browser.dto.node.NodeListItem;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,5 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheTool {
     public static final Map<String,String> TICKET_PRICE_MAP = new ConcurrentHashMap<>();
     public static final Map<String,String> NODEID_TICKETCOUNT_MAP = new ConcurrentHashMap<>();
-    public static final Map<String, AppNodeListWrapper> CHAINID_NODES_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, AppNodeListWrapper> APP_NODEID_NODES_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, NodeRespPage> API_NODEID_NODES_MAP = new ConcurrentHashMap<>();
 }
