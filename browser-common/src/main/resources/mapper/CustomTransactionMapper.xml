@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomTransactionMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Transaction">
+    <id column="hash" jdbcType="VARCHAR" property="hash" />
+    <result column="block_number" jdbcType="BIGINT" property="blockNumber" />
+    <result column="block_hash" jdbcType="VARCHAR" property="blockHash" />
+    <result column="from" jdbcType="VARCHAR" property="from" />
+    <result column="to" jdbcType="VARCHAR" property="to" />
+    <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
+    <result column="energon_used" jdbcType="VARCHAR" property="energonUsed" />
+    <result column="energon_limit" jdbcType="VARCHAR" property="energonLimit" />
+    <result column="energon_price" jdbcType="VARCHAR" property="energonPrice" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="nonce" jdbcType="VARCHAR" property="nonce" />
+    <result column="transaction_index" jdbcType="INTEGER" property="transactionIndex" />
+    <result column="tx_receipt_status" jdbcType="INTEGER" property="txReceiptStatus" />
+    <result column="actual_tx_cost" jdbcType="VARCHAR" property="actualTxCost" />
+    <result column="tx_type" jdbcType="VARCHAR" property="txType" />
+    <result column="chain_id" jdbcType="VARCHAR" property="chainId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="receive_type" jdbcType="VARCHAR" property="receiveType" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TransactionWithBLOBs">
+    <result column="input" jdbcType="LONGVARCHAR" property="input" />
+    <result column="fail_reason" jdbcType="LONGVARCHAR" property="failReason" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    `hash`, block_number, block_hash, `from`, `to`, `timestamp`, energon_used, energon_limit,
+    energon_price, `value`, nonce, transaction_index, tx_receipt_status, actual_tx_cost,
+    tx_type, chain_id, create_time, update_time, receive_type
+  </sql>
+  <sql id="Blob_Column_List">
+    `input`, fail_reason
+  </sql>
+  <select id="selectByPageWithBLOBs" parameterType="com.platon.browser.dao.entity.TransactionPage" resultMap="ResultMapWithBLOBs">
+    SELECT
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    FROM `transaction`
+    WHERE `chain_id`=#{page.cid}
+    <![CDATA[
+    AND `block_number` <= (SELECT `block_number` FROM `transaction` ORDER BY `block_number` DESC LIMIT #{page.offset},1)
+    ]]>
+    <if test="page.height!=null">
+      AND `block_number` =  #{page.height}
+    </if>
+    ORDER BY `block_number` DESC,`transaction_index` DESC LIMIT #{page.pageSize};
+  </select>
+  <select id="selectByPage" parameterType="com.platon.browser.dao.entity.TransactionPage" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM `transaction`
+    WHERE `chain_id`=#{page.cid}
+    <![CDATA[
+    AND `block_number`<= (SELECT `block_number` FROM `transaction` ORDER BY `block_number` DESC LIMIT #{page.offset},1)
+    ]]>
+    <if test="page.height!=null">
+      AND `block_number` =  #{page.height}
+    </if>
+    ORDER BY `block_number` DESC,`transaction_index` DESC LIMIT #{page.pageSize};
+  </select>
+
+  <select id="selectByChainIdAndAddressAndBeginSequenceAndDirection" resultType="com.platon.browser.dto.app.transaction.AppTransactionDto">
+    SELECT
+    actual_tx_cost AS actualTxCost,
+    block_number AS blockNumber,
+    chain_id AS chainId,
+    `from`,
+    `hash`,
+    sequence,
+    UNIX_TIMESTAMP(`timestamp`)*1000 AS `timestamp`,
+    `to`,
+    transaction_index AS transactionIndex,
+    tx_info AS txInfo,
+    tx_receipt_status AS txReceiptStatus,
+    tx_type AS txType,
+    `value`
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId}
+    AND (
+      `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+      OR
+      `to` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    )
+    <if test="beginSequence == -1">
+        <!-- 取最新 -->
+        ORDER BY `sequence` DESC
+    </if>
+    <if test="beginSequence != -1">
+      <!-- 按指定条件取 -->
+      <if test="direction == 'new'">AND `sequence` > #{beginSequence} ORDER BY `sequence` ASC</if>
+      <if test="direction == 'old'">AND `sequence` <![CDATA[<]]> #{beginSequence} ORDER BY `sequence` DESC</if>
+    </if>
+    LIMIT #{listSize}
+  </select>
+
+  <select id="selectByChainIdAndTxTypeAndNodeIdAndAddressesAndBeginSequenceAndDirection" resultType="com.platon.browser.dto.app.transaction.AppVoteTransactionDto">
+    SELECT
+    hash,
+    col1 AS nodeId,
+    col3 AS totalTicketNum,
+    UNIX_TIMESTAMP(`timestamp`)*1000 AS transactionTime,
+    sequence,
+    `col2` AS price,
+    `from` AS walletAddress
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId}
+    AND `col1` = #{nodeId}
+    AND tx_type=#{txType}
+    AND `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+
+    <if test="beginSequence == -1">
+      <!-- 取最新 -->
+      ORDER BY `sequence` DESC
+    </if>
+    <if test="beginSequence != -1">
+      <!-- 按指定条件取 -->
+      <if test="direction == 'new'">AND `sequence` > #{beginSequence} ORDER BY `sequence` ASC</if>
+      <if test="direction == 'old'">AND `sequence` <![CDATA[<]]> #{beginSequence} ORDER BY `sequence` DESC</if>
+    </if>
+    LIMIT #{listSize}
+  </select>
+
+  <select id="getUserNodeByWalletAddress" resultType="com.platon.browser.dto.app.transaction.AppUserNodeDto">
+    SELECT
+    col1 AS nodeId,
+    SUM(CONVERT(col3,signed)) AS voteCountSum,
+    UNIX_TIMESTAMP(MAX(`timestamp`))*1000 AS lastVoteTime
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
+    `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    GROUP BY col1
+  </select>
+
+  <select id="getUserNodeTransactionByWalletAddress" resultType="com.platon.browser.dto.app.transaction.AppUserNodeTransactionDto">
+    SELECT
+    col1 AS nodeId,
+    `hash` AS txHash,
+    `col2` AS price
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type=#{txType} AND
+    `from` IN (<foreach collection="walletAddrs" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+
+  <select id="getTotalVoteCountByNodeIds" resultType="java.lang.Long">
+    SELECT
+    case when SUM(CONVERT(col3,signed)) is null then 0 else SUM(CONVERT(col3,signed)) end AS totalVoteCount
+    FROM `transaction`
+    WHERE `chain_id`=#{chainId} AND tx_type='voteTicket'
+    AND col1 IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+</mapper>

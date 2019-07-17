@@ -1,0 +1,12 @@
+dependencies {
+    compile project(":browser-common")
+    compile "com.alibaba:druid:$druidVersion"
+    compile "com.platon.client:core:$platonClientVersion"
+    compile "com.maxmind.geoip2:geoip2:$maxmindGeoVersion"
+    compile "com.univocity:univocity-parsers:$univocityVersion"
+    runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
+    compileOnly "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
+    compile "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
+    compile "javax.servlet:javax.servlet-api:$servletVersion"
+
+}

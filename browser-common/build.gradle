@@ -1,0 +1,12 @@
+dependencies {
+    implementation ("org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisSpringbootStarterVersion")
+    compile ("com.github.pagehelper:pagehelper-spring-boot-starter:$pagehelperSpringbootStarterVersion")
+    implementation("org.springframework.boot:spring-boot-starter:$springbootVersion") {
+        force = true
+    }
+    implementation("org.springframework.boot:spring-boot-starter-jdbc:$springbootVersion") {
+        force = true
+    }
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
+}
+
