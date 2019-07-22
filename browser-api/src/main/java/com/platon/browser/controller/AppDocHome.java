@@ -130,7 +130,7 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
-     *          "miner":"",            //出块节点地址
+     *          "nodeAddress":"",      //出块节点地址
      *          "nodeName":"",         //出块节点名称
      *          "stakingIcon":"",      //验证人图片
      *          "ranking":333,         //节点排行
