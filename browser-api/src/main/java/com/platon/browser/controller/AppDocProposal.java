@@ -7,7 +7,7 @@ public class AppDocProposal {
      * @api {post} proposal/proposalList a.提案列表
      * @apiVersion 1.0.0
      * @apiName proposalList
-     * @apiGroup staking
+     * @apiGroup proposal
      * @apiDescription 验证人列表
      * @apiParamExample {json} Request-Example:
      * {
@@ -41,8 +41,8 @@ public class AppDocProposal {
     /**
      * @api {post} proposal/proposalDetails b.提案详情
      * @apiVersion 1.0.0
-     * @apiName stakingDetails
-     * @apiGroup staking
+     * @apiName proposalDetails
+     * @apiGroup proposal
      * @apiDescription 验证人详情
      * @apiParamExample {json} Request-Example:
      * {
@@ -87,7 +87,7 @@ public class AppDocProposal {
      * @api {post} proposal/voteList a.投票列表
      * @apiVersion 1.0.0
      * @apiName proposalList
-     * @apiGroup staking
+     * @apiGroup proposal
      * @apiDescription 验证人列表
      * @apiParamExample {json} Request-Example:
      * {

@@ -5,7 +5,6 @@ pluginManagement {
 }
 rootProject.name = 'browser-server'
 include 'browser-agent'
-include 'app-api'
 include 'browser-api'
 include 'browser-common'
 include 'browser-generator'

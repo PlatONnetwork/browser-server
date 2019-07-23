@@ -4,11 +4,20 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {post} /home/query a.搜索
+     * @api {post} /home/queryNavigation a.搜索导航
      * @apiVersion 1.0.0
-     * @apiName query
+     * @apiName queryNavigation
      * @apiGroup home
-     * @apiDescription 根据区块 高度、区块hash查询区块详情；根据交易hash查询交易详情；根据钱包地址查询地址详情；根据合约地址查询合约详情；根据验证人节点地址、验证人节点名称查询验证人详情；
+     * @apiDescription 
+     * 1. 功能：通过用户输入的查询字符串，返回到导航信息<br/>
+     * 2. 接口使用说明：通过接口返回的type内容，在调用相应的接口查询详情<br/>
+     * - type=block，通过返回的height值查询区块详情接口；<br/>
+     * - type=transaction，通过返回的txHash值查询交易详情接口；<br/>
+     * - type=staking，通过返回的stakingHash值查询验证人详情接口；<br/>
+     * - type=contract，通过返回的address值查询合约详情接口；<br/>
+     * - type=account，通过返回的address值查询地址详情接口；<br/>
+     * 3. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:queryNavigation
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
@@ -20,13 +29,12 @@ public class AppDocHome {
      *    "errMsg": "",                //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data":{
-     *       "type":"",                //block：区块；  transaction：交易；node：验证人；contract：合约；account：地址
+     *       "type":"",                //block：区块；  transaction：交易； staking：验证人； contract：合约； account：地址
      *       "struct":{
-     *          "height":17888,        //块高，type=block存在 
-     *          "txHash":"",           //交易hash，type=transaction存在 
-     *          "address":"",          //地址，type=contract 或者 type=account存在 
-     *          "nodeAddress":"",      //节点地址，type=node存在 
-     *          "stakingHash":""       //节点质押标识，type=node存在 
+     *          "height":17888,        //区块高度
+     *          "txHash":"",           //交易hash
+     *          "address":"",          //账户或合约地址
+     *          "stakingHash":""       //验证人hash
      *       }
      *    }
      * }
@@ -34,11 +42,14 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/block/statistic/new?cid=:chainId b.出块趋势（websocket请求）全量数据
+     * @api {subscribe} /topic/block/statistic/new?cid=:chainId b.出块趋势（websocket）
      * @apiVersion 1.0.0
      * @apiName block/statistic/new
      * @apiGroup home
-     * @apiDescription 全量数据
+     * @apiDescription
+     * 1. 功能：推送最新的50条出块趋势数据<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
