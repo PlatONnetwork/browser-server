@@ -56,7 +56,7 @@ public class AppDocHome {
      * {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "data":{
+     *    "data":{  
      *       "graphData":{
      *         "x":long[],             //区块高度
      *         "ya":double[],          //出块的时间
@@ -68,7 +68,7 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/chain/statistic/new?cid=:chainId c.区块链基础数据（websocket请求）全量数据
+     * @api {subscribe} /topic/chain/statistic/new?cid=:chainId c.基础数据（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/chain/statistic/new
      * @apiGroup home
@@ -87,12 +87,12 @@ public class AppDocHome {
      *       "currentTransaction":"",  //实时交易笔数
      *       "currentTps":111,         //当前的TPS
      *       "maxTps":111,             //最大交易TPS
-     *       "turnVolume":"",          //当前流通量
-     *       "issueVolume":"",         //当前发行量
-     *       "stakingTotalVolume":"",  //当前质押总数=有效的质押+委托
-     *       "addressVolume":"",       //地址数
-     *       "proposalVolume":"",      //总提案数
-     *       "doingProposalVolume":"", //进行中提案数
+     *       "turnAmount":"",          //当前流通量
+     *       "issueAmount":"",         //当前发行量
+     *       "totalAmount":"",         //当前质押总数=有效的质押+委托
+     *       "addressQty":"",          //地址数
+     *       "proposalQty":"",         //总提案数
+     *       "doingProposalQty":""     //进行中提案数
      *    }
      * }
      */	
