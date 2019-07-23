@@ -30,7 +30,7 @@ public class AppDocBlock {
      *          "serverTime":17,       //服务器时间
      *          "transaction":10000,   //块内交易数
      *          "size":188,            //块大小
-     *          "miner":"",            //出块节点地址
+     *          "nodeAddr":"",         //出块节点地址
      *          "nodeName":"",         //出块节点名称
      *          "stakingHash":"",      //验证人id
      *          "energonUsed":111,     //区块能量消耗
@@ -39,6 +39,55 @@ public class AppDocBlock {
      *    ]
      * }
      */
+	
+	
+     /**
+     *
+     * @api {post} block/blockListByStakingId a.区块列表
+     * @apiVersion 1.0.0
+     * @apiName blockListByStakingId
+     * @apiGroup block
+     * @apiDescription 区块列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "cid":"",                    //链ID (必填)
+     *    "pageNo":1,                  //页数(必填)
+     *    "pageSize":10,               //页大小(必填)
+     *    "stakingHash":""             //验证人标识
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *    "errMsg":"",                 //描述信息
+     *    "code":0,                    //成功（0），失败则由相关失败码
+     *    "displayTotalCount":18,      //显示总数
+     *    "totalCount":18,             //小于等于500000记录的总数
+     *    "totalPages":1,              //总页数
+     *    "data":[
+     *       {
+     *          "height":17888,        //块高
+     *          "timestamp":12,        //出块时间
+     *          "transaction":10000,   //块内交易数
+     *          "blockReward":"1231",  //区块奖励(单位:Energon)
+     *       }
+     *    ]
+     * }
+     */
+	
+	
+    /**
+     * @api {get} block/blockListByStakingIdDownload?cid=:cid&stakingHash=:stakingHash&date=:date h.导出区块列表
+     * @apiVersion 1.0.0
+     * @apiName blockListByStakingIdDownload
+     * @apiGroup block
+     * @apiDescription 导出区块列表
+     * @apiParam {String} cid 链ID
+     * @apiParam {String} stakingHash 验证人标识
+     * @apiParam {String} date 数据结束日期
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * >响应为 二进制文件流
+     */	
 	
 	
     /**
@@ -82,6 +131,8 @@ public class AppDocBlock {
      *    }
      * }
      */
+	
+
 	
 	
     /**

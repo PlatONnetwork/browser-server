@@ -16,7 +16,7 @@ public class AppDocStaking {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "stakingVolume":"",       //质押总数=有效的质押+委托
+     *       "totalVolume":"",         //质押总数=有效的质押+委托
      *       "issueVolume":"",         //发行量
      *       "delegateVolume":"",      //委托总数
      *       "currentHeight":111,      //当前区块高度
@@ -59,13 +59,14 @@ public class AppDocStaking {
      *         "stakingHash":"",       //验证人id
      *         "ranking":11,           //排行
      *         "status":"",            //状态 1:活跃中 2:候选中 3:出块中
-     *         "stakingVolume":"",     //质押总数=有效的质押+委托
+     *         "totalVolume":"",       //质押总数=有效的质押+委托
      *         "delegateVolume":"",    //委托总数
      *         "delegateCount":"",     //委托人数
      *         "reportLow":11,         //低出块率举报次数
      *         "reportMutiSign":11,    //多签举报次数
      *         "generateBlock":11,     //产生的区块数
      *         "expectedIncome":""     //预计年收化率（从验证人加入时刻开始计算）
+     *         
      *      }
      *   ]
      * }
@@ -111,11 +112,75 @@ public class AppDocStaking {
 	
 	
     /**
+     * @api {subscribe} /topic/staking/change/new?cid=:chainId c.staking数据变更
+     * @apiVersion 1.0.0
+     * @apiName topic/staking/statistic/new
+     * @apiGroup home
+     * @apiDescription 全量数据
+     * @apiParam {String} cid 链ID.
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *    "errMsg":"",                 //描述信息
+     *    "code":0,                    //成功（0），失败则由相关失败码
+     *    "data":{
+     *       "isFlash":"",             //是否需要刷新列表
+     *       "nodeAddress":"",         //出块节点地址
+     *       "stakingName":"",         //验证人名称
+     *       "stakingHash":"",         //验证人id
+     *       "ranking":11,             //排行
+     *       "status":"",              //状态 1:活跃中 2:候选中 3:出块中
+     *       "totalVolume":"",         //质押总数=有效的质押+委托
+     *       "delegateVolume":"",      //委托总数
+     *       "delegateCount":"",       //委托人数
+     *       "reportLow":11,           //低出块率举报次数
+     *       "reportMutiSign":11,      //多签举报次数
+     *       "generateBlock":11,       //产生的区块数
+     *       "expectedIncome":""       //预计年收化率（从验证人加入时刻开始计算）
+     *    }
+     * }
+     */	
+	
+	
+    /**
+     * @api {post} staking/stakingOptRecordList a.委托人相关的验证人列表
+     * @apiVersion 1.0.0
+     * @apiName aliveStakingList
+     * @apiGroup staking
+     * @apiDescription 验证人列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "cid":"",                    //链ID (必填)
+     *    "pageNo":1,                  //页数(必填)
+     *    "pageSize":10,               //页大小(必填)
+     *    "stakingHash":"",            //验证人id
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "errMsg":"",                  //描述信息
+     *   "code":0,                     //成功（0），失败则由相关失败码
+     *   "totalCount":18,              //总数
+     *   "totalPages":1,               //总页数
+     *   "data":[
+     *      {
+     *         "createTime":"",        //创建时间
+     *         "optDesc":"",           //操作描述
+     *         "transactionHash":"",   //所属交易
+     *         "blockNumber":11        //所属区块
+     *         
+     *      }
+     *   ]
+     * }
+     */	
+	
+	
+    /**
      * @api {post} staking/stakingDetails b.验证人详情
      * @apiVersion 1.0.0
-     * @apiName blockDetails
-     * @apiGroup block
-     * @apiDescription 区块详情
+     * @apiName stakingDetails
+     * @apiGroup staking
+     * @apiDescription 验证人详情
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
@@ -127,27 +192,32 @@ public class AppDocStaking {
      *    "errMsg":"",                 //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data": {
-     *       "height":19988,           //块高
-     *       "timestamp":123123123879, //出块时间
-     *       "hash":"0x1238",          //区块hash
-     *       "parentHash":"0x234",     //父区块hash
-     *       "miner":"",               //出块节点地址
-     *       "nodeName":"",            //出块节点名称
+     *       "stakingName":"",         //验证人名称
      *       "stakingHash":"",         //验证人id
-     *       "timeDiff":424234,        //当前块出块时间距离上一个块出块时间之差（毫秒）
-     *       "size":123,               //区块大小
-     *       "energonLimit":24234,     //能量消耗限制
-     *       "energonUsed":2342,       //能量消耗
-     *       "energonProvided":14      //交易所提供的能量
-     *       "blockReward":"123123",   //区块奖励(单位:Energon)
-     *       "extraData":"xxx",        //附加数据
-     *       "first":false,            //是否第一条记录
-     *       "last":true,              //是否最后一条记录
-     *       "transaction":1288,       //块内交易总数
-     *       "transferTransaction":11, //块内转账交易总数
-     *       "delegateTransaction":11, //块内委托交易总数
-     *       "stakingTransaction":11,  //块内验证人交易总数
-     *       "proposalTransaction":11  //块内治理交易总数
+     *       "nodeId":"",              //节点ID
+     *       "nodeAddress":"",         //节点地址
+     *       "logo":"",                //节点LOGO，url， 如果不存在默认图片
+     *       "location":"",            //所属区域
+     *       "joinTime":199880011,     //加入时间，单位-毫秒
+     *       "status":"",              //状态 1:活跃中 2:候选中 3:出块中 4:退出中 5:已退出
+     *       "verifyCount":44554,      //被选为共识轮验证人的累计次数
+     *       "blockCount":252125,      //累计出块数
+     *       "blockRato":"",           //出块率
+     *       "rewardAmount": "0.1",    //累计奖励(单位:Energon)
+     *       "expectedIncome":"",      //预计年收化率（从验证人加入时刻开始计算）
+     *       "reportLow":11,           //低出块率举报次数
+     *       "reportMutiSign":11,      //多签举报次数
+     *       "totalVolume":"",         //质押总数
+     *       "stakingVolume":"",       //质押总数
+     *       "delegateVolume":"",      //委托总数  
+     *       "delegateCount":"",       //委托人数
+     *       "benefitAddress":"",      //收益的地址
+     *       "optAddress":"",          //操作的地址
+     *       "website":"",             //节点的第三方主页
+     *       "details":"",             //节点的描述
+     *       "externalId":""           //身份证id
+     *       "stakingRetStatus":"",    //委托退回状态
+     *       "delegateRetStatus":"",   //质押退回状态
      *    }
      * }
      */	
@@ -204,4 +274,41 @@ public class AppDocStaking {
      * HTTP/1.1 200 OK
      * >响应为 二进制文件流
      */
+	
+	
+    /**
+     * @api {post} staking/delegationListByStaking a.委托人相关的验证人列表
+     * @apiVersion 1.0.0
+     * @apiName delegationListByStaking
+     * @apiGroup staking
+     * @apiDescription 验证人列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "cid":"",                    //链ID (必填)
+     *    "pageNo":1,                  //页数(必填)
+     *    "pageSize":10,               //页大小(必填)
+     *    "stakingHash":"",            //验证人id
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "errMsg":"",                  //描述信息
+     *   "code":0,                     //成功（0），失败则由相关失败码
+     *   "totalCount":18,              //总数
+     *   "totalPages":1,               //总页数
+     *   "data":[
+     *      {
+     *         "delegateAddress":"",   //委托人地址
+     *         "optDesc":"",           //操作描述
+     *         "transactionHash":"",   //所属交易
+     *         "delegateVolume":"",    //委托数量
+     *         "delegateTotalVolume:"",//总委托数量
+     *         "locketVolume":"",      //委托数量
+     *         "locketTotalVolume:"",   /总委托数量
+     *      }
+     *   ]
+     * }
+     */	
+	
+	
 }
