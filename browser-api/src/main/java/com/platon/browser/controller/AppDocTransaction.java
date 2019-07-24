@@ -211,7 +211,13 @@ public class AppDocTransaction {
      *       "last":true,              //是否最后一条记录
      *       "receiveType":"account",  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
-     *       "nodeAddr":"",            //被质押的节点地址  当 txType = 1000 存在
+     *       "nodeAddr":"",            //被质押的节点地址  当 txType = 1000 或 1001 或 1002 存在
+     *       "stakingName":"",         //验证人名称    当 txType = 1002 或 1003 存在,使用nodeId从staking表中查询当前的验证人
+     *       "stakingHash":"",         //验证人id  当 txType = 1000 存在,stakingHash = txHash
+     *                                           当 txType = 1001 或 1002 或 1003 存在,使用nodeId从staking表中查询当前的验证人
+     *       "stakingValue":"",        //质押的总金额（可以退回的总额）：当 txType = 1003 存在
+     *       "stakingLocked":"",       //质押锁定的金额（退回锁定的金额）：当 txType = 1003 存在
+     *       "stakingRefundStatus":"", //质押金退回状态： 1：退回中  2：退回成功   当 txType = 1003 存在
      *       "depositStatus":"1",      //退回状态， 1： 退回中   2：退回成功  
      *       "depositLock":""          //剩余退回
      * }
@@ -248,6 +254,9 @@ public class AppDocTransaction {
      * {
      *    "nodeId":""                  //被质押的节点Id(也叫候选人的节点Id)
      * }
+     * 
+     * //TODO
+     * 
      * txType = 1004 时：txInfo信息：
      * {
      *    "type":0,                    //表示使用账户自由金额还是账户的锁仓金额做质押，0: 自由金额； 1: 锁仓金额
