@@ -49,7 +49,8 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新的50条出块趋势数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -72,7 +73,11 @@ public class AppDocHome {
      * @apiVersion 1.0.0
      * @apiName topic/chain/statistic/new
      * @apiGroup home
-     * @apiDescription 全量数据
+     * @apiDescription
+     * 1. 功能：推送区块链基础数据<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:networks<br/>
+     * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -81,15 +86,15 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
      *       "currentHeight":111,      //当前区块高度
-     *       "nodeAddress":"",         //出块节点地址
+     *       "nodeAddr":"",            //出块节点地址
      *       "stakingName":"",         //验证人名称
      *       "stakingHash":"",         //验证人id
-     *       "currentTransaction":"",  //实时交易笔数
+     *       "txQty":"",               //总的交易数
      *       "currentTps":111,         //当前的TPS
      *       "maxTps":111,             //最大交易TPS
      *       "turnAmount":"",          //当前流通量
      *       "issueAmount":"",         //当前发行量
-     *       "totalAmount":"",         //当前质押总数=有效的质押+委托
+     *       "totalStakingAmount":"",  //当前质押总数=有效的质押+委托
      *       "addressQty":"",          //地址数
      *       "proposalQty":"",         //总提案数
      *       "doingProposalQty":""     //进行中提案数
@@ -99,14 +104,16 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/block/list/new?cid=:chainId d.区块列表（websocket请求）全量数据
+     * @api {subscribe} /topic/block/list/new?cid=:chainId d.区块列表（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/block/list/new
      * @apiGroup home
-     * @apiDescription 全量数据
+     * @apiDescription
+     * 1. 功能：推送最新8条区块信息<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
-     * @apiParamExample {json} Request-Example:
-     * {}
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -117,10 +124,10 @@ public class AppDocHome {
      *          "height":33,           //区块高度
      *          "timestamp":33333,     //出块时间
      *          "serverTime":44444,    //服务器时间
-     *          "nodeAddress":"",      //出块节点地址
+     *          "nodeAddr":"",         //出块节点地址
      *          "stakingName":"",      //验证人名称
      *          "stakingHash":"",      //验证人id
-     *          "transaction":333      //交易数
+     *          "txQty":333            //交易数
      *       }
      *    ]
      * }
@@ -128,11 +135,15 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/staking/list/new?cid=:chainId e.验证人列表（websocket请求）全量数据
+     * @api {subscribe} /topic/staking/list/new?cid=:chainId e.验证人列表（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/staking/list/new
      * @apiGroup home
-     * @apiDescription 全量数据
+     * @apiDescription
+     * 1. 功能：推送最新8条验证人信息<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中staking表<br/>
+     * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -141,14 +152,14 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
-     *          "nodeAddress":"",      //出块节点地址
-     *          "nodeName":"",         //出块节点名称
+     *          "nodeAddr":"",         //出块节点地址
+     *          "stakingName":"",      //出块节点名称
      *          "stakingIcon":"",      //验证人图片
+     *          "stakingHash":"",      //验证人id
      *          "ranking":333,         //节点排行
      *          "expectedIncome":""    //预计年收化率（从验证人加入时刻开始计算）
      *       }
      *    ]
      * }
      */
-	
 }

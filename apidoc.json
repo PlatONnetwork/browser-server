@@ -4,5 +4,5 @@
   "description": "",
   "title": "App接口文档",
   "url": "http://192.168.9.190:20060/api-{chainId}",
-  "order":["home","transaction","block","address","staking","proposal"]
+  "order":["home","block","transaction","address","staking","proposal"]
 }

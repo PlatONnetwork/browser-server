@@ -7,7 +7,7 @@ public class AppDocStaking {
      * @api {subscribe} /topic/staking/statistic/new?cid=:chainId c.staking基础数据（websocket请求）全量数据
      * @apiVersion 1.0.0
      * @apiName topic/staking/statistic/new
-     * @apiGroup home
+     * @apiGroup staking
      * @apiDescription 全量数据
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
@@ -115,7 +115,7 @@ public class AppDocStaking {
      * @api {subscribe} /topic/staking/change/new?cid=:chainId c.staking数据变更
      * @apiVersion 1.0.0
      * @apiName topic/staking/statistic/new
-     * @apiGroup home
+     * @apiGroup staking
      * @apiDescription 全量数据
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:

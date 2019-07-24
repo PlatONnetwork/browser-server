@@ -3,11 +3,14 @@ package com.platon.browser.controller;
 public class AppDocTransaction {
 	
     /**
-     * @api {post} transaction/transactionList a.交易列表
+     * @api {post} /transaction/transactionList a.交易列表
      * @apiVersion 1.0.0
      * @apiName transactionList
      * @apiGroup transaction
-     * @apiDescription 交易列表
+     * @apiDescription
+     * 1. 功能：交易列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:transactions<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
@@ -36,7 +39,7 @@ public class AppDocTransaction {
      *                                 3000: 举报多签
      *                                 4000: 创建锁仓计划
      *         "serverTime"1123123,    //服务器时间
-     *         "blockTime":18080899999,//出块时间
+     *         "timestamp":18080899999,//交易时间
      *         "blockHeight":"15566",  //交易所在区块高度
      *         "failReason":"",        //失败原因
      *         "receiveType":"account" //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
@@ -48,11 +51,14 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {post} transaction/transactionListByBlock d.区块交易列表
+     * @api {post} /transaction/transactionListByBlock b.区块的交易列表
      * @apiVersion 1.0.0
      * @apiName transactionListByBlock
      * @apiGroup transaction
-     * @apiDescription 区块交易列表
+     * @apiDescription
+     * 1. 功能：区块的交易列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中transaction表
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
@@ -60,7 +66,7 @@ public class AppDocTransaction {
      *    "pageSize":10,               //页大小(必填)
      *    "blockNumber":500,           //区块号(必填)
      *    "txType":"",                 //交易类型 (可选), 如不不传代表全部。
-     *                                 base：基础交易
+     *                                 transfer：交易
      *                                 delegate：委托相关交易
      *                                 staking：验证人相关交易
      *                                 proposal：治理相关交易
@@ -85,6 +91,7 @@ public class AppDocTransaction {
      *                                 2000: 提交文本提案 2001: 提交升级提案 2002: 提交参数提案 2003: 给提案投票 2004: 版本声明
      *                                 3000: 举报多签
      *                                 4000: 创建锁仓计划
+     *         "failReason":"",        //失败原因
      *         "receiveType":"account" //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
      *      }
@@ -94,19 +101,22 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {post} transaction/transactionListByAddress d.地址交易列表
+     * @api {post} /transaction/transactionListByAddress c.地址的交易列表
      * @apiVersion 1.0.0
      * @apiName transactionListByAddress
      * @apiGroup transaction
-     * @apiDescription 区块交易列表
+     * @apiDescription
+     * 1. 功能：地址的交易列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中transaction表
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "address":"0x"               //地址(必填)
-     *    "txType":"",                 //交易类型 (可选), 如不不传代表全部。
-     *                                 base：基础交易
+     *    "address":"0x",              //地址(必填)
+     *    "txType":""                  //交易类型 (可选), 如不不传代表全部。
+     *                                 transfer：基础交易
      *                                 delegate：委托相关交易
      *                                 staking：验证人相关交易
      *                                 proposal：治理相关交易
@@ -117,7 +127,6 @@ public class AppDocTransaction {
      *   "errMsg":"",                  //描述信息
      *   "code":0,                     //成功（0），失败则由相关失败码
      *   "totalCount":18,              //总数
-     *   "totalPages":1,               //总页数
      *   "data":[
      *      {
      *         "txHash":"0x234234",    //交易hash
@@ -131,10 +140,11 @@ public class AppDocTransaction {
      *                                 2000: 提交文本提案 2001: 提交升级提案 2002: 提交参数提案 2003: 给提案投票 2004: 版本声明
      *                                 3000: 举报多签
      *                                 4000: 创建锁仓计划
+     *         "failReason":"",        //失败原因
      *         "receiveType":"account",//此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
-     *         "blockTime":18080899999,//出块时间
-     *         "blockHeight":"15566",  //交易所在区块高度
+     *         "timestamp":18080899999,//交易时间
+     *         "blockHeight":"15566"   //交易所在区块高度
      *      }
      *   ]
      * }
@@ -142,11 +152,14 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {get} transaction/addressTransactionDownload?cid=:cid&address=:address&date=:date h.导出地址交易列表
+     * @api {get} transaction/addressTransactionDownload?cid=:cid&address=:address&date=:date d.导出地址交易列表
      * @apiVersion 1.0.0
-     * @apiName addressDownload
+     * @apiName addressTransactionDownload
      * @apiGroup transaction
-     * @apiDescription 导出地址详情
+     * @apiDescription
+     * 1. 功能：导出地址的交易列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中transaction表
      * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
@@ -157,7 +170,7 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {post} transaction/transactionDetails c.交易详情
+     * @api {post} transaction/transactionDetails e.交易详情  TODO
      * @apiVersion 1.0.0
      * @apiName transactionDetails
      * @apiGroup transaction
@@ -198,6 +211,7 @@ public class AppDocTransaction {
      *       "last":true,              //是否最后一条记录
      *       "receiveType":"account",  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
+     *       "nodeAddr":"",            //被质押的节点地址  当 txType = 1000 存在
      *       "depositStatus":"1",      //退回状态， 1： 退回中   2：退回成功  
      *       "depositLock":""          //剩余退回
      * }
@@ -307,7 +321,7 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {post} transaction/transactionDetailNavigate d.交易详情前后跳转浏览
+     * @api {post} transaction/transactionDetailNavigate h.交易详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName transactionDetailNavigate
      * @apiGroup transaction
