@@ -4,11 +4,11 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {subscribe} /topic/staking/statistic/new?cid=:chainId c.staking基础数据（websocket请求）全量数据
+     * @api {subscribe} /topic/staking/statistic/new?cid=:chainId a.汇总数据（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/staking/statistic/new
      * @apiGroup staking
-     * @apiDescription 全量数据
+     * @apiDescription
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -16,12 +16,14 @@ public class AppDocStaking {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "totalVolume":"",         //质押总数=有效的质押+委托
+     *       "totalVolume":"",         //质押委托总数
+     *       "totalStakingVolume":"",  //质押总数
      *       "issueVolume":"",         //发行量
-     *       "delegateVolume":"",      //委托总数
+     *       "curBlockReward":"",      //当前的出块奖励
+     *       "curStakingReward":"",    //当前的质押奖励
      *       "currentHeight":111,      //当前区块高度
-     *       "addFinishBlock":111,     //当前增发周期的结束快高
-     *       "addIndexBlock":111,      //当前快高处于增发周期的index
+     *       "addIssueBegin":111,      //当前增发周期的开始快高
+     *       "addIssueEnd":111,        //当前增发周期的结束块高
      *       "nextSetting":111         //离下个结算周期倒计时
      *    }
      * }
@@ -29,7 +31,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/aliveStakingList a.委托人相关的验证人列表
+     * @api {post} staking/aliveStakingList b.验证人列表 //TODO
      * @apiVersion 1.0.0
      * @apiName aliveStakingList
      * @apiGroup staking
@@ -54,11 +56,10 @@ public class AppDocStaking {
      *   "totalPages":1,               //总页数
      *   "data":[
      *      {
-     *         "nodeAddress":"",       //出块节点地址
-     *         "stakingName":"",       //验证人名称
-     *         "stakingHash":"",       //验证人id
      *         "ranking":11,           //排行
-     *         "status":"",            //状态 1:活跃中 2:候选中 3:出块中
+     *         "nodeAddr":"",          //出块节点地址
+     *         "stakingName":"",       //验证人名称
+     *         "status":"",            //状态   1:候选中  2:活跃中 3:出块中
      *         "totalVolume":"",       //质押总数=有效的质押+委托
      *         "delegateVolume":"",    //委托总数
      *         "delegateCount":"",     //委托人数
@@ -74,7 +75,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/historyStakingList a.委托人相关的验证人列表
+     * @api {post} staking/historyStakingList c.委托人相关的验证人列表
      * @apiVersion 1.0.0
      * @apiName historyStakingList
      * @apiGroup staking
@@ -114,7 +115,7 @@ public class AppDocStaking {
     /**
      * @api {subscribe} /topic/staking/change/new?cid=:chainId c.staking数据变更
      * @apiVersion 1.0.0
-     * @apiName topic/staking/statistic/new
+     * @apiName xxx
      * @apiGroup staking
      * @apiDescription 全量数据
      * @apiParam {String} cid 链ID.
@@ -143,7 +144,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/stakingOptRecordList a.委托人相关的验证人列表
+     * @api {post} staking/stakingOptRecordList c.委托人相关的验证人列表
      * @apiVersion 1.0.0
      * @apiName aliveStakingList
      * @apiGroup staking
@@ -176,7 +177,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/stakingDetails b.验证人详情
+     * @api {post} staking/stakingDetails c.验证人详情
      * @apiVersion 1.0.0
      * @apiName stakingDetails
      * @apiGroup staking
@@ -224,7 +225,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/stakingListByDelegateAddress a.委托人相关的验证人列表
+     * @api {post} staking/stakingListByDelegateAddress c.委托人相关的验证人列表
      * @apiVersion 1.0.0
      * @apiName stakingListByDelegateAddress
      * @apiGroup staking
@@ -277,7 +278,7 @@ public class AppDocStaking {
 	
 	
     /**
-     * @api {post} staking/delegationListByStaking a.委托人相关的验证人列表
+     * @api {post} staking/delegationListByStaking c.委托人相关的验证人列表
      * @apiVersion 1.0.0
      * @apiName delegationListByStaking
      * @apiGroup staking
