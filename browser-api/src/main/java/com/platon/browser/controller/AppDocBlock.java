@@ -37,7 +37,8 @@ public class AppDocBlock {
      *          "stakingName":"",      //验证人名称
      *          "stakingHash":"",      //验证人id
      *          "energonUsed":111,     //区块能量消耗
-     *          "txEnergonLimit":14    //交易所提供的能量
+     *          "txEnergonLimit":14,   //交易所提供的能量
+     *          "blockReward":"1231"   //区块奖励(单位:Energon)
      *       }
      *    ]
      * }
@@ -63,21 +64,7 @@ public class AppDocBlock {
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
-     * {
-     *    "errMsg":"",                 //描述信息
-     *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "displayTotalCount":18,      //显示总数
-     *    "totalCount":18,             //小于等于500000记录的总数
-     *    "totalPages":1,              //总页数
-     *    "data":[
-     *       {
-     *          "height":17888,        //块高
-     *          "timestamp":12,        //出块时间
-     *          "transaction":10000,   //块内交易数
-     *          "blockReward":"1231"   //区块奖励(单位:Energon)
-     *       }
-     *    ]
-     * }
+     * > 返回值同《区块列表接口》返回值
      */
 	
 	
@@ -151,11 +138,7 @@ public class AppDocBlock {
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate
      * @apiGroup block
-     * @apiDescription 
-     * 1. 功能：区块详情前后跳转浏览<br/>
-     * 2. 实现逻辑：<br/>
-     * - 先查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks，一次性查询三条数据<br/>
-     * - 上步没有命中在查询mysql中block表，一次性查询三条数据
+     * @apiDescription 区块详情前后跳转浏览
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
