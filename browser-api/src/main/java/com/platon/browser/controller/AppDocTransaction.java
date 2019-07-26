@@ -39,8 +39,8 @@ public class AppDocTransaction {
      *                                 3000: 举报多签
      *                                 4000: 创建锁仓计划
      *         "serverTime"1123123,    //服务器时间
-     *         "timestamp":18080899999,//交易时间
-     *         "blockHeight":"15566",  //交易所在区块高度
+     *         "timestamp":18080899999,//出块时间
+     *         "blockNumber":"15566",  //交易所在区块高度
      *         "failReason":"",        //失败原因
      *         "receiveType":"account" //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
@@ -131,25 +131,17 @@ public class AppDocTransaction {
      * 1. 查询mysql中transaction表<br/>
      * - 如果txType = 0（转账）：转账信息从基本信息中取
      * - 如果txType = 1、2、5（合约创建执行）：合约信息从基本信息中取
-     * - 如果txType = 1000（创建验证人）： 创建验证人 = nodeAddr + stakingName + stakingHash + externalId + benefitAddress + programVersion + website + details + value
-     * - 如果txType = 1002（增加质押）：增加质押 = nodeAddr + stakingName + stakingHash + value
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     * - 如果txType = 1001（编辑验证人）：编辑验证人 = nodeAddr + stakingName + stakingHash + externalId + benefitAddress + programVersion + website + details
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     * - 如果txType = 1003（退出验证人）：退出验证 = nodeAddr + stakingName + stakingHash + stakingRefundStatus + stakingRefundLocked + stakingValue
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     * - 如果txType = 1004（委托）：验证人 = nodeAddr + stakingName + stakingHash
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     * - 如果txType = 1005（委托赎回）：委托赎回 = nodeAddr + stakingName + stakingHash + applyAmount + redeemLocked + redeemStatus
-     *   - 需要通过nodeId + stakingBlockNum 关联staking表查询验证人信息
-     *   - 需要通过txHash 关联delegation_redeem表查询赎回的信息
-     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeAddr + stakingName + stakingHash + txType + githubID + proposalTopic + proposalHash
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     * - 如果txType = 2003（投票提案）：投票提案 = nodeAddr + stakingName + stakingHash + txType + githubID + proposalTopic + proposalHash + proposalOption
-     *   - 需要通过nodeId关联staking表查询验证人信息
-     *   - 需要通过proposal_hash关联proposal表查询提案信息
-     * - 如果txType = 2004（版本声明）：版本声明 = nodeAddr + stakingName + stakingHash + declareVersion
-     *   - 需要通过nodeId关联staking表查询验证人信息
+     * - 如果txType = 1000（创建验证人）： 创建验证人 = nodeAddr + nodeName + externalId + benefitAddr + programVersion + website + details + value
+     * - 如果txType = 1001（编辑验证人）：编辑验证人 = nodeAddr + nodeName + externalId + benefitAddr + programVersion + website + details
+     * - 如果txType = 1002（增加质押）：增加质押 = nodeAddr + nodeName + value
+     * - 如果txType = 1003（退出验证人）：退出验证 = nodeAddr + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
+     *   - 需要通过txHash关联un_staking表查询验证人信息
+     * - 如果txType = 1004（委托）：验证人 = nodeAddr + nodeName
+     * - 如果txType = 1005（委托赎回）：委托赎回 = nodeAddr + nodeName + applyAmount + redeemLocked + redeemStatus
+     *   - 需要通过txHash 关联un_delegation表查询赎回的信息
+     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeAddr + nodeName + txType + githubID + proposalTopic + proposalHash
+     * - 如果txType = 2003（投票提案）：投票提案 = nodeAddr + nodeName + txType + githubID + proposalTopic + proposalHash + proposalOption
+     * - 如果txType = 2004（版本声明）：版本声明 = nodeAddr + nodeName + declareVersion
      * - 如果txType = 4000（创建锁仓）：创建锁仓 = RPAccount + value + RPPlan
      * 
      * @apiParamExample {json} Request-Example:
@@ -170,7 +162,7 @@ public class AppDocTransaction {
      *       "timestamp":123123879,    //交易时间
      *       "serverTime"1123123,      //服务器时间
      *       "confirmNum":444,         //区块确认数
-     *       "blockHeight":"15566",    //交易所在区块高度
+     *       "blockNumber":"15566",    //交易所在区块高度
      *       "energonLimit":232,       //能量限制
      *       "energonUsed":122,        //能量消耗
      *       "energonPrice":122,       //能量价格
@@ -182,7 +174,7 @@ public class AppDocTransaction {
      *                                 2000: 提交文本提案 2001: 提交升级提案 2002: 提交参数提案 2003: 给提案投票 2004: 版本声明
      *                                 3000: 举报多签
      *                                 4000: 创建锁仓计划
-     *       "inputData":"",           //附加输入数据
+     *       "input":"",               //附加输入数据
      *       "txInfo":"{jsonObject}"   //附加输入数据解析后的结构
      *       "failReason":"",          //失败原因
      *       "first":false,            //是否第一条记录
@@ -201,9 +193,8 @@ public class AppDocTransaction {
      *       ]
      *       "nodeId":"",              //节点id
      *       "nodeAddr":"",            //节点地址
-     *       "stakingName":"",         //验证人名称
-     *       "stakingHash":"",         //验证人id
-     *       "benefitAddress":"",      //用于接受出块奖励和质押奖励的收益账户
+     *       "nodeName":"",            //节点名称
+     *       "benefitAddr":"",         //用于接受出块奖励和质押奖励的收益账户
      *       "externalId":"",          //外部Id(有长度限制，给第三方拉取节点描述的Id)
      *       "website":"",             //节点的第三方主页(有长度限制，表示该节点的主页)
      *       "details":"",             //节点的描述(有长度限制，表示该节点的描述)
@@ -211,15 +202,12 @@ public class AppDocTransaction {
      *       "applyAmount":"",         //申请赎回的金额
      *       "redeemLocked":"",        //赎回中被锁定的金额
      *       "redeemStatus":"1",       //赎回状态， 1： 退回中   2：退回成功 
-     *       "githubID":"",            //提案在github上的id
+     *       "redeemUnLockedBlock":"", //预计赎回到账的区块
+     *       "githubID":"",            //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
      *       "proposalTopic":"",       //提案的主题
      *       "proposalHash":"",        //提案id
-     *       "proposalOption":"",      //投票  0x01：文本提案    0x02：升级提案   0x03：参数提案
+     *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
      *       "declareVersion":"",      //声明的版本 
-     *       "stakingRefundStatus":"", //质押退回状态： 1：退回中  2：退回成功
-     *       "stakingRefundLocked":"", //质押退回被锁定的金额
-     *       "stakingRefundNumber":"", //质押退回的快高
-     *       "stakingValue":""         //质押的总金额
      *        --可选信息结束
      * }
      */	

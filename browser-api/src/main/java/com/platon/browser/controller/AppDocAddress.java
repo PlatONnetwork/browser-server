@@ -34,7 +34,7 @@ public class AppDocAddress {
      *       "candidateCount":11,      //已委托验证人
      *       "delegateHes":"",         //未锁定委托（LAT）
      *       "delegateLocked":"",      //已锁定委托（LAT）
-     *       "delegateReleased":"",    //已解除委托（LAT）   
+     *       "delegateUnlock":"",      //已解除委托（LAT）   
      *       "delegateReduction":""    //赎回中委托（LAT）   
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址

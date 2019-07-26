@@ -13,11 +13,13 @@ public class AppDocHome {
      * 2. 接口使用说明：通过接口返回的type内容，在调用相应的接口查询详情<br/>
      * - type=block，通过返回的height值查询区块详情接口；<br/>
      * - type=transaction，通过返回的txHash值查询交易详情接口；<br/>
-     * - type=staking，通过返回的stakingHash值查询验证人详情接口；<br/>
-     * - type=contract，通过返回的address值查询合约详情接口；<br/>
-     * - type=account，通过返回的address值查询地址详情接口；<br/>
+     * - type=address，通过返回的address值查询地址详情接口；<br/>
+     * - type=staking，通过返回的nodeAddr值查询验证人详情接口；<br/>
      * 3. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:queryNavigation
+     * - 当入参为整数类型，查询mysql中block表
+     * - 当入参为地址类型， 查询mysql中address表，如果没有在查询mysql中node表通过节点地址
+     * - 当入参为hash类型，查询mysql中transaction表，如果没有在查询mysql中block表
+     * - 如果上面没有查询到，查询mysql中node表通过节点名称查询
      * @apiParamExample {json} Request-Example:
      * {
      *    "cid":"",                    //链ID (必填)
@@ -29,12 +31,12 @@ public class AppDocHome {
      *    "errMsg": "",                //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data":{
-     *       "type":"",                //block：区块；  transaction：交易； staking：验证人； contract：合约； account：地址
+     *       "type":"",                //block：区块；  transaction：交易；  address：地址； staking：验证人
      *       "struct":{
-     *          "height":17888,        //区块高度
+     *          "number":17888,        //区块高度
      *          "txHash":"",           //交易hash
-     *          "address":"",          //账户或合约地址
-     *          "stakingHash":""       //验证人hash
+     *          "address":"",          //地址
+     *          "nodeAddr":""          //节点地址
      *       }
      *    }
      * }
@@ -76,7 +78,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送区块链基础数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:networks<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:network_stat<br/>
      * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
@@ -85,16 +87,15 @@ public class AppDocHome {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "currentHeight":111,      //当前区块高度
+     *       "currentNumber":111,      //当前区块高度
      *       "nodeAddr":"",            //出块节点地址
-     *       "stakingName":"",         //验证人名称
-     *       "stakingHash":"",         //验证人id
+     *       "nodeName":"",            //出块节点名称
      *       "txQty":"",               //总的交易数
      *       "currentTps":111,         //当前的TPS
      *       "maxTps":111,             //最大交易TPS
-     *       "turnAmount":"",          //当前流通量
-     *       "issueAmount":"",         //当前发行量
-     *       "totalStakingAmount":"",  //当前质押总数=有效的质押+委托
+     *       "turnValue":"",           //当前流通量
+     *       "issueValue":"",          //当前发行量
+     *       "stakingDelegationValue":"",  //当前质押总数=有效的质押+委托
      *       "addressQty":"",          //地址数
      *       "proposalQty":"",         //总提案数
      *       "doingProposalQty":""     //进行中提案数
@@ -121,13 +122,12 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
-     *          "height":33,           //区块高度
+     *          "number":33,           //区块高度
      *          "timestamp":33333,     //出块时间
      *          "serverTime":44444,    //服务器时间
      *          "nodeAddr":"",         //出块节点地址
-     *          "stakingName":"",      //验证人名称
-     *          "stakingHash":"",      //验证人id
-     *          "txQty":333            //交易数
+     *          "nodeName":"",         //节点名称
+     *          "statTxQty":333        //交易数
      *       }
      *    ]
      * }
@@ -142,7 +142,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新8条验证人信息<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询mysql中staking表<br/>
+     * - 查询mysql中node表<br/>
      * - 5s全量推送一次
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
@@ -153,9 +153,8 @@ public class AppDocHome {
      *    "data":[
      *       {
      *          "nodeAddr":"",         //出块节点地址
-     *          "stakingName":"",      //出块节点名称
+     *          "nodeName":"",         //出块节点名称
      *          "stakingIcon":"",      //验证人图片
-     *          "stakingHash":"",      //验证人id
      *          "ranking":333,         //节点排行
      *          "expectedIncome":""    //预计年收化率（从验证人加入时刻开始计算）
      *       }
