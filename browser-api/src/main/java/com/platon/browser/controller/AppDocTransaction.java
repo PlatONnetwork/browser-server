@@ -13,9 +13,8 @@ public class AppDocTransaction {
      * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:transactions<br/>
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
-     *    "pageSize":10,               //页大小(必填)
+     *    "pageSize":10                //页大小(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -61,11 +60,10 @@ public class AppDocTransaction {
      * - 查询mysql中transaction表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
      *    "blockNumber":500,           //区块号(必填)
-     *    "txType":"",                 //交易类型 (可选), 如不不传代表全部。
+     *    "txType":""                  //交易类型 (可选), 如不不传代表全部。
      *                                 transfer：交易
      *                                 delegate：委托相关交易
      *                                 staking：验证人相关交易
@@ -88,7 +86,6 @@ public class AppDocTransaction {
      * - 查询mysql中transaction表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
      *    "address":"0x",              //地址(必填)
@@ -105,7 +102,7 @@ public class AppDocTransaction {
 	
 	
     /**
-     * @api {get} /transaction/addressTransactionDownload?cid=:cid&address=:address&date=:date d.导出地址交易列表
+     * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date d.导出地址交易列表
      * @apiVersion 1.0.0
      * @apiName addressTransactionDownload
      * @apiGroup transaction
@@ -113,7 +110,6 @@ public class AppDocTransaction {
      * 1. 功能：导出地址的交易列表查询<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中transaction表
-     * @apiParam {String} cid 链ID
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:
@@ -146,8 +142,7 @@ public class AppDocTransaction {
      * 
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
-     *    "txHash":"",                 //交易Hash(必填)
+     *    "txHash":""                  //交易Hash(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -221,9 +216,8 @@ public class AppDocTransaction {
      * @apiDescription 交易详情前后跳转浏览
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "txHash":""                  //交易Hash(必填)
-     *    "direction":"",              //方向：prev-上一个，next-下一个 (必填)
+     *    "direction":""               //方向：prev-上一个，next-下一个 (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK

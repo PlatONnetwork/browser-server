@@ -14,7 +14,6 @@ public class AppDocBlock {
      * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10                //页大小(必填)
      * }
@@ -56,7 +55,6 @@ public class AppDocBlock {
      * - 查询mysql中block表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
      *    "nodeAddr":""                //节点地址
@@ -68,7 +66,7 @@ public class AppDocBlock {
 	
 	
     /**
-     * @api {get} /block/blockListByNodeAddrDownload?cid=:cid&nodeAddr=:nodeAddr&date=:date c.导出节点的区块列表
+     * @api {get} /block/blockListByNodeAddrDownload?nodeAddr=:nodeAddr&date=:date c.导出节点的区块列表
      * @apiVersion 1.0.0
      * @apiName blockListByNodeAddrDownload
      * @apiGroup block
@@ -76,7 +74,6 @@ public class AppDocBlock {
      * 1. 功能：导出节点产生的区块列表查询<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中block表
-     * @apiParam {String} cid 链ID
      * @apiParam {String} stakingHash 验证人标识
      * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:
@@ -96,7 +93,6 @@ public class AppDocBlock {
      * - 查询mysql中block表，一次性查询三条数据
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "number":123                 //区块高度(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -139,9 +135,8 @@ public class AppDocBlock {
      * @apiDescription 区块详情前后跳转浏览
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "number":123,                //当前所在页面的区块高度(必填)
-     *    "direction":"",              //方向：prev-上一个，next-下一个 (必填)
+     *    "direction":""               //方向：prev-上一个，next-下一个 (必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK

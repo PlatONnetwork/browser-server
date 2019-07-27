@@ -11,7 +11,6 @@ public class AppDocAddress {
      * @apiDescription 查询地址详情
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "address":"0x"               //账户地址(必填)
      * }
      * @apiSuccessExample {json} Success-Response:

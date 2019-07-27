@@ -22,7 +22,6 @@ public class AppDocHome {
      * - 如果上面没有查询到，查询mysql中node表通过节点名称查询
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "parameter":""               //用户输入
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -44,7 +43,7 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/block/statistic/new?cid=:chainId b.出块趋势（websocket）
+     * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
      * @apiVersion 1.0.0
      * @apiName block/statistic/new
      * @apiGroup home
@@ -53,7 +52,6 @@ public class AppDocHome {
      * 2. 实现逻辑：<br/>
      * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
      * - 5s全量推送一次
-     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -71,7 +69,7 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/chain/statistic/new?cid=:chainId c.基础数据（websocket）
+     * @api {subscribe} /topic/chain/statistic/new c.基础数据（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/chain/statistic/new
      * @apiGroup home
@@ -80,7 +78,6 @@ public class AppDocHome {
      * 2. 实现逻辑：<br/>
      * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:network_stat<br/>
      * - 5s全量推送一次
-     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -105,7 +102,7 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/block/list/new?cid=:chainId d.区块列表（websocket）
+     * @api {subscribe} /topic/block/list/new d.区块列表（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/block/list/new
      * @apiGroup home
@@ -114,7 +111,6 @@ public class AppDocHome {
      * 2. 实现逻辑：<br/>
      * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
      * - 5s全量推送一次
-     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -135,7 +131,7 @@ public class AppDocHome {
 	
 	
     /**
-     * @api {subscribe} /topic/staking/list/new?cid=:chainId e.验证人列表（websocket）
+     * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/staking/list/new
      * @apiGroup home
@@ -144,7 +140,6 @@ public class AppDocHome {
      * 2. 实现逻辑：<br/>
      * - 查询mysql中node表<br/>
      * - 5s全量推送一次
-     * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {

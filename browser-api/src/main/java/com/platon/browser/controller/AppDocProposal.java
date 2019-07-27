@@ -12,9 +12,8 @@ public class AppDocProposal {
      * - 查询mysql中proposal表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
-     *    "pageSize":10,               //页大小(必填)
+     *    "pageSize":10                //页大小(必填)
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -49,8 +48,7 @@ public class AppDocProposal {
      * - 查询mysql中proposal表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
-     *    "proposalHash":"",           //提案的内部id
+     *    "proposalHash":""            //提案的内部id
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -94,7 +92,6 @@ public class AppDocProposal {
      * - 查询mysql中vote表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "cid":"",                    //链ID (必填)
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
      *    "proposalHash":"",           //提案的内部id
