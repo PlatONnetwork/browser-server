@@ -36,7 +36,7 @@ public class AppDocBlock {
      *          "nodeName":"",         //节点名称
      *          "energonUsed":111,     //区块能量消耗
      *          "statTxEnergonLimit":14, //交易中提供的能量总和
-     *          "blockReward":"1231"   //区块奖励(单位:Energon)
+     *          "blockReward":"1231"   //区块奖励(单位:von)
      *       }
      *    ]
      * }
@@ -113,7 +113,7 @@ public class AppDocBlock {
      *       "energonLimit":24234,     //能量消耗限制
      *       "energonUsed":2342,       //能量消耗
      *       "txEnergonLimit":14,      //交易所提供的能量
-     *       "blockReward":"123123",   //区块奖励(单位:Energon)
+     *       "blockReward":"123123",   //区块奖励(单位:von)
      *       "extraData":"xxx",        //附加数据
      *       "first":false,            //是否第一条记录
      *       "last":true,              //是否最后一条记录

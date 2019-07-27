@@ -29,8 +29,8 @@ public class AppDocTransaction {
      *         "txHash":"0x234234",    //交易hash
      *         "from":"0x667766",      //发送方地址
      *         "to":"0x667766",        //接收方地址（操作地址）
-     *         "value":"222",          //金额(单位:Energon)
-     *         "actualTxCost":"22",    //交易费用(单位:Energon)
+     *         "value":"222",          //金额(单位:von)
+     *         "actualTxCost":"22",    //交易费用(单位:von)
      *         "txType":""             //交易类型
      *                                 0：转账  1：合约发布  2：合约调用    5：MPC交易
      *                                 1000: 发起质押  1001: 修改质押信息  1002: 增持质押  1003: 撤销质押 1004: 发起委托  1005: 减持/撤销委托
@@ -161,8 +161,8 @@ public class AppDocTransaction {
      *       "energonLimit":232,       //能量限制
      *       "energonUsed":122,        //能量消耗
      *       "energonPrice":122,       //能量价格
-     *       "value":"222",            //金额(单位:Energon)
-     *       "actualTxCost":"22",      //交易费用(单位:Energon)
+     *       "value":"222",            //金额(单位:von)
+     *       "actualTxCost":"22",      //交易费用(单位:von)
      *       "txType":"",              //交易类型
      *                                 0：转账  1：合约发布  2：合约调用    5：MPC交易
      *                                 1000: 发起质押  1001: 修改质押信息  1002: 增持质押  1003: 撤销质押 1004: 发起委托  1005: 减持/撤销委托
