@@ -9,18 +9,22 @@ public class AppDocStaking {
      * @apiName topic/staking/statistic/new
      * @apiGroup staking
      * @apiDescription 
+     * 1. 功能：推送汇总数据<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:networkstat<br/>
+     * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
-     *       "totalVolume":"",         //质押委托总数
-     *       "totalStakingVolume":"",  //质押总数
-     *       "issueVolume":"",         //发行量
-     *       "curBlockReward":"",      //当前的出块奖励
-     *       "curStakingReward":"",    //当前的质押奖励
-     *       "currentHeight":111,      //当前区块高度
+     *       "stakingDelegationValue":"", //质押委托总数
+     *       "stakingValue":"",        //质押总数
+     *       "issueValue":"",          //发行量
+     *       "blockReward":"",         //当前的出块奖励
+     *       "stakingReward":"",       //当前的质押奖励
+     *       "currentNumber":111,      //当前区块高度
      *       "addIssueBegin":111,      //当前增发周期的开始快高
      *       "addIssueEnd":111,        //当前增发周期的结束块高
      *       "nextSetting":111         //离下个结算周期倒计时
@@ -34,7 +38,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName aliveStakingList
      * @apiGroup staking
-     * @apiDescription 验证人列表
+     * @apiDescription 
+     * 1. 功能：实时验证人列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中node表并关联staking表
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -78,7 +85,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName historyStakingList
      * @apiGroup staking
-     * @apiDescription 历史验证人列表
+     * @apiDescription
+     * 1. 功能：历史验证人列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中node表并关联staking表
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -114,7 +124,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName topic/staking/change/new
      * @apiGroup staking
-     * @apiDescription 全量数据
+     * @apiDescription
+     * 1. 功能：.实时验证人变更<br/>
+     * 2. 实现逻辑：<br/>
+     * - ？
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -144,7 +157,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName stakingDetails
      * @apiGroup staking
-     * @apiDescription 验证人详情
+     * @apiDescription
+     * 1. 功能：验证人详情查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中node表并关联staking表
      * @apiParamExample {json} Request-Example:
      * {
      *    "nodeAddr":""                //节点地址
@@ -190,7 +206,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName stakingOptRecordList
      * @apiGroup staking
-     * @apiDescription 验证人列表
+     * @apiDescription
+     * 1. 功能：节点操作记录查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中node_opt表
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -221,7 +240,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName delegationListByStaking
      * @apiGroup staking
-     * @apiDescription 验证人相关的委托列表
+     * @apiDescription
+     * 1. 功能：验证人相关的委托列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中delegation表关联staking，查询 delegation.is_history = false的记录
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -255,7 +277,10 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName delegationListByAddress
      * @apiGroup staking
-     * @apiDescription 地址相关的委托列表
+     * @apiDescription
+     * 1. 功能：地址相关的委托列表查询<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中delegation表关联staking，查询 delegation.is_history = false的记录
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -291,7 +316,7 @@ public class AppDocStaking {
      * @apiVersion 1.0.0
      * @apiName delegationListByAddressDownload
      * @apiGroup staking
-     * @apiDescription 导出地址验证人委托列表
+     * @apiDescription 逻辑同 《地址相关的委托列表接口》
      * @apiParam {String} address 合约地址
      * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:

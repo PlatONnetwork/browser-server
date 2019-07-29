@@ -76,7 +76,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送区块链基础数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:network_stat<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:networkstat<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -109,7 +109,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新8条区块信息<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]::blocks<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK

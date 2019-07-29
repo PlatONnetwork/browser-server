@@ -11,7 +11,7 @@ public class AppDocBlock {
      * @apiDescription
      * 1. 功能：区块列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:blocks<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -90,7 +90,7 @@ public class AppDocBlock {
      * @apiDescription 
      * 1. 功能：区块详情查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询mysql中block表，一次性查询三条数据
+     * - 查询mysql中block表
      * @apiParamExample {json} Request-Example:
      * {
      *    "number":123                 //区块高度(必填)
@@ -132,7 +132,7 @@ public class AppDocBlock {
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate
      * @apiGroup block
-     * @apiDescription 区块详情前后跳转浏览
+     * @apiDescription 同 《区块详情接口》
      * @apiParamExample {json} Request-Example:
      * {
      *    "number":123,                //当前所在页面的区块高度(必填)

@@ -10,7 +10,7 @@ public class AppDocTransaction {
      * @apiDescription
      * 1. 功能：交易列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:transactions<br/>
+     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:transactions<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -213,7 +213,7 @@ public class AppDocTransaction {
      * @apiVersion 1.0.0
      * @apiName transactionDetailNavigate
      * @apiGroup transaction
-     * @apiDescription 交易详情前后跳转浏览
+     * @apiDescription 同 《交易详情接口》
      * @apiParamExample {json} Request-Example:
      * {
      *    "txHash":""                  //交易Hash(必填)

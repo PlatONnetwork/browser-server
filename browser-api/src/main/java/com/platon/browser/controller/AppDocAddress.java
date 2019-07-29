@@ -8,7 +8,10 @@ public class AppDocAddress {
      * @apiVersion 1.0.0
      * @apiName addressDetails
      * @apiGroup address
-     * @apiDescription 查询地址详情
+     * @apiDescription
+     * 1. 功能：查询地址详情<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中address表
      * @apiParamExample {json} Request-Example:
      * {
      *    "address":"0x"               //账户地址(必填)
