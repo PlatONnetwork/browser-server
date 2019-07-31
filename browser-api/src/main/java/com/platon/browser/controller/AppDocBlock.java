@@ -27,15 +27,15 @@ public class AppDocBlock {
      *    "totalPages":1,              //总页数
      *    "data":[
      *       {
-     *          "number":17888,        //块高
+     *          "number":17888,        //区块高度
      *          "timestamp":12,        //出块时间
-     *          "serverTime":17,       //服务器时间
-     *          "statTxQty":10000,     //块内交易数
-     *          "size":188,            //块大小
-     *          "nodeAddr":"",         //节点地址
-     *          "nodeName":"",         //节点名称
-     *          "energonUsed":111,     //区块能量消耗
-     *          "statTxEnergonLimit":14, //交易中提供的能量总和
+     *          "serverTime":17,       //当前服务器的时间
+     *          "statTxQty":10000,     //交易数
+     *          "size":188,            //区块大小
+     *          "nodeId":"",           //出块节点id
+     *          "nodeName":"",         //出块节点名称
+     *          "gasUsed":111,         //燃料用量
+     *          "statTxGasLimit":14,   //区块所有交易可提供的gas总和
      *          "blockReward":"1231"   //区块奖励(单位:von)
      *       }
      *    ]
@@ -101,23 +101,22 @@ public class AppDocBlock {
      *    "errMsg":"",                 //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data": {
-     *       "number":19988,           //块高
+     *       "number":19988,           //区块高度
      *       "timestamp":123123123879, //出块时间
+     *       "statTxQty":1288,         //块内交易总数
      *       "hash":"0x1238",          //区块hash
      *       "parentHash":"0x234",     //父区块hash
-     *       "nodeAddr":"",            //出块节点地址
-     *       "stakingName":"",         //验证人名称
-     *       "stakingHash":"",         //验证人id
+     *       "nodeId":"",              //出块节点id
+     *       "nodeName":"",            //出块节点名称
      *       "timeDiff":424234,        //当前块出块时间距离上一个块出块时间之差（毫秒）
      *       "size":123,               //区块大小
-     *       "energonLimit":24234,     //能量消耗限制
-     *       "energonUsed":2342,       //能量消耗
-     *       "txEnergonLimit":14,      //交易所提供的能量
+     *       "gasLimit":24234,         //能量消耗限制
+     *       "gasUsed":2342,           //能量消耗
+     *       "statTxGasLimit":14,      //区块所有交易可提供的gas总和
      *       "blockReward":"123123",   //区块奖励(单位:von)
      *       "extraData":"xxx",        //附加数据
      *       "first":false,            //是否第一条记录
      *       "last":true,              //是否最后一条记录
-     *       "statTxQty":1288,         //块内交易总数
      *       "statTransferQty":11,     //块内转账交易总数
      *       "statDelegateQty":11,     //块内委托交易总数
      *       "statStakingQty":11,      //块内验证人交易总数

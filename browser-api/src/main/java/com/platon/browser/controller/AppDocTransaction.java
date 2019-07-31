@@ -158,9 +158,9 @@ public class AppDocTransaction {
      *       "serverTime"1123123,      //服务器时间
      *       "confirmNum":444,         //区块确认数
      *       "blockNumber":"15566",    //交易所在区块高度
-     *       "energonLimit":232,       //能量限制
-     *       "energonUsed":122,        //能量消耗
-     *       "energonPrice":122,       //能量价格
+     *       "gasLimit":232,       //能量限制
+     *       "gasUsed":122,        //能量消耗
+     *       "gasPrice":122,       //能量价格
      *       "value":"222",            //金额(单位:von)
      *       "actualTxCost":"22",      //交易费用(单位:von)
      *       "txType":"",              //交易类型
@@ -187,7 +187,6 @@ public class AppDocTransaction {
      *          }
      *       ]
      *       "nodeId":"",              //节点id
-     *       "nodeAddr":"",            //节点地址
      *       "nodeName":"",            //节点名称
      *       "benefitAddr":"",         //用于接受出块奖励和质押奖励的收益账户
      *       "externalId":"",          //外部Id(有长度限制，给第三方拉取节点描述的Id)

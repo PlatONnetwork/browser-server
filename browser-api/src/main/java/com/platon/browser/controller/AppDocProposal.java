@@ -25,10 +25,11 @@ public class AppDocProposal {
      *   "data":[
      *      {
      *         "proposalHash":"",      //提案内部标识
-     *         "githubId":"",          //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
+     *         "githubId":"",          //PIP编号   eip-100
+     *         "url":"",               //github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md
      *         "topic":"",             //提案标题 
      *         "type":"",              //提案类型   1：文本提案； 2：升级提案；  3参数提案。
-     *         "status":"",            //状态  1:投票中；  2:已拒绝；    3:已通过
+     *         "status":"",            //状态  1：投票中  2：通过  3：失败   4：预升级  5：升级完成    已通过=2 或4 或 5
      *         "curBlock":"15566",     //当前块高
      *         "endVotingBlock":"",    //投票结算的快高
      *         "timestamp":123123879   //提案时间
@@ -57,10 +58,11 @@ public class AppDocProposal {
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data": {
      *       "proposalHash":"",        //提案内部标识
-     *       "githubId":"",            //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
+     *       "githubId":"",            //PIP编号   eip-100
+     *       "url":"",                 //github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md
      *       "topic":"",               //提案标题 
      *       "type":"",                //提案类型   1：文本提案； 2：升级提案；  3参数提案。
-     *       "status":"",              //状态  1:投票中；  2:已拒绝；    3:已通过
+     *       "status":"",              //状态  1：投票中  2：通过  3：失败   4：预升级  5：升级完成    已通过=2 或4 或 5
      *       "curBlock":"15566",       //当前块高
      *       "endVotingBlock":"",      //投票结算的快高
      *       "timestamp":123123879     //提案时间
@@ -69,15 +71,12 @@ public class AppDocProposal {
      *       "paramName":"",           //参数名
      *       "currentValue":"",        //参数当前值
      *       "newValue":"",            //参数的新值
-     *       "nodeAddr":"",            //出块节点地址
-     *       "nodeName":"",            //出块节点名称
-     *       "stakingHash":"",         //验证人id
-     *       "tallyResult":{
-     *          "yeas":11,             //同意的人
-     *          "nays":11,             //反对的人
-     *          "abstentions":11,      //弃权的人
-     *          "validators":""        //总共的人
-     *       }
+     *       "nodeName":"",            //发起提案的节点名称
+     *       "nodeId":"",              //发起提案的节点id
+     *       "yeas":11,                //同意的人
+     *       "nays":11,                //反对的人
+     *       "abstentions":11,         //弃权的人
+     *       "accuVerifiers":""        //总人数
      *    }
      * }
      */	
@@ -106,8 +105,8 @@ public class AppDocProposal {
      *   "totalPages":1,               //总页数
      *   "data":[
      *      {
-     *         "nodeAddr":"",          //出块节点地址
-     *         "nodeName":"",          //出块节点名称
+     *         "nodeName":"",          //投票验证人的节点名称
+     *         "nodeId":"",            //投票验证人的节点id
      *         "option":"",            //投票选型  1：支持；  2：反对；  3弃权
      *         "txHash":"15566",       //投票的hash
      *         "timestamp":"",         //投票的时间

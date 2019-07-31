@@ -58,11 +58,9 @@ public class AppDocHome {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{  
-     *       "graphData":{
-     *         "x":long[],             //区块高度
-     *         "ya":double[],          //出块的时间
-     *         "yb":long[]             //交易数量数量
-     *       }
+     *       "x":long[],               //区块高度
+     *       "ya":double[],            //出块的时间
+     *       "yb":long[]               //交易数量数量
      *    }
      * }
      */
@@ -121,8 +119,8 @@ public class AppDocHome {
      *          "number":33,           //区块高度
      *          "timestamp":33333,     //出块时间
      *          "serverTime":44444,    //服务器时间
-     *          "nodeAddr":"",         //出块节点地址
-     *          "nodeName":"",         //节点名称
+     *          "nodeId":"",           //出块节点id
+     *          "nodeName":"",         //出块节点名称
      *          "statTxQty":333        //交易数
      *       }
      *    ]

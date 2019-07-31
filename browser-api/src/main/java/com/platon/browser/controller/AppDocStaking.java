@@ -41,7 +41,7 @@ public class AppDocStaking {
      * @apiDescription 
      * 1. 功能：实时验证人列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询mysql中node表并关联staking表
+     * - 查询mysql中node表并关联staking表，进程中排序
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
