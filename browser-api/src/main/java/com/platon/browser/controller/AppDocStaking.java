@@ -62,7 +62,7 @@ public class AppDocStaking {
      *   "data":[
      *      {
      *         "ranking":11,           //排行
-     *         "nodeAddr":"",          //出块节点地址
+     *         "nodeId":"",            //节点id
      *         "nodeName":"",          //验证人名称
      *         "stakingIcon":"",       //验证人图标
      *         "status":"",            //状态   1:候选中  2:活跃中  3:出块中
@@ -104,7 +104,7 @@ public class AppDocStaking {
      *   "totalPages":1,               //总页数
      *   "data":[
      *      {
-     *         "nodeAddr":"",          //出块节点地址
+     *         "nodeId":"",            //出块节点地址
      *         "nodeName":"",          //验证人名称
      *         "stakingIcon":"",       //验证人图标
      *         "status":"",            //状态 4:退出中 5:已退出
@@ -135,18 +135,7 @@ public class AppDocStaking {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
      *       "isFlash":"",             //是否需要刷新列表
-     *       "ranking":11,             //排行
-     *       "nodeAddr":"",            //出块节点地址
-     *       "nodeName":"",            //验证人名称
-     *       "stakingIcon":"",         //验证人图标
-     *       "status":"",              //状态   1:候选中  2:活跃中  3:出块中
-     *       "totalValue":"",          //质押总数=有效的质押+委托
-     *       "delegateValue":"",       //委托总数
-     *       "delegateQty":"",         //委托人数
-     *       "slashLowQty":11,         //低出块率举报次数
-     *       "slashMultiQty":11,       //多签举报次数
-     *       "blockQty":11,            //产生的区块数
-     *       "expectedIncome":""       //预计年收化率（从验证人加入时刻开始计算）
+     *       "其他属性"                   //同实时验证人列表中每个对象属性 
      *    }
      * }
      */	
@@ -171,8 +160,6 @@ public class AppDocStaking {
      *    "errMsg":"",                 //描述信息
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data": {
-     *       "ranking":11,             //排行
-     *       "nodeAddr":"",            //出块节点地址
      *       "nodeName":"",            //验证人名称
      *       "stakingIcon":"",         //验证人图标
      *       "status":"",              //状态   1:候选中  2:活跃中  3:出块中
@@ -229,7 +216,6 @@ public class AppDocStaking {
      *         "desc":"",              //操作描述
      *         "txHash":"",            //所属交易
      *         "blockNumber":11        //所属区块
-     *         
      *      }
      *   ]
      * }
@@ -296,7 +282,7 @@ public class AppDocStaking {
      *   "totalPages":1,               //总页数
      *   "data":[
      *      {
-     *         "nodeAddr":"",          //节点地址
+     *         "nodeId":"",            //节点id
      *         "nodeName":"",          //节点名称
      *         "delegateValue":"",     //委托数量
      *         "delegateHes":"",       //未锁定委托（LAT）
