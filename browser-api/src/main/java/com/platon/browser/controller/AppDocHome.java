@@ -14,12 +14,13 @@ public class AppDocHome {
      * - type=block，通过返回的height值查询区块详情接口；<br/>
      * - type=transaction，通过返回的txHash值查询交易详情接口；<br/>
      * - type=address，通过返回的address值查询地址详情接口；<br/>
-     * - type=staking，通过返回的nodeAddr值查询验证人详情接口；<br/>
+     * - type=staking，通过返回的nodeId值查询验证人详情接口；<br/>
      * 3. 实现逻辑：<br/>
-     * - 当入参为整数类型，查询mysql中block表
-     * - 当入参为地址类型， 查询mysql中address表，如果没有在查询mysql中node表通过节点地址
-     * - 当入参为hash类型，查询mysql中transaction表，如果没有在查询mysql中block表
-     * - 如果上面没有查询到，查询mysql中node表通过节点名称查询
+     * - 当入参为整数类型， 查询mysql中block表<br/>
+     * - 当入参为地址类型， 查询mysql中address表<br/>
+     * - 当入参为公钥类型， 查询mysql中staking表<br/>
+     * - 当入参为hash类型，查询mysql中transaction表，如果没有在查询mysql中block表<br/>
+     * - 如果上面没有查询到，查询mysql中staking表通过节点名称查询<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "parameter":""               //用户输入
@@ -35,7 +36,7 @@ public class AppDocHome {
      *          "number":17888,        //区块高度
      *          "txHash":"",           //交易hash
      *          "address":"",          //地址
-     *          "nodeAddr":""          //节点地址
+     *          "nodeId":""            //节点地址
      *       }
      *    }
      * }
@@ -145,11 +146,12 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
-     *          "nodeAddr":"",         //出块节点地址
+     *          "nodeId":"",           //出块节点Id
      *          "nodeName":"",         //出块节点名称
      *          "stakingIcon":"",      //验证人图片
      *          "ranking":333,         //节点排行
-     *          "expectedIncome":""    //预计年收化率（从验证人加入时刻开始计算）
+     *          "expectedIncome":"",   //预计年收化率（从验证人加入时刻开始计算）
+     *          "isInit":true          //是否为初始化的验证人，如果是expectedIncome不显示数值
      *       }
      *    ]
      * }

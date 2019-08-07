@@ -72,8 +72,9 @@ public class AppDocStaking {
      *         "slashLowQty":11,       //低出块率举报次数
      *         "slashMultiQty":11,     //多签举报次数
      *         "blockQty":11,          //产生的区块数
-     *         "expectedIncome":""     //预计年收化率（从验证人加入时刻开始计算）
-     *         "isRecommend":true      //是否官方推荐 
+     *         "expectedIncome":"",    //预计年收化率（从验证人加入时刻开始计算）
+     *         "isRecommend":true,     //是否官方推荐
+     *         "isInit":true           //是否为初始节点 
      *      }
      *   ]
      * }
