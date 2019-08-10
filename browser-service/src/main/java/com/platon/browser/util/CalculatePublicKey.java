@@ -4,7 +4,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.web3j.crypto.ECDSASignature;
 import org.web3j.crypto.Hash;
 import org.web3j.crypto.Sign;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.rlp.RlpEncoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -23,14 +23,14 @@ import java.util.List;
  */
 public class CalculatePublicKey {
 
-    public static String getPublicKey(EthBlock ethBlock) throws Exception {
-        String publicKey = testBlock(ethBlock).toString(16);
+    public static String getPublicKey(PlatonBlock platonBlock) throws Exception {
+        String publicKey = testBlock(platonBlock).toString(16);
         // 不足128前面补0
         if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
         return publicKey;
     }
 
-    public static BigInteger testBlock ( EthBlock tBlock ) throws Exception{
+    public static BigInteger testBlock ( PlatonBlock tBlock ) throws Exception{
 
         String extraData = tBlock.getBlock().getExtraData();
 
@@ -49,18 +49,18 @@ public class CalculatePublicKey {
         return publicKey;
     }
 
-    private static byte[] getMsgHash ( EthBlock.Block block ) {
+    private static byte[] getMsgHash ( PlatonBlock.Block block ) {
         byte[] signData = encode(block);
         return Hash.sha3(signData);
     }
 
-    private static byte[] encode ( EthBlock.Block block ) {
+    private static byte[] encode ( PlatonBlock.Block block ) {
         List <RlpType> values = asRlpValues(block);
         RlpList rlpList = new RlpList(values);
         return RlpEncoder.encode(rlpList);
     }
 
-    static List <RlpType> asRlpValues ( EthBlock.Block block ) {
+    static List <RlpType> asRlpValues ( PlatonBlock.Block block ) {
         List <RlpType> result = new ArrayList <>();
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -88,7 +88,7 @@ public class NodeAnalyseJob {
             long startTime = System.currentTimeMillis();
             logger.debug("getBlockNumber---------------------------------->{}", System.currentTimeMillis() - startTime);
             // 从链上获取区块信息
-            EthBlock ethBlock = platon.getWeb3j(chainId).ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
+            PlatonBlock ethBlock = platon.getWeb3j(chainId).platonGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send();
             // 从链上获取节点信息
             List<NodeRanking> nodeRankingsFromChain = getNodeRankingsFromChain(ethBlock);
 
@@ -151,7 +151,7 @@ public class NodeAnalyseJob {
      * @return
      *//*
 
-    private List<NodeRanking> getNodeRankingsFromChain(EthBlock ethBlock) throws Exception {
+    private List<NodeRanking> getNodeRankingsFromChain(PlatonBlock ethBlock) throws Exception {
 
         NodeInfoFromChain nodeInfoFromChain = getNodeInfoFromChain(ethBlock);
         if (nodeInfoFromChain.getMergedNodes().size()==0) return Collections.EMPTY_LIST;
@@ -226,7 +226,7 @@ public class NodeAnalyseJob {
     }
 
 
-    private List<NodeRanking> getInsertOrUpdateData(List<NodeRanking> nodeRankingsFromChain,List<NodeRanking> nodeRankingsFromDB,EthBlock ethBlock) throws Exception {
+    private List<NodeRanking> getInsertOrUpdateData(List<NodeRanking> nodeRankingsFromChain,List<NodeRanking> nodeRankingsFromDB,PlatonBlock ethBlock) throws Exception {
 
         // 计算公钥（节点ID，不带0x）
         BigInteger publicKey = CalculatePublicKey.testBlock(ethBlock);
@@ -284,7 +284,7 @@ public class NodeAnalyseJob {
      * 从链上获取节点列表信息
      *//*
 
-    private NodeInfoFromChain getNodeInfoFromChain ( EthBlock ethBlock ) throws Exception {
+    private NodeInfoFromChain getNodeInfoFromChain ( PlatonBlock ethBlock ) throws Exception {
 
         // 调用候选合约获取提名和候选节点信息
         CandidateContract candidateContract = platon.getCandidateContract(chainId);

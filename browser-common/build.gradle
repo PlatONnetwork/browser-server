@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc:$springbootVersion") {
         force = true
     }
+    compile "com.platon.client:core:$platonClientVersion"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
 }
 

@@ -2,14 +2,13 @@ package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
 
-import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.TransactionFilter;
-import com.platon.browser.service.DBService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.filters.BlockFilter;
 
 import javax.annotation.PostConstruct;
 
@@ -30,17 +29,12 @@ public class TestBase {
 
 
     @Autowired
-    protected TransactionFilter transactionFilter;
-
-    @Autowired
     protected RedisTemplate<String, String> redisTemplate;
 
 /*
     @Autowired
     protected TransactionMapper transactionMapper;*/
 
-    @Autowired
-    protected DBService dbService;
 
 
     @Value("${platon.redis.key.transaction}")

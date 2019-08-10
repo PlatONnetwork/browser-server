@@ -1,6 +1,6 @@
 package com.platon.browser.FilterTest;
 
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class DataBuild {
             }
             return transactionList;
         }
-        if(clazz== EthBlock.Block.class){
+        if(clazz== PlatonBlock.Block.class){
 
         }
         if(clazz.equals(Transaction.class)){

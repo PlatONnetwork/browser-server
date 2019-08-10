@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 import rx.Subscription;
 
 import java.io.*;
@@ -132,7 +132,7 @@ public class DataGenTool extends TestData {
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestBlockObservable(DefaultBlockParameter.valueOf(currentHeight),true)
         .subscribe(eblock -> {
-            EthBlock.Block block = eblock.getBlock();
+            PlatonBlock.Block block = eblock.getBlock();
             if (block!=null){
                 Block bean = new Block();
                 BeanUtils.copyProperties(block,bean);
@@ -199,7 +199,7 @@ public class DataGenTool extends TestData {
                     Random random = new Random();
                     bean.setActualTxCost(String.valueOf(Math.abs(random.nextInt(200000))));
                     try {
-                        EthBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
+                        PlatonBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
                         bean.setBlockNumber(eblock.getBlock().getNumber().longValue());
                         bean.setEnergonLimit(eblock.getBlock().getGasLimit().toString());
                     } catch (IOException e) {

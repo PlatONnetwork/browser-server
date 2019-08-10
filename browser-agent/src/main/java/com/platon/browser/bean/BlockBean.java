@@ -1,10 +1,10 @@
 package com.platon.browser.bean;
 
 import com.platon.browser.dao.entity.Block;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 public class BlockBean extends Block {
-    public void init(EthBlock initData){/*
+    public void init(PlatonBlock initData){/*
         this.setNumber(initData.getBlock().getNumber().longValue());
         if (String.valueOf(initData.getBlock().getTimestamp().longValue()).length() == 10) {
             this.setTimestamp(new Date(initData.getBlock().getTimestamp().longValue() * 1000L));
