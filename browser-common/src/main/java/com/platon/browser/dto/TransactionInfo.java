@@ -18,9 +18,16 @@ public class TransactionInfo extends TransactionWithBLOBs {
 
     private TxTypeEnum typeEnum;
 
+    /**
+     * 使用原生交易信息初始化交易信息
+     * @param initData
+     */
     public TransactionInfo(PlatonBlock.TransactionResult initData){
         BeanUtils.copyProperties(initData,this);
+        // 属性类型转换
         typeEnum = TxTypeEnum.valueOf(this.getTxType());
+
+
     }
 
     /**
