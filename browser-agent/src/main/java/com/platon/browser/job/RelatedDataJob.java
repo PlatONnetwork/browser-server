@@ -1,17 +1,12 @@
 package com.platon.browser.job;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 

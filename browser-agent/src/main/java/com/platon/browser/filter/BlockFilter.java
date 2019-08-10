@@ -1,12 +1,8 @@
 package com.platon.browser.filter;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.AnalysisResult;
-import com.platon.browser.dto.agent.CandidateDto;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.util.TransactionAnalysis;
@@ -16,13 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.contracts.CandidateContract;
-import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
-import java.util.List;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 

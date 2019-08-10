@@ -20,7 +20,7 @@ public class TransactionPushItem {
     private String txType;
     private String receiveType;
 
-    public void init(Transaction initData){
+    public void init( Transaction initData){
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());

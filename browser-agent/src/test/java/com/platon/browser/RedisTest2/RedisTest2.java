@@ -2,10 +2,7 @@ package com.platon.browser.RedisTest2;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.service.DBService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

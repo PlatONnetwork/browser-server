@@ -44,7 +44,7 @@ public class TransactionDetail {
     @JsonIgnore
     private Long sequence;
 
-    public void init(TransactionWithBLOBs initData) {
+    public void init( TransactionWithBLOBs initData) {
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());

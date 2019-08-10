@@ -1,7 +1,6 @@
 package com.platon.browser.dto.transaction;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.ticket.TxInfo;
 import lombok.Data;

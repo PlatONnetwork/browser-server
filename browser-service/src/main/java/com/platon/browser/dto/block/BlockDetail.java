@@ -36,7 +36,7 @@ public class BlockDetail {
     // 是否最后一条
     private boolean last;
 
-    public void init(Block initData){
+    public void init( Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());

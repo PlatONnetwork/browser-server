@@ -27,7 +27,7 @@ public class TransactionListItem {
     private String receiveType;
     private String txInfo;
 
-    public void init(Transaction initData){
+    public void init( Transaction initData){
         BeanUtils.copyProperties(initData,this);
         this.setTxHash(initData.getHash());
         this.setBlockHeight(initData.getBlockNumber());

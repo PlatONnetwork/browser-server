@@ -27,7 +27,7 @@ public class BlockListItem {
     private Long blockVoteNumber;
     private Long blockCampaignAmount;
 
-    public void init(Block initData){
+    public void init( Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());

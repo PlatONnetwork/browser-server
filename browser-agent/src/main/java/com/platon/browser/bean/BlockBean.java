@@ -1,11 +1,7 @@
 package com.platon.browser.bean;
 
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.utils.FilterTool;
 import org.web3j.protocol.core.methods.response.EthBlock;
-
-import java.math.BigInteger;
-import java.util.Date;
 
 public class BlockBean extends Block {
     public void init(EthBlock initData){/*

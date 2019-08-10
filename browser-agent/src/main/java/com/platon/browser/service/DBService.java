@@ -1,22 +1,6 @@
 package com.platon.browser.service;
 
-import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.service.cache.BlockCacheService;
-import com.platon.browser.service.cache.NodeCacheService;
-import com.platon.browser.service.cache.StatisticCacheService;
-import com.platon.browser.service.cache.TransactionCacheService;
-import com.platon.browser.thread.AnalyseThread;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Component
 public class DBService {/*

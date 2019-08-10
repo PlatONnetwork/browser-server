@@ -1,9 +1,9 @@
 package com.platon.browser.controller;
 
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -1,16 +1,10 @@
 package com.platon.browser.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
@@ -18,7 +12,6 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.req.block.BlockDetailNavigateReq;
 import com.platon.browser.req.block.BlockDetailReq;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.req.block.BlockTransactionPageReq;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.util.I18nUtil;
@@ -29,8 +22,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -160,7 +151,7 @@ public class BlockServiceImpl implements BlockService {
     }
 
     @Override
-    public List<Block> getList(BlockDownloadReq req) {
+    public List<Block> getList( BlockDownloadReq req) {
         BlockExample condition = new BlockExample();
         BlockExample.Criteria criteria = condition.createCriteria();
         if(StringUtils.isNotBlank(req.getNodeId())){
@@ -189,8 +180,8 @@ public class BlockServiceImpl implements BlockService {
     }
 
     @Override
-    public void updateCache(String chainId,Set<Block> data) {
-        blockCacheService.updateBlockCache(chainId,data);
+    public void updateCache ( String chainId, Set <Block> data ) {
+
     }
 
 

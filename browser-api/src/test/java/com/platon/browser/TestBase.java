@@ -1,11 +1,8 @@
 package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
