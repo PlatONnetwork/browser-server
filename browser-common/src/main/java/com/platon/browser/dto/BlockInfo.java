@@ -7,6 +7,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -89,6 +90,13 @@ public class BlockInfo extends Block {
         this.setStatTransferQty(stat.transferQty);
         this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
+
+        // 交易信息按交易索引从大到小排序
+        Collections.sort(this.getTransactions(),(c1,c2)->{
+            if(c1.getTransactionIndex()>c2.getTransactionIndex()) return 1;
+            if(c1.getTransactionIndex()<c2.getTransactionIndex()) return -1;
+            return 0;
+        });
 
     }
 
