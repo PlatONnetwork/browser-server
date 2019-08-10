@@ -53,7 +53,7 @@ public class BlockInfo extends Block {
 
         // 交易信息统计
         class Stat {
-            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0;
+            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
         }
         Stat stat = new Stat();
@@ -83,11 +83,14 @@ public class BlockInfo extends Block {
             }
             // 累加交易手续费
             stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
+            // 累加交易gasLimit
+            stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
         });
         this.setStatDelegateQty(stat.delegateQty);
         this.setStatProposalQty(stat.proposalQty);
         this.setStatStakingQty(stat.stakingQty);
         this.setStatTransferQty(stat.transferQty);
+        this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
 
     }
