@@ -1,14 +1,11 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.enums.TxTypeEnum;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
