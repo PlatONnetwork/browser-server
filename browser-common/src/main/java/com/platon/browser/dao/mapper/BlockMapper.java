@@ -4,7 +4,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
-
+@Mapper
 public interface BlockMapper {
     long countByExample(BlockExample example);
 
