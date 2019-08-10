@@ -72,7 +72,7 @@ public class TransactionInfo extends TransactionWithBLOBs {
                 //创建锁仓计划(创建锁仓),txType=4000
                 return (T) JSON.parseObject(this.getTxInfo(),CreatereStrictingDto.class);
             default:
+                return null;
         }
-        return null;
     }
 }

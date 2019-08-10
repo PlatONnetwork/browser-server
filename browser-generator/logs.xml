@@ -24,7 +24,7 @@
     </commentGenerator>
 
     <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                    connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.6.0_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                    connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                     userId="platon"
                     password="platon"/>
 
