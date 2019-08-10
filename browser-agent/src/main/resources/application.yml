@@ -21,9 +21,10 @@ spring:
     #driver-class-name: com.mysql.jdbc.Driver
 # Platon配置
 platon:
-  chain:
-    config: ${chain.config}
-    active: ${chain.active}
+  web3j:
+    addresses: ${web3j.addresses}
+    collect.batch-size: ${web3j.collect.batch-size}
+
   # 虚假节点位置配置文件
   fake.location.filename: fakelocation.json
   # 批量采集线程池大小
