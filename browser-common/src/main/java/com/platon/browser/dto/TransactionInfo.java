@@ -16,8 +16,11 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 @Data
 public class TransactionInfo extends TransactionWithBLOBs {
 
+    private TxTypeEnum typeEnum;
+
     public TransactionInfo(PlatonBlock.TransactionResult initData){
         BeanUtils.copyProperties(initData,this);
+        typeEnum = TxTypeEnum.valueOf(this.getTxType());
     }
 
     /**
@@ -27,7 +30,7 @@ public class TransactionInfo extends TransactionWithBLOBs {
      * @return
      */
     public <T> T getTxJson(T clazz){
-        TxTypeEnum typeEnum = TxTypeEnum.valueOf(this.getTxType());
+
         switch (typeEnum){
             case CREATEVALIDATOR:
                 // 质押交易,txType=1000
