@@ -6,6 +6,8 @@ import com.platon.browser.dto.TransactionInfo;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,11 +19,14 @@ import java.util.Set;
  */
 @Component
 public class ProposalExecute {
+    // 全量数据，需要根据业务变化，保持与数据库一致
+    private Map<String,Proposal> proposals = new HashMap<>();
 
     private ProposalExecuteResult executeResult = new ProposalExecuteResult();
 
+    @PostConstruct
     private void init(){
-
+        // 初始化全量数据
     }
 
     /**
@@ -30,7 +35,7 @@ public class ProposalExecute {
      * @param bc
      */
     public void execute(TransactionInfo trans,BlockChain bc){
-        init();
+
         switch (trans.getTypeEnum()){
             case CREATEPROPOSALTEXT:
                 execute2000(trans);

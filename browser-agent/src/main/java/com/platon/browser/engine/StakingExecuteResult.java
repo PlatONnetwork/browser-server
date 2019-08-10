@@ -12,11 +12,6 @@ import java.util.*;
  */
 @Data
 public class StakingExecuteResult {
-    // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, Node> nodes = new HashMap<>();
-    private Map<String, Delegation> delegations = new HashMap<>();
-    private Map<String, Staking> stakings = new HashMap<>();
-
     // 插入或更新数据
     private Set<UnDelegation> addUnDelegations = new HashSet<>();
     private Set<UnDelegation> updateUnDelegations = new HashSet<>();

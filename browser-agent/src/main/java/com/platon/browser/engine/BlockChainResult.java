@@ -9,6 +9,6 @@ import lombok.Data;
  */
 @Data
 public class BlockChainResult {
-    private ProposalExecuteResult proposalExecuteResult;
-    private StakingExecuteResult stakingExecuteResult;
+    private ProposalExecuteResult proposalExecuteResult=new ProposalExecuteResult();
+    private StakingExecuteResult stakingExecuteResult=new StakingExecuteResult();
 }

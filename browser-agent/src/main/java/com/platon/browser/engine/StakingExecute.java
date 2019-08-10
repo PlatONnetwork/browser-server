@@ -1,7 +1,14 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.TransactionInfo;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -11,10 +18,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class StakingExecute {
 
-    private StakingExecuteResult executeResult;
+    // 全量数据，需要根据业务变化，保持与数据库一致
+    private Map<String, Node> nodes = new HashMap<>();
+    private Map<String, Delegation> delegations = new HashMap<>();
+    private Map<String, Staking> stakings = new HashMap<>();
 
+    private StakingExecuteResult executeResult= new StakingExecuteResult();
+
+    @PostConstruct
     private void init(){
-
+        // 初始化全量数据
     }
 
     /**
@@ -23,8 +36,6 @@ public class StakingExecute {
      * @param bc
      */
     public void execute(TransactionInfo trans, BlockChain bc){
-        init();
-
         switch (trans.getTypeEnum()){
             case CREATEVALIDATOR:
                 execute1000(trans);

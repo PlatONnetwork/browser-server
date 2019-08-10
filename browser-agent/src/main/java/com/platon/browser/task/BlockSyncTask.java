@@ -7,6 +7,8 @@ import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
+import com.platon.browser.engine.ProposalExecuteResult;
+import com.platon.browser.engine.StakingExecuteResult;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,21 +73,30 @@ public class BlockSyncTask {
             analyzeBlockAndTransaction(blocks);
 
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            List<Vote> addVotes = new ArrayList<>();
-            Set<Proposal> addProposals = new HashSet<>();
-            Set<Proposal> updateProposals = new HashSet<>();
-
+            BlockChainResult dbParams = new BlockChainResult();
+            ProposalExecuteResult perSummary = dbParams.getProposalExecuteResult();
+            StakingExecuteResult serSummary = dbParams.getStakingExecuteResult();
             blocks.forEach(block->{
                 blockChain.execute(block);
                 BlockChainResult result = blockChain.exportResult();
-                blockChain.commitResult();
-                addVotes.addAll(result.getProposalExecuteResult().getAddVotes());
-                addProposals.addAll(result.getProposalExecuteResult().getAddProposals());
-                updateProposals.addAll(result.getProposalExecuteResult().getUpdateProposals());
+                ProposalExecuteResult per = result.getProposalExecuteResult();
+                StakingExecuteResult ser = result.getStakingExecuteResult();
 
+                perSummary.getAddVotes().addAll(per.getAddVotes());
+                perSummary.getAddProposals().addAll(per.getAddProposals());
+                perSummary.getUpdateProposals().addAll(per.getUpdateProposals());
+
+                serSummary.getAddDelegations().addAll(ser.getAddDelegations());
+                serSummary.getAddNodeOpts().addAll(ser.getAddNodeOpts());
+                serSummary.getAddNodes().addAll(ser.getAddNodes());
+                serSummary.getAddSlash().addAll(ser.getAddSlash());
+
+
+                // 清楚blockChain实例状态，防止影响下一次的循环
+                blockChain.commitResult();
             });
 
-            batchSaveResult(new DbParams());
+            batchSaveResult(dbParams);
 
             commitBlockNumber=commitBlockNumber+collectBatchSize;
             TimeUnit.MILLISECONDS.sleep(500);
@@ -150,6 +161,7 @@ public class BlockSyncTask {
             return 0;
         });
 
+        logger.info("{}",result.blocks);
         return result.blocks;
 
     }
@@ -163,7 +175,7 @@ public class BlockSyncTask {
 
     }
     @Transactional
-    public void batchSaveResult(DbParams dbParams){
+    public void batchSaveResult(BlockChainResult dbParams){
         // 串行批量入库
 
     }
