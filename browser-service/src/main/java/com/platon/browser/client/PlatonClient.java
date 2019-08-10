@@ -1,13 +1,20 @@
 package com.platon.browser.client;
 
+import com.platon.browser.job.Web3DetectJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Component
 public class PlatonClient {
+    private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     private List<Web3j> allWeb3jList=new ArrayList<>();
@@ -75,5 +83,27 @@ public class PlatonClient {
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
+    }
+
+    /**
+     * web3j实例活性探测及更新
+     */
+    @Scheduled(cron = "0/30 * * * * ?")
+    protected void detect () {
+        logger.debug("*** In the detect task *** ");
+        try {
+            updateValidWeb3jList();
+        } catch (Exception e) {
+            logger.error("detect exception:{}", e.getMessage());
+            e.printStackTrace();
+        }
+        logger.debug("*** End the detect task *** ");
+    }
+
+    public static void main(String[] args) throws IOException {
+        String url = "http://192.168.120.76:6789";
+        Web3j web3j = Web3j.build(new HttpService(url));
+        EthBlock block = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.ONE),true).send();
+        logger.info("{}",block);
     }
 }

@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dto.BlockInfo;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class BlockSyncTask {
             }
 
             // 并行采集区块
-            List<EthBlock.Block> blocks = getBlockAndTransaction(blockNumbers);
+            List<BlockInfo> blocks = getBlockAndTransaction(blockNumbers);
 
 
 
@@ -74,7 +75,7 @@ public class BlockSyncTask {
      * @param blockNumbers 批量采集的区块号
      * @return
      */
-    private List<EthBlock.Block> getBlockAndTransaction(List<BigInteger> blockNumbers){
+    private List<BlockInfo> getBlockAndTransaction(List<BigInteger> blockNumbers){
         @Data
         class Error{
             public Error(BigInteger blockNumber,String msg){
@@ -86,7 +87,7 @@ public class BlockSyncTask {
         }
         @Data
         class Result{
-            List<EthBlock.Block> blocks = new CopyOnWriteArrayList<>();
+            List<BlockInfo> blocks = new CopyOnWriteArrayList<>();
             List<Error> errors = new CopyOnWriteArrayList<>();
         }
         Result result = new Result();
@@ -95,8 +96,8 @@ public class BlockSyncTask {
         blockNumbers.forEach(blockNumber->
             THREAD_POOL.submit(()->{
                 try {
-                    EthBlock.Block block = client.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-                    result.blocks.add(block);
+                    EthBlock.Block initData = client.getWeb3j().ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
+                    result.blocks.add(new BlockInfo(initData));
                 } catch (Exception e) {
                     Error error = new Error(blockNumber,e.getMessage());
                     result.errors.add(error);
@@ -106,10 +107,6 @@ public class BlockSyncTask {
                 }
             })
         );
-
-        Error error = new Error(BigInteger.ONE,"88759358te545");
-
-        result.errors.add(error);
 
         try {
             latch.await();

@@ -5,6 +5,8 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.json.CreateValidatorDto;
 import com.platon.browser.enums.TxTypeEnum;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+import org.web3j.protocol.core.methods.response.EthBlock;
 
 /**
  * @Auther: Chendongming
@@ -13,6 +15,10 @@ import lombok.Data;
  */
 @Data
 public class TransactionInfo extends TransactionWithBLOBs {
+
+    public TransactionInfo(EthBlock.TransactionResult initData){
+        BeanUtils.copyProperties(initData,this);
+    }
 
     /**
      * 根据类型获取交易参数信息对象
