@@ -12,7 +12,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.Date;
 
 public class TransactionBean extends TransactionWithBLOBs {
-    public void init(Transaction transaction, TransactionReceipt receipt){
+    public void init(Transaction transaction, TransactionReceipt receipt){/*
         // 使用原生交易信息填充交易实体
         this.setHash(transaction.getHash());
         this.setFrom(transaction.getFrom());
@@ -83,5 +83,5 @@ public class TransactionBean extends TransactionWithBLOBs {
         if(null == receipt.getBlockNumber() ){
             this.setTxReceiptStatus(0);
         }
-    }
+    */}
 }

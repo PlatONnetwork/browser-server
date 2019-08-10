@@ -1,11 +1,8 @@
+/*
 package com.platon.browser.util;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.entity.PendingTx;
-import com.platon.browser.dao.entity.PendingTxExample;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -21,17 +18,21 @@ public class DatabaseTool extends TestBase {
     private static final int pageNum = 1;
     private static final int pageSize = 100;
 
-    /**
+    */
+/**
      * 导出测试数据
-     */
+     *//*
+
     @Test
     public void exportData() {
         chainsConfig.getChainIds().forEach(chainId->{
-            /*BlockExample blockExample = new BlockExample();
+            */
+/*BlockExample blockExample = new BlockExample();
             blockExample.createCriteria().andChainIdEqualTo(chainId);
             PageHelper.startPage(pageNum,pageSize);
             List<Block> blocks = blockMapper.selectByExample(blockExample);
-            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);*/
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.BLOCK,blocks);*//*
+
 
             NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId);
@@ -39,7 +40,8 @@ public class DatabaseTool extends TestBase {
             List<NodeRanking> nodes = nodeRankingMapper.selectByExample(nodeRankingExample);
             DataGenTool.writeToFile(chainId, TestDataFileNameEnum.NODE,nodes);
 
-            /*TransactionExample transactionExample = new TransactionExample();
+            */
+/*TransactionExample transactionExample = new TransactionExample();
             transactionExample.createCriteria().andChainIdEqualTo(chainId);
             PageHelper.startPage(pageNum,pageSize);
             List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(transactionExample);
@@ -49,18 +51,22 @@ public class DatabaseTool extends TestBase {
             pendingTxExample.createCriteria().andChainIdEqualTo(chainId);
             PageHelper.startPage(pageNum,pageSize);
             List<PendingTx> pendingTxes = pendingTxMapper.selectByExampleWithBLOBs(pendingTxExample);
-            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,pendingTxes);*/
+            DataGenTool.writeToFile(chainId,TestDataFileNameEnum.PENDINGTX,pendingTxes);*//*
+
         });
     }
 
-    /**
+    */
+/**
      * 导入测试数据
-     */
+     *//*
+
     @Test
     public void importData() {
         chainsConfig.getChainIds().forEach(chainId->{
             try {
-                /*BlockExample blockExample = new BlockExample();
+                */
+/*BlockExample blockExample = new BlockExample();
                 blockExample.createCriteria().andChainIdEqualTo(chainId);
                 blockMapper.deleteByExample(blockExample);
                 List<Block> blocks = DataGenTool.getTestData(chainId,TestDataFileNameEnum.BLOCK,Block.class);
@@ -76,7 +82,8 @@ public class DatabaseTool extends TestBase {
                 transactionExample.createCriteria().andChainIdEqualTo(chainId);
                 transactionMapper.deleteByExample(transactionExample);
                 List<TransactionWithBLOBs> transactions = DataGenTool.getTestData(chainId,TestDataFileNameEnum.TRANSACTION,TransactionWithBLOBs.class);
-                if(transactions.size()>0) transactionMapper.batchInsert(transactions);*/
+                if(transactions.size()>0) transactionMapper.batchInsert(transactions);*//*
+
 
                 PendingTxExample pendingTxExample = new PendingTxExample();
                 pendingTxExample.createCriteria().andChainIdEqualTo(chainId);
@@ -90,3 +97,4 @@ public class DatabaseTool extends TestBase {
     }
 
 }
+*/

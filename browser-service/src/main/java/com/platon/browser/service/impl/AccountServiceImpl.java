@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
@@ -7,7 +8,6 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
@@ -18,11 +18,9 @@ import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.service.AccountService;
 import com.platon.browser.service.NodeService;
-import com.platon.browser.service.PendingTxService;
 import com.platon.browser.service.TransactionService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.TxInfoResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +44,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private TransactionService transactionService;
-    @Autowired
-    private PendingTxService pendingTxService;
+
     @Autowired
     private ChainsConfig chainsConfig;
-    /*@Autowired
-    private TicketService ticketService;*/
+    */
+/*@Autowired
+    private TicketService ticketService;*//*
+
     @Autowired
     private NodeService nodeService;
     @Autowired
@@ -276,3 +275,4 @@ public class AccountServiceImpl implements AccountService {
     }
 
 }
+*/

@@ -16,6 +16,5 @@ public class StatisticPushItem {
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTime(initData.getTimestamp().getTime());
-        this.setTransaction(initData.getTransactionNumber().longValue());
     }
 }

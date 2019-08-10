@@ -31,7 +31,6 @@ public class BlockListItem {
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
-        this.setTransaction(initData.getTransactionNumber());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));
     }

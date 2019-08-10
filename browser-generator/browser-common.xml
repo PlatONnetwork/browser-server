@@ -24,7 +24,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.6.2_deva?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
@@ -47,47 +47,61 @@
                        enableDeleteByExample="false" enableSelectByExample="false"
                        selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-<!--        <table tableName="block" domainObjectName="Block">
+        <table tableName="block" domainObjectName="Block">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>-->
+        </table>
 
 
-    <table tableName="transaction" domainObjectName="Transaction">
-        <columnRenamingRule searchString="^D_"
-                            replaceString=""/>
-    </table>
+        <table tableName="transaction" domainObjectName="Transaction">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
+        <table tableName="address" domainObjectName="Address">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
-        <!--      <table tableName="pending_tx" domainObjectName="PendingTx">
-                    <columnRenamingRule searchString="^D_" replaceString=""/>
-              </table>-->
-        <!-- <table tableName="node" domainObjectName="Node">
-             <columnRenamingRule searchString="^D_"
-                                 replaceString=""/>
+        <table tableName="delegation" domainObjectName="Delegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
-         </table>
-         <table tableName="statistics" domainObjectName="Statistics">
-         <columnRenamingRule searchString="^D_"
-                             replaceString=""/>
--->
+        <table tableName="node" domainObjectName="Node">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
+        <table tableName="node_opt" domainObjectName="NodeOpt">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
+        <table tableName="proposal" domainObjectName="Proposal">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
+        <table tableName="slash" domainObjectName="Slash">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
-        <!--       <table tableName="transaction" domainObjectName="Transaction">
-                     <columnRenamingRule searchString="^D_"
-                                         replaceString=""/>
-                 </table>-->
+        <table tableName="staking" domainObjectName="Staking">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
-        <!--  <table tableName="address_count" domainObjectName="AddressCount"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false" enableInsert="false"
-               enableSelectByPrimaryKey="false" enableDeleteByPrimaryKey="false"
-               enableUpdateByPrimaryKey="false" enableSelectByExample="false"
-               selectByExampleQueryId="false">
-            &lt;!&ndash;<columnRenamingRule searchString="^D_"
-                                replaceString=""/>&ndash;&gt;
-        </table>-->
+        <table tableName="un_delegation" domainObjectName="UnDelegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="vote" domainObjectName="Vote">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
     </context>
 </generatorConfiguration>

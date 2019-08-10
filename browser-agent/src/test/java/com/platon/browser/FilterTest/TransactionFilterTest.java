@@ -87,7 +87,7 @@ public class TransactionFilterTest extends TestBase {
         List<TransactionBean> list = transactionFilter.analyse(param,1557484976000l);
         AnalyseThread.AnalyseResult result = new AnalyseThread.AnalyseResult();
         result.transactions.addAll(list);
-        dbService.flush(result);
+        //dbService.flush(result);
     }
 
 

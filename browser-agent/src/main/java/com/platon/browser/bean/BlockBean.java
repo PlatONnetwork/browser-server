@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class BlockBean extends Block {
-    public void init(EthBlock initData){
+    public void init(EthBlock initData){/*
         this.setNumber(initData.getBlock().getNumber().longValue());
         if (String.valueOf(initData.getBlock().getTimestamp().longValue()).length() == 10) {
             this.setTimestamp(new Date(initData.getBlock().getTimestamp().longValue() * 1000L));
@@ -35,5 +35,6 @@ public class BlockBean extends Block {
         this.setNonce(initData.getBlock().getNonce().toString());
         String rewardWei = FilterTool.getBlockReward(initData.getBlock().getNumber().toString());
         this.setBlockReward(rewardWei);
-    }
+
+    */}
 }

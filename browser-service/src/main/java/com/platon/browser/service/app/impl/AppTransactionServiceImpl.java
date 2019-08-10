@@ -1,9 +1,6 @@
+/*
 package com.platon.browser.service.app.impl;
 
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.mapper.CustomTransactionMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.app.transaction.AppTransactionDto;
 import com.platon.browser.dto.app.transaction.AppVoteTransactionDto;
 import com.platon.browser.enums.TransactionTypeEnum;
@@ -21,11 +18,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+*/
 /**
  * User: dongqile
  * Date: 2019/3/19
  * Time: 11:42
- */
+ *//*
+
 @Service
 public class AppTransactionServiceImpl implements AppTransactionService {
 
@@ -163,3 +162,4 @@ public class AppTransactionServiceImpl implements AppTransactionService {
     }
 
 }
+*/

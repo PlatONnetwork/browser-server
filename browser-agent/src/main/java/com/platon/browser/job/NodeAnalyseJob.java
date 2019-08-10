@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.job;
 
 import com.alibaba.fastjson.JSON;
@@ -5,11 +6,7 @@ import com.platon.browser.bean.NodeRankingBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockKey;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.StatisticsCache;
 import com.platon.browser.dto.agent.CandidateDto;
 import com.platon.browser.enums.NodeTypeEnum;
@@ -17,7 +14,6 @@ import com.platon.browser.service.cache.NodeCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.utils.FilterTool;
-import jnr.ffi.annotations.In;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,20 +34,18 @@ import java.util.concurrent.TimeUnit;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_NAME;
 
+*/
 /**
  * User: dongqile
  * Date: 2019/1/22
  * Time: 11:55
- */
+ *//*
+
 @Component
 public class NodeAnalyseJob {
     private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
     @Autowired
     private BlockMapper blockMapper;
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
-    private CustomNodeRankingMapper customNodeRankingMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
     @Autowired
@@ -82,9 +76,11 @@ public class NodeAnalyseJob {
         Map<String, Integer> nodeIdToValidTicketCountMap = new HashMap <>();
     }
 
-    /**
+    */
+/**
      * 分析节点数据
-     */
+     *//*
+
     @Scheduled(cron = "0/1 * * * * ?")
     protected void analyseNode () {
         logger.debug("*** In the NodeAnalyseJob *** ");
@@ -133,10 +129,12 @@ public class NodeAnalyseJob {
     }
 
 
-    /**
+    */
+/**
      * 从数据库获取NodeRanking数据列表
      * @return
-     */
+     *//*
+
     private List <NodeRanking> getNodeRankingsFromDB(){
         // 从数据库查询有效节点信息
         NodeRankingExample condition = new NodeRankingExample();
@@ -147,10 +145,12 @@ public class NodeAnalyseJob {
         return nodeRankingsFromDB;
     }
 
-    /**
+    */
+/**
      * 从链获取节点信息，并构造NodeRanking数据列表
      * @return
-     */
+     *//*
+
     private List<NodeRanking> getNodeRankingsFromChain(EthBlock ethBlock) throws Exception {
 
         NodeInfoFromChain nodeInfoFromChain = getNodeInfoFromChain(ethBlock);
@@ -191,11 +191,13 @@ public class NodeAnalyseJob {
             nodeRanking.setChainId(chainId);
             nodeRanking.setJoinTime(new Date(ethBlock.getBlock().getTimestamp().longValue()));
             nodeRanking.setBlockReward(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString()));
-            /*
+            */
+/*
              * 统计当前块中：
              * profitAmount累计收益 = 区块奖励 * 分红比例 + 当前区块的手续费总和
              * RewardAmount分红收益 = 区块奖励 * （1-分红比例）
-             */
+             *//*
+
             nodeRanking.setProfitAmount(new BigDecimal(FilterTool.getBlockReward(ethBlock.getBlock().getNumber().toString())).
                     multiply(rate).
                     add(actualTxCostSum).toString());
@@ -277,9 +279,11 @@ public class NodeAnalyseJob {
         return insertOrUpdateData;
     }
 
-    /**
+    */
+/**
      * 从链上获取节点列表信息
-     */
+     *//*
+
     private NodeInfoFromChain getNodeInfoFromChain ( EthBlock ethBlock ) throws Exception {
 
         // 调用候选合约获取提名和候选节点信息
@@ -359,3 +363,4 @@ public class NodeAnalyseJob {
 
 
 }
+*/

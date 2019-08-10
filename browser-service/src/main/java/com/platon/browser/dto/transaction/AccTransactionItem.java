@@ -1,7 +1,6 @@
 package com.platon.browser.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platon.browser.dao.entity.PendingTx;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.TxInfoResolver;
@@ -43,7 +42,7 @@ public class AccTransactionItem {
     private Date timestamp;
 
     public void init(Object initData){
-        BeanUtils.copyProperties(initData,this);
+       /* BeanUtils.copyProperties(initData,this);
         this.setServerTime(System.currentTimeMillis());
 
         String txHash = "",value = "0",cost = "0";
@@ -73,6 +72,6 @@ public class AccTransactionItem {
         BigDecimal v = Convert.fromWei(value, Convert.Unit.WEI);
         v = Convert.fromWei(cost, Convert.Unit.ETHER);
         this.setActualTxCost(EnergonUtil.format(v));
-
+*/
     }
 }

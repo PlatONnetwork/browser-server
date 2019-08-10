@@ -2,32 +2,35 @@ package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.BlockKey;
-import org.apache.ibatis.annotations.Mapper;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-@Mapper
 public interface BlockMapper {
     long countByExample(BlockExample example);
 
     int deleteByExample(BlockExample example);
 
-    int deleteByPrimaryKey(BlockKey key);
+    int deleteByPrimaryKey(Long number);
 
     int insert(Block record);
 
     int insertSelective(Block record);
 
+    List<Block> selectByExampleWithBLOBs(BlockExample example);
+
     List<Block> selectByExample(BlockExample example);
 
-    Block selectByPrimaryKey(BlockKey key);
+    Block selectByPrimaryKey(Long number);
 
     int updateByExampleSelective(@Param("record") Block record, @Param("example") BlockExample example);
+
+    int updateByExampleWithBLOBs(@Param("record") Block record, @Param("example") BlockExample example);
 
     int updateByExample(@Param("record") Block record, @Param("example") BlockExample example);
 
     int updateByPrimaryKeySelective(Block record);
+
+    int updateByPrimaryKeyWithBLOBs(Block record);
 
     int updateByPrimaryKey(Block record);
 
@@ -47,5 +50,5 @@ public interface BlockMapper {
      * @mbg.generated
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
-    int batchInsertSelective(@Param("list") List<Block> list, @Param("selective") Block.Column... selective);
+    int batchInsertSelective(@Param("list") List<Block> list, @Param("selective") Block.Column ... selective);
 }

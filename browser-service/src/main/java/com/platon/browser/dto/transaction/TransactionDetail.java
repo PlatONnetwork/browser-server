@@ -54,8 +54,6 @@ public class TransactionDetail {
         this.setActualTxCost(EnergonUtil.format(v));
         v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
         this.setValue(EnergonUtil.format(v));
-        this.setPriceInE(initData.getEnergonPrice());
-        v = Convert.fromWei(initData.getEnergonPrice(), Convert.Unit.ETHER);
         this.setPriceInEnergon(EnergonUtil.format(v));
 
         TxInfoResolver.resolve(txType,txInfo,value,this);

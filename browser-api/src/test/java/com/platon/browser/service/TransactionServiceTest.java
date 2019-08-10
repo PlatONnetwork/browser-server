@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -67,3 +68,4 @@ public class TransactionServiceTest extends ServiceTestBase {
         });
     }
 }
+*/

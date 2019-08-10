@@ -1,0 +1,22 @@
+# ***************************生产配置**************************** #
+# 应用版本
+version: 0.4.2
+# 当前激活的配置名称(请不要修改)
+profile: prodtest
+# 服务器端口号
+port: 38030
+# MySQL数据库连接地址
+dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dbuser: root
+dbpass: Juzhenyuan_123
+# Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+#chain.config: MAIN_NET-1-http://10.0.0.5:6792
+chain.config: MAIN_NET-1-http://10.0.0.5:6789
+# Redis集群节点
+redis: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
+# 日志文件存储文件
+logpath: /data/logs/browser-server-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: error
+  platon: error

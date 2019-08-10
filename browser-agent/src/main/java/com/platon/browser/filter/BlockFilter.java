@@ -51,13 +51,12 @@ public class BlockFilter {
             String price = null;
             try {
                 price = ticketContract.GetTicketPrice().send();
-                bean.setVotePrice(null != price ? price : "0");
+                //bean.setVotePrice(null != price ? price : "0");
             } catch (Exception e) {
                 logger.error("获取票价异常");
             }
 
             // 设置需要使用当前上下文的属性
-            bean.setChainId(chainId);
             String publicKey = null;
             try {
                 publicKey = CalculatePublicKey.getPublicKey(param.ethBlock);
@@ -82,21 +81,21 @@ public class BlockFilter {
                 String nodeInfo = candidateContract.GetCandidateDetails(bean.getNodeId()).send();
                 List<CandidateDto> candidateDtos = JSON.parseArray(nodeInfo, CandidateDto.class);
                 if(candidateDtos.size()>0){
-                    bean.setRewardRatio(BigDecimal.valueOf(candidateDtos.get(0).getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
+                    //bean.setRewardRatio(BigDecimal.valueOf(candidateDtos.get(0).getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
                 }else {
-                    bean.setRewardRatio(0.0);
+                    //bean.setRewardRatio(0.0);
                 }
             } catch (Exception e) {
-                bean.setRewardRatio(0.0);
+                //bean.setRewardRatio(0.0);
             }
 
 
             if (param.transactions.isEmpty() && param.transactionReceipts.isEmpty()) {
                 // 如果交易及
-                bean.setActualTxCostSum("0");
-                bean.setBlockVoteAmount(0L);
-                bean.setBlockCampaignAmount(0L);
-                bean.setBlockVoteNumber(0L);
+                //bean.setActualTxCostSum("0");
+                //bean.setBlockVoteAmount(0L);
+                //bean.setBlockCampaignAmount(0L);
+                //bean.setBlockVoteNumber(0L);
                 return bean;
             }
 
@@ -106,7 +105,7 @@ public class BlockFilter {
             BigInteger voteAmount = new BigInteger("0");
             //blockCampaignAmount
             BigInteger campaignAmount = new BigInteger("0");
-            bean.setBlockVoteNumber(0L);
+            //bean.setBlockVoteNumber(0L);
 
 
             for (Transaction transaction : param.transactions) {
@@ -132,15 +131,15 @@ public class BlockFilter {
                                 //EventRes get Data
                                 String res = eventRes.getData();
                                 String[] strs = res.split(":");
-                                bean.setBlockVoteNumber(Long.valueOf(strs[0]));
+                                //bean.setBlockVoteNumber(Long.valueOf(strs[0]));
                             }
                         } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                             campaignAmount = campaignAmount.add(BigInteger.ONE);
                         }
                     }
-                    bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
-                    bean.setBlockCampaignAmount(voteAmount != null ? campaignAmount.longValue() : new BigInteger("0").longValue());
-                    bean.setActualTxCostSum(sum.toString());
+                    //bean.setBlockVoteAmount(voteAmount != null ? voteAmount.longValue() : new BigInteger("0").longValue());
+                    //bean.setBlockCampaignAmount(voteAmount != null ? campaignAmount.longValue() : new BigInteger("0").longValue());
+                    //bean.setActualTxCostSum(sum.toString());
                 }
 
             }

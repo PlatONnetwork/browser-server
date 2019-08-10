@@ -7,7 +7,6 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
@@ -41,8 +40,7 @@ public class BlockServiceImpl implements BlockService {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
-    @Autowired
-    private CustomBlockMapper customBlockMapper;
+
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -91,7 +89,7 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public BlockDetail getDetail(BlockDetailReq req) {
         BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(req.getHeight());
+        blockExample.createCriteria().andNumberEqualTo(req.getHeight());
         List<Block> blocks = blockMapper.selectByExample(blockExample);
         if (blocks.size()>1){
             logger.error("duplicate block: block number {}",req.getHeight());
@@ -108,7 +106,7 @@ public class BlockServiceImpl implements BlockService {
         // 取上一个区块
         blockExample = new BlockExample();
         blockExample.createCriteria()
-                .andChainIdEqualTo(req.getCid())
+
                 .andNumberEqualTo(req.getHeight()-1);
         blocks = blockMapper.selectByExample(blockExample);
         if (blocks.size()>1){
@@ -127,7 +125,7 @@ public class BlockServiceImpl implements BlockService {
         /** 设置last标识 **/
         blockExample = new BlockExample();
         blockExample.createCriteria()
-                .andChainIdEqualTo(req.getCid())
+
                 .andNumberEqualTo(req.getHeight()+1);
         blocks = blockMapper.selectByExample(blockExample);
         if(blocks.size()==0){
@@ -163,7 +161,7 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public List<Block> getList(BlockDownloadReq req) {
         BlockExample condition = new BlockExample();
-        BlockExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
+        BlockExample.Criteria criteria = condition.createCriteria();
         if(StringUtils.isNotBlank(req.getNodeId())){
             criteria.andNodeIdEqualTo(req.getNodeId());
         }
@@ -197,7 +195,7 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public RespPage<TransactionListItem> getBlockTransactionList(BlockTransactionPageReq req) {
         TransactionExample example = new TransactionExample();
-        TransactionExample.Criteria criteria = example.createCriteria().andChainIdEqualTo(req.getCid())
+        TransactionExample.Criteria criteria = example.createCriteria()
                 .andBlockNumberEqualTo(req.getBlockNumber());
         example.setOrderByClause("transaction_index ASC");
         if(StringUtils.isNotBlank(req.getTxType())){

@@ -1,16 +1,13 @@
 package com.platon.browser.service;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.BlockMissingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.service.cache.NodeCacheService;
 import com.platon.browser.service.cache.StatisticCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.thread.AnalyseThread;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Component
-public class DBService {
+public class DBService {/*
     private static Logger logger = LoggerFactory.getLogger(DBService.class);
     @Autowired
     private PlatonClient platon;
@@ -32,8 +29,6 @@ public class DBService {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
-    @Autowired
-    private BlockMissingMapper blockMissingMapper;
     @Autowired
     private BlockCacheService blockCacheService;
     @Autowired
@@ -95,6 +90,6 @@ public class DBService {
 
         logger.debug("Time Consuming(Total): {}ms",System.currentTimeMillis()-beginTime);
     }
-
+*/
 
 }

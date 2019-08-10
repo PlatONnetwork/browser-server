@@ -2,9 +2,7 @@ package com.platon.browser.util;
 
 import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.app.node.AppNodeListWrapper;
-import com.platon.browser.dto.node.NodeListItem;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

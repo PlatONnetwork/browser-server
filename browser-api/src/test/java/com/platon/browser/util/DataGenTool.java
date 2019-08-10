@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
@@ -39,12 +40,14 @@ public class DataGenTool extends TestData {
         }
     }
 
-    /**
+    */
+/**
      * 生成节点数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<NodeRanking> generateNode(String chainId, boolean writeToFile) {
         List<NodeRanking> nodes = new ArrayList<>();
 
@@ -110,12 +113,14 @@ public class DataGenTool extends TestData {
         return nodes;
     }
 
-    /**
+    */
+/**
      * 生成区块数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<Block> generateBlock(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -164,12 +169,14 @@ public class DataGenTool extends TestData {
         return returnData;
     }
 
-    /**
+    */
+/**
      * 生成交易数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -308,3 +315,4 @@ public class DataGenTool extends TestData {
         //generateBlock("1",true);
     }
 }
+*/

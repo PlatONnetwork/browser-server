@@ -39,7 +39,6 @@ public class BlockDetail {
     public void init(Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
-        this.setTransaction(initData.getTransactionNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));

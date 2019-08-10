@@ -53,7 +53,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListItem> getPageByBlockNumber(TransactionPageReq req) {
         TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid())
+        condition.createCriteria()
                 .andBlockNumberEqualTo(req.getHeight());
         condition.setOrderByClause("sequence desc");
 
@@ -72,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionDetail loadDetail(TransactionDetailReq req){
         TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(req.getCid()).andHashEqualTo(req.getTxHash());
+        condition.createCriteria().andHashEqualTo(req.getTxHash());
         List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
         if (transactions.size()>1){
             logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(StringUtils.isBlank(nodeId)){
             // 如果从txInfo中取不到节点ID，则从区块中取
             BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(initData.getBlockNumber());
+            blockExample.createCriteria().andNumberEqualTo(initData.getBlockNumber());
             List<Block> blocks = blockMapper.selectByExample(blockExample);
             if(blocks.size()>0){
                 Block block = blocks.get(0);
@@ -114,7 +114,7 @@ public class TransactionServiceImpl implements TransactionService {
     private void setupNavigateFlag(String chainId,TransactionDetail detail){
         /** 设置first和last标识 **/
         TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(chainId)
+        condition.createCriteria()
                 .andSequenceLessThan(detail.getSequence());
         PageHelper.startPage(1,1);
         List<Transaction> transactionList = transactionMapper.selectByExample(condition);
@@ -124,7 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(chainId)
+        condition.createCriteria()
                 .andSequenceGreaterThan(detail.getSequence());
         PageHelper.startPage(1,1);
         transactionList = transactionMapper.selectByExample(condition);
@@ -150,10 +150,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionWithBLOBs> getList(AddressDetailReq req) {
         TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria first = condition.createCriteria().andChainIdEqualTo(req.getCid())
+        TransactionExample.Criteria first = condition.createCriteria()
                 .andFromEqualTo(req.getAddress());
         TransactionExample.Criteria second = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid())
                 .andToEqualTo(req.getAddress());
         if(req.getTxTypes().size()>0){
             // 根据交易类型查询
@@ -195,8 +194,7 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionDetail currentDetail = loadDetail(detailReq);
 
         TransactionExample condition = new TransactionExample();
-        TransactionExample.Criteria criteria = condition.createCriteria()
-                .andChainIdEqualTo(req.getCid());
+        TransactionExample.Criteria criteria = condition.createCriteria();
         switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
             case PREV:
                 criteria.andSequenceLessThan(currentDetail.getSequence());
@@ -226,7 +224,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(StringUtils.isBlank(nodeId)){
             // 如果从txInfo中取不到节点ID，则从区块中取
             BlockExample blockExample = new BlockExample();
-            blockExample.createCriteria().andChainIdEqualTo(req.getCid()).andNumberEqualTo(initData.getBlockNumber());
+            blockExample.createCriteria().andNumberEqualTo(initData.getBlockNumber());
             List<Block> blocks = blockMapper.selectByExample(blockExample);
             if(blocks.size()>0){
                 Block block = blocks.get(0);

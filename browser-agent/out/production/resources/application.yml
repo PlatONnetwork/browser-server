@@ -1,0 +1,80 @@
+# ***************************通用配置**************************** #
+
+#Spring应用配置
+spring:
+  profiles.active: testa
+  application.name: browser-agent
+  #Redis集群配置
+  redis:
+    database: 0
+    cluster:
+      max-redirects: 3
+      nodes: ${redis}
+  #数据源配置
+  datasource:
+    name: test
+    url: ${dburl}
+    username: ${dbuser}
+    password: ${dbpass}
+    #druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    #driver-class-name: com.mysql.jdbc.Driver
+# Platon配置
+platon:
+  chain:
+    config: ${chain.config}
+    active: ${chain.active}
+  # 虚假节点位置配置文件
+  fake.location.filename: fakelocation.json
+  # 批量采集线程池大小
+  block.pool.size: ${thread.num}
+  # 批量处理数量
+  block.batch.num: ${batch.num}
+  # 区块列表缓存和交易列表缓存配置
+  redis:
+    key:
+      #验证节点列表
+      node: browser:${version}:${profile}:chain{}:nodes
+      #节点ID与其所出最大块号的映射
+      nodeid-maxblocknum: browser:${version}:${profile}:chain{}:nodeid-maxblocknum:{nodeId}
+      #区块列表
+      block: browser:${version}:${profile}:chain{}:blocks
+      #交易列表
+      transaction: browser:${version}:${profile}:chain{}:transactions
+      #统计信息
+      staticstics: browser:${version}:${profile}:chain{}:staticstics
+      #总交易笔数
+      trans-count: browser:${version}:${profile}:chain{}:trans-count
+      #24小时内的交易数
+      trans-count-24-hours: browser:${version}:${profile}:chain{}:trans-count-24-hours
+      #地址数
+      address-count: browser:${version}:${profile}:chain{}:address-count
+      #平均区块交易数
+      avg-block-trans-count: browser:${version}:${profile}:chain{}:avg-block-trans-count
+      #票价
+      ticket-price: browser:${version}:${profile}:chain{}:ticket-price
+      #投票数
+      vote-count: browser:${version}:${profile}:chain{}:vote-count
+      #MaxTps
+      max-tps: browser:${version}:${profile}:chain{}:max-tps
+      # 按地址存储的交易的键模板
+      address-trans-key-template: browser:${version}:${profile}:chain{}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
+      # 按地址存储的交易数量限制
+      address-trans-max-item: 200
+    max-item: 500000
+#日志配置
+logging:
+  file: ${logpath}
+  level:
+    org.springframework: ${loglevel.spring}
+    com.platon.browser: ${loglevel.platon}
+    com.platon.browser.filter: ${loglevel.platon.filter}
+    com.platon.browser.job: ${loglevel.platon.job}
+    com.platon.browser.service: ${loglevel.platon.service}
+    com.platon.browser.thread: ${loglevel.platon.thread}
+
+# MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类别名配置（注意：对应实体类的路径）
+  type-aliases-package: com.platon.browser.dao.entity

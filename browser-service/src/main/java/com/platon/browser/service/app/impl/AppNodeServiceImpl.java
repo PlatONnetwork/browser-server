@@ -1,8 +1,7 @@
+/*
 package com.platon.browser.service.app.impl;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
-import com.platon.browser.dao.mapper.CustomTransactionMapper;
 import com.platon.browser.dto.app.node.AppNodeDetailDto;
 import com.platon.browser.dto.app.node.AppNodeDto;
 import com.platon.browser.dto.app.node.AppNodeListWrapper;
@@ -23,11 +22,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+*/
 /**
  * User: dongqile
  * Date: 2019/3/19
  * Time: 11:42
- */
+ *//*
+
 @Service
 public class AppNodeServiceImpl implements AppNodeService {
 
@@ -35,9 +36,7 @@ public class AppNodeServiceImpl implements AppNodeService {
     @Autowired
     private PlatonClient platon;
     @Autowired
-    private CustomNodeRankingMapper customNodeRankingMapper;
-    @Autowired
-    private CustomTransactionMapper customTransactionMapper;
+
 
     @Autowired
     private ApiService apiService;
@@ -164,10 +163,12 @@ public class AppNodeServiceImpl implements AppNodeService {
         return userNodeDtos;
     }
 
-    /**
+    */
+/**
      * 更新本地进程缓存
      * @param chainId
-     */
+     *//*
+
     @Override
     public void updateLocalNodeCache(String chainId){
         logger.debug("list() begin");
@@ -201,3 +202,4 @@ public class AppNodeServiceImpl implements AppNodeService {
         LocalCacheTool.APP_CHAINID_NODES_MAP.put(chainId,nodes);
     }
 }
+*/

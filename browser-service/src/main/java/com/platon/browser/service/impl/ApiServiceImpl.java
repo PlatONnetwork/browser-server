@@ -9,8 +9,6 @@ import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.app.transaction.TxIncomeSumDto;
@@ -53,10 +51,7 @@ public class ApiServiceImpl implements ApiService {
     private BlockMapper blockMapper;
     @Autowired
     private NodeService nodeService;
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
-    private CustomBlockMapper customBlockMapper;
+
 
     @Data
     static class TicketCount{
@@ -76,7 +71,7 @@ public class ApiServiceImpl implements ApiService {
         long beginTime = System.currentTimeMillis();
         List<VoteSummary> voteSummaryList = new ArrayList<>();
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andChainIdEqualTo(chainId).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
+        transactionExample.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(addressList);
         List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
@@ -116,7 +111,7 @@ public class ApiServiceImpl implements ApiService {
         Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<VoteTransaction> voteTransactions = new ArrayList <>();
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.createCriteria().andChainIdEqualTo(req.getCid()).andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
+        transactionExample.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code)
                 .andFromIn(req.getWalletAddrs());
         List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         List<String> hashList = new ArrayList <>();
@@ -196,7 +191,7 @@ public class ApiServiceImpl implements ApiService {
         if(hashList.size() > 0){
             logger.debug("Time Consuming-begin: {}ms",System.currentTimeMillis()-beginTime);
             TransactionExample transactionExample = new TransactionExample();
-            transactionExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(hashList);
+            transactionExample.createCriteria().andHashIn(hashList);
 
             List<TransactionWithBLOBs> transactionList = transactionMapper.selectByExampleWithBLOBs(transactionExample);
             List<VoteInfo> bean = new ArrayList <>();
@@ -219,12 +214,12 @@ public class ApiServiceImpl implements ApiService {
 
             if(blockHashList.size()>0){
                 BlockExample blockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId).andHashIn(blockHashList);
+                blockExample.createCriteria().andHashIn(blockHashList);
                 List<Block> blocks = blockMapper.selectByExample(blockExample);
                 blockHashList.forEach(blockNumber->{
                     blocks.forEach(block -> {
                         if(blockNumber.equals(block.getNumber())){}
-                        priceMap.put(block.getHash(),block.getVotePrice());
+                        priceMap.put(block.getHash(),"");
                     });
                 });
             }
@@ -306,9 +301,9 @@ public class ApiServiceImpl implements ApiService {
             return incomeMap;
         }*/
 
-        List<TxIncomeSumDto> res = customBlockMapper.getIncomeByVoteHash(chainId,hashList);
+
         Map<String,BigDecimal> map = new HashMap<>();
-        res.forEach(dto -> map.put(dto.getTxHash(),dto.getIncome()));
+
         return map;
 
     }

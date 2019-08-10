@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Block;
@@ -75,6 +76,7 @@ public class BlockServiceTest extends ServiceTestBase {
             Assert.assertTrue(result.getData().size()>=0);
         });
     }
+*/
 /*
     @Test
     public void getBlockTicketList(){
@@ -85,5 +87,7 @@ public class BlockServiceTest extends ServiceTestBase {
             RespPage<Ticket> result = blockService.getBlockTicketList(req);
             Assert.assertTrue(result.getData().size()>=0);
         });
-    }*/
+    }*//*
+
 }
+*/

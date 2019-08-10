@@ -1,0 +1,34 @@
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.6.1
+# 当前激活的配置名称(请不要修改)
+profile: agent
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+# MySQL数据库用户名
+dbuser: platon
+# MySQL数据库密码
+dbpass: platon
+chain:
+  # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
+  config: MAIN_NET-1-http://192.168.120.88:6789
+  # 要采集哪个ID的链
+  active: 1
+# Redis集群节点
+redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+# 日志文件存储文件
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: debug
+  platon: debug
+  platon.job: debug
+  platon.filter: debug
+  platon.service: debug
+  platon.thread: debug
+# 区块分析线程池大小
+thread.num: 50
+# 区块批量采集大小
+batch.num: ${thread.num}
+
+

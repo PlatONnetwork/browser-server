@@ -66,9 +66,9 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      */
     @Override
     public void updateTransactionCache(String chainId, Set<Transaction> items){
-        if(!validateParam(chainsConfig,chainId,items))return;
+       /* if(!validateParam(chainsConfig,chainId,items))return;
         String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
-        updateCache(cacheKey,items,redisTemplate,maxItemNum);
+        updateCache(cacheKey,items,redisTemplate,maxItemNum);*/
     }
 
     /**
@@ -79,7 +79,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     public void resetTransactionCache(String chainId,boolean clearOld) {
         if(clearOld) clearTransactionCache(chainId);
         TransactionExample condition = new TransactionExample();
-        condition.createCriteria().andChainIdEqualTo(chainId);
+        condition.createCriteria();
         condition.setOrderByClause("block_number desc,transaction_index desc");
         for(int i=0;i<500;i++){
             PageHelper.startPage(i+1,1000);
@@ -98,7 +98,7 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      */
     @Override
     public RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize){
-        String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+       /* String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
         CachePageInfo<TransactionListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, TransactionListItem.class,i18n,redisTemplate,maxItemNum);
         RespPage<TransactionListItem> page = cpi.page;
         List<TransactionListItem> transactions = new LinkedList<>();
@@ -115,7 +115,8 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
 //        Long displayCount = transactionMapper.countByExample(new TransactionExample());
         Long displayCount = statisticCacheService.getTransCount(chainId);
         page.setDisplayTotalCount(displayCount.intValue());
-        return page;
+        return page;*/
+       return null;
     }
 
     /**

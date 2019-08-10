@@ -4,7 +4,6 @@ import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockPushItem;
-import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.platon.browser.service.impl.cache.NodeCacheServiceImpl.NODEID_TO_FAKE_NODES;
 
 
 @Component
@@ -36,16 +34,13 @@ public class StompPushJob {
     private ChainsConfig chainsConfig;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    private BlockCacheService blockCacheService;
+
     @Autowired
     private TransactionCacheService transactionCacheService;
     @Autowired
     private I18nUtil i18n;
     @Value("${platon.redis.key.block}")
     private String blockCacheKeyTemplate;
-    @Autowired
-    private NodeService nodeService;
     @Autowired
     private StatisticService statisticService;
 
@@ -54,7 +49,7 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/1 * * * * ?")
     public void pushNode(){
-        chainsConfig.getChainIds().forEach(chainId -> {
+        /*chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
             List<NodePushItem> cache = nodeService.getPushCache(chainId);
             cache.forEach(node->{
@@ -66,7 +61,7 @@ public class StompPushJob {
             });
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),cache);
             messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
-        });
+        });*/
     }
 
     /**
@@ -96,7 +91,7 @@ public class StompPushJob {
     /**
      * 推送区块相关信息
      */
-    @Scheduled(cron="0/1 * * * * ?")
+   /* @Scheduled(cron="0/1 * * * * ?")
     public void pushBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 全量推送区块信息
@@ -105,7 +100,7 @@ public class StompPushJob {
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
         });
     }
-
+*/
     /**
      * 推送交易相关信息
      */

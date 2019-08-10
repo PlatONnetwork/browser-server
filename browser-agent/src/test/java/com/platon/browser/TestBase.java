@@ -2,10 +2,8 @@ package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.filter.BlockFilter;
-import com.platon.browser.filter.PendingFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +29,6 @@ public class TestBase {
     @Autowired
     protected ChainsConfig chainsConfig;
 
-    @Autowired
-    protected PendingFilter pendingFilter;
 
     @Autowired
     protected TransactionFilter transactionFilter;
@@ -40,8 +36,6 @@ public class TestBase {
     @Autowired
     protected RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    protected NodeRankingMapper nodeRankingMapper;
 
     @Autowired
     protected TransactionMapper transactionMapper;

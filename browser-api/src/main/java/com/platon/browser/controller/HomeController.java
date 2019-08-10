@@ -6,7 +6,6 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.IndexInfo;
 import com.platon.browser.dto.StatisticInfo;
 import com.platon.browser.dto.block.BlockPushItem;
-import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.res.BaseResp;
@@ -40,20 +39,7 @@ public class HomeController {
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
-
-    @Autowired
-    private BlockCacheService blockCacheService;
-    @Autowired
     private TransactionCacheService transactionCacheService;
-
-    @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
-    private TransactionMapper transactionMapper;
-
-    @Autowired
-    private NodeService nodeService;
     @Autowired
     private StatisticService statisticService;
 
@@ -88,8 +74,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<NodePushItem> nodeInfoList = nodeService.getPushCache(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),"");
         return resp;
     }
 
@@ -242,8 +227,7 @@ public class HomeController {
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<BlockPushItem> blocks = blockCacheService.getBlockPushCache(chainId,1,10);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),"");
         return resp;
     }
 

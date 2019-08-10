@@ -1,0 +1,33 @@
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.6.0
+# 当前激活的配置名称(请不要修改)
+profile: amigo
+# MySQL数据库连接地址
+dburl: jdbc:mysql://127.0.0.1:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+# MySQL数据库用户名
+dbuser: juzix
+# MySQL数据库密码
+dbpass: Juzhen123!
+chain:
+  # Platon链配置,格式【{chainName1}-{chainIdA}-[http://nodeIPA1:portA1,http://nodeIPA2:portA2]】
+  # 同一条链匹配多个节点错容
+  config: MAIN_NET-103-["http://10.0.0.5:6791","http://13.67.44.50:6791","http://13.67.44.50:6792"]
+  # 要采集哪个ID的链
+  active: 103
+# Redis集群节点
+redis: 127.0.0.1:21006,127.0.0.1:21007,127.0.0.1:21008,127.0.0.1:21009,127.0.0.1:21010,127.0.0.1:21011
+# 日志文件存储文件
+logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: error
+  platon: error
+  platon.job: error
+  platon.filter: error
+  platon.service: error
+  platon.thread: error
+# 区块分析线程池大小
+thread.num: 200
+# 区块批量采集大小
+batch.num: ${thread.num}

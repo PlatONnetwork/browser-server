@@ -52,7 +52,6 @@ public class BlockAnalyseJob {
 
         if(!isBeginNumberInit){
             BlockExample condition = new BlockExample();
-            condition.createCriteria().andChainIdEqualTo(chainId);
             condition.setOrderByClause("number desc");
             PageHelper.startPage(1, 1);
             List <Block> blocks = blockMapper.selectByExample(condition);

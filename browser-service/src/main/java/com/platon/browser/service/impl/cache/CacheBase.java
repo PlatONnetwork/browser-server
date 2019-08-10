@@ -23,7 +23,9 @@ import java.util.*;
  * @Description:
  */
 public class CacheBase {
+/*
     private final Logger logger = LoggerFactory.getLogger(NodeCacheServiceImpl.class);
+
 
     protected boolean validateParam(ChainsConfig chainsConfig, String chainId, Collection items){
         if (!chainsConfig.getChainIds().contains(chainId)){
@@ -98,4 +100,5 @@ public class CacheBase {
         cpi.page = page;
         return cpi;
     }
+    */
 }

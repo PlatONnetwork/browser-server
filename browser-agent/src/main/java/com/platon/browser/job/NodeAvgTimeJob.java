@@ -1,13 +1,11 @@
+/*
 package com.platon.browser.job;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +23,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.platon.browser.utils.CacheTool.NODEID_TO_AVGTIME;
 
+*/
 /**
  * User: dongqile
  * Date: 2019/1/28
  * Time: 16:49
- */
+ *//*
+
 @Component
 public class NodeAvgTimeJob {
     private static Logger logger = LoggerFactory.getLogger(NodeAvgTimeJob.class);
@@ -85,4 +85,4 @@ public class NodeAvgTimeJob {
         }
         logger.debug("*** End the NodeAvgTimeJob *** ");
     }
-}
+}*/

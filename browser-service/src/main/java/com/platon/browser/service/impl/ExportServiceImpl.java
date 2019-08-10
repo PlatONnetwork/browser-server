@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
@@ -5,18 +6,13 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.PendingTxMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.account.AccountDownload;
-import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.transaction.AccTransactionItem;
-import com.platon.browser.enums.TransactionStatusEnum;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.req.account.AccountDownloadReq;
-import com.platon.browser.req.account.AddressDetailReq;
 import com.platon.browser.req.block.BlockDownloadReq;
-import com.platon.browser.service.AccountService;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.ExportService;
 import com.platon.browser.service.NodeService;
@@ -28,10 +24,8 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.platon.contracts.CandidateContract;
 import org.web3j.platon.contracts.TicketContract;
 import org.web3j.utils.Convert;
 
@@ -56,8 +50,7 @@ public class ExportServiceImpl implements ExportService {
     private TransactionMapper transactionMapper;
     @Autowired
     private BlockMapper blockMapper;
-    @Autowired
-    private PendingTxMapper pendingTxMapper;
+
 
     @Autowired
     private PlatonClient platonClient;
@@ -388,3 +381,4 @@ public class ExportServiceImpl implements ExportService {
         return blockDownload;
     }
 }
+*/

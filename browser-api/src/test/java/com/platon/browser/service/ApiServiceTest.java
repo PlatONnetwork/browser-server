@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
@@ -37,3 +38,4 @@ public class ApiServiceTest extends ServiceTestBase {
     }
 
 }
+*/

@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +27,6 @@ public class RelatedDataJob {
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
     private PlatonClient platon;
 
     @Value("${platon.chain.active}")
@@ -43,11 +38,11 @@ public class RelatedDataJob {
     //Scheduled(cron = "0/2 * * * * ?")
     //Scheduled(cron = "0/2 * * * * ?")
     protected void statistics () {
-        logger.debug("*** In the RelatedDataJob ***");
+        /* logger.debug("*** In the RelatedDataJob ***");
         Map <Long, Date> blockOfNodeinfo = new HashMap <>();
         List <Long> beforeNumberList = new ArrayList <>();
         try {
-            NodeRankingExample nodeRankingExample = new NodeRankingExample();
+           NodeRankingExample nodeRankingExample = new NodeRankingExample();
             nodeRankingExample.createCriteria().andChainIdEqualTo(chainId).andIsValidEqualTo(1);
             //有效节点信息列表
             List <NodeRanking> nodeRankingList = nodeRankingMapper.selectByExample(nodeRankingExample);
@@ -85,7 +80,7 @@ public class RelatedDataJob {
             //e.printStackTrace();
             logger.debug("*** RelatedDataJob Exception ***");
         }
-        logger.debug("*** End the RelatedDataJob ***");
+        logger.debug("*** End the RelatedDataJob ***");*/
     }
 }
 

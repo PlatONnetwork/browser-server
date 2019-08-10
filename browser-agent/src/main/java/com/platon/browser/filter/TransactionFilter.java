@@ -1,13 +1,8 @@
 package com.platon.browser.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
-import com.platon.browser.dao.mapper.CustomNodeRankingMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.ticket.TxInfo;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
@@ -44,10 +39,7 @@ public class TransactionFilter {
     @Value("${platon.chain.active}")
     private String chainId;
 
-    @Autowired
-    private NodeRankingMapper nodeRankingMapper;
-    @Autowired
-    private CustomNodeRankingMapper customNodeRankingMapper;
+
 
 
     public List <TransactionBean> analyse ( AnalyseThread.AnalyseParam param, long time ) {
@@ -68,7 +60,6 @@ public class TransactionFilter {
                     bean.setTimestamp(new Date(time));
                 }
                 // Setup the chain id
-                bean.setChainId(chainId);
                 // Setup the receiver type
                 //judge `to` address is accountAddress or contractAddress
                 if (null != RECEIVER_TO_TYPE.get(initData.getTo())) {
@@ -94,7 +85,7 @@ public class TransactionFilter {
                     // 投票交易，则从节点中查询质押金并设置到交易信息中
                     TxInfo info = JSON.parseObject(bean.getTxInfo(),TxInfo.class);
                     TxInfo.Parameter tp = info.getParameters();
-                    if(tp!=null){
+                    if(tp!=null){/*
                         // 查询对应节点的质押金，放到txinfo
                         NodeRanking nodeRanking = customNodeRankingMapper.selectByNodeIdAndBlockNumber(chainId,tp.getNodeId(),bean.getBlockNumber());
                         // 查询节点
@@ -106,7 +97,7 @@ public class TransactionFilter {
                             tp.setNodeName("Unknown");
                         }
                         bean.setTxInfo(JSON.toJSONString(info));
-                    }
+                    */}
                 }
             }
 

@@ -1,0 +1,818 @@
+2019-03-20 17:52:02.755  INFO 9572 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 9572 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:52:02.757  INFO 9572 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:52:07.787 ERROR 9572 --- [main] o.s.boot.SpringApplication               : Application startup failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) [spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:52:07.793 ERROR 9572 --- [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@70325e14] to prepare test instance [com.platon.FilterTest.BlockFilterTest@8d8f754]
+
+java.lang.IllegalStateException: Failed to load ApplicationContext
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:124) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) ~[spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 24 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:55:03.101  INFO 22572 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 22572 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:55:03.104  INFO 22572 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:55:07.449 ERROR 22572 --- [main] o.s.boot.SpringApplication               : Application startup failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) [spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:55:07.456 ERROR 22572 --- [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@41a2befb] to prepare test instance [com.platon.FilterTest.BlockFilterTest@65f651eb]
+
+java.lang.IllegalStateException: Failed to load ApplicationContext
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:124) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) ~[spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 24 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:55:58.705  INFO 21892 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 21892 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:55:58.707  INFO 21892 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:56:01.575 ERROR 21892 --- [main] o.s.boot.SpringApplication               : Application startup failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) [spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:56:01.582 ERROR 21892 --- [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@41a2befb] to prepare test instance [com.platon.FilterTest.BlockFilterTest@4b74b35]
+
+java.lang.IllegalStateException: Failed to load ApplicationContext
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:124) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:83) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:189) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:131) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:230) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:228) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:287) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:289) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:247) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:94) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58) [junit-4.12.jar:4.12]
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363) [junit-4.12.jar:4.12]
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:191) [spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137) [junit-4.12.jar:4.12]
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242) [junit-rt.jar:na]
+	at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70) [junit-rt.jar:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'blockFilter': Unsatisfied dependency expressed through field 'platon'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:761) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:543) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) ~[spring-boot-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:120) ~[spring-boot-test-1.5.9.RELEASE.jar:1.5.9.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:98) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:116) ~[spring-test-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 24 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'platonClient': Unsatisfied dependency expressed through field 'chainsConfig'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:588) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 42 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'chainsConfig': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:372) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1264) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:553) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:208) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1138) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 55 common frames omitted
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'chain.config' in value "${chain.config}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:174) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveNestedPlaceholders(AbstractPropertyResolver.java:227) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:84) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:61) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractEnvironment.getProperty(AbstractEnvironment.java:527) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:132) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$1.getProperty(PropertySourcesPlaceholderConfigurer.java:129) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getProperty(PropertySourcesPropertyResolver.java:81) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.PropertySourcesPropertyResolver.getPropertyAsRawString(PropertySourcesPropertyResolver.java:71) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver$1.resolvePlaceholder(AbstractPropertyResolver.java:239) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:147) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:126) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:236) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210) ~[spring-core-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer$2.resolveStringValue(PropertySourcesPlaceholderConfigurer.java:172) ~[spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:831) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1086) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:585) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:366) ~[spring-beans-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	... 66 common frames omitted
+
+2019-03-20 17:56:57.689  INFO 19628 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 19628 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:56:57.691  INFO 19628 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:57:02.244  INFO 19628 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:57:11.544  INFO 19628 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 14.83 seconds (JVM running for 15.841)
+2019-03-20 17:57:11.643  INFO 19628 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 17:57:35.545  INFO 11900 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 11900 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:57:35.546  INFO 11900 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:57:42.350  INFO 11900 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:57:49.274  INFO 11900 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 14.415 seconds (JVM running for 15.41)
+2019-03-20 17:57:49.328  INFO 11900 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 17:58:02.164  INFO 21264 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 21264 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:58:02.165  INFO 21264 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:58:06.226  INFO 21264 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:58:13.682  INFO 21264 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 12.535 seconds (JVM running for 13.581)
+2019-03-20 17:58:13.762  INFO 21264 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 17:58:25.439  INFO 13140 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 13140 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:58:25.442  INFO 13140 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:58:32.058  INFO 13140 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:58:39.362  INFO 13140 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 14.812 seconds (JVM running for 15.841)
+2019-03-20 17:58:39.440  INFO 13140 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 17:59:11.371  INFO 19920 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 19920 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:59:11.373  INFO 19920 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:59:15.324  INFO 19920 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:59:22.545  INFO 19920 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 11.688 seconds (JVM running for 13.23)
+2019-03-20 17:59:27.533  INFO 19920 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 17:59:34.985  INFO 22304 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 22304 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 17:59:34.986  INFO 22304 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 17:59:38.701  INFO 22304 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 17:59:45.868  INFO 22304 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 11.905 seconds (JVM running for 12.981)
+2019-03-20 18:00:41.156  INFO 20628 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 20628 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 18:00:41.157  INFO 20628 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 18:00:50.916  INFO 20628 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 18:00:58.406  INFO 20628 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 18.24 seconds (JVM running for 19.385)
+2019-03-20 18:01:26.754 ERROR 20628 --- [pool-4-thread-1] com.platon.browser.job.BlockAnalyseJob   : BlockAnalyseJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-20 18:01:30.006 ERROR 20628 --- [pool-4-thread-2] com.platon.browser.job.NodeAnalyseJob    : NodeAnalyseJob Exception:okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.java:225)
+2019-03-20 18:01:30.005 ERROR 20628 --- [pool-4-thread-3] c.platon.browser.job.PendingAnalyseJob   : PendingTxSynchronizeJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-20 18:01:30.018 ERROR 20628 --- [pool-4-thread-4] com.platon.browser.job.PendingUpdateJob  : PendingUpdateJob Exception:nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException: interrupt
+### The error may exist in file [D:\GitWorkspace\browser-server\dao\target\classes\mapper\TransactionMapper.xml]
+### The error may involve com.platon.browser.dao.mapper.TransactionMapper.selectByExample
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException: interrupt
+2019-03-20 18:01:30.025  INFO 20628 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-20 18:01:35.975  INFO 14372 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 14372 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 18:01:35.978  INFO 14372 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 18:01:41.306  INFO 14372 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 18:01:48.842  INFO 14372 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 13.753 seconds (JVM running for 14.879)
+2019-03-20 18:01:53.851 ERROR 14372 --- [pool-4-thread-1] c.platon.browser.job.PendingAnalyseJob   : PendingTxSynchronizeJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-20 18:01:53.851 ERROR 14372 --- [pool-4-thread-3] com.platon.browser.job.NodeAnalyseJob    : NodeAnalyseJob Exception:okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.java:225)
+2019-03-20 18:01:53.852 ERROR 14372 --- [pool-4-thread-2] com.platon.browser.job.BlockAnalyseJob   : BlockAnalyseJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-20 18:02:22.764  INFO 18196 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 18196 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-20 18:02:22.765  INFO 18196 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-20 18:02:26.828  INFO 18196 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-20 18:02:33.549  INFO 18196 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 11.693 seconds (JVM running for 12.725)
+2019-03-20 18:02:34.696  INFO 18196 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 11:53:21.779  INFO 18880 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 18880 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 11:53:21.780  INFO 18880 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 11:53:26.599  INFO 18880 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 11:53:36.081  INFO 18880 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 15.297 seconds (JVM running for 16.236)
+2019-03-21 11:53:36.332  INFO 18880 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 11:53:36.630 ERROR 14372 --- [pool-4-thread-1] c.platon.browser.job.PendingAnalyseJob   : PendingTxSynchronizeJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-21 11:53:36.630 ERROR 14372 --- [pool-4-thread-4] com.platon.browser.job.BlockAnalyseJob   : BlockAnalyseJob Exception:Failed to connect to /10.10.8.209:6789
+2019-03-21 11:53:36.701 ERROR 14372 --- [pool-4-thread-5] com.platon.browser.job.PendingUpdateJob  : PendingUpdateJob Exception:nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException: interrupt
+### The error may exist in file [D:\GitWorkspace\browser-server\dao\target\classes\mapper\TransactionMapper.xml]
+### The error may involve com.platon.browser.dao.mapper.TransactionMapper.selectByExample
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException: interrupt
+2019-03-21 11:53:36.711  INFO 14372 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 11:53:51.153 ERROR 22304 --- [pool-4-thread-4] com.alibaba.druid.pool.DruidDataSource   : discard connection
+
+com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: The last packet successfully received from the server was 34 milliseconds ago.  The last packet sent successfully to the server was 64,290,198 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[na:1.8.0_121]
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62) ~[na:1.8.0_121]
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[na:1.8.0_121]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423) ~[na:1.8.0_121]
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3746) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2509) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2680) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2487) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1858) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.mysql.jdbc.PreparedStatement.execute(PreparedStatement.java:1197) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:494) ~[druid-1.1.3.jar:1.1.3]
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.query(PreparedStatementHandler.java:63) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.query(RoutingStatementHandler.java:79) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:63) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:325) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:156) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:109) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:83) [mybatis-3.4.0.jar:3.4.0]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_121]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_121]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:1.8.0_121]
+	at java.lang.reflect.Method.invoke(Method.java:498) ~[na:1.8.0_121]
+	at org.apache.ibatis.plugin.Invocation.proceed(Invocation.java:49) [mybatis-3.4.0.jar:3.4.0]
+	at com.github.pagehelper.SqlUtil._processPage(SqlUtil.java:401) [pagehelper-4.1.6.jar:na]
+	at com.github.pagehelper.SqlUtil.processPage(SqlUtil.java:374) [pagehelper-4.1.6.jar:na]
+	at com.github.pagehelper.PageHelper.intercept(PageHelper.java:255) [pagehelper-4.1.6.jar:na]
+	at org.apache.ibatis.plugin.Plugin.invoke(Plugin.java:61) [mybatis-3.4.0.jar:3.4.0]
+	at com.sun.proxy.$Proxy79.query(Unknown Source) [na:na]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:148) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:141) [mybatis-3.4.0.jar:3.4.0]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_121]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_121]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:1.8.0_121]
+	at java.lang.reflect.Method.invoke(Method.java:498) ~[na:1.8.0_121]
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:434) [mybatis-spring-1.3.0.jar:1.3.0]
+	at com.sun.proxy.$Proxy66.selectList(Unknown Source) [na:na]
+	at org.mybatis.spring.SqlSessionTemplate.selectList(SqlSessionTemplate.java:231) [mybatis-spring-1.3.0.jar:1.3.0]
+	at org.apache.ibatis.binding.MapperMethod.executeForMany(MapperMethod.java:128) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.binding.MapperMethod.execute(MapperMethod.java:68) [mybatis-3.4.0.jar:3.4.0]
+	at org.apache.ibatis.binding.MapperProxy.invoke(MapperProxy.java:53) [mybatis-3.4.0.jar:3.4.0]
+	at com.sun.proxy.$Proxy74.selectByExample(Unknown Source) [na:na]
+	at com.platon.browser.job.NodeAvgTimeJob.statistics(NodeAvgTimeJob.java:52) [classes/:na]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_121]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_121]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:1.8.0_121]
+	at java.lang.reflect.Method.invoke(Method.java:498) ~[na:1.8.0_121]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:65) [spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) [spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:81) [spring-context-4.3.13.RELEASE.jar:4.3.13.RELEASE]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [na:1.8.0_121]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [na:1.8.0_121]
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180) [na:1.8.0_121]
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293) [na:1.8.0_121]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [na:1.8.0_121]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [na:1.8.0_121]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_121]
+Caused by: java.net.SocketException: Software caused connection abort: socket write error
+	at java.net.SocketOutputStream.socketWrite0(Native Method) ~[na:1.8.0_121]
+	at java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:111) ~[na:1.8.0_121]
+	at java.net.SocketOutputStream.write(SocketOutputStream.java:155) ~[na:1.8.0_121]
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82) ~[na:1.8.0_121]
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140) ~[na:1.8.0_121]
+	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3728) ~[mysql-connector-java-5.1.44.jar:5.1.44]
+	... 51 common frames omitted
+
+2019-03-21 11:53:51.282  INFO 22304 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 13:38:19.350  INFO 8316 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 8316 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:38:19.351  INFO 8316 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:38:27.015  INFO 8316 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:38:32.763  INFO 17748 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 17748 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:38:32.764  INFO 17748 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:38:39.543  INFO 8316 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 21.069 seconds (JVM running for 22.341)
+2019-03-21 13:38:43.321  INFO 8316 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 13:38:45.376  INFO 17748 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:38:53.877  INFO 17748 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 22.501 seconds (JVM running for 24.233)
+2019-03-21 13:38:54.795  INFO 17748 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 13:39:44.929  INFO 12888 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 12888 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:39:44.930  INFO 12888 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:39:51.052  INFO 12888 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:39:59.127  INFO 12888 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 15.312 seconds (JVM running for 16.568)
+2019-03-21 13:39:59.474  INFO 12888 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 13:40:32.131  INFO 22924 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 22924 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:40:32.132  INFO 22924 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:40:38.537  INFO 22924 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:40:46.704  INFO 22924 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 15.959 seconds (JVM running for 17.499)
+2019-03-21 13:40:55.033 ERROR 22924 --- [main] com.platon.FilterTest.BlockFilterTest    : price :1000000000000000000
+2019-03-21 13:41:04.946  INFO 5812 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 5812 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:41:04.948  INFO 5812 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:41:11.889  INFO 5812 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:41:19.968  INFO 5812 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 16.235 seconds (JVM running for 17.632)
+2019-03-21 13:41:35.249 ERROR 5812 --- [main] com.platon.FilterTest.BlockFilterTest    : price :1000000000000000000
+2019-03-21 13:41:35.374  INFO 5812 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 13:41:42.214  INFO 12524 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 12524 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 13:41:42.215  INFO 12524 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 13:41:48.061  INFO 12524 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 13:41:55.817  INFO 12524 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 14.977 seconds (JVM running for 16.534)
+2019-03-21 14:05:20.436 ERROR 12524 --- [main] com.platon.FilterTest.BlockFilterTest    : price 1000000000000000000
+2019-03-21 14:05:20.478 ERROR 12524 --- [pool-4-thread-5] com.platon.browser.job.NodeAvgTimeJob    : NodeAvgTimeJob Exception:nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException
+### The error may exist in file [D:\GitWorkspace\browser-server\dao\target\classes\mapper\NodeRankingMapper.xml]
+### The error may involve com.platon.browser.dao.mapper.NodeRankingMapper.selectByExample
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Could not get JDBC Connection; nested exception is java.sql.SQLException
+2019-03-21 14:05:20.479  INFO 12524 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 15:39:03.191  INFO 10584 --- [main] com.platon.FilterTest.BlockFilterTest    : Starting BlockFilterTest on DESKTOP-LAT82TP with PID 10584 (started by dongql in D:\GitWorkspace\browser-server\agent)
+2019-03-21 15:39:03.193  INFO 10584 --- [main] com.platon.FilterTest.BlockFilterTest    : The following profiles are active: dev
+2019-03-21 15:39:08.164  INFO 10584 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2019-03-21 15:39:16.084  INFO 10584 --- [main] com.platon.FilterTest.BlockFilterTest    : Started BlockFilterTest in 13.56 seconds (JVM running for 16.696)
+2019-03-21 15:39:25.118  INFO 22924 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed
+2019-03-21 15:39:25.137 ERROR 10584 --- [main] com.platon.FilterTest.BlockFilterTest    : price 1000000000000000000
+2019-03-21 15:39:25.304  INFO 10584 --- [Thread-6] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed

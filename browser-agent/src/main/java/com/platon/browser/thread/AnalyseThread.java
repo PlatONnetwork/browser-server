@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.BlockMissingMapper;
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
@@ -48,8 +47,7 @@ public class AnalyseThread {
 //    private NodeFilter nodeFilter;
     @Autowired
     private DBService dbService;
-    @Autowired
-    private BlockMissingMapper blockMissingMapper;
+
 
     public static ExecutorService THREAD_POOL;
 
@@ -81,11 +79,11 @@ public class AnalyseThread {
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("Block analyse error:{}",e.getMessage());
-                    // 出错之后记录下出错的区块号，并返回
+                  /*  // 出错之后记录下出错的区块号，并返回
                     BlockMissing err = new BlockMissing();
                     err.setChainId(chainId);
                     err.setNumber(param.ethBlock.getBlock().getNumber().longValue());
-                    result.errorBlocks.add(err);
+                    result.errorBlocks.add(err);*/
                 }finally {
                     latch.countDown();
                 }
@@ -103,23 +101,24 @@ public class AnalyseThread {
 
         // 分析完成后在同一事务中批量入库分析结果
         try {
-            dbService.flush(result);
+                //  dbService.flush(result);
         } catch (Exception e) {
             logger.error("Flush db error:{}",e.getMessage());
             List<Long> numbers = new ArrayList<>();
             result.blocks.forEach(block -> {
                 numbers.add(block.getNumber());
-                BlockMissing err = new BlockMissing();
+                /*BlockMissing err = new BlockMissing();
                 err.setChainId(chainId);
                 err.setNumber(block.getNumber());
                 result.errorBlocks.add(err);
-            });
+
             if(result.errorBlocks.size()>0){
                 BlockMissingExample example = new BlockMissingExample();
                 example.createCriteria().andChainIdEqualTo(chainId).andNumberIn(numbers);
                 blockMissingMapper.deleteByExample(example);
                 blockMissingMapper.batchInsert(result.errorBlocks);
-            }
+            }*/
+            });
         }
 
         detectMissingBlocks();
@@ -135,7 +134,7 @@ public class AnalyseThread {
         if(threshold%5==0){
             // 重置阈值，防止无限增长
             threshold=0;
-            BlockMissingExample example = new BlockMissingExample();
+/*            BlockMissingExample example = new BlockMissingExample();
             example.createCriteria().andChainIdEqualTo(chainId);
             example.setOrderByClause("number ASC");
             PageHelper.startPage(1,batchNum);
@@ -161,7 +160,7 @@ public class AnalyseThread {
                 blockMissingMapper.deleteByExample(example);
                 // 分析缺失的块
                 analyse(concurrentBlocks);
-            }
+            }*/
         }
     }
 
@@ -197,7 +196,7 @@ public class AnalyseThread {
     public static class AnalyseResult{
         public List<Block> blocks = new CopyOnWriteArrayList<>();
         public List<TransactionWithBLOBs> transactions = new CopyOnWriteArrayList<>();
-        public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
-        public List<NodeRanking> nodes = new ArrayList<>();
+     /*   public List<BlockMissing> errorBlocks = new CopyOnWriteArrayList<>();
+        public List<NodeRanking> nodes = new ArrayList<>();*/
     }
 }
