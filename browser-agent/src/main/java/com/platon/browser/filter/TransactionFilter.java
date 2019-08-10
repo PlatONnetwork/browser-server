@@ -66,7 +66,7 @@ public class TransactionFilter {
                     bean.setReceiveType(RECEIVER_TO_TYPE.get(initData.getTo()));
                 } else {
                     try {
-                        EthGetCode ethGetCode = platon.getWeb3j(chainId).ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
+                        EthGetCode ethGetCode = platon.getWeb3j().ethGetCode(initData.getTo(), DefaultBlockParameterName.LATEST).send();
                         if ("0x".equals(ethGetCode.getCode())) {
                             bean.setReceiveType("account");
                         } else {

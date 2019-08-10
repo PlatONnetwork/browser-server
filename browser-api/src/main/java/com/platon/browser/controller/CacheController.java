@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 9:40
- */
+ *//*
+
 @RestController
 @RequestMapping("/cache")
 public class CacheController {
@@ -84,3 +87,4 @@ public class CacheController {
         return "Cache ["+cacheName+"] of Chain ["+chainId+"] reset successfully!";
     }
 }
+*/

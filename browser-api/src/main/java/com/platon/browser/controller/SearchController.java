@@ -1,6 +1,6 @@
+/*
 package com.platon.browser.controller;
 
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 9:40
- */
+ *//*
+
 @RestController
 public class SearchController {
 
@@ -35,7 +37,8 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-    /**
+    */
+/**
      * @api {post} /home/search k.搜索
      * @apiVersion 1.0.0
      * @apiName search
@@ -68,7 +71,8 @@ public class SearchController {
      *
      *
      *   }
-     */
+     *//*
+
     @PostMapping("/home/query")
     public BaseResp search(@Valid @RequestBody SearchReq req){
         if(!chainsConfig.isValid(req.getCid())){
@@ -81,4 +85,4 @@ public class SearchController {
             throw new ResponseException(be.getErrorMessage());
         }
     }
-}
+}*/

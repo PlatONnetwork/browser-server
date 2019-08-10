@@ -44,8 +44,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private BlockMapper blockMapper;
 
-    @Override
-    public RespPage<TransactionListItem> getPage(TransactionPageReq req) {
+/*    @Override
+    public RespPage <TransactionListItem> getPage( TransactionPageReq req) {
         RespPage<TransactionListItem> returnData = transactionCacheService.getTransactionPage(req.getCid(),req.getPageNo(),req.getPageSize());
         return returnData;
     }
@@ -68,7 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListItem> returnData = new RespPage<>();
         returnData.init(page,data);
         return returnData;
-    }
+    }*/
 
     private TransactionDetail loadDetail(TransactionDetailReq req){
         TransactionExample condition = new TransactionExample();

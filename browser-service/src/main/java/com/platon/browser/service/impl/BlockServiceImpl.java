@@ -10,14 +10,16 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.req.block.*;
+import com.platon.browser.req.block.BlockDetailNavigateReq;
+import com.platon.browser.req.block.BlockDetailReq;
+import com.platon.browser.req.block.BlockDownloadReq;
+import com.platon.browser.req.block.BlockTransactionPageReq;
 import com.platon.browser.service.BlockService;
-import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -48,10 +50,10 @@ public class BlockServiceImpl implements BlockService {
    /* @Autowired
     private TicketService ticketService;*/
 
-    @Override
+/*    @Override
     public RespPage<BlockListItem> getPage(BlockPageReq req) {
         RespPage<BlockListItem> returnData = blockCacheService.getBlockPage(req.getCid(),req.getPageNo(),req.getPageSize());
-        return returnData;
+        return returnData;*/
 
         /*
         BlockPage page = new BlockPage();
@@ -84,7 +86,6 @@ public class BlockServiceImpl implements BlockService {
         respPage.setTotalPages(totalPages.intValue());
         respPage.setData(blockList);
         return respPage;*/
-    }
 
     @Override
     public BlockDetail getDetail(BlockDetailReq req) {
@@ -192,32 +193,5 @@ public class BlockServiceImpl implements BlockService {
         blockCacheService.updateBlockCache(chainId,data);
     }
 
-    @Override
-    public RespPage<TransactionListItem> getBlockTransactionList(BlockTransactionPageReq req) {
-        TransactionExample example = new TransactionExample();
-        TransactionExample.Criteria criteria = example.createCriteria()
-                .andBlockNumberEqualTo(req.getBlockNumber());
-        example.setOrderByClause("transaction_index ASC");
-        if(StringUtils.isNotBlank(req.getTxType())){
-            // 根据交易类型查询
-            if(req.getTxType().contains(",")){
-                String [] txTypes = req.getTxType().split(",");
-                List<String> txTypesList = Arrays.asList(txTypes);
-                criteria.andTxTypeIn(txTypesList);
-            }else{
-                criteria.andTxTypeEqualTo(req.getTxType());
-            }
-        }
-        Page page = PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        List<Transaction> transactions = transactionMapper.selectByExample(example);
-        List<TransactionListItem> data = new ArrayList<>();
-        transactions.forEach(initData -> {
-            TransactionListItem bean = new TransactionListItem();
-            bean.init(initData);
-            data.add(bean);
-        });
-        RespPage<TransactionListItem> returnData = new RespPage<>();
-        returnData.init(page,data);
-        return returnData;
-    }
+
 }

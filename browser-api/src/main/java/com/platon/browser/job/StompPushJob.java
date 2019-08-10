@@ -1,16 +1,12 @@
+/*
 package com.platon.browser.job;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.service.NodeService;
 import com.platon.browser.service.StatisticService;
-import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
@@ -44,12 +40,15 @@ public class StompPushJob {
     @Autowired
     private StatisticService statisticService;
 
-    /**
+    */
+/**
      * 推送节点信息
-     */
+     *//*
+
     @Scheduled(cron="0/1 * * * * ?")
     public void pushNode(){
-        /*chainsConfig.getChainIds().forEach(chainId -> {
+        */
+/*chainsConfig.getChainIds().forEach(chainId -> {
             // 从redis缓存获取节点信息，全量推送节点信息
             List<NodePushItem> cache = nodeService.getPushCache(chainId);
             cache.forEach(node->{
@@ -61,12 +60,15 @@ public class StompPushJob {
             });
             BaseResp nodeResp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),cache);
             messagingTemplate.convertAndSend("/topic/node/new?cid="+chainId, nodeResp);
-        });*/
+        });*//*
+
     }
 
-    /**
+    */
+/**
      * 推送指标相关信息
-     */
+     *//*
+
     @Scheduled(cron="0/1 * * * * ?")
     public void pushIndex(){
         chainsConfig.getChainIds().forEach(chainId -> {
@@ -76,9 +78,11 @@ public class StompPushJob {
         });
     }
 
-    /**
+    */
+/**
      * 推送统计相关信息
-     */
+     *//*
+
     @Scheduled(cron="0/1 * * * * ?")
     public void pushStatistics(){
         chainsConfig.getChainIds().forEach(chainId -> {
@@ -88,10 +92,13 @@ public class StompPushJob {
         });
     }
 
-    /**
+    */
+/**
      * 推送区块相关信息
-     */
-   /* @Scheduled(cron="0/1 * * * * ?")
+     *//*
+
+   */
+/* @Scheduled(cron="0/1 * * * * ?")
     public void pushBlock(){
         chainsConfig.getChainIds().forEach(chainId -> {
             // 全量推送区块信息
@@ -100,10 +107,13 @@ public class StompPushJob {
             messagingTemplate.convertAndSend("/topic/block/new?cid="+chainId, blockResp);
         });
     }
-*/
-    /**
+*//*
+
+    */
+/**
      * 推送交易相关信息
-     */
+     *//*
+
     @Scheduled(cron="0/1 * * * * ?")
     public void pushTransaction(){
         chainsConfig.getChainIds().forEach(chainId -> {
@@ -114,3 +124,4 @@ public class StompPushJob {
         });
     }
 }
+*/

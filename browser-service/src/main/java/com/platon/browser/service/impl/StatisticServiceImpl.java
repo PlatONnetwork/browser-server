@@ -16,7 +16,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Autowired
     private StatisticCacheService statisticCacheService;
 
-    @Override
+    /*@Override
     public IndexInfo getIndexInfo(String chainId) {
         StatisticsCache cache = statisticCacheService.getStatisticsCache(chainId);
         IndexInfo index = new IndexInfo();
@@ -32,7 +32,7 @@ public class StatisticServiceImpl implements StatisticService {
         StatisticsCache cache = statisticCacheService.getStatisticsCache(chainId);
         StatisticInfo statistic = new StatisticInfo();
         BeanUtils.copyProperties(cache,statistic);
-        /************** 组装图表数据 ************/
+        *//************** 组装图表数据 ************//*
         List<StatisticPushItem> items = statisticCacheService.getStatisticPushCache(chainId,1,50);
         StatisticGraphData graphData = new StatisticGraphData();
         for (int i=0;i<items.size();i++){
@@ -47,5 +47,5 @@ public class StatisticServiceImpl implements StatisticService {
         }
         statistic.setGraphData(graphData);
         return statistic;
-    }
+    }*/
 }

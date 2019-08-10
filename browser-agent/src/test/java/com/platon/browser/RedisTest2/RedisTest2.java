@@ -36,13 +36,13 @@ public class RedisTest2 extends TestBase {
         logger.info("{}",a);
     }
 
-    @Test
+   /* @Test
     public void batchTransactionListTest(){
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.createCriteria();
         List <TransactionWithBLOBs> list =  transactionMapper.selectByExampleWithBLOBs(transactionExample);
         //dbService.batchInsertTransactionList(list);
-    }
+    }*/
 
     @Test
     public void getBatchTransactionList(){

@@ -64,7 +64,7 @@ public class AnalyseThread {
         threshold++;
 
         List<AnalyseParam> params = new ArrayList<>();
-        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j(chainId))));
+        blocks.forEach(block->params.add(new AnalyseParam(block,platon.getWeb3j())));
         AnalyseResult result = new AnalyseResult();
         CountDownLatch latch = new CountDownLatch(params.size());
         params.forEach(param->

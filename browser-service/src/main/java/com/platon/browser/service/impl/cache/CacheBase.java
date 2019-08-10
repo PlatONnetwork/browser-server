@@ -1,22 +1,5 @@
 package com.platon.browser.service.impl.cache;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.util.I18nUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.core.DefaultTypedTuple;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
-
-import java.util.*;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/4/11 15:43

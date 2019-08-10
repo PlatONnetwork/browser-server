@@ -1,6 +1,5 @@
 package com.platon.browser.service.cache;
 
-import com.platon.browser.dto.StatisticPushItem;
 import com.platon.browser.dto.StatisticsCache;
 
 import java.math.BigDecimal;
@@ -8,7 +7,6 @@ import java.util.List;
 
 public interface StatisticCacheService {
     void clearStatisticsCache(String chainId);
-    List<StatisticPushItem> getStatisticPushCache(String chainId, int pageNum, int pageSize);
     boolean updateStatisticsCache(String chainId);
     StatisticsCache getStatisticsCache(String chainId);
     boolean updateTransCount(String chainId);

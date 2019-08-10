@@ -1,8 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.mapper.TransactionMapper;
+
 import com.platon.browser.filter.BlockFilter;
 import com.platon.browser.filter.TransactionFilter;
 import com.platon.browser.service.DBService;
@@ -26,8 +25,8 @@ public class TestBase {
 
     @Autowired
     protected PlatonClient web3jClient;
-    @Autowired
-    protected ChainsConfig chainsConfig;
+/*    @Autowired
+    protected ChainsConfig chainsConfig;*/
 
 
     @Autowired
@@ -36,9 +35,9 @@ public class TestBase {
     @Autowired
     protected RedisTemplate<String, String> redisTemplate;
 
-
+/*
     @Autowired
-    protected TransactionMapper transactionMapper;
+    protected TransactionMapper transactionMapper;*/
 
     @Autowired
     protected DBService dbService;
@@ -49,9 +48,9 @@ public class TestBase {
 
     protected Web3j web3j;
 
-    @PostConstruct
+   /* @PostConstruct
     private void init(){
         web3j = chainsConfig.getWeb3j(chainId);
-    }
+    }*/
 
 }

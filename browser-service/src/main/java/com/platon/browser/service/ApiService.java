@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionVoteReq;
 import com.platon.browser.dto.transaction.VoteInfo;
 import com.platon.browser.dto.transaction.VoteSummary;
@@ -19,9 +18,7 @@ import java.util.Map;
 */
 public interface ApiService {
     List<VoteSummary> getVoteSummary(List<String> addressList, String chainId);
-    RespPage<VoteTransaction> getVoteTransaction(TransactionVoteReq req);
     Map<String,Integer> getCandidateTicketCount(List<String> nodeIds, String chainId);
-    RespPage<VoteInfo> getTicketCountByTxHash(TicketCountByTxHashReq req);
     Map<String, BigDecimal> getIncome(String chainId, List<String> hashList);
     Map<String,Integer> getVailInfo(List<String> hashList,String chainId);
 }

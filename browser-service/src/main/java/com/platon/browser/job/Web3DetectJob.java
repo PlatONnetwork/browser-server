@@ -1,9 +1,7 @@
 package com.platon.browser.job;
 
-import com.platon.browser.config.ChainsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +14,7 @@ import org.springframework.stereotype.Component;
 public class Web3DetectJob {
     private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
 
-    @Autowired
-    private ChainsConfig chainsConfig;
+
 
 
     /**
@@ -27,7 +24,7 @@ public class Web3DetectJob {
     protected void analyseNode () {
         logger.debug("*** In the Web3DetectJob *** ");
         try {
-            chainsConfig.updateValidWeb3jList();
+           // chainsConfig.updateValidWeb3jList();
         } catch (Exception e) {
             logger.error("Web3DetectJob Exception:{}", e.getMessage());
             e.printStackTrace();

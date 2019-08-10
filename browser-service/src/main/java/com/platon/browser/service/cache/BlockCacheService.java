@@ -12,6 +12,6 @@ public interface BlockCacheService {
     void clearBlockCache(String chainId);
     void updateBlockCache(String chainId, Set<Block> items);
     void resetBlockCache(String chainId, boolean clearOld);
-    RespPage<BlockListItem> getBlockPage(String chainId, int pageNum, int pageSize);
+    RespPage <BlockListItem> getBlockPage( String chainId, int pageNum, int pageSize);
     List<BlockPushItem> getBlockPushCache(String chainId, int pageNum, int pageSize);
 }

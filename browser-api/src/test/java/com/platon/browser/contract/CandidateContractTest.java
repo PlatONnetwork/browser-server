@@ -23,7 +23,7 @@ public class CandidateContractTest extends TestBase {
 
     @Test
     public void CandidateList(){
-        chainsConfig.getChainIds().forEach(chainId->{
+      /*  chainsConfig.getChainIds().forEach(chainId->{
             try {
                 String res = platon.getCandidateContract(chainId).GetCandidateList().send();
                 List<String> candidateStrArr = JSON.parseArray(res,String.class);
@@ -36,7 +36,7 @@ public class CandidateContractTest extends TestBase {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        });*/
     }
 
 }

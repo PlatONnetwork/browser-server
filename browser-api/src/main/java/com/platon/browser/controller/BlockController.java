@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
@@ -27,26 +28,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 09:35
- */
+ *//*
+
 @RestController
 @RequestMapping("/block")
 public class BlockController  {
 
     @Autowired
     private I18nUtil i18n;
-    @Autowired
-    private ChainsConfig chainsConfig;
+*/
+/*    @Autowired
+    private ChainsConfig chainsConfig;*//*
+
     @Autowired
     private BlockService blockService;
     @Autowired
     private BlockCacheService blockCacheService;
     private static Logger logger = LoggerFactory.getLogger(BlockController.class);
 
-    /**
+    */
+/**
      *
      * @api {post} block/blockList a.区块列表
      *       @apiVersion 1.0.0
@@ -87,9 +93,10 @@ public class BlockController  {
      *                        }
      *                    ]
      *       }
-     * */
+     * *//*
+
     @PostMapping("blockList")
-    public RespPage<BlockListItem> blockList (@Valid @RequestBody BlockPageReq req) {
+    public RespPage <BlockListItem> blockList ( @Valid @RequestBody BlockPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
             throw new ResponseException(i18n.i(I18nEnum.CHAIN_ID_ERROR,req.getCid()));
         }
@@ -97,7 +104,8 @@ public class BlockController  {
         return page;
     }
 
-    /**
+    */
+/**
      * @api {post} block/blockDetails b.区块详情
      * @apiVersion 1.0.0
      * @apiName blockDetails
@@ -134,7 +142,8 @@ public class BlockController  {
 *                "blockCampaignAmount"://区块内竞选交易个数
      *           }
      * }
-     */
+     *//*
+
     @PostMapping("blockDetails")
     public BaseResp blockDetails (@Valid @RequestBody BlockDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -149,7 +158,8 @@ public class BlockController  {
     }
 
 
-    /**
+    */
+/**
      * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate
@@ -183,7 +193,8 @@ public class BlockController  {
      *           "last":true // 是否最后一条记录
      *      }
      * }
-     */
+     *//*
+
     @PostMapping("blockDetailNavigate")
     public BaseResp blockDetailNavigate (@Valid @RequestBody BlockDetailNavigateReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -197,7 +208,8 @@ public class BlockController  {
         }
     }
 
-    /**
+    */
+/**
      * @api {post} block/transactionList d.区块交易列表
      * @apiVersion 1.0.0
      * @apiName transactionList
@@ -273,7 +285,8 @@ public class BlockController  {
      *     // 前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
      *   }
      * ]
-     **/
+     **//*
+
     @PostMapping("transactionList")
     public RespPage<TransactionListItem> transactionList (@Valid @RequestBody BlockTransactionPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -283,3 +296,4 @@ public class BlockController  {
         return page;
     }
 }
+*/

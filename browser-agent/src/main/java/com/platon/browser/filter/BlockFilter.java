@@ -5,7 +5,6 @@ import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.AnalysisResult;
-import com.platon.browser.dto.EventRes;
 import com.platon.browser.dto.agent.CandidateDto;
 import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
@@ -22,7 +21,6 @@ import org.web3j.platon.contracts.TicketContract;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -47,10 +45,10 @@ public class BlockFilter {
         if (param.ethBlock != null) {
             bean.init(param.ethBlock);
 
-            TicketContract ticketContract = platon.getTicketContract(chainId);
+           // TicketContract ticketContract = platon.getTicketContract(chainId);
             String price = null;
             try {
-                price = ticketContract.GetTicketPrice().send();
+                //price = ticketContract.GetTicketPrice().send();
                 //bean.setVotePrice(null != price ? price : "0");
             } catch (Exception e) {
                 logger.error("获取票价异常");
@@ -77,14 +75,14 @@ public class BlockFilter {
 
             //设置在当前区块高度中的节点分红比例
             try {
-                CandidateContract candidateContract = platon.getCandidateContract(chainId);
-                String nodeInfo = candidateContract.GetCandidateDetails(bean.getNodeId()).send();
-                List<CandidateDto> candidateDtos = JSON.parseArray(nodeInfo, CandidateDto.class);
-                if(candidateDtos.size()>0){
+                //CandidateContract candidateContract = platon.getCandidateContract(chainId);
+                //String nodeInfo = candidateContract.GetCandidateDetails(bean.getNodeId()).send();
+                //List<CandidateDto> candidateDtos = JSON.parseArray(nodeInfo, CandidateDto.class);
+               /* if(candidateDtos.size()>0){
                     //bean.setRewardRatio(BigDecimal.valueOf(candidateDtos.get(0).getFee()).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue());
                 }else {
                     //bean.setRewardRatio(0.0);
-                }
+                }*/
             } catch (Exception e) {
                 //bean.setRewardRatio(0.0);
             }
@@ -124,14 +122,14 @@ public class BlockFilter {
                             voteAmount = voteAmount.add(BigInteger.ONE);
                             if (receipt.getStatus().equals("0x1")) {
                                 //get tickVoteContract vote event
-                                List <TicketContract.VoteTicketEventEventResponse> eventEventResponses = ticketContract.getVoteTicketEventEvents(receipt);
+                                /*List <TicketContract.VoteTicketEventEventResponse> eventEventResponses = ticketContract.getVoteTicketEventEvents(receipt);
                                 String event = eventEventResponses.get(0).param1;
                                 EventRes eventRes = JSON.parseObject(event, EventRes.class);
                                 //event objcet is jsonString , transform jsonObject <EventRes>
                                 //EventRes get Data
                                 String res = eventRes.getData();
                                 String[] strs = res.split(":");
-                                //bean.setBlockVoteNumber(Long.valueOf(strs[0]));
+                                //bean.setBlockVoteNumber(Long.valueOf(strs[0]));*/
                             }
                         } else if (TransactionTypeEnum.TRANSACTION_CANDIDATE_DEPOSIT.code.equals(type)) {
                             campaignAmount = campaignAmount.add(BigInteger.ONE);

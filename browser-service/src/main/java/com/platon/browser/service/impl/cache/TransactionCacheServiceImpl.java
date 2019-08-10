@@ -2,7 +2,6 @@ package com.platon.browser.service.impl.cache;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.config.ChainsConfig;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -43,8 +42,8 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
     private I18nUtil i18n;
     @Autowired
     private TransactionMapper transactionMapper;
-    @Autowired
-    private ChainsConfig chainsConfig;
+/*    @Autowired
+    private ChainsConfig chainsConfig;*/
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     @Autowired
@@ -89,6 +88,11 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
         }
     }
 
+    @Override
+    public RespPage <TransactionListItem> getTransactionPage ( String chainId, int pageNum, int pageSize ) {
+        return null;
+    }
+
     /**
      * 根据页数和每页大小获取交易的缓存分页
      * @param chainId
@@ -96,9 +100,9 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
      * @param pageSize
      * @return
      */
-    @Override
-    public RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize){
-       /* String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
+    /*@Override
+    public RespPage <TransactionListItem> getTransactionPage( String chainId, int pageNum, int pageSize){
+       *//* String cacheKey = transactionCacheKeyTemplate.replace("{}",chainId);
         CachePageInfo<TransactionListItem> cpi = getCachePageInfo(cacheKey,pageNum,pageSize, TransactionListItem.class,i18n,redisTemplate,maxItemNum);
         RespPage<TransactionListItem> page = cpi.page;
         List<TransactionListItem> transactions = new LinkedList<>();
@@ -115,9 +119,9 @@ public class TransactionCacheServiceImpl extends CacheBase implements Transactio
 //        Long displayCount = transactionMapper.countByExample(new TransactionExample());
         Long displayCount = statisticCacheService.getTransCount(chainId);
         page.setDisplayTotalCount(displayCount.intValue());
-        return page;*/
+        return page;*//*
        return null;
-    }
+    }*/
 
     /**
      * 获取区块推送数据

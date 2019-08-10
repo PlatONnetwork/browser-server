@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PageUtil {
     public static <T> RespPage<T> getRespPage(Page page, List<T> data){
-        RespPage<T> respPage = new RespPage<>();
+        RespPage <T> respPage = new RespPage<>();
         respPage.setTotalCount(page.getTotal());
         respPage.setDisplayTotalCount(page.getTotal());
         respPage.setTotalPages(page.getPages());
