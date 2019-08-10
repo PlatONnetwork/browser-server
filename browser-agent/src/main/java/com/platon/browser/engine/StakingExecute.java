@@ -54,6 +54,7 @@ public class StakingExecute {
     }
 
     public void commitResult(){
+        executeResult.getAddDelegations().clear();
 
     }
 

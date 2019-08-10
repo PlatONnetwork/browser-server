@@ -18,6 +18,7 @@ import java.util.Map;
 @Data
 public class BlockChain {
 
+    private BlockChainResult execResult = new BlockChainResult();
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
@@ -47,20 +48,40 @@ public class BlockChain {
      */
     public void execute(BlockInfo block){
         init();
+        //新开线程去查询rpc共识列表
+        //数据回填
 
+        // 根据区块信息
 
+        block.getTransactions().forEach(transactionInfo -> {
+            switch (transactionInfo.getTypeEnum()){
+                case CREATEPROPOSALTEXT:
+                    proposalExecute.execute(transactionInfo,this);
+                    ProposalExecuteResult result = proposalExecute.exportResult();
+                    execResult.getProposalExecuteResult().getAddVotes().addAll(result.getAddVotes());
+                    execResult.getProposalExecuteResult().getAddProposals().addAll(result.getAddProposals());
+                    execResult.getProposalExecuteResult().getUpdateProposals().addAll(result.getUpdateProposals());
+                    break;
+                case INCREASESTAKING:
+                    stakingExecute.execute(transactionInfo,this);
+                    StakingExecuteResult result1 = stakingExecute.exportResult();
+
+                    break;
+            }
+        });
     }
 
     /**
      * 导出需要入库的数据
      * @return
      */
-    public BlockInfo exportResult(){
-        return curBlock;
+    public BlockChainResult exportResult(){
+        return execResult;
     }
 
     public void commitResult(){
-
+        proposalExecute.commitResult();
+        stakingExecute.commitResult();
     }
 
     /**

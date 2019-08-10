@@ -53,7 +53,9 @@ public class ProposalExecute {
     }
 
     public void commitResult(){
-
+        executeResult.getUpdateProposals().clear();
+        executeResult.getAddProposals().clear();
+        executeResult.getAddVotes().clear();
     }
 
     private void updateTxInfo(TransactionInfo trans,BlockChain bc){

@@ -6,12 +6,14 @@ import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.BlockChainResult;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
@@ -72,13 +74,18 @@ public class BlockSyncTask {
             List<Vote> addVotes = new ArrayList<>();
             Set<Proposal> addProposals = new HashSet<>();
             Set<Proposal> updateProposals = new HashSet<>();
+
             blocks.forEach(block->{
-
                 blockChain.execute(block);
-
+                BlockChainResult result = blockChain.exportResult();
+                blockChain.commitResult();
+                addVotes.addAll(result.getProposalExecuteResult().getAddVotes());
+                addProposals.addAll(result.getProposalExecuteResult().getAddProposals());
+                updateProposals.addAll(result.getProposalExecuteResult().getUpdateProposals());
 
             });
 
+            batchSaveResult(new DbParams());
 
             commitBlockNumber=commitBlockNumber+collectBatchSize;
             TimeUnit.MILLISECONDS.sleep(500);
@@ -155,8 +162,8 @@ public class BlockSyncTask {
         // 对需要复杂分析的区块或交易信息，开启并行处理
 
     }
-
-    private void batchSaveResult(){
+    @Transactional
+    public void batchSaveResult(DbParams dbParams){
         // 串行批量入库
 
     }
