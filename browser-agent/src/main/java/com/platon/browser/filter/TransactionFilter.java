@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.ticket.TxInfo;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

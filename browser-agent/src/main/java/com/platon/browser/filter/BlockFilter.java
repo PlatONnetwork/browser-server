@@ -2,7 +2,9 @@ package com.platon.browser.filter;
 
 import com.platon.browser.bean.BlockBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.AnalysisResult;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.thread.AnalyseThread;
 import com.platon.browser.util.CalculatePublicKey;
 import com.platon.browser.util.TransactionAnalysis;

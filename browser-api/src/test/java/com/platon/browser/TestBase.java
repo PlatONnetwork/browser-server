@@ -1,8 +1,11 @@
 package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +68,7 @@ public class TestBase extends TestData {
        return null;
     }
 
-    protected Transaction getOneVoteTransaction(String chainId){
+    protected Transaction getOneVoteTransaction( String chainId){
         TransactionExample example = new TransactionExample();
         example.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
         return null;
