@@ -37,11 +37,12 @@ public class BlockInfo extends Block {
         // 交易总数
         this.setStatTxQty(initData.getTransactions().size());
         this.setGasLimit(initData.getGasLimit().toString());
-        // 区块奖励
-        //this.setBlockReward("");
-        // 节点名称
-        //this.setNodeName("");
-        //this.setNodeId("");
+        // TODO:区块奖励
+        this.setBlockReward("0");
+        // TODO:节点名称
+        this.setNodeName("DD");
+        // TODO:节点id
+        this.setNodeId("0xflsjgsflsdf");
 
         // 交易相关信息处理
         initData.getTransactions().forEach(txResult->{

@@ -2,14 +2,16 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
@@ -31,6 +34,12 @@ import java.util.concurrent.*;
  */
 @Component
 public class BlockSyncTask {
+
+    @Autowired
+    private BlockMapper blockMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
+
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
     private static ExecutorService THREAD_POOL;
@@ -69,18 +78,19 @@ public class BlockSyncTask {
 
             // 并行采集区块
             List<BlockInfo> blocks = getBlockAndTransaction(blockNumbers);
+
             // 对区块和交易做分析
             analyzeBlockAndTransaction(blocks);
 
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            BlockChainResult dbParams = new BlockChainResult();
-            ProposalExecuteResult perSummary = dbParams.getProposalExecuteResult();
-            StakingExecuteResult serSummary = dbParams.getStakingExecuteResult();
+            BlockChainResult bizData = new BlockChainResult();
+            ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
+            StakingExecuteResult serSummary = bizData.getStakingExecuteResult();
             blocks.forEach(block->{
                 blockChain.execute(block);
-                BlockChainResult result = blockChain.exportResult();
-                ProposalExecuteResult per = result.getProposalExecuteResult();
-                StakingExecuteResult ser = result.getStakingExecuteResult();
+                BlockChainResult bcr = blockChain.exportResult();
+                ProposalExecuteResult per = bcr.getProposalExecuteResult();
+                StakingExecuteResult ser = bcr.getStakingExecuteResult();
 
                 perSummary.getAddVotes().addAll(per.getAddVotes());
                 perSummary.getAddProposals().addAll(per.getAddProposals());
@@ -96,9 +106,9 @@ public class BlockSyncTask {
                 blockChain.commitResult();
             });
 
-            batchSaveResult(dbParams);
+            batchSaveResult(blocks,bizData);
 
-            commitBlockNumber=commitBlockNumber+collectBatchSize;
+            if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber();
             TimeUnit.MILLISECONDS.sleep(500);
         }
 
@@ -110,6 +120,7 @@ public class BlockSyncTask {
      * @return
      */
     private List<BlockInfo> getBlockAndTransaction(List<BigInteger> blockNumbers){
+
         @Data
         class Error{
             public Error(BigInteger blockNumber,String msg){
@@ -132,7 +143,9 @@ public class BlockSyncTask {
             THREAD_POOL.submit(()->{
                 try {
                     PlatonBlock.Block initData = client.getWeb3j().platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-                    result.blocks.add(new BlockInfo(initData));
+                    if(initData!=null) {
+                        result.blocks.add(new BlockInfo(initData));
+                    }
                 } catch (Exception e) {
                     Error error = new Error(blockNumber,e.getMessage());
                     result.errors.add(error);
@@ -155,14 +168,16 @@ public class BlockSyncTask {
         }
 
         // 按区块号从大到小排序
-        Collections.sort(result.blocks,(c1,c2)->{
+        List<BlockInfo> blocks = new ArrayList<>();
+        blocks.addAll(result.blocks);
+        Collections.sort(blocks,(c1,c2)->{
             if (c1.getNumber().compareTo(c2.getNumber())>0) return 1;
             if (c1.getNumber().compareTo(c2.getNumber())<0) return -1;
             return 0;
         });
 
-        logger.info("{}",result.blocks);
-        return result.blocks;
+        //logger.info("{}",result.blocks);
+        return blocks;
 
     }
 
@@ -175,8 +190,21 @@ public class BlockSyncTask {
 
     }
     @Transactional
-    public void batchSaveResult(BlockChainResult dbParams){
+    public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
         // 串行批量入库
+
+        List<Block> blocks = new ArrayList<>();
+        List<TransactionWithBLOBs> transactions = new ArrayList<>();
+        basicData.forEach(block->{
+            blocks.add(block);
+            transactions.addAll(block.getTransactions());
+        });
+        // 批量入库区块
+        if (blocks.size()>0) blockMapper.batchInsert(blocks);
+        // 批量入库交易
+        if(transactions.size()>0) transactionMapper.batchInsert(transactions);
+
+
 
     }
 }
