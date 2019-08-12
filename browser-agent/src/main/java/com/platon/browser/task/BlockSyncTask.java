@@ -24,6 +24,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
@@ -215,6 +216,55 @@ public class BlockSyncTask {
     private void analyzeBlockAndTransaction(List<BlockInfo> blocks){
 
         // 对需要复杂分析的区块或交易信息，开启并行处理
+
+
+        // 交易信息统计
+        class Stat {
+            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
+            BigDecimal txFee = BigDecimal.ZERO;
+        }
+
+        blocks.forEach(block->{
+            Stat stat = new Stat();
+            block.getTransactionList().forEach(ti->{
+                switch (ti.getTypeEnum()){
+                    case TRANSFER:
+                        stat.transferQty++;
+                        break;
+                    case CREATEPROPOSALPARAMETER:// 创建参数提案
+                    case CREATEPROPOSALTEXT:// 创建文本提案
+                    case CREATEPROPOSALUPGRADE:// 创建升级提案
+                    case DECLAREVERSION:// 版本声明
+                    case VOTINGPROPOSAL:// 提案投票
+                        stat.proposalQty++;
+                        break;
+                    case DELEGATE:// 发起委托
+                    case UNDELEGATE:// 撤销委托
+                        stat.delegateQty++;
+                        break;
+                    case INCREASESTAKING:// 增加自有质押
+                    case CREATEVALIDATOR:// 创建验证人
+                    case EXITVALIDATOR:// 退出验证人
+                    case REPORTVALIDATOR:// 举报验证人
+                    case EDITVALIDATOR:// 编辑验证人
+                        stat.stakingQty++;
+                        break;
+                }
+                // 累加交易手续费
+                stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
+                // 累加交易gasLimit
+                stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
+            });
+            block.setStatDelegateQty(stat.delegateQty);
+            block.setStatProposalQty(stat.proposalQty);
+            block.setStatStakingQty(stat.stakingQty);
+            block.setStatTransferQty(stat.transferQty);
+            block.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
+            block.setStatTxFee(stat.txFee.toString());
+        });
+
+
+
 
     }
     @Transactional

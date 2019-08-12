@@ -68,50 +68,6 @@ public class BlockInfo extends Block {
         this.setStatTransferQty(stat.transferQty);
         this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
-
-        /*// 交易信息统计
-        class Stat {
-            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
-            BigDecimal txFee = BigDecimal.ZERO;
-        }
-        Stat stat = new Stat();
-        this.getTransactions().forEach(ti->{
-            switch (ti.getTypeEnum()){
-                case TRANSFER:
-                    stat.transferQty++;
-                    break;
-                case CREATEPROPOSALPARAMETER:// 创建参数提案
-                case CREATEPROPOSALTEXT:// 创建文本提案
-                case CREATEPROPOSALUPGRADE:// 创建升级提案
-                case DECLAREVERSION:// 版本声明
-                case VOTINGPROPOSAL:// 提案投票
-                    stat.proposalQty++;
-                    break;
-                case DELEGATE:// 发起委托
-                case UNDELEGATE:// 撤销委托
-                    stat.delegateQty++;
-                    break;
-                case INCREASESTAKING:// 增加自有质押
-                case CREATEVALIDATOR:// 创建验证人
-                case EXITVALIDATOR:// 退出验证人
-                case REPORTVALIDATOR:// 举报验证人
-                case EDITVALIDATOR:// 编辑验证人
-                    stat.stakingQty++;
-                    break;
-            }
-            // 累加交易手续费
-            stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
-            // 累加交易gasLimit
-            stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
-        });
-        this.setStatDelegateQty(stat.delegateQty);
-        this.setStatProposalQty(stat.proposalQty);
-        this.setStatStakingQty(stat.stakingQty);
-        this.setStatTransferQty(stat.transferQty);
-        this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
-        this.setStatTxFee(stat.txFee.toString());
-
-        */
     }
 
     private List<TransactionInfo> transactionList = new ArrayList<>();
