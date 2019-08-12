@@ -3,14 +3,10 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Block;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -40,12 +36,12 @@ public class BlockInfo extends Block {
         // 交易总数
         this.setStatTxQty(initData.getTransactions().size());
         this.setGasLimit(initData.getGasLimit().toString());
-        // 区块奖励
-        //this.setBlockReward("");
-
-        // 节点名称
-        //this.setNodeName("");
-        //this.setNodeId("");
+        // TODO:区块奖励
+        this.setBlockReward("0");
+        // TODO:节点名称
+        this.setNodeName("DD");
+        // TODO:节点id
+        this.setNodeId("0xflsjgsflsdf");
 
         // 交易相关信息处理
         initData.getTransactions().forEach(txResult->{
@@ -105,4 +101,18 @@ public class BlockInfo extends Block {
     }
 
     private List<TransactionInfo> transactions = new ArrayList<>();
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BlockInfo blockInfo = (BlockInfo) o;
+        return Objects.equals(getNumber(), blockInfo.getNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNumber());
+    }
 }

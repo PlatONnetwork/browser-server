@@ -2,14 +2,16 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import sun.util.locale.provider.LocaleServiceProviderPool;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
@@ -31,6 +36,12 @@ import java.util.concurrent.*;
  */
 @Component
 public class BlockSyncTask {
+
+    @Autowired
+    private BlockMapper blockMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
+
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
     private static ExecutorService THREAD_POOL;
@@ -42,7 +53,7 @@ public class BlockSyncTask {
     private PlatonClient client;
 
     // 已采集入库的最高块
-    private long commitBlockNumber=0;
+    private long commitBlockNumber=1;
 
     // 每一批次采集区块的数量
     @Value("${platon.web3j.collect.batch-size}")
@@ -60,27 +71,27 @@ public class BlockSyncTask {
     public void start() throws InterruptedException {
 
         while (true){
-
             // 构造连续的待采区块号列表
             List<BigInteger> blockNumbers = new ArrayList<>();
-            for (long blockNumber=(commitBlockNumber+1);blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++){
+            for (long blockNumber=commitBlockNumber;blockNumber<commitBlockNumber+collectBatchSize;blockNumber++){
                 blockNumbers.add(BigInteger.valueOf(blockNumber));
             }
 
             // 并行采集区块
-            List<BlockInfo> blocks = getBlockAndTransaction(blockNumbers);
+            Result collectedResult = getBlockAndTransaction(blockNumbers);
+            List<BlockInfo> blocks = collectedResult.getSortedBlocks();
             // 对区块和交易做分析
             analyzeBlockAndTransaction(blocks);
 
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            BlockChainResult dbParams = new BlockChainResult();
-            ProposalExecuteResult perSummary = dbParams.getProposalExecuteResult();
-            StakingExecuteResult serSummary = dbParams.getStakingExecuteResult();
+            BlockChainResult bizData = new BlockChainResult();
+            ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
+            StakingExecuteResult serSummary = bizData.getStakingExecuteResult();
             blocks.forEach(block->{
                 blockChain.execute(block);
-                BlockChainResult result = blockChain.exportResult();
-                ProposalExecuteResult per = result.getProposalExecuteResult();
-                StakingExecuteResult ser = result.getStakingExecuteResult();
+                BlockChainResult bcr = blockChain.exportResult();
+                ProposalExecuteResult per = bcr.getProposalExecuteResult();
+                StakingExecuteResult ser = bcr.getStakingExecuteResult();
 
                 perSummary.getAddVotes().addAll(per.getAddVotes());
                 perSummary.getAddProposals().addAll(per.getAddProposals());
@@ -96,34 +107,49 @@ public class BlockSyncTask {
                 blockChain.commitResult();
             });
 
-            batchSaveResult(dbParams);
+            batchSaveResult(blocks,bizData);
 
-            commitBlockNumber=commitBlockNumber+collectBatchSize;
-            TimeUnit.MILLISECONDS.sleep(500);
+            if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber()+1;
+
+            List<Long> actualNumbers = new ArrayList<>();
+            blocks.forEach(block->actualNumbers.add(block.getNumber()));
+            logger.info("shouldNumbers{}",blockNumbers);
+            logger.info("actualNumbers{}",actualNumbers);
+            TimeUnit.SECONDS.sleep(1);
         }
-
     }
 
+    @Data
+    class Result{
+        // 并发采集的块信息，无序
+        public Set<BlockInfo> concurrentBlocks = new CopyOnWriteArraySet<>();
+        // 采集过程中的错误信息
+        List<Error> errors = new CopyOnWriteArrayList<>();
+        // 已采集的区块号列表
+        List<Long> collectedNumbers = new CopyOnWriteArrayList<>();
+        // 由于异常而未采集的区块号列表
+        private Set<BigInteger> exceptionNumbers = new CopyOnWriteArraySet<>();
+        // 已排序的区块信息列表
+        private List<BlockInfo> sortedBlocks = new LinkedList<>();
+        public List<BlockInfo> getSortedBlocks(){
+            if(sortedBlocks.size()==0){
+                sortedBlocks.addAll(concurrentBlocks);
+                Collections.sort(sortedBlocks,(c1,c2)->{
+                    if (c1.getNumber().compareTo(c2.getNumber())>0) return 1;
+                    if (c1.getNumber().compareTo(c2.getNumber())<0) return -1;
+                    return 0;
+                });
+            }
+            return sortedBlocks;
+        }
+    }
     /**
      * 并行采集区块及交易，并转换为数据库结构
      * @param blockNumbers 批量采集的区块号
      * @return
      */
-    private List<BlockInfo> getBlockAndTransaction(List<BigInteger> blockNumbers){
-        @Data
-        class Error{
-            public Error(BigInteger blockNumber,String msg){
-                this.blockNumber=blockNumber;
-                this.msg=msg;
-            }
-            BigInteger blockNumber;
-            String msg;
-        }
-        @Data
-        class Result{
-            List<BlockInfo> blocks = new CopyOnWriteArrayList<>();
-            List<Error> errors = new CopyOnWriteArrayList<>();
-        }
+    private Result getBlockAndTransaction(List<BigInteger> blockNumbers){
+
         Result result = new Result();
 
         // 并行批量采集区块
@@ -131,12 +157,16 @@ public class BlockSyncTask {
         blockNumbers.forEach(blockNumber->
             THREAD_POOL.submit(()->{
                 try {
+                    // 如果区块号已搜集，则返回
+                    if(result.collectedNumbers.contains(blockNumber.longValue())) return;
                     PlatonBlock.Block initData = client.getWeb3j().platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-                    result.blocks.add(new BlockInfo(initData));
+                    if(initData!=null) {
+                        result.concurrentBlocks.add(new BlockInfo(initData));
+                        result.collectedNumbers.add(blockNumber.longValue());
+                    }
                 } catch (Exception e) {
-                    Error error = new Error(blockNumber,e.getMessage());
-                    result.errors.add(error);
-                    logger.error("采集区块[{}]出错!{}",blockNumber,e.getMessage());
+                    result.exceptionNumbers.add(blockNumber);
+                    logger.error("已放入重试列表！",blockNumber,e.getMessage());
                 }finally {
                     latch.countDown();
                 }
@@ -149,21 +179,44 @@ public class BlockSyncTask {
             e.printStackTrace();
         }
 
-        if(result.errors.size()>0){
-            // 采集出错，终止程序
-            throw new RuntimeException("区块采集出错："+JSON.toJSONString(result.errors));
+
+        // 如果有异常，则进行重试，直到采集完本批次所有在链上存在的区块
+        List<BigInteger> retryNumbers = new ArrayList<>();
+
+        if(result.collectedNumbers.size()>0){
+            // 检测由于各节点区块同步不及时导致的区块缺失
+            Collections.sort(result.collectedNumbers,(c1,c2)->{
+                if (c1.compareTo(c2)>0) return 1;
+                if (c1.compareTo(c2)<0) return -1;
+                return 0;
+            });
+
+            long start = result.collectedNumbers.get(0);
+            long end = result.collectedNumbers.get(result.collectedNumbers.size()-1);
+
+            Set<BigInteger> uncollectedNumbers = new HashSet<>();
+            for (long i=start;i<=end;i++){
+                if(!result.collectedNumbers.contains(i)) uncollectedNumbers.add(BigInteger.valueOf(i));
+            }
+            if(uncollectedNumbers.size()>0){
+                logger.info("由于同步不及时未采集到的区块：{}",uncollectedNumbers);
+                retryNumbers.addAll(uncollectedNumbers);
+            }
         }
 
-        // 按区块号从大到小排序
-        Collections.sort(result.blocks,(c1,c2)->{
-            if (c1.getNumber().compareTo(c2.getNumber())>0) return 1;
-            if (c1.getNumber().compareTo(c2.getNumber())<0) return -1;
-            return 0;
-        });
+        if(result.exceptionNumbers.size()>0){
+            logger.info("由于Web3j异常未采集到的区块：{}",result.exceptionNumbers);
+            retryNumbers.addAll(result.exceptionNumbers);
+        }
 
-        logger.info("{}",result.blocks);
-        return result.blocks;
+        if(retryNumbers.size()>0){
+            logger.info("区块重试列表：{}",retryNumbers);
+            Result retryResult = getBlockAndTransaction(retryNumbers);
+            // 把结果汇总到本递归结果中
+            result.concurrentBlocks.addAll(retryResult.concurrentBlocks);
+        }
 
+        return result;
     }
 
     /**
@@ -175,8 +228,21 @@ public class BlockSyncTask {
 
     }
     @Transactional
-    public void batchSaveResult(BlockChainResult dbParams){
+    public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
         // 串行批量入库
+
+        List<Block> blocks = new ArrayList<>();
+        List<TransactionWithBLOBs> transactions = new ArrayList<>();
+        basicData.forEach(block->{
+            blocks.add(block);
+            transactions.addAll(block.getTransactions());
+        });
+        // 批量入库区块
+        if (blocks.size()>0) blockMapper.batchInsert(blocks);
+        // 批量入库交易
+        if(transactions.size()>0) transactionMapper.batchInsert(transactions);
+
+
 
     }
 }
