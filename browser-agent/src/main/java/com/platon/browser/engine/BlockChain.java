@@ -39,7 +39,6 @@ public class BlockChain {
 
 
     private void init(){
-
     }
 
     /**
@@ -49,6 +48,7 @@ public class BlockChain {
     public void execute(BlockInfo block){
         init();
         //新开线程去查询rpc共识列表
+
         //数据回填
 
         // 根据区块信息

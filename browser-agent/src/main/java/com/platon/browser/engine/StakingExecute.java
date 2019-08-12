@@ -3,7 +3,10 @@ package com.platon.browser.engine;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.TransactionInfo;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +21,8 @@ import java.util.Map;
 @Component
 public class StakingExecute {
 
+
+
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String, Node> nodes = new HashMap<>();
     private Map<String, Delegation> delegations = new HashMap<>();
@@ -28,6 +33,7 @@ public class StakingExecute {
     @PostConstruct
     private void init(){
         // 初始化全量数据
+
     }
 
     /**
@@ -91,7 +97,6 @@ public class StakingExecute {
     }
 
     private void updateTxInfo(TransactionInfo trans,BlockChain bc){
-
     }
 
     private void execute1000(TransactionInfo trans){

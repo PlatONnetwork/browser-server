@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Block;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
@@ -23,6 +24,8 @@ public class BlockInfo extends Block {
      * 使用原生交易信息初始化交易信息
      * @param initData
      */
+
+
     public BlockInfo(PlatonBlock.Block initData){
         BeanUtils.copyProperties(initData,this);
         // 属性类型转换
@@ -39,6 +42,7 @@ public class BlockInfo extends Block {
         this.setGasLimit(initData.getGasLimit().toString());
         // 区块奖励
         //this.setBlockReward("");
+
         // 节点名称
         //this.setNodeName("");
         //this.setNodeId("");
