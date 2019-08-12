@@ -31,7 +31,7 @@ public class PlatonClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     private List<Web3j> allWeb3jList=new ArrayList<>();
-    private List<Web3j> validWeb3jList=new ArrayList <>();
+    private Web3j currentValidWeb3j;
 
     @Value("${platon.web3j.addresses}")
     private List<String> web3jAddresses;
@@ -51,15 +51,13 @@ public class PlatonClient {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
         // 更新有效web3j实例列表
-        updateValidWeb3jList();
+        updateCurrentValidWeb3j();
     }
 
     public Web3j getWeb3j(){
+        WEB3J_CONFIG_LOCK.readLock().lock();
         try{
-            WEB3J_CONFIG_LOCK.readLock().lock();
-            Random random = new Random();
-            int index = random.nextInt(validWeb3jList.size());
-            return validWeb3jList.get(index);
+            return currentValidWeb3j;
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -68,42 +66,46 @@ public class PlatonClient {
         return null;
     }
 
-    public void updateValidWeb3jList(){
+    public void updateCurrentValidWeb3j(){
+        WEB3J_CONFIG_LOCK.writeLock().lock();
+        Web3j originWeb3j = currentValidWeb3j;
         try {
-            WEB3J_CONFIG_LOCK.writeLock().lock();
-            validWeb3jList.clear();
-            allWeb3jList.forEach((web3j)->{
-                try {
-                    PlatonBlockNumber platonBlockNumber = web3j.platonBlockNumber().send();
-                    validWeb3jList.add(web3j);
-                } catch (IOException e) {
-                    e.getMessage();
+            // 检查currentValidWeb3j连通性
+            try {
+                if(currentValidWeb3j==null) throw new RuntimeException("currentValidWeb3j需要初始化！");
+                currentValidWeb3j.platonBlockNumber().send();
+            } catch (Exception e1) {
+                logger.info("当前Web3j实例({})无效，重新选举Web3j实例！",currentValidWeb3j);
+                // 连不通，则需要更新
+                for(Web3j web3j:allWeb3jList){
+                    try {
+                        web3j.platonBlockNumber().send();
+                        currentValidWeb3j=web3j;
+                    } catch (IOException e2) {
+                        logger.info("候选Web3j实例({})无效！",web3j);
+                    }
                 }
-            });
+                if(originWeb3j==currentValidWeb3j){
+                    logger.info("当前所有候选Web3j实例均无效！");
+                }
+            }
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
     }
 
     /**
-     * web3j实例活性探测及更新
+     * web3j实例保活
      */
     @Scheduled(cron = "0/30 * * * * ?")
-    protected void detect () {
+    protected void keepAlive () {
         logger.debug("*** In the detect task *** ");
         try {
-            updateValidWeb3jList();
+            updateCurrentValidWeb3j();
         } catch (Exception e) {
             logger.error("detect exception:{}", e.getMessage());
             e.printStackTrace();
         }
         logger.debug("*** End the detect task *** ");
-    }
-
-    public static void main(String[] args) throws IOException {
-        String url = "http://192.168.120.76:6789";
-        Web3j web3j = Web3j.build(new HttpService(url));
-        PlatonBlock block = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.ONE),true).send();
-        logger.info("{}",block);
     }
 }

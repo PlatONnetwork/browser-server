@@ -6,10 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -102,4 +99,18 @@ public class BlockInfo extends Block {
     }
 
     private List<TransactionInfo> transactions = new ArrayList<>();
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BlockInfo blockInfo = (BlockInfo) o;
+        return Objects.equals(getNumber(), blockInfo.getNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNumber());
+    }
 }
