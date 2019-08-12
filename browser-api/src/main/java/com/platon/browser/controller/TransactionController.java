@@ -64,6 +64,7 @@ public class TransactionController {
 
     */
 /**
+      * @apiDeprecated
       * @api {post} transaction/transactionList a.交易列表
       * @apiVersion 1.0.0
       * @apiName transactionList
@@ -140,6 +141,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} transaction/transactionDetails b.交易详情
      * @apiVersion 1.0.0
      * @apiName transactionDetails
@@ -226,6 +228,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} transaction/transactionDetailNavigate c.交易详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName transactionDetailNavigate
@@ -324,6 +327,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} transaction/pendingList d.待处理交易列表
      * @apiVersion 1.0.0
      * @apiName pendingList
@@ -400,6 +404,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} transaction/pendingDetails e.待处理交易详情
      * @apiVersion 1.0.0
      * @apiName pendingDetails
@@ -488,6 +493,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post}  transaction/addressDetails g.查询地址详情
      * @apiVersion 1.0.0
      * @apiName addressDetails
@@ -592,6 +598,7 @@ public class TransactionController {
     }
     */
 /**
+     * @apiDeprecated
      * @api {get} transaction/addressDownload?cid=:cid&address=:address&date=:date&tab=:tab h.导出地址详情
      * @apiVersion 1.0.0
      * @apiName addressDownload
@@ -640,6 +647,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} transaction/contractDetails i.查询合约详情
      * @apiVersion 1.0.0
      * @apiName contractDetails
@@ -735,6 +743,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {get} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
      * @apiVersion 1.0.0
      * @apiName contractDownload
@@ -756,6 +765,7 @@ public class TransactionController {
 
     */
 /**
+     * @apiDeprecated
      * @api {get} transaction/blockTransaction k.查询区块交易信息
      * @apiVersion 1.0.0
      * @apiName blockTransaction

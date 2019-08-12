@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocProposal {
+public interface AppDocProposal {
 	
     /**
      * @api {post} /proposal/proposalList a.提案列表

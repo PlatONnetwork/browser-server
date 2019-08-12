@@ -53,7 +53,7 @@ public class BlockController  {
 
     */
 /**
-     *
+     * @apiDeprecated
      * @api {post} block/blockList a.区块列表
      *       @apiVersion 1.0.0
      *       @apiName blockList
@@ -106,6 +106,7 @@ public class BlockController  {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} block/blockDetails b.区块详情
      * @apiVersion 1.0.0
      * @apiName blockDetails
@@ -160,6 +161,7 @@ public class BlockController  {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate
@@ -210,6 +212,7 @@ public class BlockController  {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} block/transactionList d.区块交易列表
      * @apiVersion 1.0.0
      * @apiName transactionList

@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocBlock {
+public interface AppDocBlock {
 	
     /**
      *

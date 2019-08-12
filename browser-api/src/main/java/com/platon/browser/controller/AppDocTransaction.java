@@ -1,6 +1,15 @@
 package com.platon.browser.controller;
 
-public class AppDocTransaction {
+import javax.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.req.transaction.TransactionPageReq;
+
+public interface AppDocTransaction {
 	
     /**
      * @api {post} /transaction/transactionList a.交易列表
@@ -47,7 +56,9 @@ public class AppDocTransaction {
      *   ]
      * }
      */
-	
+	@PostMapping("transactionList")
+    public RespPage<TransactionListItem> getPage(@Valid @RequestBody TransactionPageReq req);
+		
 	
     /**
      * @api {post} /transaction/transactionListByBlock b.区块的交易列表

@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocAddress {
+public interface AppDocAddress {
 	
 	
     /**

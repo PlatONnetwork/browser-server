@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocStaking {
+public interface AppDocStaking {
 	
 	
     /**
@@ -297,20 +297,21 @@ public class AppDocStaking {
      */
 	
 	
-//	
-//    /**
-//     * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date i.导出地址验证人委托列表
-//     * @apiVersion 1.0.0
-//     * @apiName delegationListByAddressDownload
-//     * @apiGroup staking
-//     * @apiDescription 逻辑同 《地址相关的委托列表接口》
-//     * @apiParam {String} address 合约地址
-//     * @apiParam {String} date 数据结束日期
-//     * @apiSuccessExample {json} Success-Response:
-//     * HTTP/1.1 200 OK
-//     * >响应为 二进制文件流
-//     * 没有导出
-//     */
+	
+    /**
+     * @apiDeprecated
+     * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date i.导出地址验证人委托列表
+     * @apiVersion 1.0.0
+     * @apiName delegationListByAddressDownload
+     * @apiGroup staking
+     * @apiDescription 逻辑同 《地址相关的委托列表接口》
+     * @apiParam {String} address 合约地址
+     * @apiParam {String} date 数据结束日期
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * >响应为 二进制文件流
+     * 没有导出
+     */
 	
 	
 }
