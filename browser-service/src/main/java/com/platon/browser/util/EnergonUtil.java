@@ -1,7 +1,6 @@
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dto.node.NodePushItem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,16 +35,4 @@ public class EnergonUtil {
     }
 
 
-    public static void main(String[] args) {
-        String path = System.getProperty("user.home")+ File.separator+"fakelocation.json";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            StringBuilder sb = new StringBuilder();
-            br.lines().forEach(line->sb.append(line));
-            List<NodePushItem> nodes = JSON.parseArray(sb.toString(),NodePushItem.class);
-            System.out.println(sb.toString());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
@@ -5,8 +6,6 @@ import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.dto.node.NodeDetail;
-import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ResponseException;
@@ -33,11 +32,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 09:35
- */
+ *//*
+
 @RestController
 @RequestMapping("/node")
 public class NodeController {
@@ -52,7 +53,8 @@ public class NodeController {
     private ExportService exportService;
     private static Logger logger = LoggerFactory.getLogger(NodeController.class);
 
-    /**
+    */
+/**
      * @api {post} node/list a.节点列表
      * @apiVersion 1.0.0
      * @apiName list
@@ -98,7 +100,8 @@ public class NodeController {
      *           }
      *       ]
      * }
-     */
+     *//*
+
     @PostMapping("list")
     public NodeRespPage<NodeListItem> getPage (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -110,7 +113,8 @@ public class NodeController {
         return returnData;
     }
 
-    /**
+    */
+/**
      * @api {post} node/historyList b.历史节点列表
      * @apiVersion 1.0.0
      * @apiName historyList
@@ -144,7 +148,8 @@ public class NodeController {
      *           }
      *       ]
      * }
-     */
+     *//*
+
     @PostMapping("historyList")
     public RespPage<NodeListItem> getHistory (@Valid @RequestBody NodePageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -156,7 +161,8 @@ public class NodeController {
     }
 
 
-    /**
+    */
+/**
      * @api {post} node/detail c.节点详情
      * @apiVersion 1.0.0
      * @apiName detail
@@ -203,7 +209,8 @@ public class NodeController {
      *           "hitCount":555 // 中选次数
      *        }
      * }
-     */
+     *//*
+
     @PostMapping("detail")
     public BaseResp getDetail (@Valid @RequestBody NodeDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -221,7 +228,8 @@ public class NodeController {
     }
 
 
-    /**
+    */
+/**
      * @api {post} node/blockList d.节点区块列表(显示最新20条)
      * @apiVersion 1.0.0
      * @apiName blockList
@@ -252,7 +260,8 @@ public class NodeController {
      *          "serverTime": 1708098077  //服务器时间
      *       }]
      * }
-     */
+     *//*
+
     @PostMapping("blockList")
     public BaseResp blockList (@Valid @RequestBody BlockListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -278,7 +287,8 @@ public class NodeController {
         }
     }
 
-    /**
+    */
+/**
      * @api {get} node/blockDownload?cid=:cid&nodeId=:nodeId&date=:date e.导出节点区块详情
      * @apiVersion 1.0.0
      * @apiName blockDownload
@@ -290,7 +300,8 @@ public class NodeController {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
-     */
+     *//*
+
     @GetMapping("blockDownload")
     public void blockDownload(@RequestParam String cid, @RequestParam String nodeId, @RequestParam String date, HttpServletResponse response) {
         BlockDownloadReq req = new BlockDownloadReq();
@@ -311,3 +322,4 @@ public class NodeController {
         download(response,blockDownload.getFilename(),blockDownload.getLength(),blockDownload.getData());
     }
 }
+*/

@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 应用版本
-version: 0.6.1
+version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: dev
 # MySQL数据库连接地址
@@ -9,15 +9,9 @@ dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useU
 dbuser: platon
 # MySQL数据库密码
 dbpass: platon
-chain:
-  # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-#  config: MAIN_NET-1-http://10.10.8.151:7793
-#  config: MAIN_NET-1-http://192.168.9.76:8793
-  config: MAIN_NET-203-["http://192.168.120.81:6789","http://192.168.120.82:6789"]
-#  config: MAIN_NET-203-http://192.168.120.88:6789
-#  config: MAIN_NET-1-https://syde.platon.network/test
-  # 要采集哪个ID的链
-  active: 203
+web3j:
+  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
+  collect.batch-size: 500
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件

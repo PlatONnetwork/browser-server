@@ -4,26 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-public class Block extends BlockKey {
+public class Block {
+    private Long number;
+
+    private String hash;
+
     private String parentHash;
 
-    private String nonce;
-
-    private String miner;
-
-    private String extraData;
+    private Date timestamp;
 
     private Integer size;
 
-    private String energonUsed;
+    private String gasLimit;
 
-    private String energonLimit;
-
-    private String energonAverage;
-
-    private Integer transactionNumber;
-
-    private Date timestamp;
+    private String gasUsed;
 
     private String blockReward;
 
@@ -31,23 +25,43 @@ public class Block extends BlockKey {
 
     private Date updateTime;
 
-    private String actualTxCostSum;
-
-    private Long blockVoteAmount;
-
-    private Long blockVoteNumber;
-
-    private Long blockCampaignAmount;
-
     private String nodeName;
 
     private String nodeId;
 
-    private String voteHash;
+    private Integer statTxQty;
 
-    private Double rewardRatio;
+    private Integer statTransferQty;
 
-    private String votePrice;
+    private Integer statStakingQty;
+
+    private Integer statProposalQty;
+
+    private Integer statDelegateQty;
+
+    private String statTxGasLimit;
+
+    private String statTxFee;
+
+    private String miner;
+
+    private String extraData;
+
+    public Long getNumber() {
+        return number;
+    }
+
+    public void setNumber(Long number) {
+        this.number = number;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash == null ? null : hash.trim();
+    }
 
     public String getParentHash() {
         return parentHash;
@@ -57,28 +71,12 @@ public class Block extends BlockKey {
         this.parentHash = parentHash == null ? null : parentHash.trim();
     }
 
-    public String getNonce() {
-        return nonce;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setNonce(String nonce) {
-        this.nonce = nonce == null ? null : nonce.trim();
-    }
-
-    public String getMiner() {
-        return miner;
-    }
-
-    public void setMiner(String miner) {
-        this.miner = miner == null ? null : miner.trim();
-    }
-
-    public String getExtraData() {
-        return extraData;
-    }
-
-    public void setExtraData(String extraData) {
-        this.extraData = extraData == null ? null : extraData.trim();
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Integer getSize() {
@@ -89,44 +87,20 @@ public class Block extends BlockKey {
         this.size = size;
     }
 
-    public String getEnergonUsed() {
-        return energonUsed;
+    public String getGasLimit() {
+        return gasLimit;
     }
 
-    public void setEnergonUsed(String energonUsed) {
-        this.energonUsed = energonUsed == null ? null : energonUsed.trim();
+    public void setGasLimit(String gasLimit) {
+        this.gasLimit = gasLimit == null ? null : gasLimit.trim();
     }
 
-    public String getEnergonLimit() {
-        return energonLimit;
+    public String getGasUsed() {
+        return gasUsed;
     }
 
-    public void setEnergonLimit(String energonLimit) {
-        this.energonLimit = energonLimit == null ? null : energonLimit.trim();
-    }
-
-    public String getEnergonAverage() {
-        return energonAverage;
-    }
-
-    public void setEnergonAverage(String energonAverage) {
-        this.energonAverage = energonAverage == null ? null : energonAverage.trim();
-    }
-
-    public Integer getTransactionNumber() {
-        return transactionNumber;
-    }
-
-    public void setTransactionNumber(Integer transactionNumber) {
-        this.transactionNumber = transactionNumber;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setGasUsed(String gasUsed) {
+        this.gasUsed = gasUsed == null ? null : gasUsed.trim();
     }
 
     public String getBlockReward() {
@@ -153,38 +127,6 @@ public class Block extends BlockKey {
         this.updateTime = updateTime;
     }
 
-    public String getActualTxCostSum() {
-        return actualTxCostSum;
-    }
-
-    public void setActualTxCostSum(String actualTxCostSum) {
-        this.actualTxCostSum = actualTxCostSum == null ? null : actualTxCostSum.trim();
-    }
-
-    public Long getBlockVoteAmount() {
-        return blockVoteAmount;
-    }
-
-    public void setBlockVoteAmount(Long blockVoteAmount) {
-        this.blockVoteAmount = blockVoteAmount;
-    }
-
-    public Long getBlockVoteNumber() {
-        return blockVoteNumber;
-    }
-
-    public void setBlockVoteNumber(Long blockVoteNumber) {
-        this.blockVoteNumber = blockVoteNumber;
-    }
-
-    public Long getBlockCampaignAmount() {
-        return blockCampaignAmount;
-    }
-
-    public void setBlockCampaignAmount(Long blockCampaignAmount) {
-        this.blockCampaignAmount = blockCampaignAmount;
-    }
-
     public String getNodeName() {
         return nodeName;
     }
@@ -201,28 +143,76 @@ public class Block extends BlockKey {
         this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getVoteHash() {
-        return voteHash;
+    public Integer getStatTxQty() {
+        return statTxQty;
     }
 
-    public void setVoteHash(String voteHash) {
-        this.voteHash = voteHash == null ? null : voteHash.trim();
+    public void setStatTxQty(Integer statTxQty) {
+        this.statTxQty = statTxQty;
     }
 
-    public Double getRewardRatio() {
-        return rewardRatio;
+    public Integer getStatTransferQty() {
+        return statTransferQty;
     }
 
-    public void setRewardRatio(Double rewardRatio) {
-        this.rewardRatio = rewardRatio;
+    public void setStatTransferQty(Integer statTransferQty) {
+        this.statTransferQty = statTransferQty;
     }
 
-    public String getVotePrice() {
-        return votePrice;
+    public Integer getStatStakingQty() {
+        return statStakingQty;
     }
 
-    public void setVotePrice(String votePrice) {
-        this.votePrice = votePrice == null ? null : votePrice.trim();
+    public void setStatStakingQty(Integer statStakingQty) {
+        this.statStakingQty = statStakingQty;
+    }
+
+    public Integer getStatProposalQty() {
+        return statProposalQty;
+    }
+
+    public void setStatProposalQty(Integer statProposalQty) {
+        this.statProposalQty = statProposalQty;
+    }
+
+    public Integer getStatDelegateQty() {
+        return statDelegateQty;
+    }
+
+    public void setStatDelegateQty(Integer statDelegateQty) {
+        this.statDelegateQty = statDelegateQty;
+    }
+
+    public String getStatTxGasLimit() {
+        return statTxGasLimit;
+    }
+
+    public void setStatTxGasLimit(String statTxGasLimit) {
+        this.statTxGasLimit = statTxGasLimit == null ? null : statTxGasLimit.trim();
+    }
+
+    public String getStatTxFee() {
+        return statTxFee;
+    }
+
+    public void setStatTxFee(String statTxFee) {
+        this.statTxFee = statTxFee == null ? null : statTxFee.trim();
+    }
+
+    public String getMiner() {
+        return miner;
+    }
+
+    public void setMiner(String miner) {
+        this.miner = miner == null ? null : miner.trim();
+    }
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData == null ? null : extraData.trim();
     }
 
     /**
@@ -233,31 +223,27 @@ public class Block extends BlockKey {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        hash("hash", "hash", "VARCHAR", false),
         number("number", "number", "BIGINT", true),
-        chainId("chain_id", "chainId", "VARCHAR", false),
+        hash("hash", "hash", "VARCHAR", false),
         parentHash("parent_hash", "parentHash", "VARCHAR", false),
-        nonce("nonce", "nonce", "VARCHAR", false),
-        miner("miner", "miner", "VARCHAR", false),
-        extraData("extra_data", "extraData", "VARCHAR", false),
-        size("size", "size", "INTEGER", true),
-        energonUsed("energon_used", "energonUsed", "VARCHAR", false),
-        energonLimit("energon_limit", "energonLimit", "VARCHAR", false),
-        energonAverage("energon_average", "energonAverage", "VARCHAR", false),
-        transactionNumber("transaction_number", "transactionNumber", "INTEGER", false),
         timestamp("timestamp", "timestamp", "TIMESTAMP", true),
+        size("size", "size", "INTEGER", true),
+        gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
+        gasUsed("gas_used", "gasUsed", "VARCHAR", false),
         blockReward("block_reward", "blockReward", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        actualTxCostSum("actual_tx_cost_sum", "actualTxCostSum", "VARCHAR", false),
-        blockVoteAmount("block_vote_amount", "blockVoteAmount", "BIGINT", false),
-        blockVoteNumber("block_vote_number", "blockVoteNumber", "BIGINT", false),
-        blockCampaignAmount("block_campaign_amount", "blockCampaignAmount", "BIGINT", false),
         nodeName("node_name", "nodeName", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
-        voteHash("vote_hash", "voteHash", "VARCHAR", false),
-        rewardRatio("reward_ratio", "rewardRatio", "DOUBLE", false),
-        votePrice("vote_price", "votePrice", "VARCHAR", false);
+        statTxQty("stat_tx_qty", "statTxQty", "INTEGER", false),
+        statTransferQty("stat_transfer_qty", "statTransferQty", "INTEGER", false),
+        statStakingQty("stat_staking_qty", "statStakingQty", "INTEGER", false),
+        statProposalQty("stat_proposal_qty", "statProposalQty", "INTEGER", false),
+        statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
+        statTxGasLimit("stat_tx_gas_limit", "statTxGasLimit", "VARCHAR", false),
+        statTxFee("stat_tx_fee", "statTxFee", "VARCHAR", false),
+        miner("miner", "miner", "VARCHAR", false),
+        extraData("extra_data", "extraData", "LONGVARCHAR", false);
 
         /**
          * This field was generated by MyBatis Generator.

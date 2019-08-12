@@ -1,6 +1,5 @@
 package com.platon.browser.utils;
 
-import com.platon.browser.dao.entity.NodeRanking;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class FilterTool {
 
-    public static List<NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
+/*    public static List<NodeRanking> currentBlockOwner ( List <NodeRanking> list, BigInteger publicKey ) throws Exception {
         for (NodeRanking nodeRanking : list) {
             if (publicKey.equals(new BigInteger(nodeRanking.getNodeId().replace("0x", ""), 16))) {
                 long count = nodeRanking.getBlockCount();
@@ -26,9 +25,11 @@ public class FilterTool {
             }
         }
         return list;
+    }*/
+    public static String getBlockReward(){
+        return null;
     }
-
-    public static  String getBlockReward ( String number ) {
+   /* public static  String getBlockReward ( String number ) {
         //ATP trasnfrom ADP
         BigDecimal rate = BigDecimal.valueOf(10L).pow(18);
         BigDecimal height = new BigDecimal(number);
@@ -45,7 +46,7 @@ public class FilterTool {
         BigDecimal previousRound = base.multiply(rate).multiply(definiteValue.pow(wheel.subtract(BigDecimal.valueOf(1L)).intValue()));
         BigDecimal result = thisRound.subtract(previousRound).divide(blockSumOnYear);
         return result.setScale(0).toString();
-    }
+    }*/
 
     public static String valueConversion(BigInteger value){
         BigDecimal valueDiec = new BigDecimal(value.toString());
@@ -53,27 +54,6 @@ public class FilterTool {
         return  conversionCoin.toString();
     }
 
-    public static String voteHashAnalysis(String exetraDate){
-        if(StringUtils.isNotBlank(exetraDate)){
-            byte[] exetraByte = Hex.decode(exetraDate.replace("0x",""));
-            byte[] voteHashdByte = new byte[]{};
-            voteHashdByte = Arrays.copyOfRange(exetraByte,97,exetraByte.length);
-            StringBuilder stringBuilder = new StringBuilder("");
-            if (voteHashdByte == null || voteHashdByte.length <= 0) {
-                return " ";
-            }
-            for (int i = 0; i < voteHashdByte.length; i++) {
-                int v = voteHashdByte[i] & 0xFF;
-                String hv = Integer.toHexString(v);
-                if (hv.length() < 2) {
-                    stringBuilder.append(0);
-                }
-                stringBuilder.append(hv);
-            }
-            return "0x" + stringBuilder.toString();
-        }
-        return " ";
-    }
 
     public static void main ( String[] args ) {
         BigDecimal height = new BigDecimal("3");

@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
@@ -39,11 +40,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 9:40
- */
+ *//*
+
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
@@ -53,22 +56,14 @@ public class TransactionController {
     private I18nUtil i18n;
     @Autowired
     private ChainsConfig chainsConfig;
-    @Autowired
-    private ExportService exportService;
-    @Autowired
-    private AccountService accountService;
-    @Autowired
-    private PendingTxService pendingTxService;
+
     @Autowired
     private TransactionCacheService transactionCacheService;
     @Autowired
-    private BlockCacheService blockCacheService;
-    @Autowired
     private TransactionService transactionService;
-    @Autowired
-    private TransactionMapper transactionMapper;
 
-    /**
+    */
+/**
       * @api {post} transaction/transactionList a.交易列表
       * @apiVersion 1.0.0
       * @apiName transactionList
@@ -132,7 +127,8 @@ public class TransactionController {
       *           }
       *       ]
       * }
-     */
+     *//*
+
     @PostMapping("transactionList")
     public RespPage<TransactionListItem> getPage (@Valid @RequestBody TransactionPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -142,7 +138,8 @@ public class TransactionController {
         return page;
     }
 
-    /**
+    */
+/**
      * @api {post} transaction/transactionDetails b.交易详情
      * @apiVersion 1.0.0
      * @apiName transactionDetails
@@ -211,7 +208,8 @@ public class TransactionController {
      *           "deposit":445,//质押金 (竞选交易此字段才有值)
      *           "ticketPrice":3333 // 票价
      * }
-     */
+     *//*
+
     @PostMapping("transactionDetails")
     public BaseResp getDetail (@Valid @RequestBody TransactionDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -226,7 +224,8 @@ public class TransactionController {
         }
     }
 
-    /**
+    */
+/**
      * @api {post} transaction/transactionDetailNavigate c.交易详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName transactionDetailNavigate
@@ -295,7 +294,8 @@ public class TransactionController {
      *           "deposit":445,//质押金 (竞选交易此字段才有值)
      *     }
      * }
-     */
+     *//*
+
     @PostMapping("transactionDetailNavigate")
     public BaseResp transactionDetailNavigate (@Valid @RequestBody TransactionDetailNavigateReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -322,7 +322,8 @@ public class TransactionController {
         transactionDetail.setConfirmNum(block.getHeight()-transactionDetail.getBlockHeight());
     }
 
-    /**
+    */
+/**
      * @api {post} transaction/pendingList d.待处理交易列表
      * @apiVersion 1.0.0
      * @apiName pendingList
@@ -385,7 +386,8 @@ public class TransactionController {
      *           }
      *       ]
      * }
-     */
+     *//*
+
     @PostMapping("pendingList")
     public RespPage<PendingTxItem> pendingList (@Valid @RequestBody PendingTxPageReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -396,7 +398,8 @@ public class TransactionController {
     }
 
 
-    /**
+    */
+/**
      * @api {post} transaction/pendingDetails e.待处理交易详情
      * @apiVersion 1.0.0
      * @apiName pendingDetails
@@ -468,7 +471,8 @@ public class TransactionController {
      *          }
      *      }
      *  }
-     */
+     *//*
+
     @PostMapping("pendingDetails")
     public BaseResp pendingDetails (@Valid @RequestBody PendingTxDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -482,7 +486,8 @@ public class TransactionController {
         }
     }
 
-    /**
+    */
+/**
      * @api {post}  transaction/addressDetails g.查询地址详情
      * @apiVersion 1.0.0
      * @apiName addressDetails
@@ -551,7 +556,8 @@ public class TransactionController {
      *          ]
      *      }
      * }
-     */
+     *//*
+
     @PostMapping("addressDetails")
     public BaseResp addressDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -584,7 +590,8 @@ public class TransactionController {
             throw new ResponseException(i18n.i(I18nEnum.DOWNLOAD_EXCEPTION));
         }
     }
-    /**
+    */
+/**
      * @api {get} transaction/addressDownload?cid=:cid&address=:address&date=:date&tab=:tab h.导出地址详情
      * @apiVersion 1.0.0
      * @apiName addressDownload
@@ -597,7 +604,8 @@ public class TransactionController {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
-     */
+     *//*
+
     @GetMapping("addressDownload")
     public void addressDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date,@RequestParam int tab, HttpServletResponse response) {
         AccountDownloadReq req = new AccountDownloadReq();
@@ -630,7 +638,8 @@ public class TransactionController {
         download(response,accountDownload.getFilename(),accountDownload.getLength(),accountDownload.getData());
     }
 
-    /**
+    */
+/**
      * @api {post} transaction/contractDetails i.查询合约详情
      * @apiVersion 1.0.0
      * @apiName contractDetails
@@ -690,7 +699,8 @@ public class TransactionController {
      *             ]
      *      }
      * }
-     */
+     *//*
+
     @PostMapping("contractDetails")
     public BaseResp contractDetails (@Valid @RequestBody AddressDetailReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -723,7 +733,8 @@ public class TransactionController {
         }
     }
 
-    /**
+    */
+/**
      * @api {get} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
      * @apiVersion 1.0.0
      * @apiName contractDownload
@@ -735,14 +746,16 @@ public class TransactionController {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * 响应为 二进制文件流
-     */
+     *//*
+
     @GetMapping("contractDownload")
     public void contractDownload(@RequestParam String cid, @RequestParam String address, @RequestParam String date, HttpServletResponse response) {
         // 合约交易列表默认取tab值为0
         addressDownload(cid,address,date,3,response);
     }
 
-    /**
+    */
+/**
      * @api {get} transaction/blockTransaction k.查询区块交易信息
      * @apiVersion 1.0.0
      * @apiName blockTransaction
@@ -805,7 +818,8 @@ public class TransactionController {
      *
      *       ]
      * }
-     */
+     *//*
+
     @PostMapping("blockTransaction")
     public RespPage<TransactionListItem> blockTransaction (@Valid @RequestBody BlockTransactionListReq req) {
         if(!chainsConfig.isValid(req.getCid())){
@@ -817,3 +831,4 @@ public class TransactionController {
         return returnData;
     }
 }
+*/

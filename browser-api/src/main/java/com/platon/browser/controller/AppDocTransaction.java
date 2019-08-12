@@ -135,8 +135,8 @@ public class AppDocTransaction {
      * - 如果txType = 1004（委托）：验证人 = nodeId + nodeName
      * - 如果txType = 1005（委托赎回）：委托赎回 = nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
      *   - 需要通过txHash 关联un_delegation表查询赎回的信息
-     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeId + nodeName + txType + githubID + proposalTopic + proposalHash
-     * - 如果txType = 2003（投票提案）：投票提案 = nodeId + nodeName + txType + githubID + proposalTopic + proposalHash + proposalOption
+     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
+     * - 如果txType = 2003（投票提案）：投票提案 = nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
      * - 如果txType = 2004（版本声明）：版本声明 = nodeId + nodeName + declareVersion
      * - 如果txType = 4000（创建锁仓）：创建锁仓 = RPAccount + value + RPPlan
      * 
@@ -158,9 +158,9 @@ public class AppDocTransaction {
      *       "serverTime"1123123,      //服务器时间
      *       "confirmNum":444,         //区块确认数
      *       "blockNumber":"15566",    //交易所在区块高度
-     *       "gasLimit":232,       //能量限制
-     *       "gasUsed":122,        //能量消耗
-     *       "gasPrice":122,       //能量价格
+     *       "gasLimit":232,           //能量限制
+     *       "gasUsed":122,            //能量消耗
+     *       "gasPrice":122,           //能量价格
      *       "value":"222",            //金额(单位:von)
      *       "actualTxCost":"22",      //交易费用(单位:von)
      *       "txType":"",              //交易类型
@@ -185,7 +185,13 @@ public class AppDocTransaction {
      *             "amount":111,       //锁定金额
      *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
      *          }
-     *       ]
+     *       ],
+     *       "evidences":[             //举报的证据
+     *          {
+     *             "verify":"",        //节点id
+     *             "nodeName":""       //被举报的节点名称
+     *          }
+     *        ],
      *       "nodeId":"",              //节点id
      *       "nodeName":"",            //节点名称
      *       "benefitAddr":"",         //用于接受出块奖励和质押奖励的收益账户
@@ -197,10 +203,10 @@ public class AppDocTransaction {
      *       "redeemLocked":"",        //赎回中被锁定的金额
      *       "redeemStatus":"1",       //赎回状态， 1： 退回中   2：退回成功 
      *       "redeemUnLockedBlock":"", //预计赎回到账的区块
-     *       "githubID":"",            //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
-     *       "proposalTopic":"",       //提案的主题
+     *       "proposalUrl":"",         //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
      *       "proposalHash":"",        //提案id
      *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
+     *       "proposalNewVersion":"",  //升级提案的版本
      *       "declareVersion":"",      //声明的版本 
      *       "txReceiptStatus":"",     //交易状态
      *        --可选信息结束

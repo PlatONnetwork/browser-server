@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service.cache;
 
 import com.github.pagehelper.PageHelper;
@@ -27,11 +28,13 @@ public class TransactionCacheServiceTest extends TestBase {
     @Test
     public void insertData () throws FileNotFoundException {
 
-        /*BufferedReader br = new BufferedReader(new FileReader("D:\\Workspace\\browser-server\\browser-api\\src\\test\\resources\\transactions.json"));
+        */
+/*BufferedReader br = new BufferedReader(new FileReader("D:\\Workspace\\browser-server\\browser-api\\src\\test\\resources\\transactions.json"));
         StringBuilder sb = new StringBuilder();
         br.lines().forEach(line->sb.append(line));
         List<TransactionWithBLOBs> transactions = JSON.parseArray(sb.toString(), TransactionWithBLOBs.class);
-        transactionCacheService.classifyByAddress("500",transactions);*/
+        transactionCacheService.classifyByAddress("500",transactions);*//*
+
 
         int page = 1;
         while (true){
@@ -76,3 +79,4 @@ public class TransactionCacheServiceTest extends TestBase {
     }
 }
 
+*/

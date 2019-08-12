@@ -71,7 +71,7 @@ public class BusinessException extends RuntimeException {
 	        this(errorCodeEnum, Locale.getDefault());
 	    }
 
-	    public BusinessException(ErrorCodeEnum errorCodeEnum, Locale locale) {
+	    public BusinessException( ErrorCodeEnum errorCodeEnum, Locale locale) {
 	        this.errorCode = errorCodeEnum.getCode();
 	        this.errorMessage = errorCodeEnum.getDesc();
 	        this.locale = locale;

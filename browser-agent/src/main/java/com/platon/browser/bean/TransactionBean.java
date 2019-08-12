@@ -1,18 +1,11 @@
 package com.platon.browser.bean;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.AnalysisResult;
-import com.platon.browser.dto.ticket.TxInfo;
-import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.util.TransactionAnalysis;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.util.Date;
-
 public class TransactionBean extends TransactionWithBLOBs {
-    public void init(Transaction transaction, TransactionReceipt receipt){
+    public void init(Transaction transaction, TransactionReceipt receipt){/*
         // 使用原生交易信息填充交易实体
         this.setHash(transaction.getHash());
         this.setFrom(transaction.getFrom());
@@ -83,5 +76,5 @@ public class TransactionBean extends TransactionWithBLOBs {
         if(null == receipt.getBlockNumber() ){
             this.setTxReceiptStatus(0);
         }
-    }
+    */}
 }

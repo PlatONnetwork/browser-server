@@ -1,14 +1,11 @@
 package com.platon.browser.req.account;
 
-import com.platon.browser.enums.TransactionTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 账户详情下载请求对象

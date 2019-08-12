@@ -19,12 +19,11 @@ public class BlockPushItem {
     private String nodeName;
     private String nodeId;
 
-    public void init(Block initData){
+    public void init( Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setNode(initData.getMiner());
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
-        this.setTransaction(initData.getTransactionNumber());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));
         this.setServerTime(System.currentTimeMillis());

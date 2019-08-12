@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.PlatonBlock;
 import rx.Subscription;
 
 import java.io.*;
@@ -39,12 +40,14 @@ public class DataGenTool extends TestData {
         }
     }
 
-    /**
+    */
+/**
      * 生成节点数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<NodeRanking> generateNode(String chainId, boolean writeToFile) {
         List<NodeRanking> nodes = new ArrayList<>();
 
@@ -110,12 +113,14 @@ public class DataGenTool extends TestData {
         return nodes;
     }
 
-    /**
+    */
+/**
      * 生成区块数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<Block> generateBlock(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -127,7 +132,7 @@ public class DataGenTool extends TestData {
         BigInteger currentHeight = BigInteger.valueOf(1);
         Subscription subscription = web3j.catchUpToLatestBlockObservable(DefaultBlockParameter.valueOf(currentHeight),true)
         .subscribe(eblock -> {
-            EthBlock.Block block = eblock.getBlock();
+            PlatonBlock.Block block = eblock.getBlock();
             if (block!=null){
                 Block bean = new Block();
                 BeanUtils.copyProperties(block,bean);
@@ -164,12 +169,14 @@ public class DataGenTool extends TestData {
         return returnData;
     }
 
-    /**
+    */
+/**
      * 生成交易数据
      * @param chainId
      * @param writeToFile
      * @return
-     */
+     *//*
+
     public static List<TransactionWithBLOBs> generateTransactionWithBLOB(String chainId, boolean writeToFile) {
 
         if(web3j==null){
@@ -192,7 +199,7 @@ public class DataGenTool extends TestData {
                     Random random = new Random();
                     bean.setActualTxCost(String.valueOf(Math.abs(random.nextInt(200000))));
                     try {
-                        EthBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
+                        PlatonBlock eblock = web3j.ethGetBlockByHash(transaction.getBlockHash(),false).send();
                         bean.setBlockNumber(eblock.getBlock().getNumber().longValue());
                         bean.setEnergonLimit(eblock.getBlock().getGasLimit().toString());
                     } catch (IOException e) {
@@ -308,3 +315,4 @@ public class DataGenTool extends TestData {
         //generateBlock("1",true);
     }
 }
+*/

@@ -39,7 +39,7 @@ public class AppException extends RuntimeException {
         this.errorMessage = msg;
     }
 
-    public AppException(ErrorCodeEnum errorCodeEnum) {
+    public AppException( ErrorCodeEnum errorCodeEnum) {
         super(errorCodeEnum.getDesc());
         this.errorCode = errorCodeEnum.getCode();
         this.errorMessage = errorCodeEnum.getDesc();

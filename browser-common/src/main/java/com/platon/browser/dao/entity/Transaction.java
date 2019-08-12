@@ -11,45 +11,37 @@ public class Transaction {
 
     private String blockHash;
 
-    private String from;
-
-    private String to;
+    private Integer transactionIndex;
 
     private Date timestamp;
 
-    private String energonUsed;
+    private String gasPrice;
 
-    private String energonLimit;
+    private String gasUsed;
 
-    private String energonPrice;
+    private String gasLimit;
+
+    private String from;
+
+    private String to;
 
     private String value;
 
     private String nonce;
 
-    private Integer transactionIndex;
-
-    private Integer txReceiptStatus;
-
     private String actualTxCost;
 
     private String txType;
 
-    private String chainId;
+    private String receiveType;
 
     private Date createTime;
 
     private Date updateTime;
 
-    private String receiveType;
+    private Integer txReceiptStatus;
 
     private Long sequence;
-
-    private String col1;
-
-    private String col2;
-
-    private String col3;
 
     public String getHash() {
         return hash;
@@ -75,6 +67,46 @@ public class Transaction {
         this.blockHash = blockHash == null ? null : blockHash.trim();
     }
 
+    public Integer getTransactionIndex() {
+        return transactionIndex;
+    }
+
+    public void setTransactionIndex(Integer transactionIndex) {
+        this.transactionIndex = transactionIndex;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getGasPrice() {
+        return gasPrice;
+    }
+
+    public void setGasPrice(String gasPrice) {
+        this.gasPrice = gasPrice == null ? null : gasPrice.trim();
+    }
+
+    public String getGasUsed() {
+        return gasUsed;
+    }
+
+    public void setGasUsed(String gasUsed) {
+        this.gasUsed = gasUsed == null ? null : gasUsed.trim();
+    }
+
+    public String getGasLimit() {
+        return gasLimit;
+    }
+
+    public void setGasLimit(String gasLimit) {
+        this.gasLimit = gasLimit == null ? null : gasLimit.trim();
+    }
+
     public String getFrom() {
         return from;
     }
@@ -89,38 +121,6 @@ public class Transaction {
 
     public void setTo(String to) {
         this.to = to == null ? null : to.trim();
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getEnergonUsed() {
-        return energonUsed;
-    }
-
-    public void setEnergonUsed(String energonUsed) {
-        this.energonUsed = energonUsed == null ? null : energonUsed.trim();
-    }
-
-    public String getEnergonLimit() {
-        return energonLimit;
-    }
-
-    public void setEnergonLimit(String energonLimit) {
-        this.energonLimit = energonLimit == null ? null : energonLimit.trim();
-    }
-
-    public String getEnergonPrice() {
-        return energonPrice;
-    }
-
-    public void setEnergonPrice(String energonPrice) {
-        this.energonPrice = energonPrice == null ? null : energonPrice.trim();
     }
 
     public String getValue() {
@@ -139,22 +139,6 @@ public class Transaction {
         this.nonce = nonce == null ? null : nonce.trim();
     }
 
-    public Integer getTransactionIndex() {
-        return transactionIndex;
-    }
-
-    public void setTransactionIndex(Integer transactionIndex) {
-        this.transactionIndex = transactionIndex;
-    }
-
-    public Integer getTxReceiptStatus() {
-        return txReceiptStatus;
-    }
-
-    public void setTxReceiptStatus(Integer txReceiptStatus) {
-        this.txReceiptStatus = txReceiptStatus;
-    }
-
     public String getActualTxCost() {
         return actualTxCost;
     }
@@ -171,12 +155,12 @@ public class Transaction {
         this.txType = txType == null ? null : txType.trim();
     }
 
-    public String getChainId() {
-        return chainId;
+    public String getReceiveType() {
+        return receiveType;
     }
 
-    public void setChainId(String chainId) {
-        this.chainId = chainId == null ? null : chainId.trim();
+    public void setReceiveType(String receiveType) {
+        this.receiveType = receiveType == null ? null : receiveType.trim();
     }
 
     public Date getCreateTime() {
@@ -195,12 +179,12 @@ public class Transaction {
         this.updateTime = updateTime;
     }
 
-    public String getReceiveType() {
-        return receiveType;
+    public Integer getTxReceiptStatus() {
+        return txReceiptStatus;
     }
 
-    public void setReceiveType(String receiveType) {
-        this.receiveType = receiveType == null ? null : receiveType.trim();
+    public void setTxReceiptStatus(Integer txReceiptStatus) {
+        this.txReceiptStatus = txReceiptStatus;
     }
 
     public Long getSequence() {
@@ -209,30 +193,6 @@ public class Transaction {
 
     public void setSequence(Long sequence) {
         this.sequence = sequence;
-    }
-
-    public String getCol1() {
-        return col1;
-    }
-
-    public void setCol1(String col1) {
-        this.col1 = col1 == null ? null : col1.trim();
-    }
-
-    public String getCol2() {
-        return col2;
-    }
-
-    public void setCol2(String col2) {
-        this.col2 = col2 == null ? null : col2.trim();
-    }
-
-    public String getCol3() {
-        return col3;
-    }
-
-    public void setCol3(String col3) {
-        this.col3 = col3 == null ? null : col3.trim();
     }
 
     /**
@@ -246,29 +206,25 @@ public class Transaction {
         hash("hash", "hash", "VARCHAR", false),
         blockNumber("block_number", "blockNumber", "BIGINT", false),
         blockHash("block_hash", "blockHash", "VARCHAR", false),
+        transactionIndex("transaction_index", "transactionIndex", "INTEGER", false),
+        timestamp("timestamp", "timestamp", "TIMESTAMP", true),
+        gasPrice("gas_price", "gasPrice", "VARCHAR", false),
+        gasUsed("gas_used", "gasUsed", "VARCHAR", false),
+        gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
         from("from", "from", "VARCHAR", true),
         to("to", "to", "VARCHAR", true),
-        timestamp("timestamp", "timestamp", "TIMESTAMP", true),
-        energonUsed("energon_used", "energonUsed", "VARCHAR", false),
-        energonLimit("energon_limit", "energonLimit", "VARCHAR", false),
-        energonPrice("energon_price", "energonPrice", "VARCHAR", false),
         value("value", "value", "VARCHAR", true),
         nonce("nonce", "nonce", "VARCHAR", false),
-        transactionIndex("transaction_index", "transactionIndex", "INTEGER", false),
-        txReceiptStatus("tx_receipt_status", "txReceiptStatus", "INTEGER", false),
         actualTxCost("actual_tx_cost", "actualTxCost", "VARCHAR", false),
         txType("tx_type", "txType", "VARCHAR", false),
-        chainId("chain_id", "chainId", "VARCHAR", false),
+        receiveType("receive_type", "receiveType", "VARCHAR", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        receiveType("receive_type", "receiveType", "VARCHAR", false),
+        txReceiptStatus("tx_receipt_status", "txReceiptStatus", "INTEGER", false),
         sequence("sequence", "sequence", "BIGINT", true),
-        col1("col1", "col1", "VARCHAR", false),
-        col2("col2", "col2", "VARCHAR", false),
-        col3("col3", "col3", "VARCHAR", false),
         input("input", "input", "LONGVARCHAR", true),
-        failReason("fail_reason", "failReason", "LONGVARCHAR", false),
-        txInfo("tx_info", "txInfo", "LONGVARCHAR", false);
+        txInfo("tx_info", "txInfo", "LONGVARCHAR", false),
+        failReason("fail_reason", "failReason", "LONGVARCHAR", false);
 
         /**
          * This field was generated by MyBatis Generator.

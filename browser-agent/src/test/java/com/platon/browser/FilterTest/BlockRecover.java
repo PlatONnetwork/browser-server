@@ -31,7 +31,7 @@ public class BlockRecover extends TestBase {
     public void blockRecover(){
         List<String> numberList = new ArrayList <>();
         BlockExample blockExample = new BlockExample();
-        blockExample.createCriteria().andChainIdEqualTo("1");
+        blockExample.createCriteria();
         blockExample.setOrderByClause("number desc");
         List<Block> blockList = blockMapper.selectByExample(blockExample);
         blockList.forEach(block -> {

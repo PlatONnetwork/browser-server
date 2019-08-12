@@ -1,6 +1,5 @@
 package com.platon.browser;
 
-import com.platon.browser.util.DataGenTool;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -38,7 +37,6 @@ public class TestData {
             new Org("JINGDONG","http://www.jingdong.com/"),
             new Org("XUNLEI"  ,"http://www.xunlei.com/")
     };
-    static { DataGenTool.web3j = web3j; }
 
     public enum TestDataFileNameEnum {
         NODE("nodes-"),

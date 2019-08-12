@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service.impl;
 
 import com.github.pagehelper.PageHelper;
@@ -12,9 +13,7 @@ import com.platon.browser.dto.account.AccountDetail;
 import com.platon.browser.dto.account.AddressDetail;
 import com.platon.browser.dto.account.ContractDetail;
 import com.platon.browser.dto.block.BlockDetail;
-import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.search.SearchResult;
-import com.platon.browser.dto.transaction.PendingOrTransaction;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.req.account.AddressDetailReq;
@@ -33,10 +32,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+*/
 /**
  * 缓存服务
  * 提供首页节点信息、统计信息、区块信息、交易信息
- */
+ *//*
+
 @Service
 public class SearchServiceImpl implements SearchService {
 
@@ -50,8 +51,6 @@ public class SearchServiceImpl implements SearchService {
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
-    @Autowired
-    private PendingTxService pendingTxService;
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -103,7 +102,8 @@ public class SearchServiceImpl implements SearchService {
             AddressDetailReq adr = new AddressDetailReq();
             adr.setCid(chainId);
             adr.setAddress(keyword);
-            /**
+            */
+/**
              * 逻辑分析：
              * 1、对同一条链，钱包地址和合约地址是属性同一命名空间的，因此是唯一的，钱包地址和合约地址不可能相同；
              * 2、由于from字段的值必定是钱包地址，所以首先查看from里是否有查询关键字的值，有则证明是钱包地址；
@@ -111,10 +111,11 @@ public class SearchServiceImpl implements SearchService {
              *    如果to存在查询关键字的值，由于to既可存放钱包地址也可存放合约地址，所以需要根据receive_type字段的值来判定to存放的是钱包地址还是合约地址。
              *
              *    TO-DO 如果查询的地址只存在于pending表中，则这个地址会查不到
-             */
+             *//*
+
             // 查询交易表的from字段是否有查询关键字的值
             TransactionExample condition = new TransactionExample();
-            condition.createCriteria().andChainIdEqualTo(chainId)
+            condition.createCriteria()
                     .andFromEqualTo(keyword);
             long transactionCount = transactionMapper.countByExample(condition);
             if(transactionCount>0){
@@ -129,7 +130,7 @@ public class SearchServiceImpl implements SearchService {
             if(transactionCount==0){
                 // from里是否有查询关键字的值, 需要进一步查询to字段是否有查询关键字的值
                 condition = new TransactionExample();
-                condition.createCriteria().andChainIdEqualTo(chainId)
+                condition.createCriteria()
                         .andToEqualTo(keyword);
                 // 为提高查询性能，只取一条数据
                 PageHelper.startPage(1,1);
@@ -164,13 +165,15 @@ public class SearchServiceImpl implements SearchService {
 
         if (isTransactionOrBlock) {
             // 交易hash或者区块hash
-            /**
+            */
+/**
              * 逻辑分析
              * 1、优先查询已完成交易
              * 2、已完成交易查询无记录，则查询区块
              * 3、区块查询无记录，则查询待处理交易
              * 4、以上都无记录，则返回空结果
-             */
+             *//*
+
             TransactionDetailReq transactionDetailReq = new TransactionDetailReq();
             transactionDetailReq.setCid(chainId);
             transactionDetailReq.setTxHash(keyword);
@@ -183,7 +186,7 @@ public class SearchServiceImpl implements SearchService {
             }catch (BusinessException be){
                 logger.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...",keyword,keyword);
                 BlockExample blockExample = new BlockExample();
-                blockExample.createCriteria().andChainIdEqualTo(chainId).andHashEqualTo(keyword);
+                blockExample.createCriteria().andHashEqualTo(keyword);
                 List<Block> blockList = blockMapper.selectByExample(blockExample);
                 if(blockList.size()>0){
                     // 如果找到区块信息，则构造结果并返回
@@ -200,9 +203,6 @@ public class SearchServiceImpl implements SearchService {
                 pendingTxDetailReq.setCid(chainId);
                 pendingTxDetailReq.setTxHash(keyword);
                 try{
-                    PendingOrTransaction pendingOrTransaction = pendingTxService.getDetail(pendingTxDetailReq);
-                    result.setType(pendingOrTransaction.getType());
-                    result.setStruct(pendingOrTransaction.getPending());
                     logger.debug("if (isTransactionOrBlock) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
                     return result;
                 }catch (BusinessException be2){
@@ -217,10 +217,8 @@ public class SearchServiceImpl implements SearchService {
             req.setCid(chainId);
             req.setKeyword(keyword);
             req.setIsValid(1);
-            RespPage<NodeListItem> nodes = nodeService.getPage(req);
             if(nodes.getData().size()>0){
                 result.setType("node");
-                result.setStruct(nodes.getData().get(0));
             }
             logger.debug("if (isNodeIdOrName) Time Consuming: {}ms",System.currentTimeMillis()-beginTime);
             return result;
@@ -247,3 +245,4 @@ public class SearchServiceImpl implements SearchService {
         throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
     }
 }
+*/

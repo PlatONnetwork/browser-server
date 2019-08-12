@@ -1,36 +1,30 @@
+/*
 package com.platon.browser.controller;
 
 import com.platon.browser.config.ChainsConfig;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.IndexInfo;
-import com.platon.browser.dto.StatisticInfo;
-import com.platon.browser.dto.block.BlockPushItem;
-import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.dto.transaction.TransactionPushItem;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.service.NodeService;
 import com.platon.browser.service.StatisticService;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.service.cache.BlockCacheService;
 import com.platon.browser.service.cache.TransactionCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+*/
 /**
  * User: dongqile
  * Date: 2018/10/23
  * Time: 9:40
- */
+ *//*
+
 @RestController
 public class HomeController {
 
@@ -40,24 +34,12 @@ public class HomeController {
     @Autowired
     private ChainsConfig chainsConfig;
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
-
-    @Autowired
-    private BlockCacheService blockCacheService;
-    @Autowired
     private TransactionCacheService transactionCacheService;
-
-    @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
-    private TransactionMapper transactionMapper;
-
-    @Autowired
-    private NodeService nodeService;
     @Autowired
     private StatisticService statisticService;
 
-    /**
+    */
+/**
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName node/init
@@ -81,19 +63,20 @@ public class HomeController {
      *           }
      *      ]
      *   }
-     */
+     *//*
+
     @SubscribeMapping("/node/init?cid={chainId}")
     public BaseResp nodeInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<NodePushItem> nodeInfoList = nodeService.getPushCache(chainId);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),nodeInfoList);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),"");
         return resp;
     }
 
-    /**
+    */
+/**
      * @api {subscribe} /topic/node/new?cid=:chainId b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName node/new
@@ -104,11 +87,13 @@ public class HomeController {
      *   {}
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
-     */
+     *//*
 
 
 
-    /**
+
+    */
+/**
      * @api {subscribe} /app/index/init?cid=:chainId c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName index/init
@@ -134,7 +119,8 @@ public class HomeController {
      *      	    "ticketPrice": //票价 (单位: Energon)
      *           }
      *   }
-     */
+     *//*
+
     @SubscribeMapping("/index/init?cid={chainId}")
     public BaseResp indexInit(@DestinationVariable String chainId) {
         logger.debug("获取节点初始化列表数据！");
@@ -146,7 +132,8 @@ public class HomeController {
         return resp;
     }
 
-    /**
+    */
+/**
      * @api {subscribe} /topic/index/new?cid=:chainId d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName index/new
@@ -155,10 +142,12 @@ public class HomeController {
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
-     */
+     *//*
 
 
-    /**
+
+    */
+/**
      * @api {subscribe} /app/statistic/init?cid=:chainId e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName statistic/init
@@ -186,7 +175,8 @@ public class HomeController {
      *           }
      *
      *   }
-     */
+     *//*
+
     @SubscribeMapping("/statistic/init?cid={chainId}")
     public BaseResp statisticInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
@@ -198,7 +188,8 @@ public class HomeController {
         return resp;
     }
 
-    /**
+    */
+/**
      * @api {subscribe} /topic/statistic/new?cid=:chainId f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName statistic/new
@@ -207,10 +198,12 @@ public class HomeController {
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
-     */
+     *//*
 
 
-    /**
+
+    */
+/**
      * @api {subscribe} /app/block/init?cid=:chainId g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName block/init
@@ -235,19 +228,20 @@ public class HomeController {
      *           }
      *      ]
      *   }
-     */
+     *//*
+
     @SubscribeMapping("/block/init?cid={chainId}")
     public BaseResp blockInit(@DestinationVariable String chainId) {
         logger.debug("获取区块列表初始数据！");
         if(!chainsConfig.isValid(chainId)){
             return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.CHAIN_ID_ERROR,chainId),null);
         }
-        List<BlockPushItem> blocks = blockCacheService.getBlockPushCache(chainId,1,10);
-        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),blocks);
+        BaseResp resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),"");
         return resp;
     }
 
-    /**
+    */
+/**
      * @api {subscribe} /topic/block/new?cid=:chainId h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName block/new
@@ -256,10 +250,12 @@ public class HomeController {
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
-     */
+     *//*
 
 
-    /**
+
+    */
+/**
      * @api {subscribe} /app/transaction/init?cid=:chainId i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName transaction/init
@@ -298,7 +294,8 @@ public class HomeController {
      *           }
      *      ]
      *   }
-     */
+     *//*
+
     @SubscribeMapping("/transaction/init?cid={chainId}")
     public BaseResp transactionInit(@DestinationVariable String chainId) {
         logger.debug("获取出块时间及交易数据初始数据！");
@@ -310,7 +307,8 @@ public class HomeController {
         return resp;
     }
 
-    /**
+    */
+/**
      * @api {subscribe} /topic/transaction/new?cid=:chainId j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName transaction/new
@@ -319,6 +317,8 @@ public class HomeController {
      * @apiParam {String} cid 链ID.
      * @apiSuccessExample  Success-Response:
      *   HTTP/1.1 200 OK
-     */
+     *//*
+
 
 }
+*/

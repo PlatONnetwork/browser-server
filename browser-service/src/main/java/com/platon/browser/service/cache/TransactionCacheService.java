@@ -14,7 +14,7 @@ public interface TransactionCacheService {
     void clearTransactionCache(String chainId);
     void updateTransactionCache(String chainId, Set<Transaction> items);
     void resetTransactionCache(String chainId, boolean clearOld);
-    RespPage<TransactionListItem> getTransactionPage(String chainId, int pageNum, int pageSize);
+    RespPage <TransactionListItem> getTransactionPage( String chainId, int pageNum, int pageSize);
     List<TransactionPushItem> getTransactionPushCache(String chainId, int pageNum, int pageSize);
     void classifyByAddress(String chainId, List<TransactionWithBLOBs> transactions );
     //void retentionValidData(String address,String chainId);

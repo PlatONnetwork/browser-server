@@ -31,4 +31,63 @@ thread.num: 50
 # 区块批量采集大小
 batch.num: ${thread.num}
 
+#初始化链相关的配置
+platonconfig:
+  # 增发周期
+  add.issue.period:
+
+  #结算周期
+  setting.period:
+
+  #共识周期
+  consensus.period:
+
+  #增发率
+  add.issue.rate:
+
+  #出块激励比例
+  block.reward.rate:
+
+  #质押激励比例
+  staking.reward.rate:
+
+  #初始发行金额
+  init.issue.value:
+
+  #激励合约地址
+  reward.addr:
+
+  #质押合约地址
+  staking.addr:
+
+  #锁仓合约地址
+  restricting.addr:
+
+  #质押门槛
+  stake.threshold:
+
+  #委托门槛
+  minimum.threshold:
+
+  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
+  election.distance:
+
+  #投票数百分比下限
+  support.rate.threshold:
+
+  #双签低处罚金额，百分比
+  duplicate.sign.low.slashing:
+
+  #每个共识轮低异常的出块数
+  pack.amount.abnormal:
+
+  #每个共识轮高异常的出块数
+  pack.amount.high.abnormal:
+
+  #每个共识轮低异常出块数的处罚额度，百分比
+  pack.amount.low.slash.rate:
+
+  #每个共识轮高异常出块数的处罚额度，百分比
+  pack.amount.high.slash.rate:
+
 

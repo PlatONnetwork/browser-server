@@ -36,10 +36,9 @@ public class BlockDetail {
     // 是否最后一条
     private boolean last;
 
-    public void init(Block initData){
+    public void init( Block initData){
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
-        this.setTransaction(initData.getTransactionNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
         this.setBlockReward(EnergonUtil.format(v));

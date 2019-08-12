@@ -1,7 +1,7 @@
+/*
 package com.platon.browser.service;
 
 import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.dto.node.NodeListItem;
 import com.platon.browser.dto.search.SearchResult;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.req.search.SearchReq;
@@ -19,7 +19,9 @@ public class SearchServiceTest extends ServiceTestBase {
     @Autowired
     private SearchService searchService;
 
-    /*************节点****************/
+    */
+/*************节点****************//*
+
     @Test
     public void searchNode(){
         // 搜索节点
@@ -71,3 +73,4 @@ public class SearchServiceTest extends ServiceTestBase {
     }
 
 }
+*/

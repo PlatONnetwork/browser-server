@@ -1,11 +1,9 @@
+/*
 package com.platon.browser.service;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.node.NodeDetail;
-import com.platon.browser.dto.node.NodeListItem;
-import com.platon.browser.dto.node.NodePushItem;
 import com.platon.browser.req.node.NodeDetailReq;
 import com.platon.browser.req.node.NodePageReq;
 import com.platon.browser.util.DataTool;
@@ -22,7 +20,9 @@ import java.util.List;
 public class NodeServiceTest extends ServiceTestBase {
     private static final Logger logger = LoggerFactory.getLogger(NodeServiceTest.class);
 
-    /*************节点****************/
+    */
+/*************节点****************//*
+
     @Test
     public void getPage(){
         chainsConfig.getChainIds().forEach(chainId -> {
@@ -65,3 +65,4 @@ public class NodeServiceTest extends ServiceTestBase {
         System.out.println(blocks.size());
     }
 }
+*/

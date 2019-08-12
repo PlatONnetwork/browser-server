@@ -1,3 +1,4 @@
+/*
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
@@ -6,10 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NodeRanking;
-import com.platon.browser.dao.entity.NodeRankingExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeRankingMapper;
 import com.platon.browser.dto.NodeRespPage;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.StatisticsCache;
@@ -238,10 +236,12 @@ public class NodeServiceImpl implements NodeService {
         return map;
     }
 
-    /**
+    */
+/**
      * 根据请求参数查询节点列表
      * @param req
-     */
+     *//*
+
     private NodeRespPage getNodePage(NodePageReq req){
         NodeRankingExample condition = new NodeRankingExample();
         NodeRankingExample.Criteria criteria = condition.createCriteria().andChainIdEqualTo(req.getCid());
@@ -370,10 +370,12 @@ public class NodeServiceImpl implements NodeService {
         return returnData;
     }
 
-    /**
+    */
+/**
      * 更新本地进程缓存
      * @param chainId
-     */
+     *//*
+
     @Override
     public void updateLocalNodeCache(String chainId) {
         NodePageReq req = new NodePageReq();
@@ -385,3 +387,4 @@ public class NodeServiceImpl implements NodeService {
         LocalCacheTool.API_CHAINID_NODES_MAP.put(chainId,returnData);
     }
 }
+*/
