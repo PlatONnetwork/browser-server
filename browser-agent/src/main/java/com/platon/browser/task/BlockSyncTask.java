@@ -10,6 +10,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
+import com.platon.browser.exception.BusinessException;
 import lombok.Data;
 import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
@@ -107,7 +108,12 @@ public class BlockSyncTask {
                 blockChain.commitResult();
             });
 
-            batchSaveResult(blocks,bizData);
+            try {
+                // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
+                batchSaveResult(blocks,bizData);
+            }catch (BusinessException e){
+                break;
+            }
 
             if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber();
             TimeUnit.SECONDS.sleep(1);
@@ -225,19 +231,19 @@ public class BlockSyncTask {
     @Transactional
     public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
         // 串行批量入库
-
-        List<Block> blocks = new ArrayList<>();
-        List<TransactionWithBLOBs> transactions = new ArrayList<>();
-        basicData.forEach(block->{
-            blocks.add(block);
-            transactions.addAll(block.getTransactions());
-        });
-        // 批量入库区块
-        if (blocks.size()>0) blockMapper.batchInsert(blocks);
-        // 批量入库交易
-        if(transactions.size()>0) transactionMapper.batchInsert(transactions);
-
-
-
+        try{
+            List<Block> blocks = new ArrayList<>();
+            List<TransactionWithBLOBs> transactions = new ArrayList<>();
+            basicData.forEach(block->{
+                blocks.add(block);
+                transactions.addAll(block.getTransactions());
+            });
+            // 批量入库区块
+            if (blocks.size()>0) blockMapper.batchInsert(blocks);
+            // 批量入库交易
+            if(transactions.size()>0) transactionMapper.batchInsert(transactions);
+        }catch (Exception e){
+            throw new BusinessException("入库失败！原因："+e.getMessage());
+        }
     }
 }
