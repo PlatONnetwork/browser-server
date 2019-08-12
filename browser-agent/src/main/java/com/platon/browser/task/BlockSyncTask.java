@@ -110,11 +110,6 @@ public class BlockSyncTask {
             batchSaveResult(blocks,bizData);
 
             if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber()+1;
-
-            List<Long> actualNumbers = new ArrayList<>();
-            blocks.forEach(block->actualNumbers.add(block.getNumber()));
-            logger.info("shouldNumbers{}",blockNumbers);
-            logger.info("actualNumbers{}",actualNumbers);
             TimeUnit.SECONDS.sleep(1);
         }
     }
