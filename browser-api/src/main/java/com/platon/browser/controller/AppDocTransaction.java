@@ -10,7 +10,7 @@ public class AppDocTransaction {
      * @apiDescription
      * 1. 功能：交易列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:transactions<br/>
+     * - 查询redis结构：browser:transactions<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -27,8 +27,8 @@ public class AppDocTransaction {
      *   "data":[
      *      {
      *         "txHash":"0x234234",    //交易hash
-     *         "from":"0x667766",      //发送方地址
-     *         "to":"0x667766",        //接收方地址（操作地址）
+     *         "from":"0x667766",      //发送方地址（操作地址）
+     *         "to":"0x667766",        //接收方地址
      *         "value":"222",          //金额(单位:von)
      *         "actualTxCost":"22",    //交易费用(单位:von)
      *         "txType":""             //交易类型
@@ -183,7 +183,7 @@ public class AppDocTransaction {
      *          {
      *             "epoch":11,         //锁仓周期
      *             "amount":111,       //锁定金额
-     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch
+     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
      *          }
      *       ],
      *       "evidences":[             //举报的证据
@@ -208,6 +208,7 @@ public class AppDocTransaction {
      *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
      *       "proposalNewVersion":"",  //升级提案的版本
      *       "declareVersion":"",      //声明的版本 
+     *       "txReceiptStatus":"",     //交易状态
      *        --可选信息结束
      * }
      */	
