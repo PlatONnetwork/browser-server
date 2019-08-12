@@ -7,6 +7,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @Auther: Chendongming
@@ -20,10 +21,9 @@ public class BlockInfo extends Block {
      * 使用原生交易信息初始化交易信息
      * @param initData
      */
-
-
     public BlockInfo(PlatonBlock.Block initData){
         BeanUtils.copyProperties(initData,this);
+
         // 属性类型转换
         this.setNumber(initData.getNumber().longValue());
         this.setTimestamp(new Date(initData.getTimestamp().longValue()));
@@ -43,13 +43,30 @@ public class BlockInfo extends Block {
         // TODO:节点id
         this.setNodeId("0xflsjgsflsdf");
 
-        // 交易相关信息处理
-        initData.getTransactions().forEach(txResult->{
-            TransactionInfo ti = new TransactionInfo(txResult);
-            this.getTransactions().add(ti);
-        });
+        try{
+            // 抽取交易信息
+            initData.getTransactions().forEach(transactionResult -> {
+                TransactionInfo ti = new TransactionInfo(transactionResult);
+                transactionList.add(ti);
+            });
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
 
-        // 交易信息统计
+        class Stat {
+            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
+            BigDecimal txFee = BigDecimal.ZERO;
+        }
+        Stat stat = new Stat();
+        this.setStatDelegateQty(stat.delegateQty);
+        this.setStatProposalQty(stat.proposalQty);
+        this.setStatStakingQty(stat.stakingQty);
+        this.setStatTransferQty(stat.transferQty);
+        this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
+        this.setStatTxFee(stat.txFee.toString());
+
+        /*// 交易信息统计
         class Stat {
             int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
@@ -91,16 +108,10 @@ public class BlockInfo extends Block {
         this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
 
-        // 交易信息按交易索引从大到小排序
-        Collections.sort(this.getTransactions(),(c1,c2)->{
-            if(c1.getTransactionIndex()>c2.getTransactionIndex()) return 1;
-            if(c1.getTransactionIndex()<c2.getTransactionIndex()) return -1;
-            return 0;
-        });
-
+        */
     }
 
-    private List<TransactionInfo> transactions = new ArrayList<>();
+    private List<TransactionInfo> transactionList = new ArrayList<>();
 
 
     @Override

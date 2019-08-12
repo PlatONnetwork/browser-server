@@ -7,17 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -44,6 +39,7 @@ public class PlatonClient {
             web3jAddresses.forEach(address->{
                 Web3j web3j = Web3j.build(new HttpService(address));
                 allWeb3jList.add(web3j);
+                if(currentValidWeb3j==null) currentValidWeb3j=web3j;
             });
         }catch (Exception e){
             e.printStackTrace();

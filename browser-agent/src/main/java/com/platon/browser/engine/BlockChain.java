@@ -2,7 +2,10 @@ package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dto.BlockInfo;
+import com.platon.browser.task.BlockSyncTask;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,7 @@ import java.util.Map;
 @Component
 @Data
 public class BlockChain {
+    private static Logger logger = LoggerFactory.getLogger(BlockChain.class);
 
     private BlockChainResult execResult = new BlockChainResult();
     @Autowired
@@ -46,14 +50,13 @@ public class BlockChain {
      * @param block
      */
     public void execute(BlockInfo block){
+        curBlock=block;
         init();
         //新开线程去查询rpc共识列表
 
         //数据回填
 
-        // 根据区块信息
-
-        block.getTransactions().forEach(transactionInfo -> {
+        block.getTransactionList().forEach(transactionInfo -> {
             switch (transactionInfo.getTypeEnum()){
                 case CREATEPROPOSALTEXT:
                     proposalExecute.execute(transactionInfo,this);
@@ -69,6 +72,25 @@ public class BlockChain {
                     break;
             }
         });
+
+        // 根据区块号是否与周期整除来触发周期相关处理方法
+        if(block.getNumber()%chainConfig.getConsensusPeriod()==0){
+            // 进入新共识周期
+            logger.debug("进入新共识周期：Block Number({})",block.getNumber());
+            onNewConsEpoch();
+        }
+
+        if(block.getNumber()%chainConfig.getSettingPeriod()==0){
+            // 进入新结算周期
+            logger.debug("进入新结算周期：Block Number({})",block.getNumber());
+            onNewSettingEpoch();
+        }
+
+        if(block.getNumber()%chainConfig.getElectionDistance()==0){
+            // 进入选举
+            logger.debug("进入选举：Block Number({})",block.getNumber());
+            onElectionDistance();
+        }
     }
 
     /**

@@ -10,8 +10,9 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 web3j:
-  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
-  collect.batch-size: 500
+  addresses: http://192.168.9.221:6789
+#  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
+  collect.batch-size: 1000
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
@@ -19,12 +20,49 @@ logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: debug
-  platon: debug
-  platon.job: debug
-  platon.filter: debug
-  platon.service: debug
-  platon.thread: debug
-# 区块分析线程池大小
-thread.num: 500
-# 区块批量采集大小
-batch.num: ${thread.num}
+  platon.task: debug
+  platon.engine: debug
+
+
+
+#初始化链相关的配置
+platonconfig:
+  chain_id: 101
+  # 增发周期
+  add_issue_period: 20000
+  #结算周期
+  setting_period: 2500
+  #共识周期
+  consensus_period: 250
+  #增发率
+  add_issue_rate: 2.5
+  #出块激励比例
+  block_reward_rate: 2.5
+  #质押激励比例
+  staking_reward_rate: 2.5
+  #初始发行金额
+  init_issue_value: 200000000000000000000000000000000000
+  #激励合约地址
+  reward_addr:
+  #质押合约地址
+  staking_addr:
+  #锁仓合约地址
+  restricting_addr:
+  #质押门槛
+  stake_threshold:
+  #委托门槛
+  minimum_threshold:
+  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
+  election_distance: 230
+  #投票数百分比下限
+  support_rate_threshold:
+  #双签低处罚金额，百分比
+  duplicate_sign_low_slashing:
+  #每个共识轮低异常的出块数
+  pack_amount_abnormal:
+  #每个共识轮高异常的出块数
+  pack_amount_high_abnormal:
+  #每个共识轮低异常出块数的处罚额度，百分比
+  pack_amount_low_slash_rate:
+  #每个共识轮高异常出块数的处罚额度，百分比
+  pack_amount_high_slash_rate:

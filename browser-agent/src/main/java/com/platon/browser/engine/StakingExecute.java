@@ -3,14 +3,16 @@ package com.platon.browser.engine;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.TransactionInfo;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +23,12 @@ import java.util.Map;
 @Component
 public class StakingExecute {
 
-
+    @Autowired
+    private NodeMapper nodeMapper;
+    @Autowired
+    private DelegationMapper delegationMapper;
+    @Autowired
+    private StakingMapper stakingMapper;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String, Node> nodes = new HashMap<>();
@@ -34,6 +41,17 @@ public class StakingExecute {
     private void init(){
         // 初始化全量数据
 
+        // 节点汇总列表
+        List<Node> nodeList = nodeMapper.selectByExample(null);
+        nodeList.forEach(node ->nodes.put(node.getNodeId(),node));
+
+        // 质押列表,节点ID+质押区块号唯一确定一条记录
+        List<Staking> stakingList = stakingMapper.selectByExample(null);
+        stakingList.forEach(staking -> stakings.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
+
+        // 委托列表
+        List<Delegation> delegationList = delegationMapper.selectByExample(null);
+        delegationList.forEach(delegation -> delegations.put(delegation.getDelegateAddr(),delegation));
     }
 
     /**

@@ -23,10 +23,11 @@ public class TransactionInfo extends TransactionWithBLOBs {
      * @param initData
      */
     public TransactionInfo(PlatonBlock.TransactionResult initData){
-        BeanUtils.copyProperties(initData,this);
-        // 属性类型转换
-        typeEnum = TxTypeEnum.valueOf(this.getTxType());
-
+//        try {
+//            BeanUtils.copyProperties(initData,this);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
 
     }
 
