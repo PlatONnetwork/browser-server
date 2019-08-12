@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChain;
@@ -37,6 +38,8 @@ public class BlockSyncTask {
 
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private CustomBlockMapper customBlockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
 
@@ -85,6 +88,8 @@ public class BlockSyncTask {
     public void init(){
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
+        Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
+        if(maxBlockNumber!=null&&maxBlockNumber>0) commitBlockNumber = maxBlockNumber;
     }
 
     public void start() throws InterruptedException {
@@ -223,9 +228,13 @@ public class BlockSyncTask {
                 transactions.addAll(block.getTransactionList());
             });
             // 批量入库区块
-            if (blocks.size()>0) blockMapper.batchInsert(blocks);
+            if (blocks.size()>0) {
+                blockMapper.batchInsert(blocks);
+            }
             // 批量入库交易
-            //if(transactions.size()>0) transactionMapper.batchInsert(transactions);
+            if(transactions.size()>0) {
+                transactionMapper.batchInsert(transactions);
+            }
         }catch (Exception e){
             logger.debug("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());

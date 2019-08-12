@@ -60,6 +60,10 @@ public class TransactionInfo extends TransactionWithBLOBs {
 
             // TODO: 从交易回执中获取
             this.setTxReceiptStatus(ReceiveStatusEnum.SUCCESS.code);
+            // TODO:
+            this.setTxInfo("");
+            Long sequence = Long.valueOf(String.valueOf(this.getBlockNumber())+this.getTransactionIndex());
+            this.setSequence(sequence);
 
 
         }catch (Exception e){
