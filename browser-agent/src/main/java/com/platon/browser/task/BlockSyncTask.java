@@ -105,7 +105,7 @@ public class BlockSyncTask {
 
             // 调用BlockChain实例，分析质押、提案相关业务数据
             BlockChainResult bizData = new BlockChainResult();
-            /*ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
+            ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
             StakingExecuteResult serSummary = bizData.getStakingExecuteResult();
             blocks.forEach(block->{
                 blockChain.execute(block);
@@ -123,9 +123,9 @@ public class BlockSyncTask {
                 serSummary.getAddSlash().addAll(ser.getAddSlash());
 
 
-                // 清楚blockChain实例状态，防止影响下一次的循环
+                // 清除blockChain实例状态，防止影响下一次的循环
                 blockChain.commitResult();
-            });*/
+            });
 
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现

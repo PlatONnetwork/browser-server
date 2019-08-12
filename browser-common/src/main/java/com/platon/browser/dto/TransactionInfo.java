@@ -3,10 +3,15 @@ package com.platon.browser.dto;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.json.*;
+import com.platon.browser.enums.ReceiveStatusEnum;
+import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
+
+import java.math.BigDecimal;
 
 /**
  * @Auther: Chendongming
@@ -23,11 +28,43 @@ public class TransactionInfo extends TransactionWithBLOBs {
      * @param initData
      */
     public TransactionInfo(PlatonBlock.TransactionResult initData){
-//        try {
-//            BeanUtils.copyProperties(initData,this);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try {
+            Transaction transaction = (Transaction)initData;
+            BeanUtils.copyProperties(transaction,this);
+
+            // TODO: 需要从input数据中解析出来
+            this.setTypeEnum(TxTypeEnum.CREATEVALIDATOR);
+
+
+
+            this.setBlockNumber(transaction.getBlockNumber().longValue());
+            this.setTransactionIndex(transaction.getTransactionIndex().intValue());
+            // TODO: 在区块中设置
+//            this.setTimestamp();
+
+            this.setGasPrice(transaction.getGasPrice().toString());
+            // TODO：从交易回执中获取
+            this.setGasUsed("0");
+            this.setGasLimit(transaction.getGas().toString());
+            this.setValue(transaction.getValue().toString());
+            this.setNonce(transaction.getNonce().toString());
+            BigDecimal txCost = new BigDecimal(this.getGasUsed()).multiply(new BigDecimal(this.getGasPrice()));
+            this.setActualTxCost(txCost.toString());
+            this.setTxType(String.valueOf(typeEnum.code));
+
+            // TODO: 接收者类型
+            this.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
+            // TODO: 在区块中设置
+//            this.setCreateTime();
+//            this.setUpdateTime();
+
+            // TODO: 从交易回执中获取
+            this.setTxReceiptStatus(ReceiveStatusEnum.SUCCESS.code);
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

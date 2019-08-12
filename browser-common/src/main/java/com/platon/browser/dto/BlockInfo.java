@@ -47,6 +47,9 @@ public class BlockInfo extends Block {
             // 抽取交易信息
             initData.getTransactions().forEach(transactionResult -> {
                 TransactionInfo ti = new TransactionInfo(transactionResult);
+                ti.setTimestamp(this.getTimestamp());
+                ti.setCreateTime(date);
+                ti.setUpdateTime(date);
                 transactionList.add(ti);
             });
         }catch (Exception ex){
