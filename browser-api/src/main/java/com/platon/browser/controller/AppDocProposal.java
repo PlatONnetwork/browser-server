@@ -76,7 +76,10 @@ public class AppDocProposal {
      *       "yeas":11,                //同意的人
      *       "nays":11,                //反对的人
      *       "abstentions":11,         //弃权的人
-     *       "accuVerifiers":""        //总人数
+     *       "accuVerifiers":"",        //总人数
+     *       "activeBlockTime":"",      //生效块高预计时间  (activeBlock-curBlock)*period
+     *       "endVotingBlockTime":"",    //投票块高的时间   (endVotingBlock-curBlock)*period
+     *       "supportRateThreshold":""   //通过率
      *    }
      * }
      */	

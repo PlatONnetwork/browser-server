@@ -14,12 +14,13 @@ public class AppDocHome {
      * - type=block，通过返回的height值查询区块详情接口；<br/>
      * - type=transaction，通过返回的txHash值查询交易详情接口；<br/>
      * - type=address，通过返回的address值查询地址详情接口；<br/>
-     * - type=staking，通过返回的nodeAddr值查询验证人详情接口；<br/>
+     * - type=staking，通过返回的nodeId值查询验证人详情接口；<br/>
      * 3. 实现逻辑：<br/>
      * - 当入参为整数类型，查询mysql中block表
      * - 当入参为地址类型， 查询mysql中address表，如果没有在查询mysql中node表通过节点地址
      * - 当入参为hash类型，查询mysql中transaction表，如果没有在查询mysql中block表
-     * - 如果上面没有查询到，查询mysql中node表通过节点名称查询
+     * - 如果上面没有查询到，查询mysql中staking表中的stakingname通过节点名称查询
+     * - 前端根据返回的数据进行跳转
      * @apiParamExample {json} Request-Example:
      * {
      *    "parameter":""               //用户输入
@@ -35,7 +36,7 @@ public class AppDocHome {
      *          "number":17888,        //区块高度
      *          "txHash":"",           //交易hash
      *          "address":"",          //地址
-     *          "nodeAddr":""          //节点地址
+     *          "nodeId":""          //节点地址
      *       }
      *    }
      * }
@@ -50,7 +51,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新的50条出块趋势数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 查询redis结构：browser:chain[链ID]:blocks<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -74,7 +75,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送区块链基础数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:networkstat<br/>
+     * - 查询redis结构：browser:networkstat<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -83,7 +84,7 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
      *       "currentNumber":111,      //当前区块高度
-     *       "nodeAddr":"",            //出块节点地址
+     *       "nodeId":"",            //出块节点id
      *       "nodeName":"",            //出块节点名称
      *       "txQty":"",               //总的交易数
      *       "currentTps":111,         //当前的TPS
@@ -107,7 +108,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新8条区块信息<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]::blocks<br/>
+     * - 查询redis结构：browser:blocks<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -137,6 +138,8 @@ public class AppDocHome {
      * 1. 功能：推送最新8条验证人信息<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中node表<br/>
+     * - 根据状态和是否共识验证人标识来查询
+     * - 根据一级排序 质押金+委托总额来排序，二级排序根据版本号进行排序，三级排序根据质押索引倒序
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -145,7 +148,7 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
-     *          "nodeAddr":"",         //出块节点地址
+     *          "nodeId":"",         //出块节点地址
      *          "nodeName":"",         //出块节点名称
      *          "stakingIcon":"",      //验证人图片
      *          "ranking":333,         //节点排行

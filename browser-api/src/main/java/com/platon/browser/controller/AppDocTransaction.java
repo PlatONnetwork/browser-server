@@ -10,7 +10,7 @@ public class AppDocTransaction {
      * @apiDescription
      * 1. 功能：交易列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:transactions<br/>
+     * - 查询redis结构：browser:transactions<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -27,8 +27,8 @@ public class AppDocTransaction {
      *   "data":[
      *      {
      *         "txHash":"0x234234",    //交易hash
-     *         "from":"0x667766",      //发送方地址
-     *         "to":"0x667766",        //接收方地址（操作地址）
+     *         "from":"0x667766",      //发送方地址（操作地址）
+     *         "to":"0x667766",        //接收方地址
      *         "value":"222",          //金额(单位:von)
      *         "actualTxCost":"22",    //交易费用(单位:von)
      *         "txType":""             //交易类型
@@ -127,17 +127,17 @@ public class AppDocTransaction {
      * 1. 查询mysql中transaction表<br/>
      * - 如果txType = 0（转账）：转账信息从基本信息中取
      * - 如果txType = 1、2、5（合约创建执行）：合约信息从基本信息中取
-     * - 如果txType = 1000（创建验证人）： 创建验证人 = nodeAddr + nodeName + externalId + benefitAddr + programVersion + website + details + value
-     * - 如果txType = 1001（编辑验证人）：编辑验证人 = nodeAddr + nodeName + externalId + benefitAddr + programVersion + website + details
-     * - 如果txType = 1002（增加质押）：增加质押 = nodeAddr + nodeName + value
-     * - 如果txType = 1003（退出验证人）：退出验证 = nodeAddr + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
+     * - 如果txType = 1000（创建验证人）： 创建验证人 = nodeId + nodeName + externalId + benefitAddr + programVersion + website + details + value
+     * - 如果txType = 1001（编辑验证人）：编辑验证人 = nodeId + nodeName + externalId + benefitAddr + programVersion + website + details
+     * - 如果txType = 1002（增加质押）：增加质押 = nodeId + nodeName + value
+     * - 如果txType = 1003（退出验证人）：退出验证 = nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
      *   - 需要通过txHash关联un_staking表查询验证人信息
-     * - 如果txType = 1004（委托）：验证人 = nodeAddr + nodeName
-     * - 如果txType = 1005（委托赎回）：委托赎回 = nodeAddr + nodeName + applyAmount + redeemLocked + redeemStatus
+     * - 如果txType = 1004（委托）：验证人 = nodeId + nodeName
+     * - 如果txType = 1005（委托赎回）：委托赎回 = nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
      *   - 需要通过txHash 关联un_delegation表查询赎回的信息
-     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeAddr + nodeName + txType + githubID + proposalTopic + proposalHash
-     * - 如果txType = 2003（投票提案）：投票提案 = nodeAddr + nodeName + txType + githubID + proposalTopic + proposalHash + proposalOption
-     * - 如果txType = 2004（版本声明）：版本声明 = nodeAddr + nodeName + declareVersion
+     * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeId + nodeName + txType + githubID + proposalTopic + proposalHash
+     * - 如果txType = 2003（投票提案）：投票提案 = nodeId + nodeName + txType + githubID + proposalTopic + proposalHash + proposalOption
+     * - 如果txType = 2004（版本声明）：版本声明 = nodeId + nodeName + declareVersion
      * - 如果txType = 4000（创建锁仓）：创建锁仓 = RPAccount + value + RPPlan
      * 
      * @apiParamExample {json} Request-Example:
@@ -183,7 +183,7 @@ public class AppDocTransaction {
      *          {
      *             "epoch":11,         //锁仓周期
      *             "amount":111,       //锁定金额
-     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch
+     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
      *          }
      *       ]
      *       "nodeId":"",              //节点id
@@ -202,6 +202,7 @@ public class AppDocTransaction {
      *       "proposalHash":"",        //提案id
      *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
      *       "declareVersion":"",      //声明的版本 
+     *       "txReceiptStatus":"",     //交易状态
      *        --可选信息结束
      * }
      */	
