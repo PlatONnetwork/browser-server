@@ -53,7 +53,7 @@ public class BlockSyncTask {
     private PlatonClient client;
 
     // 已采集入库的最高块
-    private long commitBlockNumber=1;
+    private long commitBlockNumber=0;
 
     // 每一批次采集区块的数量
     @Value("${platon.web3j.collect.batch-size}")
@@ -73,7 +73,7 @@ public class BlockSyncTask {
         while (true){
             // 构造连续的待采区块号列表
             List<BigInteger> blockNumbers = new ArrayList<>();
-            for (long blockNumber=commitBlockNumber;blockNumber<commitBlockNumber+collectBatchSize;blockNumber++){
+            for (long blockNumber=commitBlockNumber+1;blockNumber<commitBlockNumber+collectBatchSize;blockNumber++){
                 blockNumbers.add(BigInteger.valueOf(blockNumber));
             }
 
@@ -109,7 +109,7 @@ public class BlockSyncTask {
 
             batchSaveResult(blocks,bizData);
 
-            if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber()+1;
+            if(blocks.size()>0) commitBlockNumber=blocks.get(blocks.size()-1).getNumber();
             TimeUnit.SECONDS.sleep(1);
         }
     }
