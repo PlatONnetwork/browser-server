@@ -1,10 +1,8 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.TransactionInfo;
-import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +10,6 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Auther: Chendongming

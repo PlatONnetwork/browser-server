@@ -2,13 +2,14 @@ package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dto.BlockInfo;
-import com.platon.browser.task.BlockSyncTask;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +56,12 @@ public class BlockChain {
         //新开线程去查询rpc共识列表
 
         //数据回填
+
+        // 根据区块号是否与周期整除来触发周期相关处理方法
+        // 计算共识周期轮数
+        curConsensusEpoch = BigDecimal.valueOf(block.getNumber()).divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod()),0, RoundingMode.CEILING).longValue();
+        // 计算结算周期轮数
+        curSettingEpoch = BigDecimal.valueOf(block.getNumber()).divide(BigDecimal.valueOf(chainConfig.getSettingPeriod()),0, RoundingMode.CEILING).longValue();
 
         block.getTransactionList().forEach(transactionInfo -> {
             switch (transactionInfo.getTypeEnum()){
