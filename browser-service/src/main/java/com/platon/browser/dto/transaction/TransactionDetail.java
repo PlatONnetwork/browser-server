@@ -3,7 +3,6 @@ package com.platon.browser.dto.transaction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.TxInfoResolver;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.utils.Convert;
@@ -56,6 +55,6 @@ public class TransactionDetail {
         this.setValue(EnergonUtil.format(v));
         this.setPriceInEnergon(EnergonUtil.format(v));
 
-        TxInfoResolver.resolve(txType,txInfo,value,this);
+        //TxInfoResolver.resolve(txType,txInfo,value,this);
     }
 }
