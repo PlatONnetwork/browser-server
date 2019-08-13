@@ -174,7 +174,7 @@ public class BlockChain {
     }
 
     /**
-     * 分析交易信息：
+     * 根据交易信息新增或更新相关记录：
      *
      */
     private void analyzeTransaction(){

@@ -23,8 +23,8 @@ import java.util.List;
  */
 public class CalculatePublicKey {
 
-    public static String getPublicKey(PlatonBlock platonBlock) throws Exception {
-        String publicKey = testBlock(platonBlock.getBlock()).toString(16);
+    public static String getPublicKey(PlatonBlock.Block block) throws Exception {
+        String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
         if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
         return publicKey;

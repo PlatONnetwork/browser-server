@@ -2,20 +2,12 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
-import com.platon.browser.req.newtransaction.TransactionDetailsReq;
-import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
-import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.transaction.TransactionDetailsResp;
-import com.platon.browser.res.transaction.TransactionListResp;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.req.transaction.TransactionPageReq;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -266,4 +258,5 @@ public interface AppDocTransaction {
 	@ApiOperation(value = "transaction/transactionDetailNavigate", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@RequestMapping(value = "transaction/transactionDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
     public BaseResp<TransactionListResp> transactionDetailNavigate(@ApiParam(value = "TransactionDetailNavigateReq req ", required = true)@Valid @RequestBody TransactionDetailNavigateReq req);
+	
 }

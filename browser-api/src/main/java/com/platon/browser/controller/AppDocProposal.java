@@ -60,6 +60,7 @@ public interface AppDocProposal {
 	@RequestMapping(value = "proposal/proposalList", produces = { "application/json" }, method = RequestMethod.POST)
 	public BaseResp<ProposalListResp> proposalList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
 	
+	
     /**
      * @api {post} /proposal/proposalDetails b.提案详情
      * @apiVersion 1.0.0

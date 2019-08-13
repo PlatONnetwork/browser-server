@@ -43,7 +43,7 @@ public class StakingInfo extends Staking {
 
     }
 
-    public void initWithIncreaseStaking(TransactionInfo<IncreaseStakingDto> initData){
+    public void initWithIncreaseStaking(TransactionInfo initData){
         BeanUtils.copyProperties(initData,this);
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址
@@ -58,7 +58,7 @@ public class StakingInfo extends Staking {
         this.setStatDelegateReduction("0");
         this.setStatDelegateQty(0);
         this.setStatVerifierTime(0);
-        this.setStakingName(initData.getTxJson().getNodeName());
+        this.setStakingName(initData.getTxJson(IncreaseStakingDto.class).getNodeName());
 
 
         // TODO:

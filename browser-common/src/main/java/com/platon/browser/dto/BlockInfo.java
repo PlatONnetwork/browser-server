@@ -22,7 +22,6 @@ public class BlockInfo extends Block {
      */
     public BlockInfo(PlatonBlock.Block initData){
         BeanUtils.copyProperties(initData,this);
-
         // 属性类型转换
         this.setNumber(initData.getNumber().longValue());
         this.setTimestamp(new Date(initData.getTimestamp().longValue()));

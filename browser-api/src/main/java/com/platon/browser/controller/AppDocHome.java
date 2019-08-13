@@ -126,6 +126,7 @@ public interface AppDocHome {
 	@SubscribeMapping(value = "topic/chain/statistic/new")
 	public BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
+	
     /**
      * @api {subscribe} /topic/block/list/new d.区块列表（websocket）
      * @apiVersion 1.0.0

@@ -114,6 +114,7 @@ public interface AppDocStaking {
 	@RequestMapping(value = "staking/aliveStakingList", produces = { "application/json" }, method = RequestMethod.POST)
     public RespPage<AliveStakingListResp> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
 	
+	
     /**
      * @api {post} /staking/historyStakingList c.历史验证人列表
      * @apiVersion 1.0.0
@@ -154,6 +155,7 @@ public interface AppDocStaking {
 	@ApiOperation(value = "staking/historyStakingList", nickname = "", notes = "", response = HistoryStakingListResp.class, tags = { "Staking" })
 	@RequestMapping(value = "staking/historyStakingList", produces = { "application/json" }, method = RequestMethod.POST)
     public RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
+	
 	
     /**
      * @api {subscribe} /topic/staking/change/new d.实时验证人变更（websocket）

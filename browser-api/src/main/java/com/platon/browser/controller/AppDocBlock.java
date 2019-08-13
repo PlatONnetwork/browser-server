@@ -111,6 +111,7 @@ public interface AppDocBlock {
     public void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
     		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date);
 	
+	
     /**
      * @api {post} /block/blockDetails d.区块详情
      * @apiVersion 1.0.0
@@ -156,6 +157,7 @@ public interface AppDocBlock {
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockDetails", produces = { "application/json" }, method = RequestMethod.POST)
     public BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq ", required = true)@Valid @RequestBody BlockDetailsReq req);
+	
 	
     /**
      * @api {post} /block/blockDetailNavigate e.区块详情前后跳转浏览

@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.dto.AnalysisResult;
 import com.platon.browser.dto.json.*;
@@ -16,6 +17,7 @@ import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,8 +38,9 @@ public class TxParamResolver {
     }
 
     public static Result analysis ( String input) {
+        Result result = new Result();
+        result.txTypeEnum = TxTypeEnum.TRANSFER;
         try {
-            AnalysisResult analysisResult = new AnalysisResult();
             if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
                 List <RlpType> rlpTypes = rlpList.getValues();
@@ -47,10 +50,8 @@ public class TxParamResolver {
                 RlpList rlpList2 = RlpDecoder.decode(rlpString.getBytes());
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
-                analysisResult.setTxCode(txCode.toString());
 
-                TxTypeEnum typeEnum = TxTypeEnum.valueOf(analysisResult.getTxCode());
-                Result result = new Result();
+                TxTypeEnum typeEnum = TxTypeEnum.getEnum(txCode.intValue());
                 result.txTypeEnum = typeEnum;
 
                 switch (typeEnum) {
@@ -245,21 +246,32 @@ public class TxParamResolver {
                         ReportValidatorDto reportValidatorDto = new ReportValidatorDto();
                         reportValidatorDto.setData(list);
                         result.param = reportValidatorDto;
-
                         break;
                     case CREATERESTRICTING: // 4000
                         //创建锁仓计划
 
-                        RlpString Strings = (RlpString) rlpList1.getValues().get(1);
-                        RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
-                        RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
-                        String stringValue = Numeric.toHexString(StringsListString.getBytes());
+                        //锁仓释放到账账户
+                        String account = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+
+                        // RestrictingPlan 类型的列表（数组）
+                        BigInteger[] arrayList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
+                        PlanDto planDto = new PlanDto();
+                        planDto.setEpoch(arrayList[0].intValue());
+                        planDto.setAmount(arrayList[1].toString());
+                        List<PlanDto> planDtoList = new ArrayList <>();
+                        planDtoList.add(planDto);
+                        CreatereStrictingDto createreStrictingDto = new CreatereStrictingDto();
+                        createreStrictingDto.setPlan(planDtoList);
+                        createreStrictingDto.setAccount(account);
+                        result.param = createreStrictingDto;
                         break;
+                    default:
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return result;
         }
-        return null;
+        return result;
     }
+
 }
