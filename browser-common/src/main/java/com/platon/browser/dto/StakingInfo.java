@@ -58,7 +58,7 @@ public class StakingInfo extends Staking {
         this.setStatDelegateReduction("0");
         this.setStatDelegateQty(0);
         this.setStatVerifierTime(0);
-        this.setStakingName(initData.getTxJson().getNodeName());
+        //this.setStakingName(initData.getTxJson().getNodeName());
 
 
         // TODO:

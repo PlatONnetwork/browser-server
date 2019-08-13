@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.dto.AnalysisResult;
 import com.platon.browser.dto.json.*;
@@ -245,15 +246,24 @@ public class TxParamResolver {
                         ReportValidatorDto reportValidatorDto = new ReportValidatorDto();
                         reportValidatorDto.setData(list);
                         result.param = reportValidatorDto;
-
                         break;
                     case CREATERESTRICTING: // 4000
                         //创建锁仓计划
 
-                        RlpString Strings = (RlpString) rlpList1.getValues().get(1);
-                        RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
+                        //锁仓释放到账账户
+                        String account = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
+                        // RestrictingPlan 类型的列表（数组）
+                        BigInteger[] arrayList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
+                        PlanDto planDto = new PlanDto();
+                        planDto.setEpoch(arrayList[0].intValue());
+                        planDto.setAmount(arrayList[1].toString());
+                        CreatereStrictingDto createreStrictingDto = new CreatereStrictingDto();
+                        createreStrictingDto.setPlan(planDto);
+                        createreStrictingDto.setAccount(account);
+                        result.param = createreStrictingDto;
                         break;
+                    default:
                 }
             }
         } catch (Exception e) {
@@ -261,4 +271,5 @@ public class TxParamResolver {
         }
         return null;
     }
+
 }
