@@ -293,7 +293,7 @@ public class BlockSyncTask {
             PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
             PlatonGetCode platonGetCode = client.getWeb3j().platonGetCode(tx.getTo(), DefaultBlockParameterName.LATEST).send();
-
+            tx.updateTransactionInfo(receipts.get(),platonGetCode.getCode());
         }catch (IOException e){
 
         }
