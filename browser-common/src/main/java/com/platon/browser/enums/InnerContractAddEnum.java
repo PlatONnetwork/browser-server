@@ -1,5 +1,9 @@
 package com.platon.browser.enums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * \*
  * \* User: dongqile
@@ -34,5 +38,11 @@ public enum InnerContractAddEnum {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static  List <String> innerContractList = new ArrayList <>();
+
+    static {
+        Arrays.asList(InnerContractAddEnum.values()).forEach(innerContractAddEnum-> innerContractList.add(innerContractAddEnum.address));
     }
 }

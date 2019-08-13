@@ -37,6 +37,7 @@ public class TransactionInfo extends TransactionWithBLOBs {
             this.setGasPrice(transaction.getGasPrice().toString());
             this.setGasLimit(transaction.getGas().toString());
             this.setValue(transaction.getValue().toString());
+
             this.setNonce(transaction.getNonce().toString());
             Long sequence = Long.valueOf(String.valueOf(this.getBlockNumber()) + this.getTransactionIndex());
             this.setSequence(sequence);
@@ -46,24 +47,10 @@ public class TransactionInfo extends TransactionWithBLOBs {
 
     }
 
-    public void updateTransactionInfo ( TransactionReceipt receipt, String code ) {
+    public void updateTransactionInfo ( TransactionReceipt receipt) {
         this.setGasUsed(receipt.getGasUsed().toString());
         this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
         this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
-        //TODO:code判断,
-        // 1.首先先判断to的地址是否等于内置合约地址以及code是否不为空
-        // a.满足以上条件，则to的类型为合约
-        // b.不满足以上条件说明to的地址为外部钱包地址，则为账户
-        if (this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
-                "0x" != code) {
-            this.setReceiveType("contract");
-        } else
-            this.setReceiveType("account");
     }
 
     /**

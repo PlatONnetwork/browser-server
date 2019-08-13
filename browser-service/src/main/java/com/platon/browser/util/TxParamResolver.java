@@ -39,7 +39,7 @@ public class TxParamResolver {
 
     public static Result analysis ( String input) {
         Result result = new Result();
-        result.txTypeEnum = TxTypeEnum.TRANSFER;
+        result.txTypeEnum = TxTypeEnum.OTHERS;
         try {
             if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
@@ -265,10 +265,10 @@ public class TxParamResolver {
                         createreStrictingDto.setAccount(account);
                         result.param = createreStrictingDto;
                         break;
-                    default:
                 }
             }
         } catch (Exception e) {
+            result.txTypeEnum = TxTypeEnum.OTHERS;
             return result;
         }
         return result;
