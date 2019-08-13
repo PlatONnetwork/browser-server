@@ -1,5 +1,7 @@
 package com.platon.browser.task;
 
+import com.alibaba.druid.support.spring.stat.annotation.Stat;
+import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
@@ -8,11 +10,14 @@ import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.dto.TransactionInfo;
+import com.platon.browser.dto.json.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.util.Resolver;
+import com.platon.browser.util.TxParamResolver;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +32,10 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetCode;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.utils.Numeric;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -227,20 +236,29 @@ public class BlockSyncTask {
         // 对需要复杂分析的区块或交易信息，开启并行处理
         blocks.forEach(b -> {
             List<TransactionInfo> txList = b.getTransactionList();
-            txList.forEach(tx ->{
+            CountDownLatch latch = new CountDownLatch(txList.size());
+            txList.forEach(tx ->
                 TX_THREAD_POOL.submit(() -> {
-                    updateTransactionInfo(tx);
-                });
-            });
+                    try {
+                        updateTransactionInfo(tx);
+                    }finally {
+                        latch.countDown();
+                    }
+                })
+            );
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         });
 
 
-        // 交易信息统计
+        // 汇总统计信息
         class Stat {
             int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
         }
-
         blocks.forEach(block->{
             Stat stat = new Stat();
             block.getTransactionList().forEach(ti->{
@@ -279,10 +297,6 @@ public class BlockSyncTask {
             block.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
             block.setStatTxFee(stat.txFee.toString());
         });
-
-
-
-
     }
 
     /**
@@ -294,6 +308,66 @@ public class BlockSyncTask {
             Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
             PlatonGetCode platonGetCode = client.getWeb3j().platonGetCode(tx.getTo(), DefaultBlockParameterName.LATEST).send();
             tx.updateTransactionInfo(receipts.get(),platonGetCode.getCode());
+
+            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
+            tx.setTypeEnum(txParams.getTxTypeEnum());
+
+            switch (txParams.getTxTypeEnum()){
+                case CREATEVALIDATOR: // 1000
+                    // 发起质押
+                    //CreateValidatorDto cvd = tx.getTxJson(CreateValidatorDto.class);
+                    break;
+                case EDITVALIDATOR: // 1001
+                    // 修改质押信息
+
+                    break;
+                case INCREASESTAKING: // 1002
+                    // 增持质押
+
+                    break;
+                case EXITVALIDATOR: // 1003
+                    // 撤销质押
+
+                    break;
+                case DELEGATE: // 1004
+                    // 发起委托
+
+                    break;
+                case UNDELEGATE: // 1005
+                    // 减持/撤销委托
+
+                    break;
+
+                case CREATEPROPOSALTEXT: // 2000
+                    // 提交文本提案
+
+                    break;
+                case CREATEPROPOSALUPGRADE: // 2001
+                    // 提交升级提案
+
+                    break;
+                case CREATEPROPOSALPARAMETER: // 2002
+                    // 提交参数提案
+
+                    break;
+                case VOTINGPROPOSAL: // 2003
+                    // 给提案投票
+
+                    break;
+                case DECLAREVERSION: // 2004
+                    // 版本声明
+
+                    break;
+                case REPORTVALIDATOR: // 3000
+                    // 举报双签
+
+                    break;
+                case CREATERESTRICTING: // 4000
+                    //创建锁仓计划
+
+                    break;
+            }
+
         }catch (IOException e){
 
         }

@@ -73,7 +73,7 @@ public class TransactionInfo<T> extends TransactionWithBLOBs {
      *
      * @return
      */
-    public T getTxJson () {
+    public T getTxJson (Class<T> clazz) {
 
         switch (typeEnum) {
             case CREATEVALIDATOR:
