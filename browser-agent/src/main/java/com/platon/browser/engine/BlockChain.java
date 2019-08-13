@@ -1,17 +1,25 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.BlockInfo;
+import com.platon.browser.dto.StakingInfo;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.BaseResponse;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -30,20 +38,38 @@ public class BlockChain {
     private StakingExecute stakingExecute;
     @Autowired
     private ProposalExecute proposalExecute;
+
+    @Autowired
+    private NodeMapper nodeMapper;
+    @Autowired
+    private CustomStakingMapper customStakingMapper;
+
+    @Autowired
+    private PlatonClient client;
+
     private long curSettingEpoch;
     private long curConsensusEpoch;
     private BlockInfo curBlock;
-    // 当前结算周期验证人
-    private Map<String, Node> curVerifier = new HashMap<>();
+
     // 上轮结算周期验证人
-    private Map<String, Node> preVerifier = new HashMap<>();
-    // 当前共识周期验证人
-    private Map<String, Node> curValidator = new HashMap<>();
+    private Map<String, Staking> preVerifier = new HashMap<>();
+    // 当前结算周期验证人
+    private Map<String, Staking> curVerifier = new HashMap<>();
     // 上轮共识周期验证人
-    private Map<String, Node> preValidator = new HashMap<>();
+    private Map<String, Staking> preValidator = new HashMap<>();
+    // 当前共识周期验证人
+    private Map<String, Staking> curValidator = new HashMap<>();
 
 
+    @PostConstruct
     private void init(){
+        /***把当前库中的验证人列表加载到内存中**/
+        // 初始化当前结算周期验证人列表
+        List<Staking> verifiers = customStakingMapper.selectVerifiers();
+        verifiers.forEach(verifier -> curVerifier.put(verifier.getNodeId()+verifier.getStakingBlockNum(),verifier));
+        // 初始化当前共识周期验证人列表
+        List<Staking> validators = customStakingMapper.selectValidators();
+        validators.forEach(validator -> curValidator.put(validator.getNodeId(),validator));
     }
 
     /**
@@ -52,55 +78,179 @@ public class BlockChain {
      */
     public void execute(BlockInfo block){
         curBlock=block;
-        init();
         //新开线程去查询rpc共识列表
 
         //数据回填
+        // 推算并更新共识周期和结算周期
+        updateEpoch();
+        // 更新共识周期验证人和结算周期验证人列表
+        updateNodes();
+        // 分析交易信息
+        analyzeTransaction();
+    }
 
+    /**
+     * 根据区块号推算并更新共识周期和结算周期轮数
+     */
+    private void updateEpoch(){
         // 根据区块号是否与周期整除来触发周期相关处理方法
         // 计算共识周期轮数
-        curConsensusEpoch = BigDecimal.valueOf(block.getNumber()).divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod()),0, RoundingMode.CEILING).longValue();
+        curConsensusEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod()),0, RoundingMode.CEILING).longValue();
         // 计算结算周期轮数
-        curSettingEpoch = BigDecimal.valueOf(block.getNumber()).divide(BigDecimal.valueOf(chainConfig.getSettingPeriod()),0, RoundingMode.CEILING).longValue();
+        curSettingEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getSettingPeriod()),0, RoundingMode.CEILING).longValue();
+    }
 
-        block.getTransactionList().forEach(transactionInfo -> {
+    /**
+     * 更新共识周期验证人和结算周期验证人列表
+     * // 假设当前链上最高区块号为750
+     *   1         250        500        750
+     *   |----------|----------|----------|
+     *      A B C      A C D       B C D
+     *   共识周期的临界块号分别是：1,250,500,750
+     *   使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
+     *   如果当前区块号为753，由于未达到
+     */
+    private List<Staking> convertToStaking(BaseResponse<List<org.web3j.platon.bean.Node>> response){
+        List<Staking> stakingList = new ArrayList<>();
+        if(response.isStatusOk()){
+            List<org.web3j.platon.bean.Node> validators = response.data;
+            Date date = new Date();
+            validators.forEach(validator->{
+                StakingInfo staking = new StakingInfo(validator);
+                staking.setCreateTime(date);
+                staking.setUpdateTime(date);
+                staking.setIsConsensus(0);
+                if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0) staking.setIsConsensus(1);
+                staking.setIsSetting(0);
+                if(curBlock.getNumber()%chainConfig.getSettingPeriod()==0) staking.setIsSetting(1);
+
+                stakingList.add(staking);
+            });
+            logger.debug("validators: {}",validators);
+        }
+        return stakingList;
+    }
+    private void updateNodes(){
+        if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
+            // 进入新共识周期
+            // 把curValidator引用赋给preValidator
+            preValidator.clear();
+            preValidator.putAll(curValidator);
+            // 清除当前共识周期验证人
+            curVerifier.clear();
+        }else{
+            if(curValidator.size()==0){
+                // 直接查询实时共识验证人列表作为curValidator
+                try {
+                    BaseResponse<List<org.web3j.platon.bean.Node>> response = client.getNodeContract().getValidatorList().send();
+                    convertToStaking(response).forEach(staking -> curValidator.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
+                    logger.debug("{}",response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if(curBlock.getNumber()%chainConfig.getSettingPeriod()==0){
+            // 进入新结算周期
+            // 把curVerifier引用赋给preVerifier
+            preVerifier.clear();
+            preVerifier.putAll(curVerifier);
+            // 清除当前结算周期验证人
+            curVerifier.clear();
+        }else{
+            if(curVerifier.size()==0){
+                // 直接查询实时共识验证人列表作为curVerifier
+                try {
+                    BaseResponse<List<org.web3j.platon.bean.Node>> response = client.getNodeContract().getVerifierList().send();
+                    convertToStaking(response).forEach(staking -> curVerifier.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
+                    logger.debug("{}",response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 分析交易信息：
+     *
+     */
+    private void analyzeTransaction(){
+        curBlock.getTransactionList().forEach(transactionInfo -> {
+            // 调用交易分析引擎分析交易，以补充相关数据
             switch (transactionInfo.getTypeEnum()){
-                case CREATEPROPOSALTEXT:
-                    proposalExecute.execute(transactionInfo,this);
-                    ProposalExecuteResult result = proposalExecute.exportResult();
-                    execResult.getProposalExecuteResult().getAddVotes().addAll(result.getAddVotes());
-                    execResult.getProposalExecuteResult().getAddProposals().addAll(result.getAddProposals());
-                    execResult.getProposalExecuteResult().getUpdateProposals().addAll(result.getUpdateProposals());
-                    break;
-                case INCREASESTAKING:
+                case CREATEVALIDATOR: // 创建验证人
+                case EDITVALIDATOR: // 编辑验证人
+                case INCREASESTAKING: // 增持质押
+                case EXITVALIDATOR: // 撤销质押
+                case UNDELEGATE: // 撤销委托
+                case REPORTVALIDATOR: // 举报多签验证人
                     stakingExecute.execute(transactionInfo,this);
-                    StakingExecuteResult result1 = stakingExecute.exportResult();
-
+                    StakingExecuteResult ser = stakingExecute.exportResult();
+                    StakingExecuteResult serSummary = execResult.getStakingExecuteResult();
+                    // 汇总添加【节点】记录
+                    serSummary.getAddNodes().addAll(ser.getAddNodes());
+                    // 汇总更新【节点】记录
+                    serSummary.getUpdateNodes().addAll(ser.getUpdateNodes());
+                    // 汇总添加【惩罚】记录
+                    serSummary.getAddSlash().addAll(ser.getAddSlash());
+                    // 汇总添加【节点操作】记录
+                    serSummary.getAddNodeOpts().addAll(ser.getAddNodeOpts());
+                    // 汇总添加【委托】记录
+                    serSummary.getAddDelegations().addAll(ser.getAddDelegations());
+                    // 汇总更新【委托】记录
+                    serSummary.getUpdateDelegations().addAll(ser.getUpdateDelegations());
+                    // 汇总添加【撤销委托】记录
+                    serSummary.getAddUnDelegations().addAll(ser.getAddUnDelegations());
+                    // 汇总更新【撤销委托】记录
+                    serSummary.getUpdateUnDelegations().addAll(ser.getUpdateUnDelegations());
+                    // 汇总添加【质押】记录
+                    serSummary.getAddStakings().addAll(ser.getAddStakings());
+                    // 汇总更新【质押】记录
+                    serSummary.getUpdateStakings().addAll(ser.getUpdateStakings());
+                    break;
+                case CREATEPROPOSALTEXT: // 创建文本提案
+                case CREATEPROPOSALUPGRADE: // 创建升级提案
+                case CREATEPROPOSALPARAMETER: // 创建参数提案
+                case VOTINGPROPOSAL: // 给提案投票
+                    proposalExecute.execute(transactionInfo,this);
+                    ProposalExecuteResult per = proposalExecute.exportResult();
+                    ProposalExecuteResult perSummary = execResult.getProposalExecuteResult();
+                    // 汇总添加【提案】记录
+                    perSummary.getAddProposals().addAll(per.getAddProposals());
+                    // 汇总更新【提案】记录
+                    perSummary.getUpdateProposals().addAll(per.getUpdateProposals());
+                    // 汇总添加【提案投票】记录
+                    perSummary.getAddVotes().addAll(per.getAddVotes());
                     break;
             }
         });
 
-        // 根据区块号是否与周期整除来触发周期相关处理方法
-        if(block.getNumber()%chainConfig.getConsensusPeriod()==0){
+
+        // 根据区块号是否整除周期来触发周期相关处理方法
+        Long blockNumber = curBlock.getNumber();
+        if(blockNumber%chainConfig.getConsensusPeriod()==0){
             // 进入新共识周期
-            logger.debug("进入新共识周期：Block Number({})",block.getNumber());
+            logger.debug("进入新共识周期：Block Number({})",blockNumber);
             onNewConsEpoch();
         }
 
-        if(block.getNumber()%chainConfig.getSettingPeriod()==0){
+        if(blockNumber%chainConfig.getSettingPeriod()==0){
             // 进入新结算周期
-            logger.debug("进入新结算周期：Block Number({})",block.getNumber());
-
+            logger.debug("进入新结算周期：Block Number({})",blockNumber);
 
             onNewSettingEpoch();
         }
 
-        if(block.getNumber()%chainConfig.getElectionDistance()==0){
-            // 进入选举
-            logger.debug("进入选举：Block Number({})",block.getNumber());
+        if(blockNumber%chainConfig.getElectionDistance()==0){
+            // 开始验证人选举
+            logger.debug("开始验证人选举：Block Number({})",blockNumber);
             onElectionDistance();
         }
     }
+
+
 
     /**
      * 导出需要入库的数据

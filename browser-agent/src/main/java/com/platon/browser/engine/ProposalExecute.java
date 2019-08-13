@@ -1,5 +1,6 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.TransactionInfo;
@@ -23,6 +24,9 @@ public class ProposalExecute {
 
     @Autowired
     private ProposalMapper proposalMapper;
+
+    @Autowired
+    private PlatonClient client;
 
     private ProposalExecuteResult executeResult = new ProposalExecuteResult();
 

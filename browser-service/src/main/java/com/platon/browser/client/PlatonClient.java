@@ -116,7 +116,7 @@ public class PlatonClient {
                     }
                 }
                 if(originWeb3j==currentValidWeb3j){
-                    logger.info("当前所有候选Web3j实例均无效！");
+                    logger.info("当前所有候选Web3j实例均无法连通！");
                 }
             }
         }finally {

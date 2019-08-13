@@ -7,7 +7,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @Auther: Chendongming
@@ -68,6 +67,13 @@ public class BlockInfo extends Block {
         this.setStatTransferQty(stat.transferQty);
         this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
+
+        // 确保区块内的交易顺序
+        Collections.sort(transactionList,(c1,c2)->{
+            if(c1.getTransactionIndex()>c2.getTransactionIndex())return 1;
+            if(c1.getTransactionIndex()<c2.getTransactionIndex())return -1;
+            return 0;
+        });
     }
 
     private List<TransactionInfo> transactionList = new ArrayList<>();

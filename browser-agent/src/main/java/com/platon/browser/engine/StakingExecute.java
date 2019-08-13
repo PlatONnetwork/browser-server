@@ -1,5 +1,6 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.Staking;
@@ -30,10 +31,13 @@ public class StakingExecute {
     @Autowired
     private StakingMapper stakingMapper;
 
+    @Autowired
+    private PlatonClient client;
+
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, Node> nodes = new HashMap<>();
-    private Map<String, Delegation> delegations = new HashMap<>();
-    private Map<String, Staking> stakings = new HashMap<>();
+    private Map<String, Node> nodes = new HashMap<>(); // 节点统计表
+    private Map<String, Delegation> delegations = new HashMap<>(); // 委托表
+    private Map<String, Staking> stakings = new HashMap<>(); // 验证人列表
 
     private StakingExecuteResult executeResult= new StakingExecuteResult();
 
@@ -56,32 +60,32 @@ public class StakingExecute {
 
     /**
      * 执行交易
-     * @param trans
+     * @param tx
      * @param bc
      */
-    public void execute(TransactionInfo trans, BlockChain bc){
-        switch (trans.getTypeEnum()){
+    public void execute(TransactionInfo tx, BlockChain bc){
+        switch (tx.getTypeEnum()){
             case CREATEVALIDATOR:
-                execute1000(trans);
+                execute1000(tx,bc);
                 break;
             case EDITVALIDATOR:
-                execute1001(trans);
+                execute1001(tx,bc);
                 break;
             case INCREASESTAKING:
-                execute1002(trans);
+                execute1002(tx,bc);
                 break;
             case EXITVALIDATOR:
-                execute1003(trans);
+                execute1003(tx,bc);
                 break;
             case UNDELEGATE:
-                execute1005(trans);
+                execute1005(tx,bc);
                 break;
             case REPORTVALIDATOR:
-                execute3000(trans);
+                execute3000(tx,bc);
                 break;
         }
 
-        updateTxInfo(trans,bc);
+        updateTxInfo(tx,bc);
     }
 
     public StakingExecuteResult exportResult(){
@@ -114,25 +118,31 @@ public class StakingExecute {
 
     }
 
-    private void updateTxInfo(TransactionInfo trans,BlockChain bc){
+    private void updateTxInfo(TransactionInfo tx,BlockChain bc){
     }
 
-    private void execute1000(TransactionInfo trans){
+    //发起质押(创建验证人)
+    private void execute1000(TransactionInfo tx,BlockChain bc){
 
     }
-    private void execute1001(TransactionInfo trans){
+    //修改质押信息(编辑验证人)
+    private void execute1001(TransactionInfo tx,BlockChain bc){
 
     }
-    private void execute1002(TransactionInfo trans){
+    //增持质押(增加自有质押)
+    private void execute1002(TransactionInfo tx,BlockChain bc){
 
     }
-    private void execute1003(TransactionInfo trans){
+    //撤销质押(退出验证人)
+    private void execute1003(TransactionInfo tx,BlockChain bc){
 
     }
-    private void execute1005(TransactionInfo trans){
+    //减持/撤销委托(赎回委托)
+    private void execute1005(TransactionInfo tx,BlockChain bc){
 
     }
-    private void execute3000(TransactionInfo trans){
+    //举报多签(举报验证人)
+    private void execute3000(TransactionInfo tx,BlockChain bc){
 
     }
 }
