@@ -17,6 +17,7 @@ import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -258,8 +259,10 @@ public class TxParamResolver {
                         PlanDto planDto = new PlanDto();
                         planDto.setEpoch(arrayList[0].intValue());
                         planDto.setAmount(arrayList[1].toString());
+                        List<PlanDto> planDtoList = new ArrayList <>();
+                        planDtoList.add(planDto);
                         CreatereStrictingDto createreStrictingDto = new CreatereStrictingDto();
-                        createreStrictingDto.setPlan(planDto);
+                        createreStrictingDto.setPlan(planDtoList);
                         createreStrictingDto.setAccount(account);
                         result.param = createreStrictingDto;
                         break;

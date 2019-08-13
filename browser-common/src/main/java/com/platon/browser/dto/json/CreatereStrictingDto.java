@@ -20,5 +20,5 @@ public class CreatereStrictingDto {
     /**
      * 锁仓具体计划
      */
-    private PlanDto plan;
+    private List<PlanDto> plan;
 }
