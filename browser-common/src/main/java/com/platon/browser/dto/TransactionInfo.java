@@ -64,8 +64,6 @@ public class TransactionInfo extends TransactionWithBLOBs {
             this.setReceiveType("contract");
         } else
             this.setReceiveType("account");
-        //todo:txinfo
-        //todo:txType
     }
 
     /**

@@ -19,6 +19,7 @@ import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.util.Resolver;
 import com.platon.browser.util.TxParamResolver;
+import com.platon.browser.utils.CalculatePublicKey;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,7 +183,10 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
+
                             BlockInfo block = new BlockInfo(initData);
+                            String publicKey = CalculatePublicKey.getPublicKey(initData);
+                            block.setNodeId(publicKey);
                             try{
                                 result.concurrentBlockMap.put(blockNumber.longValue(),block);
                             }catch (Exception ex){
@@ -314,8 +318,8 @@ public class BlockSyncTask {
 
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
+            tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
-            if(txParams.getParam()!=null) tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
         }catch (IOException e){
 
         }
@@ -340,6 +344,8 @@ public class BlockSyncTask {
             if(transactions.size()>0) {
                 transactionMapper.batchInsert(transactions);
             }
+            //批量入库相关对象
+            bizData.getProposalExecuteResult().getAddVotes();
         }catch (Exception e){
             logger.debug("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());
