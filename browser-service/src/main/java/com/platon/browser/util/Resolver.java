@@ -1,11 +1,10 @@
 package com.platon.browser.util;
 
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
+import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -29,5 +28,20 @@ public  class Resolver {
         String stringValue = Numeric.toHexString(StringsListString.getBytes());
         return stringValue;
     }
+/*
+
+    public static String ObjectResolver(RlpString rlpString ){
+        List <RlpType> rlpTypeList = ((RlpList) rlps2.getValues().get(0)).getValues();
+
+        for (RlpType rlpType1 : rlpTypeList) {
+            RlpList rlpList1 = (RlpList) rlpType1;
+            RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
+            RlpString rlpString1 = (RlpString) rlpList1.getValues().get(1);
+            byte[] bytes = RlpEncoder.encode(rlpString);
+            byte[] bytes1 = RlpEncoder.encode(rlpString1);
+            System.out.println(new BigInteger(1, bytes) + ":" + new BigInteger(1, bytes1));
+        }
+    }
+*/
 
 }

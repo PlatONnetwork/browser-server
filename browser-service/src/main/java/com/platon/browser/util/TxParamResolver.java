@@ -252,8 +252,7 @@ public class TxParamResolver {
 
                         RlpString Strings = (RlpString) rlpList1.getValues().get(1);
                         RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
-                        RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
-                        String stringValue = Numeric.toHexString(StringsListString.getBytes());
+
                         break;
                 }
             }
