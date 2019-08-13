@@ -16,6 +16,8 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
+import com.platon.browser.enums.InnerContractAddEnum;
+import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.util.Resolver;
 import com.platon.browser.util.TxParamResolver;
@@ -183,10 +185,13 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-
                             BlockInfo block = new BlockInfo(initData);
+                            block.setNodeId("");
                             String publicKey = CalculatePublicKey.getPublicKey(initData);
-                            block.setNodeId(publicKey);
+                            if(publicKey!=null){
+                                if(!publicKey.startsWith("0x")) block.setNodeId("0x"+publicKey);
+                                else block.setNodeId(publicKey);
+                            }
                             try{
                                 result.concurrentBlockMap.put(blockNumber.longValue(),block);
                             }catch (Exception ex){
@@ -313,13 +318,14 @@ public class BlockSyncTask {
         try {
             PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
-            PlatonGetCode platonGetCode = client.getWeb3j().platonGetCode(tx.getTo(), DefaultBlockParameterName.LATEST).send();
-            tx.updateTransactionInfo(receipts.get(),platonGetCode.getCode());
-
+            tx.updateTransactionInfo(receipts.get());
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+            if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
+                tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
+            }
         }catch (IOException e){
 
         }
