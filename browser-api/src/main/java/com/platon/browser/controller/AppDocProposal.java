@@ -1,5 +1,19 @@
 package com.platon.browser.controller;
 
+import javax.validation.Valid;
+
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.platon.browser.req.PageReq;
+import com.platon.browser.req.proposal.ProposalDetailRequest;
+import com.platon.browser.req.proposal.VoteListRequest;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.proposal.ProposalDetailsResp;
+import com.platon.browser.res.proposal.ProposalListResp;
+import com.platon.browser.res.proposal.VoteListResp;
+
 public interface AppDocProposal {
 	
     /**
@@ -37,7 +51,8 @@ public interface AppDocProposal {
      *   ]
      * }
      */	
-	
+	@RequestMapping(value = "proposal/proposalList", produces = { "application/json" }, method = RequestMethod.POST)
+	public BaseResp<ProposalListResp> proposalList(@Valid @RequestBody PageReq req);
 	
     /**
      * @api {post} /proposal/proposalDetails b.提案详情
@@ -81,6 +96,8 @@ public interface AppDocProposal {
      *    }
      * }
      */	
+	@RequestMapping(value = "proposal/proposalDetails", produces = { "application/json" }, method = RequestMethod.POST)
+	public BaseResp<ProposalDetailsResp> proposalDetails(@Valid @RequestBody ProposalDetailRequest req);
 	
     /**
      * @api {post} /proposal/voteList c.投票列表
@@ -115,4 +132,6 @@ public interface AppDocProposal {
      *   ]
      * }
      */	
+	@RequestMapping(value = "proposal/voteList", produces = { "application/json" }, method = RequestMethod.POST)
+	public BaseResp<VoteListResp> voteList(@Valid @RequestBody VoteListRequest req);
 }
