@@ -36,8 +36,9 @@ public class TxParamResolver {
     }
 
     public static Result analysis ( String input) {
+        Result result = new Result();
+        result.txTypeEnum = TxTypeEnum.TRANSFER;
         try {
-            AnalysisResult analysisResult = new AnalysisResult();
             if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
                 List <RlpType> rlpTypes = rlpList.getValues();
@@ -47,10 +48,8 @@ public class TxParamResolver {
                 RlpList rlpList2 = RlpDecoder.decode(rlpString.getBytes());
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
-                analysisResult.setTxCode(txCode.toString());
 
-                TxTypeEnum typeEnum = TxTypeEnum.valueOf(analysisResult.getTxCode());
-                Result result = new Result();
+                TxTypeEnum typeEnum = TxTypeEnum.getEnum(txCode.intValue());
                 result.txTypeEnum = typeEnum;
 
                 switch (typeEnum) {
@@ -258,8 +257,8 @@ public class TxParamResolver {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return result;
         }
-        return null;
+        return result;
     }
 }

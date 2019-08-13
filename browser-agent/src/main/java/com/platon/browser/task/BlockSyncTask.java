@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.druid.support.spring.stat.annotation.Stat;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Block;
@@ -241,7 +242,9 @@ public class BlockSyncTask {
                 TX_THREAD_POOL.submit(() -> {
                     try {
                         updateTransactionInfo(tx);
-                    }finally {
+                    }catch (Exception e){
+                        logger.error("更新交易信息错误：{}",e.getMessage());
+                    } finally {
                         latch.countDown();
                     }
                 })
@@ -311,63 +314,8 @@ public class BlockSyncTask {
 
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
-
-            switch (txParams.getTxTypeEnum()){
-                case CREATEVALIDATOR: // 1000
-                    // 发起质押
-                    //CreateValidatorDto cvd = tx.getTxJson(CreateValidatorDto.class);
-                    break;
-                case EDITVALIDATOR: // 1001
-                    // 修改质押信息
-
-                    break;
-                case INCREASESTAKING: // 1002
-                    // 增持质押
-
-                    break;
-                case EXITVALIDATOR: // 1003
-                    // 撤销质押
-
-                    break;
-                case DELEGATE: // 1004
-                    // 发起委托
-
-                    break;
-                case UNDELEGATE: // 1005
-                    // 减持/撤销委托
-
-                    break;
-
-                case CREATEPROPOSALTEXT: // 2000
-                    // 提交文本提案
-
-                    break;
-                case CREATEPROPOSALUPGRADE: // 2001
-                    // 提交升级提案
-
-                    break;
-                case CREATEPROPOSALPARAMETER: // 2002
-                    // 提交参数提案
-
-                    break;
-                case VOTINGPROPOSAL: // 2003
-                    // 给提案投票
-
-                    break;
-                case DECLAREVERSION: // 2004
-                    // 版本声明
-
-                    break;
-                case REPORTVALIDATOR: // 3000
-                    // 举报双签
-
-                    break;
-                case CREATERESTRICTING: // 4000
-                    //创建锁仓计划
-
-                    break;
-            }
-
+            tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+            if(txParams.getParam()!=null) tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
         }catch (IOException e){
 
         }

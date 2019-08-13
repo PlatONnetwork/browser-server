@@ -1,5 +1,9 @@
 package com.platon.browser.enums;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * \*
  * \* User: dongqile
@@ -28,11 +32,19 @@ public enum TxTypeEnum {
     DECLAREVERSION(2004,"版本声明"),
     REPORTVALIDATOR(3000,"举报多签(举报验证人)"),
     CREATERESTRICTING(4000,"创建锁仓计划(创建锁仓)"),
-    DUPLICATESIGN(11,"区块双签");
+    DUPLICATESIGN(11,"区块双签"),
+    ;
 
 
 
+    private static Map<Integer, TxTypeEnum> map = new HashMap<>();
+    static {
+        Arrays.asList(TxTypeEnum.values()).forEach(typeEnum->map.put(typeEnum.code,typeEnum));
+    }
 
+    public static TxTypeEnum getEnum(Integer code){
+        return map.get(code);
+    }
 
     public int code;
     public String desc;
