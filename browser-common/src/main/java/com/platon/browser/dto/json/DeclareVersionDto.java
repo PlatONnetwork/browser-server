@@ -20,4 +20,9 @@ public class DeclareVersionDto {
      * 声明的版本
      */
     private Integer version;
+
+    public void init(String activeNode,Integer version){
+        this.setActiveNode(activeNode);
+        this.setVersion(version);
+    }
 }

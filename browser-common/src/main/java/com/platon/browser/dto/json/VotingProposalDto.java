@@ -29,4 +29,10 @@ public class VotingProposalDto {
      */
     private String option;
 
+    public void init(String verifier,String proposalId,String option){
+        this.setVerifier(verifier);
+        this.setProposalId(proposalId);
+        this.setOption(option);
+    }
+
 }
