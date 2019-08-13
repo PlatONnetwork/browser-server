@@ -1,5 +1,29 @@
 package com.platon.browser.controller;
 
+import javax.validation.Valid;
+
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.platon.browser.dto.RespPage;
+import com.platon.browser.req.staking.AliveStakingListReq;
+import com.platon.browser.req.staking.DelegationListByAddressReq;
+import com.platon.browser.req.staking.DelegationListByStakingReq;
+import com.platon.browser.req.staking.HistoryStakingListReq;
+import com.platon.browser.req.staking.StakingDetailsReq;
+import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.resp.staking.AliveStakingListResp;
+import com.platon.browser.resp.staking.DelegationListByAddressResp;
+import com.platon.browser.resp.staking.DelegationListByStakingResp;
+import com.platon.browser.resp.staking.HistoryStakingListResp;
+import com.platon.browser.resp.staking.StakingChangeNewResp;
+import com.platon.browser.resp.staking.StakingDetailsResp;
+import com.platon.browser.resp.staking.StakingOptRecordListResp;
+import com.platon.browser.resp.staking.StakingStatisticNewResp;
+
 public interface AppDocStaking {
 	
 	
@@ -31,7 +55,8 @@ public interface AppDocStaking {
      *    }
      * }
      */	
-	
+	@SubscribeMapping(value = "topic/staking/statistic/new")
+	public BaseResp<StakingStatisticNewResp> stakingStatisticNew();
 	
     /**
      * @api {post} /staking/aliveStakingList b.实时验证人列表
@@ -79,7 +104,8 @@ public interface AppDocStaking {
      *   ]
      * }
      */	
-	
+	@RequestMapping(value = "staking/aliveStakingList", produces = { "application/json" }, method = RequestMethod.POST)
+    public RespPage<AliveStakingListResp> aliveStakingList(@Valid @RequestBody AliveStakingListReq req);
 	
     /**
      * @api {post} /staking/historyStakingList c.历史验证人列表
@@ -118,7 +144,8 @@ public interface AppDocStaking {
      *   ]
      * }
      */	
-	
+	@RequestMapping(value = "staking/historyStakingList", produces = { "application/json" }, method = RequestMethod.POST)
+    public RespPage<HistoryStakingListResp> historyStakingList(@Valid @RequestBody HistoryStakingListReq req);
 	
     /**
      * @api {subscribe} /topic/staking/change/new d.实时验证人变更（websocket）
@@ -140,7 +167,8 @@ public interface AppDocStaking {
      *    }
      * }
      */	
-	
+	@SubscribeMapping(value = "topic/staking/change/new")
+	public BaseResp<StakingChangeNewResp> stakingChangeNew();
 	
     /**
      * @api {post} /staking/stakingDetails e.验证人详情
@@ -187,7 +215,8 @@ public interface AppDocStaking {
      *    }
      * }
      */	
-	
+	@RequestMapping(value = "staking/stakingDetails", produces = { "application/json" }, method = RequestMethod.POST)
+    public BaseResp<StakingDetailsResp> stakingDetails(@Valid @RequestBody StakingDetailsReq req);
 	
     /**
      * @api {post} /staking/stakingOptRecordList f.节点操作记录
@@ -221,6 +250,8 @@ public interface AppDocStaking {
      *   ]
      * }
      */	
+	@RequestMapping(value = "staking/stakingOptRecordList", produces = { "application/json" }, method = RequestMethod.POST)
+    public RespPage<StakingOptRecordListResp> stakingOptRecordList(@Valid @RequestBody StakingOptRecordListReq req);
 	
     /**
      * @api {post} /staking/delegationListByStaking g.验证人相关的委托列表
@@ -256,7 +287,8 @@ public interface AppDocStaking {
      *   ]
      * }
      */
-	
+	@RequestMapping(value = "staking/delegationListByStaking", produces = { "application/json" }, method = RequestMethod.POST)
+    public RespPage<DelegationListByStakingResp> delegationListByStaking(@Valid @RequestBody DelegationListByStakingReq req);
 	
 	
     /**
@@ -295,7 +327,8 @@ public interface AppDocStaking {
      *   ]
      * }
      */
-	
+	@RequestMapping(value = "staking/delegationListByAddress", produces = { "application/json" }, method = RequestMethod.POST)
+    public RespPage<DelegationListByAddressResp> delegationListByAddress(@Valid @RequestBody DelegationListByAddressReq req);
 	
 	
     /**
