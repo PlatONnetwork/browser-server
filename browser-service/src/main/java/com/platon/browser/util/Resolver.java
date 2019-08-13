@@ -13,7 +13,7 @@ import java.util.List;
  * Date: 2019/8/13
  * Time: 16:48
  */
-public class Resolver {
+public  class Resolver {
 
     public static BigInteger bigIntegerResolver ( RlpString rlpString ) {
         RlpString integers = rlpString;

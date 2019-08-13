@@ -246,7 +246,9 @@ public class BlockSyncTask {
                 TX_THREAD_POOL.submit(() -> {
                     try {
                         updateTransactionInfo(tx);
-                    }finally {
+                    }catch (Exception e){
+                        logger.error("更新交易信息错误：{}",e.getMessage());
+                    } finally {
                         latch.countDown();
                     }
                 })

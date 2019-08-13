@@ -2,20 +2,12 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
-import com.platon.browser.req.newtransaction.TransactionDetailsReq;
-import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
-import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.transaction.TransactionDetailsResp;
-import com.platon.browser.res.transaction.TransactionListResp;
+import com.platon.browser.dto.transaction.TransactionListItem;
+import com.platon.browser.req.transaction.TransactionPageReq;
 
 public interface AppDocTransaction {
 	
@@ -64,8 +56,8 @@ public interface AppDocTransaction {
      *   ]
      * }
      */
-	@RequestMapping(value = "transaction/transactionList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<TransactionListResp> transactionList(@Valid @RequestBody PageReq req);
+	@PostMapping("transactionList")
+    public RespPage<TransactionListItem> getPage(@Valid @RequestBody TransactionPageReq req);
 		
 	
     /**
@@ -92,8 +84,7 @@ public interface AppDocTransaction {
      * HTTP/1.1 200 OK
      * > 返回值同《交易列表接口》返回值
      */
-	@RequestMapping(value = "transaction/transactionListByBlock", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<TransactionListResp> transactionListByBlock(@Valid @RequestBody TransactionListByBlockRequest req);
+	
 	
     /**
      * @api {post} /transaction/transactionListByAddress c.地址的交易列表
@@ -119,8 +110,7 @@ public interface AppDocTransaction {
      * HTTP/1.1 200 OK
      * > 返回值同《交易列表接口》返回值
      */
-	@RequestMapping(value = "transaction/transactionListByAddress", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<TransactionListResp> transactionListByAddress(@Valid @RequestBody TransactionListByAddressRequest req);
+	
 	
     /**
      * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date d.导出地址交易列表
@@ -137,9 +127,7 @@ public interface AppDocTransaction {
      * HTTP/1.1 200 OK
      * >响应为 二进制文件流
      */
-	@RequestMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" }, method = RequestMethod.GET)
-    public void addressTransactionDownload(@RequestParam(value = "address", required = false)String address,
-    		@RequestParam(value = "date", required = true)String date);
+	
 	
     /**
      * @api {post} transaction/transactionDetails e.交易详情 
@@ -235,8 +223,7 @@ public interface AppDocTransaction {
      *        --可选信息结束
      * }
      */	
-	@RequestMapping(value = "transaction/transactionDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<TransactionDetailsResp> transactionDetails(@Valid @RequestBody TransactionDetailsReq req);
+	
 	
     /**
      * @api {post} transaction/transactionDetailNavigate f.交易详情前后跳转浏览
@@ -253,6 +240,5 @@ public interface AppDocTransaction {
      * HTTP/1.1 200 OK
      * > 返回值同《交易详情接口》返回值
      */
-	@RequestMapping(value = "transaction/transactionDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid @RequestBody TransactionDetailNavigateReq req);
+	
 }

@@ -1,15 +1,5 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.platon.browser.req.address.QueryDetailRequest;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.address.QueryDetailResp;
-
 public interface AppDocAddress {
 	
 	
@@ -54,6 +44,4 @@ public interface AppDocAddress {
      *    }
      * }
      */
-	@RequestMapping(value = "address/details", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryDetailResp> details(@Valid @RequestBody QueryDetailRequest req);
 }

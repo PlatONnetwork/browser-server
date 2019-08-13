@@ -1,21 +1,5 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newblock.BlockDetailNavigateReq;
-import com.platon.browser.req.newblock.BlockDetailsReq;
-import com.platon.browser.req.newblock.BlockListByNodeIdReq;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.block.BlockDetailResp;
-import com.platon.browser.res.block.BlockListResp;
-
 public interface AppDocBlock {
 	
     /**
@@ -57,8 +41,7 @@ public interface AppDocBlock {
      *    ]
      * }
      */
-	@RequestMapping(value = "block/blockList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockList(@Valid @RequestBody PageReq req);
+	
 	
      /**
      *
@@ -80,8 +63,7 @@ public interface AppDocBlock {
      * HTTP/1.1 200 OK
      * > 返回值同《区块列表接口》返回值
      */
-	@RequestMapping(value = "block/blockListByNodeId", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockListByNodeId(@Valid @RequestBody BlockListByNodeIdReq req);
+	
 	
     /**
      * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date c.导出节点的区块列表
@@ -99,9 +81,7 @@ public interface AppDocBlock {
      * >响应为 二进制文件流
      * TODO 模版
      */	
-	@RequestMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" }, method = RequestMethod.GET)
-    public void blockListByNodeIdDownload(@RequestParam(value = "nodeId", required = false)String nodeId,
-    		@RequestParam(value = "date", required = true)String date);
+	
 	
     /**
      * @api {post} /block/blockDetails d.区块详情
@@ -145,8 +125,7 @@ public interface AppDocBlock {
      *    }
      * }
      */
-	@RequestMapping(value = "block/blockDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetails(@Valid @RequestBody BlockDetailsReq req);
+	
 	
     /**
      * @api {post} /block/blockDetailNavigate e.区块详情前后跳转浏览
@@ -163,6 +142,4 @@ public interface AppDocBlock {
      * HTTP/1.1 200 OK
      * > 返回值同《区块详情接口》返回值
      */
-	@RequestMapping(value = "block/blockDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetailNavigate(@Valid @RequestBody BlockDetailNavigateReq req);
 }

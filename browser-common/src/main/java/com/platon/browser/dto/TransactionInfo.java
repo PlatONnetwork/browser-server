@@ -19,7 +19,7 @@ import java.math.BigInteger;
  * @Description:
  */
 @Data
-public class TransactionInfo<T> extends TransactionWithBLOBs {
+public class TransactionInfo extends TransactionWithBLOBs {
 
     private TxTypeEnum typeEnum;
 
@@ -49,7 +49,7 @@ public class TransactionInfo<T> extends TransactionWithBLOBs {
     public void updateTransactionInfo ( TransactionReceipt receipt, String code ) {
         this.setGasUsed(receipt.getGasUsed().toString());
         this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-        this.setTxReceiptStatus(Integer.valueOf(receipt.getStatus()));
+        this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
         //TODO:code判断,
         // 1.首先先判断to的地址是否等于内置合约地址以及code是否不为空
         // a.满足以上条件，则to的类型为合约
@@ -71,7 +71,7 @@ public class TransactionInfo<T> extends TransactionWithBLOBs {
      *
      * @return
      */
-    public T getTxJson (Class<T> clazz) {
+    public <T> T getTxJson (Class<T> clazz) {
 
         switch (typeEnum) {
             case CREATEVALIDATOR:

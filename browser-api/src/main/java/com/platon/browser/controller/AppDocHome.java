@@ -1,20 +1,5 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.platon.browser.req.home.QueryNavigationRequest;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.home.BlockListNewResp;
-import com.platon.browser.res.home.BlockStatisticNewResp;
-import com.platon.browser.res.home.ChainStatisticNewResp;
-import com.platon.browser.res.home.QueryNavigationResp;
-import com.platon.browser.res.home.StakingListNewResp;
-
 public interface AppDocHome {
 	
 	
@@ -56,8 +41,7 @@ public interface AppDocHome {
      *    }
      * }
      */
-	@RequestMapping(value = "home/queryNavigation", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryNavigationResp> queryNavigation(@Valid @RequestBody QueryNavigationRequest req);
+	
 	
     /**
      * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
@@ -81,8 +65,7 @@ public interface AppDocHome {
      *    }
      * }
      */
-	@SubscribeMapping(value = "topic/block/statistic/new")
-	public BaseResp<BlockStatisticNewResp> blockStatisticNew();
+	
 	
     /**
      * @api {subscribe} /topic/chain/statistic/new c.基础数据（websocket）
@@ -115,8 +98,7 @@ public interface AppDocHome {
      *    }
      * }
      */	
-	@SubscribeMapping(value = "topic/chain/statistic/new")
-	public BaseResp<ChainStatisticNewResp> chainStatisticNew();
+	
 	
     /**
      * @api {subscribe} /topic/block/list/new d.区块列表（websocket）
@@ -145,8 +127,7 @@ public interface AppDocHome {
      *    ]
      * }
      */
-	@SubscribeMapping(value = "topic/block/list/new")
-	public BaseResp<BlockListNewResp> blockListNew();
+	
 	
     /**
      * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
@@ -177,6 +158,4 @@ public interface AppDocHome {
      *    ]
      * }
      */
-	@SubscribeMapping(value = "topic/staking/list/new")
-	public BaseResp<StakingListNewResp> stakingListNew();
 }
