@@ -27,13 +27,13 @@ public class TransactionBean extends TransactionWithBLOBs {
             this.setTxType("transfer");
         }
         try {
-            AnalysisResult analysisResult = TransactionAnalysis.analysis(transaction.getInput(),false);
+            AnalysisResult analysisResult = TxParamResolver.analysis(transaction.getInput(),false);
             if("1".equals(analysisResult.getType())){
                 analysisResult.setFunctionName("contract deploy");
                 this.setTo(receipt.getContractAddress());
                 this.setReceiveType("contract");
             }else this.setTo(transaction.getTo());
-            String type =  TransactionAnalysis.getTypeName(analysisResult.getType());
+            String type =  TxParamResolver.getTypeName(analysisResult.getType());
             this.setTxType(type == null ? "transfer" : type);
             String txinfo = JSON.toJSONString(analysisResult);
             this.setTxInfo(txinfo);

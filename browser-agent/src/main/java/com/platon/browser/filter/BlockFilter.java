@@ -9,7 +9,7 @@
 //import com.platon.browser.enums.TransactionTypeEnum;
 //import com.platon.browser.thread.AnalyseThread;
 //import com.platon.browser.util.CalculatePublicKey;
-//import com.platon.browser.util.TransactionAnalysis;
+//import com.platon.browser.util.TxParamResolver;
 //import org.apache.commons.lang3.StringUtils;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -112,12 +112,12 @@
 //                    sum = sum.add(receipt.getGasUsed().multiply(transaction.getGasPrice()));
 //                    AnalysisResult analysisResult = new AnalysisResult();
 //                    try {
-//                        analysisResult = TransactionAnalysis.analysis(transaction.getInput(), false);
+//                        analysisResult = TxParamResolver.analysis(transaction.getInput(), false);
 //                    } catch (Exception e) {
 //                        logger.error("BlockFilter Analysis Exception", e.getMessage());
 //                    }
 //                    if (org.springframework.util.StringUtils.isEmpty(analysisResult)) {
-//                        String type = TransactionAnalysis.getTypeName(analysisResult.getType());
+//                        String type = TxParamResolver.getTypeName(analysisResult.getType());
 //                        if (TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code.equals(type)) {
 //                            voteAmount = voteAmount.add(BigInteger.ONE);
 //                            if (receipt.getStatus().equals("0x1")) {

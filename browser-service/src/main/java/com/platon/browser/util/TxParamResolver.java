@@ -16,11 +16,12 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
+ * 交易参数解析器
  * User: dongqile
  * Date: 2019/1/9
  * Time: 11:46
  */
-public class TransactionAnalysis {
+public class TxParamResolver {
 
     public static class Result<T> {
         private T result;
