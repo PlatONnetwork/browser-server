@@ -90,6 +90,8 @@ public class BlockChain {
         if(block.getNumber()%chainConfig.getSettingPeriod()==0){
             // 进入新结算周期
             logger.debug("进入新结算周期：Block Number({})",block.getNumber());
+
+
             onNewSettingEpoch();
         }
 
