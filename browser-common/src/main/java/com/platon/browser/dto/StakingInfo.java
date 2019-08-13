@@ -1,6 +1,7 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dto.json.CreateValidatorDto;
 import com.platon.browser.dto.json.IncreaseStakingDto;
 import org.springframework.beans.BeanUtils;
 
@@ -43,7 +44,7 @@ public class StakingInfo extends Staking {
 
     }
 
-    public void initWithIncreaseStaking(TransactionInfo initData){
+    public void initWithCreateValidatorDto(TransactionInfo initData){
         BeanUtils.copyProperties(initData,this);
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址
@@ -58,7 +59,7 @@ public class StakingInfo extends Staking {
         this.setStatDelegateReduction("0");
         this.setStatDelegateQty(0);
         this.setStatVerifierTime(0);
-        this.setStakingName(initData.getTxJson(IncreaseStakingDto.class).getNodeName());
+        this.setStakingName(initData.getTxJson(CreateValidatorDto.class).getNodeName());
 
 
         // TODO:

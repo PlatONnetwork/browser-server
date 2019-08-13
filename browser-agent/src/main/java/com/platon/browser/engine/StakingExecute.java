@@ -129,7 +129,7 @@ public class StakingExecute {
     //发起质押(创建验证人)
     private void execute1000(TransactionInfo tx,BlockChain bc){
         StakingInfo staking = new StakingInfo();
-        staking.initWithIncreaseStaking(tx);
+        staking.initWithCreateValidatorDto(tx);
     }
     //修改质押信息(编辑验证人)
     private void execute1001(TransactionInfo tx,BlockChain bc){

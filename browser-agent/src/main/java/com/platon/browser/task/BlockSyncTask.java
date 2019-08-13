@@ -185,10 +185,13 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-
                             BlockInfo block = new BlockInfo(initData);
+                            block.setNodeId("");
                             String publicKey = CalculatePublicKey.getPublicKey(initData);
-                            block.setNodeId(publicKey);
+                            if(publicKey!=null){
+                                if(!publicKey.startsWith("0x")) block.setNodeId("0x"+publicKey);
+                                else block.setNodeId(publicKey);
+                            }
                             try{
                                 result.concurrentBlockMap.put(blockNumber.longValue(),block);
                             }catch (Exception ex){
