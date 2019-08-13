@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.dto.AnalysisResult;
 import com.platon.browser.dto.json.*;
@@ -16,6 +17,7 @@ import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +39,7 @@ public class TxParamResolver {
 
     public static Result analysis ( String input) {
         Result result = new Result();
-        result.txTypeEnum = TxTypeEnum.TRANSFER;
+        result.txTypeEnum = TxTypeEnum.OTHERS;
         try {
             if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
@@ -244,20 +246,32 @@ public class TxParamResolver {
                         ReportValidatorDto reportValidatorDto = new ReportValidatorDto();
                         reportValidatorDto.setData(list);
                         result.param = reportValidatorDto;
-
                         break;
                     case CREATERESTRICTING: // 4000
                         //创建锁仓计划
 
-                        RlpString Strings = (RlpString) rlpList1.getValues().get(1);
-                        RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
+                        //锁仓释放到账账户
+                        String account = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
+                        // RestrictingPlan 类型的列表（数组）
+                        BigInteger[] arrayList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
+                        PlanDto planDto = new PlanDto();
+                        planDto.setEpoch(arrayList[0].intValue());
+                        planDto.setAmount(arrayList[1].toString());
+                        List<PlanDto> planDtoList = new ArrayList <>();
+                        planDtoList.add(planDto);
+                        CreatereStrictingDto createreStrictingDto = new CreatereStrictingDto();
+                        createreStrictingDto.setPlan(planDtoList);
+                        createreStrictingDto.setAccount(account);
+                        result.param = createreStrictingDto;
                         break;
                 }
             }
         } catch (Exception e) {
+            result.txTypeEnum = TxTypeEnum.OTHERS;
             return result;
         }
         return result;
     }
+
 }
