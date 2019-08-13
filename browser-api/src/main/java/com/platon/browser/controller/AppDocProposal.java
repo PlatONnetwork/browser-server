@@ -14,6 +14,11 @@ import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.res.proposal.VoteListResp;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@Api(value = "/proposal", tags = "Proposal")
 public interface AppDocProposal {
 	
     /**
@@ -51,8 +56,9 @@ public interface AppDocProposal {
      *   ]
      * }
      */	
+	@ApiOperation(value = "proposal/proposalList", nickname = "", notes = "", response = ProposalListResp.class, tags = { "Proposal" })
 	@RequestMapping(value = "proposal/proposalList", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<ProposalListResp> proposalList(@Valid @RequestBody PageReq req);
+	public BaseResp<ProposalListResp> proposalList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
 	
     /**
      * @api {post} /proposal/proposalDetails b.提案详情
@@ -96,8 +102,10 @@ public interface AppDocProposal {
      *    }
      * }
      */	
+	@ApiOperation(value = "proposal/proposalDetails", nickname = "", notes = "", response = ProposalDetailsResp.class, tags = { "Proposal" })
 	@RequestMapping(value = "proposal/proposalDetails", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<ProposalDetailsResp> proposalDetails(@Valid @RequestBody ProposalDetailRequest req);
+	public BaseResp<ProposalDetailsResp> proposalDetails(
+			@ApiParam(value = "ProposalDetailRequest ", required = true)@Valid @RequestBody ProposalDetailRequest req);
 	
     /**
      * @api {post} /proposal/voteList c.投票列表
@@ -132,6 +140,7 @@ public interface AppDocProposal {
      *   ]
      * }
      */	
+	@ApiOperation(value = "proposal/voteList", nickname = "", notes = "", response = VoteListResp.class, tags = { "Proposal" })
 	@RequestMapping(value = "proposal/voteList", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<VoteListResp> voteList(@Valid @RequestBody VoteListRequest req);
+	public BaseResp<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ", required = true)@Valid @RequestBody VoteListRequest req);
 }

@@ -15,6 +15,11 @@ import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.QueryNavigationResp;
 import com.platon.browser.res.home.StakingListNewResp;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@Api(value = "/home", tags = "Home")
 public interface AppDocHome {
 	
 	
@@ -56,8 +61,9 @@ public interface AppDocHome {
      *    }
      * }
      */
+	@ApiOperation(value = "home/queryNavigation", nickname = "", notes = "", response = QueryNavigationResp.class, tags = { "Home" })
 	@RequestMapping(value = "home/queryNavigation", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryNavigationResp> queryNavigation(@Valid @RequestBody QueryNavigationRequest req);
+	public BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
 	
     /**
      * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
@@ -81,6 +87,7 @@ public interface AppDocHome {
      *    }
      * }
      */
+	@ApiOperation(value = "topic/block/statistic/new", nickname = "", notes = "", response = BlockStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/statistic/new")
 	public BaseResp<BlockStatisticNewResp> blockStatisticNew();
 	
@@ -115,6 +122,7 @@ public interface AppDocHome {
      *    }
      * }
      */	
+	@ApiOperation(value = "topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/chain/statistic/new")
 	public BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
@@ -145,6 +153,7 @@ public interface AppDocHome {
      *    ]
      * }
      */
+	@ApiOperation(value = "topic/block/list/new", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/list/new")
 	public BaseResp<BlockListNewResp> blockListNew();
 	
@@ -177,6 +186,7 @@ public interface AppDocHome {
      *    ]
      * }
      */
+	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
 	public BaseResp<StakingListNewResp> stakingListNew();
 }

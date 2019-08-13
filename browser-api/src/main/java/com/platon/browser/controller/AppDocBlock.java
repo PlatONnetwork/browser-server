@@ -16,6 +16,11 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@Api(value = "/block", tags = "Block")
 public interface AppDocBlock {
 	
     /**
@@ -57,8 +62,9 @@ public interface AppDocBlock {
      *    ]
      * }
      */
+	@ApiOperation(value = "block/blockList", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockList(@Valid @RequestBody PageReq req);
+    public RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
 	
      /**
      *
@@ -80,8 +86,9 @@ public interface AppDocBlock {
      * HTTP/1.1 200 OK
      * > 返回值同《区块列表接口》返回值
      */
+	@ApiOperation(value = "block/blockListByNodeId", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockListByNodeId", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockListByNodeId(@Valid @RequestBody BlockListByNodeIdReq req);
+    public RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq ", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
      * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date c.导出节点的区块列表
@@ -99,9 +106,10 @@ public interface AppDocBlock {
      * >响应为 二进制文件流
      * TODO 模版
      */	
+	@ApiOperation(value = "block/blockListByNodeIdDownload", nickname = "", notes = "", tags = { "Block" })
 	@RequestMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" }, method = RequestMethod.GET)
-    public void blockListByNodeIdDownload(@RequestParam(value = "nodeId", required = false)String nodeId,
-    		@RequestParam(value = "date", required = true)String date);
+    public void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date);
 	
     /**
      * @api {post} /block/blockDetails d.区块详情
@@ -145,8 +153,9 @@ public interface AppDocBlock {
      *    }
      * }
      */
+	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetails(@Valid @RequestBody BlockDetailsReq req);
+    public BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq ", required = true)@Valid @RequestBody BlockDetailsReq req);
 	
     /**
      * @api {post} /block/blockDetailNavigate e.区块详情前后跳转浏览
@@ -163,6 +172,7 @@ public interface AppDocBlock {
      * HTTP/1.1 200 OK
      * > 返回值同《区块详情接口》返回值
      */
+	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetailNavigate(@Valid @RequestBody BlockDetailNavigateReq req);
+    public BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq ", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
 }
