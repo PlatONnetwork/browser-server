@@ -7,7 +7,10 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.StakingInfo;
 import com.platon.browser.dto.TransactionInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,7 @@ import java.util.Map;
  */
 @Component
 public class StakingExecute {
+    private static Logger logger = LoggerFactory.getLogger(StakingExecute.class);
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -119,11 +123,13 @@ public class StakingExecute {
     }
 
     private void updateTxInfo(TransactionInfo tx,BlockChain bc){
+
     }
 
     //发起质押(创建验证人)
     private void execute1000(TransactionInfo tx,BlockChain bc){
-
+        StakingInfo staking = new StakingInfo();
+        staking.initWithIncreaseStaking(tx);
     }
     //修改质押信息(编辑验证人)
     private void execute1001(TransactionInfo tx,BlockChain bc){
