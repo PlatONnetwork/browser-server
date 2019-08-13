@@ -116,7 +116,8 @@ public class BlockChain {
             List<org.web3j.platon.bean.Node> validators = response.data;
             Date date = new Date();
             validators.forEach(validator->{
-                StakingInfo staking = new StakingInfo(validator);
+                StakingInfo staking = new StakingInfo();
+                staking.initWithNode(validator);
                 staking.setCreateTime(date);
                 staking.setUpdateTime(date);
                 staking.setIsConsensus(0);

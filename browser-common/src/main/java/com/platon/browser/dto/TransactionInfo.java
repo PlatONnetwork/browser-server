@@ -19,7 +19,7 @@ import java.math.BigInteger;
  * @Description:
  */
 @Data
-public class TransactionInfo extends TransactionWithBLOBs {
+public class TransactionInfo<T> extends TransactionWithBLOBs {
 
     private TxTypeEnum typeEnum;
 
@@ -62,11 +62,9 @@ public class TransactionInfo extends TransactionWithBLOBs {
 
     /**
      * 根据类型获取交易参数信息对象
-     * @param clazz
-     * @param <T>
      * @return
      */
-    public <T> T getTxJson(T clazz){
+    public T getTxJson(){
 
         switch (typeEnum){
             case CREATEVALIDATOR:
