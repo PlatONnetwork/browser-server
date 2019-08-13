@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.dto.AnalysisResult;
 import com.platon.browser.dto.json.*;
 import org.apache.commons.lang3.StringUtils;
@@ -49,58 +50,32 @@ public class TxParamResolver {
                         createStaking.clazz = CreateValidatorDto.class;
 
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
-                        RlpString stakingType = (RlpString) rlpList1.getValues().get(1);
-                        RlpList stakingTypeList = RlpDecoder.decode(stakingType.getBytes());
-                        RlpString typeString = (RlpString) stakingTypeList.getValues().get(0);
-                        BigInteger stakingTyp = new BigInteger(1, typeString.getBytes());
+                        BigInteger stakingTyp =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
 
                         //用于接受出块奖励和质押奖励的收益账户
-                        RlpString stakingAdd = (RlpString) rlpList1.getValues().get(2);
-                        RlpList stakingAddList = RlpDecoder.decode(stakingAdd.getBytes());
-                        RlpString stakingAddString = (RlpString) stakingAddList.getValues().get(0);
-                        String addr = Numeric.toHexString(stakingAddString.getBytes());
+                        String addr = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //被质押的节点的NodeId
-                        RlpString stakingNodeId = (RlpString) rlpList1.getValues().get(3);
-                        RlpList stakingNodeIdList = RlpDecoder.decode(stakingNodeId.getBytes());
-                        RlpString nodeIdString = (RlpString) stakingNodeIdList.getValues().get(0);
-                        String stakNodeId = Numeric.toHexString(nodeIdString.getBytes());
+                        String stakNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
 
                         //外部Id
-                        RlpString extrId = (RlpString) rlpList1.getValues().get(4);
-                        RlpList extrIdList = RlpDecoder.decode(extrId.getBytes());
-                        RlpString extrString = (RlpString) extrIdList.getValues().get(0);
-                        String extrnaId = Numeric.toHexString(extrString.getBytes());
+                        String extrnaId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
 
                         //被质押节点的名称
-                        RlpString nodeName = (RlpString) rlpList1.getValues().get(5);
-                        RlpList nodeNameList = RlpDecoder.decode(nodeName.getBytes());
-                        RlpString nodeNameString = (RlpString) nodeNameList.getValues().get(0);
-                        String stakNodeName = Numeric.toHexString(nodeNameString.getBytes());
+                        String stakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         //节点的第三方主页
-                        RlpString webSite = (RlpString) rlpList1.getValues().get(6);
-                        RlpList webSiteList = RlpDecoder.decode(webSite.getBytes());
-                        RlpString webSitString = (RlpString) webSiteList.getValues().get(0);
-                        String webSiteAdd = Numeric.toHexString(webSitString.getBytes());
+                        String webSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
 
                         //节点的描述
-                        RlpString detail = (RlpString) rlpList1.getValues().get(7);
-                        RlpList detailsList = RlpDecoder.decode(detail.getBytes());
-                        RlpString dateilString = (RlpString) detailsList.getValues().get(0);
-                        String deteils = Numeric.toHexString(dateilString.getBytes());
+                        String deteils = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
 
                         //质押的von
-                        RlpString stakAmount = (RlpString) rlpList1.getValues().get(8);
-                        RlpList stakingAmountList = RlpDecoder.decode(stakAmount.getBytes());
-                        RlpString stakingAmountString = (RlpString) stakingAmountList.getValues().get(0);
-                        BigInteger stakingAmount = new BigInteger(1, stakingAmountString.getBytes());
+                        BigInteger stakingAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(8));
+
 
                         //程序的真实版本，治理rpc获取
-                        RlpString programVersion = (RlpString) rlpList1.getValues().get(9);
-                        RlpList programVersionList = RlpDecoder.decode(programVersion.getBytes());
-                        RlpString programVersionString = (RlpString) programVersionList.getValues().get(0);
-                        BigInteger versions = new BigInteger(1, programVersionString.getBytes());
+                        BigInteger versions =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(9));
 
                         CreateValidatorDto createValidatorDto = new CreateValidatorDto();
                         createValidatorDto.init(stakingTyp.intValue(), addr, stakNodeId, extrnaId, stakNodeName,
@@ -114,40 +89,23 @@ public class TxParamResolver {
                         editValidatorResult.clazz = EditValidatorDto.class;
 
                         //用于接受出块奖励和质押奖励的收益账户
-                        RlpString editValidatorAdd = (RlpString) rlpList1.getValues().get(1);
-                        RlpList editValidatorAddList = RlpDecoder.decode(editValidatorAdd.getBytes());
-                        RlpString editValidatorAddString = (RlpString) editValidatorAddList.getValues().get(0);
-                        String editAddr = Numeric.toHexString(editValidatorAddString.getBytes());
+                        String editAddr = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //被质押的节点的NodeId
-                        RlpString editNodeIds = (RlpString) rlpList1.getValues().get(2);
-                        RlpList editNodeIdNodeIdList = RlpDecoder.decode(editNodeIds.getBytes());
-                        RlpString editNodeIdString = (RlpString) editNodeIdNodeIdList.getValues().get(0);
-                        String editNodeId = Numeric.toHexString(editNodeIdString.getBytes());
+                        String editNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //外部Id
-                        RlpString editExtrIds = (RlpString) rlpList1.getValues().get(3);
-                        RlpList editExtrIdList = RlpDecoder.decode(editExtrIds.getBytes());
-                        RlpString editExtrIdString = (RlpString) editExtrIdList.getValues().get(0);
-                        String editExtrId = Numeric.toHexString(editExtrIdString.getBytes());
+                        String editExtrId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
 
                         //被质押节点的名称
-                        RlpString editNodeNames = (RlpString) rlpList1.getValues().get(4);
-                        RlpList editNodeNameList = RlpDecoder.decode(editNodeNames.getBytes());
-                        RlpString editNodeNameString = (RlpString) editNodeNameList.getValues().get(0);
-                        String editNodeName = Numeric.toHexString(editNodeNameString.getBytes());
+                        String editNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
 
                         //节点的第三方主页
-                        RlpString editWebSites = (RlpString) rlpList1.getValues().get(5);
-                        RlpList editWebSiteList = RlpDecoder.decode(editWebSites.getBytes());
-                        RlpString editWebSiteString = (RlpString) editWebSiteList.getValues().get(0);
-                        String editWebSiteAdd = Numeric.toHexString(editWebSiteString.getBytes());
+                        String editWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         //节点的描述
-                        RlpString editDetails = (RlpString) rlpList1.getValues().get(6);
-                        RlpList editDetailsList = RlpDecoder.decode(editDetails.getBytes());
-                        RlpString editDetailsListString = (RlpString) editDetailsList.getValues().get(0);
-                        String editDetail = Numeric.toHexString(editDetailsListString.getBytes());
+                        String editDetail = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+
 
                         EditValidatorDto editValidatorDto = new EditValidatorDto();
                         editValidatorDto.init(editAddr,editNodeId,editExtrId,editNodeName,editWebSiteAdd,editDetail);
@@ -160,22 +118,13 @@ public class TxParamResolver {
                         increaseStakingResult.clazz = IncreaseStakingDto.class;
 
                         //被质押的节点的NodeId
-                        RlpString increaseNodeIds = (RlpString) rlpList1.getValues().get(1);
-                        RlpList increaseNodeIdsList = RlpDecoder.decode(increaseNodeIds.getBytes());
-                        RlpString increaseNodeIdsString = (RlpString) increaseNodeIdsList.getValues().get(0);
-                        String increaseNodeId= Numeric.toHexString(increaseNodeIdsString.getBytes());
+                        String increaseNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
-                        RlpString increaseTypes = (RlpString) rlpList1.getValues().get(2);
-                        RlpList increaseTypeList = RlpDecoder.decode(increaseTypes.getBytes());
-                        RlpString increaseTypeString = (RlpString) increaseTypeList.getValues().get(0);
-                        BigInteger increaseTyp = new BigInteger(1, increaseTypeString.getBytes());
+                        BigInteger increaseTyp =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(2));
 
                         //质押的von
-                        RlpString increaseAmounts = (RlpString) rlpList1.getValues().get(8);
-                        RlpList increaseAmountList = RlpDecoder.decode(increaseAmounts.getBytes());
-                        RlpString increaseAmountString = (RlpString) increaseAmountList.getValues().get(0);
-                        BigInteger increaseAmount = new BigInteger(1, increaseAmountString.getBytes());
+                        BigInteger increaseAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         IncreaseStakingDto increaseStakingDto = new IncreaseStakingDto();
                         increaseStakingDto.init(increaseNodeId,increaseTyp.intValue(),increaseAmount.toString(),"");
@@ -189,10 +138,7 @@ public class TxParamResolver {
                         exitValidatorResult.clazz = ExitValidatorDto.class;
 
                         //被质押的节点的NodeId
-                        RlpString exitNodeIds = (RlpString) rlpList1.getValues().get(1);
-                        RlpList exitNodeIdsList = RlpDecoder.decode(exitNodeIds.getBytes());
-                        RlpString exitNodeIdsString = (RlpString) exitNodeIdsList.getValues().get(0);
-                        String exitNodeId= Numeric.toHexString(exitNodeIdsString.getBytes());
+                        String exitNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         ExitValidatorDto exitValidatorDto = new ExitValidatorDto();
                         exitValidatorDto.init(exitNodeId,"","");
@@ -204,22 +150,13 @@ public class TxParamResolver {
                         Result <DelegateDto> result = new Result <>();
                         result.clazz = DelegateDto.class;
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
-                        RlpString delegateTypes = (RlpString) rlpList1.getValues().get(1);
-                        RlpList delegateTypesList = RlpDecoder.decode(delegateTypes.getBytes());
-                        RlpString delegateTypesString = (RlpString) delegateTypesList.getValues().get(0);
-                        BigInteger type = new BigInteger(1, delegateTypesString.getBytes());
+                        BigInteger type =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
 
                         //被质押的节点的NodeId
-                        RlpString delegateNodeIds = (RlpString) rlpList1.getValues().get(2);
-                        RlpList delegateNodeList = RlpDecoder.decode(delegateNodeIds.getBytes());
-                        RlpString delegateNodeIdString = (RlpString) delegateNodeList.getValues().get(0);
-                        String delegateNodeId = Numeric.toHexString(delegateNodeIdString.getBytes());
+                        String delegateNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //委托的金额
-                        RlpString delegateAmounts = (RlpString) rlpList1.getValues().get(3);
-                        RlpList delegateAmountList = RlpDecoder.decode(delegateAmounts.getBytes());
-                        RlpString delegateAmountString = (RlpString) delegateAmountList.getValues().get(0);
-                        BigInteger delegateAmount = new BigInteger(1, delegateAmountString.getBytes());
+                        BigInteger delegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         DelegateDto delegateDto = new DelegateDto();
                         delegateDto.init(type.intValue(),delegateNodeId,delegateAmount.toString(),"","");
@@ -231,22 +168,13 @@ public class TxParamResolver {
                         unDelegateResult.clazz = UnDelegateDto.class;
 
                         //代表着某个node的某次质押的唯一标示
-                        RlpString withdrewDeleBlocks = (RlpString) rlpList1.getValues().get(1);
-                        RlpList withdrewDeleBlockList = RlpDecoder.decode(withdrewDeleBlocks.getBytes());
-                        RlpString withdrewDelBlockString = (RlpString) withdrewDeleBlockList.getValues().get(0);
-                        String stakingBlockNum = Numeric.toHexString(withdrewDelBlockString.getBytes());
+                        String stakingBlockNum = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //被质押的节点的NodeId
-                        RlpString unDelegateNodeIds = (RlpString) rlpList1.getValues().get(2);
-                        RlpList unDelegateNodeIdList = RlpDecoder.decode(unDelegateNodeIds.getBytes());
-                        RlpString unDelegateNodeIdString = (RlpString) unDelegateNodeIdList.getValues().get(0);
-                        String unDelegateNodeId = Numeric.toHexString(unDelegateNodeIdString.getBytes());
+                        String unDelegateNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
-                        RlpString unDelegateAmounts = (RlpString) rlpList1.getValues().get(3);
-                        RlpList unDelegateAmountsList = RlpDecoder.decode(unDelegateAmounts.getBytes());
-                        RlpString unDelegateAmountsString = (RlpString) unDelegateAmountsList.getValues().get(0);
-                        BigInteger unDelegateAmount = new BigInteger(1, unDelegateAmountsString.getBytes());
+                        BigInteger unDelegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         UnDelegateDto unDelegateDto = new UnDelegateDto();
                         unDelegateDto.init(stakingBlockNum,unDelegateNodeId,unDelegateAmount.toString(),"");
@@ -259,22 +187,13 @@ public class TxParamResolver {
                         createProposalTextResult.clazz = CreateProposalTextDto.class;
 
                         //提交提案的验证人
-                        RlpString proposalVerifiers = (RlpString) rlpList1.getValues().get(1);
-                        RlpList proposalVerifiersList = RlpDecoder.decode(proposalVerifiers.getBytes());
-                        RlpString proposalVerifiersString = (RlpString) proposalVerifiersList.getValues().get(0);
-                        String proposalVerifier = Numeric.toHexString(proposalVerifiersString.getBytes());
+                        String proposalVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //提案URL，长度不超过512
-                        RlpString proposalurls = (RlpString) rlpList1.getValues().get(2);
-                        RlpList proposalurlsList = RlpDecoder.decode(proposalurls.getBytes());
-                        RlpString proposalurlsString = (RlpString) proposalurlsList.getValues().get(0);
-                        String proposalurl = Numeric.toHexString(proposalurlsString.getBytes());
+                        String proposalurl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //投票截至快高
-                        RlpString endVotingRounds = (RlpString) rlpList1.getValues().get(3);
-                        RlpList endVotingRoundsList = RlpDecoder.decode(endVotingRounds.getBytes());
-                        RlpString endVotingRoundsString = (RlpString) endVotingRoundsList.getValues().get(0);
-                        BigInteger endVotingRound = new BigInteger(1, endVotingRoundsString.getBytes());
+                        BigInteger endVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         CreateProposalTextDto createProposalTextDto = new CreateProposalTextDto();
                         createProposalTextDto.init(proposalVerifier,"",proposalurl,endVotingRound.intValue());
@@ -286,35 +205,19 @@ public class TxParamResolver {
                         createProposalUpgradeResult.clazz = CreateProposalUpgradeDto.class;
 
                         //提交提案的验证人
-                        RlpString upgradeVerifiers = (RlpString) rlpList1.getValues().get(1);
-                        RlpList upgradeVerifiersList = RlpDecoder.decode(upgradeVerifiers.getBytes());
-                        RlpString upgradeVerifiersString = (RlpString) upgradeVerifiersList.getValues().get(0);
-                        String upgradeVerifier = Numeric.toHexString(upgradeVerifiersString.getBytes());
-
+                        String upgradeVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //提案URL，长度不超过512
-                        RlpString upgradelurls = (RlpString) rlpList1.getValues().get(2);
-                        RlpList upgradelurlsList = RlpDecoder.decode(upgradelurls.getBytes());
-                        RlpString upgradelurlsString = (RlpString) upgradelurlsList.getValues().get(0);
-                        String upgradelurl = Numeric.toHexString(upgradelurlsString.getBytes());
+                        String upgradelurl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //升级版本
-                        RlpString newVersions = (RlpString) rlpList1.getValues().get(3);
-                        RlpList newVersionsList = RlpDecoder.decode(newVersions.getBytes());
-                        RlpString newVersionsString = (RlpString) newVersionsList.getValues().get(0);
-                        BigInteger newVersion = new BigInteger(1, newVersionsString.getBytes());
+                        BigInteger newVersion =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         //投票截至快高
-                        RlpString upgradeEndVotingRounds = (RlpString) rlpList1.getValues().get(4);
-                        RlpList upgradeEndVotingRoundsList = RlpDecoder.decode(upgradeEndVotingRounds.getBytes());
-                        RlpString upgradeEndVotingRoundsListString = (RlpString) upgradeEndVotingRoundsList.getValues().get(0);
-                        BigInteger upgradeEndVotingRound = new BigInteger(1, upgradeEndVotingRoundsListString.getBytes());
+                        BigInteger upgradeEndVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
 
                         //生效块高
-                        RlpString upgradeActives = (RlpString) rlpList1.getValues().get(5);
-                        RlpList upgradeActivesList = RlpDecoder.decode(upgradeActives.getBytes());
-                        RlpString upgradeActivesString = (RlpString) upgradeActivesList.getValues().get(0);
-                        BigInteger upgradeActive = new BigInteger(1, upgradeActivesString.getBytes());
+                        BigInteger upgradeActive =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(5));
 
                         CreateProposalUpgradeDto createProposalUpgradeDto = new CreateProposalUpgradeDto();
                         createProposalUpgradeDto.init(upgradeVerifier,"",upgradelurl,upgradeEndVotingRound.intValue(),
@@ -328,40 +231,23 @@ public class TxParamResolver {
                         createProposalParamResult.clazz = CreateProposalParamDto.class;
 
                         //提交提案的验证人
-                        RlpString paramVerifiers = (RlpString) rlpList1.getValues().get(1);
-                        RlpList paramVerifiersList = RlpDecoder.decode(paramVerifiers.getBytes());
-                        RlpString paramVerifiersString = (RlpString) paramVerifiersList.getValues().get(0);
-                        String paramVerifier = Numeric.toHexString(paramVerifiersString.getBytes());
+                        String paramVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         //提案URL，长度不超过512
-                        RlpString paramUrls = (RlpString) rlpList1.getValues().get(2);
-                        RlpList paramUrlsList = RlpDecoder.decode(paramUrls.getBytes());
-                        RlpString paramUrlsString = (RlpString) paramUrlsList.getValues().get(0);
-                        String paramUrl = Numeric.toHexString(paramUrlsString.getBytes());
+                        String paramUrl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         //投票截至快高
-                        RlpString paramEndVotingRounds = (RlpString) rlpList1.getValues().get(3);
-                        RlpList paramEndVotingRoundsList = RlpDecoder.decode(paramEndVotingRounds.getBytes());
-                        RlpString paramEndVotingRoundsString = (RlpString) paramEndVotingRoundsList.getValues().get(0);
-                        BigInteger paramEndVotingRound = new BigInteger(1, paramEndVotingRoundsString.getBytes());
+                        BigInteger paramEndVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         //参数名称
-                        RlpString paramNames = (RlpString) rlpList1.getValues().get(4);
-                        RlpList paramNamesList = RlpDecoder.decode(paramNames.getBytes());
-                        RlpString paramNamesString = (RlpString) paramNamesList.getValues().get(0);
-                        String paramName = Numeric.toHexString(paramNamesString.getBytes());
+                        String paramName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
 
                         //当前值
-                        RlpString currentValues = (RlpString) rlpList1.getValues().get(5);
-                        RlpList currentValuesList = RlpDecoder.decode(currentValues.getBytes());
-                        RlpString currentValuesString = (RlpString) currentValuesList.getValues().get(0);
-                        String currentValue = Numeric.toHexString(currentValuesString.getBytes());
+                        String currentValue = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         //新的值
-                        RlpString newValues = (RlpString) rlpList1.getValues().get(5);
-                        RlpList newValuesList = RlpDecoder.decode(newValues.getBytes());
-                        RlpString newValuesString = (RlpString) newValuesList.getValues().get(0);
-                        String newValue = Numeric.toHexString(newValuesString.getBytes());
+                        String newValue = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+
 
 
                         CreateProposalParamDto createProposalParamDto = new CreateProposalParamDto();
@@ -371,18 +257,70 @@ public class TxParamResolver {
 
                     case 2003:
                         // 给提案投票
+                        Result<VotingProposalDto> votingProposalResult = new Result <>();
+                        votingProposalResult.clazz = VotingProposalDto.class;
+
+                        //投票验证人
+                        String voteVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+
+                        //提案ID
+                        String proposalID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+
+                        //投票选项
+                        BigInteger option =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
+
+                        //节点代码版本，有rpc的getProgramVersion接口获取
+                        BigInteger programVersions =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
+
+                        //代码版本签名，有rpc的getProgramVersion接口获取
+                        String versionSign = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+
+                        VotingProposalDto votingProposalDto = new VotingProposalDto();
+                        votingProposalDto.init(voteVerifier,proposalID,option.toString());
+                        votingProposalResult.result = votingProposalDto;
+
                         break;
 
                     case 2004:
                         // 版本声明
+                        Result<DeclareVersionDto> declareVersionResult = new Result <>();
+                        declareVersionResult.clazz = DeclareVersionDto.class;
+
+                        //声明的节点，只能是验证人/候选人
+                        String activeNode = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+
+                        //声明的版本，有rpc的getProgramVersion接口获取
+                        BigInteger version =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(2));
+
+                        //声明的版本签名，有rpc的getProgramVersion接口获取
+                        String versionSigns = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        DeclareVersionDto declareVersionDto = new DeclareVersionDto();
+                        declareVersionDto.init(activeNode,version.intValue());
+                        declareVersionResult.result = declareVersionDto;
                         break;
 
                     case 3000:
                         // 举报双签
+                        Result<ReportValidatorDto> reportValidatorResult = new Result <>();
+                        reportValidatorResult.clazz = ReportValidatorDto.class;
+
+                        //data
+                        String data = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        List<EvidencesDto> list = JSONArray.parseArray(data,EvidencesDto.class);
+
+                        ReportValidatorDto reportValidatorDto = new ReportValidatorDto();
+                        reportValidatorDto.setData(list);
+                        reportValidatorResult.result = reportValidatorDto;
+
                         break;
 
                     case 4000:
                         //创建锁仓计划
+
+                        RlpString Strings = (RlpString) rlpList1.getValues().get(1);
+                        RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
+                        RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
+                        String stringValue = Numeric.toHexString(StringsListString.getBytes());
                         break;
 
                 }
