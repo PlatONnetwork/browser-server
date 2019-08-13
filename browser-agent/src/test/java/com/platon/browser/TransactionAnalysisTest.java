@@ -2,6 +2,7 @@ package com.platon.browser;
 
 import com.platon.browser.dto.AnalysisResult;
 import com.platon.browser.util.TransactionAnalysis;
+import org.web3j.platon.contracts.DelegateContract;
 
 import java.math.BigDecimal;
 
@@ -15,10 +16,10 @@ public class TransactionAnalysisTest {
     public static void main ( String[] args ) {
         AnalysisResult analysisResult = null;
         try {
-            analysisResult = TransactionAnalysis.analysis("0xf901928800000000000003e99043616e6469646174654465706f736974b88230783466366338666431306266623531323739336638316133353934313230633736623639393164336430366330636336353230333563626661653366636437636463336633643761383230323164666462396561393966303134373535656331613634306438333261303336326234376265363838626233316435303466363264aa3078313163356132373465663261393234663539653731383261626337633033313230366364636636368800000000000022c48c3139322e3136382e392e3736853338373931b8ab7b226e6f64654e616d65223a22707074657374222c226e6f6465506f727472616974223a223031222c226e6f64654469736372697074696f6e223a22707074657374207070746573745c75376238305c7534656362222c226e6f64654465706172746d656e74223a223131222c226f6666696369616c57656273697465223a22687474703a2f2f7777772e62616964752e636f6d222c2274696d65223a313534373631383731383238387d",false);
-            System.out.println(analysisResult.getType());
-            System.out.println(analysisResult.getParameters());
-            System.out.println(analysisResult.getFunctionName());
+            //analysisResult = TransactionAnalysis.analysis("f856838203ec8180b842b8401f3a8672348ff6b789e416762ad53e69063138b8eb4d8780101658f24b2369f1a8e09499226b467d8bc0c4e03e1dc903df857eeb3c67733d21b6aaee2840e4298b8ad3c21bcecceda1000000",true);
+           // System.out.println(analysisResult.getType());
+            //System.out.println(analysisResult.getParameters());
+            //System.out.println(analysisResult.getFunctionName());
             double a = BigDecimal.valueOf(8900L).divide(BigDecimal.valueOf(10000), 4, BigDecimal.ROUND_FLOOR).doubleValue();
             System.out.println(a);
         } catch (Exception e) {

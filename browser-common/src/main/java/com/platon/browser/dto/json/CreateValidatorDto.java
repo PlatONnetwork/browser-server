@@ -56,4 +56,18 @@ public class CreateValidatorDto {
      * 程序的真实版本，治理rpc获取
      */
     private String programVersion;
+
+    public void init(Integer type, String benefitAddress,
+                     String nodeId,String externalId,String nodeName,
+                     String website ,String details,String amount, String programVersion){
+        this.setType(type);
+        this.setBenefitAddress(benefitAddress);
+        this.setNodeId(nodeId);
+        this.setExternalId(externalId);
+        this.setNodeName(nodeName);
+        this.setWebsite(website);
+        this.setDetails(details);
+        this.setAmount(amount);
+        this.setProgramVersion(programVersion);
+    }
 }

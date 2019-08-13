@@ -31,5 +31,12 @@ public class CreateProposalTextDto {
      */
     private Integer endVotingBlock;
 
+    public void init(String verifier,String githubID,String url,Integer endVotingBlock){
+        this.setVerifier(verifier);
+        this.setGithubID(githubID);
+        this.setUrl(url);
+        this.setEndVotingBlock(endVotingBlock);
+    }
+
 
 }

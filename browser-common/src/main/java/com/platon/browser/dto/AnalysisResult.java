@@ -12,7 +12,5 @@ import java.util.Map;
  */
 @Data
 public class AnalysisResult {
-    private String type;
-    private String functionName;
-    private Map <String, Object> parameters = new HashMap <>();
+    private String txCode;
 }

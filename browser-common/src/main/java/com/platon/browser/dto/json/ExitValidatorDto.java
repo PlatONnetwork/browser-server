@@ -24,4 +24,10 @@ public class ExitValidatorDto {
      * 质押交易快高
      */
     private String stakingBlockNum;
+
+    public void init(String nodeId,String nodeName,String stakingBlockNum){
+        this.setNodeId(nodeId);
+        this.setNodeName(nodeName);
+        this.setStakingBlockNum(stakingBlockNum);
+    }
 }

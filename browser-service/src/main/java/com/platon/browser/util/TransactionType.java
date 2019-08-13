@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Uint16;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint32;
 import org.web3j.abi.datatypes.generated.Uint64;
@@ -66,5 +67,15 @@ public class TransactionType {
         setCandidateExtra.put(2, new ClassName(Utf8String.class, "nodeId"));
         setCandidateExtra.put(3, new ClassName(Utf8String.class, "Extra"));
         functionNameToParamTypeMap.put("SetCandidateExtra", setCandidateExtra);
+    }
+
+    public static final Map<Integer, ClassName> delegate = new HashMap <>();
+
+    static {
+        delegate.put(1, new ClassName(Uint16.class,"typ"));
+        delegate.put(2, new ClassName(Utf8String.class,"nodeId"));
+        delegate.put(3, new ClassName(Utf8String.class,"amount"));
+        functionNameToParamTypeMap.put("delegate", delegate);
+
     }
 }

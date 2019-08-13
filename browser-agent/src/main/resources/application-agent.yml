@@ -9,6 +9,9 @@ dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useU
 dbuser: platon
 # MySQL数据库密码
 dbpass: platon
+web3j:
+  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
+  collect.batch-size: 500
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
   config: MAIN_NET-1-http://192.168.120.88:6789

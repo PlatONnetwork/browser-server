@@ -3,10 +3,15 @@ package com.platon.browser.dto;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.json.*;
+import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.math.BigInteger;
 
 /**
  * @Auther: Chendongming
@@ -23,11 +28,36 @@ public class TransactionInfo extends TransactionWithBLOBs {
      * @param initData
      */
     public TransactionInfo(PlatonBlock.TransactionResult initData){
-        BeanUtils.copyProperties(initData,this);
+        Transaction transaction = (Transaction)initData;
+        BeanUtils.copyProperties(transaction,this);
         // 属性类型转换
-        typeEnum = TxTypeEnum.valueOf(this.getTxType());
+        this.setGasLimit(transaction.getGas().toString());
+    }
 
-
+    public void updateTransactionInfo( TransactionReceipt receipt , String code){
+        this.setTransactionIndex(receipt.getTransactionIndex().intValue());
+        this.setGasUsed(receipt.getGasUsed().toString());
+        this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
+        String sequence = this.getBlockNumber().toString()+this.getTransactionIndex().toString();
+        this.setSequence(Long.valueOf(sequence));
+        this.setTxReceiptStatus(Integer.valueOf(receipt.getStatus()));
+        //TODO:code判断,
+        // 1.首先先判断to的地址是否等于内置合约地址以及code是否不为空
+        // a.满足以上条件，则to的类型为合约
+        // b.不满足以上条件说明to的地址为外部钱包地址，则为账户
+        if( this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
+                "0x" != code )
+        {
+            this.setReceiveType("contract");
+        }else
+            this.setReceiveType("account");
+        //txinfo
+        //txType
     }
 
     /**

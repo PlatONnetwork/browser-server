@@ -31,4 +31,11 @@ public class UnDelegateDto {
      */
     private String nodeName;
 
+    public void init(String stakingBlockNum ,String nodeId,String amount,String nodeName){
+        this.setStakingBlockNum(stakingBlockNum);
+        this.setNodeId(nodeId);
+        this.setAmount(amount);
+        this.setNodeName(nodeName);
+    }
+
 }

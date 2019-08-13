@@ -1,5 +1,6 @@
 package com.platon.browser.dto.json;
 
+import jnr.ffi.annotations.In;
 import lombok.Data;
 
 /**
@@ -40,4 +41,14 @@ public class CreateProposalUpgradeDto {
      * 生效块高（endVotingBlock+ 4*250 ~ endVotingBlock+ 10*250）
      */
     private Integer activeBlock;
+
+    public void init( String verifier, String githubID, String url, Integer endVotingBlock,Integer newVersion,Integer activeBlock ){
+        this.setVerifier(verifier);
+        this.setGithubID(githubID);
+        this.setUrl(url);
+        this.setEndVotingBlock(endVotingBlock);
+        this.setNewVersion(newVersion);
+        this.setActiveBlock(activeBlock);
+
+    }
 }

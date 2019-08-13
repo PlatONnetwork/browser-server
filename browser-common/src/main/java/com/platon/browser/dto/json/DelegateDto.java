@@ -1,6 +1,7 @@
 package com.platon.browser.dto.json;
 
 import lombok.Data;
+import org.web3j.abi.datatypes.Int;
 
 /**
  * User: dongqile
@@ -36,5 +37,13 @@ public class DelegateDto {
      * 质押交易快高
      */
     private String stakingBlockNum;
+
+    public void init( Integer type,String nodeId,String amount ,String nodeName,String stakingBlockNum ){
+        this.setType(type);
+        this.setNodeId(nodeId);
+        this.setAmount(amount);
+        this.setNodeName(nodeName);
+        this.setStakingBlockNum(stakingBlockNum);
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.platon.browser.util;
+package com.platon.browser.utils;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.web3j.crypto.ECDSASignature;
@@ -24,19 +24,19 @@ import java.util.List;
 public class CalculatePublicKey {
 
     public static String getPublicKey(PlatonBlock platonBlock) throws Exception {
-        String publicKey = testBlock(platonBlock).toString(16);
+        String publicKey = testBlock(platonBlock.getBlock()).toString(16);
         // 不足128前面补0
         if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
         return publicKey;
     }
 
-    public static BigInteger testBlock ( PlatonBlock tBlock ) throws Exception{
+    public static BigInteger testBlock ( PlatonBlock.Block block) throws Exception{
 
-        String extraData = tBlock.getBlock().getExtraData();
+        String extraData = block.getExtraData();
 
         String signature = extraData.substring(66, extraData.length());
 
-        byte[] msgHash = getMsgHash(tBlock.getBlock());
+        byte[] msgHash = getMsgHash(block);
 
 
         byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
@@ -65,7 +65,7 @@ public class CalculatePublicKey {
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));
         //UncleHash   common.Hash    `json:"sha3Uncles"       gencodec:"required"`
-        result.add(RlpString.create(decodeHash(block.getSha3Uncles())));
+        //result.add(RlpString.create(decodeHash(block.getSha3Uncles())));
         //Coinbase    common.Address `json:"miner"            gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getMiner())));
         //Root        common.Hash    `json:"stateRoot"        gencodec:"required"`
@@ -89,9 +89,8 @@ public class CalculatePublicKey {
         result.add(RlpString.create(block.getTimestamp()));
         //Extra       []byte         `json:"extraData"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getExtraData().substring(0, 66))));
-
         //MixDigest   common.Hash    `json:"mixHash"`
-        result.add(RlpString.create(decodeHash(block.getMixHash())));
+        //result.add(RlpString.create(decodeHash(block.getMixHash())));
         //Nonce       BlockNonce     `json:"nonce"`
         result.add(RlpString.create(decodeHash(block.getNonceRaw())));
 

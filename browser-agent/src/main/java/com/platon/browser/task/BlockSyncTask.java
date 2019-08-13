@@ -1,18 +1,18 @@
 package com.platon.browser.task;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
+import com.platon.browser.dto.TransactionInfo;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.exception.BusinessException;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
-import sun.util.locale.provider.LocaleServiceProviderPool;
+import org.web3j.protocol.core.methods.response.PlatonGetCode;
+import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
@@ -47,6 +49,8 @@ public class BlockSyncTask {
 
     private static ExecutorService THREAD_POOL;
 
+    private static ExecutorService TX_THREAD_POOL;
+
     @Autowired
     private BlockChain blockChain;
 
@@ -67,6 +71,7 @@ public class BlockSyncTask {
     public void init(){
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
+        TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
     }
 
     public void start() throws InterruptedException {
@@ -226,8 +231,32 @@ public class BlockSyncTask {
     private void analyzeBlockAndTransaction(List<BlockInfo> blocks){
 
         // 对需要复杂分析的区块或交易信息，开启并行处理
+        blocks.forEach(b -> {
+            List<TransactionInfo> txList = b.getTransactions();
+            txList.forEach(tx ->{
+                TX_THREAD_POOL.submit(() -> {
+                    updateTransactionInfo(tx);
+                });
+            });
+        });
 
     }
+
+    /**
+     * 分析区块获取code&交易回执
+     */
+    private TransactionInfo  updateTransactionInfo(TransactionInfo tx){
+        try {
+            PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
+            Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
+            PlatonGetCode platonGetCode = client.getWeb3j().platonGetCode(tx.getTo(), DefaultBlockParameterName.LATEST).send();
+            tx.updateTransactionInfo(receipts.get(),platonGetCode.getCode());
+        }catch (IOException e){
+
+        }
+        return tx;
+    }
+
     @Transactional
     public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
         // 串行批量入库

@@ -2,6 +2,8 @@ package com.platon.browser.dto.json;
 
 import lombok.Data;
 
+import java.lang.management.GarbageCollectorMXBean;
+
 /**
  * User: dongqile
  * Date: 2019/8/6
@@ -45,4 +47,15 @@ public class CreateProposalParamDto {
      * 新的值
      */
     private String newVersion;
+
+    public void init(String verifier,String githubID,String url,Integer endVotingBlock,String paramName,String currentValue,String newVersion){
+        this.setVerifier(verifier);
+        this.setGithubID(githubID);
+        this.setUrl(url);
+        this.setEndVotingBlock(endVotingBlock);
+        this.setParamName(paramName);
+        this.setCurrentValue(currentValue);
+        this.setNewVersion(newVersion);
+
+    }
 }

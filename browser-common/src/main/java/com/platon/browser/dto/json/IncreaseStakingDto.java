@@ -36,4 +36,11 @@ public class IncreaseStakingDto {
      * 质押交易快高
      */
     private String stakingBlockNum;
+
+    public void init(String nodeId, Integer type,String amount,String stakingBlockNum){
+        this.setNodeId(nodeId);
+        this.setType(type);
+        this.setAmount(amount);
+        this.setStakingBlockNum(stakingBlockNum);
+    }
 }

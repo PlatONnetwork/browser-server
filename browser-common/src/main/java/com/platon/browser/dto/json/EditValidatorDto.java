@@ -40,4 +40,15 @@ public class EditValidatorDto {
      * 节点的描述(有长度限制，表示该节点的描述)
      */
     private String details;
+
+    public void init(String benefitAddress,String nodeId,String externalId,
+                     String nodeName,String website,String details){
+        this.setBenefitAddress(benefitAddress);
+        this.setNodeId(nodeId);
+        this.setExternalId(externalId);
+        this.setNodeName(nodeName);
+        this.setWebsite(website);
+        this.setDetails(details);
+
+    }
 }
