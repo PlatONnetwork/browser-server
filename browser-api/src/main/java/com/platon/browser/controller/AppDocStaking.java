@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocStaking {
+public interface AppDocStaking {
 	
 	
     /**
@@ -128,7 +128,7 @@ public class AppDocStaking {
      * @apiDescription
      * 1. 功能：.实时验证人变更<br/>
      * 2. 实现逻辑：<br/>
-     * - ？
+     * - TODO 实现方式？
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -153,7 +153,7 @@ public class AppDocStaking {
      * - 查询mysql中node表并关联staking表
      * @apiParamExample {json} Request-Example:
      * {
-     *    "nodeAddr":""                //节点地址
+     *    "nodeId":""                //节点地址
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -202,7 +202,7 @@ public class AppDocStaking {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeAddr":""                //节点地址
+     *    "nodeId":""                //节点地址
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -235,7 +235,7 @@ public class AppDocStaking {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeAddr":"",               //节点地址
+     *    "nodeId":"",               //节点地址
      *    "stakingBlockNum",""         //最新的质押交易块高
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -299,6 +299,7 @@ public class AppDocStaking {
 	
 	
     /**
+     * @apiDeprecated
      * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date i.导出地址验证人委托列表
      * @apiVersion 1.0.0
      * @apiName delegationListByAddressDownload
@@ -309,6 +310,7 @@ public class AppDocStaking {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * >响应为 二进制文件流
+     * 没有导出
      */
 	
 	

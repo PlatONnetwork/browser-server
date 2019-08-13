@@ -20,10 +20,9 @@ public class BlockInfo extends Block {
      * 使用原生交易信息初始化交易信息
      * @param initData
      */
-
-
     public BlockInfo(PlatonBlock.Block initData){
         BeanUtils.copyProperties(initData,this);
+
         // 属性类型转换
         this.setNumber(initData.getNumber().longValue());
         this.setTimestamp(new Date(initData.getTimestamp().longValue()));
@@ -43,47 +42,25 @@ public class BlockInfo extends Block {
         // TODO:节点id
         this.setNodeId("0xflsjgsflsdf");
 
-        // 交易相关信息处理
-        initData.getTransactions().forEach(txResult->{
-            TransactionInfo ti = new TransactionInfo(txResult);
-            this.getTransactions().add(ti);
-        });
+        try{
+            // 抽取交易信息
+            initData.getTransactions().forEach(transactionResult -> {
+                TransactionInfo ti = new TransactionInfo(transactionResult);
+                ti.setTimestamp(this.getTimestamp());
+                ti.setCreateTime(date);
+                ti.setUpdateTime(date);
+                transactionList.add(ti);
+            });
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
 
-        // 交易信息统计
         class Stat {
             int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
         }
         Stat stat = new Stat();
-        this.getTransactions().forEach(ti->{
-            switch (ti.getTypeEnum()){
-                case TRANSFER:
-                    stat.transferQty++;
-                    break;
-                case CREATEPROPOSALPARAMETER:// 创建参数提案
-                case CREATEPROPOSALTEXT:// 创建文本提案
-                case CREATEPROPOSALUPGRADE:// 创建升级提案
-                case DECLAREVERSION:// 版本声明
-                case VOTINGPROPOSAL:// 提案投票
-                    stat.proposalQty++;
-                    break;
-                case DELEGATE:// 发起委托
-                case UNDELEGATE:// 撤销委托
-                    stat.delegateQty++;
-                    break;
-                case INCREASESTAKING:// 增加自有质押
-                case CREATEVALIDATOR:// 创建验证人
-                case EXITVALIDATOR:// 退出验证人
-                case REPORTVALIDATOR:// 举报验证人
-                case EDITVALIDATOR:// 编辑验证人
-                    stat.stakingQty++;
-                    break;
-            }
-            // 累加交易手续费
-            stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
-            // 累加交易gasLimit
-            stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
-        });
         this.setStatDelegateQty(stat.delegateQty);
         this.setStatProposalQty(stat.proposalQty);
         this.setStatStakingQty(stat.stakingQty);
@@ -91,16 +68,15 @@ public class BlockInfo extends Block {
         this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
         this.setStatTxFee(stat.txFee.toString());
 
-        // 交易信息按交易索引从大到小排序
-        Collections.sort(this.getTransactions(),(c1,c2)->{
-            if(c1.getTransactionIndex()>c2.getTransactionIndex()) return 1;
-            if(c1.getTransactionIndex()<c2.getTransactionIndex()) return -1;
+        // 确保区块内的交易顺序
+        Collections.sort(transactionList,(c1,c2)->{
+            if(c1.getTransactionIndex()>c2.getTransactionIndex())return 1;
+            if(c1.getTransactionIndex()<c2.getTransactionIndex())return -1;
             return 0;
         });
-
     }
 
-    private List<TransactionInfo> transactions = new ArrayList<>();
+    private List<TransactionInfo> transactionList = new ArrayList<>();
 
 
     @Override

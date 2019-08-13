@@ -1,16 +1,16 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.TransactionInfo;
-import org.omg.CORBA.PRIVATE_MEMBER;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Auther: Chendongming
@@ -22,11 +22,20 @@ public class ProposalExecute {
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String,Proposal> proposals = new HashMap<>();
 
+    @Autowired
+    private ProposalMapper proposalMapper;
+
+    @Autowired
+    private PlatonClient client;
+
     private ProposalExecuteResult executeResult = new ProposalExecuteResult();
 
     @PostConstruct
     private void init(){
         // 初始化全量数据
+        List<Proposal> proposalList = proposalMapper.selectByExample(null);
+        proposalList.forEach(proposal -> proposals.put(proposal.getHash(),proposal));
+
     }
 
     /**

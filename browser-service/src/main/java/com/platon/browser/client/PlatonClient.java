@@ -6,18 +6,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.PlatonBlockNumber;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.ReadonlyTransactionManager;
+import org.web3j.tx.gas.DefaultWasmGasProvider;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -32,6 +30,24 @@ public class PlatonClient {
 
     private List<Web3j> allWeb3jList=new ArrayList<>();
     private Web3j currentValidWeb3j;
+    // 委托合约接口
+    private DelegateContract delegateContract;
+    public DelegateContract getDelegateContract(){return delegateContract;}
+    // 节点合约接口
+    private NodeContract nodeContract;
+    public NodeContract getNodeContract(){return nodeContract;}
+    // 提案合约接口
+    private ProposalContract proposalContract;
+    public ProposalContract getProposalContract(){return proposalContract;}
+    // 锁仓合约接口
+    private RestrictingPlanContract restrictingPlanContract;
+    public RestrictingPlanContract getRestrictingPlanContract(){return restrictingPlanContract;}
+    // 惩罚合约接口
+    private SlashContract slashContract;
+    public SlashContract getSlashContract(){return slashContract;}
+    // 质押合约接口
+    private StakingContract stakingContract;
+    public StakingContract getStakingContract(){return stakingContract;}
 
     @Value("${platon.web3j.addresses}")
     private List<String> web3jAddresses;
@@ -44,12 +60,16 @@ public class PlatonClient {
             web3jAddresses.forEach(address->{
                 Web3j web3j = Web3j.build(new HttpService(address));
                 allWeb3jList.add(web3j);
+                if(currentValidWeb3j==null) currentValidWeb3j=web3j;
             });
         }catch (Exception e){
             e.printStackTrace();
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
+
+        // 更新合约
+        updateContract();
         // 更新有效web3j实例列表
         updateCurrentValidWeb3j();
     }
@@ -66,6 +86,15 @@ public class PlatonClient {
         return null;
     }
 
+    private void updateContract(){
+        delegateContract = DelegateContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, DelegateContract.DELEGATE_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        nodeContract = NodeContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, NodeContract.NODE_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        proposalContract = ProposalContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, ProposalContract.PROPOSAL_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        slashContract = SlashContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, SlashContract.SLASH_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        stakingContract = StakingContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, StakingContract.STAKING_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+    }
+
     public void updateCurrentValidWeb3j(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
         Web3j originWeb3j = currentValidWeb3j;
@@ -74,6 +103,7 @@ public class PlatonClient {
             try {
                 if(currentValidWeb3j==null) throw new RuntimeException("currentValidWeb3j需要初始化！");
                 currentValidWeb3j.platonBlockNumber().send();
+                updateContract();
             } catch (Exception e1) {
                 logger.info("当前Web3j实例({})无效，重新选举Web3j实例！",currentValidWeb3j);
                 // 连不通，则需要更新
@@ -86,7 +116,7 @@ public class PlatonClient {
                     }
                 }
                 if(originWeb3j==currentValidWeb3j){
-                    logger.info("当前所有候选Web3j实例均无效！");
+                    logger.info("当前所有候选Web3j实例均无法连通！");
                 }
             }
         }finally {

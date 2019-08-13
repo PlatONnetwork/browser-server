@@ -39,6 +39,7 @@ public class SearchController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} /home/search k.搜索
      * @apiVersion 1.0.0
      * @apiName search

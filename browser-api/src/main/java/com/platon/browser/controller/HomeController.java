@@ -40,6 +40,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /app/node/init?cid=:chainId a.节点监控图标数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName node/init
@@ -77,6 +78,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /topic/node/new?cid=:chainId b.节点监控图标数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName node/new
@@ -94,6 +96,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /app/index/init?cid=:chainId c.实时监控指标（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName index/init
@@ -134,6 +137,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /topic/index/new?cid=:chainId d.实时监控指标（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName index/new
@@ -148,6 +152,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /app/statistic/init?cid=:chainId e.出块时间及交易数据（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName statistic/init
@@ -190,6 +195,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /topic/statistic/new?cid=:chainId f.出块时间及交易数据（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName statistic/new
@@ -204,6 +210,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /app/block/init?cid=:chainId g.实时区块列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName block/init
@@ -242,6 +249,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /topic/block/new?cid=:chainId h.实时区块列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName block/new
@@ -256,6 +264,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /app/transaction/init?cid=:chainId i.实时交易列表（websocket请求）初始数据
      * @apiVersion 1.0.0
      * @apiName transaction/init
@@ -309,6 +318,7 @@ public class HomeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {subscribe} /topic/transaction/new?cid=:chainId j.实时交易列表（websocket请求）增量数据
      * @apiVersion 1.0.0
      * @apiName transaction/new

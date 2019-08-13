@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocHome {
+public interface AppDocHome {
 	
 	
     /**
@@ -51,7 +51,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新的50条出块趋势数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:chain[链ID]:blocks<br/>
+     * - 查询redis结构：browser:chain[链ID]:blocks<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -75,7 +75,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送区块链基础数据<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:networkstat<br/>
+     * - 查询redis结构：browser:networkstat<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -84,7 +84,7 @@ public class AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":{
      *       "currentNumber":111,      //当前区块高度
-     *       "nodeAddr":"",            //出块节点地址
+     *       "nodeId":"",            //出块节点id
      *       "nodeName":"",            //出块节点名称
      *       "txQty":"",               //总的交易数
      *       "currentTps":111,         //当前的TPS
@@ -108,7 +108,7 @@ public class AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新8条区块信息<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]::blocks<br/>
+     * - 查询redis结构：browser:blocks<br/>
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -138,6 +138,8 @@ public class AppDocHome {
      * 1. 功能：推送最新8条验证人信息<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中node表<br/>
+     * - 根据状态和是否共识验证人标识来查询
+     * - 根据一级排序 质押金+委托总额来排序，二级排序根据版本号进行排序，三级排序根据质押索引倒序
      * - 5s全量推送一次
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK

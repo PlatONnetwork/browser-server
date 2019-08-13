@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomNodeMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Node">
+    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="stat_slash_multi_qty" jdbcType="INTEGER" property="statSlashMultiQty" />
+    <result column="stat_slash_low_qty" jdbcType="INTEGER" property="statSlashLowQty" />
+    <result column="stat_block_qty" jdbcType="BIGINT" property="statBlockQty" />
+    <result column="stat_expect_block_qty" jdbcType="BIGINT" property="statExpectBlockQty" />
+    <result column="stat_reward_value" jdbcType="VARCHAR" property="statRewardValue" />
+    <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
+    <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    sta.node_id, nod.stat_slash_multi_qty, nod.stat_slash_low_qty, nod.stat_block_qty, nod.stat_expect_block_qty,
+    nod.stat_reward_value, nod.stat_verifier_time, nod.is_recommend, nod.create_time, nod.update_time
+  </sql>
+  <select id="selectVerifiers" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from staking sta left join node nod on nod.node_id=sta.node_id
+    where sta.is_setting = 1
+  </select>
+
+  <select id="selectValidators" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from staking sta left join node nod on nod.node_id=sta.node_id
+    where sta.is_consensus = 1
+  </select>
+</mapper>

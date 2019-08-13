@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomStakingMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Staking">
+    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
+    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="staking_tx_index" jdbcType="INTEGER" property="stakingTxIndex" />
+    <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
+    <result column="staking_has" jdbcType="VARCHAR" property="stakingHas" />
+    <result column="staking_locked" jdbcType="VARCHAR" property="stakingLocked" />
+    <result column="stat_delegate_has" jdbcType="VARCHAR" property="statDelegateHas" />
+    <result column="stat_delegate_locked" jdbcType="VARCHAR" property="statDelegateLocked" />
+    <result column="stat_delegate_reduction" jdbcType="VARCHAR" property="statDelegateReduction" />
+    <result column="stat_delegate_qty" jdbcType="INTEGER" property="statDelegateQty" />
+    <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
+    <result column="staking_icon" jdbcType="VARCHAR" property="stakingIcon" />
+    <result column="external_id" jdbcType="VARCHAR" property="externalId" />
+    <result column="denefit_addr" jdbcType="VARCHAR" property="denefitAddr" />
+    <result column="expected_income" jdbcType="VARCHAR" property="expectedIncome" />
+    <result column="block_reward_value" jdbcType="VARCHAR" property="blockRewardValue" />
+    <result column="pre_set_block_reward_value" jdbcType="VARCHAR" property="preSetBlockRewardValue" />
+    <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />
+    <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
+    <result column="staking_reward_value" jdbcType="VARCHAR" property="stakingRewardValue" />
+    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
+    <result column="details" jdbcType="VARCHAR" property="details" />
+    <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
+    <result column="leave_time" jdbcType="TIMESTAMP" property="leaveTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_consensus" jdbcType="INTEGER" property="isConsensus" />
+    <result column="staking_epoch" jdbcType="INTEGER" property="stakingEpoch" />
+    <result column="staking_reduction" jdbcType="VARCHAR" property="stakingReduction" />
+    <result column="staking_name" jdbcType="VARCHAR" property="stakingName" />
+    <result column="is_setting" jdbcType="INTEGER" property="isSetting" />
+    <result column="is_init" jdbcType="INTEGER" property="isInit" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    staking_block_num, node_id, staking_tx_index, staking_addr, staking_has, staking_locked,
+    stat_delegate_has, stat_delegate_locked, stat_delegate_reduction, stat_delegate_qty,
+    stat_verifier_time, staking_icon, external_id, denefit_addr, expected_income, block_reward_value,
+    pre_set_block_reward_value, cur_cons_block_qty, pre_cons_block_qty, staking_reward_value,
+    web_site, details, join_time, leave_time, `status`, create_time, update_time, is_consensus,
+    staking_epoch, staking_reduction, staking_name, is_setting, is_init
+  </sql>
+  <select id="selectVerifiers" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from staking
+    where is_setting = 1
+  </select>
+
+  <select id="selectValidators" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from staking
+    where is_consensus = 1
+  </select>
+</mapper>

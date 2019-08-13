@@ -55,6 +55,7 @@ public class NodeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} node/list a.节点列表
      * @apiVersion 1.0.0
      * @apiName list
@@ -115,6 +116,7 @@ public class NodeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} node/historyList b.历史节点列表
      * @apiVersion 1.0.0
      * @apiName historyList
@@ -163,6 +165,7 @@ public class NodeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} node/detail c.节点详情
      * @apiVersion 1.0.0
      * @apiName detail
@@ -230,6 +233,7 @@ public class NodeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {post} node/blockList d.节点区块列表(显示最新20条)
      * @apiVersion 1.0.0
      * @apiName blockList
@@ -289,6 +293,7 @@ public class NodeController {
 
     */
 /**
+     * @apiDeprecated
      * @api {get} node/blockDownload?cid=:cid&nodeId=:nodeId&date=:date e.导出节点区块详情
      * @apiVersion 1.0.0
      * @apiName blockDownload

@@ -1,6 +1,6 @@
 package com.platon.browser.controller;
 
-public class AppDocBlock {
+public interface AppDocBlock {
 	
     /**
      *
@@ -11,7 +11,7 @@ public class AppDocBlock {
      * @apiDescription
      * 1. 功能：区块列表查询<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询redis结构：browser:[应用版本]:[应用运行配置名称]:blocks<br/>
+     * - 查询redis结构：browser:blocks<br/>
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -45,9 +45,9 @@ public class AppDocBlock {
 	
      /**
      *
-     * @api {post} /block/blockListByNodeAddr b.节点的区块列表
+     * @api {post} /block/blockListByNodeId b.节点的区块列表
      * @apiVersion 1.0.0
-     * @apiName blockListByNodeAddr
+     * @apiName blockListByNodeId
      * @apiGroup block
      * @apiDescription
      * 1. 功能：节点产生的区块列表查询<br/>
@@ -57,7 +57,7 @@ public class AppDocBlock {
      * {
      *    "pageNo":1,                  //页数(必填)
      *    "pageSize":10,               //页大小(必填)
-     *    "nodeAddr":""                //节点地址
+     *    "nodeId":""                //节点id
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -66,19 +66,20 @@ public class AppDocBlock {
 	
 	
     /**
-     * @api {get} /block/blockListByNodeAddrDownload?nodeAddr=:nodeAddr&date=:date c.导出节点的区块列表
+     * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date c.导出节点的区块列表
      * @apiVersion 1.0.0
-     * @apiName blockListByNodeAddrDownload
+     * @apiName blockListByNodeIdDownload
      * @apiGroup block
      * @apiDescription
      * 1. 功能：导出节点产生的区块列表查询<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中block表
-     * @apiParam {String} stakingHash 验证人标识
+     * @apiParam {String} nodeId 节点id
      * @apiParam {String} date 数据结束日期
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * >响应为 二进制文件流
+     * TODO 模版
      */	
 	
 	
