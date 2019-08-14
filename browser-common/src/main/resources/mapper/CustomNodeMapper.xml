@@ -17,6 +17,16 @@
     nod.update_time
   </sql>
 
+  <!--查询所有节点-->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from node nod
+  </select>
+
   <!--查询结算周期验证人-->
   <select id="selectVerifiers" resultMap="BaseResultMap">
     select

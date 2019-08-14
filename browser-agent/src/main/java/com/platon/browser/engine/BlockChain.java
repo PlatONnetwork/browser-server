@@ -45,14 +45,7 @@ public class BlockChain {
     @Autowired
     private AddressExecute addressExecute;
 
-    @Autowired
-    private CustomNodeMapper customNodeMapper;
-    @Autowired
-    private CustomStakingMapper customStakingMapper;
-    @Autowired
-    private CustomNodeOptMapper customNodeOptMapper;
-    @Autowired
-    private CustomSlashMapper customSlashMapper;
+
 
     @Autowired
     private PlatonClient client;
@@ -71,41 +64,10 @@ public class BlockChain {
     // 当前共识周期验证人
     private Map<String, NodeBean> curValidator = new HashMap<>();
 
-    enum NodeType {VALIDATOR,VERIFIER}
-    private void loadNodes(NodeType type){
-        List<NodeBean> nodes;
-        Map<String,NodeBean> nodeMap;
-        switch (type){
-            case VALIDATOR:
-                nodes = customNodeMapper.selectValidators();
-                nodeMap = curValidator;
-                break;
-            default:
-                nodes = customNodeMapper.selectVerifiers();
-                nodeMap = curVerifier;
-        }
-        List<String> nodeIds = new ArrayList<>();
-        nodes.forEach(node -> {
-            nodeIds.add(node.getNodeId());
-            nodeMap.put(node.getNodeId(),node);
-        });
-        // |-加载质押记录
-        List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
-        stakings.forEach(staking->nodeMap.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking));
-        // |-加载节点操作记录
-        List<NodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
-        nodeOpts.forEach(opt->nodeMap.get(opt.getNodeId()).getNodeOpts().add(opt));
-        // |-加载节点惩罚记录
-        List<Slash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
-        slashes.forEach(slash -> nodeMap.get(slash.getNodeId()).getSlashes().add(slash));
-    }
-
     @PostConstruct
     private void init(){
         /***把当前库中的验证人列表加载到内存中**/
-        // 初始化当前结算周期验证人列表
-        loadNodes(NodeType.VERIFIER);
-        loadNodes(NodeType.VALIDATOR);
+
     }
 
     /**

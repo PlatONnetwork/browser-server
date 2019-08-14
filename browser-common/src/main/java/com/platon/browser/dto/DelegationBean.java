@@ -1,9 +1,10 @@
 package com.platon.browser.dto;
 
+import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.UnDelegation;
 import lombok.Data;
-import org.omg.CORBA.PRIVATE_MEMBER;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,14 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class DelegationBean {
-    private List<UnDelegation> unDelegations;
+public class DelegationBean extends Delegation {
+    private List<UnDelegation> unDelegations = new ArrayList<>();
+
+    public String getStakingMapKey(){
+        return this.getNodeId()+this.getStakingBlockNum();
+    }
+
+    public String getDelegationMapKey(){
+        return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
+    }
 }

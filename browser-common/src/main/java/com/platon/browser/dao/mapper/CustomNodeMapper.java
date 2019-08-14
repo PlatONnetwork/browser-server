@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface CustomNodeMapper {
 
+    List<NodeBean> selectAll();
     List<NodeBean> selectVerifiers();
     List<NodeBean> selectValidators();
 

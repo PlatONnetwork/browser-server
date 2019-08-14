@@ -19,6 +19,10 @@ public class StakingBean extends Staking {
     // <质押块高-质押记录> 映射
     private Map<String, DelegationBean> delegations = new HashMap<>();
 
+    public String getMapKey(){
+        return this.getNodeId()+this.getStakingBlockNum();
+    }
+
     public void initWithNode(org.web3j.platon.bean.Node initData){
         BeanUtils.copyProperties(initData,this);
         if(initData.getStakingTxIndex()!=null) this.setStakingTxIndex(initData.getStakingTxIndex().intValue());
