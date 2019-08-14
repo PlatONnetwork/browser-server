@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time, 
+    `hash`, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time,
     update_time, node_id
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.UnDelegationExample" resultMap="BaseResultMap">
@@ -89,7 +89,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from un_delegation
     where hash = #{hash,jdbcType=VARCHAR}
@@ -105,12 +105,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.UnDelegation">
-    insert into un_delegation (hash, staking_block_num, delegate_addr, 
-      apply_amount, redeem_locked, `status`, 
+    insert into un_delegation (hash, staking_block_num, delegate_addr,
+      apply_amount, redeem_locked, `status`,
       create_time, update_time, node_id
       )
-    values (#{hash,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{delegateAddr,jdbcType=VARCHAR}, 
-      #{applyAmount,jdbcType=VARCHAR}, #{redeemLocked,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+    values (#{hash,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{delegateAddr,jdbcType=VARCHAR},
+      #{applyAmount,jdbcType=VARCHAR}, #{redeemLocked,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{nodeId,jdbcType=VARCHAR}
       )
   </insert>
@@ -280,12 +280,12 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into un_delegation
-    (hash, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time, 
+    (hash, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time,
       update_time, node_id)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.delegateAddr,jdbcType=VARCHAR}, 
-        #{item.applyAmount,jdbcType=VARCHAR}, #{item.redeemLocked,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER}, 
+      (#{item.hash,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.delegateAddr,jdbcType=VARCHAR},
+        #{item.applyAmount,jdbcType=VARCHAR}, #{item.redeemLocked,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER},
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.nodeId,jdbcType=VARCHAR}
         )
     </foreach>

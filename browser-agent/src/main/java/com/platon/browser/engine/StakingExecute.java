@@ -1,23 +1,17 @@
 package com.platon.browser.engine;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.mapper.DelegationMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.StakingBean;
-import com.platon.browser.dto.TransactionBean;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -29,37 +23,72 @@ public class StakingExecute {
     private static Logger logger = LoggerFactory.getLogger(StakingExecute.class);
 
     @Autowired
-    private NodeMapper nodeMapper;
+    private CustomNodeMapper customNodeMapper;
     @Autowired
-    private DelegationMapper delegationMapper;
+    private CustomStakingMapper customStakingMapper;
     @Autowired
-    private StakingMapper stakingMapper;
-
+    private CustomNodeOptMapper customNodeOptMapper;
     @Autowired
-    private PlatonClient client;
+    private CustomSlashMapper customSlashMapper;
+    @Autowired
+    private CustomDelegationMapper customDelegationMapper;
+    @Autowired
+    private CustomUnDelegationMapper customUnDelegationMapper;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, Node> nodes = new HashMap<>(); // 节点统计表
-    private Map<String, Delegation> delegations = new HashMap<>(); // 委托表
-    private Map<String, Staking> stakings = new HashMap<>(); // 验证人列表
+    private Map<String, NodeBean> nodes = new TreeMap<>(); // 节点统计表
 
     private StakingExecuteResult executeResult= new StakingExecuteResult();
 
+    private void loadNodes(){
+        List<NodeBean> nodeList = customNodeMapper.selectAll();
+        List<String> nodeIds = new ArrayList<>();
+        nodeList.forEach(node -> {
+            nodeIds.add(node.getNodeId());
+            nodes.put(node.getNodeId(),node);
+        });
+        // |-加载质押记录
+        List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
+        // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
+        Map<String,StakingBean> nodeIdStakingNum_Staking_Map = new HashMap<>();
+        stakings.forEach(staking->{
+            nodes.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
+            nodeIdStakingNum_Staking_Map.put(staking.getMapKey(),staking);
+        });
+        // |-加载委托记录
+        List<DelegationBean> delegations = customDelegationMapper.selectByNodeIdList(nodeIds);
+        // <节点ID+质押块号 - 质押记录> 映射, 方便【撤销委托记录】的添加
+        Map<String,DelegationBean> delegateAddrNodeIdStakingNum_Delegation_Map = new HashMap<>();
+        delegations.forEach(delegation->{
+            StakingBean staking = nodeIdStakingNum_Staking_Map.get(delegation.getStakingMapKey());
+            if(staking!=null) {
+                staking.getDelegations().put(delegation.getDelegateAddr(),delegation);
+                delegateAddrNodeIdStakingNum_Delegation_Map.put(delegation.getDelegationMapKey(),delegation);
+            }
+        });
+        // |-加载撤销委托记录
+        List<UnDelegationBean> unDelegations = customUnDelegationMapper.selectByNodeIdList(nodeIds);
+        unDelegations.forEach(unDelegation->{
+            DelegationBean delegation = delegateAddrNodeIdStakingNum_Delegation_Map.get(unDelegation.getDelegationMapKey());
+            if(delegation!=null){
+                delegation.getUnDelegations().add(unDelegation);
+            }
+        });
+        // |-加载节点操作记录
+        List<NodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
+        nodeOpts.forEach(opt->nodes.get(opt.getNodeId()).getNodeOpts().add(opt));
+        // |-加载节点惩罚记录
+        List<Slash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
+        slashes.forEach(slash -> nodes.get(slash.getNodeId()).getSlashes().add(slash));
+    }
+
     @PostConstruct
     private void init(){
-        // 初始化全量数据
+        /***把当前库中的验证人列表加载到内存中**/
+        // 初始化当前结算周期验证人列表
+        loadNodes();
 
-        // 节点汇总列表
-        List<Node> nodeList = nodeMapper.selectByExample(null);
-        nodeList.forEach(node ->nodes.put(node.getNodeId(),node));
-
-        // 质押列表,节点ID+质押区块号唯一确定一条记录
-        List<Staking> stakingList = stakingMapper.selectByExample(null);
-        stakingList.forEach(staking -> stakings.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
-
-        // 委托列表
-        List<Delegation> delegationList = delegationMapper.selectByExample(null);
-        delegationList.forEach(delegation -> delegations.put(delegation.getDelegateAddr(),delegation));
+        logger.debug("{}", JSON.toJSONString(nodes,true));
     }
 
     /**
