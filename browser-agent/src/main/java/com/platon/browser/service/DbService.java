@@ -5,12 +5,14 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.engine.BlockChainResult;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * User: dongqile
@@ -40,6 +42,8 @@ public class DbService {
     private SlashMapper slashMapper;
     @Autowired
     private NodeOptMapper nodeOptMapper;
+    @Autowired
+    private AddressMapper addressMapper;
 
     @Transactional
     public void insertOrUpdateChainInfo ( List <BlockInfo> basicData, BlockChainResult bizData ) throws Exception {

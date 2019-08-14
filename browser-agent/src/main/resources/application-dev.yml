@@ -53,7 +53,7 @@ platonconfig:
   stake_threshold:
   #委托门槛
   minimum_threshold:
-  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
+  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)选举周期
   election_distance: 230
   #投票数百分比下限
   support_rate_threshold:

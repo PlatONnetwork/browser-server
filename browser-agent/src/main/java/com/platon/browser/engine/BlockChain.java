@@ -38,18 +38,17 @@ public class BlockChain {
     private StakingExecute stakingExecute;
     @Autowired
     private ProposalExecute proposalExecute;
-
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
     private CustomStakingMapper customStakingMapper;
-
     @Autowired
     private PlatonClient client;
 
     private long curSettingEpoch;
     private long curConsensusEpoch;
     private BlockInfo curBlock;
+    private long transactionCount;
 
     // 上轮结算周期验证人
     private Map<String, Staking> preVerifier = new HashMap<>();
@@ -179,6 +178,8 @@ public class BlockChain {
      */
     private void analyzeTransaction(){
         curBlock.getTransactionList().forEach(transactionInfo -> {
+            // 地址相关
+
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (transactionInfo.getTypeEnum()){
                 case CREATEVALIDATOR: // 创建验证人
