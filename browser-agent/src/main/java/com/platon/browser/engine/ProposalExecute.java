@@ -3,7 +3,7 @@ package com.platon.browser.engine;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dto.TransactionInfo;
+import com.platon.browser.dto.TransactionBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class ProposalExecute {
      * @param tx
      * @param bc
      */
-    public void execute(TransactionInfo tx,BlockChain bc){
+    public void execute(TransactionBean tx, BlockChain bc){
 
         switch (tx.getTypeEnum()){
             case CREATEPROPOSALTEXT:
@@ -76,23 +76,23 @@ public class ProposalExecute {
         executeResult.getAddVotes().clear();
     }
 
-    private void updateTxInfo(TransactionInfo tx,BlockChain bc){
+    private void updateTxInfo(TransactionBean tx, BlockChain bc){
 
     }
     //提交文本提案(创建提案)
-    private void execute2000(TransactionInfo tx,BlockChain bc){
+    private void execute2000(TransactionBean tx, BlockChain bc){
 
     }
     //提交升级提案(创建提案)
-    private void execute2001(TransactionInfo tx,BlockChain bc){
+    private void execute2001(TransactionBean tx, BlockChain bc){
 
     }
     //提交参数提案(创建提案)
-    private void execute2002(TransactionInfo tx,BlockChain bc){
+    private void execute2002(TransactionBean tx, BlockChain bc){
 
     }
     //给提案投票(提案投票)
-    private void execute2003(TransactionInfo tx,BlockChain bc){
+    private void execute2003(TransactionBean tx, BlockChain bc){
 
     }
     public void checkProposalStatus(){

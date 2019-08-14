@@ -14,13 +14,13 @@ import java.util.*;
  * @Description:
  */
 @Data
-public class BlockInfo extends Block {
+public class BlockBean extends Block {
 
     /**
      * 使用原生交易信息初始化交易信息
      * @param initData
      */
-    public BlockInfo(PlatonBlock.Block initData){
+    public BlockBean(PlatonBlock.Block initData){
         BeanUtils.copyProperties(initData,this);
         // 属性类型转换
         this.setNumber(initData.getNumber().longValue());
@@ -44,7 +44,7 @@ public class BlockInfo extends Block {
         try{
             // 抽取交易信息
             initData.getTransactions().forEach(transactionResult -> {
-                TransactionInfo ti = new TransactionInfo(transactionResult);
+                TransactionBean ti = new TransactionBean(transactionResult);
                 ti.setTimestamp(this.getTimestamp());
                 ti.setCreateTime(date);
                 ti.setUpdateTime(date);
@@ -75,14 +75,14 @@ public class BlockInfo extends Block {
         });
     }
 
-    private List<TransactionInfo> transactionList = new ArrayList<>();
+    private List<TransactionBean> transactionList = new ArrayList<>();
 
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BlockInfo blockInfo = (BlockInfo) o;
+        BlockBean blockInfo = (BlockBean) o;
         return Objects.equals(getNumber(), blockInfo.getNumber());
     }
 

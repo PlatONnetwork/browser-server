@@ -12,7 +12,8 @@ import javax.annotation.PostConstruct;
 
 @EnableScheduling
 @SpringBootApplication
-public class BrowserAgentApplication implements ApplicationRunner {
+//public class BrowserAgentApplication implements ApplicationRunner {
+public class BrowserAgentApplication {
 
 	@Autowired
 	private BlockSyncTask blockSyncTask;
@@ -21,7 +22,7 @@ public class BrowserAgentApplication implements ApplicationRunner {
 		SpringApplication.run(BrowserAgentApplication.class, args);
 	}
 
-	@Override
+	//@Override
 	public void run(ApplicationArguments args) throws Exception {
 		blockSyncTask.init();
 		blockSyncTask.start();

@@ -1,14 +1,18 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.NodeOpt;
+import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
+import com.platon.browser.dao.mapper.CustomNodeOptMapper;
+import com.platon.browser.dao.mapper.CustomSlashMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dto.BlockInfo;
-import com.platon.browser.dto.StakingInfo;
+import com.platon.browser.dto.BlockBean;
+import com.platon.browser.dto.NodeBean;
+import com.platon.browser.dto.StakingBean;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,6 @@ import org.web3j.platon.BaseResponse;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -31,6 +34,8 @@ import java.util.*;
 public class BlockChain {
     private static Logger logger = LoggerFactory.getLogger(BlockChain.class);
 
+    private Map<String,Long> nodeIdToBlockCountMap = new HashMap<>();
+
     private BlockChainResult execResult = new BlockChainResult();
     @Autowired
     private BlockChainConfig chainConfig;
@@ -40,45 +45,88 @@ public class BlockChain {
     private ProposalExecute proposalExecute;
 
     @Autowired
-    private NodeMapper nodeMapper;
+    private CustomNodeMapper customNodeMapper;
     @Autowired
     private CustomStakingMapper customStakingMapper;
+    @Autowired
+    private CustomNodeOptMapper customNodeOptMapper;
+    @Autowired
+    private CustomSlashMapper customSlashMapper;
 
     @Autowired
     private PlatonClient client;
 
     private long curSettingEpoch;
     private long curConsensusEpoch;
-    private BlockInfo curBlock;
+    private BlockBean curBlock;
 
     // 上轮结算周期验证人
-    private Map<String, Staking> preVerifier = new HashMap<>();
+    private Map<String, NodeBean> preVerifier = new HashMap<>();
     // 当前结算周期验证人
-    private Map<String, Staking> curVerifier = new HashMap<>();
+    private Map<String, NodeBean> curVerifier = new HashMap<>();
     // 上轮共识周期验证人
-    private Map<String, Staking> preValidator = new HashMap<>();
+    private Map<String, NodeBean> preValidator = new HashMap<>();
     // 当前共识周期验证人
-    private Map<String, Staking> curValidator = new HashMap<>();
+    private Map<String, NodeBean> curValidator = new HashMap<>();
 
+    enum NodeType {VALIDATOR,VERIFIER}
+    private void loadNodes(NodeType type){
+        List<NodeBean> nodes;
+        Map<String,NodeBean> nodeMap;
+        switch (type){
+            case VALIDATOR:
+                nodes = customNodeMapper.selectValidators();
+                nodeMap = curValidator;
+                break;
+            default:
+                nodes = customNodeMapper.selectVerifiers();
+                nodeMap = curVerifier;
+        }
+        List<String> nodeIds = new ArrayList<>();
+        nodes.forEach(node -> {
+            nodeIds.add(node.getNodeId());
+            nodeMap.put(node.getNodeId(),node);
+        });
+        // |-加载质押记录
+        List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
+        stakings.forEach(staking->nodeMap.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking));
+        // |-加载节点操作记录
+        List<NodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
+        nodeOpts.forEach(opt->nodeMap.get(opt.getNodeId()).getNodeOpts().add(opt));
+        // |-加载节点惩罚记录
+        List<Slash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
+        slashes.forEach(slash -> nodeMap.get(slash.getNodeId()).getSlashes().add(slash));
+    }
 
     @PostConstruct
     private void init(){
         /***把当前库中的验证人列表加载到内存中**/
         // 初始化当前结算周期验证人列表
-        List<Staking> verifiers = customStakingMapper.selectVerifiers();
-        verifiers.forEach(verifier -> curVerifier.put(verifier.getNodeId()+verifier.getStakingBlockNum(),verifier));
-        // 初始化当前共识周期验证人列表
-        List<Staking> validators = customStakingMapper.selectValidators();
-        validators.forEach(validator -> curValidator.put(validator.getNodeId(),validator));
+        loadNodes(NodeType.VERIFIER);
+        loadNodes(NodeType.VALIDATOR);
     }
 
     /**
      * 执行区块
      * @param block
      */
-    public void execute(BlockInfo block){
+    public void execute(BlockBean block){
         curBlock=block;
         //新开线程去查询rpc共识列表
+
+        // 节点区块数统计
+        Long blockCount = nodeIdToBlockCountMap.get(block.getNodeId());
+        if(blockCount==null){
+            blockCount=0l;
+        }
+        nodeIdToBlockCountMap.put(block.getNodeId(),++blockCount);
+
+        if(block.getNumber()==1){
+            // TODO: 初始化共识周期验证人列表和结算周期验证人列表，结算周期验证人列表包含了共识周期验证人列表
+            // 调用节点合约获取初始验证人,并入库
+            client.getNodeContract().getValidatorList();
+        }
+
 
         //数据回填
         // 推算并更新共识周期和结算周期
@@ -116,7 +164,7 @@ public class BlockChain {
             List<org.web3j.platon.bean.Node> validators = response.data;
             Date date = new Date();
             validators.forEach(validator->{
-                StakingInfo staking = new StakingInfo();
+                StakingBean staking = new StakingBean();
                 staking.initWithNode(validator);
                 staking.setCreateTime(date);
                 staking.setUpdateTime(date);
@@ -132,7 +180,7 @@ public class BlockChain {
         return stakingList;
     }
     private void updateNodes(){
-        if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
+        /*if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
             // 进入新共识周期
             // 把curValidator引用赋给preValidator
             preValidator.clear();
@@ -170,7 +218,7 @@ public class BlockChain {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -234,6 +282,8 @@ public class BlockChain {
         if(blockNumber%chainConfig.getConsensusPeriod()==0){
             // 进入新共识周期
             logger.debug("进入新共识周期：Block Number({})",blockNumber);
+
+            // TODO: 更新共识周期验证人列表
             onNewConsEpoch();
         }
 
@@ -241,12 +291,15 @@ public class BlockChain {
             // 进入新结算周期
             logger.debug("进入新结算周期：Block Number({})",blockNumber);
 
+            // TODO: 更新结算周期验证人列表
             onNewSettingEpoch();
         }
 
         if(blockNumber%chainConfig.getElectionDistance()==0){
             // 开始验证人选举
             logger.debug("开始验证人选举：Block Number({})",blockNumber);
+
+            // TODO: 对上一轮共识验证人进行出块率计算，并进行处罚罚款（更新对应的staking表中的金额），罚款计算公式参考底层文档
             onElectionDistance();
         }
     }
