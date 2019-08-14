@@ -17,6 +17,7 @@ import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.enums.InnerContractAddEnum;
+import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
@@ -327,8 +328,10 @@ public class BlockSyncTask {
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+            tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
             if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
+                tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
         }catch (IOException e){
 
