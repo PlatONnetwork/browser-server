@@ -1,19 +1,26 @@
 package com.platon.browser.task;
 
+import com.alibaba.druid.support.spring.stat.annotation.Stat;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.BlockInfo;
 import com.platon.browser.dto.TransactionInfo;
+import com.platon.browser.dto.json.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
 import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.enums.InnerContractAddEnum;
-import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
+import com.platon.browser.util.Resolver;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.CalculatePublicKey;
 import lombok.Data;
@@ -22,11 +29,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.core.methods.response.PlatonGetCode;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.utils.Numeric;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -43,6 +57,8 @@ import java.util.concurrent.*;
 @Component
 public class BlockSyncTask {
 
+    @Autowired
+    private BlockMapper blockMapper;
     @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
@@ -166,34 +182,37 @@ public class BlockSyncTask {
 
         // 并行批量采集区块
         CountDownLatch latch = new CountDownLatch(blockNumbers.size());
-        blockNumbers.forEach(blockNumber ->
-                THREAD_POOL.submit(() -> {
-                    try {
-                        Web3j web3j = client.getWeb3j();
-                        PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
-                        if (initData != null) {
-                            try {
-
-                                BlockInfo block = new BlockInfo(initData);
-                                String publicKey = CalculatePublicKey.getPublicKey(initData);
-                                block.setNodeId(publicKey);
-                                try {
-                                    result.concurrentBlockMap.put(blockNumber.longValue(), block);
-                                } catch (Exception ex) {
-                                    logger.debug("Add BlockInfo Exception!");
-                                    throw ex;
-                                }
-                            } catch (Exception ex) {
-                                logger.debug("New BlockInfo Exception!");
+        blockNumbers.forEach(blockNumber->
+            THREAD_POOL.submit(()->{
+                try {
+                    Web3j web3j = client.getWeb3j();
+                    PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
+                    if(initData!=null) {
+                        try{
+                            BlockInfo block = new BlockInfo(initData);
+                            block.setNodeId("");
+                            String publicKey = CalculatePublicKey.getPublicKey(initData);
+                            if(publicKey!=null){
+                                if(!publicKey.startsWith("0x")) block.setNodeId("0x"+publicKey);
+                                else block.setNodeId(publicKey);
+                            }
+                            try{
+                                result.concurrentBlockMap.put(blockNumber.longValue(),block);
+                            }catch (Exception ex){
+                                logger.debug("Add BlockInfo Exception!");
                                 throw ex;
                             }
+                        }catch (Exception ex){
+                            logger.debug("New BlockInfo Exception!");
+                            throw ex;
                         }
-                    } catch (Exception e) {
-                        result.retryNumbers.add(blockNumber);
-                    } finally {
-                        latch.countDown();
                     }
-                })
+                } catch (Exception e) {
+                    result.retryNumbers.add(blockNumber);
+                }finally {
+                    latch.countDown();
+                }
+            })
         );
 
         try {
@@ -253,13 +272,13 @@ public class BlockSyncTask {
 
         // 汇总统计信息
         class Stat {
-            int transferQty = 0, stakingQty = 0, proposalQty = 0, delegateQty = 0, txGasLimit = 0;
+            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
         }
-        blocks.forEach(block -> {
+        blocks.forEach(block->{
             Stat stat = new Stat();
-            block.getTransactionList().forEach(ti -> {
-                switch (ti.getTypeEnum()) {
+            block.getTransactionList().forEach(ti->{
+                switch (ti.getTypeEnum()){
                     case TRANSFER:
                         stat.transferQty++;
                         break;
@@ -285,7 +304,7 @@ public class BlockSyncTask {
                 // 累加交易手续费
                 stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
                 // 累加交易gasLimit
-                stat.txGasLimit = stat.txGasLimit + Integer.valueOf(ti.getGasLimit());
+                stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
             });
             block.setStatDelegateQty(stat.delegateQty);
             block.setStatProposalQty(stat.proposalQty);
@@ -299,34 +318,32 @@ public class BlockSyncTask {
     /**
      * 分析区块获取code&交易回执
      */
-    private TransactionInfo updateTransactionInfo ( TransactionInfo tx ) {
+    private TransactionInfo  updateTransactionInfo(TransactionInfo tx){
         try {
             PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional <TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
+            Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
             tx.updateTransactionInfo(receipts.get());
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
-            tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
-            if (null != tx.getValue() && !InnerContractAddEnum.innerContractList.contains(tx.getTo())) {
+            if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
-                tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
-        } catch (IOException e) {
+        }catch (IOException e){
 
         }
         return tx;
     }
 
-
-    public void batchSaveResult ( List <BlockInfo> basicData, BlockChainResult bizData ) {
+    @Transactional
+    public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
         // 串行批量入库
-        try {
+        try{
             service.insertOrUpdateChainInfo(basicData,bizData);
-        } catch (Exception e) {
-            logger.debug("入库失败！原因：" + e.getMessage());
-            throw new BusinessException("入库失败！原因：" + e.getMessage());
+        }catch (Exception e){
+            logger.debug("入库失败！原因："+e.getMessage());
+            throw new BusinessException("入库失败！原因："+e.getMessage());
         }
     }
 }

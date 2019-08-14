@@ -1,5 +1,20 @@
 package com.platon.browser.controller;
 
+import javax.validation.Valid;
+
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.platon.browser.req.address.QueryDetailRequest;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.address.QueryDetailResp;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
+@Api(value = "/address", tags = "Address")
 public interface AppDocAddress {
 	
 	
@@ -44,4 +59,7 @@ public interface AppDocAddress {
      *    }
      * }
      */
+	@ApiOperation(value = "address/details", nickname = "address details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
+	@RequestMapping(value = "address/details", produces = { "application/json" }, method = RequestMethod.POST)
+	public BaseResp<QueryDetailResp> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
 }
