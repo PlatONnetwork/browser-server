@@ -34,9 +34,15 @@ public class DbService {
     private DelegationMapper delegationMapper;
     @Autowired
     private UnDelegationMapper unDelegationMapper;
+    @Autowired
+    private NodeMapper nodeMapper;
+    @Autowired
+    private SlashMapper slashMapper;
+    @Autowired
+    private NodeOptMapper nodeOptMapper;
 
     @Transactional
-    public void insertOrUpdateChainInfo ( List <BlockInfo> basicData, BlockChainResult bizData )throws Exception {
+    public void insertOrUpdateChainInfo ( List <BlockInfo> basicData, BlockChainResult bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {
@@ -68,15 +74,41 @@ public class DbService {
             stakingMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddStakings()));
         }
         //批量入库更新质押数据
-        if(bizData.getStakingExecuteResult().getUpdateStakings().size()>0){
+        if (bizData.getStakingExecuteResult().getUpdateStakings().size() > 0) {
             stakingMapper.batchInsertSelective(new ArrayList <>(bizData.getStakingExecuteResult().getUpdateStakings()));
         }
         //批量入库新增委托数据
-        if(bizData.getStakingExecuteResult().getAddDelegations().size()>0){
+        if (bizData.getStakingExecuteResult().getAddDelegations().size() > 0) {
             delegationMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddDelegations()));
         }
         //批量入库更新委托数据
-
+        if (bizData.getStakingExecuteResult().getUpdateDelegations().size() > 0) {
+            delegationMapper.batchInsertSelective(new ArrayList <>(bizData.getStakingExecuteResult().getUpdateDelegations()));
+        }
+        //批量入库新增解委托数据
+        if (bizData.getStakingExecuteResult().getAddUnDelegations().size() > 0) {
+            unDelegationMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddUnDelegations()));
+        }
+        //批量入库更新解委托数据
+        if (bizData.getStakingExecuteResult().getUpdateUnDelegations().size() > 0) {
+            unDelegationMapper.batchInsertSelective(new ArrayList <>(bizData.getStakingExecuteResult().getUpdateUnDelegations()));
+        }
+        //批量入库新增节点数据
+        if (bizData.getStakingExecuteResult().getAddNodes().size() > 0) {
+            nodeMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddNodes()));
+        }
+        //批量入库更新节点数据
+        if (bizData.getStakingExecuteResult().getUpdateNodes().size() > 0) {
+            nodeMapper.batchInsertSelective(new ArrayList <>(bizData.getStakingExecuteResult().getUpdateNodes()));
+        }
+        //批量入库新增惩罚数据
+        if (bizData.getStakingExecuteResult().getAddSlash().size() > 0) {
+            slashMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddSlash()));
+        }
+        //批量入库新增操作数据
+        if (bizData.getStakingExecuteResult().getAddNodeOpts().size() > 0) {
+            nodeOptMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddNodeOpts()));
+        }
     }
 
 }
