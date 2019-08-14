@@ -1,17 +1,11 @@
 package com.platon.browser.task;
 
-import com.alibaba.druid.support.spring.stat.annotation.Stat;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dto.BlockInfo;
-import com.platon.browser.dto.TransactionInfo;
-import com.platon.browser.dto.json.*;
+import com.platon.browser.dto.BlockBean;
+import com.platon.browser.dto.TransactionBean;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
 import com.platon.browser.engine.ProposalExecuteResult;
@@ -21,7 +15,6 @@ import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
-import com.platon.browser.util.Resolver;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.CalculatePublicKey;
 import lombok.Data;
@@ -33,15 +26,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.PlatonGetCode;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.utils.Numeric;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -88,13 +75,13 @@ public class BlockSyncTask {
     @Data
     class Result {
         // 并发采集的块信息，无序
-        public Map <Long, BlockInfo> concurrentBlockMap = new ConcurrentHashMap <>();
+        public Map <Long, BlockBean> concurrentBlockMap = new ConcurrentHashMap <>();
         // 由于异常而未采集的区块号列表
         private Set <BigInteger> retryNumbers = new CopyOnWriteArraySet <>();
         // 已排序的区块信息列表
-        private List <BlockInfo> sortedBlocks = new LinkedList <>();
+        private List <BlockBean> sortedBlocks = new LinkedList <>();
 
-        public List <BlockInfo> getSortedBlocks () {
+        public List <BlockBean> getSortedBlocks () {
             if (sortedBlocks.size() == 0) {
                 sortedBlocks.addAll(concurrentBlockMap.values());
                 Collections.sort(sortedBlocks, ( c1, c2 ) -> {
@@ -131,7 +118,7 @@ public class BlockSyncTask {
             // 并行采集区块
             Result collectedResult = new Result();
             getBlockAndTransaction(blockNumbers, collectedResult);
-            List <BlockInfo> blocks = collectedResult.getSortedBlocks();
+            List <BlockBean> blocks = collectedResult.getSortedBlocks();
 
             // 采集不到区块则则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
@@ -196,7 +183,7 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-                            BlockInfo block = new BlockInfo(initData);
+                            BlockBean block = new BlockBean(initData);
                             block.setNodeId("");
                             String publicKey = CalculatePublicKey.getPublicKey(initData);
                             if(publicKey!=null){
@@ -206,11 +193,11 @@ public class BlockSyncTask {
                             try{
                                 result.concurrentBlockMap.put(blockNumber.longValue(),block);
                             }catch (Exception ex){
-                                logger.debug("Add BlockInfo Exception!");
+                                logger.debug("Add BlockBean Exception!");
                                 throw ex;
                             }
                         }catch (Exception ex){
-                            logger.debug("New BlockInfo Exception!");
+                            logger.debug("New BlockBean Exception!");
                             throw ex;
                         }
                     }
@@ -252,11 +239,11 @@ public class BlockSyncTask {
     /**
      * 并行分析区块
      */
-    private void analyzeBlockAndTransaction ( List <BlockInfo> blocks ) {
+    private void analyzeBlockAndTransaction ( List <BlockBean> blocks ) {
 
         // 对需要复杂分析的区块或交易信息，开启并行处理
         blocks.forEach(b -> {
-            List <TransactionInfo> txList = b.getTransactionList();
+            List <TransactionBean> txList = b.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
             txList.forEach(tx ->
                     TX_THREAD_POOL.submit(() -> {
@@ -325,7 +312,7 @@ public class BlockSyncTask {
     /**
      * 分析区块获取code&交易回执
      */
-    private TransactionInfo  updateTransactionInfo(TransactionInfo tx){
+    private TransactionBean updateTransactionInfo(TransactionBean tx){
         try {
             PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
@@ -346,7 +333,7 @@ public class BlockSyncTask {
     }
 
     @Transactional
-    public void batchSaveResult(List<BlockInfo> basicData,BlockChainResult bizData){
+    public void batchSaveResult(List<BlockBean> basicData, BlockChainResult bizData){
         // 串行批量入库
         try{
             service.insertOrUpdateChainInfo(basicData,bizData);

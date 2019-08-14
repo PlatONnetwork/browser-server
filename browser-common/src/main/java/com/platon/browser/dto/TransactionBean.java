@@ -19,7 +19,7 @@ import java.math.BigInteger;
  * @Description:
  */
 @Data
-public class TransactionInfo extends TransactionWithBLOBs {
+public class TransactionBean extends TransactionWithBLOBs {
 
     private TxTypeEnum typeEnum;
 
@@ -28,7 +28,7 @@ public class TransactionInfo extends TransactionWithBLOBs {
      *
      * @param initData
      */
-    public TransactionInfo ( PlatonBlock.TransactionResult initData ) {
+    public TransactionBean(PlatonBlock.TransactionResult initData ) {
         try {
             Transaction transaction = (Transaction) initData;
             BeanUtils.copyProperties(transaction, this);

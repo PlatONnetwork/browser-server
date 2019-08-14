@@ -7,8 +7,8 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.StakingInfo;
-import com.platon.browser.dto.TransactionInfo;
+import com.platon.browser.dto.StakingBean;
+import com.platon.browser.dto.TransactionBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class StakingExecute {
      * @param tx
      * @param bc
      */
-    public void execute(TransactionInfo tx, BlockChain bc){
+    public void execute(TransactionBean tx, BlockChain bc){
         switch (tx.getTypeEnum()){
             case CREATEVALIDATOR:
                 execute1000(tx,bc);
@@ -122,33 +122,46 @@ public class StakingExecute {
 
     }
 
-    private void updateTxInfo(TransactionInfo tx,BlockChain bc){
+    private void updateTxInfo(TransactionBean tx, BlockChain bc){
 
     }
 
     //发起质押(创建验证人)
-    private void execute1000(TransactionInfo tx,BlockChain bc){
-        StakingInfo staking = new StakingInfo();
+    private void execute1000(TransactionBean tx, BlockChain bc){
+        StakingBean staking = new StakingBean();
         staking.initWithCreateValidatorDto(tx);
+
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
     //修改质押信息(编辑验证人)
-    private void execute1001(TransactionInfo tx,BlockChain bc){
+    private void execute1001(TransactionBean tx, BlockChain bc){
 
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
     //增持质押(增加自有质押)
-    private void execute1002(TransactionInfo tx,BlockChain bc){
+    private void execute1002(TransactionBean tx, BlockChain bc){
 
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
     //撤销质押(退出验证人)
-    private void execute1003(TransactionInfo tx,BlockChain bc){
+    private void execute1003(TransactionBean tx, BlockChain bc){
 
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
     //减持/撤销委托(赎回委托)
-    private void execute1005(TransactionInfo tx,BlockChain bc){
+    private void execute1005(TransactionBean tx, BlockChain bc){
 
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
     //举报多签(举报验证人)
-    private void execute3000(TransactionInfo tx,BlockChain bc){
+    private void execute3000(TransactionBean tx, BlockChain bc){
 
+        // TODO: 修改验证人列表
+        // 修改验证人列表
     }
 }

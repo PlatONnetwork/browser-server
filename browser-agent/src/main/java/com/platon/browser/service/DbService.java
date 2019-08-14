@@ -3,7 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.BlockInfo;
+import com.platon.browser.dto.BlockBean;
 import com.platon.browser.engine.BlockChainResult;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class DbService {
     private AddressMapper addressMapper;
 
     @Transactional
-    public void insertOrUpdateChainInfo ( List <BlockInfo> basicData, BlockChainResult bizData ) throws Exception {
+    public void insertOrUpdateChainInfo (List <BlockBean> basicData, BlockChainResult bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {

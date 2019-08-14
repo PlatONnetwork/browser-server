@@ -2,15 +2,22 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.json.CreateValidatorDto;
-import com.platon.browser.dto.json.IncreaseStakingDto;
+import lombok.Data;
 import org.springframework.beans.BeanUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/13 14:36
  * @Description:
  */
-public class StakingInfo extends Staking {
+@Data
+public class StakingBean extends Staking {
+
+    // <质押块高-质押记录> 映射
+    private Map<String, DelegationBean> delegations = new HashMap<>();
 
     public void initWithNode(org.web3j.platon.bean.Node initData){
         BeanUtils.copyProperties(initData,this);
@@ -44,7 +51,7 @@ public class StakingInfo extends Staking {
 
     }
 
-    public void initWithCreateValidatorDto(TransactionInfo initData){
+    public void initWithCreateValidatorDto(TransactionBean initData){
         BeanUtils.copyProperties(initData,this);
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址

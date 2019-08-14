@@ -11,4 +11,5 @@ import lombok.Data;
 public class BlockChainResult {
     private ProposalExecuteResult proposalExecuteResult=new ProposalExecuteResult();
     private StakingExecuteResult stakingExecuteResult=new StakingExecuteResult();
+    private AddressExecuteResult addressExecuteResult =new AddressExecuteResult();
 }
