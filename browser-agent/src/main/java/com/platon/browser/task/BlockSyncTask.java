@@ -132,9 +132,15 @@ public class BlockSyncTask {
             Result collectedResult = new Result();
             getBlockAndTransaction(blockNumbers, collectedResult);
             List <BlockInfo> blocks = collectedResult.getSortedBlocks();
+
+            // 采集不到区块则则暂停1秒, 结束本次循环
+            if(blocks.size()==0) {
+                TimeUnit.SECONDS.sleep(1);
+                continue;
+            }
+
             // 对区块和交易做分析
             analyzeBlockAndTransaction(blocks);
-
             // 调用BlockChain实例，分析质押、提案相关业务数据
             BlockChainResult bizData = new BlockChainResult();
             ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
@@ -166,7 +172,7 @@ public class BlockSyncTask {
                 break;
             }
 
-            if (blocks.size() > 0) commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
+            commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
             TimeUnit.SECONDS.sleep(1);
         }
     }
