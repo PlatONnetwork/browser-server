@@ -37,7 +37,6 @@ public class TransactionInfo extends TransactionWithBLOBs {
             this.setGasPrice(transaction.getGasPrice().toString());
             this.setGasLimit(transaction.getGas().toString());
             this.setValue(transaction.getValue().toString());
-
             this.setNonce(transaction.getNonce().toString());
             Long sequence = Long.valueOf(String.valueOf(this.getBlockNumber()) + this.getTransactionIndex());
             this.setSequence(sequence);
@@ -51,6 +50,17 @@ public class TransactionInfo extends TransactionWithBLOBs {
         this.setGasUsed(receipt.getGasUsed().toString());
         this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
         this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+/*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
+                "0x" != code )
+        {
+            this.setReceiveType("contract");
+        }else
+            this.setReceiveType("account");*/
     }
 
     /**
