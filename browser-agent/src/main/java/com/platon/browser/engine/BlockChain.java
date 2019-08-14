@@ -42,6 +42,8 @@ public class BlockChain {
     private StakingExecute stakingExecute;
     @Autowired
     private ProposalExecute proposalExecute;
+    @Autowired
+    private AddressExecute addressExecute;
 
     @Autowired
     private CustomNodeMapper customNodeMapper;
@@ -58,6 +60,7 @@ public class BlockChain {
     private long curSettingEpoch;
     private long curConsensusEpoch;
     private BlockBean curBlock;
+    private long transactionCount;
 
     // 上轮结算周期验证人
     private Map<String, NodeBean> preVerifier = new HashMap<>();
@@ -110,6 +113,9 @@ public class BlockChain {
      * @param block
      */
     public void execute( BlockBean block){
+        //累加区块中的交易总数
+        transactionCount = transactionCount + block.getTransactionList().size();
+
         curBlock=block;
         //新开线程去查询rpc共识列表
 

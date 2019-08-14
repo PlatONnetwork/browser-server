@@ -113,6 +113,9 @@ public class DbService {
         if (bizData.getStakingExecuteResult().getAddNodeOpts().size() > 0) {
             nodeOptMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddNodeOpts()));
         }
+        //批量入库地址新增数据
+        //批量入库地址更新数据
+        //批量入库统计数据
     }
 
 }
