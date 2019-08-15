@@ -15,6 +15,7 @@ import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
@@ -34,6 +35,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -48,12 +50,9 @@ import java.util.concurrent.*;
 public class BlockSyncTask {
 
     @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService service;
-
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
@@ -115,10 +114,12 @@ public class BlockSyncTask {
                 // 1、根据区块号1初始化blockChain的curVerifiers和curValidators属性
                 // 结算周期验证人
                 BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
-                if(verifiers.isStatusOk()) verifiers.data.forEach(node->blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()),node));
+                Map<String,Node> verifierMap = new HashMap<>();
+                if(verifiers.isStatusOk()) verifiers.data.forEach(node->verifierMap.put(HexTool.prefix(node.getNodeId()),node));
                 // 共识周期验证人
                 BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
-                if(validators.isStatusOk()) verifiers.data.forEach(node->blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
+                Map<String,Node> validatorMap = new HashMap<>();
+                if(validators.isStatusOk()) verifiers.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
 
                 // 2、根据区块号1查询候选节点列表并入库；
                 // 所有候选节点
@@ -137,9 +138,9 @@ public class BlockSyncTask {
                         stakingBean.setIsInit(1);
 
                         // 如果当前候选节点在结算周期验证人列表，则标识其为结算周期节点
-                        if(blockChain.getCurVerifier().get(node.getNodeId())!=null) stakingBean.setIsSetting(1);
+                        if(verifierMap.get(node.getNodeId())!=null) stakingBean.setIsSetting(1);
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                        if(blockChain.getCurValidator().get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
+                        if(validatorMap.get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
 
                         bcr.getStakingExecuteResult().getAddStakings().add(stakingBean);
                     });
@@ -151,21 +152,6 @@ public class BlockSyncTask {
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {
                 logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
-            }
-        }else{
-            // 直接查当前最新的结算周期验证人列表和共识周期验证人列表来初始化blockChain的curVerifiers和curValidators属性
-            try {
-                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
-                if(verifiers.isStatusOk()) verifiers.data.forEach(node -> blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()),node));
-            } catch (Exception e) {
-                logger.error("查询最新结算周期验证人列表失败,原因：{}",e.getMessage());
-            }
-
-            try {
-                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
-                if(validators.isStatusOk()) validators.data.forEach(node -> blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
-            } catch (Exception e) {
-                logger.error("查询最新共识周期验证人列表失败,原因：{}",e.getMessage());
             }
         }
     }
@@ -366,15 +352,23 @@ public class BlockSyncTask {
     /**
      * 分析区块获取code&交易回执
      */
-    private TransactionBean updateTransactionInfo(TransactionBean tx){
+    private TransactionBean updateTransactionInfo(TransactionBean tx) throws IOException, BeanCreateOrUpdateException {
         try {
             // 查询交易回执
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
             // 如果交易回执存在，则更新交易中与回执相关的信息
             if(receipt.isPresent()) tx.update(receipt.get());
+        }catch (IOException e){
+            logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
+            throw e;
+        }catch (BeanCreateOrUpdateException e){
+            logger.error("更新交易[hash={}]的回执相关信息出错:{}",tx.getHash(),e.getMessage());
+            throw e;
+        }
 
-            // 解析交易参数，补充交易中与交易参数相关的信息
+        // 解析交易参数，补充交易中与交易参数相关的信息
+        try {
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
@@ -385,8 +379,10 @@ public class BlockSyncTask {
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
         }catch (Exception e){
-            logger.error("{}",e.getMessage());
+            logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
+            throw e;
         }
+
         return tx;
     }
 
@@ -396,7 +392,7 @@ public class BlockSyncTask {
         try{
             service.insertOrUpdateChainInfo(basicData,bizData);
         }catch (Exception e){
-            logger.debug("入库失败！原因："+e.getMessage());
+            logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());
         }
     }

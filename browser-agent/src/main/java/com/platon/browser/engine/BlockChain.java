@@ -7,12 +7,14 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.BlockBean;
 import com.platon.browser.dto.StakingBean;
 import com.platon.browser.service.DbService;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.Node;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -55,6 +57,11 @@ public class BlockChain {
     private long curConsensusEpoch;
     private BlockBean curBlock;
 
+
+    /***
+     * 以下字段业务使用说明：
+     * 在当前共识周期发生选举的时候，需要对上一共识周期的验证节点计算出块率，如果发现出块率低的节点，就要看次节点是否在cur
+     */
     // 上轮结算周期验证人
     private Map<String, org.web3j.platon.bean.Node> preVerifier = new HashMap<>();
     // 当前结算周期验证人
@@ -66,7 +73,6 @@ public class BlockChain {
 
     @PostConstruct
     private void init(){
-        /***把当前库中的验证人列表加载到内存中**/
 
     }
 
@@ -74,9 +80,8 @@ public class BlockChain {
      * 执行区块
      * @param block
      */
-    public void execute( BlockBean block){
+    public void execute(BlockBean block){
         curBlock=block;
-        //新开线程去查询rpc共识列表
 
         // 节点区块数统计
         Long blockCount = nodeIdToBlockCountMap.get(block.getNodeId());
@@ -85,18 +90,11 @@ public class BlockChain {
         }
         nodeIdToBlockCountMap.put(block.getNodeId(),++blockCount);
 
-        if(block.getNumber()==1){
-            // TODO: 初始化共识周期验证人列表和结算周期验证人列表，结算周期验证人列表包含了共识周期验证人列表
-            // 调用节点合约获取初始验证人,并入库
-            client.getNodeContract().getValidatorList();
-        }
-
-
-        //数据回填
         // 推算并更新共识周期和结算周期
         updateEpoch();
         // 更新共识周期验证人和结算周期验证人列表
-        updateNodes();
+        updateVerifierAndValidator();
+
         // 分析交易信息
         analyzeTransaction();
     }
@@ -113,7 +111,7 @@ public class BlockChain {
     }
 
     /**
-     * 更新共识周期验证人和结算周期验证人列表
+     * 更新共识周期验证人和结算周期验证人映射缓存
      * // 假设当前链上最高区块号为750
      *   1         250        500        750
      *   |----------|----------|----------|
@@ -122,68 +120,45 @@ public class BlockChain {
      *   使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      *   如果当前区块号为753，由于未达到
      */
-    private List<Staking> convertToStaking(BaseResponse<List<org.web3j.platon.bean.Node>> response){
-        List<Staking> stakingList = new ArrayList<>();
-        if(response.isStatusOk()){
-            List<org.web3j.platon.bean.Node> validators = response.data;
-            Date date = new Date();
-            validators.forEach(validator->{
-                StakingBean staking = new StakingBean();
-                staking.initWithNode(validator);
-                staking.setCreateTime(date);
-                staking.setUpdateTime(date);
-                staking.setIsConsensus(0);
-                if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0) staking.setIsConsensus(1);
-                staking.setIsSetting(0);
-                if(curBlock.getNumber()%chainConfig.getSettingPeriod()==0) staking.setIsSetting(1);
-
-                stakingList.add(staking);
-            });
-            logger.debug("validators: {}",validators);
-        }
-        return stakingList;
-    }
-    private void updateNodes(){
-
-        /*if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
-            // 进入新共识周期
-            // 把curValidator引用赋给preValidator
-            preValidator.clear();
-            preValidator.putAll(curValidator);
-            // 清除当前共识周期验证人
-            curVerifier.clear();
-        }else{
-            if(curValidator.size()==0){
-                // 直接查询实时共识验证人列表作为curValidator
-                try {
-                    BaseResponse<List<org.web3j.platon.bean.Node>> response = client.getNodeContract().getValidatorList().send();
-                    convertToStaking(response).forEach(staking -> curValidator.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
-                    logger.debug("{}",response);
-                } catch (Exception e) {
-                    e.printStackTrace();
+    private void updateVerifierAndValidator(){
+        // 根据区块号是否整除周期来触发周期相关处理方法
+        // 查询当前轮的候选人，至少需要在周期切换后出的第一个块号才可以查到，所以需要减一
+        Long curBlockNumber = curBlock.getNumber(),prevBlockNumber = curBlockNumber-1;
+        if(prevBlockNumber%chainConfig.getConsensusPeriod()==0){
+            logger.debug("共识周期切换块号:{}, 查新共识周期验证节点时的块号:{}",prevBlockNumber,curBlockNumber);
+            // 直接查当前最新的共识周期验证人列表来初始化blockChain的curValidators属性
+            try {
+                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
+                if(validators.isStatusOk()) {
+                    // 把curValidator转存至preValidator
+                    preValidator.clear();
+                    preValidator.putAll(curValidator);
+                    curValidator.clear();
+                    // 设置新的当前共识周期验证人
+                    validators.data.forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()),node));
                 }
+            } catch (Exception e) {
+                logger.error("查询最新共识周期验证人列表失败,原因：{}",e.getMessage());
             }
         }
 
-        if(curBlock.getNumber()%chainConfig.getSettingPeriod()==0){
-            // 进入新结算周期
-            // 把curVerifier引用赋给preVerifier
-            preVerifier.clear();
-            preVerifier.putAll(curVerifier);
-            // 清除当前结算周期验证人
-            curVerifier.clear();
-        }else{
-            if(curVerifier.size()==0){
-                // 直接查询实时共识验证人列表作为curVerifier
-                try {
-                    BaseResponse<List<org.web3j.platon.bean.Node>> response = client.getNodeContract().getVerifierList().send();
-                    convertToStaking(response).forEach(staking -> curVerifier.put(staking.getNodeId()+staking.getStakingBlockNum(),staking));
-                    logger.debug("{}",response);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if(prevBlockNumber%chainConfig.getSettingPeriod()==0){
+            logger.debug("结算周期切换块号:{}, 查新结算周期验证节点时的块号:{}",prevBlockNumber,curBlockNumber);
+            // 直接查当前最新的结算周期验证人列表来初始化blockChain的curVerifiers属性
+            try {
+                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
+                if(verifiers.isStatusOk()) {
+                    // 把curVerifier转存至preVerifier
+                    preVerifier.clear();
+                    preVerifier.putAll(curVerifier);
+                    curVerifier.clear();
+                    // 设置新的当前结算周期验证人
+                    verifiers.data.forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()),node));
                 }
+            } catch (Exception e) {
+                logger.error("查询最新结算周期验证人列表失败,原因：{}",e.getMessage());
             }
-        }*/
+        }
     }
 
     /**

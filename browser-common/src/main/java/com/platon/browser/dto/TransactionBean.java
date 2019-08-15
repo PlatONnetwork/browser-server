@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.json.*;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.TxTypeEnum;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
@@ -45,13 +46,13 @@ public class TransactionBean extends TransactionWithBLOBs {
         }
     }
 
-    public void update (TransactionReceipt receipt) {
+    public void update (TransactionReceipt receipt) throws BeanCreateOrUpdateException {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
             this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
         }catch (Exception e){
-            throw new RuntimeException("TransactionBean.update() error:"+e.getMessage());
+            throw new BeanCreateOrUpdateException("TransactionBean.update() error:"+e.getMessage());
         }
 /*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
                 this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||

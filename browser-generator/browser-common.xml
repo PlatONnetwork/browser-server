@@ -47,7 +47,7 @@
                        enableDeleteByExample="false" enableSelectByExample="false"
                        selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-        <table tableName="block" domainObjectName="Block">
+        <!--<table tableName="block" domainObjectName="Block">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -99,6 +99,11 @@
         </table>
 
         <table tableName="vote" domainObjectName="Vote">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>-->
+
+        <table tableName="network_stat" domainObjectName="NetworkStat">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
