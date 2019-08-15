@@ -60,7 +60,8 @@ public class BlockChain {
 
     /***
      * 以下字段业务使用说明：
-     * 在当前共识周期发生选举的时候，需要对上一共识周期的验证节点计算出块率，如果发现出块率低的节点，就要看次节点是否在cur
+     * 在当前共识周期发生选举的时候，需要对上一共识周期的验证节点计算出块率，如果发现出块率低的节点，就要看此节点是否在curValidator中，如果在则
+     * 剔除
      */
     // 上轮结算周期验证人
     private Map<String, org.web3j.platon.bean.Node> preVerifier = new HashMap<>();
@@ -123,11 +124,15 @@ public class BlockChain {
     private void updateVerifierAndValidator(){
         // 根据区块号是否整除周期来触发周期相关处理方法
         // 查询当前轮的候选人，至少需要在周期切换后出的第一个块号才可以查到，所以需要减一
-        Long curBlockNumber = curBlock.getNumber(),prevBlockNumber = curBlockNumber-1;
+        Long blockNumber = curBlock.getNumber(),prevBlockNumber = blockNumber-1;
         if(prevBlockNumber%chainConfig.getConsensusPeriod()==0){
-            logger.debug("共识周期切换块号:{}, 查新共识周期验证节点时的块号:{}",prevBlockNumber,curBlockNumber);
+            logger.debug("共识周期切换块号:{}, 查新共识周期验证节点时的块号:{}",prevBlockNumber,blockNumber);
             // 直接查当前最新的共识周期验证人列表来初始化blockChain的curValidators属性
             try {
+                // TODO:
+                // 1、当agent落后链上至少一个共识周期时，使用blockNumber是可以查询到验证人信息的
+                // 2、当agent与链都在同一个共识周期是，使用blockNumber是查询不到验证人信息的
+                // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
                 BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
                 if(validators.isStatusOk()) {
                     // 把curValidator转存至preValidator
@@ -143,9 +148,13 @@ public class BlockChain {
         }
 
         if(prevBlockNumber%chainConfig.getSettingPeriod()==0){
-            logger.debug("结算周期切换块号:{}, 查新结算周期验证节点时的块号:{}",prevBlockNumber,curBlockNumber);
+            logger.debug("结算周期切换块号:{}, 查新结算周期验证节点时的块号:{}",prevBlockNumber,blockNumber);
             // 直接查当前最新的结算周期验证人列表来初始化blockChain的curVerifiers属性
             try {
+                // TODO:
+                // 1、当agent落后链上至少一个共识周期时，使用blockNumber是可以查询到验证人信息的
+                // 2、当agent与链都在同一个共识周期是，使用blockNumber是查询不到验证人信息的
+                // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
                 BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
                 if(verifiers.isStatusOk()) {
                     // 把curVerifier转存至preVerifier

@@ -31,14 +31,14 @@ public class CustomNodeMapperTest extends TestBase {
 
     @Test
     public void selectValidators(){
-        List<NodeBean> nodeBeans = customNodeMapper.selectVerifiers();
+        //List<NodeBean> nodeBeans = customNodeMapper.selectVerifiers();
 
         List<String> nodeIds = new ArrayList<>();
-        nodeBeans.forEach(nodeBean -> nodeIds.add(nodeBean.getNodeId()));
+        //nodeBeans.forEach(nodeBean -> nodeIds.add(nodeBean.getNodeId()));
 
         List<StakingBean> stakingBeans = customStakingMapper.selectByNodeIdList(nodeIds);
 
-        logger.debug("{}",nodeBeans);
+        //logger.debug("{}",nodeBeans);
     }
 
 }
