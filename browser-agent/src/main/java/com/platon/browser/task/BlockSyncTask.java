@@ -295,7 +295,6 @@ public class BlockSyncTask {
         blocks.forEach(block->{
             Stat stat = new Stat();
             block.getTransactionList().forEach(ti->{
-                BlockBean b = block;
                 switch (ti.getTypeEnum()){
                     case TRANSFER:
                         stat.transferQty++;
