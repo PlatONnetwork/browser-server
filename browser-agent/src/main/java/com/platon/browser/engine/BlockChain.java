@@ -148,42 +148,7 @@ public class BlockChain {
         return stakingList;
     }
     private void updateNodes(){
-        if(curBlock.getNumber()==1){
-            // 如果当前区块号等于1，则查询当前结算周期验证节点列表，并入库
-            try {
-                // TODO: 需要更换为根据区块号1查询
-                BaseResponse<List<Node>> response = client.getNodeContract().getVerifierList().send();
-                if(response.isStatusOk()){
-                    List<com.platon.browser.dao.entity.Node> nodeList = new ArrayList<>();
-                    List<Staking> stakingList = new ArrayList<>();
-                    Date date = new Date();
-                    response.data.forEach(node -> {
-                        NodeBean nodeBean = new NodeBean();
-                        nodeBean.initWithNode(node);
-                        nodeBean.setUpdateTime(date);
-                        nodeBean.setCreateTime(date);
-                        nodeList.add(nodeBean);
 
-                        StakingBean stakingBean = new StakingBean();
-                        stakingBean.initWithNode(node);
-                        stakingBean.setStakingHas("");
-                        stakingBean.setStakingIcon(node.getExternalId());
-                        stakingBean.setStatus(1);
-                        stakingBean.setIsConsensus(1);
-                        stakingList.add(stakingBean);
-
-                        curVerifier.put(nodeBean.getNodeId(),node);
-                    });
-                    if(nodeList.size()>0){
-                        dbService.initNodes(nodeList,stakingList);
-                    }
-                }
-                // 通知质押引擎重新初始化
-                stakingExecute.init();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         /*if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
             // 进入新共识周期
             // 把curValidator引用赋给preValidator

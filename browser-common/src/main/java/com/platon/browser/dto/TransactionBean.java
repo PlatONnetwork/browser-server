@@ -21,9 +21,6 @@ import java.math.BigInteger;
 @Data
 public class TransactionBean extends TransactionWithBLOBs {
 
-    public TransactionBean() {
-    }
-
     private TxTypeEnum typeEnum;
 
     /**
@@ -31,7 +28,7 @@ public class TransactionBean extends TransactionWithBLOBs {
      *
      * @param initData
      */
-    public TransactionBean(PlatonBlock.TransactionResult initData ) {
+    public void init (PlatonBlock.TransactionResult initData ) {
         try {
             Transaction transaction = (Transaction) initData;
             BeanUtils.copyProperties(transaction, this);
@@ -46,13 +43,16 @@ public class TransactionBean extends TransactionWithBLOBs {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public void updateTransactionInfo ( TransactionReceipt receipt) {
-        this.setGasUsed(receipt.getGasUsed().toString());
-        this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-        this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+    public void update (TransactionReceipt receipt) {
+        try{
+            this.setGasUsed(receipt.getGasUsed().toString());
+            this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
+            this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+        }catch (Exception e){
+            throw new RuntimeException("TransactionBean.update() error:"+e.getMessage());
+        }
 /*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
                 this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
                 this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||

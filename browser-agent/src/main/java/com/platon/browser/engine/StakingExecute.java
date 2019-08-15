@@ -41,7 +41,7 @@ public class StakingExecute {
     private StakingExecuteResult executeResult= new StakingExecuteResult();
 
 
-    private void loadNodes(){
+    public void loadNodes(){
         List<NodeBean> nodeList = customNodeMapper.selectAll();
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> {
@@ -52,26 +52,26 @@ public class StakingExecute {
         // |-加载质押记录
         List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
         // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
-        Map<String,StakingBean> nodeIdStakingNum_Staking_Map = new HashMap<>();
+        Map<String,StakingBean> stakingMap = new HashMap<>();
         stakings.forEach(staking->{
             nodes.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
-            nodeIdStakingNum_Staking_Map.put(staking.getMapKey(),staking);
+            stakingMap.put(staking.getStakingMapKey(),staking);
         });
         // |-加载委托记录
         List<DelegationBean> delegations = customDelegationMapper.selectByNodeIdList(nodeIds);
         // <节点ID+质押块号 - 质押记录> 映射, 方便【撤销委托记录】的添加
-        Map<String,DelegationBean> delegateAddrNodeIdStakingNum_Delegation_Map = new HashMap<>();
+        Map<String,DelegationBean> delegationMap = new HashMap<>();
         delegations.forEach(delegation->{
-            StakingBean staking = nodeIdStakingNum_Staking_Map.get(delegation.getStakingMapKey());
+            StakingBean staking = stakingMap.get(delegation.getStakingMapKey());
             if(staking!=null) {
                 staking.getDelegations().put(delegation.getDelegateAddr(),delegation);
-                delegateAddrNodeIdStakingNum_Delegation_Map.put(delegation.getDelegationMapKey(),delegation);
+                delegationMap.put(delegation.getDelegationMapKey(),delegation);
             }
         });
         // |-加载撤销委托记录
         List<UnDelegationBean> unDelegations = customUnDelegationMapper.selectByNodeIdList(nodeIds);
         unDelegations.forEach(unDelegation->{
-            DelegationBean delegation = delegateAddrNodeIdStakingNum_Delegation_Map.get(unDelegation.getDelegationMapKey());
+            DelegationBean delegation = delegationMap.get(unDelegation.getDelegationMapKey());
             if(delegation!=null){
                 delegation.getUnDelegations().add(unDelegation);
             }
@@ -85,12 +85,10 @@ public class StakingExecute {
     }
 
     @PostConstruct
-    public void init(){
+    private void init(){
         /***把当前库中的验证人列表加载到内存中**/
         // 初始化当前结算周期验证人列表
         loadNodes();
-
-        logger.debug("{}", JSON.toJSONString(nodes,true));
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.utils.NodeTools;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
@@ -16,11 +17,18 @@ import java.util.*;
 @Data
 public class BlockBean extends Block {
 
+    public BlockBean(){
+        // 设置默认值
+        this.setNodeId("");
+        this.setBlockReward("0");
+        this.setNodeName("Unknown");
+    }
+
     /**
      * 使用原生交易信息初始化交易信息
      * @param initData
      */
-    public BlockBean(PlatonBlock.Block initData){
+    public void init(PlatonBlock.Block initData) throws Exception {
         BeanUtils.copyProperties(initData,this);
         // 属性类型转换
         this.setNumber(initData.getNumber().longValue());
@@ -34,21 +42,19 @@ public class BlockBean extends Block {
         // 交易总数
         this.setStatTxQty(initData.getTransactions().size());
         this.setGasLimit(initData.getGasLimit().toString());
-        // TODO:区块奖励
-        this.setBlockReward("0");
-        // TODO:节点名称
-        this.setNodeName("DD");
-        // TODO:节点id
-        this.setNodeId("0xflsjgsflsdf");
+
+        String publicKey = NodeTools.calculateNodePublicKey(initData);
+        if(publicKey!=null) this.setNodeId(publicKey.startsWith("0x")?publicKey:"0x"+publicKey);
 
         try{
             // 抽取交易信息
-            initData.getTransactions().forEach(transactionResult -> {
-                TransactionBean ti = new TransactionBean(transactionResult);
-                ti.setTimestamp(this.getTimestamp());
-                ti.setCreateTime(date);
-                ti.setUpdateTime(date);
-                transactionList.add(ti);
+            initData.getTransactions().forEach(tr -> {
+                TransactionBean transaction = new TransactionBean();
+                transaction.init(tr);
+                transaction.setTimestamp(this.getTimestamp());
+                transaction.setCreateTime(date);
+                transaction.setUpdateTime(date);
+                transactionList.add(transaction);
             });
         }catch (Exception ex){
             ex.printStackTrace();
@@ -74,6 +80,8 @@ public class BlockBean extends Block {
             return 0;
         });
     }
+
+
 
     private List<TransactionBean> transactionList = new ArrayList<>();
 

@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.BlockBean;
@@ -19,7 +18,7 @@ import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
-import com.platon.browser.utils.CalculatePublicKey;
+import com.platon.browser.utils.NodeTools;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -102,13 +100,43 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    @PostConstruct
     public void init () {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+
+        if(maxBlockNumber==null){
+            // 如果当前区块号等于1，则查询当前结算周期验证节点列表，并入库
+            try {
+                // TODO: 需要更换为根据区块号1查询
+                BaseResponse<List<Node>> response = client.getNodeContract().getVerifierList().send();
+                if(response.isStatusOk()){
+                    BlockChainResult bcr = new BlockChainResult();
+                    response.data.forEach(node -> {
+                        NodeBean nodeBean = new NodeBean();
+                        nodeBean.initWithNode(node);
+                        nodeBean.setIsRecommend(1);
+                        bcr.getStakingExecuteResult().getAddNodes().add(nodeBean);
+
+                        StakingBean stakingBean = new StakingBean();
+                        stakingBean.initWithNode(node);
+                        stakingBean.setStakingIcon("");
+                        stakingBean.setIsConsensus(1);
+                        stakingBean.setIsInit(1);
+                        stakingBean.setIsSetting(1);
+
+                        bcr.getStakingExecuteResult().getAddStakings().add(stakingBean);
+                    });
+                    service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
+                }
+                // 通知质押引擎重新初始化节点缓存
+                blockChain.getStakingExecute().loadNodes();
+            } catch (Exception e) {
+                logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
+            }
+        }
     }
 
     public void start () throws InterruptedException {
@@ -188,21 +216,11 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-                            BlockBean block = new BlockBean(initData);
-                            block.setNodeId("");
-                            String publicKey = CalculatePublicKey.getPublicKey(initData);
-                            if(publicKey!=null){
-                                if(!publicKey.startsWith("0x")) block.setNodeId("0x"+publicKey);
-                                else block.setNodeId(publicKey);
-                            }
-                            try{
-                                result.concurrentBlockMap.put(blockNumber.longValue(),block);
-                            }catch (Exception ex){
-                                logger.debug("Add BlockBean Exception!");
-                                throw ex;
-                            }
+                            BlockBean block = new BlockBean();
+                            block.init(initData);
+                            result.concurrentBlockMap.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
-                            logger.debug("New BlockBean Exception!");
+                            logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
                             throw ex;
                         }
                     }
@@ -277,6 +295,7 @@ public class BlockSyncTask {
         blocks.forEach(block->{
             Stat stat = new Stat();
             block.getTransactionList().forEach(ti->{
+                BlockBean b = block;
                 switch (ti.getTypeEnum()){
                     case TRANSFER:
                         stat.transferQty++;
@@ -319,9 +338,13 @@ public class BlockSyncTask {
      */
     private TransactionBean updateTransactionInfo(TransactionBean tx){
         try {
-            PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
-            tx.updateTransactionInfo(receipts.get());
+            // 查询交易回执
+            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
+            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
+            // 如果交易回执存在，则更新交易中与回执相关的信息
+            if(receipt.isPresent()) tx.update(receipt.get());
+
+            // 解析交易参数，补充交易中与交易参数相关的信息
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
@@ -331,8 +354,8 @@ public class BlockSyncTask {
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
-        }catch (IOException e){
-
+        }catch (Exception e){
+            logger.error("{}",e.getMessage());
         }
         return tx;
     }

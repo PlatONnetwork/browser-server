@@ -116,11 +116,4 @@ public class DbService {
             nodeOptMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddNodeOpts()));
         }
     }
-
-    @Transactional
-    public void initNodes(List<Node> nodeList, List<Staking>stakingList){
-        nodeMapper.batchInsert(nodeList);
-        stakingMapper.batchInsert(stakingList);
-    }
-
 }
