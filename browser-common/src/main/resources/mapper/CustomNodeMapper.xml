@@ -10,7 +10,7 @@
     <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List" />
+    <include refid="com.platon.browser.dao.mapper.NodeMapper.Base_Column_List" />
     from node
   </select>
 </mapper>
