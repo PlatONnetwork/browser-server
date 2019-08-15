@@ -19,16 +19,6 @@ public class Block {
 
     private String gasUsed;
 
-    private String blockReward;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    private String nodeName;
-
-    private String nodeId;
-
     private Integer statTxQty;
 
     private Integer statTransferQty;
@@ -43,7 +33,17 @@ public class Block {
 
     private String statTxFee;
 
+    private String nodeName;
+
+    private String nodeId;
+
+    private String blockReward;
+
     private String miner;
+
+    private Date createTime;
+
+    private Date updateTime;
 
     private String extraData;
 
@@ -103,46 +103,6 @@ public class Block {
         this.gasUsed = gasUsed == null ? null : gasUsed.trim();
     }
 
-    public String getBlockReward() {
-        return blockReward;
-    }
-
-    public void setBlockReward(String blockReward) {
-        this.blockReward = blockReward == null ? null : blockReward.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName == null ? null : nodeName.trim();
-    }
-
-    public String getNodeId() {
-        return nodeId;
-    }
-
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId == null ? null : nodeId.trim();
-    }
-
     public Integer getStatTxQty() {
         return statTxQty;
     }
@@ -199,12 +159,52 @@ public class Block {
         this.statTxFee = statTxFee == null ? null : statTxFee.trim();
     }
 
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName == null ? null : nodeName.trim();
+    }
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId == null ? null : nodeId.trim();
+    }
+
+    public String getBlockReward() {
+        return blockReward;
+    }
+
+    public void setBlockReward(String blockReward) {
+        this.blockReward = blockReward == null ? null : blockReward.trim();
+    }
+
     public String getMiner() {
         return miner;
     }
 
     public void setMiner(String miner) {
         this.miner = miner == null ? null : miner.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getExtraData() {
@@ -230,11 +230,6 @@ public class Block {
         size("size", "size", "INTEGER", true),
         gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
         gasUsed("gas_used", "gasUsed", "VARCHAR", false),
-        blockReward("block_reward", "blockReward", "VARCHAR", false),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        nodeName("node_name", "nodeName", "VARCHAR", false),
-        nodeId("node_id", "nodeId", "VARCHAR", false),
         statTxQty("stat_tx_qty", "statTxQty", "INTEGER", false),
         statTransferQty("stat_transfer_qty", "statTransferQty", "INTEGER", false),
         statStakingQty("stat_staking_qty", "statStakingQty", "INTEGER", false),
@@ -242,7 +237,12 @@ public class Block {
         statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
         statTxGasLimit("stat_tx_gas_limit", "statTxGasLimit", "VARCHAR", false),
         statTxFee("stat_tx_fee", "statTxFee", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
+        nodeId("node_id", "nodeId", "VARCHAR", false),
+        blockReward("block_reward", "blockReward", "VARCHAR", false),
         miner("miner", "miner", "VARCHAR", false),
+        createTime("create_time", "createTime", "TIMESTAMP", false),
+        updateTime("update_time", "updateTime", "TIMESTAMP", false),
         extraData("extra_data", "extraData", "LONGVARCHAR", false);
 
         /**

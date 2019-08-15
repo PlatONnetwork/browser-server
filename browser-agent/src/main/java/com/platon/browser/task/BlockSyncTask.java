@@ -18,7 +18,7 @@ import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
-import com.platon.browser.utils.NodeTools;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -107,34 +106,66 @@ public class BlockSyncTask {
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
 
+        // 结算周期验证人
         if(maxBlockNumber==null){
-            // 如果当前区块号等于1，则查询当前结算周期验证节点列表，并入库
+            // 如果库里区块为空，则：
             try {
                 // TODO: 需要更换为根据区块号1查询
-                BaseResponse<List<Node>> response = client.getNodeContract().getVerifierList().send();
-                if(response.isStatusOk()){
+
+                // 1、根据区块号1初始化blockChain的curVerifiers和curValidators属性
+                // 结算周期验证人
+                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
+                if(verifiers.isStatusOk()) verifiers.data.forEach(node->blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()),node));
+                // 共识周期验证人
+                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
+                if(validators.isStatusOk()) verifiers.data.forEach(node->blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
+
+                // 2、根据区块号1查询候选节点列表并入库；
+                // 所有候选节点
+                BaseResponse<List<Node>> candidates = client.getNodeContract().getCandidateList().send();
+                if(candidates.isStatusOk()){
                     BlockChainResult bcr = new BlockChainResult();
-                    response.data.forEach(node -> {
-                        NodeBean nodeBean = new NodeBean();
-                        nodeBean.initWithNode(node);
-                        nodeBean.setIsRecommend(1);
-                        bcr.getStakingExecuteResult().getAddNodes().add(nodeBean);
+                    candidates.data.forEach(candidate -> {
+                        NodeBean node = new NodeBean();
+                        node.initWithNode(candidate);
+                        node.setIsRecommend(1);
+                        bcr.getStakingExecuteResult().getAddNodes().add(node);
 
                         StakingBean stakingBean = new StakingBean();
-                        stakingBean.initWithNode(node);
+                        stakingBean.initWithNode(candidate);
                         stakingBean.setStakingIcon("");
-                        stakingBean.setIsConsensus(1);
                         stakingBean.setIsInit(1);
-                        stakingBean.setIsSetting(1);
+
+                        // 如果当前候选节点在结算周期验证人列表，则标识其为结算周期节点
+                        if(blockChain.getCurVerifier().get(node.getNodeId())!=null) stakingBean.setIsSetting(1);
+                        // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
+                        if(blockChain.getCurValidator().get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
 
                         bcr.getStakingExecuteResult().getAddStakings().add(stakingBean);
                     });
                     service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
                 }
+                // 初始化质押引擎的共识周期验证人列表缓存和结算周期验证人列表缓存
+
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {
                 logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
+            }
+        }else{
+            // 直接查当前最新的结算周期验证人列表和共识周期验证人列表来初始化blockChain的curVerifiers和curValidators属性
+            try {
+                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
+                if(verifiers.isStatusOk()) verifiers.data.forEach(node -> blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()),node));
+            } catch (Exception e) {
+                logger.error("查询最新结算周期验证人列表失败,原因：{}",e.getMessage());
+            }
+
+            try {
+                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
+                if(validators.isStatusOk()) validators.data.forEach(node -> blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
+            } catch (Exception e) {
+                logger.error("查询最新共识周期验证人列表失败,原因：{}",e.getMessage());
             }
         }
     }

@@ -575,6 +575,66 @@ public class DelegationExample {
             return (Criteria) this;
         }
 
+        public Criteria andSequenceIsNull() {
+            addCriterion("`sequence` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceIsNotNull() {
+            addCriterion("`sequence` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceEqualTo(Long value) {
+            addCriterion("`sequence` =", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceNotEqualTo(Long value) {
+            addCriterion("`sequence` <>", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceGreaterThan(Long value) {
+            addCriterion("`sequence` >", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceGreaterThanOrEqualTo(Long value) {
+            addCriterion("`sequence` >=", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceLessThan(Long value) {
+            addCriterion("`sequence` <", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceLessThanOrEqualTo(Long value) {
+            addCriterion("`sequence` <=", value, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceIn(List<Long> values) {
+            addCriterion("`sequence` in", values, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceNotIn(List<Long> values) {
+            addCriterion("`sequence` not in", values, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceBetween(Long value1, Long value2) {
+            addCriterion("`sequence` between", value1, value2, "sequence");
+            return (Criteria) this;
+        }
+
+        public Criteria andSequenceNotBetween(Long value1, Long value2) {
+            addCriterion("`sequence` not between", value1, value2, "sequence");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

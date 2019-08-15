@@ -21,7 +21,7 @@ import java.util.List;
  * Date: 2019/1/10
  * Time: 10:52
  */
-public class NodeTools {
+public class NodeTool {
 
     /**
      * 通过区块计算节点公钥

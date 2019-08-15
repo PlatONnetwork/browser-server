@@ -9,11 +9,6 @@
     <result column="size" jdbcType="INTEGER" property="size" />
     <result column="gas_limit" jdbcType="VARCHAR" property="gasLimit" />
     <result column="gas_used" jdbcType="VARCHAR" property="gasUsed" />
-    <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
-    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
     <result column="stat_tx_qty" jdbcType="INTEGER" property="statTxQty" />
     <result column="stat_transfer_qty" jdbcType="INTEGER" property="statTransferQty" />
     <result column="stat_staking_qty" jdbcType="INTEGER" property="statStakingQty" />
@@ -21,7 +16,12 @@
     <result column="stat_delegate_qty" jdbcType="INTEGER" property="statDelegateQty" />
     <result column="stat_tx_gas_limit" jdbcType="VARCHAR" property="statTxGasLimit" />
     <result column="stat_tx_fee" jdbcType="VARCHAR" property="statTxFee" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="block_reward" jdbcType="VARCHAR" property="blockReward" />
     <result column="miner" jdbcType="VARCHAR" property="miner" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Block">
     <result column="extra_data" jdbcType="LONGVARCHAR" property="extraData" />
@@ -85,9 +85,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `number`, hash, parent_hash, `timestamp`, `size`, gas_limit, gas_used, block_reward, 
-    create_time, update_time, node_name, node_id, stat_tx_qty, stat_transfer_qty, stat_staking_qty, 
-    stat_proposal_qty, stat_delegate_qty, stat_tx_gas_limit, stat_tx_fee, miner
+    `number`, hash, parent_hash, `timestamp`, `size`, gas_limit, gas_used, stat_tx_qty, 
+    stat_transfer_qty, stat_staking_qty, stat_proposal_qty, stat_delegate_qty, stat_tx_gas_limit, 
+    stat_tx_fee, node_name, node_id, block_reward, miner, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
     extra_data
@@ -143,19 +143,19 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Block">
     insert into block (`number`, hash, parent_hash, 
       `timestamp`, `size`, gas_limit, 
-      gas_used, block_reward, create_time, 
-      update_time, node_name, node_id, 
-      stat_tx_qty, stat_transfer_qty, stat_staking_qty, 
-      stat_proposal_qty, stat_delegate_qty, stat_tx_gas_limit, 
-      stat_tx_fee, miner, extra_data
+      gas_used, stat_tx_qty, stat_transfer_qty, 
+      stat_staking_qty, stat_proposal_qty, stat_delegate_qty, 
+      stat_tx_gas_limit, stat_tx_fee, node_name, 
+      node_id, block_reward, miner, 
+      create_time, update_time, extra_data
       )
     values (#{number,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{parentHash,jdbcType=VARCHAR}, 
       #{timestamp,jdbcType=TIMESTAMP}, #{size,jdbcType=INTEGER}, #{gasLimit,jdbcType=VARCHAR}, 
-      #{gasUsed,jdbcType=VARCHAR}, #{blockReward,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{nodeName,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, 
-      #{statTxQty,jdbcType=INTEGER}, #{statTransferQty,jdbcType=INTEGER}, #{statStakingQty,jdbcType=INTEGER}, 
-      #{statProposalQty,jdbcType=INTEGER}, #{statDelegateQty,jdbcType=INTEGER}, #{statTxGasLimit,jdbcType=VARCHAR}, 
-      #{statTxFee,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, #{extraData,jdbcType=LONGVARCHAR}
+      #{gasUsed,jdbcType=VARCHAR}, #{statTxQty,jdbcType=INTEGER}, #{statTransferQty,jdbcType=INTEGER}, 
+      #{statStakingQty,jdbcType=INTEGER}, #{statProposalQty,jdbcType=INTEGER}, #{statDelegateQty,jdbcType=INTEGER}, 
+      #{statTxGasLimit,jdbcType=VARCHAR}, #{statTxFee,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, 
+      #{nodeId,jdbcType=VARCHAR}, #{blockReward,jdbcType=VARCHAR}, #{miner,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{extraData,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Block">
@@ -182,21 +182,6 @@
       <if test="gasUsed != null">
         gas_used,
       </if>
-      <if test="blockReward != null">
-        block_reward,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-      <if test="nodeName != null">
-        node_name,
-      </if>
-      <if test="nodeId != null">
-        node_id,
-      </if>
       <if test="statTxQty != null">
         stat_tx_qty,
       </if>
@@ -218,8 +203,23 @@
       <if test="statTxFee != null">
         stat_tx_fee,
       </if>
+      <if test="nodeName != null">
+        node_name,
+      </if>
+      <if test="nodeId != null">
+        node_id,
+      </if>
+      <if test="blockReward != null">
+        block_reward,
+      </if>
       <if test="miner != null">
         miner,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
       </if>
       <if test="extraData != null">
         extra_data,
@@ -247,21 +247,6 @@
       <if test="gasUsed != null">
         #{gasUsed,jdbcType=VARCHAR},
       </if>
-      <if test="blockReward != null">
-        #{blockReward,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="nodeName != null">
-        #{nodeName,jdbcType=VARCHAR},
-      </if>
-      <if test="nodeId != null">
-        #{nodeId,jdbcType=VARCHAR},
-      </if>
       <if test="statTxQty != null">
         #{statTxQty,jdbcType=INTEGER},
       </if>
@@ -283,8 +268,23 @@
       <if test="statTxFee != null">
         #{statTxFee,jdbcType=VARCHAR},
       </if>
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="blockReward != null">
+        #{blockReward,jdbcType=VARCHAR},
+      </if>
       <if test="miner != null">
         #{miner,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="extraData != null">
         #{extraData,jdbcType=LONGVARCHAR},
@@ -321,21 +321,6 @@
       <if test="record.gasUsed != null">
         gas_used = #{record.gasUsed,jdbcType=VARCHAR},
       </if>
-      <if test="record.blockReward != null">
-        block_reward = #{record.blockReward,jdbcType=VARCHAR},
-      </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.nodeName != null">
-        node_name = #{record.nodeName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.nodeId != null">
-        node_id = #{record.nodeId,jdbcType=VARCHAR},
-      </if>
       <if test="record.statTxQty != null">
         stat_tx_qty = #{record.statTxQty,jdbcType=INTEGER},
       </if>
@@ -357,8 +342,23 @@
       <if test="record.statTxFee != null">
         stat_tx_fee = #{record.statTxFee,jdbcType=VARCHAR},
       </if>
+      <if test="record.nodeName != null">
+        node_name = #{record.nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.blockReward != null">
+        block_reward = #{record.blockReward,jdbcType=VARCHAR},
+      </if>
       <if test="record.miner != null">
         miner = #{record.miner,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.extraData != null">
         extra_data = #{record.extraData,jdbcType=LONGVARCHAR},
@@ -377,11 +377,6 @@
       `size` = #{record.size,jdbcType=INTEGER},
       gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
       gas_used = #{record.gasUsed,jdbcType=VARCHAR},
-      block_reward = #{record.blockReward,jdbcType=VARCHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      node_name = #{record.nodeName,jdbcType=VARCHAR},
-      node_id = #{record.nodeId,jdbcType=VARCHAR},
       stat_tx_qty = #{record.statTxQty,jdbcType=INTEGER},
       stat_transfer_qty = #{record.statTransferQty,jdbcType=INTEGER},
       stat_staking_qty = #{record.statStakingQty,jdbcType=INTEGER},
@@ -389,7 +384,12 @@
       stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
       stat_tx_gas_limit = #{record.statTxGasLimit,jdbcType=VARCHAR},
       stat_tx_fee = #{record.statTxFee,jdbcType=VARCHAR},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      block_reward = #{record.blockReward,jdbcType=VARCHAR},
       miner = #{record.miner,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       extra_data = #{record.extraData,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -404,11 +404,6 @@
       `size` = #{record.size,jdbcType=INTEGER},
       gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
       gas_used = #{record.gasUsed,jdbcType=VARCHAR},
-      block_reward = #{record.blockReward,jdbcType=VARCHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      node_name = #{record.nodeName,jdbcType=VARCHAR},
-      node_id = #{record.nodeId,jdbcType=VARCHAR},
       stat_tx_qty = #{record.statTxQty,jdbcType=INTEGER},
       stat_transfer_qty = #{record.statTransferQty,jdbcType=INTEGER},
       stat_staking_qty = #{record.statStakingQty,jdbcType=INTEGER},
@@ -416,7 +411,12 @@
       stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
       stat_tx_gas_limit = #{record.statTxGasLimit,jdbcType=VARCHAR},
       stat_tx_fee = #{record.statTxFee,jdbcType=VARCHAR},
-      miner = #{record.miner,jdbcType=VARCHAR}
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      block_reward = #{record.blockReward,jdbcType=VARCHAR},
+      miner = #{record.miner,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -442,21 +442,6 @@
       <if test="gasUsed != null">
         gas_used = #{gasUsed,jdbcType=VARCHAR},
       </if>
-      <if test="blockReward != null">
-        block_reward = #{blockReward,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="nodeName != null">
-        node_name = #{nodeName,jdbcType=VARCHAR},
-      </if>
-      <if test="nodeId != null">
-        node_id = #{nodeId,jdbcType=VARCHAR},
-      </if>
       <if test="statTxQty != null">
         stat_tx_qty = #{statTxQty,jdbcType=INTEGER},
       </if>
@@ -478,8 +463,23 @@
       <if test="statTxFee != null">
         stat_tx_fee = #{statTxFee,jdbcType=VARCHAR},
       </if>
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="blockReward != null">
+        block_reward = #{blockReward,jdbcType=VARCHAR},
+      </if>
       <if test="miner != null">
         miner = #{miner,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="extraData != null">
         extra_data = #{extraData,jdbcType=LONGVARCHAR},
@@ -495,11 +495,6 @@
       `size` = #{size,jdbcType=INTEGER},
       gas_limit = #{gasLimit,jdbcType=VARCHAR},
       gas_used = #{gasUsed,jdbcType=VARCHAR},
-      block_reward = #{blockReward,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      node_name = #{nodeName,jdbcType=VARCHAR},
-      node_id = #{nodeId,jdbcType=VARCHAR},
       stat_tx_qty = #{statTxQty,jdbcType=INTEGER},
       stat_transfer_qty = #{statTransferQty,jdbcType=INTEGER},
       stat_staking_qty = #{statStakingQty,jdbcType=INTEGER},
@@ -507,7 +502,12 @@
       stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
       stat_tx_gas_limit = #{statTxGasLimit,jdbcType=VARCHAR},
       stat_tx_fee = #{statTxFee,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_id = #{nodeId,jdbcType=VARCHAR},
+      block_reward = #{blockReward,jdbcType=VARCHAR},
       miner = #{miner,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
       extra_data = #{extraData,jdbcType=LONGVARCHAR}
     where `number` = #{number,jdbcType=BIGINT}
   </update>
@@ -519,11 +519,6 @@
       `size` = #{size,jdbcType=INTEGER},
       gas_limit = #{gasLimit,jdbcType=VARCHAR},
       gas_used = #{gasUsed,jdbcType=VARCHAR},
-      block_reward = #{blockReward,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      node_name = #{nodeName,jdbcType=VARCHAR},
-      node_id = #{nodeId,jdbcType=VARCHAR},
       stat_tx_qty = #{statTxQty,jdbcType=INTEGER},
       stat_transfer_qty = #{statTransferQty,jdbcType=INTEGER},
       stat_staking_qty = #{statStakingQty,jdbcType=INTEGER},
@@ -531,7 +526,12 @@
       stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
       stat_tx_gas_limit = #{statTxGasLimit,jdbcType=VARCHAR},
       stat_tx_fee = #{statTxFee,jdbcType=VARCHAR},
-      miner = #{miner,jdbcType=VARCHAR}
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_id = #{nodeId,jdbcType=VARCHAR},
+      block_reward = #{blockReward,jdbcType=VARCHAR},
+      miner = #{miner,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where `number` = #{number,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -541,20 +541,20 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into block
-    (`number`, hash, parent_hash, `timestamp`, `size`, gas_limit, gas_used, block_reward, 
-      create_time, update_time, node_name, node_id, stat_tx_qty, stat_transfer_qty, stat_staking_qty, 
-      stat_proposal_qty, stat_delegate_qty, stat_tx_gas_limit, stat_tx_fee, miner, extra_data
-      )
+    (`number`, hash, parent_hash, `timestamp`, `size`, gas_limit, gas_used, stat_tx_qty, 
+      stat_transfer_qty, stat_staking_qty, stat_proposal_qty, stat_delegate_qty, stat_tx_gas_limit, 
+      stat_tx_fee, node_name, node_id, block_reward, miner, create_time, update_time, 
+      extra_data)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.number,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.parentHash,jdbcType=VARCHAR}, 
         #{item.timestamp,jdbcType=TIMESTAMP}, #{item.size,jdbcType=INTEGER}, #{item.gasLimit,jdbcType=VARCHAR}, 
-        #{item.gasUsed,jdbcType=VARCHAR}, #{item.blockReward,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, 
-        #{item.statTxQty,jdbcType=INTEGER}, #{item.statTransferQty,jdbcType=INTEGER}, #{item.statStakingQty,jdbcType=INTEGER}, 
-        #{item.statProposalQty,jdbcType=INTEGER}, #{item.statDelegateQty,jdbcType=INTEGER}, 
-        #{item.statTxGasLimit,jdbcType=VARCHAR}, #{item.statTxFee,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, 
-        #{item.extraData,jdbcType=LONGVARCHAR})
+        #{item.gasUsed,jdbcType=VARCHAR}, #{item.statTxQty,jdbcType=INTEGER}, #{item.statTransferQty,jdbcType=INTEGER}, 
+        #{item.statStakingQty,jdbcType=INTEGER}, #{item.statProposalQty,jdbcType=INTEGER}, 
+        #{item.statDelegateQty,jdbcType=INTEGER}, #{item.statTxGasLimit,jdbcType=VARCHAR}, 
+        #{item.statTxFee,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, 
+        #{item.blockReward,jdbcType=VARCHAR}, #{item.miner,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.extraData,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -593,21 +593,6 @@
         <if test="'gas_used'.toString() == column.value">
           #{item.gasUsed,jdbcType=VARCHAR}
         </if>
-        <if test="'block_reward'.toString() == column.value">
-          #{item.blockReward,jdbcType=VARCHAR}
-        </if>
-        <if test="'create_time'.toString() == column.value">
-          #{item.createTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'node_name'.toString() == column.value">
-          #{item.nodeName,jdbcType=VARCHAR}
-        </if>
-        <if test="'node_id'.toString() == column.value">
-          #{item.nodeId,jdbcType=VARCHAR}
-        </if>
         <if test="'stat_tx_qty'.toString() == column.value">
           #{item.statTxQty,jdbcType=INTEGER}
         </if>
@@ -629,8 +614,23 @@
         <if test="'stat_tx_fee'.toString() == column.value">
           #{item.statTxFee,jdbcType=VARCHAR}
         </if>
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_reward'.toString() == column.value">
+          #{item.blockReward,jdbcType=VARCHAR}
+        </if>
         <if test="'miner'.toString() == column.value">
           #{item.miner,jdbcType=VARCHAR}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'extra_data'.toString() == column.value">
           #{item.extraData,jdbcType=LONGVARCHAR}

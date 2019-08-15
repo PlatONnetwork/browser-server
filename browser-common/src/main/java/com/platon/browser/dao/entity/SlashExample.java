@@ -245,6 +245,136 @@ public class SlashExample {
             return (Criteria) this;
         }
 
+        public Criteria andSlashRateIsNull() {
+            addCriterion("slash_rate is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateIsNotNull() {
+            addCriterion("slash_rate is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateEqualTo(String value) {
+            addCriterion("slash_rate =", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateNotEqualTo(String value) {
+            addCriterion("slash_rate <>", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateGreaterThan(String value) {
+            addCriterion("slash_rate >", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateGreaterThanOrEqualTo(String value) {
+            addCriterion("slash_rate >=", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateLessThan(String value) {
+            addCriterion("slash_rate <", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateLessThanOrEqualTo(String value) {
+            addCriterion("slash_rate <=", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateLike(String value) {
+            addCriterion("slash_rate like", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateNotLike(String value) {
+            addCriterion("slash_rate not like", value, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateIn(List<String> values) {
+            addCriterion("slash_rate in", values, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateNotIn(List<String> values) {
+            addCriterion("slash_rate not in", values, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateBetween(String value1, String value2) {
+            addCriterion("slash_rate between", value1, value2, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSlashRateNotBetween(String value1, String value2) {
+            addCriterion("slash_rate not between", value1, value2, "slashRate");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitIsNull() {
+            addCriterion("is_quit is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitIsNotNull() {
+            addCriterion("is_quit is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitEqualTo(Integer value) {
+            addCriterion("is_quit =", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitNotEqualTo(Integer value) {
+            addCriterion("is_quit <>", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitGreaterThan(Integer value) {
+            addCriterion("is_quit >", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitGreaterThanOrEqualTo(Integer value) {
+            addCriterion("is_quit >=", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitLessThan(Integer value) {
+            addCriterion("is_quit <", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitLessThanOrEqualTo(Integer value) {
+            addCriterion("is_quit <=", value, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitIn(List<Integer> values) {
+            addCriterion("is_quit in", values, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitNotIn(List<Integer> values) {
+            addCriterion("is_quit not in", values, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitBetween(Integer value1, Integer value2) {
+            addCriterion("is_quit between", value1, value2, "isQuit");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsQuitNotBetween(Integer value1, Integer value2) {
+            addCriterion("is_quit not between", value1, value2, "isQuit");
+            return (Criteria) this;
+        }
+
         public Criteria andRewardIsNull() {
             addCriterion("reward is null");
             return (Criteria) this;
@@ -632,136 +762,6 @@ public class SlashExample {
 
         public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
             addCriterion("update_time not between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateIsNull() {
-            addCriterion("slash_rate is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateIsNotNull() {
-            addCriterion("slash_rate is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateEqualTo(String value) {
-            addCriterion("slash_rate =", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateNotEqualTo(String value) {
-            addCriterion("slash_rate <>", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateGreaterThan(String value) {
-            addCriterion("slash_rate >", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateGreaterThanOrEqualTo(String value) {
-            addCriterion("slash_rate >=", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateLessThan(String value) {
-            addCriterion("slash_rate <", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateLessThanOrEqualTo(String value) {
-            addCriterion("slash_rate <=", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateLike(String value) {
-            addCriterion("slash_rate like", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateNotLike(String value) {
-            addCriterion("slash_rate not like", value, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateIn(List<String> values) {
-            addCriterion("slash_rate in", values, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateNotIn(List<String> values) {
-            addCriterion("slash_rate not in", values, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateBetween(String value1, String value2) {
-            addCriterion("slash_rate between", value1, value2, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andSlashRateNotBetween(String value1, String value2) {
-            addCriterion("slash_rate not between", value1, value2, "slashRate");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitIsNull() {
-            addCriterion("is_quit is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitIsNotNull() {
-            addCriterion("is_quit is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitEqualTo(Integer value) {
-            addCriterion("is_quit =", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitNotEqualTo(Integer value) {
-            addCriterion("is_quit <>", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitGreaterThan(Integer value) {
-            addCriterion("is_quit >", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitGreaterThanOrEqualTo(Integer value) {
-            addCriterion("is_quit >=", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitLessThan(Integer value) {
-            addCriterion("is_quit <", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitLessThanOrEqualTo(Integer value) {
-            addCriterion("is_quit <=", value, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitIn(List<Integer> values) {
-            addCriterion("is_quit in", values, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitNotIn(List<Integer> values) {
-            addCriterion("is_quit not in", values, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitBetween(Integer value1, Integer value2) {
-            addCriterion("is_quit between", value1, value2, "isQuit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsQuitNotBetween(Integer value1, Integer value2) {
-            addCriterion("is_quit not between", value1, value2, "isQuit");
             return (Criteria) this;
         }
     }

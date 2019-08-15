@@ -175,66 +175,6 @@ public class UnDelegationExample {
             return (Criteria) this;
         }
 
-        public Criteria andStakingBlockNumIsNull() {
-            addCriterion("staking_block_num is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumIsNotNull() {
-            addCriterion("staking_block_num is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumEqualTo(Long value) {
-            addCriterion("staking_block_num =", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumNotEqualTo(Long value) {
-            addCriterion("staking_block_num <>", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumGreaterThan(Long value) {
-            addCriterion("staking_block_num >", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumGreaterThanOrEqualTo(Long value) {
-            addCriterion("staking_block_num >=", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumLessThan(Long value) {
-            addCriterion("staking_block_num <", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumLessThanOrEqualTo(Long value) {
-            addCriterion("staking_block_num <=", value, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumIn(List<Long> values) {
-            addCriterion("staking_block_num in", values, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumNotIn(List<Long> values) {
-            addCriterion("staking_block_num not in", values, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumBetween(Long value1, Long value2) {
-            addCriterion("staking_block_num between", value1, value2, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingBlockNumNotBetween(Long value1, Long value2) {
-            addCriterion("staking_block_num not between", value1, value2, "stakingBlockNum");
-            return (Criteria) this;
-        }
-
         public Criteria andDelegateAddrIsNull() {
             addCriterion("delegate_addr is null");
             return (Criteria) this;
@@ -302,6 +242,136 @@ public class UnDelegationExample {
 
         public Criteria andDelegateAddrNotBetween(String value1, String value2) {
             addCriterion("delegate_addr not between", value1, value2, "delegateAddr");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumIsNull() {
+            addCriterion("staking_block_num is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumIsNotNull() {
+            addCriterion("staking_block_num is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumEqualTo(Long value) {
+            addCriterion("staking_block_num =", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumNotEqualTo(Long value) {
+            addCriterion("staking_block_num <>", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumGreaterThan(Long value) {
+            addCriterion("staking_block_num >", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumGreaterThanOrEqualTo(Long value) {
+            addCriterion("staking_block_num >=", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumLessThan(Long value) {
+            addCriterion("staking_block_num <", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumLessThanOrEqualTo(Long value) {
+            addCriterion("staking_block_num <=", value, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumIn(List<Long> values) {
+            addCriterion("staking_block_num in", values, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumNotIn(List<Long> values) {
+            addCriterion("staking_block_num not in", values, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumBetween(Long value1, Long value2) {
+            addCriterion("staking_block_num between", value1, value2, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingBlockNumNotBetween(Long value1, Long value2) {
+            addCriterion("staking_block_num not between", value1, value2, "stakingBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIsNull() {
+            addCriterion("node_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIsNotNull() {
+            addCriterion("node_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdEqualTo(String value) {
+            addCriterion("node_id =", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotEqualTo(String value) {
+            addCriterion("node_id <>", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdGreaterThan(String value) {
+            addCriterion("node_id >", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdGreaterThanOrEqualTo(String value) {
+            addCriterion("node_id >=", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLessThan(String value) {
+            addCriterion("node_id <", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLessThanOrEqualTo(String value) {
+            addCriterion("node_id <=", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdLike(String value) {
+            addCriterion("node_id like", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotLike(String value) {
+            addCriterion("node_id not like", value, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdIn(List<String> values) {
+            addCriterion("node_id in", values, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotIn(List<String> values) {
+            addCriterion("node_id not in", values, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdBetween(String value1, String value2) {
+            addCriterion("node_id between", value1, value2, "nodeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeIdNotBetween(String value1, String value2) {
+            addCriterion("node_id not between", value1, value2, "nodeId");
             return (Criteria) this;
         }
 
@@ -622,76 +692,6 @@ public class UnDelegationExample {
 
         public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
             addCriterion("update_time not between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdIsNull() {
-            addCriterion("node_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdIsNotNull() {
-            addCriterion("node_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdEqualTo(String value) {
-            addCriterion("node_id =", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdNotEqualTo(String value) {
-            addCriterion("node_id <>", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdGreaterThan(String value) {
-            addCriterion("node_id >", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdGreaterThanOrEqualTo(String value) {
-            addCriterion("node_id >=", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdLessThan(String value) {
-            addCriterion("node_id <", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdLessThanOrEqualTo(String value) {
-            addCriterion("node_id <=", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdLike(String value) {
-            addCriterion("node_id like", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdNotLike(String value) {
-            addCriterion("node_id not like", value, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdIn(List<String> values) {
-            addCriterion("node_id in", values, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdNotIn(List<String> values) {
-            addCriterion("node_id not in", values, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdBetween(String value1, String value2) {
-            addCriterion("node_id between", value1, value2, "nodeId");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeIdNotBetween(String value1, String value2) {
-            addCriterion("node_id not between", value1, value2, "nodeId");
             return (Criteria) this;
         }
     }

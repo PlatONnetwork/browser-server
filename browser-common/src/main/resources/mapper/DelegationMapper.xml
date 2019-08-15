@@ -9,6 +9,7 @@
     <result column="delegate_locked" jdbcType="VARCHAR" property="delegateLocked" />
     <result column="delegate_reduction" jdbcType="VARCHAR" property="delegateReduction" />
     <result column="is_history" jdbcType="INTEGER" property="isHistory" />
+    <result column="sequence" jdbcType="BIGINT" property="sequence" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -72,7 +73,7 @@
   </sql>
   <sql id="Base_Column_List">
     delegate_addr, staking_block_num, node_id, delegate_has, delegate_locked, delegate_reduction, 
-    is_history, create_time, update_time
+    is_history, `sequence`, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.DelegationExample" resultMap="BaseResultMap">
     select
@@ -111,12 +112,12 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Delegation">
     insert into delegation (delegate_addr, staking_block_num, node_id, 
       delegate_has, delegate_locked, delegate_reduction, 
-      is_history, create_time, update_time
-      )
+      is_history, `sequence`, create_time, 
+      update_time)
     values (#{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
       #{delegateHas,jdbcType=VARCHAR}, #{delegateLocked,jdbcType=VARCHAR}, #{delegateReduction,jdbcType=VARCHAR}, 
-      #{isHistory,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{isHistory,jdbcType=INTEGER}, #{sequence,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Delegation">
     insert into delegation
@@ -141,6 +142,9 @@
       </if>
       <if test="isHistory != null">
         is_history,
+      </if>
+      <if test="sequence != null">
+        `sequence`,
       </if>
       <if test="createTime != null">
         create_time,
@@ -170,6 +174,9 @@
       </if>
       <if test="isHistory != null">
         #{isHistory,jdbcType=INTEGER},
+      </if>
+      <if test="sequence != null">
+        #{sequence,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -209,6 +216,9 @@
       <if test="record.isHistory != null">
         is_history = #{record.isHistory,jdbcType=INTEGER},
       </if>
+      <if test="record.sequence != null">
+        `sequence` = #{record.sequence,jdbcType=BIGINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -229,6 +239,7 @@
       delegate_locked = #{record.delegateLocked,jdbcType=VARCHAR},
       delegate_reduction = #{record.delegateReduction,jdbcType=VARCHAR},
       is_history = #{record.isHistory,jdbcType=INTEGER},
+      `sequence` = #{record.sequence,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -250,6 +261,9 @@
       <if test="isHistory != null">
         is_history = #{isHistory,jdbcType=INTEGER},
       </if>
+      <if test="sequence != null">
+        `sequence` = #{sequence,jdbcType=BIGINT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -267,6 +281,7 @@
       delegate_locked = #{delegateLocked,jdbcType=VARCHAR},
       delegate_reduction = #{delegateReduction,jdbcType=VARCHAR},
       is_history = #{isHistory,jdbcType=INTEGER},
+      `sequence` = #{sequence,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where delegate_addr = #{delegateAddr,jdbcType=VARCHAR}
@@ -281,13 +296,14 @@
     -->
     insert into delegation
     (delegate_addr, staking_block_num, node_id, delegate_has, delegate_locked, delegate_reduction, 
-      is_history, create_time, update_time)
+      is_history, `sequence`, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
         #{item.nodeId,jdbcType=VARCHAR}, #{item.delegateHas,jdbcType=VARCHAR}, #{item.delegateLocked,jdbcType=VARCHAR}, 
         #{item.delegateReduction,jdbcType=VARCHAR}, #{item.isHistory,jdbcType=INTEGER}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+        #{item.sequence,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -325,6 +341,9 @@
         </if>
         <if test="'is_history'.toString() == column.value">
           #{item.isHistory,jdbcType=INTEGER}
+        </if>
+        <if test="'sequence'.toString() == column.value">
+          #{item.sequence,jdbcType=BIGINT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}

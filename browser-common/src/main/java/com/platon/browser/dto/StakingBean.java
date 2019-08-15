@@ -2,9 +2,11 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.json.CreateValidatorDto;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,20 +20,44 @@ import java.util.Map;
 public class StakingBean extends Staking {
 
     public StakingBean() {
-        // 初始化默认值
-        this.setStakingLocked("0");
-        this.setStakingReduction("0");
-        this.setStakingEpoch(0);
-        this.setStatDelegateHas("0");
-        this.setStatDelegateLocked("0");
-        this.setStatDelegateReduction("0");
-        this.setStatDelegateQty(0);
-        this.setStatVerifierTime(0);
-        this.setIsSetting(0);
-        this.setIsInit(0);
-        this.setIsConsensus(0);
+        /** 初始化默认值 **/
+        // 质押金额(犹豫期金额)
         this.setStakingHas("0");
-        this.setStatus(0);
+        // 质押金额(锁定金额)
+        this.setStakingLocked("0");
+        // 委托交易总金额(犹豫期金额)
+        this.setStatDelegateHas("0");
+        // 委托交易总金额(锁定期金额)
+        this.setStatDelegateLocked("0");
+        // 质押金额(退回中金额)
+        this.setStakingReduction("0");
+        // 委托交易总金额(退回中金额)
+        this.setStatDelegateReduction("0");
+        // 节点名称(质押节点名称)
+        this.setStakingName("Unknown");
+        // 预计年化率
+        this.setExpectedIncome("0");
+        // 出块奖励
+        this.setBlockRewardValue("0");
+        // 上个结算周期出块奖励
+        this.setPreSetBlockRewardValue("0");
+        // 程序版本
+        this.setProgramVersion("0");
+        // 质押奖励
+        this.setStakingRewardValue("0");
+        // 结算周期标识
+        this.setStakingReductionEpoch(0);
+        // 委托交易总数(关联的委托交易总数)
+        this.setStatDelegateQty(0);
+        // 进入共识验证论次数
+        this.setStatVerifierTime(0);
+        // 上个共识周期出块数
+        this.setPreConsBlockQty(0l);
+        // 当前共识周期出块数
+        this.setCurConsBlockQty(0l);
+        // 节点状态 1：候选中 2：退出中 3：已退出
+        this.setStatus(1);
+
     }
 
     // <质押块高-质押记录> 映射
@@ -51,7 +77,7 @@ public class StakingBean extends Staking {
         // 质押区块高度
         if(initData.getStakingBlockNum()!=null) this.setStakingBlockNum(initData.getStakingBlockNum().longValue());
         // 质押节点地址
-        this.setNodeId(this.getNodeId().startsWith("0x")?this.getNodeId():"0x"+this.getNodeId());
+        this.setNodeId(HexTool.prefix(this.getNodeId()));
         // 发起质押交易的索引
         if(initData.getStakingTxIndex()!=null) this.setStakingTxIndex(initData.getStakingTxIndex().intValue());
         // 发起质押的账户地址
@@ -62,8 +88,6 @@ public class StakingBean extends Staking {
         this.setDenefitAddr(initData.getBenifitAddress());
         // 节点状态 1：候选中 2：退出中 3：已退出
         if(initData.getStatus()!=null) this.setStatus(initData.getStatus().intValue());
-        // 结算周期标识
-        if(initData.getStakingEpoch()!=null) this.setStakingEpoch(initData.getStakingEpoch().intValue());
         // 节点名称(质押节点名称)
         this.setStakingName(initData.getNodeName());
         // 节点的第三方主页

@@ -5,18 +5,14 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.BlockBean;
-import com.platon.browser.dto.NodeBean;
 import com.platon.browser.dto.StakingBean;
 import com.platon.browser.service.DbService;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.Node;
-import org.web3j.protocol.core.Response;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;

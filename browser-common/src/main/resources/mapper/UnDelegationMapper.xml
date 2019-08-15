@@ -3,14 +3,14 @@
 <mapper namespace="com.platon.browser.dao.mapper.UnDelegationMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.UnDelegation">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <result column="delegate_addr" jdbcType="VARCHAR" property="delegateAddr" />
+    <result column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
     <result column="apply_amount" jdbcType="VARCHAR" property="applyAmount" />
     <result column="redeem_locked" jdbcType="VARCHAR" property="redeemLocked" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,8 +71,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `hash`, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time,
-    update_time, node_id
+    hash, delegate_addr, staking_block_num, node_id, apply_amount, redeem_locked, `status`, 
+    create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.UnDelegationExample" resultMap="BaseResultMap">
     select
@@ -89,7 +89,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from un_delegation
     where hash = #{hash,jdbcType=VARCHAR}
@@ -105,13 +105,13 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.UnDelegation">
-    insert into un_delegation (hash, staking_block_num, delegate_addr,
-      apply_amount, redeem_locked, `status`,
-      create_time, update_time, node_id
+    insert into un_delegation (hash, delegate_addr, staking_block_num, 
+      node_id, apply_amount, redeem_locked, 
+      `status`, create_time, update_time
       )
-    values (#{hash,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{delegateAddr,jdbcType=VARCHAR},
-      #{applyAmount,jdbcType=VARCHAR}, #{redeemLocked,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{nodeId,jdbcType=VARCHAR}
+    values (#{hash,jdbcType=VARCHAR}, #{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, 
+      #{nodeId,jdbcType=VARCHAR}, #{applyAmount,jdbcType=VARCHAR}, #{redeemLocked,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.UnDelegation">
@@ -120,11 +120,14 @@
       <if test="hash != null">
         hash,
       </if>
+      <if test="delegateAddr != null">
+        delegate_addr,
+      </if>
       <if test="stakingBlockNum != null">
         staking_block_num,
       </if>
-      <if test="delegateAddr != null">
-        delegate_addr,
+      <if test="nodeId != null">
+        node_id,
       </if>
       <if test="applyAmount != null">
         apply_amount,
@@ -141,19 +144,19 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="nodeId != null">
-        node_id,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
+      <if test="delegateAddr != null">
+        #{delegateAddr,jdbcType=VARCHAR},
+      </if>
       <if test="stakingBlockNum != null">
         #{stakingBlockNum,jdbcType=BIGINT},
       </if>
-      <if test="delegateAddr != null">
-        #{delegateAddr,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
       </if>
       <if test="applyAmount != null">
         #{applyAmount,jdbcType=VARCHAR},
@@ -170,9 +173,6 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="nodeId != null">
-        #{nodeId,jdbcType=VARCHAR},
-      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.platon.browser.dao.entity.UnDelegationExample" resultType="java.lang.Long">
@@ -187,11 +187,14 @@
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
+      <if test="record.delegateAddr != null">
+        delegate_addr = #{record.delegateAddr,jdbcType=VARCHAR},
+      </if>
       <if test="record.stakingBlockNum != null">
         staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
       </if>
-      <if test="record.delegateAddr != null">
-        delegate_addr = #{record.delegateAddr,jdbcType=VARCHAR},
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
       <if test="record.applyAmount != null">
         apply_amount = #{record.applyAmount,jdbcType=VARCHAR},
@@ -208,9 +211,6 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.nodeId != null">
-        node_id = #{record.nodeId,jdbcType=VARCHAR},
-      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -219,14 +219,14 @@
   <update id="updateByExample" parameterType="map">
     update un_delegation
     set hash = #{record.hash,jdbcType=VARCHAR},
-      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
       delegate_addr = #{record.delegateAddr,jdbcType=VARCHAR},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
       apply_amount = #{record.applyAmount,jdbcType=VARCHAR},
       redeem_locked = #{record.redeemLocked,jdbcType=VARCHAR},
       `status` = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      node_id = #{record.nodeId,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -234,11 +234,14 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.UnDelegation">
     update un_delegation
     <set>
+      <if test="delegateAddr != null">
+        delegate_addr = #{delegateAddr,jdbcType=VARCHAR},
+      </if>
       <if test="stakingBlockNum != null">
         staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
       </if>
-      <if test="delegateAddr != null">
-        delegate_addr = #{delegateAddr,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
       <if test="applyAmount != null">
         apply_amount = #{applyAmount,jdbcType=VARCHAR},
@@ -255,22 +258,19 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="nodeId != null">
-        node_id = #{nodeId,jdbcType=VARCHAR},
-      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.UnDelegation">
     update un_delegation
-    set staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
-      delegate_addr = #{delegateAddr,jdbcType=VARCHAR},
+    set delegate_addr = #{delegateAddr,jdbcType=VARCHAR},
+      staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
+      node_id = #{nodeId,jdbcType=VARCHAR},
       apply_amount = #{applyAmount,jdbcType=VARCHAR},
       redeem_locked = #{redeemLocked,jdbcType=VARCHAR},
       `status` = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      node_id = #{nodeId,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -280,13 +280,13 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into un_delegation
-    (hash, staking_block_num, delegate_addr, apply_amount, redeem_locked, `status`, create_time,
-      update_time, node_id)
+    (hash, delegate_addr, staking_block_num, node_id, apply_amount, redeem_locked, `status`, 
+      create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.delegateAddr,jdbcType=VARCHAR},
-        #{item.applyAmount,jdbcType=VARCHAR}, #{item.redeemLocked,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER},
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.nodeId,jdbcType=VARCHAR}
+      (#{item.hash,jdbcType=VARCHAR}, #{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
+        #{item.nodeId,jdbcType=VARCHAR}, #{item.applyAmount,jdbcType=VARCHAR}, #{item.redeemLocked,jdbcType=VARCHAR}, 
+        #{item.status,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
         )
     </foreach>
   </insert>
@@ -308,11 +308,14 @@
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
         </if>
+        <if test="'delegate_addr'.toString() == column.value">
+          #{item.delegateAddr,jdbcType=VARCHAR}
+        </if>
         <if test="'staking_block_num'.toString() == column.value">
           #{item.stakingBlockNum,jdbcType=BIGINT}
         </if>
-        <if test="'delegate_addr'.toString() == column.value">
-          #{item.delegateAddr,jdbcType=VARCHAR}
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
         </if>
         <if test="'apply_amount'.toString() == column.value">
           #{item.applyAmount,jdbcType=VARCHAR}
@@ -328,9 +331,6 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'node_id'.toString() == column.value">
-          #{item.nodeId,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

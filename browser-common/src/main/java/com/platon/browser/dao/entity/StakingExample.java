@@ -505,6 +505,136 @@ public class StakingExample {
             return (Criteria) this;
         }
 
+        public Criteria andStakingReductionEpochIsNull() {
+            addCriterion("staking_reduction_epoch is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochIsNotNull() {
+            addCriterion("staking_reduction_epoch is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochEqualTo(Integer value) {
+            addCriterion("staking_reduction_epoch =", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochNotEqualTo(Integer value) {
+            addCriterion("staking_reduction_epoch <>", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochGreaterThan(Integer value) {
+            addCriterion("staking_reduction_epoch >", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochGreaterThanOrEqualTo(Integer value) {
+            addCriterion("staking_reduction_epoch >=", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochLessThan(Integer value) {
+            addCriterion("staking_reduction_epoch <", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochLessThanOrEqualTo(Integer value) {
+            addCriterion("staking_reduction_epoch <=", value, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochIn(List<Integer> values) {
+            addCriterion("staking_reduction_epoch in", values, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochNotIn(List<Integer> values) {
+            addCriterion("staking_reduction_epoch not in", values, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochBetween(Integer value1, Integer value2) {
+            addCriterion("staking_reduction_epoch between", value1, value2, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEpochNotBetween(Integer value1, Integer value2) {
+            addCriterion("staking_reduction_epoch not between", value1, value2, "stakingReductionEpoch");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionIsNull() {
+            addCriterion("staking_reduction is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionIsNotNull() {
+            addCriterion("staking_reduction is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionEqualTo(String value) {
+            addCriterion("staking_reduction =", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionNotEqualTo(String value) {
+            addCriterion("staking_reduction <>", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionGreaterThan(String value) {
+            addCriterion("staking_reduction >", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionGreaterThanOrEqualTo(String value) {
+            addCriterion("staking_reduction >=", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionLessThan(String value) {
+            addCriterion("staking_reduction <", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionLessThanOrEqualTo(String value) {
+            addCriterion("staking_reduction <=", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionLike(String value) {
+            addCriterion("staking_reduction like", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionNotLike(String value) {
+            addCriterion("staking_reduction not like", value, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionIn(List<String> values) {
+            addCriterion("staking_reduction in", values, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionNotIn(List<String> values) {
+            addCriterion("staking_reduction not in", values, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionBetween(String value1, String value2) {
+            addCriterion("staking_reduction between", value1, value2, "stakingReduction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingReductionNotBetween(String value1, String value2) {
+            addCriterion("staking_reduction not between", value1, value2, "stakingReduction");
+            return (Criteria) this;
+        }
+
         public Criteria andStatDelegateHasIsNull() {
             addCriterion("stat_delegate_has is null");
             return (Criteria) this;
@@ -832,6 +962,76 @@ public class StakingExample {
 
         public Criteria andStatVerifierTimeNotBetween(Integer value1, Integer value2) {
             addCriterion("stat_verifier_time not between", value1, value2, "statVerifierTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameIsNull() {
+            addCriterion("staking_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameIsNotNull() {
+            addCriterion("staking_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameEqualTo(String value) {
+            addCriterion("staking_name =", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameNotEqualTo(String value) {
+            addCriterion("staking_name <>", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameGreaterThan(String value) {
+            addCriterion("staking_name >", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameGreaterThanOrEqualTo(String value) {
+            addCriterion("staking_name >=", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameLessThan(String value) {
+            addCriterion("staking_name <", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameLessThanOrEqualTo(String value) {
+            addCriterion("staking_name <=", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameLike(String value) {
+            addCriterion("staking_name like", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameNotLike(String value) {
+            addCriterion("staking_name not like", value, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameIn(List<String> values) {
+            addCriterion("staking_name in", values, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameNotIn(List<String> values) {
+            addCriterion("staking_name not in", values, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameBetween(String value1, String value2) {
+            addCriterion("staking_name between", value1, value2, "stakingName");
+            return (Criteria) this;
+        }
+
+        public Criteria andStakingNameNotBetween(String value1, String value2) {
+            addCriterion("staking_name not between", value1, value2, "stakingName");
             return (Criteria) this;
         }
 
@@ -1255,6 +1455,66 @@ public class StakingExample {
             return (Criteria) this;
         }
 
+        public Criteria andPreConsBlockQtyIsNull() {
+            addCriterion("pre_cons_block_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyIsNotNull() {
+            addCriterion("pre_cons_block_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyEqualTo(Long value) {
+            addCriterion("pre_cons_block_qty =", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyNotEqualTo(Long value) {
+            addCriterion("pre_cons_block_qty <>", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyGreaterThan(Long value) {
+            addCriterion("pre_cons_block_qty >", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyGreaterThanOrEqualTo(Long value) {
+            addCriterion("pre_cons_block_qty >=", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyLessThan(Long value) {
+            addCriterion("pre_cons_block_qty <", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyLessThanOrEqualTo(Long value) {
+            addCriterion("pre_cons_block_qty <=", value, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyIn(List<Long> values) {
+            addCriterion("pre_cons_block_qty in", values, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyNotIn(List<Long> values) {
+            addCriterion("pre_cons_block_qty not in", values, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyBetween(Long value1, Long value2) {
+            addCriterion("pre_cons_block_qty between", value1, value2, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreConsBlockQtyNotBetween(Long value1, Long value2) {
+            addCriterion("pre_cons_block_qty not between", value1, value2, "preConsBlockQty");
+            return (Criteria) this;
+        }
+
         public Criteria andCurConsBlockQtyIsNull() {
             addCriterion("cur_cons_block_qty is null");
             return (Criteria) this;
@@ -1315,63 +1575,73 @@ public class StakingExample {
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyIsNull() {
-            addCriterion("pre_cons_block_qty is null");
+        public Criteria andProgramVersionIsNull() {
+            addCriterion("program_version is null");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyIsNotNull() {
-            addCriterion("pre_cons_block_qty is not null");
+        public Criteria andProgramVersionIsNotNull() {
+            addCriterion("program_version is not null");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyEqualTo(Long value) {
-            addCriterion("pre_cons_block_qty =", value, "preConsBlockQty");
+        public Criteria andProgramVersionEqualTo(String value) {
+            addCriterion("program_version =", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyNotEqualTo(Long value) {
-            addCriterion("pre_cons_block_qty <>", value, "preConsBlockQty");
+        public Criteria andProgramVersionNotEqualTo(String value) {
+            addCriterion("program_version <>", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyGreaterThan(Long value) {
-            addCriterion("pre_cons_block_qty >", value, "preConsBlockQty");
+        public Criteria andProgramVersionGreaterThan(String value) {
+            addCriterion("program_version >", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyGreaterThanOrEqualTo(Long value) {
-            addCriterion("pre_cons_block_qty >=", value, "preConsBlockQty");
+        public Criteria andProgramVersionGreaterThanOrEqualTo(String value) {
+            addCriterion("program_version >=", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyLessThan(Long value) {
-            addCriterion("pre_cons_block_qty <", value, "preConsBlockQty");
+        public Criteria andProgramVersionLessThan(String value) {
+            addCriterion("program_version <", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyLessThanOrEqualTo(Long value) {
-            addCriterion("pre_cons_block_qty <=", value, "preConsBlockQty");
+        public Criteria andProgramVersionLessThanOrEqualTo(String value) {
+            addCriterion("program_version <=", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyIn(List<Long> values) {
-            addCriterion("pre_cons_block_qty in", values, "preConsBlockQty");
+        public Criteria andProgramVersionLike(String value) {
+            addCriterion("program_version like", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyNotIn(List<Long> values) {
-            addCriterion("pre_cons_block_qty not in", values, "preConsBlockQty");
+        public Criteria andProgramVersionNotLike(String value) {
+            addCriterion("program_version not like", value, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyBetween(Long value1, Long value2) {
-            addCriterion("pre_cons_block_qty between", value1, value2, "preConsBlockQty");
+        public Criteria andProgramVersionIn(List<String> values) {
+            addCriterion("program_version in", values, "programVersion");
             return (Criteria) this;
         }
 
-        public Criteria andPreConsBlockQtyNotBetween(Long value1, Long value2) {
-            addCriterion("pre_cons_block_qty not between", value1, value2, "preConsBlockQty");
+        public Criteria andProgramVersionNotIn(List<String> values) {
+            addCriterion("program_version not in", values, "programVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andProgramVersionBetween(String value1, String value2) {
+            addCriterion("program_version between", value1, value2, "programVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andProgramVersionNotBetween(String value1, String value2) {
+            addCriterion("program_version not between", value1, value2, "programVersion");
             return (Criteria) this;
         }
 
@@ -1765,126 +2035,6 @@ public class StakingExample {
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeIsNull() {
-            addCriterion("create_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeIsNotNull() {
-            addCriterion("create_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeEqualTo(Date value) {
-            addCriterion("create_time =", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotEqualTo(Date value) {
-            addCriterion("create_time <>", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeGreaterThan(Date value) {
-            addCriterion("create_time >", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("create_time >=", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeLessThan(Date value) {
-            addCriterion("create_time <", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeLessThanOrEqualTo(Date value) {
-            addCriterion("create_time <=", value, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeIn(List<Date> values) {
-            addCriterion("create_time in", values, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotIn(List<Date> values) {
-            addCriterion("create_time not in", values, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeBetween(Date value1, Date value2) {
-            addCriterion("create_time between", value1, value2, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCreateTimeNotBetween(Date value1, Date value2) {
-            addCriterion("create_time not between", value1, value2, "createTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIsNull() {
-            addCriterion("update_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIsNotNull() {
-            addCriterion("update_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeEqualTo(Date value) {
-            addCriterion("update_time =", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotEqualTo(Date value) {
-            addCriterion("update_time <>", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeGreaterThan(Date value) {
-            addCriterion("update_time >", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("update_time >=", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeLessThan(Date value) {
-            addCriterion("update_time <", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeLessThanOrEqualTo(Date value) {
-            addCriterion("update_time <=", value, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeIn(List<Date> values) {
-            addCriterion("update_time in", values, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotIn(List<Date> values) {
-            addCriterion("update_time not in", values, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeBetween(Date value1, Date value2) {
-            addCriterion("update_time between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
-            addCriterion("update_time not between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
         public Criteria andIsConsensusIsNull() {
             addCriterion("is_consensus is null");
             return (Criteria) this;
@@ -1942,206 +2092,6 @@ public class StakingExample {
 
         public Criteria andIsConsensusNotBetween(Integer value1, Integer value2) {
             addCriterion("is_consensus not between", value1, value2, "isConsensus");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochIsNull() {
-            addCriterion("staking_epoch is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochIsNotNull() {
-            addCriterion("staking_epoch is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochEqualTo(Integer value) {
-            addCriterion("staking_epoch =", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochNotEqualTo(Integer value) {
-            addCriterion("staking_epoch <>", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochGreaterThan(Integer value) {
-            addCriterion("staking_epoch >", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochGreaterThanOrEqualTo(Integer value) {
-            addCriterion("staking_epoch >=", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochLessThan(Integer value) {
-            addCriterion("staking_epoch <", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochLessThanOrEqualTo(Integer value) {
-            addCriterion("staking_epoch <=", value, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochIn(List<Integer> values) {
-            addCriterion("staking_epoch in", values, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochNotIn(List<Integer> values) {
-            addCriterion("staking_epoch not in", values, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochBetween(Integer value1, Integer value2) {
-            addCriterion("staking_epoch between", value1, value2, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingEpochNotBetween(Integer value1, Integer value2) {
-            addCriterion("staking_epoch not between", value1, value2, "stakingEpoch");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionIsNull() {
-            addCriterion("staking_reduction is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionIsNotNull() {
-            addCriterion("staking_reduction is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionEqualTo(String value) {
-            addCriterion("staking_reduction =", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionNotEqualTo(String value) {
-            addCriterion("staking_reduction <>", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionGreaterThan(String value) {
-            addCriterion("staking_reduction >", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionGreaterThanOrEqualTo(String value) {
-            addCriterion("staking_reduction >=", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionLessThan(String value) {
-            addCriterion("staking_reduction <", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionLessThanOrEqualTo(String value) {
-            addCriterion("staking_reduction <=", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionLike(String value) {
-            addCriterion("staking_reduction like", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionNotLike(String value) {
-            addCriterion("staking_reduction not like", value, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionIn(List<String> values) {
-            addCriterion("staking_reduction in", values, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionNotIn(List<String> values) {
-            addCriterion("staking_reduction not in", values, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionBetween(String value1, String value2) {
-            addCriterion("staking_reduction between", value1, value2, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingReductionNotBetween(String value1, String value2) {
-            addCriterion("staking_reduction not between", value1, value2, "stakingReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameIsNull() {
-            addCriterion("staking_name is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameIsNotNull() {
-            addCriterion("staking_name is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameEqualTo(String value) {
-            addCriterion("staking_name =", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameNotEqualTo(String value) {
-            addCriterion("staking_name <>", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameGreaterThan(String value) {
-            addCriterion("staking_name >", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameGreaterThanOrEqualTo(String value) {
-            addCriterion("staking_name >=", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameLessThan(String value) {
-            addCriterion("staking_name <", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameLessThanOrEqualTo(String value) {
-            addCriterion("staking_name <=", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameLike(String value) {
-            addCriterion("staking_name like", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameNotLike(String value) {
-            addCriterion("staking_name not like", value, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameIn(List<String> values) {
-            addCriterion("staking_name in", values, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameNotIn(List<String> values) {
-            addCriterion("staking_name not in", values, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameBetween(String value1, String value2) {
-            addCriterion("staking_name between", value1, value2, "stakingName");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingNameNotBetween(String value1, String value2) {
-            addCriterion("staking_name not between", value1, value2, "stakingName");
             return (Criteria) this;
         }
 
@@ -2262,6 +2212,126 @@ public class StakingExample {
 
         public Criteria andIsInitNotBetween(Integer value1, Integer value2) {
             addCriterion("is_init not between", value1, value2, "isInit");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIsNull() {
+            addCriterion("create_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIsNotNull() {
+            addCriterion("create_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeEqualTo(Date value) {
+            addCriterion("create_time =", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotEqualTo(Date value) {
+            addCriterion("create_time <>", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeGreaterThan(Date value) {
+            addCriterion("create_time >", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("create_time >=", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeLessThan(Date value) {
+            addCriterion("create_time <", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeLessThanOrEqualTo(Date value) {
+            addCriterion("create_time <=", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIn(List<Date> values) {
+            addCriterion("create_time in", values, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotIn(List<Date> values) {
+            addCriterion("create_time not in", values, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeBetween(Date value1, Date value2) {
+            addCriterion("create_time between", value1, value2, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotBetween(Date value1, Date value2) {
+            addCriterion("create_time not between", value1, value2, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIsNull() {
+            addCriterion("update_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIsNotNull() {
+            addCriterion("update_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeEqualTo(Date value) {
+            addCriterion("update_time =", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotEqualTo(Date value) {
+            addCriterion("update_time <>", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeGreaterThan(Date value) {
+            addCriterion("update_time >", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("update_time >=", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeLessThan(Date value) {
+            addCriterion("update_time <", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeLessThanOrEqualTo(Date value) {
+            addCriterion("update_time <=", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIn(List<Date> values) {
+            addCriterion("update_time in", values, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotIn(List<Date> values) {
+            addCriterion("update_time not in", values, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeBetween(Date value1, Date value2) {
+            addCriterion("update_time between", value1, value2, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
+            addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
     }

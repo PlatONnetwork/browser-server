@@ -1,7 +1,8 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.utils.NodeTools;
+import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.NodeTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
@@ -18,9 +19,26 @@ import java.util.*;
 public class BlockBean extends Block {
 
     public BlockBean(){
-        // 设置默认值
-        this.setNodeId("");
+        /** 初始化默认值 **/
+        // 区块内交易数（区块所含交易个数）
+        this.setStatTxQty(0);
+        // 区块内转账交易总数
+        this.setStatTransferQty(0);
+        // 区块内验证人交易总数
+        this.setStatStakingQty(0);
+        // 区块内治理交易总数
+        this.setStatProposalQty(0);
+        // 区块内委托交易总数
+        this.setStatDelegateQty(0);
+        // 区块中交易能量限制
+        this.setStatTxGasLimit("0");
+        // 区块中交易实际花费值(手续费)总和，单位：von
+        this.setStatTxFee("0");
+        // 区块奖励，单位：von
         this.setBlockReward("0");
+        // 节点ID
+        this.setNodeId("");
+        // 节点名称
         this.setNodeName("Unknown");
     }
 
@@ -43,8 +61,8 @@ public class BlockBean extends Block {
         this.setStatTxQty(initData.getTransactions().size());
         this.setGasLimit(initData.getGasLimit().toString());
 
-        String publicKey = NodeTools.calculateNodePublicKey(initData);
-        if(publicKey!=null) this.setNodeId(publicKey.startsWith("0x")?publicKey:"0x"+publicKey);
+        String publicKey = NodeTool.calculateNodePublicKey(initData);
+        if(publicKey!=null) this.setNodeId(HexTool.prefix(publicKey));
 
         try{
             // 抽取交易信息
