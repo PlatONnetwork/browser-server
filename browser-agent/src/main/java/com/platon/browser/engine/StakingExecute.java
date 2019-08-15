@@ -40,6 +40,7 @@ public class StakingExecute {
 
     private StakingExecuteResult executeResult= new StakingExecuteResult();
 
+
     private void loadNodes(){
         List<NodeBean> nodeList = customNodeMapper.selectAll();
         List<String> nodeIds = new ArrayList<>();
@@ -47,6 +48,7 @@ public class StakingExecute {
             nodeIds.add(node.getNodeId());
             nodes.put(node.getNodeId(),node);
         });
+        if(nodeIds.size()==0) return;
         // |-加载质押记录
         List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
         // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
@@ -83,7 +85,7 @@ public class StakingExecute {
     }
 
     @PostConstruct
-    private void init(){
+    public void init(){
         /***把当前库中的验证人列表加载到内存中**/
         // 初始化当前结算周期验证人列表
         loadNodes();

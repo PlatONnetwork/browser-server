@@ -1,22 +1,22 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.mapper.CustomNodeMapper;
-import com.platon.browser.dao.mapper.CustomNodeOptMapper;
-import com.platon.browser.dao.mapper.CustomSlashMapper;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.BlockBean;
 import com.platon.browser.dto.NodeBean;
 import com.platon.browser.dto.StakingBean;
+import com.platon.browser.service.DbService;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.Node;
+import org.web3j.protocol.core.Response;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -43,6 +43,13 @@ public class BlockChain {
     @Autowired
     private ProposalExecute proposalExecute;
 
+    @Autowired
+    private NodeMapper nodeMapper;
+    @Autowired
+    private StakingMapper stakingMapper;
+
+    @Autowired
+    private DbService dbService;
 
 
     @Autowired
@@ -53,13 +60,13 @@ public class BlockChain {
     private BlockBean curBlock;
 
     // 上轮结算周期验证人
-    private Map<String, NodeBean> preVerifier = new HashMap<>();
+    private Map<String, org.web3j.platon.bean.Node> preVerifier = new HashMap<>();
     // 当前结算周期验证人
-    private Map<String, NodeBean> curVerifier = new HashMap<>();
+    private Map<String, org.web3j.platon.bean.Node> curVerifier = new HashMap<>();
     // 上轮共识周期验证人
-    private Map<String, NodeBean> preValidator = new HashMap<>();
+    private Map<String, org.web3j.platon.bean.Node> preValidator = new HashMap<>();
     // 当前共识周期验证人
-    private Map<String, NodeBean> curValidator = new HashMap<>();
+    private Map<String, org.web3j.platon.bean.Node> curValidator = new HashMap<>();
 
     @PostConstruct
     private void init(){
@@ -141,6 +148,42 @@ public class BlockChain {
         return stakingList;
     }
     private void updateNodes(){
+        if(curBlock.getNumber()==1){
+            // 如果当前区块号等于1，则查询当前结算周期验证节点列表，并入库
+            try {
+                // TODO: 需要更换为根据区块号1查询
+                BaseResponse<List<Node>> response = client.getNodeContract().getVerifierList().send();
+                if(response.isStatusOk()){
+                    List<com.platon.browser.dao.entity.Node> nodeList = new ArrayList<>();
+                    List<Staking> stakingList = new ArrayList<>();
+                    Date date = new Date();
+                    response.data.forEach(node -> {
+                        NodeBean nodeBean = new NodeBean();
+                        nodeBean.initWithNode(node);
+                        nodeBean.setUpdateTime(date);
+                        nodeBean.setCreateTime(date);
+                        nodeList.add(nodeBean);
+
+                        StakingBean stakingBean = new StakingBean();
+                        stakingBean.initWithNode(node);
+                        stakingBean.setStakingHas("");
+                        stakingBean.setStakingIcon(node.getExternalId());
+                        stakingBean.setStatus(1);
+                        stakingBean.setIsConsensus(1);
+                        stakingList.add(stakingBean);
+
+                        curVerifier.put(nodeBean.getNodeId(),node);
+                    });
+                    if(nodeList.size()>0){
+                        dbService.initNodes(nodeList,stakingList);
+                    }
+                }
+                // 通知质押引擎重新初始化
+                stakingExecute.init();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         /*if(curBlock.getNumber()%chainConfig.getConsensusPeriod()==0){
             // 进入新共识周期
             // 把curValidator引用赋给preValidator

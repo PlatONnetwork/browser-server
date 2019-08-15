@@ -1,6 +1,8 @@
 package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.BlockBean;
@@ -113,6 +115,12 @@ public class DbService {
         if (bizData.getStakingExecuteResult().getAddNodeOpts().size() > 0) {
             nodeOptMapper.batchInsert(new ArrayList <>(bizData.getStakingExecuteResult().getAddNodeOpts()));
         }
+    }
+
+    @Transactional
+    public void initNodes(List<Node> nodeList, List<Staking>stakingList){
+        nodeMapper.batchInsert(nodeList);
+        stakingMapper.batchInsert(stakingList);
     }
 
 }

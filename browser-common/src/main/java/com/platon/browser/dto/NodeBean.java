@@ -16,6 +16,18 @@ import java.util.TreeMap;
  */
 @Data
 public class NodeBean extends Node {
+
+     public void initWithNode(org.web3j.platon.bean.Node initData){
+          this.setNodeId(initData.getNodeId().startsWith("0x")?initData.getNodeId():"0x"+initData.getNodeId());
+          this.setIsRecommend(1);
+          this.setStatRewardValue("0");
+          this.setStatSlashLowQty(0);
+          this.setStatVerifierTime(0);
+          this.setStatExpectBlockQty(0l);
+          this.setStatBlockQty(0l);
+          this.setStatSlashMultiQty(0);
+     }
+
      private TreeMap<Long, StakingBean> stakings = new TreeMap<>();
      private List<Slash> slashes = new ArrayList<>();
      private List<NodeOpt> nodeOpts = new ArrayList<>();

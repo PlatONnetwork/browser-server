@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 public class DelegationBean extends Delegation {
+
     private List<UnDelegation> unDelegations = new ArrayList<>();
 
     public String getStakingMapKey(){

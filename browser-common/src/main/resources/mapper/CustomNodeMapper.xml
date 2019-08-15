@@ -4,19 +4,6 @@
 
   <resultMap id="BaseResultMap" type="com.platon.browser.dto.NodeBean" extends="com.platon.browser.dao.mapper.NodeMapper.BaseResultMap"/>
 
-  <sql id="Base_Column_List">
-    nod.node_id,
-    nod.stat_slash_multi_qty,
-    nod.stat_slash_low_qty,
-    nod.stat_block_qty,
-    nod.stat_expect_block_qty,
-    nod.stat_reward_value,
-    nod.stat_verifier_time,
-    nod.is_recommend,
-    nod.create_time,
-    nod.update_time
-  </sql>
-
   <!--查询所有节点-->
   <select id="selectAll" resultMap="BaseResultMap">
     select
@@ -24,26 +11,6 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from node nod
-  </select>
-
-  <!--查询结算周期验证人-->
-  <select id="selectVerifiers" resultMap="BaseResultMap">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from node nod join staking sta where sta.is_setting = 1 group by nod.node_id
-  </select>
-
-  <!--查询共识验证人-->
-  <select id="selectValidators" resultMap="BaseResultMap">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from node nod join staking sta where sta.is_consensus = 1 group by nod.node_id
+    from node
   </select>
 </mapper>

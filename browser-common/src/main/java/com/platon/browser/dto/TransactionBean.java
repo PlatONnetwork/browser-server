@@ -21,6 +21,9 @@ import java.math.BigInteger;
 @Data
 public class TransactionBean extends TransactionWithBLOBs {
 
+    public TransactionBean() {
+    }
+
     private TxTypeEnum typeEnum;
 
     /**
