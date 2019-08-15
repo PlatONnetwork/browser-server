@@ -98,22 +98,24 @@ public class StakingExecute {
      */
     public void execute(TransactionBean tx, BlockChain bc){
         switch (tx.getTypeEnum()){
-            case CREATEVALIDATOR:
+            case CREATEVALIDATOR: //发起质押(创建验证人)
                 execute1000(tx,bc);
                 break;
-            case EDITVALIDATOR:
+            case EDITVALIDATOR: //修改质押信息(编辑验证人)
                 execute1001(tx,bc);
                 break;
-            case INCREASESTAKING:
+            case INCREASESTAKING: //增持质押(增加自有质押)
                 execute1002(tx,bc);
                 break;
-            case EXITVALIDATOR:
+            case EXITVALIDATOR://撤销质押(退出验证人)
                 execute1003(tx,bc);
                 break;
-            case UNDELEGATE:
+            case DELEGATE://发起委托(委托)
+                execute1004(tx,bc);
+            case UNDELEGATE://减持/撤销委托(赎回委托)
                 execute1005(tx,bc);
                 break;
-            case REPORTVALIDATOR:
+            case REPORTVALIDATOR://举报多签(举报验证人)
                 execute3000(tx,bc);
                 break;
         }
@@ -159,37 +161,43 @@ public class StakingExecute {
     private void execute1000(TransactionBean tx, BlockChain bc){
         StakingBean staking = new StakingBean();
         staking.initWithCreateValidatorDto(tx);
-
+        logger.debug("发起质押(创建验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //修改质押信息(编辑验证人)
     private void execute1001(TransactionBean tx, BlockChain bc){
-
+        logger.debug("修改质押信息(编辑验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //增持质押(增加自有质押)
     private void execute1002(TransactionBean tx, BlockChain bc){
-
+        logger.debug("增持质押(增加自有质押)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //撤销质押(退出验证人)
     private void execute1003(TransactionBean tx, BlockChain bc){
-
+        logger.debug("撤销质押(退出验证人)");
+        // TODO: 修改验证人列表
+        // 修改验证人列表
+    }
+    // 发起委托(委托)
+    private void execute1004(TransactionBean tx, BlockChain bc){
+        logger.debug("撤销质押(退出验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(TransactionBean tx, BlockChain bc){
-
+        logger.debug("减持/撤销委托(赎回委托)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //举报多签(举报验证人)
     private void execute3000(TransactionBean tx, BlockChain bc){
-
+        logger.debug("举报多签(举报验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }

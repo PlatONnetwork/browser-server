@@ -6,6 +6,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.BlockBean;
 import com.platon.browser.dto.StakingBean;
+import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.service.DbService;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -192,18 +193,19 @@ public class BlockChain {
      *
      */
     private void analyzeTransaction(){
-        curBlock.getTransactionList().forEach(transactionInfo -> {
+        curBlock.getTransactionList().forEach(tx -> {
             // 地址相关
 
             // 调用交易分析引擎分析交易，以补充相关数据
-            switch (transactionInfo.getTypeEnum()){
+            switch (tx.getTypeEnum()){
                 case CREATEVALIDATOR: // 创建验证人
                 case EDITVALIDATOR: // 编辑验证人
                 case INCREASESTAKING: // 增持质押
                 case EXITVALIDATOR: // 撤销质押
+                case DELEGATE: // 发起委托
                 case UNDELEGATE: // 撤销委托
                 case REPORTVALIDATOR: // 举报多签验证人
-                    stakingExecute.execute(transactionInfo,this);
+                    stakingExecute.execute(tx,this);
                     StakingExecuteResult ser = stakingExecute.exportResult();
                     StakingExecuteResult serSummary = execResult.getStakingExecuteResult();
                     // 汇总添加【节点】记录
@@ -231,7 +233,8 @@ public class BlockChain {
                 case CREATEPROPOSALUPGRADE: // 创建升级提案
                 case CREATEPROPOSALPARAMETER: // 创建参数提案
                 case VOTINGPROPOSAL: // 给提案投票
-                    proposalExecute.execute(transactionInfo,this);
+                case DUPLICATESIGN: // 双签举报
+                    proposalExecute.execute(tx,this);
                     ProposalExecuteResult per = proposalExecute.exportResult();
                     ProposalExecuteResult perSummary = execResult.getProposalExecuteResult();
                     // 汇总添加【提案】记录
@@ -241,6 +244,14 @@ public class BlockChain {
                     // 汇总添加【提案投票】记录
                     perSummary.getAddVotes().addAll(per.getAddVotes());
                     break;
+                case CONTRACTCREATION: // 合约发布(合约创建)
+                    logger.debug("合约发布(合约创建): txHash({}),contract({})",tx.getHash(),tx.getTo());
+                    break;
+                case TRANSFER: // 转账
+                    logger.debug("转账: txHash({}),from({}),to({})",tx.getHash(),tx.getFrom(),tx.getTo());
+                    break;
+                case OTHERS: // 其它
+                case MPC:
             }
         });
 
