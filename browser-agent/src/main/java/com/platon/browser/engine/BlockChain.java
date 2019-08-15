@@ -18,6 +18,7 @@ import org.web3j.platon.bean.Node;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -131,16 +132,24 @@ public class BlockChain {
             try {
                 // TODO:
                 // 1、当agent落后链上至少一个共识周期时，使用blockNumber是可以查询到验证人信息的
-                // 2、当agent与链都在同一个共识周期是，使用blockNumber是查询不到验证人信息的
+                // 2、当agent与链都在同一个共识周期时，使用blockNumber是查询不到验证人信息的
                 // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
-                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
+
+                // 先根据区块号查
+                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.valueOf(blockNumber));
+                if(!validators.isStatusOk()||validators.data==null||validators.data.size()==0){
+                    logger.debug("通过区块号[{}]查询历史共识周期验证人列表为空:{}",blockNumber,validators.errMsg);
+                    logger.debug("查询实时共识周期验证人列表...");
+                    validators = client.getNodeContract().getValidatorList().send();
+                }
+
                 if(validators.isStatusOk()) {
                     // 把curValidator转存至preValidator
                     preValidator.clear();
                     preValidator.putAll(curValidator);
                     curValidator.clear();
                     // 设置新的当前共识周期验证人
-                    validators.data.forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()),node));
+                    validators.data.stream().filter(Objects::nonNull).forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()),node));
                 }
             } catch (Exception e) {
                 logger.error("查询最新共识周期验证人列表失败,原因：{}",e.getMessage());
@@ -152,17 +161,25 @@ public class BlockChain {
             // 直接查当前最新的结算周期验证人列表来初始化blockChain的curVerifiers属性
             try {
                 // TODO:
-                // 1、当agent落后链上至少一个共识周期时，使用blockNumber是可以查询到验证人信息的
-                // 2、当agent与链都在同一个共识周期是，使用blockNumber是查询不到验证人信息的
+                // 1、当agent落后链上至少一个结算周期时，使用blockNumber是可以查询到验证人信息的
+                // 2、当agent与链都在同一个结算周期时，使用blockNumber是查询不到验证人信息的
                 // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
-                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
+
+                // 先根据区块号查
+                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
+                if(!verifiers.isStatusOk()||verifiers.data==null||verifiers.data.size()==0){
+                    logger.debug("通过区块号[{}]查询历史结算周期验证人列表为空:{}",blockNumber,verifiers.errMsg);
+                    logger.debug("查询实时结算周期验证人列表...");
+                    verifiers = client.getNodeContract().getVerifierList().send();
+                }
+
                 if(verifiers.isStatusOk()) {
                     // 把curVerifier转存至preVerifier
                     preVerifier.clear();
                     preVerifier.putAll(curVerifier);
                     curVerifier.clear();
                     // 设置新的当前结算周期验证人
-                    verifiers.data.forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()),node));
+                    verifiers.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()),node));
                 }
             } catch (Exception e) {
                 logger.error("查询最新结算周期验证人列表失败,原因：{}",e.getMessage());

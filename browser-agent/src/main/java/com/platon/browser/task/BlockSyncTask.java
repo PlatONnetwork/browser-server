@@ -109,36 +109,36 @@ public class BlockSyncTask {
         if(maxBlockNumber==null){
             // 如果库里区块为空，则：
             try {
-                // TODO: 需要更换为根据区块号1查询
-
-                // 1、根据区块号1初始化blockChain的curVerifiers和curValidators属性
-                // 结算周期验证人
-                BaseResponse<List<Node>> verifiers = client.getNodeContract().getVerifierList().send();
-                Map<String,Node> verifierMap = new HashMap<>();
-                if(verifiers.isStatusOk()) verifiers.data.forEach(node->verifierMap.put(HexTool.prefix(node.getNodeId()),node));
-                // 共识周期验证人
-                BaseResponse<List<Node>> validators = client.getNodeContract().getValidatorList().send();
+                // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
+                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ONE);
+                if(!validators.isStatusOk()){
+                    logger.debug("通过区块号[{}]查询历史共识周期验证人列表为空:{}",BigInteger.ONE,validators.errMsg);
+                    logger.debug("查询实时共识周期验证人列表...");
+                    validators = client.getNodeContract().getValidatorList().send();
+                }
                 Map<String,Node> validatorMap = new HashMap<>();
-                if(validators.isStatusOk()) verifiers.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
+                if(validators.isStatusOk()) validators.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
 
-                // 2、根据区块号1查询候选节点列表并入库；
-                // 所有候选节点
-                BaseResponse<List<Node>> candidates = client.getNodeContract().getCandidateList().send();
-                if(candidates.isStatusOk()){
+                // 根据区块号0查询结算周期验证人列表并入库
+                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ONE);
+                if(!verifiers.isStatusOk()){
+                    logger.debug("通过区块号[{}]查询历史结算周期验证人列表为空:{}",BigInteger.ONE,verifiers.errMsg);
+                    logger.debug("查询实时结算周期验证人列表...");
+                    verifiers = client.getNodeContract().getVerifierList().send();
+                }
+                if(verifiers.isStatusOk()) {
                     BlockChainResult bcr = new BlockChainResult();
-                    candidates.data.forEach(candidate -> {
+                    verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
                         NodeBean node = new NodeBean();
-                        node.initWithNode(candidate);
+                        node.initWithNode(verifier);
                         node.setIsRecommend(1);
                         bcr.getStakingExecuteResult().getAddNodes().add(node);
 
                         StakingBean stakingBean = new StakingBean();
-                        stakingBean.initWithNode(candidate);
+                        stakingBean.initWithNode(verifier);
                         stakingBean.setStakingIcon("");
                         stakingBean.setIsInit(1);
-
-                        // 如果当前候选节点在结算周期验证人列表，则标识其为结算周期节点
-                        if(verifierMap.get(node.getNodeId())!=null) stakingBean.setIsSetting(1);
+                        stakingBean.setIsSetting(1);
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                         if(validatorMap.get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
 
@@ -146,8 +146,6 @@ public class BlockSyncTask {
                     });
                     service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
                 }
-                // 初始化质押引擎的共识周期验证人列表缓存和结算周期验证人列表缓存
-
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {

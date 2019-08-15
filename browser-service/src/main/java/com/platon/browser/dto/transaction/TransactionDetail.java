@@ -49,9 +49,9 @@ public class TransactionDetail {
         this.setBlockHeight(initData.getBlockNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
         this.setInputData(initData.getInput());
-        BigDecimal v= Convert.fromWei(initData.getActualTxCost(), Convert.Unit.ETHER);
+        BigDecimal v= Convert.fromVon(initData.getActualTxCost(), Convert.Unit.LAT);
         this.setActualTxCost(EnergonUtil.format(v));
-        v = Convert.fromWei(initData.getValue(), Convert.Unit.ETHER);
+        v = Convert.fromVon(initData.getValue(), Convert.Unit.LAT);
         this.setValue(EnergonUtil.format(v));
         this.setPriceInEnergon(EnergonUtil.format(v));
 
