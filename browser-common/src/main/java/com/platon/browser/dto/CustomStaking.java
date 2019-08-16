@@ -20,6 +20,10 @@ import java.util.Map;
 public class CustomStaking extends Staking {
 
     public CustomStaking() {
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+        this.setJoinTime(date);
         /** 初始化默认值 **/
         // 质押金额(犹豫期金额)
         this.setStakingHas("0");
@@ -35,6 +39,8 @@ public class CustomStaking extends Staking {
         this.setStatDelegateReduction("0");
         // 节点名称(质押节点名称)
         this.setStakingName("Unknown");
+        // 节点头像(关联external_id，第三方软件获取)
+        this.setStakingIcon("");
         // 预计年化率
         this.setExpectedIncome("0");
         // 出块奖励
@@ -56,8 +62,13 @@ public class CustomStaking extends Staking {
         // 当前共识周期出块数
         this.setCurConsBlockQty(0l);
         // 节点状态 1：候选中 2：退出中 3：已退出
-        this.setStatus(1);
-
+        this.setStatus(StatusEnum.CANDIDATE.code);
+        //是否结算周期验证人
+        this.setIsSetting(YesNoEnum.NO.code);
+        //是否共识周期验证人
+        this.setIsConsensus(YesNoEnum.NO.code);
+        // 是否为链初始化时内置的候选人
+        this.setIsInit(YesNoEnum.NO.code);
     }
 
     // <质押块高-质押记录> 映射
@@ -70,9 +81,6 @@ public class CustomStaking extends Staking {
 
 
     public void initWithNode(org.web3j.platon.bean.Node initData){
-        Date date = new Date();
-        this.setCreateTime(date);
-        this.setUpdateTime(date);
         BeanUtils.copyProperties(initData,this);
         // 质押区块高度
         if(initData.getStakingBlockNum()!=null) this.setStakingBlockNum(initData.getStakingBlockNum().longValue());
@@ -95,13 +103,24 @@ public class CustomStaking extends Staking {
     }
 
     public void initWithTransactionBean(CustomTransaction initData){
-        BeanUtils.copyProperties(initData,this);
+        // 质押块号
+        this.setStakingBlockNum(initData.getBlockNumber());
+        // 质押交易索引
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址
         this.setStakingAddr(initData.getFrom());
         // 质押金额(犹豫期金额)
         this.setStakingHas(initData.getValue());
-        this.setStakingName(initData.getTxParam(CreateValidatorParam.class).getNodeName());
+        /**********从交易入参中取相关信息***********/
+        CreateValidatorParam param = initData.getTxParam(CreateValidatorParam.class);
+        this.setNodeId(param.getNodeId());
+        this.setStakingName(param.getNodeName());
+        this.setDenefitAddr(param.getBenefitAddress());
+        this.setStakingHas(param.getAmount());
+        this.setWebSite(param.getWebsite());
+        this.setProgramVersion(param.getProgramVersion());
+        this.setDetails(param.getDetails());
+        this.setExternalId(param.getExternalId());
     }
 
 

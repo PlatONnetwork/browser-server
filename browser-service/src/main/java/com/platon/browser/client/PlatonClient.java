@@ -223,4 +223,9 @@ public class PlatonClient {
             return response;
         });
     }
+
+    public static void main(String[] args) {
+        String val = new String(Numeric.hexStringToByteArray("0x7777772e63646d2e636f6d"));
+        logger.error("{}",val);
+    }
 }
