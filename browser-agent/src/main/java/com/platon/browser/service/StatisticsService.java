@@ -2,7 +2,6 @@ package com.platon.browser.service;
 
 import com.platon.browser.dto.BlockBean;
 import com.platon.browser.engine.BlockChainResult;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

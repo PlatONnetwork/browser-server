@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
+    // 链ID
+    private String chainId;
     // 增发周期
     private Long addIssuePeriod;
     // 结算周期

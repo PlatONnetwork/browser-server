@@ -49,6 +49,7 @@ public class DelegationKey {
         delegateLocked("delegate_locked", "delegateLocked", "VARCHAR", false),
         delegateReduction("delegate_reduction", "delegateReduction", "VARCHAR", false),
         isHistory("is_history", "isHistory", "INTEGER", false),
+        sequence("sequence", "sequence", "BIGINT", true),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 

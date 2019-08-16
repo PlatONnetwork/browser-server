@@ -9,7 +9,5 @@ import java.util.List;
 public interface CustomNodeMapper {
 
     List<NodeBean> selectAll();
-    List<NodeBean> selectVerifiers();
-    List<NodeBean> selectValidators();
 
 }

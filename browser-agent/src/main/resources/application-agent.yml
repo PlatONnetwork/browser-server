@@ -1,6 +1,6 @@
 # ***************************开发配置**************************** #
 # 应用版本
-version: 0.6.1
+version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: agent
 # MySQL数据库连接地址
@@ -10,8 +10,12 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 web3j:
-  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
-  collect.batch-size: 500
+  #  addresses: http://192.168.9.221:6789
+  #  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
+
+  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  #  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
+  collect.batch-size: 1000
 chain:
   # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
   config: MAIN_NET-1-http://192.168.120.88:6789
@@ -34,63 +38,47 @@ thread.num: 50
 # 区块批量采集大小
 batch.num: ${thread.num}
 
+
 #初始化链相关的配置
 platonconfig:
+  chain_id: 101
   # 增发周期
-  add.issue.period:
-
+  add_issue_period: 20000
   #结算周期
-  setting.period:
-
+  setting_period: 2500
   #共识周期
-  consensus.period:
-
+  consensus_period: 250
   #增发率
-  add.issue.rate:
-
+  add_issue_rate: 2.5
   #出块激励比例
-  block.reward.rate:
-
+  block_reward_rate: 2.5
   #质押激励比例
-  staking.reward.rate:
-
+  staking_reward_rate: 2.5
   #初始发行金额
-  init.issue.value:
-
+  init_issue_value: 200000000000000000000000000000000000
   #激励合约地址
-  reward.addr:
-
+  reward_addr:
   #质押合约地址
-  staking.addr:
-
+  staking_addr:
   #锁仓合约地址
-  restricting.addr:
-
+  restricting_addr:
   #质押门槛
-  stake.threshold:
-
+  stake_threshold:
   #委托门槛
-  minimum.threshold:
-
-  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
-  election.distance:
-
+  minimum_threshold:
+  #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)选举周期
+  election_distance: 230
   #投票数百分比下限
-  support.rate.threshold:
-
+  support_rate_threshold:
   #双签低处罚金额，百分比
-  duplicate.sign.low.slashing:
-
+  duplicate_sign_low_slashing:
   #每个共识轮低异常的出块数
-  pack.amount.abnormal:
-
+  pack_amount_abnormal:
   #每个共识轮高异常的出块数
-  pack.amount.high.abnormal:
-
+  pack_amount_high_abnormal:
   #每个共识轮低异常出块数的处罚额度，百分比
-  pack.amount.low.slash.rate:
-
+  pack_amount_low_slash_rate:
   #每个共识轮高异常出块数的处罚额度，百分比
-  pack.amount.high.slash.rate:
+  pack_amount_high_slash_rate:
 
 

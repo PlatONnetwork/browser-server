@@ -26,7 +26,7 @@ public class VoteSummary {
         TxInfo ticketTxInfo = JSON.parseObject(transaction.getTxInfo(), TxInfo.class);
         TxInfo.Parameter ticketParameter = ticketTxInfo.getParameters();
         if(ticketParameter!=null){
-            BigDecimal ticketPrice= Convert.fromWei(ticketParameter.getPrice().toString(), Convert.Unit.ETHER);
+            BigDecimal ticketPrice= Convert.fromVon(ticketParameter.getPrice().toString(), Convert.Unit.LAT);
             this.ticketPrice = ticketPrice;
             this.totalTicketNum = ticketParameter.getCount().toString();
         }

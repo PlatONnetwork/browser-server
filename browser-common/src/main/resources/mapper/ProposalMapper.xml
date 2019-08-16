@@ -4,6 +4,9 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Proposal">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
     <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="verifier" jdbcType="VARCHAR" property="verifier" />
+    <result column="verifier_name" jdbcType="VARCHAR" property="verifierName" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="new_version" jdbcType="VARCHAR" property="newVersion" />
     <result column="param_name" jdbcType="VARCHAR" property="paramName" />
     <result column="current_value" jdbcType="VARCHAR" property="currentValue" />
@@ -11,16 +14,13 @@
     <result column="end_voting_block" jdbcType="VARCHAR" property="endVotingBlock" />
     <result column="active_block" jdbcType="VARCHAR" property="activeBlock" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="verifier" jdbcType="VARCHAR" property="verifier" />
-    <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="yeas" jdbcType="BIGINT" property="yeas" />
     <result column="nays" jdbcType="BIGINT" property="nays" />
     <result column="abstentions" jdbcType="BIGINT" property="abstentions" />
     <result column="accu_verifiers" jdbcType="BIGINT" property="accuVerifiers" />
     <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="verifier_name" jdbcType="VARCHAR" property="verifierName" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -81,9 +81,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, `type`, new_version, param_name, current_value, new_value, end_voting_block, 
-    active_block, `timestamp`, update_time, create_time, verifier, url, yeas, nays, abstentions, 
-    accu_verifiers, `status`, verifier_name
+    hash, `type`, verifier, verifier_name, url, new_version, param_name, current_value, 
+    new_value, end_voting_block, active_block, `timestamp`, yeas, nays, abstentions, 
+    accu_verifiers, `status`, update_time, create_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -116,20 +116,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Proposal">
-    insert into proposal (hash, `type`, new_version, 
+    insert into proposal (hash, `type`, verifier, 
+      verifier_name, url, new_version, 
       param_name, current_value, new_value, 
       end_voting_block, active_block, `timestamp`, 
-      update_time, create_time, verifier, 
-      url, yeas, nays, abstentions, 
-      accu_verifiers, `status`, verifier_name
-      )
-    values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
+      yeas, nays, abstentions, 
+      accu_verifiers, `status`, update_time, 
+      create_time)
+    values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{verifier,jdbcType=VARCHAR}, 
+      #{verifierName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
       #{paramName,jdbcType=VARCHAR}, #{currentValue,jdbcType=VARCHAR}, #{newValue,jdbcType=VARCHAR}, 
       #{endVotingBlock,jdbcType=VARCHAR}, #{activeBlock,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{verifier,jdbcType=VARCHAR}, 
-      #{url,jdbcType=VARCHAR}, #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
-      #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{verifierName,jdbcType=VARCHAR}
-      )
+      #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
+      #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal
@@ -139,6 +139,15 @@
       </if>
       <if test="type != null">
         `type`,
+      </if>
+      <if test="verifier != null">
+        verifier,
+      </if>
+      <if test="verifierName != null">
+        verifier_name,
+      </if>
+      <if test="url != null">
+        url,
       </if>
       <if test="newVersion != null">
         new_version,
@@ -161,18 +170,6 @@
       <if test="timestamp != null">
         `timestamp`,
       </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="verifier != null">
-        verifier,
-      </if>
-      <if test="url != null">
-        url,
-      </if>
       <if test="yeas != null">
         yeas,
       </if>
@@ -188,8 +185,11 @@
       <if test="status != null">
         `status`,
       </if>
-      <if test="verifierName != null">
-        verifier_name,
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="createTime != null">
+        create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -198,6 +198,15 @@
       </if>
       <if test="type != null">
         #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="verifier != null">
+        #{verifier,jdbcType=VARCHAR},
+      </if>
+      <if test="verifierName != null">
+        #{verifierName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
       </if>
       <if test="newVersion != null">
         #{newVersion,jdbcType=VARCHAR},
@@ -220,18 +229,6 @@
       <if test="timestamp != null">
         #{timestamp,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="verifier != null">
-        #{verifier,jdbcType=VARCHAR},
-      </if>
-      <if test="url != null">
-        #{url,jdbcType=VARCHAR},
-      </if>
       <if test="yeas != null">
         #{yeas,jdbcType=BIGINT},
       </if>
@@ -247,8 +244,11 @@
       <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="verifierName != null">
-        #{verifierName,jdbcType=VARCHAR},
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -266,6 +266,15 @@
       </if>
       <if test="record.type != null">
         `type` = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifier != null">
+        verifier = #{record.verifier,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifierName != null">
+        verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.url != null">
+        url = #{record.url,jdbcType=VARCHAR},
       </if>
       <if test="record.newVersion != null">
         new_version = #{record.newVersion,jdbcType=VARCHAR},
@@ -288,18 +297,6 @@
       <if test="record.timestamp != null">
         `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.verifier != null">
-        verifier = #{record.verifier,jdbcType=VARCHAR},
-      </if>
-      <if test="record.url != null">
-        url = #{record.url,jdbcType=VARCHAR},
-      </if>
       <if test="record.yeas != null">
         yeas = #{record.yeas,jdbcType=BIGINT},
       </if>
@@ -315,8 +312,11 @@
       <if test="record.status != null">
         `status` = #{record.status,jdbcType=INTEGER},
       </if>
-      <if test="record.verifierName != null">
-        verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -327,6 +327,9 @@
     update proposal
     set hash = #{record.hash,jdbcType=VARCHAR},
       `type` = #{record.type,jdbcType=VARCHAR},
+      verifier = #{record.verifier,jdbcType=VARCHAR},
+      verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      url = #{record.url,jdbcType=VARCHAR},
       new_version = #{record.newVersion,jdbcType=VARCHAR},
       param_name = #{record.paramName,jdbcType=VARCHAR},
       current_value = #{record.currentValue,jdbcType=VARCHAR},
@@ -334,16 +337,13 @@
       end_voting_block = #{record.endVotingBlock,jdbcType=VARCHAR},
       active_block = #{record.activeBlock,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      verifier = #{record.verifier,jdbcType=VARCHAR},
-      url = #{record.url,jdbcType=VARCHAR},
       yeas = #{record.yeas,jdbcType=BIGINT},
       nays = #{record.nays,jdbcType=BIGINT},
       abstentions = #{record.abstentions,jdbcType=BIGINT},
       accu_verifiers = #{record.accuVerifiers,jdbcType=BIGINT},
       `status` = #{record.status,jdbcType=INTEGER},
-      verifier_name = #{record.verifierName,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -353,6 +353,15 @@
     <set>
       <if test="type != null">
         `type` = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="verifier != null">
+        verifier = #{verifier,jdbcType=VARCHAR},
+      </if>
+      <if test="verifierName != null">
+        verifier_name = #{verifierName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
       </if>
       <if test="newVersion != null">
         new_version = #{newVersion,jdbcType=VARCHAR},
@@ -375,18 +384,6 @@
       <if test="timestamp != null">
         `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="verifier != null">
-        verifier = #{verifier,jdbcType=VARCHAR},
-      </if>
-      <if test="url != null">
-        url = #{url,jdbcType=VARCHAR},
-      </if>
       <if test="yeas != null">
         yeas = #{yeas,jdbcType=BIGINT},
       </if>
@@ -402,8 +399,11 @@
       <if test="status != null">
         `status` = #{status,jdbcType=INTEGER},
       </if>
-      <if test="verifierName != null">
-        verifier_name = #{verifierName,jdbcType=VARCHAR},
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
@@ -411,6 +411,9 @@
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Proposal">
     update proposal
     set `type` = #{type,jdbcType=VARCHAR},
+      verifier = #{verifier,jdbcType=VARCHAR},
+      verifier_name = #{verifierName,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
       new_version = #{newVersion,jdbcType=VARCHAR},
       param_name = #{paramName,jdbcType=VARCHAR},
       current_value = #{currentValue,jdbcType=VARCHAR},
@@ -418,16 +421,13 @@
       end_voting_block = #{endVotingBlock,jdbcType=VARCHAR},
       active_block = #{activeBlock,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      verifier = #{verifier,jdbcType=VARCHAR},
-      url = #{url,jdbcType=VARCHAR},
       yeas = #{yeas,jdbcType=BIGINT},
       nays = #{nays,jdbcType=BIGINT},
       abstentions = #{abstentions,jdbcType=BIGINT},
       accu_verifiers = #{accuVerifiers,jdbcType=BIGINT},
       `status` = #{status,jdbcType=INTEGER},
-      verifier_name = #{verifierName,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -437,18 +437,18 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into proposal
-    (hash, `type`, new_version, param_name, current_value, new_value, end_voting_block, 
-      active_block, `timestamp`, update_time, create_time, verifier, url, yeas, nays, 
-      abstentions, accu_verifiers, `status`, verifier_name)
+    (hash, `type`, verifier, verifier_name, url, new_version, param_name, current_value, 
+      new_value, end_voting_block, active_block, `timestamp`, yeas, nays, abstentions, 
+      accu_verifiers, `status`, update_time, create_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.newVersion,jdbcType=VARCHAR}, 
+      (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.verifier,jdbcType=VARCHAR}, 
+        #{item.verifierName,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.newVersion,jdbcType=VARCHAR}, 
         #{item.paramName,jdbcType=VARCHAR}, #{item.currentValue,jdbcType=VARCHAR}, #{item.newValue,jdbcType=VARCHAR}, 
         #{item.endVotingBlock,jdbcType=VARCHAR}, #{item.activeBlock,jdbcType=VARCHAR}, 
-        #{item.timestamp,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.verifier,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.yeas,jdbcType=BIGINT}, 
-        #{item.nays,jdbcType=BIGINT}, #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, 
-        #{item.status,jdbcType=INTEGER}, #{item.verifierName,jdbcType=VARCHAR})
+        #{item.timestamp,jdbcType=TIMESTAMP}, #{item.yeas,jdbcType=BIGINT}, #{item.nays,jdbcType=BIGINT}, 
+        #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -472,6 +472,15 @@
         <if test="'type'.toString() == column.value">
           #{item.type,jdbcType=VARCHAR}
         </if>
+        <if test="'verifier'.toString() == column.value">
+          #{item.verifier,jdbcType=VARCHAR}
+        </if>
+        <if test="'verifier_name'.toString() == column.value">
+          #{item.verifierName,jdbcType=VARCHAR}
+        </if>
+        <if test="'url'.toString() == column.value">
+          #{item.url,jdbcType=VARCHAR}
+        </if>
         <if test="'new_version'.toString() == column.value">
           #{item.newVersion,jdbcType=VARCHAR}
         </if>
@@ -493,18 +502,6 @@
         <if test="'timestamp'.toString() == column.value">
           #{item.timestamp,jdbcType=TIMESTAMP}
         </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'create_time'.toString() == column.value">
-          #{item.createTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'verifier'.toString() == column.value">
-          #{item.verifier,jdbcType=VARCHAR}
-        </if>
-        <if test="'url'.toString() == column.value">
-          #{item.url,jdbcType=VARCHAR}
-        </if>
         <if test="'yeas'.toString() == column.value">
           #{item.yeas,jdbcType=BIGINT}
         </if>
@@ -520,8 +517,11 @@
         <if test="'status'.toString() == column.value">
           #{item.status,jdbcType=INTEGER}
         </if>
-        <if test="'verifier_name'.toString() == column.value">
-          #{item.verifierName,jdbcType=VARCHAR}
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
         </if>
       </foreach>
       )

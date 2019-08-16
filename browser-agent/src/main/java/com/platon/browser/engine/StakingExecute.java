@@ -40,36 +40,38 @@ public class StakingExecute {
 
     private StakingExecuteResult executeResult= new StakingExecuteResult();
 
-    private void loadNodes(){
+
+    public void loadNodes(){
         List<NodeBean> nodeList = customNodeMapper.selectAll();
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> {
             nodeIds.add(node.getNodeId());
             nodes.put(node.getNodeId(),node);
         });
+        if(nodeIds.size()==0) return;
         // |-加载质押记录
         List<StakingBean> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
         // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
-        Map<String,StakingBean> nodeIdStakingNum_Staking_Map = new HashMap<>();
+        Map<String,StakingBean> stakingMap = new HashMap<>();
         stakings.forEach(staking->{
             nodes.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
-            nodeIdStakingNum_Staking_Map.put(staking.getMapKey(),staking);
+            stakingMap.put(staking.getStakingMapKey(),staking);
         });
         // |-加载委托记录
         List<DelegationBean> delegations = customDelegationMapper.selectByNodeIdList(nodeIds);
         // <节点ID+质押块号 - 质押记录> 映射, 方便【撤销委托记录】的添加
-        Map<String,DelegationBean> delegateAddrNodeIdStakingNum_Delegation_Map = new HashMap<>();
+        Map<String,DelegationBean> delegationMap = new HashMap<>();
         delegations.forEach(delegation->{
-            StakingBean staking = nodeIdStakingNum_Staking_Map.get(delegation.getStakingMapKey());
+            StakingBean staking = stakingMap.get(delegation.getStakingMapKey());
             if(staking!=null) {
                 staking.getDelegations().put(delegation.getDelegateAddr(),delegation);
-                delegateAddrNodeIdStakingNum_Delegation_Map.put(delegation.getDelegationMapKey(),delegation);
+                delegationMap.put(delegation.getDelegationMapKey(),delegation);
             }
         });
         // |-加载撤销委托记录
         List<UnDelegationBean> unDelegations = customUnDelegationMapper.selectByNodeIdList(nodeIds);
         unDelegations.forEach(unDelegation->{
-            DelegationBean delegation = delegateAddrNodeIdStakingNum_Delegation_Map.get(unDelegation.getDelegationMapKey());
+            DelegationBean delegation = delegationMap.get(unDelegation.getDelegationMapKey());
             if(delegation!=null){
                 delegation.getUnDelegations().add(unDelegation);
             }
@@ -87,8 +89,6 @@ public class StakingExecute {
         /***把当前库中的验证人列表加载到内存中**/
         // 初始化当前结算周期验证人列表
         loadNodes();
-
-        logger.debug("{}", JSON.toJSONString(nodes,true));
     }
 
     /**
@@ -98,22 +98,24 @@ public class StakingExecute {
      */
     public void execute(TransactionBean tx, BlockChain bc){
         switch (tx.getTypeEnum()){
-            case CREATEVALIDATOR:
+            case CREATEVALIDATOR: //发起质押(创建验证人)
                 execute1000(tx,bc);
                 break;
-            case EDITVALIDATOR:
+            case EDITVALIDATOR: //修改质押信息(编辑验证人)
                 execute1001(tx,bc);
                 break;
-            case INCREASESTAKING:
+            case INCREASESTAKING: //增持质押(增加自有质押)
                 execute1002(tx,bc);
                 break;
-            case EXITVALIDATOR:
+            case EXITVALIDATOR://撤销质押(退出验证人)
                 execute1003(tx,bc);
                 break;
-            case UNDELEGATE:
+            case DELEGATE://发起委托(委托)
+                execute1004(tx,bc);
+            case UNDELEGATE://减持/撤销委托(赎回委托)
                 execute1005(tx,bc);
                 break;
-            case REPORTVALIDATOR:
+            case REPORTVALIDATOR://举报多签(举报验证人)
                 execute3000(tx,bc);
                 break;
         }
@@ -160,37 +162,43 @@ public class StakingExecute {
     private void execute1000(TransactionBean tx, BlockChain bc){
         StakingBean staking = new StakingBean();
         staking.initWithCreateValidatorDto(tx);
-
+        logger.debug("发起质押(创建验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //修改质押信息(编辑验证人)
     private void execute1001(TransactionBean tx, BlockChain bc){
-
+        logger.debug("修改质押信息(编辑验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //增持质押(增加自有质押)
     private void execute1002(TransactionBean tx, BlockChain bc){
-
+        logger.debug("增持质押(增加自有质押)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //撤销质押(退出验证人)
     private void execute1003(TransactionBean tx, BlockChain bc){
-
+        logger.debug("撤销质押(退出验证人)");
+        // TODO: 修改验证人列表
+        // 修改验证人列表
+    }
+    // 发起委托(委托)
+    private void execute1004(TransactionBean tx, BlockChain bc){
+        logger.debug("撤销质押(退出验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(TransactionBean tx, BlockChain bc){
-
+        logger.debug("减持/撤销委托(赎回委托)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
     //举报多签(举报验证人)
     private void execute3000(TransactionBean tx, BlockChain bc){
-
+        logger.debug("举报多签(举报验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
     }

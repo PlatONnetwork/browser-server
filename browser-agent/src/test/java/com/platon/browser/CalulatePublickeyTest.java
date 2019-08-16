@@ -1,7 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.utils.CalculatePublicKey;
+import com.platon.browser.utils.NodeTool;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +28,7 @@ public class CalulatePublickeyTest {
         try {
             Web3j web3j = Web3j.build(new HttpService("http://10.10.8.200:6789"));
             PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(1000)),true).send().getBlock();
-            BigInteger nodeIdInteger = CalculatePublicKey.testBlock(initData);
+            BigInteger nodeIdInteger = NodeTool.testBlock(initData);
             String publicKey = nodeIdInteger.toString(16);
             System.out.println(publicKey);
         } catch (Exception e) {

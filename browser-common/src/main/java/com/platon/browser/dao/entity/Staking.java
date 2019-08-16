@@ -13,6 +13,10 @@ public class Staking extends StakingKey {
 
     private String stakingLocked;
 
+    private Integer stakingReductionEpoch;
+
+    private String stakingReduction;
+
     private String statDelegateHas;
 
     private String statDelegateLocked;
@@ -22,6 +26,8 @@ public class Staking extends StakingKey {
     private Integer statDelegateQty;
 
     private Integer statVerifierTime;
+
+    private String stakingName;
 
     private String stakingIcon;
 
@@ -35,9 +41,11 @@ public class Staking extends StakingKey {
 
     private String preSetBlockRewardValue;
 
+    private Long preConsBlockQty;
+
     private Long curConsBlockQty;
 
-    private Long preConsBlockQty;
+    private String programVersion;
 
     private String stakingRewardValue;
 
@@ -51,21 +59,15 @@ public class Staking extends StakingKey {
 
     private Integer status;
 
-    private Date createTime;
-
-    private Date updateTime;
-
     private Integer isConsensus;
-
-    private Integer stakingEpoch;
-
-    private String stakingReduction;
-
-    private String stakingName;
 
     private Integer isSetting;
 
     private Integer isInit;
+
+    private Date createTime;
+
+    private Date updateTime;
 
     public Integer getStakingTxIndex() {
         return stakingTxIndex;
@@ -97,6 +99,22 @@ public class Staking extends StakingKey {
 
     public void setStakingLocked(String stakingLocked) {
         this.stakingLocked = stakingLocked == null ? null : stakingLocked.trim();
+    }
+
+    public Integer getStakingReductionEpoch() {
+        return stakingReductionEpoch;
+    }
+
+    public void setStakingReductionEpoch(Integer stakingReductionEpoch) {
+        this.stakingReductionEpoch = stakingReductionEpoch;
+    }
+
+    public String getStakingReduction() {
+        return stakingReduction;
+    }
+
+    public void setStakingReduction(String stakingReduction) {
+        this.stakingReduction = stakingReduction == null ? null : stakingReduction.trim();
     }
 
     public String getStatDelegateHas() {
@@ -137,6 +155,14 @@ public class Staking extends StakingKey {
 
     public void setStatVerifierTime(Integer statVerifierTime) {
         this.statVerifierTime = statVerifierTime;
+    }
+
+    public String getStakingName() {
+        return stakingName;
+    }
+
+    public void setStakingName(String stakingName) {
+        this.stakingName = stakingName == null ? null : stakingName.trim();
     }
 
     public String getStakingIcon() {
@@ -187,6 +213,14 @@ public class Staking extends StakingKey {
         this.preSetBlockRewardValue = preSetBlockRewardValue == null ? null : preSetBlockRewardValue.trim();
     }
 
+    public Long getPreConsBlockQty() {
+        return preConsBlockQty;
+    }
+
+    public void setPreConsBlockQty(Long preConsBlockQty) {
+        this.preConsBlockQty = preConsBlockQty;
+    }
+
     public Long getCurConsBlockQty() {
         return curConsBlockQty;
     }
@@ -195,12 +229,12 @@ public class Staking extends StakingKey {
         this.curConsBlockQty = curConsBlockQty;
     }
 
-    public Long getPreConsBlockQty() {
-        return preConsBlockQty;
+    public String getProgramVersion() {
+        return programVersion;
     }
 
-    public void setPreConsBlockQty(Long preConsBlockQty) {
-        this.preConsBlockQty = preConsBlockQty;
+    public void setProgramVersion(String programVersion) {
+        this.programVersion = programVersion == null ? null : programVersion.trim();
     }
 
     public String getStakingRewardValue() {
@@ -251,52 +285,12 @@ public class Staking extends StakingKey {
         this.status = status;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
     public Integer getIsConsensus() {
         return isConsensus;
     }
 
     public void setIsConsensus(Integer isConsensus) {
         this.isConsensus = isConsensus;
-    }
-
-    public Integer getStakingEpoch() {
-        return stakingEpoch;
-    }
-
-    public void setStakingEpoch(Integer stakingEpoch) {
-        this.stakingEpoch = stakingEpoch;
-    }
-
-    public String getStakingReduction() {
-        return stakingReduction;
-    }
-
-    public void setStakingReduction(String stakingReduction) {
-        this.stakingReduction = stakingReduction == null ? null : stakingReduction.trim();
-    }
-
-    public String getStakingName() {
-        return stakingName;
-    }
-
-    public void setStakingName(String stakingName) {
-        this.stakingName = stakingName == null ? null : stakingName.trim();
     }
 
     public Integer getIsSetting() {
@@ -315,6 +309,22 @@ public class Staking extends StakingKey {
         this.isInit = isInit;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
     /**
      * This enum was generated by MyBatis Generator.
      * This enum corresponds to the database table staking
@@ -329,33 +339,34 @@ public class Staking extends StakingKey {
         stakingAddr("staking_addr", "stakingAddr", "VARCHAR", false),
         stakingHas("staking_has", "stakingHas", "VARCHAR", false),
         stakingLocked("staking_locked", "stakingLocked", "VARCHAR", false),
+        stakingReductionEpoch("staking_reduction_epoch", "stakingReductionEpoch", "INTEGER", false),
+        stakingReduction("staking_reduction", "stakingReduction", "VARCHAR", false),
         statDelegateHas("stat_delegate_has", "statDelegateHas", "VARCHAR", false),
         statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "VARCHAR", false),
         statDelegateReduction("stat_delegate_reduction", "statDelegateReduction", "VARCHAR", false),
         statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
         statVerifierTime("stat_verifier_time", "statVerifierTime", "INTEGER", false),
+        stakingName("staking_name", "stakingName", "VARCHAR", false),
         stakingIcon("staking_icon", "stakingIcon", "VARCHAR", false),
         externalId("external_id", "externalId", "VARCHAR", false),
         denefitAddr("denefit_addr", "denefitAddr", "VARCHAR", false),
         expectedIncome("expected_income", "expectedIncome", "VARCHAR", false),
         blockRewardValue("block_reward_value", "blockRewardValue", "VARCHAR", false),
         preSetBlockRewardValue("pre_set_block_reward_value", "preSetBlockRewardValue", "VARCHAR", false),
-        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
         preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
+        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
+        programVersion("program_version", "programVersion", "VARCHAR", false),
         stakingRewardValue("staking_reward_value", "stakingRewardValue", "VARCHAR", false),
         webSite("web_site", "webSite", "VARCHAR", false),
         details("details", "details", "VARCHAR", false),
         joinTime("join_time", "joinTime", "TIMESTAMP", false),
         leaveTime("leave_time", "leaveTime", "TIMESTAMP", false),
         status("status", "status", "INTEGER", true),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
         isConsensus("is_consensus", "isConsensus", "INTEGER", false),
-        stakingEpoch("staking_epoch", "stakingEpoch", "INTEGER", false),
-        stakingReduction("staking_reduction", "stakingReduction", "VARCHAR", false),
-        stakingName("staking_name", "stakingName", "VARCHAR", false),
         isSetting("is_setting", "isSetting", "INTEGER", false),
-        isInit("is_init", "isInit", "INTEGER", false);
+        isInit("is_init", "isInit", "INTEGER", false),
+        createTime("create_time", "createTime", "TIMESTAMP", false),
+        updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
         /**
          * This field was generated by MyBatis Generator.

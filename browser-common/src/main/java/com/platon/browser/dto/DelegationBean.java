@@ -14,12 +14,15 @@ import java.util.List;
  */
 @Data
 public class DelegationBean extends Delegation {
+
     private List<UnDelegation> unDelegations = new ArrayList<>();
 
+    // delegation与staking的关联键
     public String getStakingMapKey(){
         return this.getNodeId()+this.getStakingBlockNum();
     }
 
+    // delegation与un_delegation的关联键
     public String getDelegationMapKey(){
         return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
     }

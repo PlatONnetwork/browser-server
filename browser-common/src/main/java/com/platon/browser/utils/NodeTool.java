@@ -21,9 +21,15 @@ import java.util.List;
  * Date: 2019/1/10
  * Time: 10:52
  */
-public class CalculatePublicKey {
+public class NodeTool {
 
-    public static String getPublicKey(PlatonBlock.Block block) throws Exception {
+    /**
+     * 通过区块计算节点公钥
+     * @param block
+     * @return
+     * @throws Exception
+     */
+    public static String calculateNodePublicKey(PlatonBlock.Block block) throws Exception {
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
         if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;

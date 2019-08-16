@@ -40,7 +40,7 @@ public class BlockDetail {
         BeanUtils.copyProperties(initData,this);
         this.setHeight(initData.getNumber());
         this.setTimestamp(initData.getTimestamp().getTime());
-        BigDecimal v = Convert.fromWei(initData.getBlockReward(), Convert.Unit.ETHER);
+        BigDecimal v = Convert.fromVon(initData.getBlockReward(), Convert.Unit.LAT);
         this.setBlockReward(EnergonUtil.format(v));
     }
 }

@@ -5,6 +5,8 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.BlockBean;
+import com.platon.browser.dto.NodeBean;
+import com.platon.browser.dto.StakingBean;
 import com.platon.browser.dto.TransactionBean;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
@@ -13,11 +15,12 @@ import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.service.StatisticsService;
 import com.platon.browser.util.TxParamResolver;
-import com.platon.browser.utils.CalculatePublicKey;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
@@ -26,13 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -48,14 +52,11 @@ import java.util.concurrent.*;
 public class BlockSyncTask {
 
     @Autowired
-    private BlockMapper blockMapper;
-    @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService service;
     @Autowired
     private StatisticsService statisticsService;
-
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
@@ -101,13 +102,60 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    @PostConstruct
     public void init () {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+
+        // 结算周期验证人
+        if(maxBlockNumber==null){
+            // 如果库里区块为空，则：
+            try {
+                // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
+                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ONE);
+                if(!validators.isStatusOk()){
+                    logger.debug("通过区块号[{}]查询历史共识周期验证人列表为空:{}",BigInteger.ONE,validators.errMsg);
+                    logger.debug("查询实时共识周期验证人列表...");
+                    validators = client.getNodeContract().getValidatorList().send();
+                }
+                Map<String,Node> validatorMap = new HashMap<>();
+                if(validators.isStatusOk()) validators.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
+
+                // 根据区块号0查询结算周期验证人列表并入库
+                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ONE);
+                if(!verifiers.isStatusOk()){
+                    logger.debug("通过区块号[{}]查询历史结算周期验证人列表为空:{}",BigInteger.ONE,verifiers.errMsg);
+                    logger.debug("查询实时结算周期验证人列表...");
+                    verifiers = client.getNodeContract().getVerifierList().send();
+                }
+                if(verifiers.isStatusOk()) {
+                    BlockChainResult bcr = new BlockChainResult();
+                    verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
+                        NodeBean node = new NodeBean();
+                        node.initWithNode(verifier);
+                        node.setIsRecommend(1);
+                        bcr.getStakingExecuteResult().getAddNodes().add(node);
+
+                        StakingBean stakingBean = new StakingBean();
+                        stakingBean.initWithNode(verifier);
+                        stakingBean.setStakingIcon("");
+                        stakingBean.setIsInit(1);
+                        stakingBean.setIsSetting(1);
+                        // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
+                        if(validatorMap.get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
+
+                        bcr.getStakingExecuteResult().getAddStakings().add(stakingBean);
+                    });
+                    service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
+                }
+                // 通知质押引擎重新初始化节点缓存
+                blockChain.getStakingExecute().loadNodes();
+            } catch (Exception e) {
+                logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
+            }
+        }
     }
 
     public void start () throws InterruptedException {
@@ -188,21 +236,11 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-                            BlockBean block = new BlockBean(initData);
-                            block.setNodeId("");
-                            String publicKey = CalculatePublicKey.getPublicKey(initData);
-                            if(publicKey!=null){
-                                if(!publicKey.startsWith("0x")) block.setNodeId("0x"+publicKey);
-                                else block.setNodeId(publicKey);
-                            }
-                            try{
-                                result.concurrentBlockMap.put(blockNumber.longValue(),block);
-                            }catch (Exception ex){
-                                logger.debug("Add BlockBean Exception!");
-                                throw ex;
-                            }
+                            BlockBean block = new BlockBean();
+                            block.init(initData);
+                            result.concurrentBlockMap.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
-                            logger.debug("New BlockBean Exception!");
+                            logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
                             throw ex;
                         }
                     }
@@ -317,11 +355,23 @@ public class BlockSyncTask {
     /**
      * 分析区块获取code&交易回执
      */
-    private TransactionBean updateTransactionInfo(TransactionBean tx){
+    private TransactionBean updateTransactionInfo(TransactionBean tx) throws IOException, BeanCreateOrUpdateException {
         try {
-            PlatonGetTransactionReceipt platonGetTransactionReceipt = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipts = platonGetTransactionReceipt.getTransactionReceipt();
-            tx.updateTransactionInfo(receipts.get());
+            // 查询交易回执
+            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
+            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
+            // 如果交易回执存在，则更新交易中与回执相关的信息
+            if(receipt.isPresent()) tx.update(receipt.get());
+        }catch (IOException e){
+            logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
+            throw e;
+        }catch (BeanCreateOrUpdateException e){
+            logger.error("更新交易[hash={}]的回执相关信息出错:{}",tx.getHash(),e.getMessage());
+            throw e;
+        }
+
+        // 解析交易参数，补充交易中与交易参数相关的信息
+        try {
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
@@ -331,9 +381,11 @@ public class BlockSyncTask {
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
-        }catch (IOException e){
-
+        }catch (Exception e){
+            logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
+            throw e;
         }
+
         return tx;
     }
 
@@ -345,7 +397,7 @@ public class BlockSyncTask {
             // 串行批量入库
             service.insertOrUpdateChainInfo(basicData,bizData);
         }catch (Exception e){
-            logger.debug("入库失败！原因："+e.getMessage());
+            logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());
         }
     }

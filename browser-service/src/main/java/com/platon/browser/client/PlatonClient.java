@@ -6,16 +6,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.RemoteCall;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.PlatonCall;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
+import org.web3j.utils.PlatOnUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -27,6 +43,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class PlatonClient {
     private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
+
+    /**
+     * 查询区块历史的验证人队列
+     */
+    public static final int GET_HISTORY_VERIFIERLIST_FUNC_TYPE = 1106;
+    /**
+     * 查询历史共识周期的验证人列
+     */
+    public static final int GET_HISTORY_VALIDATORLIST_FUNC_TYPE = 1107;
+    /**
+     * 获取可用和锁仓余额
+     */
+    public static final int GET_RESTRICTINGBALANCE_FUNC_TYPE = 4101;
 
     private List<Web3j> allWeb3jList=new ArrayList<>();
     private Web3j currentValidWeb3j;
@@ -137,5 +166,61 @@ public class PlatonClient {
             e.printStackTrace();
         }
         logger.debug("*** End the detect task *** ");
+    }
+
+
+    /**
+     * 根据区块号获取结算周期验证人列表
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public BaseResponse<List<Node>> getHistoryVerifierList(BigInteger blockNumber) throws Exception {
+        BaseResponse<List<Node>> nodes = nodeCall(
+                blockNumber,
+                GET_HISTORY_VERIFIERLIST_FUNC_TYPE
+        ).send();
+        return nodes;
+    }
+
+    /**
+     * 根据区块号获取共识周期验证人列表
+     * @param blockNumber
+     * @return
+     * @throws Exception
+     */
+    public BaseResponse<List<Node>> getHistoryValidatorList(BigInteger blockNumber) throws Exception {
+        BaseResponse<List<Node>> nodes = nodeCall(
+                blockNumber,
+                GET_HISTORY_VALIDATORLIST_FUNC_TYPE
+        ).send();
+        return nodes;
+    }
+
+
+    /**
+     * 根据account获取可用余额和锁仓余额
+     * @param account
+     * @return
+     * @throws Exception
+     */
+
+    private RemoteCall<BaseResponse<List<Node>>> nodeCall(BigInteger blockNumber,int funcType) {
+        final Function function = new Function(
+                funcType,
+                Arrays.asList(new Uint256(blockNumber)),
+                Arrays.asList(new TypeReference<Utf8String>() {})
+        );
+        return new RemoteCall<>((Callable<BaseResponse<List<Node>>>) () -> {
+            String encodedFunction = PlatOnUtil.invokeEncode(function);
+            PlatonCall ethCall = currentValidWeb3j.platonCall(
+                    Transaction.createEthCallTransaction(NodeContract.NODE_CONTRACT_ADDRESS, NodeContract.NODE_CONTRACT_ADDRESS, encodedFunction),
+                    DefaultBlockParameter.valueOf(blockNumber)
+            ).send();
+            String value = ethCall.getValue();
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            response.data = JSONUtil.parseArray((String) response.data, Node.class);
+            return response;
+        });
     }
 }

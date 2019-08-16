@@ -13,6 +13,8 @@ public class Delegation extends DelegationKey {
 
     private Integer isHistory;
 
+    private Long sequence;
+
     private Date createTime;
 
     private Date updateTime;
@@ -49,6 +51,14 @@ public class Delegation extends DelegationKey {
         this.isHistory = isHistory;
     }
 
+    public Long getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Long sequence) {
+        this.sequence = sequence;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -80,6 +90,7 @@ public class Delegation extends DelegationKey {
         delegateLocked("delegate_locked", "delegateLocked", "VARCHAR", false),
         delegateReduction("delegate_reduction", "delegateReduction", "VARCHAR", false),
         isHistory("is_history", "isHistory", "INTEGER", false),
+        sequence("sequence", "sequence", "BIGINT", true),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
