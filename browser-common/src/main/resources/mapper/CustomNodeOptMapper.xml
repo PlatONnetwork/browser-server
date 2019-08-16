@@ -14,4 +14,43 @@
     from node_opt where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
 
+  <!--批量选择性插入或更新-->
+  <insert id="batchInsertSelective" parameterType="map">
+    replace into node_opt (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'id'.toString() == column.value">
+          #{item.id,jdbcType=BIGINT}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'desc'.toString() == column.value">
+          #{item.desc,jdbcType=VARCHAR}
+        </if>
+        <if test="'tx_hash'.toString() == column.value">
+          #{item.txHash,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_number'.toString() == column.value">
+          #{item.blockNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'timestamp'.toString() == column.value">
+          #{item.timestamp,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
 </mapper>

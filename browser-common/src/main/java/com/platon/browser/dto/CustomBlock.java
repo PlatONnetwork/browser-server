@@ -16,9 +16,9 @@ import java.util.*;
  * @Description:
  */
 @Data
-public class BlockBean extends Block {
+public class CustomBlock extends Block {
 
-    public BlockBean(){
+    public CustomBlock(){
         /** 初始化默认值 **/
         // 区块内交易数（区块所含交易个数）
         this.setStatTxQty(0);
@@ -67,7 +67,7 @@ public class BlockBean extends Block {
         try{
             // 抽取交易信息
             initData.getTransactions().forEach(tr -> {
-                TransactionBean transaction = new TransactionBean();
+                CustomTransaction transaction = new CustomTransaction();
                 transaction.init(tr);
                 transaction.setTimestamp(this.getTimestamp());
                 transaction.setCreateTime(date);
@@ -101,14 +101,14 @@ public class BlockBean extends Block {
 
 
 
-    private List<TransactionBean> transactionList = new ArrayList<>();
+    private List<CustomTransaction> transactionList = new ArrayList<>();
 
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BlockBean blockInfo = (BlockBean) o;
+        CustomBlock blockInfo = (CustomBlock) o;
         return Objects.equals(getNumber(), blockInfo.getNumber());
     }
 
@@ -116,4 +116,7 @@ public class BlockBean extends Block {
     public int hashCode() {
         return Objects.hash(getNumber());
     }
+
+
+
 }

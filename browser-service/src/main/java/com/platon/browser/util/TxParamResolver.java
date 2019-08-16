@@ -11,6 +11,7 @@ import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -62,11 +63,16 @@ public class TxParamResolver {
                         //外部Id
                         String extrnaId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
                         //被质押节点的名称
-                        String stakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String hexStakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String stakNodeName = new String(Numeric.hexStringToByteArray(hexStakNodeName));
                         //节点的第三方主页
-                        String webSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String hexWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String webSiteAdd = new String(Numeric.hexStringToByteArray(hexWebSiteAdd));
+
                         //节点的描述
-                        String deteils = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String hexDeteils = Resolver.StringResolver((RlpString) rlpList1.getValues().get(7));
+                        String deteils = new String(Numeric.hexStringToByteArray(hexDeteils));
+
                         //质押的von
                         BigInteger stakingAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(8));
                         //程序的真实版本，治理rpc获取
@@ -86,11 +92,17 @@ public class TxParamResolver {
                         //外部Id
                         String editExtrId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
                         //被质押节点的名称
-                        String editNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String hexEditNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String editNodeName = new String(Numeric.hexStringToByteArray(hexEditNodeName));
+
                         //节点的第三方主页
-                        String editWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String hexEditWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String editWebSiteAdd = new String(Numeric.hexStringToByteArray(hexEditWebSiteAdd));
+
                         //节点的描述
-                        String editDetail = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String hexEditDetail = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String editDetail = new String(Numeric.hexStringToByteArray(hexEditDetail));
+
 
                         EditValidatorParam editValidatorParam = new EditValidatorParam();
                         editValidatorParam.init(editAddr,editNodeId,editExtrId,editNodeName,editWebSiteAdd,editDetail);
@@ -270,4 +282,8 @@ public class TxParamResolver {
         return result;
     }
 
+
+    public static void main ( String[] args ) {
+        TxParamResolver.analysis("0xf883838203e88180959460ceca9c1290ee56b98d4e160ef0453f7c40d219b842b84000cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba410008180848363646d8e8d7777772e62616964752e636f6d8685626169647583829c408180");
+    }
 }

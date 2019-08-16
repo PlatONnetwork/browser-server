@@ -15,7 +15,12 @@ import java.util.Set;
  */
 @Data
 public class AddressExecuteResult {
-    private Map <String, Address> addressMap = new HashMap <>();
+
     private Set<Address> addAddress =  new HashSet<>();
     private Set<Address> updateAddress = new HashSet <>();
+
+    public void clear() {
+        addAddress.clear();
+        updateAddress.clear();
+    }
 }

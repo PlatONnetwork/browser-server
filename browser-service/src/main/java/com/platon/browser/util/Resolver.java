@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
@@ -23,7 +24,7 @@ public  class Resolver {
         return integer;
     }
 
-    public static String StringResolver ( RlpString rlpString ) {
+    public static String StringResolver ( RlpString rlpString ) throws Exception{
         RlpString Strings = rlpString;
         RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
         RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
@@ -48,5 +49,8 @@ public  class Resolver {
         }
         return list;
     }
+
+
+
 
 }

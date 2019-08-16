@@ -347,6 +347,7 @@ public interface AppDocStaking {
 	
 	
     /**
+     * 多余的接口
      * @apiDeprecated
      * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date i.导出地址验证人委托列表
      * @apiVersion 1.0.0

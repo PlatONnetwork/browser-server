@@ -24,7 +24,7 @@ public class BaseResp<T> {
         return errMsg;
     }
 
-    public static <T> BaseResp build(Integer code, String errMsg, T data){
-        return new BaseResp(code,errMsg,data);
+    public static <T> BaseResp<T> build(Integer code, String errMsg, T data){
+        return new BaseResp<T>(code,errMsg,data);
     }
 }

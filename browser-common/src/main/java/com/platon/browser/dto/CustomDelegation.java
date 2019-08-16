@@ -13,7 +13,7 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class DelegationBean extends Delegation {
+public class CustomDelegation extends Delegation {
 
     private List<UnDelegation> unDelegations = new ArrayList<>();
 

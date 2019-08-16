@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomProposalMapper">
+
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomProposal" extends="com.platon.browser.dao.mapper.ProposalMapper.BaseResultMap"/>
+
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into proposal (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
+        </if>
+        <if test="'verifier'.toString() == column.value">
+          #{item.verifier,jdbcType=VARCHAR}
+        </if>
+        <if test="'verifier_name'.toString() == column.value">
+          #{item.verifierName,jdbcType=VARCHAR}
+        </if>
+        <if test="'url'.toString() == column.value">
+          #{item.url,jdbcType=VARCHAR}
+        </if>
+        <if test="'new_version'.toString() == column.value">
+          #{item.newVersion,jdbcType=VARCHAR}
+        </if>
+        <if test="'param_name'.toString() == column.value">
+          #{item.paramName,jdbcType=VARCHAR}
+        </if>
+        <if test="'current_value'.toString() == column.value">
+          #{item.currentValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'new_value'.toString() == column.value">
+          #{item.newValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'end_voting_block'.toString() == column.value">
+          #{item.endVotingBlock,jdbcType=VARCHAR}
+        </if>
+        <if test="'active_block'.toString() == column.value">
+          #{item.activeBlock,jdbcType=VARCHAR}
+        </if>
+        <if test="'timestamp'.toString() == column.value">
+          #{item.timestamp,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'yeas'.toString() == column.value">
+          #{item.yeas,jdbcType=BIGINT}
+        </if>
+        <if test="'nays'.toString() == column.value">
+          #{item.nays,jdbcType=BIGINT}
+        </if>
+        <if test="'abstentions'.toString() == column.value">
+          #{item.abstentions,jdbcType=BIGINT}
+        </if>
+        <if test="'accu_verifiers'.toString() == column.value">
+          #{item.accuVerifiers,jdbcType=BIGINT}
+        </if>
+        <if test="'status'.toString() == column.value">
+          #{item.status,jdbcType=INTEGER}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

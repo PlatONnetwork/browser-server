@@ -2,33 +2,29 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dto.BlockBean;
-import com.platon.browser.dto.NodeBean;
-import com.platon.browser.dto.StakingBean;
-import com.platon.browser.dto.TransactionBean;
+import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.BlockChainResult;
-import com.platon.browser.engine.ProposalExecuteResult;
-import com.platon.browser.engine.StakingExecuteResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
-import com.platon.browser.service.StatisticsService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
@@ -55,8 +51,6 @@ public class BlockSyncTask {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService service;
-    @Autowired
-    private StatisticsService statisticsService;
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
@@ -80,13 +74,13 @@ public class BlockSyncTask {
     @Data
     class Result {
         // 并发采集的块信息，无序
-        public Map <Long, BlockBean> concurrentBlockMap = new ConcurrentHashMap <>();
+        public Map <Long, CustomBlock> concurrentBlockMap = new ConcurrentHashMap <>();
         // 由于异常而未采集的区块号列表
         private Set <BigInteger> retryNumbers = new CopyOnWriteArraySet <>();
         // 已排序的区块信息列表
-        private List <BlockBean> sortedBlocks = new LinkedList <>();
+        private List <CustomBlock> sortedBlocks = new LinkedList <>();
 
-        public List <BlockBean> getSortedBlocks () {
+        public List <CustomBlock> getSortedBlocks () {
             if (sortedBlocks.size() == 0) {
                 sortedBlocks.addAll(concurrentBlockMap.values());
                 Collections.sort(sortedBlocks, ( c1, c2 ) -> {
@@ -131,14 +125,13 @@ public class BlockSyncTask {
                     verifiers = client.getNodeContract().getVerifierList().send();
                 }
                 if(verifiers.isStatusOk()) {
-                    BlockChainResult bcr = new BlockChainResult();
                     verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
-                        NodeBean node = new NodeBean();
+                        CustomNode node = new CustomNode();
                         node.initWithNode(verifier);
                         node.setIsRecommend(1);
-                        bcr.getStakingExecuteResult().getAddNodes().add(node);
+                        blockChain.BIZ_DATA.getStakingExecuteResult().getAddNodes().add(node);
 
-                        StakingBean stakingBean = new StakingBean();
+                        CustomStaking stakingBean = new CustomStaking();
                         stakingBean.initWithNode(verifier);
                         stakingBean.setStakingIcon("");
                         stakingBean.setIsInit(1);
@@ -146,9 +139,11 @@ public class BlockSyncTask {
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                         if(validatorMap.get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
 
-                        bcr.getStakingExecuteResult().getAddStakings().add(stakingBean);
+                        blockChain.BIZ_DATA.getStakingExecuteResult().getAddStakings().add(stakingBean);
                     });
+                    BlockChainResult bcr = blockChain.exportResult();
                     service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
+                    blockChain.commitResult();
                 }
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
@@ -170,7 +165,7 @@ public class BlockSyncTask {
             // 并行采集区块
             Result collectedResult = new Result();
             getBlockAndTransaction(blockNumbers, collectedResult);
-            List <BlockBean> blocks = collectedResult.getSortedBlocks();
+            List <CustomBlock> blocks = collectedResult.getSortedBlocks();
 
             // 采集不到区块则则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
@@ -181,36 +176,20 @@ public class BlockSyncTask {
             // 对区块和交易做分析
             analyzeBlockAndTransaction(blocks);
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            BlockChainResult bizData = new BlockChainResult();
-            ProposalExecuteResult perSummary = bizData.getProposalExecuteResult();
-            StakingExecuteResult serSummary = bizData.getStakingExecuteResult();
-            blocks.forEach(block -> {
-                blockChain.execute(block);
-                BlockChainResult bcr = blockChain.exportResult();
-                ProposalExecuteResult per = bcr.getProposalExecuteResult();
-                StakingExecuteResult ser = bcr.getStakingExecuteResult();
+            blocks.forEach(block ->blockChain.execute(block));
+            //获取内存中全量质押和委托信息，用于地址相关统计数据
 
-                perSummary.getAddVotes().addAll(per.getAddVotes());
-                perSummary.getAddProposals().addAll(per.getAddProposals());
-                perSummary.getUpdateProposals().addAll(per.getUpdateProposals());
-
-                serSummary.getAddDelegations().addAll(ser.getAddDelegations());
-                serSummary.getAddNodeOpts().addAll(ser.getAddNodeOpts());
-                serSummary.getAddNodes().addAll(ser.getAddNodes());
-                serSummary.getAddSlash().addAll(ser.getAddSlash());
-
-
-                // 清除blockChain实例状态，防止影响下一次的循环
-                blockChain.commitResult();
-            });
-
+            TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
+            TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
+            blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
-
+                BlockChainResult bizData = blockChain.exportResult();
                 batchSaveResult(blocks, bizData);
             } catch (BusinessException e) {
                 break;
             }
+            blockChain.commitResult();
 
             commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
             TimeUnit.SECONDS.sleep(1);
@@ -236,7 +215,7 @@ public class BlockSyncTask {
                     PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                     if(initData!=null) {
                         try{
-                            BlockBean block = new BlockBean();
+                            CustomBlock block = new CustomBlock();
                             block.init(initData);
                             result.concurrentBlockMap.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
@@ -282,10 +261,10 @@ public class BlockSyncTask {
     /**
      * 并行分析区块
      */
-    private void analyzeBlockAndTransaction ( List <BlockBean> blocks ) {
+    private void analyzeBlockAndTransaction ( List <CustomBlock> blocks ) {
         // 对需要复杂分析的区块或交易信息，开启并行处理
         blocks.forEach(b -> {
-            List <TransactionBean> txList = b.getTransactionList();
+            List <CustomTransaction> txList = b.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
             txList.forEach(tx ->
                     TX_THREAD_POOL.submit(() -> {
@@ -353,7 +332,7 @@ public class BlockSyncTask {
     /**
      * 分析区块获取code&交易回执
      */
-    private TransactionBean updateTransactionInfo(TransactionBean tx) throws IOException, BeanCreateOrUpdateException {
+    private CustomTransaction updateTransactionInfo(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
         try {
             // 查询交易回执
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
@@ -389,11 +368,9 @@ public class BlockSyncTask {
         return tx;
     }
 
-    public void batchSaveResult(List<BlockBean> basicData, BlockChainResult bizData){
+    public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
         try{
-            //todo：address数据补全，统计数据批次统计
-            statisticsService.addressInfoUpdate(basicData,bizData);
-            statisticsService.statisticsUpdate(basicData,bizData);
+
             // 串行批量入库
             service.insertOrUpdateChainInfo(basicData,bizData);
         }catch (Exception e){

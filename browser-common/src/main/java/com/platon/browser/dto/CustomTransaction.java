@@ -16,7 +16,10 @@ import org.web3j.utils.JSONUtil;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -24,7 +27,7 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class TransactionBean extends TransactionWithBLOBs {
+public class CustomTransaction extends TransactionWithBLOBs {
 
     private TxTypeEnum typeEnum;
 
@@ -60,8 +63,19 @@ public class TransactionBean extends TransactionWithBLOBs {
                 this.setTxReceiptStatus(1);
             }else this.setTxReceiptStatus(0);
         }catch (Exception e){
-            throw new BeanCreateOrUpdateException("TransactionBean.update() error:"+e.getMessage());
+            throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
         }
+/*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
+                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
+                "0x" != code )
+        {
+            this.setReceiveType("contract");
+        }else
+            this.setReceiveType("account");*/
     }
 
     /**
@@ -114,5 +128,27 @@ public class TransactionBean extends TransactionWithBLOBs {
             default:
                 return null;
         }
+    }
+
+    public enum TxReceiptStatusEnum{
+        SUCCESS(1, "成功"),
+        FAILURE(0, "失败")
+        ;
+        public int code;
+        public String desc;
+        TxReceiptStatusEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static Map<Integer, TxReceiptStatusEnum> ENUMS = new HashMap<>();
+        static {
+            Arrays.asList(TxReceiptStatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static TxReceiptStatusEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(TxReceiptStatusEnum en){return ENUMS.containsValue(en);}
     }
 }
