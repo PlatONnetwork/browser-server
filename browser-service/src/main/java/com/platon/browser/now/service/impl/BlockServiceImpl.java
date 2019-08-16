@@ -28,14 +28,10 @@ public class BlockServiceImpl implements BlockService {
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
 		//小于50万条查询redis
-		long total = 0l; 
 		if(req.getPageNo().intValue() * req.getPageSize().intValue() < 500000) {
 			List<BlockRedis> items = statisticCacheService.getBlockCache(req.getPageNo(),req.getPageSize());
 			BlockListResp blockListNewResp = new BlockListResp();
 			for (int i = 0;i < items.size(); i++) {
-				if(i == 0) {
-					total = items.get(i).getNumber();
-				}
 				blockListNewResp.setBlockReward(items.get(i).getBlockReward());
 				blockListNewResp.setGasUsed(items.get(i).getGasUsed());
 				blockListNewResp.setNodeId(items.get(i).getNodeId());
@@ -51,8 +47,9 @@ public class BlockServiceImpl implements BlockService {
 		} else {
 			//TODO  是否查询超过五十万条数据
 		}
+		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
 		Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
-		page.setTotal(total);
+		page.setTotal(blockEnd.get(0).getNumber());
 		respPage.init(page, lists);
 		return respPage;
 	}
