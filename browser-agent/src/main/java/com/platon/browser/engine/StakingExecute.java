@@ -133,7 +133,7 @@ public class StakingExecute {
     /**
      * 进入新的结算周期
      */
-    public void onNewSettingEpoch(){
+    public void  onNewSettingEpoch(){
 
     }
 
@@ -150,6 +150,7 @@ public class StakingExecute {
     public void onElectionDistance(){
 
     }
+
 
     private void updateTxInfo(TransactionBean tx, BlockChain bc){
 

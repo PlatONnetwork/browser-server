@@ -15,9 +15,11 @@ import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
+import com.platon.browser.service.StatisticsService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.CalculatePublicKey;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,8 @@ public class BlockSyncTask {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService service;
+    @Autowired
+    private StatisticsService statisticsService;
 
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
@@ -154,6 +158,7 @@ public class BlockSyncTask {
 
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
+
                 batchSaveResult(blocks, bizData);
             } catch (BusinessException e) {
                 break;
@@ -332,10 +337,12 @@ public class BlockSyncTask {
         return tx;
     }
 
-    @Transactional
     public void batchSaveResult(List<BlockBean> basicData, BlockChainResult bizData){
-        // 串行批量入库
         try{
+            //todo：address数据补全，统计数据批次统计
+            statisticsService.addressInfoUpdate(basicData,bizData);
+            statisticsService.statisticsUpdate(basicData,bizData);
+            // 串行批量入库
             service.insertOrUpdateChainInfo(basicData,bizData);
         }catch (Exception e){
             logger.debug("入库失败！原因："+e.getMessage());

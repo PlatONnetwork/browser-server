@@ -46,12 +46,12 @@ public class BlockChain {
     private AddressExecute addressExecute;
 
 
-
     @Autowired
     private PlatonClient client;
 
     private long curSettingEpoch;
     private long curConsensusEpoch;
+    private long addIssueEpoch;
     private BlockBean curBlock;
     private long transactionCount;
 
@@ -96,7 +96,7 @@ public class BlockChain {
 
 
         //数据回填
-        // 推算并更新共识周期和结算周期
+        // 推算并更新共识周期和结算周期和增发周期
         updateEpoch();
         // 更新共识周期验证人和结算周期验证人列表
         updateNodes();
@@ -113,6 +113,8 @@ public class BlockChain {
         curConsensusEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod()),0, RoundingMode.CEILING).longValue();
         // 计算结算周期轮数
         curSettingEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getSettingPeriod()),0, RoundingMode.CEILING).longValue();
+        //计算增发周期轮数
+        addIssueEpoch= BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriod()),0 ,RoundingMode.CEILING).longValue();
     }
 
     /**
@@ -187,6 +189,8 @@ public class BlockChain {
             }
         }*/
     }
+
+
 
     /**
      * 根据交易信息新增或更新相关记录：
