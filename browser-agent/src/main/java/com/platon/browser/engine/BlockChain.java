@@ -213,13 +213,13 @@ public class BlockChain {
 
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()){
-                case CREATEVALIDATOR: // 创建验证人
-                case EDITVALIDATOR: // 编辑验证人
-                case INCREASESTAKING: // 增持质押
-                case EXITVALIDATOR: // 撤销质押
+                case CREATE_VALIDATOR: // 创建验证人
+                case EDIT_VALIDATOR: // 编辑验证人
+                case INCREASE_STAKING: // 增持质押
+                case EXIT_VALIDATOR: // 撤销质押
                 case DELEGATE: // 发起委托
-                case UNDELEGATE: // 撤销委托
-                case REPORTVALIDATOR: // 举报多签验证人
+                case UN_DELEGATE: // 撤销委托
+                case REPORT_VALIDATOR: // 举报多签验证人
                     stakingExecute.execute(tx,this);
                     StakingExecuteResult ser = stakingExecute.exportResult();
                     StakingExecuteResult serSummary = execResult.getStakingExecuteResult();
@@ -244,11 +244,11 @@ public class BlockChain {
                     // 汇总更新【质押】记录
                     serSummary.getUpdateStakings().addAll(ser.getUpdateStakings());
                     break;
-                case CREATEPROPOSALTEXT: // 创建文本提案
-                case CREATEPROPOSALUPGRADE: // 创建升级提案
-                case CREATEPROPOSALPARAMETER: // 创建参数提案
-                case VOTINGPROPOSAL: // 给提案投票
-                case DUPLICATESIGN: // 双签举报
+                case CREATE_PROPOSAL_TEXT: // 创建文本提案
+                case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
+                case CREATE_PROPOSAL_PARAMETER: // 创建参数提案
+                case VOTING_PROPOSAL: // 给提案投票
+                case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx,this);
                     ProposalExecuteResult per = proposalExecute.exportResult();
                     ProposalExecuteResult perSummary = execResult.getProposalExecuteResult();
@@ -259,7 +259,7 @@ public class BlockChain {
                     // 汇总添加【提案投票】记录
                     perSummary.getAddVotes().addAll(per.getAddVotes());
                     break;
-                case CONTRACTCREATION: // 合约发布(合约创建)
+                case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})",tx.getHash(),tx.getTo());
                     break;
                 case TRANSFER: // 转账

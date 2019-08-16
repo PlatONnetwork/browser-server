@@ -1,12 +1,11 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dto.json.CreateValidatorDto;
+import com.platon.browser.param.CreateValidatorParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,6 +100,6 @@ public class StakingBean extends Staking {
         this.setStakingAddr(initData.getFrom());
         // 质押金额(犹豫期金额)
         this.setStakingHas(initData.getValue());
-        this.setStakingName(initData.getTxJson(CreateValidatorDto.class).getNodeName());
+        this.setStakingName(initData.getTxParam(CreateValidatorParam.class).getNodeName());
     }
 }

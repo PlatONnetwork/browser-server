@@ -2,10 +2,9 @@ package com.platon.browser.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dto.json.*;
-import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.param.*;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
@@ -72,48 +71,48 @@ public class TransactionBean extends TransactionWithBLOBs {
      *
      * @return
      */
-    public <T> T getTxJson (Class<T> clazz) {
+    public <T> T getTxParam (Class<T> clazz) {
 
         switch (typeEnum) {
-            case CREATEVALIDATOR:
+            case CREATE_VALIDATOR:
                 // 质押交易,txType=1000
-                return (T) JSON.parseObject(this.getTxInfo(), CreateValidatorDto.class);
-            case EDITVALIDATOR:
+                return (T) JSON.parseObject(this.getTxInfo(), CreateValidatorParam.class);
+            case EDIT_VALIDATOR:
                 //修改质押信息,txType=1001
-                return (T) JSON.parseObject(this.getTxInfo(), EditValidatorDto.class);
-            case INCREASESTAKING:
+                return (T) JSON.parseObject(this.getTxInfo(), EditValidatorParam.class);
+            case INCREASE_STAKING:
                 //增持质押(增加自有质押),txType=1002
-                return (T) JSON.parseObject(this.getTxInfo(), IncreaseStakingDto.class);
-            case EXITVALIDATOR:
+                return (T) JSON.parseObject(this.getTxInfo(), IncreaseStakingParam.class);
+            case EXIT_VALIDATOR:
                 //撤销质押(退出验证人),tyType=1003
-                return (T) JSON.parseObject(this.getTxInfo(), ExitValidatorDto.class);
+                return (T) JSON.parseObject(this.getTxInfo(), ExitValidatorParam.class);
             case DELEGATE:
                 // 委托交易,tyType=1004
-                return (T) JSON.parseObject(this.getTxInfo(), DelegateDto.class);
-            case UNDELEGATE:
+                return (T) JSON.parseObject(this.getTxInfo(), DelegateParam.class);
+            case UN_DELEGATE:
                 //减持/撤销委托(赎回委托),txType=1005
-                return (T) JSON.parseObject(this.getTxInfo(), UnDelegateDto.class);
-            case CREATEPROPOSALTEXT:
+                return (T) JSON.parseObject(this.getTxInfo(), UnDelegateParam.class);
+            case CREATE_PROPOSAL_TEXT:
                 //提交文本提案(创建提案),tyType=2000
-                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalTextDto.class);
-            case CREATEPROPOSALUPGRADE:
+                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalTextParam.class);
+            case CREATE_PROPOSAL_UPGRADE:
                 //提交升级提案(创建提案),txType=2001
-                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalUpgradeDto.class);
-            case CREATEPROPOSALPARAMETER:
+                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalUpgradeParam.class);
+            case CREATE_PROPOSAL_PARAMETER:
                 //提交参数提案(创建提案),txType=2002
-                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalParamDto.class);
-            case VOTINGPROPOSAL:
+                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalParameterParam.class);
+            case VOTING_PROPOSAL:
                 //提案投票(提案投票),txType=2003
-                return (T) JSON.parseObject(this.getTxInfo(), VotingProposalDto.class);
-            case DECLAREVERSION:
+                return (T) JSON.parseObject(this.getTxInfo(), VotingProposalParam.class);
+            case DECLARE_VERSION:
                 //版本声明,txType=2004
-                return (T) JSON.parseObject(this.getTxInfo(), DeclareVersionDto.class);
-            case REPORTVALIDATOR:
+                return (T) JSON.parseObject(this.getTxInfo(), DeclareVersionParam.class);
+            case REPORT_VALIDATOR:
                 //举报多签(举报验证人),txType=3000
-                return (T) JSON.parseObject(this.getTxInfo(), ReportValidatorDto.class);
-            case CREATERESTRICTING:
+                return (T) JSON.parseObject(this.getTxInfo(), ReportValidatorParam.class);
+            case CREATE_RESTRICTING:
                 //创建锁仓计划(创建锁仓),txType=4000
-                return (T) JSON.parseObject(this.getTxInfo(), CreatereStrictingDto.class);
+                return (T) JSON.parseObject(this.getTxInfo(), CreateRestrictingParam.class);
             default:
                 return null;
         }

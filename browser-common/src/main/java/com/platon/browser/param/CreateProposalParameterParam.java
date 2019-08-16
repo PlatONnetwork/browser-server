@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.lang.management.GarbageCollectorMXBean;
  * txType=2002提交参数提案(创建提案)
  */
 @Data
-public class CreateProposalParamDto {
+public class CreateProposalParameterParam {
 
     /**
      * 提交提案的验证人

@@ -56,7 +56,7 @@ public class TransactionSender {
             StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
             response.data.forEach(node->{
                 try {
-                    BaseResponse res = stakingContract.staking(node.getNodeId(), BigInteger.valueOf(10000), StakingAmountType.FREE_AMOUNT_TYPE,node.getBenifitAddress(),node.getExternalId(),node.getNodeName(),node.getWebsite(),node.getDetails(),node.getProgramVersion()).send();
+                    BaseResponse res = stakingContract.staking(node.getNodeId(), BigInteger.valueOf(40000), StakingAmountType.FREE_AMOUNT_TYPE,node.getBenifitAddress(),node.getExternalId(),node.getNodeName(),node.getWebsite(),node.getDetails(),node.getProgramVersion()).send();
                     logger.debug("res:{}",res);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=3000多签举报证据模板
  */
 @Data
-public class EvidencesDto {
+public class EvidencesParam {
     /**
      * 举报的节点id
      */

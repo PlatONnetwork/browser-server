@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 import org.web3j.abi.datatypes.Int;
@@ -10,7 +10,7 @@ import org.web3j.abi.datatypes.Int;
  * tyType=1004发起委托(委托)
  */
 @Data
-public class DelegateDto {
+public class DelegateParam {
     /**
      * 表示使用账户自由金额还是账户的锁仓金额做质押
      * 0: 自由金额

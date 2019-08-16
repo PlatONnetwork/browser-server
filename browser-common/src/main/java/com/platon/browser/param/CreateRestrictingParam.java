@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * txType=4000创建锁仓计划(创建锁仓)
  */
 @Data
-public class CreatereStrictingDto {
+public class CreateRestrictingParam {
     /**
      * 锁仓释放到账账户
      */
@@ -20,5 +20,5 @@ public class CreatereStrictingDto {
     /**
      * 锁仓具体计划
      */
-    private List<PlanDto> plan;
+    private List<PlanParam> plan;
 }

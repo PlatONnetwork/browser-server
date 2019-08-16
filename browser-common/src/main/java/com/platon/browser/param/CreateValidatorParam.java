@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=1000,发起质押(创建验证人)
  */
 @Data
-public class CreateValidatorDto {
+public class CreateValidatorParam {
     /**
      * 表示使用账户自由金额还是账户的锁仓金额做质押
      * 0: 自由金额

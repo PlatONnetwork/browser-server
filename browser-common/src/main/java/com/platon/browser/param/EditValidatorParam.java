@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=1001修改质押信息(编辑验证人)
  */
 @Data
-public class EditValidatorDto {
+public class EditValidatorParam {
 
     /**
      * 用于接受出块奖励和质押奖励的收益账户

@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -11,11 +11,11 @@ import java.util.List;
  * txType=3000举报多签(举报验证人)
  */
 @Data
-public class ReportValidatorDto {
+public class ReportValidatorParam {
 
     /**
      * 证据的json值，格式为RPC接口Evidences的返回值
      */
-    private List <EvidencesDto> data;
+    private List <EvidencesParam> data;
 
 }

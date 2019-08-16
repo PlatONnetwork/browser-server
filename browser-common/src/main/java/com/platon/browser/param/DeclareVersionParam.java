@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=2004版本声明
  */
 @Data
-public class DeclareVersionDto {
+public class DeclareVersionParam {
 
     /**
      * 声明的节点，只能是验证人/候选人

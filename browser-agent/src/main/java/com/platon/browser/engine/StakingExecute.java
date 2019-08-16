@@ -1,7 +1,5 @@
 package com.platon.browser.engine;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
@@ -98,24 +96,24 @@ public class StakingExecute {
      */
     public void execute(TransactionBean tx, BlockChain bc){
         switch (tx.getTypeEnum()){
-            case CREATEVALIDATOR: //发起质押(创建验证人)
+            case CREATE_VALIDATOR: //发起质押(创建验证人)
                 execute1000(tx,bc);
                 break;
-            case EDITVALIDATOR: //修改质押信息(编辑验证人)
+            case EDIT_VALIDATOR: //修改质押信息(编辑验证人)
                 execute1001(tx,bc);
                 break;
-            case INCREASESTAKING: //增持质押(增加自有质押)
+            case INCREASE_STAKING: //增持质押(增加自有质押)
                 execute1002(tx,bc);
                 break;
-            case EXITVALIDATOR://撤销质押(退出验证人)
+            case EXIT_VALIDATOR://撤销质押(退出验证人)
                 execute1003(tx,bc);
                 break;
             case DELEGATE://发起委托(委托)
                 execute1004(tx,bc);
-            case UNDELEGATE://减持/撤销委托(赎回委托)
+            case UN_DELEGATE://减持/撤销委托(赎回委托)
                 execute1005(tx,bc);
                 break;
-            case REPORTVALIDATOR://举报多签(举报验证人)
+            case REPORT_VALIDATOR://举报多签(举报验证人)
                 execute3000(tx,bc);
                 break;
         }
@@ -160,9 +158,20 @@ public class StakingExecute {
 
     //发起质押(创建验证人)
     private void execute1000(TransactionBean tx, BlockChain bc){
+        logger.debug("发起质押(创建验证人)");
+
+        /** 业务逻辑说明：
+         *  1、如果当前质押交易质押的是已经质押过的节点，则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
+         *  2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
+         */
+        // 获取交易入参
+        //CreateValidatorParam param = tx.getTxJson(CreateValidatorParam.class);
+
         StakingBean staking = new StakingBean();
         staking.initWithCreateValidatorDto(tx);
-        logger.debug("发起质押(创建验证人)");
+
+
+
         // TODO: 修改验证人列表
         // 修改验证人列表
     }

@@ -50,16 +50,16 @@ public class ProposalExecute {
     public void execute(TransactionBean tx, BlockChain bc){
 
         switch (tx.getTypeEnum()){
-            case CREATEPROPOSALTEXT:
+            case CREATE_PROPOSAL_TEXT://提交文本提案(创建提案)
                 execute2000(tx,bc);
                 break;
-            case CREATEPROPOSALUPGRADE:
+            case CREATE_PROPOSAL_UPGRADE://提交升级提案(创建提案)
                 execute2001(tx,bc);
                 break;
-            case CREATEPROPOSALPARAMETER:
+            case CREATE_PROPOSAL_PARAMETER://提交参数提案(创建提案)
                 execute2002(tx,bc);
                 break;
-            case VOTINGPROPOSAL:
+            case VOTING_PROPOSAL://给提案投票(提案投票)
                 execute2003(tx,bc);
                 break;
         }

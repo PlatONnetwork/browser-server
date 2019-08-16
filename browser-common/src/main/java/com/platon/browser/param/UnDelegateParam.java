@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=1005减持/撤销委托(赎回委托)
  */
 @Data
-public class UnDelegateDto {
+public class UnDelegateParam {
 
     /**
      * 代表着某个node的某次质押的唯一标示

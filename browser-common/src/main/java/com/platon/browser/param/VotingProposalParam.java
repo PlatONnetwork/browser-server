@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * txType=2003给提案投票(提案投票)
  */
 @Data
-public class VotingProposalDto {
+public class VotingProposalParam {
 
     /**
      * 投票的验证人

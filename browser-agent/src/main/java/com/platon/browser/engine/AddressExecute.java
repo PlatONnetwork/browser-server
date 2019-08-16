@@ -60,25 +60,25 @@ public class AddressExecute {
                 case TRANSFER:
                     address.setTransferQty(1);
                     break;
-                case CREATEPROPOSALPARAMETER:// 创建参数提案
-                case CREATEPROPOSALTEXT:// 创建文本提案
-                case CREATEPROPOSALUPGRADE:// 创建升级提案
-                case DECLAREVERSION:// 版本声明
-                case VOTINGPROPOSAL:// 提案投票
+                case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
+                case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                case DECLARE_VERSION:// 版本声明
+                case VOTING_PROPOSAL:// 提案投票
                     address.setProposalQty(1);
                     break;
                 case DELEGATE:// 发起委托
                     address.setCandidateCount(1);
                     address.setDelegateQty(1);
                     break;
-                case UNDELEGATE:// 撤销委托
+                case UN_DELEGATE:// 撤销委托
                     address.setDelegateQty(1);
                     break;
-                case INCREASESTAKING:// 增加自有质押
-                case CREATEVALIDATOR:// 创建验证人
-                case EXITVALIDATOR:// 退出验证人
-                case REPORTVALIDATOR:// 举报验证人
-                case EDITVALIDATOR:// 编辑验证人
+                case INCREASE_STAKING:// 增加自有质押
+                case CREATE_VALIDATOR:// 创建验证人
+                case EXIT_VALIDATOR:// 退出验证人
+                case REPORT_VALIDATOR:// 举报验证人
+                case EDIT_VALIDATOR:// 编辑验证人
                     address.setStakingQty(1);
                     break;
             }
@@ -100,25 +100,25 @@ public class AddressExecute {
                 case TRANSFER:
                     address.setTransferQty(address.getTransferQty() + 1);
                     break;
-                case CREATEPROPOSALPARAMETER:// 创建参数提案
-                case CREATEPROPOSALTEXT:// 创建文本提案
-                case CREATEPROPOSALUPGRADE:// 创建升级提案
-                case DECLAREVERSION:// 版本声明
-                case VOTINGPROPOSAL:// 提案投票
+                case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
+                case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                case DECLARE_VERSION:// 版本声明
+                case VOTING_PROPOSAL:// 提案投票
                     address.setProposalQty(address.getProposalQty() + 1);
                     break;
                 case DELEGATE:// 发起委托
                     address.setCandidateCount(address.getCandidateCount() + 1);
                     address.setDelegateQty(address.getDelegateQty() + 1);
                     break;
-                case UNDELEGATE:// 撤销委托
+                case UN_DELEGATE:// 撤销委托
                     address.setDelegateQty(address.getDelegateQty() + 1);
                     break;
-                case INCREASESTAKING:// 增加自有质押
-                case CREATEVALIDATOR:// 创建验证人
-                case EXITVALIDATOR:// 退出验证人
-                case REPORTVALIDATOR:// 举报验证人
-                case EDITVALIDATOR:// 编辑验证人
+                case INCREASE_STAKING:// 增加自有质押
+                case CREATE_VALIDATOR:// 创建验证人
+                case EXIT_VALIDATOR:// 退出验证人
+                case REPORT_VALIDATOR:// 举报验证人
+                case EDIT_VALIDATOR:// 编辑验证人
                     address.setStakingQty(address.getStakingQty() + 1);
                     break;
             }

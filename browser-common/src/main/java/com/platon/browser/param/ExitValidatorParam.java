@@ -1,4 +1,4 @@
-package com.platon.browser.dto.json;
+package com.platon.browser.param;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * tyType=1003撤销质押(退出验证人)
  */
 @Data
-public class ExitValidatorDto {
+public class ExitValidatorParam {
     /**
      * 被质押的节点Id(也叫候选人的节点Id)
      */
