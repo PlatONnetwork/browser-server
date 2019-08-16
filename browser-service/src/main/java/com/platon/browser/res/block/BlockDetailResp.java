@@ -12,9 +12,9 @@ public class BlockDetailResp {
     private String nodeName;
     private String nodeId;
     private Long timeDiff;
-    private Long gasLimit;
-    private Long gasUsed;
-    private Long statTxGasLimit;
+    private String gasLimit;
+    private String gasUsed;
+    private String statTxGasLimit;
     private String blockReward;
     private String extraData;
  // 是否第一条

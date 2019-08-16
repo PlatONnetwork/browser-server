@@ -1,6 +1,7 @@
 package com.platon.browser.now.service;
 
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
@@ -17,4 +18,6 @@ public interface BlockService {
 	public BlockDetailResp blockDetails( BlockDetailsReq req);
 	
 	public BlockDetailResp blockDetailNavigate( BlockDetailNavigateReq req);
+	
+	public BlockDownload blockListByNodeIdDownload(String nodeId, String date);
 }
