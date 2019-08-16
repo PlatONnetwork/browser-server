@@ -374,6 +374,8 @@ public class BlockSyncTask {
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+
+
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
             if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));

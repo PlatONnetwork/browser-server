@@ -7,11 +7,16 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.*;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.platon.BaseResponse;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * @Auther: Chendongming
@@ -49,21 +54,14 @@ public class TransactionBean extends TransactionWithBLOBs {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+            List <Log> list =  receipt.getLogs();
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(list.get(0).getData())), BaseResponse.class);
+            if(true == response.status){
+                this.setTxReceiptStatus(1);
+            }else this.setTxReceiptStatus(0);
         }catch (Exception e){
             throw new BeanCreateOrUpdateException("TransactionBean.update() error:"+e.getMessage());
         }
-/*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
-                "0x" != code )
-        {
-            this.setReceiveType("contract");
-        }else
-            this.setReceiveType("account");*/
     }
 
     /**

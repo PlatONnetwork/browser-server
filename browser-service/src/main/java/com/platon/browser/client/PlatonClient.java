@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.Utils;
+import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
@@ -15,6 +17,7 @@ import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.PlatonCall;
@@ -198,9 +201,22 @@ public class PlatonClient {
         return nodes;
     }
 
-
     /**
      * 根据account获取可用余额和锁仓余额
+     * @param addressList
+     * @return
+     * @throws Exception
+     */
+    public BaseResponse<List<RestrictingBalance>> getRestrictingBalance(List<String> addressList) throws Exception {
+        BaseResponse<List<RestrictingBalance>> accounts = getBalance(
+                addressList,
+                GET_RESTRICTINGBALANCE_FUNC_TYPE
+                ).send();
+        return accounts;
+    }
+
+    /**
+     *
      * @return
      * @throws Exception
      */
@@ -223,4 +239,24 @@ public class PlatonClient {
             return response;
         });
     }
+
+    private RemoteCall<BaseResponse<List<RestrictingBalance>>> getBalance(List<String> addresses,int funcType){
+        final Function function = new Function(
+                funcType,
+                Collections.singletonList(new DynamicArray <>(Utils.typeMap(addresses, Utf8String.class))),
+                Collections.emptyList()
+        );
+        return new RemoteCall<>((Callable<BaseResponse<List<RestrictingBalance>>>) () -> {
+            String encodedFunction = PlatOnUtil.invokeEncode(function);
+            PlatonCall ethCall = currentValidWeb3j.platonCall(
+                    Transaction.createEthCallTransaction(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, encodedFunction),
+                    DefaultBlockParameterName.LATEST
+            ).send();
+            String value = ethCall.getValue();
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
+            return response;
+        });
+    }
 }
+

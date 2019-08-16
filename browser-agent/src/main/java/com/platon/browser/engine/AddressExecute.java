@@ -27,28 +27,26 @@ public class AddressExecute {
     @Autowired
     private AddressMapper addressMapper;
 
-    private Map <String, Address> addressMap = new HashMap <>();
-
     private AddressExecuteResult addressExecuteResult = new AddressExecuteResult();
 
     @PostConstruct
     private void init () {
         // 初始化全量数据
         List <Address> addresseList = addressMapper.selectByExample(null);
-        addresseList.forEach(address -> addressMap.put(address.getAddress(), address));
+        addresseList.forEach(address -> addressExecuteResult.getAddressMap().put(address.getAddress(), address));
     }
 
     public void execute ( TransactionBean tx ) {
         //入库前对address进行数据分析统计
-        if (addressMap.get(tx.getFrom()).equals(null) || addressMap.get(tx.getTo()).equals(null)) {
+        if (addressExecuteResult.getAddressMap().get(tx.getFrom()).equals(null) || addressExecuteResult.getAddressMap().get(tx.getTo()).equals(null)) {
             //【全量记录】中未查询到，则新增
             Address address = new Address();
-            if (addressMap.get(tx.getFrom()).equals(null)) {
+            if (addressExecuteResult.getAddressMap().get(tx.getFrom()).equals(null)) {
                 //todo：主动发起交易的都认为是账户地址因为当前川陀版本无wasm
                 address.setAddress(tx.getFrom());
                 address.setType(AddressEnum.ACCOUNT.getCode());
             }
-            if (addressMap.get(tx.getTo()).equals(null)) {
+            if (addressExecuteResult.getAddressMap().get(tx.getTo()).equals(null)) {
                 address.setAddress(tx.getTo());
                 if (InnerContractAddEnum.innerContractList.contains(tx.getTo())) {
                     address.setType(AddressEnum.INNERCONTRACT.getCode());
@@ -83,17 +81,17 @@ public class AddressExecute {
                     break;
             }
             //若为新增address，添加到全量数据map记录中
-            addressMap.put(address.getAddress(), address);
+            addressExecuteResult.getAddressMap().put(address.getAddress(), address);
             //若为新增address，添加到新增Set记录中
             addressExecuteResult.getAddAddress().add(address);
         } else {
             Address address = new Address();
             //【全量记录】中查询到，则更新
-            if (!addressMap.get(tx.getFrom()).equals(null)) {
-                address = addressMap.get(tx.getFrom());
+            if (!addressExecuteResult.getAddressMap().get(tx.getFrom()).equals(null)) {
+                address = addressExecuteResult.getAddressMap().get(tx.getFrom());
             }
-            if (!addressMap.get(tx.getTo()).equals(null)) {
-                address = addressMap.get(tx.getTo());
+            if (!addressExecuteResult.getAddressMap().get(tx.getTo()).equals(null)) {
+                address = addressExecuteResult.getAddressMap().get(tx.getTo());
             }
             address.setTxQty(address.getTxQty() + 1);
             switch (tx.getTypeEnum()) {
@@ -123,7 +121,7 @@ public class AddressExecute {
                     break;
             }
             //若为存在address，更新全量数据map记录中
-            addressMap.put(address.getAddress(), address);
+            addressExecuteResult.getAddressMap().put(address.getAddress(), address);
             //若为存在address，添加到更新Set记录中
             addressExecuteResult.getUpdateAddress().add(address);
         }

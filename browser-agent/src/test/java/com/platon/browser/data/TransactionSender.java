@@ -32,7 +32,7 @@ import java.util.List;
 public class TransactionSender {
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-    private Credentials credentials = WalletUtils.loadCredentials("11111111","D:\\Workspace\\browser-server\\browser-agent\\src\\test\\resources\\wallet.json");
+    private Credentials credentials = WalletUtils.loadCredentials("11111111","D:\\GitWorkspace\\browser-server\\browser-agent\\src\\test\\resources\\wallet.json");
     public TransactionSender() throws IOException, CipherException {}
 
     // 发送转账交易

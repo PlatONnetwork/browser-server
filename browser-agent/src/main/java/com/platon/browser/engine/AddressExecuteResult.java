@@ -3,7 +3,9 @@ package com.platon.browser.engine;
 import com.platon.browser.dao.entity.Address;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,7 +15,7 @@ import java.util.Set;
  */
 @Data
 public class AddressExecuteResult {
-
+    private Map <String, Address> addressMap = new HashMap <>();
     private Set<Address> addAddress =  new HashSet<>();
     private Set<Address> updateAddress = new HashSet <>();
 }
