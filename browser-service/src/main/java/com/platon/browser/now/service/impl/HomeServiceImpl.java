@@ -89,9 +89,9 @@ public class HomeServiceImpl implements HomeService {
 					transactionDetailReq.setTxHash(keyword);
 					try {
 						// 此处调用如果查询不到交易记录会抛出BusinessException异常
-						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
-						result.setType("transaction");
-						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
+//						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
+//						result.setType("transaction");
+//						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
 					} catch (BusinessException be) {
 						log.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
 						BlockExample blockExample = new BlockExample();

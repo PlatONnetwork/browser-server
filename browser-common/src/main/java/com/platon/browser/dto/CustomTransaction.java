@@ -7,13 +7,18 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.*;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.platon.BaseResponse;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +57,19 @@ public class CustomTransaction extends TransactionWithBLOBs {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+            // TODO: 需要与后台商榷交易是否成功的判断标准
+            this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
+            /*List <Log> logs =  receipt.getLogs();
+            if(logs.size()==0){
+                this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+            }else {
+                BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(logs.get(0).getData())), BaseResponse.class);
+                if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                if(response!=null){
+                    if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+                    else this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                }
+            }*/
         }catch (Exception e){
             throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
         }

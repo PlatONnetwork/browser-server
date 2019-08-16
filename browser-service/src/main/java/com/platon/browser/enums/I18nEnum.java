@@ -1,5 +1,7 @@
 package com.platon.browser.enums;
 
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 public enum I18nEnum {
 
     // 通用

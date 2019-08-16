@@ -15,6 +15,7 @@ import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.PlatonCall;
@@ -200,7 +201,7 @@ public class PlatonClient {
 
 
     /**
-     * 根据account获取可用余额和锁仓余额
+     * 根据区块号获取节点列表
      * @return
      * @throws Exception
      */
@@ -222,5 +223,31 @@ public class PlatonClient {
             response.data = JSONUtil.parseArray((String) response.data, Node.class);
             return response;
         });
+    }
+
+    /**
+     * 根据账户地址获取锁仓余额
+     * @param addresses
+     * @return
+     * @throws Exception
+     */
+    public BaseResponse<List<RestrictingBalance>> getRestrictingBalance(String addresses) throws Exception {
+        final Function function = new Function(
+                PlatonClient.GET_RESTRICTINGBALANCE_FUNC_TYPE,
+                //Collections.singletonList(new DynamicArray<>(Utils.typeMap(addresses, Utf8String.class))),
+                Arrays.asList(new Utf8String(addresses)),
+                Collections.emptyList());
+        return new RemoteCall<>((Callable<BaseResponse<List<RestrictingBalance>>>) () -> {
+            String encodedFunction = PlatOnUtil.invokeEncode(function);
+            PlatonCall ethCall = currentValidWeb3j.platonCall(
+                    Transaction.createEthCallTransaction(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, encodedFunction),
+                    DefaultBlockParameterName.LATEST
+            ).send();
+            String value = ethCall.getValue();
+            String a = new String(Numeric.hexStringToByteArray(value));
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
+            return response;
+        }).send();
     }
 }

@@ -3,6 +3,7 @@ package com.platon.browser.controller;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -31,10 +32,10 @@ public class AppDocBlockController implements AppDocBlock {
 	private final Logger logger = LoggerFactory.getLogger(AppDocBlockController.class);
 	
 	@Autowired
-	private I18nUtil i18n;
+	private BlockService blockService;
 	
 	@Autowired
-	private BlockService blockService;
+	private I18nUtil i18n;
 	
 	@Override
 	public RespPage<BlockListResp> blockList(@Valid PageReq req) {

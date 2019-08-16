@@ -17,6 +17,9 @@ import java.util.*;
 public class CustomNode extends Node {
 
      public CustomNode(){
+         Date date = new Date();
+         this.setUpdateTime(date);
+         this.setCreateTime(date);
           /** 初始化默认值 **/
           // 多签举报次数
           this.setStatSlashMultiQty(0);
@@ -35,9 +38,6 @@ public class CustomNode extends Node {
      }
 
      public void initWithNode(org.web3j.platon.bean.Node initData){
-          Date date = new Date();
-          this.setUpdateTime(date);
-          this.setCreateTime(date);
           this.setNodeId(HexTool.prefix(initData.getNodeId()));
      }
 
@@ -45,8 +45,13 @@ public class CustomNode extends Node {
      private List<Slash> slashes = new ArrayList<>();
      private List<NodeOpt> nodeOpts = new ArrayList<>();
 
+    public void initWithStaking(CustomStaking staking) {
+        this.setNodeId(staking.getNodeId());
+        this.setCreateTime(new Date());
+    }
 
-     public enum YesNoEnum{
+
+    public enum YesNoEnum{
           YES(1, "是"),
           NO(2, "否")
           ;

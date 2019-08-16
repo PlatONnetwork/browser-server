@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.param.CreateValidatorParam;
+import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -181,11 +182,13 @@ public class StakingExecute {
          *  1、如果当前质押交易质押的是已经质押过的节点，则:
          *     a、查询节点的有效质押记录（即staking表中status=1的记录），如果存在则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
          *     b、如果节点没有有效质押记录（即staking表中status!=1），则插入一条新的质押记录；
-         *  2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
          */
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         CustomNode node = nodes.get(param.getNodeId());
+        CustomNodeOpt nodeOpt = new CustomNodeOpt();
+        nodeOpt.initWithTransaction(tx);
+        nodeOpt.setNodeId(param.getNodeId());
         if(node!=null){
             logger.error("节点(id={})已经被质押！");
             // 取最近一条质押信息
@@ -206,16 +209,34 @@ public class StakingExecute {
         }
 
         if(node==null){
+            /**
+             * 2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
+             */
             logger.error("节点(id={})未被质押！");
-
+            CustomStaking staking = new CustomStaking();
+            staking.initWithTransactionBean(tx);
+            node = new CustomNode();
+            node.initWithStaking(staking);
+            executeResult.getAddNodes().add(node);
+            executeResult.getAddStakings().add(staking);
         }
+
+        // 设置操作日志
+        nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+        executeResult.getAddNodeOpts().add(nodeOpt);
 
     }
     //修改质押信息(编辑验证人)
     private void execute1001(CustomTransaction tx, BlockChain bc){
         logger.debug("修改质押信息(编辑验证人)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+        // 获取交易入参
+        EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
+        CustomNode node = nodes.get(param.getNodeId());
+        if(node==null){
+            logger.error("节点(id={})不存在,无法更新!",param.getNodeId());
+            return;
+        }
+        //node.set
     }
     //增持质押(增加自有质押)
     private void execute1002(CustomTransaction tx, BlockChain bc){
@@ -246,5 +267,17 @@ public class StakingExecute {
         logger.debug("举报多签(举报验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
+    }
+
+    public TreeMap<String, Staking> getStakingCache () {
+        TreeMap<String, Staking> stakingCache = new TreeMap <>();
+        nodes.forEach((nodeId,node)->node.getStakings().forEach((stakingBlockNumber,staking)->stakingCache.put(staking.getStakingAddr(),staking)));
+        return stakingCache;
+    }
+
+    public TreeMap<String, Delegation> getDelegationCache () {
+        TreeMap<String, Delegation> delegationCache = new TreeMap <>();
+        nodes.forEach((nodeId,node)->node.getStakings().forEach((stakingBlockNumber,staking)->staking.getDelegations().forEach((key,delegation)->delegationCache.put(delegation.getDelegateAddr(),delegation))));
+        return delegationCache;
     }
 }
