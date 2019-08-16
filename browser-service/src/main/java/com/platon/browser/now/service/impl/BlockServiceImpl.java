@@ -10,11 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.BlockExample.Criteria;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.BlockService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.req.PageReq;
+import com.platon.browser.req.newblock.BlockDetailNavigateReq;
+import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newblock.BlockListByNodeIdReq;
+import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
 
 @Service
@@ -22,6 +31,9 @@ public class BlockServiceImpl implements BlockService {
 
 	@Autowired
 	private StatisticCacheService statisticCacheService;
+	
+	@Autowired
+	private BlockMapper blockMapper;
 	
 	@Override
 	public RespPage<BlockListResp> blockList(@Valid PageReq req) {
@@ -52,6 +64,49 @@ public class BlockServiceImpl implements BlockService {
 		page.setTotal(blockEnd.get(0).getNumber());
 		respPage.init(page, lists);
 		return respPage;
+	}
+
+	@Override
+	public RespPage<BlockListResp> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
+		BlockExample blockExample = new BlockExample();
+		blockExample.setOrderByClause("number desc ");
+		Criteria criteria = blockExample.createCriteria();
+		criteria.andNodeIdEqualTo(req.getNodeId());
+		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+		List<Block> blocks = blockMapper.selectByExample(blockExample);
+		RespPage<BlockListResp> respPage = new RespPage<>();
+		List<BlockListResp> lists = new LinkedList<>();
+		for(Block block : blocks) {
+			BlockListResp blockListResp = new BlockListResp();
+			blockListResp.setBlockReward(block.getBlockReward());
+			blockListResp.setGasUsed(block.getGasUsed());
+			blockListResp.setNodeId(block.getNodeId());
+			blockListResp.setNodeName(block.getNodeName());
+			blockListResp.setNumber(block.getNumber());
+			blockListResp.setServerTime(new Date().getTime());
+			blockListResp.setSize(block.getSize());
+			blockListResp.setStatTxGasLimit(block.getStatTxGasLimit());
+			blockListResp.setStatTxQty(block.getStatTxQty());
+			blockListResp.setTimestamp(block.getTimestamp().getTime());
+			lists.add(blockListResp);
+		}
+		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
+		Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
+		page.setTotal(blockEnd.get(0).getNumber());
+		respPage.init(page, lists);
+		return respPage;
+	}
+
+	@Override
+	public BlockDetailResp blockDetails(BlockDetailsReq req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BlockDetailResp blockDetailNavigate(BlockDetailNavigateReq req) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
