@@ -52,13 +52,13 @@ public class SpecialContractApiInvoker {
         BigInteger blockNumber = currentValidWeb3j.platonBlockNumber().send().getBlockNumber();
         logger.error("{}",blockNumber);
         // 查询区块号为1时的结算周期历史验证人列表
-        BaseResponse<List<Node>> historyVerifierList = getHistoryVerifierList(BigInteger.valueOf(240));
+        BaseResponse<List<Node>> historyVerifierList = getHistoryVerifierList(BigInteger.valueOf(0));
         logger.error("{}",historyVerifierList);
         // 查询实时结算验证人列表
         BaseResponse<List<Node>> verifierList = nodeContract.getVerifierList().send();
         logger.error("{}",verifierList);
         // 查询区块号为1时的共识周期历史验证人列表
-        BaseResponse<List<Node>> historyValidatorList = getHistoryValidatorList(BigInteger.valueOf(1));
+        BaseResponse<List<Node>> historyValidatorList = getHistoryValidatorList(BigInteger.valueOf(0));
         logger.error("{}",historyValidatorList);
         // 查询实时共识验证人列表
         BaseResponse<List<Node>> validatorList = nodeContract.getValidatorList().send();

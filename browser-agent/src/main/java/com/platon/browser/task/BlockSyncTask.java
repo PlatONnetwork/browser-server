@@ -114,7 +114,7 @@ public class BlockSyncTask {
             // 如果库里区块为空，则：
             try {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
-                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ONE);
+                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ZERO);
                 if(!validators.isStatusOk()){
                     logger.debug("通过区块号[{}]查询历史共识周期验证人列表为空:{}",BigInteger.ONE,validators.errMsg);
                     logger.debug("查询实时共识周期验证人列表...");
@@ -124,7 +124,7 @@ public class BlockSyncTask {
                 if(validators.isStatusOk()) validators.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
 
                 // 根据区块号0查询结算周期验证人列表并入库
-                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ONE);
+                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ZERO);
                 if(!verifiers.isStatusOk()){
                     logger.debug("通过区块号[{}]查询历史结算周期验证人列表为空:{}",BigInteger.ONE,verifiers.errMsg);
                     logger.debug("查询实时结算周期验证人列表...");
