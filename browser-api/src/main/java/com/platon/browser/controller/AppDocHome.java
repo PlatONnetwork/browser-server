@@ -168,7 +168,7 @@ public interface AppDocHome {
      * @apiDescription
      * 1. 功能：推送最新8条验证人信息<br/>
      * 2. 实现逻辑：<br/>
-     * - 查询mysql中node表<br/>
+     * - 查询mysql中staking表<br/>
      * - 根据状态和是否共识验证人标识来查询
      * - 根据一级排序 质押金+委托总额来排序，二级排序根据版本号进行排序，三级排序根据质押索引倒序
      * - 5s全量推送一次

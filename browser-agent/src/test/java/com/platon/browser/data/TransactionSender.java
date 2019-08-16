@@ -50,19 +50,39 @@ public class TransactionSender {
     // 发送质押交易
     @Test
     public void staking() throws Exception {
-        NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
+
+        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+        try {
+            BaseResponse res = stakingContract.staking("0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                    BigInteger.valueOf(40000),
+                    StakingAmountType.FREE_AMOUNT_TYPE,
+
+                    "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+                    "","cdm","www.baidu.com","baidu",BigInteger.ZERO).send();
+            logger.debug("res:{}",res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        /*NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
         BaseResponse<List<Node>> response = nodeContract.getVerifierList().send();
         if(response.isStatusOk()){
             StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
-            response.data.forEach(node->{
+            try {
+                BaseResponse res = stakingContract.staking(node.getNodeId(), BigInteger.valueOf(40000), StakingAmountType.FREE_AMOUNT_TYPE,node.getBenifitAddress(),node.getExternalId(),node.getNodeName(),node.getWebsite(),node.getDetails(),node.getProgramVersion()).send();
+                logger.debug("res:{}",res);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            *//*response.data.forEach(node->{
                 try {
                     BaseResponse res = stakingContract.staking(node.getNodeId(), BigInteger.valueOf(40000), StakingAmountType.FREE_AMOUNT_TYPE,node.getBenifitAddress(),node.getExternalId(),node.getNodeName(),node.getWebsite(),node.getDetails(),node.getProgramVersion()).send();
                     logger.debug("res:{}",res);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            });
-        }
+            });*//*
+        }*/
     }
 
     // 发送委托交易
