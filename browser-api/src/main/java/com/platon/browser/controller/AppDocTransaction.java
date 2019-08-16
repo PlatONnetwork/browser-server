@@ -211,6 +211,7 @@ public interface AppDocTransaction {
      *        --交易基本信息结束
      *        --可选信息开始
      *       "RPAccount":"",           //锁仓计划的地址
+     *       "RPNum":"",				//锁仓数量
      *       "RPPlan":[
      *          {
      *             "epoch":11,         //锁仓周期
@@ -240,7 +241,7 @@ public interface AppDocTransaction {
      *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
      *       "proposalNewVersion":"",  //升级提案的版本
      *       "declareVersion":"",      //声明的版本 
-     *       "txReceiptStatus":"",     //交易状态
+     *       "txReceiptStatus":"",     //交易状态 1:成功 2：失败
      *        --可选信息结束
      * }
      */	

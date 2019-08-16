@@ -11,7 +11,7 @@ public class BlockListResp {
     private Integer size;
     private String nodeName;
     private String nodeId;
-    private Long gasUsed;
+    private String gasUsed;
     private Long statTxGasLimit;
     private String blockReward;
 }

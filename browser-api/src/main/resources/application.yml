@@ -7,7 +7,7 @@ server:
     context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles.active: testb
+  profiles.active: dev
   application.name: browser-api
   #国际化配置
   messages.basename: messages
@@ -28,8 +28,49 @@ spring:
     #driver-class-name: com.mysql.jdbc.Driver
 # Platon配置
 platon:
-  # 链配置格式 [chainName]-[chainId]-[http://nodeIP:port]，多个链配置使用逗号分隔
-  chain.config: ${chain.config}
+  web3j:
+    addresses: ${web3j.addresses}
+    collect.batch-size: ${web3j.collect.batch-size}
+  config:
+    chainId: ${platonconfig.chain_id}
+    # 增发周期
+    addIssuePeriod: ${platonconfig.add_issue_period}
+    #结算周期
+    settingPeriod: ${platonconfig.setting_period}
+    #共识周期
+    consensusPeriod: ${platonconfig.consensus_period}
+    #增发率
+    addIssueRate: ${platonconfig.add_issue_rate}
+    #出块激励比例
+    blockRewardRate: ${platonconfig.add_issue_rate}
+    #质押激励比例
+    stakingRewardRate:  ${platonconfig.staking_reward_rate}
+    #初始发行金额
+    initIssueValue: ${platonconfig.init_issue_value}
+    #激励合约地址
+    rewardAddr: ${platonconfig.reward_addr}
+    #质押合约地址
+    stakingAddr: ${platonconfig.staking_addr}
+    #锁仓合约地址
+    restrictingAddr: ${platonconfig.restricting_addr}
+    #质押门槛
+    stakeThreshold: ${platonconfig.stake_threshold}
+    #委托门槛
+    minimumThreshold: ${platonconfig.minimum_threshold}
+    #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
+    electionDistance: ${platonconfig.election_distance}
+    #投票数百分比下限
+    supportRateThreshold: ${platonconfig.support_rate_threshold}
+    #双签低处罚金额，百分比
+    duplicateSignLowSlashing: ${platonconfig.duplicate_sign_low_slashing}
+    #每个共识轮低异常的出块数
+    packAmountAbnormal: ${platonconfig.pack_amount_abnormal}
+    #每个共识轮高异常的出块数
+    packAmountHighAbnormal: ${platonconfig.pack_amount_high_abnormal}
+    #每个共识轮低异常出块数的处罚额度，百分比
+    packAmountLowSlashRate: ${platonconfig.pack_amount_low_slash_rate}
+    #每个共识轮高异常出块数的处罚额度，百分比
+    packAmountHighSlashRate: ${platonconfig.pack_amount_high_slash_rate}
   fake.location.filename: fakelocation-${version}-${profile}.json
   # 区块列表缓存和交易列表缓存配置
   redis:

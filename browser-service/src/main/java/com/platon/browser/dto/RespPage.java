@@ -19,9 +19,9 @@ public class RespPage<T> {
     //总页数
     private long totalPages;
     // 响应数据
-    private List<T> data= Collections.EMPTY_LIST;
+    private List<T> data= Collections.emptyList();
 
-    public void init(Page page, List<T> data){
+    public void init(Page<?> page, List<T> data){
         this.setTotalCount(page.getTotal());
         this.setTotalPages(page.getPages());
         this.setDisplayTotalCount(page.getTotal());
