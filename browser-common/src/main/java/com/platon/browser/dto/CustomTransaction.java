@@ -7,13 +7,18 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.*;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.platon.BaseResponse;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +57,11 @@ public class CustomTransaction extends TransactionWithBLOBs {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            this.setTxReceiptStatus(receipt.isStatusOK()?1:0);
+            List <Log> list =  receipt.getLogs();
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(list.get(0).getData())), BaseResponse.class);
+            if(true == response.status){
+                this.setTxReceiptStatus(1);
+            }else this.setTxReceiptStatus(0);
         }catch (Exception e){
             throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
         }

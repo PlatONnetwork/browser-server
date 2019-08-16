@@ -2,6 +2,8 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
@@ -15,7 +17,6 @@ import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
-import com.platon.browser.service.StatisticsService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -50,8 +51,6 @@ public class BlockSyncTask {
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService service;
-    @Autowired
-    private StatisticsService statisticsService;
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
@@ -177,8 +176,12 @@ public class BlockSyncTask {
             // 对区块和交易做分析
             analyzeBlockAndTransaction(blocks);
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            blocks.forEach(block -> blockChain.execute(block));
+            blocks.forEach(block ->blockChain.execute(block));
+            //获取内存中全量质押和委托信息，用于地址相关统计数据
 
+            TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
+            TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
+            blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainResult bizData = blockChain.exportResult();
@@ -350,6 +353,8 @@ public class BlockSyncTask {
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+
+
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
             if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
@@ -365,9 +370,7 @@ public class BlockSyncTask {
 
     public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
         try{
-            //todo：address数据补全，统计数据批次统计
-            statisticsService.addressInfoUpdate(basicData,bizData);
-            statisticsService.statisticsUpdate(basicData,bizData);
+
             // 串行批量入库
             service.insertOrUpdateChainInfo(basicData,bizData);
         }catch (Exception e){

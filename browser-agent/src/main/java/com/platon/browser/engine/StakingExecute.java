@@ -267,4 +267,16 @@ public class StakingExecute {
         // TODO: 修改验证人列表
         // 修改验证人列表
     }
+
+    public TreeMap<String, Staking> getStakingCache () {
+        TreeMap<String, Staking> stakingCache = new TreeMap <>();
+        nodes.forEach((nodeId,node)->node.getStakings().forEach((stakingBlockNumber,staking)->stakingCache.put(staking.getStakingAddr(),staking)));
+        return stakingCache;
+    }
+
+    public TreeMap<String, Delegation> getDelegationCache () {
+        TreeMap<String, Delegation> delegationCache = new TreeMap <>();
+        nodes.forEach((nodeId,node)->node.getStakings().forEach((stakingBlockNumber,staking)->staking.getDelegations().forEach((key,delegation)->delegationCache.put(delegation.getDelegateAddr(),delegation))));
+        return delegationCache;
+    }
 }

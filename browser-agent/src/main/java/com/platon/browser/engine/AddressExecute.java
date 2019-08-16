@@ -1,7 +1,10 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.AddressEnum;
 import com.platon.browser.enums.InnerContractAddEnum;
@@ -11,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * User: dongqile
@@ -27,9 +32,9 @@ public class AddressExecute {
     @Autowired
     private AddressMapper addressMapper;
 
-    private Map <String, Address> addressMap = new HashMap <>();
+    private AddressExecuteResult addressExecuteResult = new AddressExecuteResult();
 
-    private AddressExecuteResult addressExecuteResult = BlockChain.BIZ_DATA.getAddressExecuteResult();
+    private Map <String, Address> addressMap = new HashMap <>();
 
     @PostConstruct
     private void init () {
@@ -136,7 +141,28 @@ public class AddressExecute {
     }
 
     public void commitResult () {
-        addressExecuteResult.clear();
+        addressExecuteResult.getAddAddress().clear();
+        addressExecuteResult.getUpdateAddress().clear();
     }
+/*
+    public void statisticsAddressInfo ( TreeMap <String, Staking> stakingCache, TreeMap <String, Delegation> delegationCache ) {
+        //新增
+        addressExecuteResult.getAddAddress().forEach(address -> {
+            //统计质押
+            //地址的质押金 = 该地址质押过的全部节点的质押金（犹豫期+锁定期）
+            Map.Entry <String, Staking> lastEntry = stakingCache.lastEntry();
+            BigInteger stakingValue = new BigInteger(lastEntry.getValue().getStakingHas()).add(new BigInteger(lastEntry.getValue().getStakingLocked()));
+            address.setStakingValue(new BigInteger(address.getStakingValue()).add(stakingValue).toString());
 
-}
+            //统计委托
+            //地址的委托金 = 该地址全部委托的的金额汇总（犹豫期+锁定期）
+            delegationCache.forEach(( k, v ) -> {
+                if (k.equals(address)) {
+
+                });
+                BigInteger delegationValue = new BigInteger("");
+            });
+            //更新
+
+        }*/
+    }
