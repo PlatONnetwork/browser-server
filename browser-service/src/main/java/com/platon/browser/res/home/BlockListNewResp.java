@@ -9,6 +9,6 @@ public class BlockListNewResp {
 	private Long serverTime; // 服务器时间
 	private String nodeId; // 出块节点id
 	private String nodeName; // 出块节点名称
-	private Long statTxQty; // 交易数
+	private Integer statTxQty; // 交易数
 
 }

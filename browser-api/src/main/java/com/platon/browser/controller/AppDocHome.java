@@ -1,5 +1,7 @@
 package com.platon.browser.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
@@ -156,7 +158,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/list/new", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/list/new")
-	public BaseResp<BlockListNewResp> blockListNew();
+	public BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
      * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
@@ -189,5 +191,5 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
-	public BaseResp<StakingListNewResp> stakingListNew();
+	public BaseResp<List<StakingListNewResp>> stakingListNew();
 }

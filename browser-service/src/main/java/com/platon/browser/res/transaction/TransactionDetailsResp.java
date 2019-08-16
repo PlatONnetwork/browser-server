@@ -26,6 +26,7 @@ public class TransactionDetailsResp {
     private Boolean last;              //是否最后一条记录
     private String receiveType;  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
     private String RPAccount;           //锁仓计划的地址
+    private String RPNum;
     private List<TransactionDetailsRPPlanResp> RPPlan;
     private List<TransactionDetailsEvidencesResp> evidences;
     private String nodeId;              //节点id
