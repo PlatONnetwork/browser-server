@@ -283,7 +283,6 @@ public class BlockSyncTask {
      * 并行分析区块
      */
     private void analyzeBlockAndTransaction ( List <BlockBean> blocks ) {
-
         // 对需要复杂分析的区块或交易信息，开启并行处理
         blocks.forEach(b -> {
             List <TransactionBean> txList = b.getTransactionList();
@@ -306,8 +305,7 @@ public class BlockSyncTask {
             }
         });
 
-
-        // 汇总统计信息
+        // 汇总区块相关的统计信息
         class Stat {
             int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
             BigDecimal txFee = BigDecimal.ZERO;
@@ -316,7 +314,7 @@ public class BlockSyncTask {
             Stat stat = new Stat();
             block.getTransactionList().forEach(ti->{
                 switch (ti.getTypeEnum()){
-                    case TRANSFER:
+                    case TRANSFER: // 转账交易数总和
                         stat.transferQty++;
                         break;
                     case CREATEPROPOSALPARAMETER:// 创建参数提案
@@ -324,23 +322,23 @@ public class BlockSyncTask {
                     case CREATEPROPOSALUPGRADE:// 创建升级提案
                     case DECLAREVERSION:// 版本声明
                     case VOTINGPROPOSAL:// 提案投票
-                        stat.proposalQty++;
+                        stat.proposalQty++; // 提案交易数总和
                         break;
                     case DELEGATE:// 发起委托
                     case UNDELEGATE:// 撤销委托
-                        stat.delegateQty++;
+                        stat.delegateQty++; // 委托交易数总和
                         break;
                     case INCREASESTAKING:// 增加自有质押
                     case CREATEVALIDATOR:// 创建验证人
                     case EXITVALIDATOR:// 退出验证人
                     case REPORTVALIDATOR:// 举报验证人
                     case EDITVALIDATOR:// 编辑验证人
-                        stat.stakingQty++;
+                        stat.stakingQty++; // 质押交易数总和
                         break;
                 }
-                // 累加交易手续费
+                // 累加当前区块内所有交易的手续费
                 stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
-                // 累加交易gasLimit
+                // 累加当前区块内所有交易的GasLimit
                 stat.txGasLimit = stat.txGasLimit+Integer.valueOf(ti.getGasLimit());
             });
             block.setStatDelegateQty(stat.delegateQty);
