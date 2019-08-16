@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomDelegationMapper">
 
-  <resultMap id="BaseResultMap" type="com.platon.browser.dto.DelegationBean" extends="com.platon.browser.dao.mapper.DelegationMapper.BaseResultMap"/>
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomDelegation" extends="com.platon.browser.dao.mapper.DelegationMapper.BaseResultMap"/>
 
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select
@@ -15,4 +15,50 @@
     <include refid="com.platon.browser.dao.mapper.DelegationMapper.Base_Column_List" />
     from delegation where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
+
+  <!--批量选择性插入或更新-->
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into delegation (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'delegate_addr'.toString() == column.value">
+          #{item.delegateAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_has'.toString() == column.value">
+          #{item.delegateHas,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_locked'.toString() == column.value">
+          #{item.delegateLocked,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_reduction'.toString() == column.value">
+          #{item.delegateReduction,jdbcType=VARCHAR}
+        </if>
+        <if test="'is_history'.toString() == column.value">
+          #{item.isHistory,jdbcType=INTEGER}
+        </if>
+        <if test="'sequence'.toString() == column.value">
+          #{item.sequence,jdbcType=BIGINT}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
 </mapper>

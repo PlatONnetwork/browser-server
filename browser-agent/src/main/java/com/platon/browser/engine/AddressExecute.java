@@ -2,7 +2,7 @@ package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dto.TransactionBean;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.AddressEnum;
 import com.platon.browser.enums.InnerContractAddEnum;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class AddressExecute {
 
     private Map <String, Address> addressMap = new HashMap <>();
 
-    private AddressExecuteResult addressExecuteResult = new AddressExecuteResult();
+    private AddressExecuteResult addressExecuteResult = BlockChain.BIZ_DATA.getAddressExecuteResult();
 
     @PostConstruct
     private void init () {
@@ -38,7 +38,7 @@ public class AddressExecute {
         addresseList.forEach(address -> addressMap.put(address.getAddress(), address));
     }
 
-    public void execute ( TransactionBean tx ) {
+    public void execute ( CustomTransaction tx ) {
         //入库前对address进行数据分析统计
         if (addressMap.get(tx.getFrom()).equals(null) || addressMap.get(tx.getTo()).equals(null)) {
             //【全量记录】中未查询到，则新增
@@ -136,8 +136,7 @@ public class AddressExecute {
     }
 
     public void commitResult () {
-        addressExecuteResult.getAddAddress().clear();
-        addressExecuteResult.getUpdateAddress().clear();
+        addressExecuteResult.clear();
     }
 
 }

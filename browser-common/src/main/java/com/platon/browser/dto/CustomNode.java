@@ -6,11 +6,7 @@ import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -18,9 +14,9 @@ import java.util.TreeMap;
  * @Description:
  */
 @Data
-public class NodeBean extends Node {
+public class CustomNode extends Node {
 
-     public NodeBean(){
+     public CustomNode(){
           /** 初始化默认值 **/
           // 多签举报次数
           this.setStatSlashMultiQty(0);
@@ -45,8 +41,30 @@ public class NodeBean extends Node {
           this.setNodeId(HexTool.prefix(initData.getNodeId()));
      }
 
-     private TreeMap<Long, StakingBean> stakings = new TreeMap<>();
+     private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
      private List<Slash> slashes = new ArrayList<>();
      private List<NodeOpt> nodeOpts = new ArrayList<>();
+
+
+     public enum YesNoEnum{
+          YES(1, "是"),
+          NO(2, "否")
+          ;
+          public int code;
+          public String desc;
+          YesNoEnum(int code, String desc) {
+               this.code = code;
+               this.desc = desc;
+          }
+          public int getCode(){return code;}
+          public String getDesc(){return desc;}
+          private static Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
+          static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+          public static YesNoEnum getEnum(Integer code){
+               return ENUMS.get(code);
+          }
+          public static boolean contains(int code){return ENUMS.containsKey(code);}
+          public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
+     }
 
 }

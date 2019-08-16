@@ -1,15 +1,10 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.BlockBean;
-import com.platon.browser.dto.NodeBean;
-import com.platon.browser.dto.StakingBean;
-import com.platon.browser.enums.TxTypeEnum;
+import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.service.DbService;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -38,13 +33,16 @@ public class BlockChain {
 
     private Map<String,Long> nodeIdToBlockCountMap = new HashMap<>();
 
-    private BlockChainResult execResult = new BlockChainResult();
+    public static final BlockChainResult BIZ_DATA = new BlockChainResult();
+
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
     private StakingExecute stakingExecute;
     @Autowired
     private ProposalExecute proposalExecute;
+    @Autowired
+    private AddressExecute addressExecute;
 
     @Autowired
     private NodeMapper nodeMapper;
@@ -53,9 +51,6 @@ public class BlockChain {
 
     @Autowired
     private DbService dbService;
-    @Autowired
-    private AddressExecute addressExecute;
-
 
     @Autowired
     private PlatonClient client;
@@ -63,7 +58,7 @@ public class BlockChain {
     private long curSettingEpoch;
     private long curConsensusEpoch;
     private long addIssueEpoch;
-    private BlockBean curBlock;
+    private CustomBlock curBlock;
     private long transactionCount;
 
 
@@ -90,9 +85,7 @@ public class BlockChain {
      * 执行区块
      * @param block
      */
-
-
-    public void execute(BlockBean block){
+    public void execute(CustomBlock block){
 
         //累加区块中的交易总数
         transactionCount = transactionCount + block.getTransactionList().size();
@@ -113,6 +106,9 @@ public class BlockChain {
 
         // 分析交易信息
         analyzeTransaction();
+
+        // 更新node表中的节点出块数信息
+        stakingExecute.updateNodeStatBlockQty(curBlock.getNodeId());
     }
 
     /**
@@ -211,6 +207,9 @@ public class BlockChain {
         curBlock.getTransactionList().forEach(tx -> {
             // 地址相关
 
+            // 链上执行失败的交易不予处理
+            if(CustomTransaction.TxReceiptStatusEnum.FAILURE.code==tx.getTxReceiptStatus()) return;
+
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()){
                 case CREATE_VALIDATOR: // 创建验证人
@@ -221,28 +220,6 @@ public class BlockChain {
                 case UN_DELEGATE: // 撤销委托
                 case REPORT_VALIDATOR: // 举报多签验证人
                     stakingExecute.execute(tx,this);
-                    StakingExecuteResult ser = stakingExecute.exportResult();
-                    StakingExecuteResult serSummary = execResult.getStakingExecuteResult();
-                    // 汇总添加【节点】记录
-                    serSummary.getAddNodes().addAll(ser.getAddNodes());
-                    // 汇总更新【节点】记录
-                    serSummary.getUpdateNodes().addAll(ser.getUpdateNodes());
-                    // 汇总添加【惩罚】记录
-                    serSummary.getAddSlash().addAll(ser.getAddSlash());
-                    // 汇总添加【节点操作】记录
-                    serSummary.getAddNodeOpts().addAll(ser.getAddNodeOpts());
-                    // 汇总添加【委托】记录
-                    serSummary.getAddDelegations().addAll(ser.getAddDelegations());
-                    // 汇总更新【委托】记录
-                    serSummary.getUpdateDelegations().addAll(ser.getUpdateDelegations());
-                    // 汇总添加【撤销委托】记录
-                    serSummary.getAddUnDelegations().addAll(ser.getAddUnDelegations());
-                    // 汇总更新【撤销委托】记录
-                    serSummary.getUpdateUnDelegations().addAll(ser.getUpdateUnDelegations());
-                    // 汇总添加【质押】记录
-                    serSummary.getAddStakings().addAll(ser.getAddStakings());
-                    // 汇总更新【质押】记录
-                    serSummary.getUpdateStakings().addAll(ser.getUpdateStakings());
                     break;
                 case CREATE_PROPOSAL_TEXT: // 创建文本提案
                 case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
@@ -250,14 +227,6 @@ public class BlockChain {
                 case VOTING_PROPOSAL: // 给提案投票
                 case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx,this);
-                    ProposalExecuteResult per = proposalExecute.exportResult();
-                    ProposalExecuteResult perSummary = execResult.getProposalExecuteResult();
-                    // 汇总添加【提案】记录
-                    perSummary.getAddProposals().addAll(per.getAddProposals());
-                    // 汇总更新【提案】记录
-                    perSummary.getUpdateProposals().addAll(per.getUpdateProposals());
-                    // 汇总添加【提案投票】记录
-                    perSummary.getAddVotes().addAll(per.getAddVotes());
                     break;
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})",tx.getHash(),tx.getTo());
@@ -301,11 +270,11 @@ public class BlockChain {
 
 
     /**
-     * 导出需要入库的数据
+     * 导出需要入库的业务数据
      * @return
      */
     public BlockChainResult exportResult(){
-        return execResult;
+        return BIZ_DATA;
     }
 
     public void commitResult(){

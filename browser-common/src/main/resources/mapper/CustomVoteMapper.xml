@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomVoteMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomVote" extends="com.platon.browser.dao.mapper.VoteMapper.BaseResultMap"/>
+
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into vote (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'verifier_name'.toString() == column.value">
+          #{item.verifierName,jdbcType=VARCHAR}
+        </if>
+        <if test="'verifier'.toString() == column.value">
+          #{item.verifier,jdbcType=VARCHAR}
+        </if>
+        <if test="'option'.toString() == column.value">
+          #{item.option,jdbcType=VARCHAR}
+        </if>
+        <if test="'proposal_hash'.toString() == column.value">
+          #{item.proposalHash,jdbcType=VARCHAR}
+        </if>
+        <if test="'timestamp'.toString() == column.value">
+          #{item.timestamp,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

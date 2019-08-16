@@ -3,7 +3,7 @@ package com.platon.browser.engine;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dto.TransactionBean;
+import com.platon.browser.dto.CustomTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class ProposalExecute {
     @Autowired
     private PlatonClient client;
 
-    private ProposalExecuteResult executeResult = new ProposalExecuteResult();
+    private ProposalExecuteResult executeResult = BlockChain.BIZ_DATA.getProposalExecuteResult();
 
     @PostConstruct
     private void init(){
@@ -47,7 +47,7 @@ public class ProposalExecute {
      * @param tx
      * @param bc
      */
-    public void execute(TransactionBean tx, BlockChain bc){
+    public void execute(CustomTransaction tx, BlockChain bc){
 
         switch (tx.getTypeEnum()){
             case CREATE_PROPOSAL_TEXT://提交文本提案(创建提案)
@@ -70,29 +70,30 @@ public class ProposalExecute {
         return executeResult;
     }
 
+    /**
+     * 清除待入库或待更新缓存，需要在入库后调用
+     */
     public void commitResult(){
-        executeResult.getUpdateProposals().clear();
-        executeResult.getAddProposals().clear();
-        executeResult.getAddVotes().clear();
+        executeResult.clear();
     }
 
-    private void updateTxInfo(TransactionBean tx, BlockChain bc){
+    private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
     //提交文本提案(创建提案)
-    private void execute2000(TransactionBean tx, BlockChain bc){
+    private void execute2000(CustomTransaction tx, BlockChain bc){
 
     }
     //提交升级提案(创建提案)
-    private void execute2001(TransactionBean tx, BlockChain bc){
+    private void execute2001(CustomTransaction tx, BlockChain bc){
 
     }
     //提交参数提案(创建提案)
-    private void execute2002(TransactionBean tx, BlockChain bc){
+    private void execute2002(CustomTransaction tx, BlockChain bc){
 
     }
     //给提案投票(提案投票)
-    private void execute2003(TransactionBean tx, BlockChain bc){
+    private void execute2003(CustomTransaction tx, BlockChain bc){
 
     }
     public void checkProposalStatus(){
