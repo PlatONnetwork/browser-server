@@ -14,7 +14,12 @@ import java.util.*;
 @Data
 public class ProposalExecuteResult {
     // 插入或更新数据
-    private List<Vote> addVotes = new ArrayList<>();
     private Set<Proposal> addProposals = new HashSet<>();
     private Set<Proposal> updateProposals = new HashSet<>();
+    private Set<Vote> addVotes = new HashSet<>();
+    public void clear() {
+        addProposals.clear();
+        updateProposals.clear();
+        addVotes.clear();
+    }
 }

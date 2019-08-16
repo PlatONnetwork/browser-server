@@ -16,4 +16,9 @@ public class AddressExecuteResult {
 
     private Set<Address> addAddress =  new HashSet<>();
     private Set<Address> updateAddress = new HashSet <>();
+
+    public void clear() {
+        addAddress.clear();
+        updateAddress.clear();
+    }
 }

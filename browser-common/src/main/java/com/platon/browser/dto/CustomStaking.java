@@ -17,9 +17,9 @@ import java.util.Map;
  * @Description:
  */
 @Data
-public class StakingBean extends Staking {
+public class CustomStaking extends Staking {
 
-    public StakingBean() {
+    public CustomStaking() {
         /** 初始化默认值 **/
         // 质押金额(犹豫期金额)
         this.setStakingHas("0");
@@ -61,7 +61,7 @@ public class StakingBean extends Staking {
     }
 
     // <质押块高-质押记录> 映射
-    private Map<String, DelegationBean> delegations = new HashMap<>();
+    private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     // staking与delegation的关联键
     public String getStakingMapKey(){
@@ -94,7 +94,7 @@ public class StakingBean extends Staking {
         this.setWebSite(initData.getWebsite());
     }
 
-    public void initWithTransactionBean(TransactionBean initData){
+    public void initWithTransactionBean(CustomTransaction initData){
         BeanUtils.copyProperties(initData,this);
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址

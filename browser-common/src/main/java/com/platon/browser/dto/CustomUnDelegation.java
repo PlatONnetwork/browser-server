@@ -9,7 +9,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class UnDelegationBean extends UnDelegation {
+public class CustomUnDelegation extends UnDelegation {
 
     public String getDelegationMapKey(){
         return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
