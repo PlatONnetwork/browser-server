@@ -187,8 +187,8 @@ public class StakingExecute {
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         CustomNode node = nodes.get(param.getNodeId());
         CustomNodeOpt nodeOpt = new CustomNodeOpt();
+        nodeOpt.initWithTransaction(tx);
         nodeOpt.setNodeId(node.getNodeId());
-        nodeOpt.setBlockNumber(tx.getBlockNumber());
         if(node!=null){
             logger.error("节点(id={})已经被质押！");
             // 取最近一条质押信息
@@ -205,9 +205,6 @@ public class StakingExecute {
                 node.getStakings().put(tx.getBlockNumber(),newStaking);
                 // 把最新质押信息添加至待入库列表
                 executeResult.getAddStakings().add(newStaking);
-
-                // 设置操作日志
-                nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
             }
         }
 
@@ -223,6 +220,10 @@ public class StakingExecute {
             executeResult.getAddNodes().add(node);
             executeResult.getAddStakings().add(staking);
         }
+
+        // 设置操作日志
+        nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+        executeResult.getAddNodeOpts().add(nodeOpt);
 
     }
     //修改质押信息(编辑验证人)

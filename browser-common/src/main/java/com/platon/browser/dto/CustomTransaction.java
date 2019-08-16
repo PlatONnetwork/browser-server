@@ -57,11 +57,19 @@ public class CustomTransaction extends TransactionWithBLOBs {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            List <Log> list =  receipt.getLogs();
-            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(list.get(0).getData())), BaseResponse.class);
-            if(true == response.status){
-                this.setTxReceiptStatus(1);
-            }else this.setTxReceiptStatus(0);
+            // TODO: 需要与后台商榷交易是否成功的判断标准
+            this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
+            /*List <Log> logs =  receipt.getLogs();
+            if(logs.size()==0){
+                this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+            }else {
+                BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(logs.get(0).getData())), BaseResponse.class);
+                if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                if(response!=null){
+                    if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+                    else this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                }
+            }*/
         }catch (Exception e){
             throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
         }
