@@ -15,7 +15,7 @@
   </select>
 
   <!--批量选择性插入或更新-->
-  <insert id="batchInsertSelective" parameterType="map">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into node_opt (
     <foreach collection="selective" item="column" separator=",">
       ${column.escapedColumnName}

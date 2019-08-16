@@ -188,7 +188,7 @@ public class StakingExecute {
         CustomNode node = nodes.get(param.getNodeId());
         CustomNodeOpt nodeOpt = new CustomNodeOpt();
         nodeOpt.initWithTransaction(tx);
-        nodeOpt.setNodeId(node.getNodeId());
+        nodeOpt.setNodeId(param.getNodeId());
         if(node!=null){
             logger.error("节点(id={})已经被质押！");
             // 取最近一条质押信息
