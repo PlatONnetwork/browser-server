@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -200,7 +201,6 @@ public class PlatonClient {
 
     /**
      * 根据account获取可用余额和锁仓余额
-     * @param account
      * @return
      * @throws Exception
      */
@@ -208,8 +208,8 @@ public class PlatonClient {
     private RemoteCall<BaseResponse<List<Node>>> nodeCall(BigInteger blockNumber,int funcType) {
         final Function function = new Function(
                 funcType,
-                Arrays.asList(new Uint256(blockNumber)),
-                Arrays.asList(new TypeReference<Utf8String>() {})
+                Collections.singletonList(new Uint256(blockNumber)),
+                Collections.singletonList(new TypeReference<Utf8String>() {})
         );
         return new RemoteCall<>((Callable<BaseResponse<List<Node>>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);

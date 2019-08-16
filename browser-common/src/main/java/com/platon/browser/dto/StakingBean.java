@@ -6,6 +6,7 @@ import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class StakingBean extends Staking {
         this.setWebSite(initData.getWebsite());
     }
 
-    public void initWithCreateValidatorDto(TransactionBean initData){
+    public void initWithTransactionBean(TransactionBean initData){
         BeanUtils.copyProperties(initData,this);
         this.setStakingTxIndex(initData.getTransactionIndex());
         // 发起质押的账户地址
@@ -101,5 +102,50 @@ public class StakingBean extends Staking {
         // 质押金额(犹豫期金额)
         this.setStakingHas(initData.getValue());
         this.setStakingName(initData.getTxParam(CreateValidatorParam.class).getNodeName());
+    }
+
+
+    public enum StatusEnum{
+        CANDIDATE(1, "候选中"),
+        EXITING(2, "退出中"),
+        EXITED(3, "已退出")
+        ;
+        public int code;
+        public String desc;
+        StatusEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static Map<Integer, StatusEnum> ENUMS = new HashMap<>();
+        static {
+            Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static StatusEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(StatusEnum en){return ENUMS.containsValue(en);}
+    }
+
+    public enum YesNoEnum{
+        YES(1, "是"),
+        NO(2, "否")
+        ;
+        public int code;
+        public String desc;
+        YesNoEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
+        static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static YesNoEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
     }
 }

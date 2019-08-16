@@ -3,8 +3,10 @@ package com.platon.browser.engine;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
+import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -161,19 +163,38 @@ public class StakingExecute {
         logger.debug("发起质押(创建验证人)");
 
         /** 业务逻辑说明：
-         *  1、如果当前质押交易质押的是已经质押过的节点，则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
+         *  1、如果当前质押交易质押的是已经质押过的节点，则:
+         *     a、查询节点的有效质押记录（即staking表中status=1的记录），如果存在则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
+         *     b、如果节点没有有效质押记录（即staking表中status!=1），则插入一条新的质押记录；
          *  2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
          */
         // 获取交易入参
-        //CreateValidatorParam param = tx.getTxJson(CreateValidatorParam.class);
+        CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
+        NodeBean node = nodes.get(param.getNodeId());
+        if(node!=null){
+            logger.error("节点(id={})已经被质押！");
+            // 取最近一条质押信息
+            Map.Entry<Long,StakingBean> lastEntry = node.getStakings().lastEntry();
+            StakingBean latestStaking = lastEntry.getValue();
+            if(latestStaking.getStatus()!=StakingBean.StatusEnum.CANDIDATE.code){
+                // 如果当前节点最新质押信息无效，则添加一条质押信息
+                StakingBean newStaking = new StakingBean();
+                // 把旧质押信息复制至新质押
+                BeanUtils.copyProperties(latestStaking,newStaking);
+                // 使用最新的质押交易信息覆盖相关信息
+                newStaking.initWithTransactionBean(tx);
+                // 把最新质押信息添加至缓存
+                node.getStakings().put(tx.getBlockNumber(),newStaking);
+                // 把最新质押信息添加至待入库列表
+                executeResult.getAddStakings().add(newStaking);
+            }
+        }
 
-        StakingBean staking = new StakingBean();
-        staking.initWithCreateValidatorDto(tx);
+        if(node==null){
+            logger.error("节点(id={})未被质押！");
 
+        }
 
-
-        // TODO: 修改验证人列表
-        // 修改验证人列表
     }
     //修改质押信息(编辑验证人)
     private void execute1001(TransactionBean tx, BlockChain bc){
