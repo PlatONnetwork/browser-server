@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.param.CreateValidatorParam;
+import com.platon.browser.param.DelegateParam;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -251,6 +253,27 @@ public class StakingExecute {
     }
     // 发起委托(委托)
     private void execute1004(CustomTransaction tx, BlockChain bc){
+        DelegateParam param = tx.getTxParam(DelegateParam.class);
+        CustomNode node = nodes.get(param.getNodeId());
+
+        //通过nodeId+质押块高获取唯一质押对象
+        CustomStaking customStaking = node.getStakings().get(param.getNodeId()+param.getStakingBlockNum());
+        //通过委托地址+nodeId+质押块高获取委托对象
+        CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom()+param.getNodeId()+param.getStakingBlockNum());
+
+        //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
+        //更新犹豫期金额
+        if(customDelegation!=null){
+            customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
+            customStaking.getDelegations().put(tx.getFrom()+param.getNodeId()+param.getStakingBlockNum(),customDelegation);
+        }
+
+        //若不存在，则说明该地址有对此节点做过委托
+        if(customDelegation==null){
+            CustomDelegation newCustomDelegation = new CustomDelegation();
+            newCustomDelegation.initWithDelegation(param,tx.getTransactionIndex());
+            customStaking.getDelegations().put(param.getNodeId()+param.getStakingBlockNum(),newCustomDelegation);
+        }
         logger.debug("撤销质押(退出验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表

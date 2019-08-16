@@ -181,7 +181,7 @@ public class BlockSyncTask {
 
             TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
             TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
-            blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
+            //blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainResult bizData = blockChain.exportResult();

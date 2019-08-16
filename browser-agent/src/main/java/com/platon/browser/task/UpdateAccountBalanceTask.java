@@ -31,12 +31,12 @@ public class UpdateAccountBalanceTask {
     protected void updateBalance () {
         //1.AddressExectue获取到需要新增和更新的地址列表
         //2.调用底层提供接口，查询列表中的所有
-        Map <String,Address> addMaps = addressExecute.exportResult().getAddressMap();
+        /*Map <String,Address> addMaps = addressExecute.exportResult().getAddressMap();
         try{
             BaseResponse <List <RestrictingBalance>> updateAddBalanceList = client.getRestrictingBalance(new ArrayList <>());
         }catch (Exception e){
 
         }
-
+*/
     }
 }
