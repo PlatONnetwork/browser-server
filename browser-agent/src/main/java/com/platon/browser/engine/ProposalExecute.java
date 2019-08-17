@@ -48,20 +48,11 @@ public class ProposalExecute {
      * @param bc
      */
     public void execute(CustomTransaction tx, BlockChain bc){
-
         switch (tx.getTypeEnum()){
-            case CREATE_PROPOSAL_TEXT://提交文本提案(创建提案)
-                execute2000(tx,bc);
-                break;
-            case CREATE_PROPOSAL_UPGRADE://提交升级提案(创建提案)
-                execute2001(tx,bc);
-                break;
-            case CREATE_PROPOSAL_PARAMETER://提交参数提案(创建提案)
-                execute2002(tx,bc);
-                break;
-            case VOTING_PROPOSAL://给提案投票(提案投票)
-                execute2003(tx,bc);
-                break;
+            case CREATE_PROPOSAL_TEXT: createProposalText(tx,bc);break; //提交文本提案(创建提案)
+            case CREATE_PROPOSAL_UPGRADE: createProposalUpgrade(tx,bc);break; //提交升级提案(创建提案)
+            case CREATE_PROPOSAL_PARAMETER: createProposalParameter(tx,bc);break; //提交参数提案(创建提案)
+            case VOTING_PROPOSAL: votingProposal(tx,bc);break; //给提案投票(提案投票)
         }
         updateTxInfo(tx,bc);
     }
@@ -74,19 +65,19 @@ public class ProposalExecute {
 
     }
     //提交文本提案(创建提案)
-    private void execute2000(CustomTransaction tx, BlockChain bc){
+    private void createProposalText(CustomTransaction tx, BlockChain bc){
 
     }
     //提交升级提案(创建提案)
-    private void execute2001(CustomTransaction tx, BlockChain bc){
+    private void createProposalUpgrade(CustomTransaction tx, BlockChain bc){
 
     }
     //提交参数提案(创建提案)
-    private void execute2002(CustomTransaction tx, BlockChain bc){
+    private void createProposalParameter(CustomTransaction tx, BlockChain bc){
 
     }
     //给提案投票(提案投票)
-    private void execute2003(CustomTransaction tx, BlockChain bc){
+    private void votingProposal(CustomTransaction tx, BlockChain bc){
 
     }
     public void checkProposalStatus(){
