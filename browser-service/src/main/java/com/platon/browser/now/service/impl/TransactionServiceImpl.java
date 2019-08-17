@@ -1,17 +1,24 @@
 package com.platon.browser.now.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
+import com.platon.browser.now.service.cache.StatisticCacheService;
+import com.platon.browser.redis.dto.TransactionRedis;
+import com.platon.browser.req.PageReq;
 import com.platon.browser.req.account.AddressDetailReq;
+import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.transaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.transaction.TransactionDetailReq;
+import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.service.NodeService;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.service.cache.TransactionCacheService;
@@ -23,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.*;
 
 @Service
@@ -39,6 +47,8 @@ public class TransactionServiceImpl implements TransactionService {
     private NodeService nodeService;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private StatisticCacheService statisticCacheService;
 
 /*    @Override
     public RespPage <TransactionListItem> getPage( TransactionPageReq req) {
@@ -246,6 +256,38 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void updateCache(String chainId,Set<Transaction> data) {
         transactionCacheService.updateTransactionCache(chainId,data);
+    }
+    //--------------- 华丽的分割线----------------
+    @Override
+    public RespPage<TransactionListResp> getTransactionList(@Valid PageReq req) {
+        RespPage<TransactionListResp> result = new RespPage<>();
+        List<TransactionListResp> lists = new LinkedList<>();
+        List<TransactionRedis> items = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
+        TransactionListResp transactionListResp = new TransactionListResp();
+        for (int i = 0; i < items.size(); i++) {
+            transactionListResp.setTxHash(items.get(i).getHash());
+            transactionListResp.setFrom(items.get(i).getFrom());
+            transactionListResp.setTo(items.get(i).getTo());
+            transactionListResp.setValue(items.get(i).getValue());
+            transactionListResp.setActualTxCost(items.get(i).getActualTxCost());
+            transactionListResp.setTxType(items.get(i).getTxType());
+            transactionListResp.setServerTime(new Date().getTime());
+            transactionListResp.setTimestamp(items.get(i).getTimestamp().getTime());
+            transactionListResp.setBlockNumber(items.get(i).getBlockNumber());
+            //TODO
+            transactionListResp.setFailReason("");
+            transactionListResp.setReceiveType(items.get(i).getReceiveType());
+            lists.add(transactionListResp);
+        }
+        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
+        result.init(page, lists);
+        return result;
+    }
+
+    @Override
+    public RespPage<TransactionListResp> getBlockTransactionList(TransactionListByBlockRequest req) {
+
+        return null;
     }
 
 }
