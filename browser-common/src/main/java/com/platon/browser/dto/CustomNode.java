@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
@@ -53,9 +54,9 @@ public class CustomNode extends Node {
     /**
      * 获取指定节点的最新质押记录
      */
-    public CustomStaking getLatestStaking(){
+    public CustomStaking getLatestStaking() throws NoSuchBeanException {
         Map.Entry<Long, CustomStaking> lastEntry = stakings.lastEntry();
-        if(lastEntry==null) return null;
+        if(lastEntry==null) throw new NoSuchBeanException("没有质押记录！");
         return lastEntry.getValue();
     }
 

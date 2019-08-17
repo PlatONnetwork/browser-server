@@ -2,6 +2,7 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.param.CreateValidatorParam;
+import com.platon.browser.param.EditValidatorParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -121,6 +122,16 @@ public class CustomStaking extends Staking {
         this.setProgramVersion(param.getProgramVersion());
         this.setDetails(param.getDetails());
         this.setExternalId(param.getExternalId());
+    }
+
+    /**
+     * 使用编辑验证人信息参数更新质押记录
+     * @param param
+     */
+    public void updateWithEditValidatorParam(EditValidatorParam param) {
+        BeanUtils.copyProperties(param,this);
+        this.setStakingName(param.getNodeName());
+        this.setDenefitAddr(param.getBenefitAddress());
     }
 
 

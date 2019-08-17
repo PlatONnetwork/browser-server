@@ -3,6 +3,7 @@ package com.platon.browser.engine;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
@@ -192,22 +193,25 @@ public class StakingExecute {
              */
             logger.error("节点(id={})已经被质押！");
             // 取当前节点最新质押信息
-            CustomStaking latestStaking = node.getLatestStaking();
-            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
-                // 如果当前节点最新质押信息无效，则添加一条质押信息
-                CustomStaking newStaking = new CustomStaking();
-                // 把旧质押信息复制至新质押
-                BeanUtils.copyProperties(latestStaking,newStaking);
-                // 使用最新的质押交易信息覆盖相关信息
-                newStaking.initWithTransactionBean(tx);
-                // 把最新质押信息添加至缓存
-                node.getStakings().put(tx.getBlockNumber(),newStaking);
-                // 把最新质押信息添加至待入库列表
-                executeResult.getAddStakings().add(newStaking);
-
-                // 设置操作日志
-                nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
-                executeResult.getAddNodeOpts().add(nodeOpt);
+            try {
+                CustomStaking latestStaking = node.getLatestStaking();
+                if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
+                    // 如果当前节点最新质押信息无效，则添加一条质押信息
+                    CustomStaking newStaking = new CustomStaking();
+                    // 把旧质押信息复制至新质押
+                    BeanUtils.copyProperties(latestStaking,newStaking);
+                    // 使用最新的质押交易信息覆盖相关信息
+                    newStaking.initWithTransactionBean(tx);
+                    // 把最新质押信息添加至缓存
+                    node.getStakings().put(tx.getBlockNumber(),newStaking);
+                    // 把最新质押信息添加至待入库列表
+                    executeResult.getAddStakings().add(newStaking);
+                    // 设置操作日志
+                    nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+                    executeResult.getAddNodeOpts().add(nodeOpt);
+                }
+            } catch (NoSuchBeanException e) {
+                logger.error("{}",e.getMessage());
             }
             return;
         }
@@ -239,7 +243,21 @@ public class StakingExecute {
             logger.error("节点(id={})不存在,无法更新!",param.getNodeId());
             return;
         }
+        try {
+            // 取当前节点最新质押信息来修改
+            CustomStaking latestStaking = node.getLatestStaking();
+            latestStaking.updateWithEditValidatorParam(param);
+            executeResult.getUpdateStakings().add(latestStaking);
 
+            // 记录操作日志
+            CustomNodeOpt nodeOpt = new CustomNodeOpt();
+            nodeOpt.initWithTransaction(tx);
+            nodeOpt.setNodeId(param.getNodeId());
+            nodeOpt.setDesc(CustomNodeOpt.DescEnum.MODIFY.code);
+            executeResult.getAddNodeOpts().add(nodeOpt);
+        } catch (NoSuchBeanException e) {
+            logger.error("{}",e.getMessage());
+        }
     }
     //增持质押(增加自有质押)
     private void execute1002(CustomTransaction tx, BlockChain bc){
