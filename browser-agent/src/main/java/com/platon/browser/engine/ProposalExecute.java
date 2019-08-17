@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.result.ProposalExecuteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

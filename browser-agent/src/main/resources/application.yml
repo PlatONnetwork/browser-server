@@ -112,6 +112,7 @@ logging:
     com.platon.browser.task: ${loglevel.platon.task}
     com.platon.browser.engine: ${loglevel.platon.engine}
     com.platon.browser.client: ${loglevel.platon.client}
+    com.platon.browser.dao: ${loglevel.platon.dao}
 
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:

@@ -1,11 +1,9 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.result.AddressExecuteResult;
 import com.platon.browser.enums.AddressEnum;
 import com.platon.browser.enums.InnerContractAddEnum;
 import org.slf4j.Logger;
@@ -14,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * User: dongqile

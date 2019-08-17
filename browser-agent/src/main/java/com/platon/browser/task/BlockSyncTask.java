@@ -8,7 +8,7 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.BlockChainResult;
+import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
