@@ -301,6 +301,7 @@ public class StakingExecute {
                 if (customDelegation == null) {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
                     newCustomDelegation.updateWithDelegation(param, tx);
+                    newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
                     latestStaking.getDelegations().put(tx.getFrom(), newCustomDelegation);
                     //新增分析结果AddSet
                     executeResult.getAddDelegations().add(newCustomDelegation);
