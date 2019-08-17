@@ -21,16 +21,16 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	@Autowired
 	private I18nUtil i18n;
 	
-	@Value("${platon.redis.key.bolck}")
+	@Value("${platon.redis.key.bolck:}")
 	private String blockCacheKeyTemplate;
 	
-	@Value("${platon.redis.key.transaction}")
+	@Value("${platon.redis.key.transaction:}")
 	private String transactionCacheKeyTemplate;
 	
-	@Value("${platon.redis.key.networkStat}")
+	@Value("${platon.redis.key.networkStat:}")
 	private String networkStatCacheKeyTemplate;
 	
-	@Value("${platon.redis.max-item}")
+	@Value("${platon.redis.max-item:}")
 	private long maxItemNum;
 
 	@Autowired

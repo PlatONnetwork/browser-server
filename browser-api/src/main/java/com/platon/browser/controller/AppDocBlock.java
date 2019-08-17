@@ -1,5 +1,6 @@
 package com.platon.browser.controller;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,7 +110,7 @@ public interface AppDocBlock {
 	@ApiOperation(value = "block/blockListByNodeIdDownload", nickname = "", notes = "", tags = { "Block" })
 	@RequestMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" }, method = RequestMethod.GET)
     public void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
-    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date);
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, HttpServletResponse response);
 	
 	
     /**

@@ -58,8 +58,20 @@ public class CustomTransaction extends TransactionWithBLOBs {
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
             // TODO: 需要与后台商榷交易是否成功的判断标准
+
             this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
-            /*List <Log> logs =  receipt.getLogs();
+
+            /*
+            // 关于交易是否成功的判断(此做法是否合理有待商榷)：
+            // 1、交易回执logs为空列表时：
+            //     a、根据交易的to地址是否是内置合约地址来判断是否是合约调用；
+            //     b、如果to地址不是内置合约地址，则可能是转账或其它未知交易：
+            //
+            // 2、交易回执logs有内容时：
+            //     a、需要解码logs.get(0).getData()来解析出status字段，用于确定交易是否成功；
+            //
+            // 例子：转账和委托失败，交易回执中的logs都为空
+            List <Log> logs =  receipt.getLogs();
             if(logs.size()==0){
                 this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
             }else {
