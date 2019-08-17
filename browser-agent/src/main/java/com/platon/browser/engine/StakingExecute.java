@@ -7,6 +7,8 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import com.platon.browser.param.DelegateParam;
 import com.platon.browser.param.EditValidatorParam;
+import com.platon.browser.param.UnDelegateParam;
+import jdk.nashorn.internal.ir.UnaryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +40,8 @@ public class StakingExecute {
     private CustomDelegationMapper customDelegationMapper;
     @Autowired
     private CustomUnDelegationMapper customUnDelegationMapper;
+    @Autowired
+    private BlockChainConfig chainConfig;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String, CustomNode> nodes = new TreeMap<>(); // 节点统计表
@@ -287,6 +291,7 @@ public class StakingExecute {
             //交易数据tx_info补全
             param.setNodeName(latestStaking.getStakingName());
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+            //todo：交易数据回填
 
             //通过委托地址+nodeId+质押块高获取委托对象
             CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
@@ -295,6 +300,7 @@ public class StakingExecute {
             //更新犹豫期金额
             if(customDelegation!=null){
                 customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
+                customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
             }
 
             //若不存在，则说明该地址有对此节点做过委托
@@ -309,6 +315,38 @@ public class StakingExecute {
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(CustomTransaction tx, BlockChain bc){
+        UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
+        CustomNode node = nodes.get(param.getNodeId());
+
+        //根据委托赎回参数blockNumber找到对应当时委托的质押信息
+        CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+
+        //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
+        CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom());
+
+        /*
+        *  1.获取到对应的委托信息
+        *  2.根据委托信息，判断，余额
+        *  3.判断是否是全部退出
+         *   a.yes
+        *       委托的犹豫期金额 + 锁定期金额 - 赎回委托的金额 < 最小委托金额，则全部退出，并创建赎回委托结构
+        *    b.no
+        *       b1.若委托犹豫期金额 >= 本次赎回委托的金额，则直接扣去相应的金额
+        *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
+        * */
+        UnDelegation unDelegation = new UnDelegation();
+
+        BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateHas()));
+        if(delegationSum.compareTo(new BigInteger(chainConfig.getMinimumThreshold())) == -1){
+            //委托赎回金额为 =  原赎回金额 + 锁仓金额
+            customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
+            customDelegation.setDelegateHas("0");
+            customDelegation.setDelegateLocked("0");
+
+            unDelegation.setRedeemLocked(customDelegation.getDelegateReduction());
+        }else {
+
+        }
         logger.debug("减持/撤销委托(赎回委托)");
         // TODO: 修改验证人列表
         // 修改验证人列表
