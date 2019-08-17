@@ -189,8 +189,8 @@ public class StakingExecute {
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         CustomNode node = nodes.get(param.getNodeId());
         CustomNodeOpt nodeOpt = new CustomNodeOpt();
-        nodeOpt.setNodeId(node.getNodeId());
-        nodeOpt.setBlockNumber(tx.getBlockNumber());
+        nodeOpt.initWithTransaction(tx);
+        nodeOpt.setNodeId(param.getNodeId());
         if(node!=null){
             logger.error("节点(id={})已经被质押！");
             // 取最近一条质押信息
@@ -207,9 +207,6 @@ public class StakingExecute {
                 node.getStakings().put(tx.getBlockNumber(),newStaking);
                 // 把最新质押信息添加至待入库列表
                 executeResult.getAddStakings().add(newStaking);
-
-                // 设置操作日志
-                nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
             }
         }
 
@@ -225,6 +222,10 @@ public class StakingExecute {
             executeResult.getAddNodes().add(node);
             executeResult.getAddStakings().add(staking);
         }
+
+        // 设置操作日志
+        nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+        executeResult.getAddNodeOpts().add(nodeOpt);
 
     }
     //修改质押信息(编辑验证人)
@@ -256,27 +257,32 @@ public class StakingExecute {
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         CustomNode node = nodes.get(param.getNodeId());
 
-        //通过nodeId+质押块高获取唯一质押对象
-        CustomStaking customStaking = node.getStakings().get(param.getNodeId()+param.getStakingBlockNum());
+        //获取treemap中最新一条质押数据数据
+        //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+        Map.Entry<Long, CustomStaking> lastEntry = node.getStakings().lastEntry();
+        CustomStaking latestStaking = lastEntry.getValue();
+
+        //交易数据tx_info补全
+        param.setNodeName(latestStaking.getStakingName());
+        param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+
         //通过委托地址+nodeId+质押块高获取委托对象
-        CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom()+param.getNodeId()+param.getStakingBlockNum());
+        CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
 
         //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
         //更新犹豫期金额
         if(customDelegation!=null){
             customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
-            customStaking.getDelegations().put(tx.getFrom()+param.getNodeId()+param.getStakingBlockNum(),customDelegation);
         }
 
         //若不存在，则说明该地址有对此节点做过委托
         if(customDelegation==null){
             CustomDelegation newCustomDelegation = new CustomDelegation();
             newCustomDelegation.initWithDelegation(param,tx.getTransactionIndex());
-            customStaking.getDelegations().put(param.getNodeId()+param.getStakingBlockNum(),newCustomDelegation);
+            latestStaking.getDelegations().put(tx.getFrom(),newCustomDelegation);
         }
         logger.debug("撤销质押(退出验证人)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(CustomTransaction tx, BlockChain bc){

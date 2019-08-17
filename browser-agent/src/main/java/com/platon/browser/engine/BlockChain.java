@@ -241,7 +241,7 @@ public class BlockChain {
                 case MPC:
             }
             // 地址相关
-            addressExecute.execute(tx);
+            //addressExecute.execute(tx);
         });
 
 

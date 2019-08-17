@@ -20,6 +20,12 @@ public class CustomNodeOpt extends NodeOpt {
         this.setCreateTime(date);
     }
 
+    public void initWithTransaction(CustomTransaction tx) {
+        this.setTxHash(tx.getHash());
+        this.setBlockNumber(tx.getBlockNumber());
+        this.setTimestamp(tx.getTimestamp());
+    }
+
     /**
      * 1 create 创建
        2 modify 修改
