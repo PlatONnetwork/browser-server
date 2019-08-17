@@ -2,10 +2,11 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.UnDelegation;
+import com.platon.browser.param.DelegateParam;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -25,5 +26,36 @@ public class CustomDelegation extends Delegation {
     // delegation与un_delegation的关联键
     public String getDelegationMapKey(){
         return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
+    }
+
+    public void initWithDelegation( DelegateParam delegateParam,int transactionIndex){
+        this.setDelegateHas(delegateParam.getAmount());
+        this.setDelegateLocked("0");
+        this.setDelegateReduction("0");
+        this.setIsHistory(YesNoEnum.NO.code);
+        this.setSequence(Long.valueOf(delegateParam.getStakingBlockNum())*100000+transactionIndex);
+        this.setCreateTime(new Date());
+        this.setUpdateTime(new Date());
+    }
+
+    public enum YesNoEnum{
+        YES(1, "是"),
+        NO(2, "否")
+        ;
+        public int code;
+        public String desc;
+        YesNoEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static Map <Integer, CustomStaking.YesNoEnum> ENUMS = new HashMap <>();
+        static {Arrays.asList(CustomStaking.YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static CustomStaking.YesNoEnum getEnum( Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains( CustomStaking.YesNoEnum en){return ENUMS.containsValue(en);}
     }
 }

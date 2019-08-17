@@ -5,6 +5,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
+import com.platon.browser.param.DelegateParam;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -273,9 +275,34 @@ public class StakingExecute {
     }
     // 发起委托(委托)
     private void execute1004(CustomTransaction tx, BlockChain bc){
+        DelegateParam param = tx.getTxParam(DelegateParam.class);
+        CustomNode node = nodes.get(param.getNodeId());
+
+        //获取treemap中最新一条质押数据数据
+        //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+        CustomStaking latestStaking = node.getLatestStaking();
+
+        //交易数据tx_info补全
+        param.setNodeName(latestStaking.getStakingName());
+        param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+
+        //通过委托地址+nodeId+质押块高获取委托对象
+        CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
+
+        //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
+        //更新犹豫期金额
+        if(customDelegation!=null){
+            customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
+        }
+
+        //若不存在，则说明该地址有对此节点做过委托
+        if(customDelegation==null){
+            CustomDelegation newCustomDelegation = new CustomDelegation();
+            newCustomDelegation.initWithDelegation(param,tx.getTransactionIndex());
+            latestStaking.getDelegations().put(tx.getFrom(),newCustomDelegation);
+        }
         logger.debug("撤销质押(退出验证人)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(CustomTransaction tx, BlockChain bc){
