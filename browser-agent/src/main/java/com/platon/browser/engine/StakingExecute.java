@@ -262,8 +262,7 @@ public class StakingExecute {
 
         //获取treemap中最新一条质押数据数据
         //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
-        Map.Entry<Long, CustomStaking> lastEntry = node.getStakings().lastEntry();
-        CustomStaking latestStaking = lastEntry.getValue();
+        CustomStaking latestStaking = node.getLatestStaking();
 
         //交易数据tx_info补全
         param.setNodeName(latestStaking.getStakingName());
