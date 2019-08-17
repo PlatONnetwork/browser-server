@@ -14,13 +14,19 @@ import java.util.Map;
  */
 public class CustomNodeOpt extends NodeOpt {
 
-    public CustomNodeOpt() {
+    public CustomNodeOpt(){
         Date date = new Date();
         this.setUpdateTime(date);
         this.setCreateTime(date);
     }
 
-    public void initWithTransaction(CustomTransaction tx) {
+    public CustomNodeOpt(String nodeId, DescEnum desc) {
+        super();
+        this.setNodeId(nodeId);
+        this.setDesc(desc.code);
+    }
+
+    public void updateWithTransaction(CustomTransaction tx) {
         this.setTxHash(tx.getHash());
         this.setBlockNumber(tx.getBlockNumber());
         this.setTimestamp(tx.getTimestamp());

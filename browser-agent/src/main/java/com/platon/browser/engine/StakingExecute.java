@@ -4,10 +4,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.CreateValidatorParam;
-import com.platon.browser.param.DelegateParam;
-import com.platon.browser.param.EditValidatorParam;
-import com.platon.browser.param.UnDelegateParam;
+import com.platon.browser.param.*;
 import jdk.nashorn.internal.ir.UnaryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +37,34 @@ public class StakingExecute {
     private CustomDelegationMapper customDelegationMapper;
     @Autowired
     private CustomUnDelegationMapper customUnDelegationMapper;
-    @Autowired
-    private BlockChainConfig chainConfig;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String, CustomNode> nodes = new TreeMap<>(); // 节点统计表
+
+    /**
+     * 根据节点ID获取节点
+     * @param nodeId
+     * @return
+     * @throws NoSuchBeanException
+     */
+    public CustomNode getNode(String nodeId) throws NoSuchBeanException {
+        CustomNode node = nodes.get(nodeId);
+        if(node==null) throw new NoSuchBeanException("节点(id="+nodeId+")的节点不存在");
+        return node;
+    }
+
+    /**
+     * 添加节点操作日志
+     * @param tx
+     * @param nodeId
+     * @param descEnum
+     */
+    private void operationLog(CustomTransaction tx,String nodeId,CustomNodeOpt.DescEnum descEnum){
+        // 设置操作日志
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(nodeId,descEnum);
+        nodeOpt.updateWithTransaction(tx);
+        executeResult.getAddNodeOpts().add(nodeOpt);
+    }
 
     private StakingExecuteResult executeResult= BlockChain.BIZ_DATA.getStakingExecuteResult();
 
@@ -85,10 +105,10 @@ public class StakingExecute {
             }
         });
         // |-加载节点操作记录
-        List<NodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
+        List<CustomNodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
         nodeOpts.forEach(opt->nodes.get(opt.getNodeId()).getNodeOpts().add(opt));
         // |-加载节点惩罚记录
-        List<Slash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
+        List<CustomSlash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
         slashes.forEach(slash -> nodes.get(slash.getNodeId()).getSlashes().add(slash));
     }
 
@@ -187,17 +207,14 @@ public class StakingExecute {
 
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
-        CustomNode node = nodes.get(param.getNodeId());
-        CustomNodeOpt nodeOpt = new CustomNodeOpt();
-        nodeOpt.initWithTransaction(tx);
-        nodeOpt.setNodeId(param.getNodeId());
-        if(node!=null){
+        try {
+            CustomNode node = getNode(param.getNodeId());
             /** 业务逻辑说明：
              *  1、如果当前质押交易质押的是已经质押过的节点，则:
              *     a、查询节点的有效质押记录（即staking表中status=1的记录），如果存在则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
              *     b、如果节点没有有效质押记录（即staking表中status!=1），则插入一条新的质押记录；
              */
-            logger.error("节点(id={})已经被质押！");
+            logger.debug("节点(id={})已经被质押！",param.getNodeId());
             // 取当前节点最新质押信息
             try {
                 CustomStaking latestStaking = node.getLatestStaking();
@@ -206,37 +223,33 @@ public class StakingExecute {
                     CustomStaking newStaking = new CustomStaking();
                     // 把旧质押信息复制至新质押
                     BeanUtils.copyProperties(latestStaking,newStaking);
-                    // 使用最新的质押交易信息覆盖相关信息
-                    newStaking.initWithTransactionBean(tx);
+                    // 使用最新的质押交易更新相关信息
+                    newStaking.updateWithTransactionBean(tx);
                     // 把最新质押信息添加至缓存
                     node.getStakings().put(tx.getBlockNumber(),newStaking);
                     // 把最新质押信息添加至待入库列表
                     executeResult.getAddStakings().add(newStaking);
-                    // 设置操作日志
-                    nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
-                    executeResult.getAddNodeOpts().add(nodeOpt);
+                    // 记录操作日志
+                    operationLog(tx,param.getNodeId(), CustomNodeOpt.DescEnum.CREATE);
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}",e.getMessage());
             }
-            return;
-        }
-
-        if(node==null){
+        } catch (NoSuchBeanException e) {
+            logger.debug("节点(id={})尚未被质押！",param.getNodeId());
             /** 业务逻辑说明：
              * 2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
              */
             logger.error("节点(id={})未被质押！");
             CustomStaking staking = new CustomStaking();
-            staking.initWithTransactionBean(tx);
-            node = new CustomNode();
+            staking.updateWithTransactionBean(tx);
+            CustomNode node = new CustomNode();
             node.initWithStaking(staking);
             executeResult.getAddNodes().add(node);
             executeResult.getAddStakings().add(staking);
 
-            // 设置操作日志
-            nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
-            executeResult.getAddNodeOpts().add(nodeOpt);
+            // 记录操作日志
+            operationLog(tx,param.getNodeId(), CustomNodeOpt.DescEnum.CREATE);
         }
     }
     //修改质押信息(编辑验证人)
@@ -244,112 +257,132 @@ public class StakingExecute {
         logger.debug("修改质押信息(编辑验证人)");
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
-        CustomNode node = nodes.get(param.getNodeId());
-        if(node==null){
-            logger.error("节点(id={})不存在,无法更新!",param.getNodeId());
-            return;
-        }
-        try {
+        try{
+            CustomNode node = getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithEditValidatorParam(param);
             executeResult.getUpdateStakings().add(latestStaking);
-
             // 记录操作日志
-            CustomNodeOpt nodeOpt = new CustomNodeOpt();
-            nodeOpt.initWithTransaction(tx);
-            nodeOpt.setNodeId(param.getNodeId());
-            nodeOpt.setDesc(CustomNodeOpt.DescEnum.MODIFY.code);
-            executeResult.getAddNodeOpts().add(nodeOpt);
+            operationLog(tx,param.getNodeId(), CustomNodeOpt.DescEnum.MODIFY);
         } catch (NoSuchBeanException e) {
-            logger.error("{}",e.getMessage());
+            logger.error("无法修改质押信息: {}",e.getMessage());
         }
     }
     //增持质押(增加自有质押)
     private void execute1002(CustomTransaction tx, BlockChain bc){
         logger.debug("增持质押(增加自有质押)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+        // 获取交易入参
+        IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
+        try{
+            CustomNode node = getNode(param.getNodeId());
+            // 取当前节点最新质押信息来修改
+            CustomStaking latestStaking = node.getLatestStaking();
+            latestStaking.updateWithIncreaseStakingParam(param);
+            executeResult.getUpdateStakings().add(latestStaking);
+            // 记录操作日志
+            operationLog(tx,param.getNodeId(), CustomNodeOpt.DescEnum.MODIFY);
+        } catch (NoSuchBeanException e) {
+            logger.error("无法修改质押信息: {}",e.getMessage());
+        }
     }
     //撤销质押(退出验证人)
     private void execute1003(CustomTransaction tx, BlockChain bc){
         logger.debug("撤销质押(退出验证人)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+        // 获取交易入参
+        ExitValidatorParam param = tx.getTxParam(ExitValidatorParam.class);
+        try{
+            CustomNode node = getNode(param.getNodeId());
+            // 取当前节点最新质押信息来修改
+            CustomStaking latestStaking = node.getLatestStaking();
+            latestStaking.updateWithExitValidatorParam(param);
+            executeResult.getUpdateStakings().add(latestStaking);
+            // 记录操作日志
+            operationLog(tx,param.getNodeId(), CustomNodeOpt.DescEnum.MODIFY);
+        } catch (NoSuchBeanException e) {
+            logger.error("无法修改质押信息: {}",e.getMessage());
+        }
     }
     // 发起委托(委托)
     private void execute1004(CustomTransaction tx, BlockChain bc){
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
-        CustomNode node = nodes.get(param.getNodeId());
 
-        //获取treemap中最新一条质押数据数据
-        //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
-        try {
-            CustomStaking latestStaking = node.getLatestStaking();
+        try{
+            CustomNode node = getNode(param.getNodeId());
 
-            //交易数据tx_info补全
-            param.setNodeName(latestStaking.getStakingName());
-            param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
-            //todo：交易数据回填
+            //获取treemap中最新一条质押数据数据
+            //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+            try {
+                CustomStaking latestStaking = node.getLatestStaking();
 
-            //通过委托地址+nodeId+质押块高获取委托对象
-            CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
+                //交易数据tx_info补全
+                param.setNodeName(latestStaking.getStakingName());
+                param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+                //todo：交易数据回填
 
-            //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
-            //更新犹豫期金额
-            if(customDelegation!=null){
-                customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
-                customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
+                //通过委托地址+nodeId+质押块高获取委托对象
+                CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
+
+                //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
+                //更新犹豫期金额
+                if(customDelegation!=null){
+                    customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
+                    customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
+                }
+
+                //若不存在，则说明该地址有对此节点做过委托
+                if(customDelegation==null){
+                    CustomDelegation newCustomDelegation = new CustomDelegation();
+                    newCustomDelegation.initWithDelegation(param,tx.getTransactionIndex());
+                    latestStaking.getDelegations().put(tx.getFrom(),newCustomDelegation);
+                }
+            }catch (NoSuchBeanException e){
+                logger.error("{}",e.getMessage());
             }
-
-            //若不存在，则说明该地址有对此节点做过委托
-            if(customDelegation==null){
-                CustomDelegation newCustomDelegation = new CustomDelegation();
-                newCustomDelegation.initWithDelegation(param,tx.getTransactionIndex());
-                latestStaking.getDelegations().put(tx.getFrom(),newCustomDelegation);
-            }
-        }catch (NoSuchBeanException e){
-            logger.error("{}",e.getMessage());
+        } catch (NoSuchBeanException e) {
+            logger.error("无法获取节点信息: {}",e.getMessage());
         }
     }
     //减持/撤销委托(赎回委托)
     private void execute1005(CustomTransaction tx, BlockChain bc){
-        UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
-        CustomNode node = nodes.get(param.getNodeId());
-
-        //根据委托赎回参数blockNumber找到对应当时委托的质押信息
-        CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
-
-        //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
-        CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom());
-
-        /*
-        *  1.获取到对应的委托信息
-        *  2.根据委托信息，判断，余额
-        *  3.判断是否是全部退出
-         *   a.yes
-        *       委托的犹豫期金额 + 锁定期金额 - 赎回委托的金额 < 最小委托金额，则全部退出，并创建赎回委托结构
-        *    b.no
-        *       b1.若委托犹豫期金额 >= 本次赎回委托的金额，则直接扣去相应的金额
-        *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
-        * */
-        UnDelegation unDelegation = new UnDelegation();
-
-        BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateHas()));
-        if(delegationSum.compareTo(new BigInteger(chainConfig.getMinimumThreshold())) == -1){
-            //委托赎回金额为 =  原赎回金额 + 锁仓金额
-            customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
-            customDelegation.setDelegateHas("0");
-            customDelegation.setDelegateLocked("0");
-
-            unDelegation.setRedeemLocked(customDelegation.getDelegateReduction());
-        }else {
-
-        }
         logger.debug("减持/撤销委托(赎回委托)");
-        // TODO: 修改验证人列表
-        // 修改验证人列表
+        UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
+        try{
+            CustomNode node = getNode(param.getNodeId());
+
+            //根据委托赎回参数blockNumber找到对应当时委托的质押信息
+            CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+
+            //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
+            CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom());
+
+            /*
+             *  1.获取到对应的委托信息
+             *  2.根据委托信息，判断，余额
+             *  3.判断是否是全部退出
+             *   a.yes
+             *       委托的犹豫期金额 + 锁定期金额 - 赎回委托的金额 < 最小委托金额，则全部退出，并创建赎回委托结构
+             *    b.no
+             *       b1.若委托犹豫期金额 >= 本次赎回委托的金额，则直接扣去相应的金额
+             *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
+             * */
+            UnDelegation unDelegation = new UnDelegation();
+
+            BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateHas()));
+            if(delegationSum.compareTo(new BigInteger(bc.getChainConfig().getMinimumThreshold())) == -1){
+                //委托赎回金额为 =  原赎回金额 + 锁仓金额
+                customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
+                customDelegation.setDelegateHas("0");
+                customDelegation.setDelegateLocked("0");
+
+                unDelegation.setRedeemLocked(customDelegation.getDelegateReduction());
+            }else {
+
+            }
+        } catch (NoSuchBeanException e) {
+            logger.error("{}",e.getMessage());
+        }
     }
     //举报多签(举报验证人)
     private void execute3000(CustomTransaction tx, BlockChain bc){

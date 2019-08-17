@@ -2,8 +2,6 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
@@ -132,7 +130,7 @@ public class BlockSyncTask {
                         blockChain.BIZ_DATA.getStakingExecuteResult().getAddNodes().add(node);
 
                         CustomStaking stakingBean = new CustomStaking();
-                        stakingBean.initWithNode(verifier);
+                        stakingBean.updateWithNode(verifier);
                         stakingBean.setStakingIcon("");
                         stakingBean.setIsInit(1);
                         stakingBean.setIsSetting(1);
@@ -179,8 +177,8 @@ public class BlockSyncTask {
             blocks.forEach(block ->blockChain.execute(block));
             //获取内存中全量质押和委托信息，用于地址相关统计数据
 
-            TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
-            TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
+            //TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
+            //TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
             //blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现

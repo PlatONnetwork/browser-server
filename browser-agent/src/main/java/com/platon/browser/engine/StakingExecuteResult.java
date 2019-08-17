@@ -1,6 +1,7 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.*;
+import com.platon.browser.dto.CustomStaking;
 import lombok.Data;
 
 import java.util.*;
@@ -32,5 +33,8 @@ public class StakingExecuteResult {
         updateDelegations.clear();
         addSlash.clear();
         addNodeOpts.clear();
+    }
+    public void stageAddStaking(CustomStaking staking){
+
     }
 }

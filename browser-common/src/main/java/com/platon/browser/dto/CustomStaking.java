@@ -3,10 +3,14 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.param.CreateValidatorParam;
 import com.platon.browser.param.EditValidatorParam;
+import com.platon.browser.param.ExitValidatorParam;
+import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,40 +84,45 @@ public class CustomStaking extends Staking {
         return this.getNodeId()+this.getStakingBlockNum();
     }
 
-
-    public void initWithNode(org.web3j.platon.bean.Node initData){
-        BeanUtils.copyProperties(initData,this);
+    /**
+     * 使用节点信息更新质押信息
+     * @param node
+     */
+    public void updateWithNode(org.web3j.platon.bean.Node node){
+        BeanUtils.copyProperties(node,this);
         // 质押区块高度
-        if(initData.getStakingBlockNum()!=null) this.setStakingBlockNum(initData.getStakingBlockNum().longValue());
+        if(node.getStakingBlockNum()!=null) this.setStakingBlockNum(node.getStakingBlockNum().longValue());
         // 质押节点地址
         this.setNodeId(HexTool.prefix(this.getNodeId()));
         // 发起质押交易的索引
-        if(initData.getStakingTxIndex()!=null) this.setStakingTxIndex(initData.getStakingTxIndex().intValue());
+        if(node.getStakingTxIndex()!=null) this.setStakingTxIndex(node.getStakingTxIndex().intValue());
         // 发起质押的账户地址
-        this.setStakingAddr(initData.getStakingAddress());
+        this.setStakingAddr(node.getStakingAddress());
         // 第三方社交软件关联id
-        this.setExternalId(initData.getExternalId());
+        this.setExternalId(node.getExternalId());
         // 收益地址
-        this.setDenefitAddr(initData.getBenifitAddress());
+        this.setDenefitAddr(node.getBenifitAddress());
         // 节点状态 1：候选中 2：退出中 3：已退出
-        if(initData.getStatus()!=null) this.setStatus(initData.getStatus().intValue());
+        if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
         // 节点名称(质押节点名称)
-        this.setStakingName(initData.getNodeName());
+        this.setStakingName(node.getNodeName());
         // 节点的第三方主页
-        this.setWebSite(initData.getWebsite());
+        this.setWebSite(node.getWebsite());
     }
 
-    public void initWithTransactionBean(CustomTransaction initData){
+    /**
+     * 使用交易信息更新质押信息
+     * @param tx
+     */
+    public void updateWithTransactionBean(CustomTransaction tx){
         // 质押块号
-        this.setStakingBlockNum(initData.getBlockNumber());
+        this.setStakingBlockNum(tx.getBlockNumber());
         // 质押交易索引
-        this.setStakingTxIndex(initData.getTransactionIndex());
+        this.setStakingTxIndex(tx.getTransactionIndex());
         // 发起质押的账户地址
-        this.setStakingAddr(initData.getFrom());
-        // 质押金额(犹豫期金额)
-        this.setStakingHas(initData.getValue());
+        this.setStakingAddr(tx.getFrom());
         /**********从交易入参中取相关信息***********/
-        CreateValidatorParam param = initData.getTxParam(CreateValidatorParam.class);
+        CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         this.setNodeId(param.getNodeId());
         this.setStakingName(param.getNodeName());
         this.setDenefitAddr(param.getBenefitAddress());
@@ -122,6 +131,7 @@ public class CustomStaking extends Staking {
         this.setProgramVersion(param.getProgramVersion());
         this.setDetails(param.getDetails());
         this.setExternalId(param.getExternalId());
+        this.setJoinTime(tx.getTimestamp());
     }
 
     /**
@@ -129,11 +139,44 @@ public class CustomStaking extends Staking {
      * @param param
      */
     public void updateWithEditValidatorParam(EditValidatorParam param) {
-        BeanUtils.copyProperties(param,this);
+        this.setExternalId(param.getExternalId());
         this.setStakingName(param.getNodeName());
+        this.setDetails(param.getDetails());
         this.setDenefitAddr(param.getBenefitAddress());
+        this.setWebSite(param.getWebsite());
+        this.setUpdateTime(new Date());
     }
 
+    /**
+     * 使用增持验证人参数更新质押记录
+     * @param param
+     */
+    public void updateWithIncreaseStakingParam(IncreaseStakingParam param) {
+        if(StringUtils.isNotBlank(param.getAmount())){
+            BigInteger addAmount = new BigInteger(param.getAmount());
+            BigInteger stakingHas = new BigInteger(this.getStakingHas());
+            BigInteger total = stakingHas.add(addAmount);
+            this.setStakingHas(total.toString());
+        }
+    }
+
+    /**
+     * 使用退出验证人参数更新质押记录
+     * @param param
+     */
+    public void updateWithExitValidatorParam(ExitValidatorParam param) {
+        this.setStakingHas("0");
+        this.setLeaveTime(new Date());
+        BigInteger stakingLocked = new BigInteger(getStakingLocked());
+        if(stakingLocked.compareTo(BigInteger.ZERO)>0){
+            this.setStakingReduction(getStakingLocked());
+            this.setStakingLocked("0");
+            this.setStatus(StatusEnum.EXITING.code);
+        }else {
+            this.setStakingLocked("0");
+            this.setStatus(StatusEnum.EXITED.code);
+        }
+    }
 
     public enum StatusEnum{
         CANDIDATE(1, "候选中"),
