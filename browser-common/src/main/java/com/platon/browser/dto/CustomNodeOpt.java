@@ -26,7 +26,7 @@ public class CustomNodeOpt extends NodeOpt {
         this.setDesc(desc.code);
     }
 
-    public void updateWithTransaction(CustomTransaction tx) {
+    public void updateWithCustomTransaction(CustomTransaction tx) {
         this.setTxHash(tx.getHash());
         this.setBlockNumber(tx.getBlockNumber());
         this.setTimestamp(tx.getTimestamp());

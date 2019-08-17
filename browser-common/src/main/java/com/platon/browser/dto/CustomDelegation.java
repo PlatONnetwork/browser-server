@@ -28,14 +28,14 @@ public class CustomDelegation extends Delegation {
         return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
     }
 
-    public void updateWithDelegation( DelegateParam delegateParam,CustomTransaction tx){
-        this.setDelegateHas(delegateParam.getAmount());
+    public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
+        this.setDelegateHas(param.getAmount());
         this.setDelegateLocked("0");
         this.setDelegateReduction("0");
-        this.setNodeId(delegateParam.getNodeId());
+        this.setNodeId(param.getNodeId());
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
-        this.setSequence(Long.valueOf(delegateParam.getStakingBlockNum())*100000+tx.getTransactionIndex());
+        this.setSequence(Long.valueOf(param.getStakingBlockNum())*100000+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }

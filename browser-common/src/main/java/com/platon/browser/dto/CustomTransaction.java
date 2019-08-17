@@ -33,12 +33,11 @@ public class CustomTransaction extends TransactionWithBLOBs {
 
     /**
      * 使用原生交易信息初始化交易信息
-     *
-     * @param initData
+     * @param tr
      */
-    public void init (PlatonBlock.TransactionResult initData ) {
+    public void updateWithTransactionResult (PlatonBlock.TransactionResult tr ) {
         try {
-            Transaction transaction = (Transaction) initData;
+            Transaction transaction = (Transaction) tr;
             BeanUtils.copyProperties(transaction, this);
             this.setBlockNumber(transaction.getBlockNumber().longValue());
             this.setTransactionIndex(transaction.getTransactionIndex().intValue());
@@ -53,7 +52,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
         }
     }
 
-    public void update (TransactionReceipt receipt) throws BeanCreateOrUpdateException {
+    public void updateWithTransactionReceipt (TransactionReceipt receipt) throws BeanCreateOrUpdateException {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());

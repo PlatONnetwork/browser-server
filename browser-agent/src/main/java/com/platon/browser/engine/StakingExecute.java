@@ -214,7 +214,7 @@ public class StakingExecute {
             CustomStaking staking = new CustomStaking();
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();
-            node.initWithStaking(staking);
+            node.updateWithCustomStaking(staking);
             executeResult.stageAddNode(node);
             executeResult.stageAddStaking(staking,tx);
         }
@@ -300,7 +300,7 @@ public class StakingExecute {
                 //若不存在，则说明该地址有对此节点做过委托
                 if (customDelegation == null) {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
-                    newCustomDelegation.updateWithDelegation(param, tx);
+                    newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
                     latestStaking.getDelegations().put(tx.getFrom(), newCustomDelegation);
                     //新增分析结果AddSet

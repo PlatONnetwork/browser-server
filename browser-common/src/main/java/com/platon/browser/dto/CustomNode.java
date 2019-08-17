@@ -16,6 +16,9 @@ import java.util.*;
  */
 @Data
 public class CustomNode extends Node {
+    private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
+    private List<Slash> slashes = new ArrayList<>();
+    private List<NodeOpt> nodeOpts = new ArrayList<>();
 
      public CustomNode(){
          Date date = new Date();
@@ -38,15 +41,11 @@ public class CustomNode extends Node {
           this.setIsRecommend(2);
      }
 
-     public void initWithNode(org.web3j.platon.bean.Node initData){
-          this.setNodeId(HexTool.prefix(initData.getNodeId()));
+     public void updateWithNode(org.web3j.platon.bean.Node node){
+          this.setNodeId(HexTool.prefix(node.getNodeId()));
      }
 
-     private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
-     private List<Slash> slashes = new ArrayList<>();
-     private List<NodeOpt> nodeOpts = new ArrayList<>();
-
-    public void initWithStaking(CustomStaking staking) {
+    public void updateWithCustomStaking(CustomStaking staking) {
         this.setNodeId(staking.getNodeId());
         this.setCreateTime(new Date());
     }

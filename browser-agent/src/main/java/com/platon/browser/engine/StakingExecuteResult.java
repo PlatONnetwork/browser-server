@@ -65,7 +65,7 @@ public class StakingExecuteResult {
             // 如果是内置节点，暂存时是没有交易信息的，所以不用记日志
             // 构建操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.CREATE);
-            nodeOpt.updateWithTransaction(tx);
+            nodeOpt.updateWithCustomTransaction(tx);
             // 暂存至待入库节点操作日志列表
             stageAddNodeOpt(nodeOpt);
         }
@@ -79,7 +79,7 @@ public class StakingExecuteResult {
         updateStakings.add(staking);
         // 构建操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.MODIFY);
-        nodeOpt.updateWithTransaction(tx);
+        nodeOpt.updateWithCustomTransaction(tx);
         stageAddNodeOpt(nodeOpt);
     }
 

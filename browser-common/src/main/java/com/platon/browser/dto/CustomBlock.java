@@ -68,7 +68,7 @@ public class CustomBlock extends Block {
             // 抽取交易信息
             initData.getTransactions().forEach(tr -> {
                 CustomTransaction transaction = new CustomTransaction();
-                transaction.init(tr);
+                transaction.updateWithTransactionResult(tr);
                 transaction.setTimestamp(this.getTimestamp());
                 transaction.setCreateTime(date);
                 transaction.setUpdateTime(date);
@@ -99,10 +99,7 @@ public class CustomBlock extends Block {
         });
     }
 
-
-
     private List<CustomTransaction> transactionList = new ArrayList<>();
-
 
     @Override
     public boolean equals(Object o) {

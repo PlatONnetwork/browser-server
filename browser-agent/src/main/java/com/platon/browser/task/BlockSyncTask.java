@@ -126,7 +126,7 @@ public class BlockSyncTask {
                 if(verifiers.isStatusOk()) {
                     verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
                         CustomNode node = new CustomNode();
-                        node.initWithNode(verifier);
+                        node.updateWithNode(verifier);
                         node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
                         blockChain.STAGE_BIZ_DATA.getStakingExecuteResult().stageAddNode(node);
 
@@ -334,7 +334,7 @@ public class BlockSyncTask {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
             // 如果交易回执存在，则更新交易中与回执相关的信息
-            if(receipt.isPresent()) tx.update(receipt.get());
+            if(receipt.isPresent()) tx.updateWithTransactionReceipt(receipt.get());
         }catch (IOException e){
             logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
             throw e;
