@@ -146,7 +146,6 @@ public class BlockChain {
             logger.debug("共识周期切换块号:{}, 查新共识周期验证节点时的块号:{}", prevBlockNumber, blockNumber);
             // 直接查当前最新的共识周期验证人列表来初始化blockChain的curValidators属性
             try {
-                // TODO:
                 // 1、当agent落后链上至少一个共识周期时，使用blockNumber是可以查询到验证人信息的
                 // 2、当agent与链都在同一个共识周期时，使用blockNumber是查询不到验证人信息的
                 // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
@@ -176,7 +175,6 @@ public class BlockChain {
             logger.debug("结算周期切换块号:{}, 查新结算周期验证节点时的块号:{}", prevBlockNumber, blockNumber);
             // 直接查当前最新的结算周期验证人列表来初始化blockChain的curVerifiers属性
             try {
-                // TODO:
                 // 1、当agent落后链上至少一个结算周期时，使用blockNumber是可以查询到验证人信息的
                 // 2、当agent与链都在同一个结算周期时，使用blockNumber是查询不到验证人信息的
                 // 所以，先使用blockNumber查询，结果为空证明agent已经追上链，则换为实时查询
