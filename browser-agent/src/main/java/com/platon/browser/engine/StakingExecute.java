@@ -191,9 +191,8 @@ public class StakingExecute {
              *     b、如果节点没有有效质押记录（即staking表中status!=1），则插入一条新的质押记录；
              */
             logger.error("节点(id={})已经被质押！");
-            // 取最近一条质押信息
-            Map.Entry<Long, CustomStaking> lastEntry = node.getStakings().lastEntry();
-            CustomStaking latestStaking = lastEntry.getValue();
+            // 取当前节点最新质押信息
+            CustomStaking latestStaking = node.getLatestStaking();
             if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
                 // 如果当前节点最新质押信息无效，则添加一条质押信息
                 CustomStaking newStaking = new CustomStaking();
@@ -205,7 +204,12 @@ public class StakingExecute {
                 node.getStakings().put(tx.getBlockNumber(),newStaking);
                 // 把最新质押信息添加至待入库列表
                 executeResult.getAddStakings().add(newStaking);
+
+                // 设置操作日志
+                nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+                executeResult.getAddNodeOpts().add(nodeOpt);
             }
+            return;
         }
 
         if(node==null){
@@ -219,12 +223,11 @@ public class StakingExecute {
             node.initWithStaking(staking);
             executeResult.getAddNodes().add(node);
             executeResult.getAddStakings().add(staking);
+
+            // 设置操作日志
+            nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
+            executeResult.getAddNodeOpts().add(nodeOpt);
         }
-
-        // 设置操作日志
-        nodeOpt.setDesc(CustomNodeOpt.DescEnum.CREATE.code);
-        executeResult.getAddNodeOpts().add(nodeOpt);
-
     }
     //修改质押信息(编辑验证人)
     private void execute1001(CustomTransaction tx, BlockChain bc){
@@ -236,7 +239,7 @@ public class StakingExecute {
             logger.error("节点(id={})不存在,无法更新!",param.getNodeId());
             return;
         }
-        //node.set
+
     }
     //增持质押(增加自有质押)
     private void execute1002(CustomTransaction tx, BlockChain bc){

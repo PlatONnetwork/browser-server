@@ -50,6 +50,14 @@ public class CustomNode extends Node {
         this.setCreateTime(new Date());
     }
 
+    /**
+     * 获取指定节点的最新质押记录
+     */
+    public CustomStaking getLatestStaking(){
+        Map.Entry<Long, CustomStaking> lastEntry = stakings.lastEntry();
+        if(lastEntry==null) return null;
+        return lastEntry.getValue();
+    }
 
     public enum YesNoEnum{
           YES(1, "是"),
