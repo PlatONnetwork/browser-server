@@ -113,29 +113,14 @@ public class StakingExecute {
      */
     public void execute(CustomTransaction tx, BlockChain bc){
         switch (tx.getTypeEnum()){
-            case CREATE_VALIDATOR: //发起质押(创建验证人)
-                execute1000(tx,bc);
-                break;
-            case EDIT_VALIDATOR: //修改质押信息(编辑验证人)
-                execute1001(tx,bc);
-                break;
-            case INCREASE_STAKING: //增持质押(增加自有质押)
-                execute1002(tx,bc);
-                break;
-            case EXIT_VALIDATOR://撤销质押(退出验证人)
-                execute1003(tx,bc);
-                break;
-            case DELEGATE://发起委托(委托)
-                execute1004(tx,bc);
-                break;
-            case UN_DELEGATE://减持/撤销委托(赎回委托)
-                execute1005(tx,bc);
-                break;
-            case REPORT_VALIDATOR://举报多签(举报验证人)
-                execute3000(tx,bc);
-                break;
+            case CREATE_VALIDATOR: createValidator(tx,bc); break; //发起质押(创建验证人)
+            case EDIT_VALIDATOR: editValidator(tx,bc);break; //修改质押信息(编辑验证人)
+            case INCREASE_STAKING: increaseStaking(tx,bc);break; //增持质押(增加自有质押)
+            case EXIT_VALIDATOR: exitValidator(tx,bc);break; //撤销质押(退出验证人)
+            case DELEGATE: delegate(tx,bc);break; //发起委托(委托)
+            case UN_DELEGATE: unDelegate(tx,bc);break; //减持/撤销委托(赎回委托)
+            case REPORT_VALIDATOR: reportValidator(tx,bc);break; //举报多签(举报验证人)
         }
-
         updateTxInfo(tx,bc);
     }
 
@@ -177,7 +162,7 @@ public class StakingExecute {
     }
 
     //发起质押(创建验证人)
-    private void execute1000(CustomTransaction tx, BlockChain bc){
+    private void createValidator(CustomTransaction tx, BlockChain bc){
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
@@ -220,7 +205,7 @@ public class StakingExecute {
         }
     }
     //修改质押信息(编辑验证人)
-    private void execute1001(CustomTransaction tx, BlockChain bc){
+    private void editValidator(CustomTransaction tx, BlockChain bc){
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
         logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));
@@ -235,7 +220,7 @@ public class StakingExecute {
         }
     }
     //增持质押(增加自有质押)
-    private void execute1002(CustomTransaction tx, BlockChain bc){
+    private void increaseStaking(CustomTransaction tx, BlockChain bc){
         // 获取交易入参
         IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
         logger.debug("增持质押(增加自有质押):{}", JSON.toJSONString(param));
@@ -250,7 +235,7 @@ public class StakingExecute {
         }
     }
     //撤销质押(退出验证人)
-    private void execute1003(CustomTransaction tx, BlockChain bc){
+    private void exitValidator(CustomTransaction tx, BlockChain bc){
         // 获取交易入参
         ExitValidatorParam param = tx.getTxParam(ExitValidatorParam.class);
         logger.debug("撤销质押(退出验证人):{}", JSON.toJSONString(param));
@@ -266,7 +251,7 @@ public class StakingExecute {
     }
 
     // 发起委托(委托)
-    private void execute1004 ( CustomTransaction tx, BlockChain bc ) {
+    private void delegate ( CustomTransaction tx, BlockChain bc ) {
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
 
@@ -315,7 +300,7 @@ public class StakingExecute {
     }
 
     //减持/撤销委托(赎回委托)
-    private void execute1005 ( CustomTransaction tx, BlockChain bc ) {
+    private void unDelegate ( CustomTransaction tx, BlockChain bc ) {
         logger.debug("减持/撤销委托(赎回委托)");
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
@@ -385,7 +370,7 @@ public class StakingExecute {
     }
 
     //举报多签(举报验证人)
-    private void execute3000 ( CustomTransaction tx, BlockChain bc ) {
+    private void reportValidator ( CustomTransaction tx, BlockChain bc ) {
         logger.debug("举报多签(举报验证人)");
         // TODO: 修改验证人列表
         // 修改验证人列表
