@@ -23,6 +23,8 @@ import java.util.Map;
  */
 @Data
 public class CustomStaking extends Staking {
+    // <质押块高-质押记录> 映射
+    private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     public CustomStaking() {
         Date date = new Date();
@@ -75,9 +77,6 @@ public class CustomStaking extends Staking {
         // 是否为链初始化时内置的候选人
         this.setIsInit(YesNoEnum.NO.code);
     }
-
-    // <质押块高-质押记录> 映射
-    private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     // staking与delegation的关联键
     public String getStakingMapKey(){

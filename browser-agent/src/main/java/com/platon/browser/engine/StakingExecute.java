@@ -40,19 +40,7 @@ public class StakingExecute {
     private CustomUnDelegationMapper customUnDelegationMapper;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, CustomNode> nodes = new TreeMap<>(); // 节点统计表
-
-    /**
-     * 根据节点ID获取节点
-     * @param nodeId
-     * @return
-     * @throws NoSuchBeanException
-     */
-    public CustomNode getNode(String nodeId) throws NoSuchBeanException {
-        CustomNode node = nodes.get(nodeId);
-        if(node==null) throw new NoSuchBeanException("节点(id="+nodeId+")的节点不存在");
-        return node;
-    }
+    private NodeCache nodeCache = new NodeCache();
 
     private StakingExecuteResult executeResult= BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult();
 
@@ -61,7 +49,7 @@ public class StakingExecute {
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> {
             nodeIds.add(node.getNodeId());
-            nodes.put(node.getNodeId(),node);
+            nodeCache.add(node);
         });
         if(nodeIds.size()==0) return;
         // |-加载质押记录
@@ -69,7 +57,11 @@ public class StakingExecute {
         // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
         Map<String, CustomStaking> stakingMap = new HashMap<>();
         stakings.forEach(staking->{
-            nodes.get(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
+            try {
+                nodeCache.getNode(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
+            } catch (NoSuchBeanException e) {
+                logger.error("构造缓存错误:{}, 无法向其关联质押(stakingBlockNumber={})",e.getMessage(),staking.getStakingBlockNum());
+            }
             stakingMap.put(staking.getStakingMapKey(),staking);
         });
         // |-加载委托记录
@@ -93,10 +85,22 @@ public class StakingExecute {
         });
         // |-加载节点操作记录
         List<CustomNodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
-        nodeOpts.forEach(opt->nodes.get(opt.getNodeId()).getNodeOpts().add(opt));
+        nodeOpts.forEach(opt-> {
+            try {
+                nodeCache.getNode(opt.getNodeId()).getNodeOpts().add(opt);
+            } catch (NoSuchBeanException e) {
+                logger.error("构造缓存错误:{}, 无法向其关联节点操作日志(id={})",e.getMessage(),opt.getId());
+            }
+        });
         // |-加载节点惩罚记录
         List<CustomSlash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
-        slashes.forEach(slash -> nodes.get(slash.getNodeId()).getSlashes().add(slash));
+        slashes.forEach(slash -> {
+            try {
+                nodeCache.getNode(slash.getNodeId()).getSlashes().add(slash);
+            } catch (NoSuchBeanException e) {
+                logger.error("构造缓存错误:{}, 无法向其关联节点惩罚记录(slashTxHash={})",e.getMessage(),slash.getHash());
+            }
+        });
     }
 
     @PostConstruct
@@ -127,7 +131,7 @@ public class StakingExecute {
     /**
      * 进行验证人选举时触发
      */
-    public void onElectionDistance(CustomBlock block){
+    public void onElectionDistance(CustomBlock block,BlockChain bc){
         logger.debug("进行验证人选举:{}", block.getNumber());
 
     }
@@ -135,7 +139,7 @@ public class StakingExecute {
     /**
      * 进入新的共识周期变更
      */
-    public void onNewConsEpoch(CustomBlock block){
+    public void onNewConsEpoch(CustomBlock block,BlockChain bc){
         logger.debug("进入新的共识周期:{}", block.getNumber());
 
     }
@@ -143,8 +147,14 @@ public class StakingExecute {
     /**
      * 进入新的结算周期
      */
-    public void  onNewSettingEpoch(CustomBlock block){
+    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc){
         logger.debug("进入新的结算周期:{}", block.getNumber());
+
+        /**
+         * 质押结算
+         */
+        stakingSettle(block,bc);
+
         /**
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息
@@ -157,6 +167,32 @@ public class StakingExecute {
         modifyUnDelegationInfoOnNewSettingEpoch();
     }
 
+    /**
+     * 质押结算
+     * 对所有候选中和退出中的节点进行结算
+     * @param block 结算
+     */
+    private void stakingSettle(CustomBlock block,BlockChain bc) {
+        // 结算周期切换时对所有候选中和退出中状态的节点进行结算
+        List<CustomStaking> stakings = nodeCache.getStakingByStatus(Arrays.asList(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING));
+        stakings.forEach(staking -> {
+            // 调整金额状态
+            BigInteger stakingLocked = new BigInteger(staking.getStakingLocked()).add(new BigInteger(staking.getStakingHas()));
+            staking.setStakingLocked(stakingLocked.toString());
+            staking.setStakingHas("0");
+            if(bc.getCurSettingEpoch() > staking.getStakingReductionEpoch()+1){
+                //
+                staking.setStakingReduction("0");
+            }
+            BigInteger stakingReduction = new BigInteger(staking.getStakingReduction());
+            if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
+                staking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+            }
+            // 计算质押激励和年化率
+                    });
+
+    }
+
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
@@ -167,7 +203,7 @@ public class StakingExecute {
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
         try {
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             /** 业务逻辑说明：
              *  1、如果当前质押交易质押的是已经质押过的节点，则:
              *     a、查询节点的有效质押记录（即staking表中status=1的记录），如果存在则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
@@ -210,7 +246,7 @@ public class StakingExecute {
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
         logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithEditValidatorParam(param);
@@ -225,7 +261,7 @@ public class StakingExecute {
         IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
         logger.debug("增持质押(增加自有质押):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithIncreaseStakingParam(param);
@@ -240,7 +276,7 @@ public class StakingExecute {
         ExitValidatorParam param = tx.getTxParam(ExitValidatorParam.class);
         logger.debug("撤销质押(退出验证人):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithExitValidatorParam(param);
@@ -256,7 +292,7 @@ public class StakingExecute {
         DelegateParam param = tx.getTxParam(DelegateParam.class);
 
         try {
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
 
             //获取treemap中最新一条质押数据数据
             //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
@@ -279,7 +315,7 @@ public class StakingExecute {
                     customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
                     customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
                     //更新分析结果UpdateSet
-                    executeResult.getUpdateDelegations().add(customDelegation);
+                    executeResult.stageUpdateDelegation(customDelegation);
                 }
 
                 //若不存在，则说明该地址有对此节点做过委托
@@ -289,7 +325,7 @@ public class StakingExecute {
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
                     latestStaking.getDelegations().put(tx.getFrom(), newCustomDelegation);
                     //新增分析结果AddSet
-                    executeResult.getAddDelegations().add(newCustomDelegation);
+                    executeResult.stageAddDelegation(newCustomDelegation);
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}", e.getMessage());
@@ -304,7 +340,7 @@ public class StakingExecute {
         logger.debug("减持/撤销委托(赎回委托)");
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
-            CustomNode node = getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
             CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
@@ -361,9 +397,9 @@ public class StakingExecute {
             } else
                 customUnDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.code);
             //更新分析委托结果
-            executeResult.getUpdateDelegations().add(customDelegation);
+            executeResult.stageUpdateDelegation(customDelegation);
             //新增分析委托赎回结果
-            executeResult.getAddUnDelegations().add(customUnDelegation);
+            executeResult.stageAddUnDelegation(customUnDelegation);
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
         }
@@ -379,48 +415,36 @@ public class StakingExecute {
     //结算周期变更导致的委托数据的变更
     private void modifyDelegationInfoOnNewSettingEpoch () {
         //由于结算周期的变更，对所有的节点下的质押的委托更新
-        nodes.forEach(( nodeId, node ) -> {
-            node.getStakings().forEach((( aLong, customStaking ) -> {
-                customStaking.getDelegations().forEach(( k, v ) -> {
-                    //只需变更不为历史节点的委托数据(isHistory=NO(2))
-                    if (v.getIsHistory().equals(CustomDelegation.YesNoEnum.NO.code)) {
-                        //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
-                        v.setDelegateLocked(new BigInteger(v.getDelegateLocked()).add(new BigInteger(v.getDelegateHas())).toString());
-                        //累加后的犹豫期金额至为0
-                        v.setDelegateHas("0");
-                        v.setDelegateReduction("0");
-                        //并判断经过一个结算周期后该委托的对应赎回是否全部完成，若完成则将委托设置为历史节点
-                        //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
-                        if (new BigInteger(v.getDelegateHas()).add(new BigInteger(v.getDelegateLocked())).add(new BigInteger(v.getDelegateReduction())) == BigInteger.ZERO) {
-                            v.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
-                        }
-                        //添加需要更新的委托的信息到委托更新列表
-                        executeResult.getUpdateDelegations().add(v);
-                    }
-                });
-            }));
+        //只需变更不为历史节点的委托数据(isHistory=NO(2))
+        List<CustomDelegation> delegations = nodeCache.getDelegationByIsHistory(Collections.singletonList(CustomDelegation.YesNoEnum.NO));
+        delegations.forEach(delegation->{
+            //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
+            delegation.setDelegateLocked(new BigInteger(delegation.getDelegateLocked()).add(new BigInteger(delegation.getDelegateHas())).toString());
+            //累加后的犹豫期金额至为0
+            delegation.setDelegateHas("0");
+            delegation.setDelegateReduction("0");
+            //并判断经过一个结算周期后该委托的对应赎回是否全部完成，若完成则将委托设置为历史节点
+            //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
+            if (new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(delegation.getDelegateReduction())) == BigInteger.ZERO) {
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+            }
+            //添加需要更新的委托的信息到委托更新列表
+            executeResult.stageUpdateDelegation(delegation);
         });
     }
 
     //结算周期变更导致的委托赎回的变更
     private void modifyUnDelegationInfoOnNewSettingEpoch () {
         //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
-        nodes.forEach(( nodeId, node ) -> {
-            node.getStakings().forEach((( aLong, customStaking ) -> {
-                customStaking.getDelegations().forEach(( k, v ) -> {
-                    v.getUnDelegations().forEach(unDelegation -> {
-                        //经过结算周期的变更，判断赎回委托的结果
-                        if(unDelegation.getStatus().equals(CustomUnDelegation.StatusEnum.EXITING.code)){
-                            //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-                            unDelegation.setRedeemLocked("0");
-                            //当锁定期金额为零时，认为此笔赎回委托交易已经完成
-                            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
-                        }
-                        //添加需要更新的赎回委托信息到赎回委托更新列表
-                        executeResult.getUpdateUnDelegations().add(unDelegation);
-                    });
-                });
-            }));
+        //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
+        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(Collections.singletonList(CustomUnDelegation.StatusEnum.EXITING));
+        unDelegations.forEach(unDelegation -> {
+            //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
+            unDelegation.setRedeemLocked("0");
+            //当锁定期金额为零时，认为此笔赎回委托交易已经完成
+            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
+            //添加需要更新的赎回委托信息到赎回委托更新列表
+            executeResult.stageUpdateUnDelegation(unDelegation);
         });
     }
 
@@ -431,12 +455,12 @@ public class StakingExecute {
      * @param nodeId
      */
     public void updateNodeStatBlockQty(String nodeId){
-        CustomNode node = nodes.get(nodeId);
-        if(node==null){
-            logger.error("节点(ID={})未存入质押节点列表，无法统计出块数！",nodeId);
-            return;
+        try {
+            CustomNode node = nodeCache.getNode(nodeId);
+            node.setStatBlockQty(node.getStatBlockQty()+1);
+            executeResult.stageUpdateNode(node);
+        } catch (NoSuchBeanException e) {
+            logger.error("{}",e.getMessage());
         }
-        node.setStatBlockQty(node.getStatBlockQty()+1);
-        executeResult.stageUpdateNode(node);
     }
 }

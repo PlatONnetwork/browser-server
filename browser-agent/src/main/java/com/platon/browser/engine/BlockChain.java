@@ -108,7 +108,7 @@ public class BlockChain {
 
         if (blockNumber % chainConfig.getElectionDistance() == 0) {
             logger.debug("开始验证人选举：Block Number({})", blockNumber);
-            stakingExecute.onElectionDistance(curBlock);
+            stakingExecute.onElectionDistance(curBlock,this);
 
             // 通知BlockChain实例内部做与开始验证人选举相关操作
             onElectionDistance();
@@ -116,7 +116,7 @@ public class BlockChain {
 
         if (blockNumber % chainConfig.getConsensusPeriod() == 0) {
             logger.debug("进入新共识周期：Block Number({})", blockNumber);
-            stakingExecute.onNewConsEpoch(curBlock);
+            stakingExecute.onNewConsEpoch(curBlock,this);
 
             // 通知BlockChain实例内部做与共识周期切换相关操作
             onNewConsEpoch();
@@ -124,7 +124,7 @@ public class BlockChain {
 
         if (blockNumber % chainConfig.getSettingPeriod() == 0) {
             logger.debug("进入新结算周期：Block Number({})", blockNumber);
-            stakingExecute.onNewSettingEpoch(curBlock);
+            stakingExecute.onNewSettingEpoch(curBlock,this);
 
             // 通知BlockChain实例内部做与结算周期切换相关操作
             onNewSettingEpoch();

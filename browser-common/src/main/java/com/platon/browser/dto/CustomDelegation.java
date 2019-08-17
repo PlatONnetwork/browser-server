@@ -16,7 +16,7 @@ import java.util.*;
 @Data
 public class CustomDelegation extends Delegation {
 
-    private List<UnDelegation> unDelegations = new ArrayList<>();
+    private List<CustomUnDelegation> unDelegations = new ArrayList<>();
 
     // delegation与staking的关联键
     public String getStakingMapKey(){
@@ -53,12 +53,12 @@ public class CustomDelegation extends Delegation {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map <Integer, CustomStaking.YesNoEnum> ENUMS = new HashMap <>();
-        static {Arrays.asList(CustomStaking.YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
-        public static CustomStaking.YesNoEnum getEnum( Integer code){
+        private static Map <Integer, YesNoEnum> ENUMS = new HashMap <>();
+        static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static YesNoEnum getEnum( Integer code){
             return ENUMS.get(code);
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
-        public static boolean contains( CustomStaking.YesNoEnum en){return ENUMS.containsValue(en);}
+        public static boolean contains( YesNoEnum en){return ENUMS.containsValue(en);}
     }
 }
