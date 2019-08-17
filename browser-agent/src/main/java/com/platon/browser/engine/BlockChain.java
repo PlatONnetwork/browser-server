@@ -33,11 +33,6 @@ import java.util.*;
 @Data
 public class BlockChain {
     private static Logger logger = LoggerFactory.getLogger(BlockChain.class);
-
-    private Map <String, Long> nodeIdToBlockCountMap = new HashMap <>();
-
-    public static final BlockChainResult BIZ_DATA = new BlockChainResult();
-
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
@@ -46,24 +41,25 @@ public class BlockChain {
     private ProposalExecute proposalExecute;
     @Autowired
     private AddressExecute addressExecute;
-
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
     private StakingMapper stakingMapper;
-
     @Autowired
     private DbService dbService;
-
     @Autowired
     private PlatonClient client;
 
+    // 业务数据暂存容器
+    public static final BlockChainResult STAGE_BIZ_DATA = new BlockChainResult();
+    // 当前结算周期轮数
     private long curSettingEpoch;
+    // 当前共识周期轮数
     private long curConsensusEpoch;
+    // 增发周期轮数
     private long addIssueEpoch;
+    // 当前块
     private CustomBlock curBlock;
-    private long transactionCount;
-
 
     /***
      * 以下字段业务使用说明：
@@ -85,35 +81,56 @@ public class BlockChain {
     }
 
     /**
-     * 执行区块
-     *
+     * 分析区块内的业务信息
      * @param block
      */
     public void execute ( CustomBlock block ) {
-
-        //累加区块中的交易总数
-        transactionCount = transactionCount + block.getTransactionList().size();
         curBlock = block;
-        //新开线程去查询rpc共识列表
-
-        // 节点区块数统计
-        Long blockCount = nodeIdToBlockCountMap.get(block.getNodeId());
-        if (blockCount == null) {
-            blockCount = 0l;
-        }
-        nodeIdToBlockCountMap.put(block.getNodeId(), ++blockCount);
-
         // 推算并更新共识周期和结算周期
         updateEpoch();
         // 更新共识周期验证人和结算周期验证人列表
         updateVerifierAndValidator();
-
-        // 分析交易信息
+        // 分析交易信息, 通知质押引擎补充质押相关信息，通知提案引擎补充提案相关信息
         analyzeTransaction();
-
+        // 通知各引擎周期临界点事件
+        periodChangeNotify();
         // 更新node表中的节点出块数信息
         stakingExecute.updateNodeStatBlockQty(curBlock.getNodeId());
     }
+
+    /**
+     * 周期变更通知：
+     *  通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
+     */
+    private void periodChangeNotify() {
+        // 根据区块号是否整除周期来触发周期相关处理方法
+        Long blockNumber = curBlock.getNumber();
+
+        if (blockNumber % chainConfig.getElectionDistance() == 0) {
+            logger.debug("开始验证人选举：Block Number({})", blockNumber);
+            stakingExecute.onElectionDistance(curBlock);
+
+            // 通知BlockChain实例内部做与开始验证人选举相关操作
+            onElectionDistance();
+        }
+
+        if (blockNumber % chainConfig.getConsensusPeriod() == 0) {
+            logger.debug("进入新共识周期：Block Number({})", blockNumber);
+            stakingExecute.onNewConsEpoch(curBlock);
+
+            // 通知BlockChain实例内部做与共识周期切换相关操作
+            onNewConsEpoch();
+        }
+
+        if (blockNumber % chainConfig.getSettingPeriod() == 0) {
+            logger.debug("进入新结算周期：Block Number({})", blockNumber);
+            stakingExecute.onNewSettingEpoch(curBlock);
+
+            // 通知BlockChain实例内部做与结算周期切换相关操作
+            onNewSettingEpoch();
+        }
+    }
+
 
     /**
      * 根据区块号推算并更新共识周期和结算周期轮数
@@ -206,11 +223,8 @@ public class BlockChain {
      */
     private void analyzeTransaction () {
         curBlock.getTransactionList().forEach(tx -> {
-
-
             // 链上执行失败的交易不予处理
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
-
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人
@@ -241,33 +255,6 @@ public class BlockChain {
             // 地址相关
             //addressExecute.execute(tx);
         });
-
-
-        // 根据区块号是否整除周期来触发周期相关处理方法
-        Long blockNumber = curBlock.getNumber();
-        if (blockNumber % chainConfig.getConsensusPeriod() == 0) {
-            // 进入新共识周期
-            logger.debug("进入新共识周期：Block Number({})", blockNumber);
-
-            // TODO: 更新共识周期验证人列表
-            onNewConsEpoch();
-        }
-
-        if (blockNumber % chainConfig.getSettingPeriod() == 0) {
-            // 进入新结算周期
-            logger.debug("进入新结算周期：Block Number({})", blockNumber);
-
-            // TODO: 更新结算周期验证人列表
-            onNewSettingEpoch();
-        }
-
-        if (blockNumber % chainConfig.getElectionDistance() == 0) {
-            // 开始验证人选举
-            logger.debug("开始验证人选举：Block Number({})", blockNumber);
-
-            // TODO: 对上一轮共识验证人进行出块率计算，并进行处罚罚款（更新对应的staking表中的金额），罚款计算公式参考底层文档
-            onElectionDistance();
-        }
     }
 
 
@@ -277,33 +264,34 @@ public class BlockChain {
      * @return
      */
     public BlockChainResult exportResult () {
-        return BIZ_DATA;
+        return STAGE_BIZ_DATA;
     }
 
+    /**
+     * 清除分析后的业务数据
+     */
     public void commitResult () {
-        proposalExecute.commitResult();
-        stakingExecute.commitResult();
+        STAGE_BIZ_DATA.clear();
     }
 
     /**
      * 进入新的结算周期
      */
     private void onNewSettingEpoch () {
-        stakingExecute.onNewSettingEpoch();
+
     }
 
     /**
      * 进入新的共识周期变更
      */
     private void onNewConsEpoch () {
-        stakingExecute.onNewConsEpoch();
+
     }
 
     /**
      * 进行选择验证人时触发
      */
     private void onElectionDistance () {
-        stakingExecute.onElectionDistance();
-    }
 
+    }
 }

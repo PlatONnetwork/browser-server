@@ -77,7 +77,7 @@ public class DbService {
         //批量入库新增解委托数据
         if (ser.getAddUnDelegations().size() > 0) customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getAddUnDelegations(),UnDelegation.Column.values());
         //批量入库新增惩罚数据
-        if (ser.getAddSlash().size() > 0) customSlashMapper.batchInsertOrUpdateSelective(ser.getAddSlash(),Slash.Column.values());
+        if (ser.getAddSlashs().size() > 0) customSlashMapper.batchInsertOrUpdateSelective(ser.getAddSlashs(),Slash.Column.values());
         //批量入库新增操作数据
         if (ser.getAddNodeOpts().size() > 0) customNodeOptMapper.batchInsertOrUpdateSelective(ser.getAddNodeOpts(),NodeOpt.Column.values());
 

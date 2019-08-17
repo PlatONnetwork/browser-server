@@ -32,7 +32,7 @@ public class ProposalExecute {
     @Autowired
     private PlatonClient client;
 
-    private ProposalExecuteResult executeResult = BlockChain.BIZ_DATA.getProposalExecuteResult();
+    private ProposalExecuteResult executeResult = BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult();
 
     @PostConstruct
     private void init(){
@@ -68,13 +68,6 @@ public class ProposalExecute {
 
     public ProposalExecuteResult exportResult(){
         return executeResult;
-    }
-
-    /**
-     * 清除待入库或待更新缓存，需要在入库后调用
-     */
-    public void commitResult(){
-        executeResult.clear();
     }
 
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){

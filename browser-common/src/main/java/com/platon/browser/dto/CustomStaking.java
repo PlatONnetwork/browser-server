@@ -114,7 +114,7 @@ public class CustomStaking extends Staking {
      * 使用交易信息更新质押信息
      * @param tx
      */
-    public void updateWithTransactionBean(CustomTransaction tx){
+    public void updateWithCustomTransaction(CustomTransaction tx){
         // 质押块号
         this.setStakingBlockNum(tx.getBlockNumber());
         // 质押交易索引

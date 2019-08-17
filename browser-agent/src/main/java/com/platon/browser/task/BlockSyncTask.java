@@ -13,6 +13,7 @@ import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlockCollectingException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
@@ -126,18 +127,18 @@ public class BlockSyncTask {
                     verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
                         CustomNode node = new CustomNode();
                         node.initWithNode(verifier);
-                        node.setIsRecommend(1);
-                        blockChain.BIZ_DATA.getStakingExecuteResult().getAddNodes().add(node);
+                        node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
+                        blockChain.STAGE_BIZ_DATA.getStakingExecuteResult().stageAddNode(node);
 
-                        CustomStaking stakingBean = new CustomStaking();
-                        stakingBean.updateWithNode(verifier);
-                        stakingBean.setStakingIcon("");
-                        stakingBean.setIsInit(1);
-                        stakingBean.setIsSetting(1);
+                        CustomStaking staking = new CustomStaking();
+                        staking.updateWithNode(verifier);
+                        staking.setStakingIcon("");
+                        staking.setIsInit(1);
+                        staking.setIsSetting(1);
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                        if(validatorMap.get(node.getNodeId())!=null) stakingBean.setIsConsensus(1);
-
-                        blockChain.BIZ_DATA.getStakingExecuteResult().getAddStakings().add(stakingBean);
+                        if(validatorMap.get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                        // 暂存至新增质押待入库列表
+                        blockChain.STAGE_BIZ_DATA.getStakingExecuteResult().stageAddStaking(staking,null);
                     });
                     BlockChainResult bcr = blockChain.exportResult();
                     service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
@@ -151,35 +152,28 @@ public class BlockSyncTask {
         }
     }
 
-    public void start () throws InterruptedException {
-
+    public void start () throws BlockCollectingException {
         while (true) {
-            // 构造连续的待采区块号列表
+            // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();
-            for (long blockNumber = commitBlockNumber + 1; blockNumber <= (commitBlockNumber + collectBatchSize); blockNumber++) {
-                blockNumbers.add(BigInteger.valueOf(blockNumber));
-            }
-
-            // 并行采集区块
+            for (long blockNumber=commitBlockNumber+1; blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++) blockNumbers.add(BigInteger.valueOf(blockNumber));
+            // 并行采集区块 ||||||||||||||||||||||||||||
             Result collectedResult = new Result();
             getBlockAndTransaction(blockNumbers, collectedResult);
             List <CustomBlock> blocks = collectedResult.getSortedBlocks();
-
-            // 采集不到区块则则暂停1秒, 结束本次循环
+            // 采集不到区块则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
-                TimeUnit.SECONDS.sleep(1);
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
+                }
                 continue;
             }
-
-            // 对区块和交易做分析
+            // 对区块和交易做并行分析 ||||||||||||||||||||||||||||
             analyzeBlockAndTransaction(blocks);
             // 调用BlockChain实例，分析质押、提案相关业务数据
             blocks.forEach(block ->blockChain.execute(block));
-            //获取内存中全量质押和委托信息，用于地址相关统计数据
-
-            //TreeMap<String, Staking> stakingCache = blockChain.getStakingExecute().getStakingCache();
-            //TreeMap<String, Delegation> delegationCache = blockChain.getStakingExecute().getDelegationCache();
-            //blockChain.getAddressExecute().statisticsAddressInfo(stakingCache,delegationCache);
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainResult bizData = blockChain.exportResult();
@@ -188,9 +182,13 @@ public class BlockSyncTask {
                 break;
             }
             blockChain.commitResult();
-
+            // 记录已采入库最高区块号
             commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
-            TimeUnit.SECONDS.sleep(1);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
+            }
         }
     }
 
@@ -200,10 +198,9 @@ public class BlockSyncTask {
      * @param blockNumbers 批量采集的区块号
      * @return
      */
-    private void getBlockAndTransaction ( List <BigInteger> blockNumbers, Result result ) {
-
+    private void getBlockAndTransaction ( List <BigInteger> blockNumbers, Result result ) throws BlockCollectingException {
+        // 清空重试区块号列表
         result.retryNumbers.clear();
-
         // 并行批量采集区块
         CountDownLatch latch = new CountDownLatch(blockNumbers.size());
         blockNumbers.forEach(blockNumber->
@@ -222,6 +219,7 @@ public class BlockSyncTask {
                         }
                     }
                 } catch (Exception e) {
+                    // 把出现异常的区块号加入重试列表
                     result.retryNumbers.add(blockNumber);
                 }finally {
                     latch.countDown();
@@ -232,7 +230,7 @@ public class BlockSyncTask {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new BlockCollectingException("区块采集线程被中断:"+e.getMessage());
         }
 
         if (result.concurrentBlockMap.size() > 0) {
