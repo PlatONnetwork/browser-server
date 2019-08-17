@@ -28,7 +28,7 @@ public class CustomDelegation extends Delegation {
         return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
     }
 
-    public void initWithDelegation( DelegateParam delegateParam,int transactionIndex){
+    public void updateWithDelegation( DelegateParam delegateParam,int transactionIndex){
         this.setDelegateHas(delegateParam.getAmount());
         this.setDelegateLocked("0");
         this.setDelegateReduction("0");
@@ -37,6 +37,7 @@ public class CustomDelegation extends Delegation {
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }
+
 
     public enum YesNoEnum{
         YES(1, "是"),
