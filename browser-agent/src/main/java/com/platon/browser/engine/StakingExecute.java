@@ -300,7 +300,7 @@ public class StakingExecute {
                 //若不存在，则说明该地址有对此节点做过委托
                 if (customDelegation == null) {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
-                    newCustomDelegation.updateWithDelegation(param, tx.getTransactionIndex());
+                    newCustomDelegation.updateWithDelegation(param, tx);
                     latestStaking.getDelegations().put(tx.getFrom(), newCustomDelegation);
                     //新增分析结果AddSet
                     executeResult.getAddDelegations().add(newCustomDelegation);
