@@ -6,5 +6,5 @@ import com.platon.browser.req.PageReq;
 
 @Data
 public class HistoryStakingListReq extends PageReq{
-    private String nodeId;
+    private String key;
 }

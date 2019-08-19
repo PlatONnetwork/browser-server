@@ -98,8 +98,8 @@ public interface AppDocStaking {
      *         "stakingIcon":"",       //验证人图标
      *         "status":"",            //状态   1:候选中  2:活跃中  3:出块中
      *         "totalValue":"",        //质押总数=有效的质押+委托
-     *         "delegateValue":"",     //委托总数
-     *         "delegateQty":"",       //委托人数
+     *         "delegateValue":"",     //委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额)
+     *         "delegateQty":"",       //委托人数（地址数）
      *         "slashLowQty":11,       //低出块率举报次数
      *         "slashMultiQty":11,     //多签举报次数
      *         "blockQty":11,          //产生的区块数
@@ -144,7 +144,6 @@ public interface AppDocStaking {
      *         "stakingIcon":"",       //验证人图标
      *         "status":"",            //状态 4:退出中 5:已退出
      *         "statDelegateReduction":"", //待提取的委托
-     *         "reportLow":11,         //低出块率举报次数
      *         "slashLowQty":11,       //低出块率举报次数
      *         "slashMultiQty":11,     //多签举报次数
      *         "leaveTime":11          //退出时间

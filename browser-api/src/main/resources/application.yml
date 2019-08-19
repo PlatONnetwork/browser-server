@@ -76,31 +76,31 @@ platon:
   redis:
     key:
       #验证节点列表
-      node: browser:${version}:${profile}:chain{}:nodes
+      node: browser:${profile}:nodes
       #节点ID与其所出最大块号的映射
-      nodeid-maxblocknum: browser:${version}:${profile}:chain{}:nodeid-maxblocknum:{nodeId}
+      nodeid-maxblocknum: browser:${profile}:nodeid-maxblocknum:{nodeId}
       #区块列表
-      block: browser:${version}:${profile}:chain{}:blocks
+      block: browser:${profile}:blocks
       #交易列表
-      transaction: browser:${version}:${profile}:chain{}:transactions
+      transaction: browser:${profile}:transactions
       #统计信息
-      staticstics: browser:${version}:${profile}:chain{}:staticstics
+      networkStat: browser:${profile}:networkStat
       #总交易笔数
-      trans-count: browser:${version}:${profile}:chain{}:trans-count
+      trans-count: browser:${profile}:trans-count
       #24小时内的交易数
-      trans-count-24-hours: browser:${version}:${profile}:chain{}:trans-count-24-hours
+      trans-count-24-hours: browser:${profile}:trans-count-24-hours
       #地址数
-      address-count: browser:${version}:${profile}:chain{}:address-count
+      address-count: browser:${profile}:address-count
       #平均区块交易数
-      avg-block-trans-count: browser:${version}:${profile}:chain{}:avg-block-trans-count
+      avg-block-trans-count: browser:${profile}:avg-block-trans-count
       #票价
-      ticket-price: browser:${version}:${profile}:chain{}:ticket-price
+      ticket-price: browser:${profile}:ticket-price
       #投票数
-      vote-count: browser:${version}:${profile}:chain{}:vote-count
+      vote-count: browser:${profile}:vote-count
       #MaxTps
-      max-tps: browser:${version}:${profile}:chain{}:max-tps
+      max-tps: browser:${profile}:max-tps
       # 按地址存储的交易的键模板
-      address-trans-key-template: browser:${version}:${profile}:chain{}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
+      address-trans-key-template: browser:${profile}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
       # 按地址存储的交易数量限制
       address-trans-max-item: 200
     max-item: 500000
