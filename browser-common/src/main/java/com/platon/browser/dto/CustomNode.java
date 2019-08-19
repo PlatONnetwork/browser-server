@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
@@ -15,6 +16,9 @@ import java.util.*;
  */
 @Data
 public class CustomNode extends Node {
+    private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
+    private List<Slash> slashes = new ArrayList<>();
+    private List<NodeOpt> nodeOpts = new ArrayList<>();
 
      public CustomNode(){
          Date date = new Date();
@@ -37,15 +41,11 @@ public class CustomNode extends Node {
           this.setIsRecommend(2);
      }
 
-     public void initWithNode(org.web3j.platon.bean.Node initData){
-          this.setNodeId(HexTool.prefix(initData.getNodeId()));
+     public void updateWithNode(org.web3j.platon.bean.Node node){
+          this.setNodeId(HexTool.prefix(node.getNodeId()));
      }
 
-     private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
-     private List<Slash> slashes = new ArrayList<>();
-     private List<NodeOpt> nodeOpts = new ArrayList<>();
-
-    public void initWithStaking(CustomStaking staking) {
+    public void updateWithCustomStaking(CustomStaking staking) {
         this.setNodeId(staking.getNodeId());
         this.setCreateTime(new Date());
     }
@@ -53,9 +53,9 @@ public class CustomNode extends Node {
     /**
      * 获取指定节点的最新质押记录
      */
-    public CustomStaking getLatestStaking(){
+    public CustomStaking getLatestStaking() throws NoSuchBeanException {
         Map.Entry<Long, CustomStaking> lastEntry = stakings.lastEntry();
-        if(lastEntry==null) return null;
+        if(lastEntry==null) throw new NoSuchBeanException("没有质押记录！");
         return lastEntry.getValue();
     }
 

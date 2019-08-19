@@ -40,12 +40,16 @@ platon:
     stakingRewardRate:  ${platonconfig.staking_reward_rate}
     #初始发行金额
     initIssueValue: ${platonconfig.init_issue_value}
-    #激励合约地址
-    rewardAddr: ${platonconfig.reward_addr}
-    #质押合约地址
-    stakingAddr: ${platonconfig.staking_addr}
-    #锁仓合约地址
-    restrictingAddr: ${platonconfig.restricting_addr}
+
+    #锁仓账户地址
+    restrictingAccountAddr: ${platonconfig.restricting_account_addr}
+    #激励池账户地址
+    stimulatePoolAccountAddr: ${platonconfig.stimulate_pool_account_addr}
+    #开发者激励基金账户地址
+    developerStimulateFundAccountAddr: ${platonconfig.developer_stimulate_fund_account_addr}
+    #PlatOn基金会账户地址
+    platonFundAccountAddr: ${platonconfig.platon_fund_account_addr}
+
     #质押门槛
     stakeThreshold: ${platonconfig.stake_threshold}
     #委托门槛
@@ -112,6 +116,7 @@ logging:
     com.platon.browser.task: ${loglevel.platon.task}
     com.platon.browser.engine: ${loglevel.platon.engine}
     com.platon.browser.client: ${loglevel.platon.client}
+    com.platon.browser.dao: ${loglevel.platon.dao}
 
 # MyBatis配置（注意：一定要对应mapper映射xml文件的所在路径）
 mybatis:

@@ -1,4 +1,4 @@
-package com.platon.browser.engine;
+package com.platon.browser.engine.result;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
