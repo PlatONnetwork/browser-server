@@ -17,6 +17,8 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.IsConsensusStatus;
+import com.platon.browser.enums.StakingStatus;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.TransactionService;
@@ -145,18 +147,20 @@ public class HomeServiceImpl implements HomeService {
 	public ChainStatisticNewResp chainStatisticNew() {
 		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
 		ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
-		chainStatisticNewResp.setMaxTps(networkStatRedis.getMaxTps());
-		chainStatisticNewResp.setAddressQty(networkStatRedis.getAddressQty());
-		chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurrentNumber());
-		chainStatisticNewResp.setDoingProposalQty(networkStatRedis.getDoingProposalQty());
-		chainStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
-		chainStatisticNewResp.setNodeId(networkStatRedis.getNodeId());
-		chainStatisticNewResp.setNodeName(networkStatRedis.getNodeName());
-		chainStatisticNewResp.setProposalQty(networkStatRedis.getProposalQty());
-		BigDecimal sum = new BigDecimal(networkStatRedis.getStakingDelegationValue()).add(new BigDecimal(networkStatRedis.getStakingValue()));
-		chainStatisticNewResp.setTakingDelegationValue(sum.toString());
-		chainStatisticNewResp.setTurnValue(networkStatRedis.getTurnValue());
-		chainStatisticNewResp.setTxQty(networkStatRedis.getTxQty());
+		if(networkStatRedis != null) {
+			chainStatisticNewResp.setMaxTps(networkStatRedis.getMaxTps());
+			chainStatisticNewResp.setAddressQty(networkStatRedis.getAddressQty());
+			chainStatisticNewResp.setCurrentNumber(networkStatRedis.getCurrentNumber());
+			chainStatisticNewResp.setDoingProposalQty(networkStatRedis.getDoingProposalQty());
+			chainStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
+			chainStatisticNewResp.setNodeId(networkStatRedis.getNodeId());
+			chainStatisticNewResp.setNodeName(networkStatRedis.getNodeName());
+			chainStatisticNewResp.setProposalQty(networkStatRedis.getProposalQty());
+			BigDecimal sum = new BigDecimal(networkStatRedis.getStakingDelegationValue()).add(new BigDecimal(networkStatRedis.getStakingValue()));
+			chainStatisticNewResp.setTakingDelegationValue(sum.toString());
+			chainStatisticNewResp.setTurnValue(networkStatRedis.getTurnValue());
+			chainStatisticNewResp.setTxQty(networkStatRedis.getTxQty());
+		}
 		return chainStatisticNewResp;
 	}
 
@@ -164,7 +168,7 @@ public class HomeServiceImpl implements HomeService {
 	public List<StakingListNewResp> stakingListNew() {
 		StakingExample stakingExample = new StakingExample();
 		Criteria criteria = stakingExample.createCriteria();
-		criteria.andStatusEqualTo(1).andIsConsensusEqualTo(1);
+		criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode()).andIsConsensusEqualTo(IsConsensusStatus.YES.getCode());
 		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
 				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,id desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
