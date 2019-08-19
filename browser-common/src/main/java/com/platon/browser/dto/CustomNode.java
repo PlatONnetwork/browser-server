@@ -51,6 +51,21 @@ public class CustomNode extends Node {
     }
 
     /**
+     * 取最近的x条质押记录
+     * @param x
+     * @return
+     * @throws NoSuchBeanException
+     */
+    public List<CustomStaking> getLatestXStakings(int x) throws NoSuchBeanException {
+        List<CustomStaking> returnData  = new ArrayList<>();
+        for (Map.Entry<Long,CustomStaking> entry:stakings.descendingMap().descendingMap().entrySet()){
+            returnData.add(entry.getValue());
+            if(returnData.size()==x) break;
+        }
+        return returnData;
+    }
+
+    /**
      * 获取指定节点的最新质押记录
      */
     public CustomStaking getLatestStaking() throws NoSuchBeanException {

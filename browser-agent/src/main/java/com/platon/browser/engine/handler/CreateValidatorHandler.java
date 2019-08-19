@@ -64,9 +64,11 @@ public class CreateValidatorHandler implements EventHandler {
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();
             node.updateWithCustomStaking(staking);
-
-//            context.getNodeCache()
-
+            // 把质押记录添加到节点质押记录列表中
+            node.getStakings().put(staking.getStakingBlockNum(),staking);
+            // 节点添加到缓存中
+            nodeCache.add(node);
+            // 新节点和新质押记录暂存到待入库列表中
             executeResult.stageAddNode(node);
             executeResult.stageAddStaking(staking,tx);
         }
