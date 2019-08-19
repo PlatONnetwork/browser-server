@@ -36,8 +36,14 @@ public class ProposalTextHandler implements EventHandler {
             CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
             CustomProposal customProposal = new CustomProposal();
             //设置提案发起人所属节点nodeName
+            customProposal.updateWithProposal(tx);
+            customProposal.setActiveBlock("");
+            customProposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
+            customProposal.setNewVersion("");
+            customProposal.setEndVotingBlock(param.getEndVotingBlock().toString());
+            customProposal.setVerifier(param.getVerifier());
             customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            customProposal.updateWithProposalText(tx,param);
+            customProposal.setUrl(param.getUrl());
             //新增文本提案交易结构
             proposalExecuteResult.getAddProposals().add(customProposal);
             //全量数据补充

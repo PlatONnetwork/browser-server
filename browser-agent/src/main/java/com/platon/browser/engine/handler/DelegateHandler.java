@@ -40,13 +40,13 @@ public class DelegateHandler implements EventHandler {
             try {
                 //获取treemap中最新一条质押数据数据
                 CustomStaking latestStaking = node.getLatestStaking();
+                logger.debug("委托信息:{}", JSON.toJSONString(param));
 
                 //交易数据tx_info补全
                 param.setNodeName(latestStaking.getStakingName());
                 param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
                 //todo：交易数据回填
                 tx.setTxInfo(JSON.toJSONString(param));
-
 
                 //通过委托地址+nodeId+质押块高获取委托对象
                 CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());

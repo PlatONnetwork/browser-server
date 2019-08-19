@@ -30,69 +30,19 @@ public class CustomProposal extends Proposal {
         BeanUtils.copyProperties(proposal, this);
     }
 
-    public void updateWithProposalText ( CustomTransaction tx, CreateProposalTextParam param ) {
+    public void updateWithProposal ( CustomTransaction tx) {
         this.setHash(tx.getHash());
         this.setYeas(0L);
         this.setNays(0L);
         this.setAbstentions(0L);
-        this.setEndVotingBlock(param.getEndVotingBlock().toString());
+        this.setAccuVerifiers(0L);
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
-        this.setType(String.valueOf(TypeEnum.TEXT.code));
-        this.setUrl("");
-        this.setNewVersion("");
-        this.setParamName("");
-        this.setCurrentValue("");
-        this.setActiveBlock("");
         this.setTimestamp(tx.getTimestamp());
-        this.setAccuVerifiers(0L);
-        this.setNewValue("");
         this.setStatus(StatusEnum.VOTEING.code);
-        this.setVerifier(param.getVerifier());
     }
 
 
-    public void updateWithProposalUpgrage ( CustomTransaction tx, CreateProposalUpgradeParam param ) {
-        this.setHash(tx.getHash());
-        this.setYeas(0L);
-        this.setNays(0L);
-        this.setAbstentions(0L);
-        this.setEndVotingBlock(param.getEndVotingBlock().toString());
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
-        this.setType(String.valueOf(TypeEnum.UPGRADE.code));
-        this.setUrl(param.getUrl());
-        this.setNewVersion(String.valueOf(param.getNewVersion()));
-        this.setParamName("");
-        this.setCurrentValue("");
-        this.setActiveBlock(String.valueOf(param.getActiveBlock()));
-        this.setTimestamp(tx.getTimestamp());
-        this.setAccuVerifiers(0L);
-        this.setNewVersion("");
-        this.setStatus(StatusEnum.VOTEING.code);
-        this.setVerifier(param.getVerifier());
-    }
-
-    public void updateWithProposalParam ( CustomTransaction tx, CreateProposalParameterParam param ) {
-        this.setHash(tx.getHash());
-        this.setYeas(0L);
-        this.setNays(0L);
-        this.setAbstentions(0L);
-        this.setEndVotingBlock(param.getEndVotingBlock().toString());
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
-        this.setType(String.valueOf(TypeEnum.UPGRADE.code));
-        this.setUrl(param.getUrl());
-        this.setNewVersion(String.valueOf(param.getNewVersion()));
-        this.setParamName(param.getParamName());
-        this.setCurrentValue(param.getCurrentValue());
-        this.setActiveBlock("");
-        this.setTimestamp(tx.getTimestamp());
-        this.setAccuVerifiers(0L);
-        this.setNewValue(param.getNewVersion());
-        this.setStatus(StatusEnum.VOTEING.code);
-        this.setVerifier(param.getVerifier());
-    }
 
     public enum OptionEnum {
         SUPPORT(1, "支持"),

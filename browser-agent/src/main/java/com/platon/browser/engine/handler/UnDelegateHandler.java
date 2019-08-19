@@ -30,13 +30,17 @@ public class UnDelegateHandler implements EventHandler {
         NodeCache nodeCache = context.getNodeCache();
         StakingExecuteResult executeResult = context.getExecuteResult();
         BlockChain bc = context.getBlockChain();
-        logger.debug("减持/撤销委托(赎回委托)");
+
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
             CustomNode node = nodeCache.getNode(param.getNodeId());
+            logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
             CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+            //交易数据回填
+            param.setNodeName(customStaking.getStakingName());
+            tx.setTxInfo(JSON.toJSONString(param));
 
             //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
             CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom());
@@ -93,6 +97,7 @@ public class UnDelegateHandler implements EventHandler {
             executeResult.stageUpdateDelegation(customDelegation);
             //新增分析委托赎回结果
             executeResult.stageAddUnDelegation(customUnDelegation);
+
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
         }

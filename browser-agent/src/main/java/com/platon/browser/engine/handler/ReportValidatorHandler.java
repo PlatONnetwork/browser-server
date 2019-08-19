@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -42,6 +43,11 @@ public class ReportValidatorHandler implements EventHandler {
         evidencesParams.forEach(evidencesParam -> {
             try {
                 CustomStaking latestStaking = nodeCache.getNode(evidencesParam.getVerify()).getLatestStaking();
+                logger.debug("多签举报信息:{}", JSON.toJSONString(param));
+
+                //交易数据回填
+                evidencesParam.setNodeName(latestStaking.getStakingName());
+
                 //多签举报，惩罚金额
                 Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashing();
                 //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
@@ -76,6 +82,8 @@ public class ReportValidatorHandler implements EventHandler {
             } catch (NoSuchBeanException e) {
                 logger.error("{}", e.getMessage());
             }
+
+            tx.setTxInfo(JSON.toJSONString(param));
         });
         logger.debug("举报多签(举报验证人)");
 

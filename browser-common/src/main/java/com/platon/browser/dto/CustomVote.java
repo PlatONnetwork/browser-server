@@ -2,8 +2,11 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.param.VotingProposalParam;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+
+import java.util.Date;
 
 /**
  * @Auther: Chendongming
@@ -15,5 +18,16 @@ public class CustomVote extends Vote {
 
     public void bulidStructure( Vote vote){
         BeanUtils.copyProperties(vote,this);
+    }
+
+    public void updateWithVote( CustomTransaction tx, VotingProposalParam param ){
+        this.setCreateTime(new Date());
+        this.setUpdateTime(new Date());
+        this.setHash(tx.getHash());
+        this.setProposalHash(param.getProposalId());
+        this.setOption(param.getOption());
+        this.setTimestamp(tx.getTimestamp());
+        this.setVerifier(param.getVerifier());
+        this.setProposalHash(param.getProposalId());
     }
 }

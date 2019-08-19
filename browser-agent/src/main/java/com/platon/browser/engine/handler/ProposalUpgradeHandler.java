@@ -36,8 +36,15 @@ public class ProposalUpgradeHandler implements EventHandler{
             CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
             CustomProposal customProposal = new CustomProposal();
             //设置提案发起人所属节点nodeName
+            customProposal.updateWithProposal(tx);
+            customProposal.setActiveBlock(String.valueOf(param.getActiveBlock()));
+            customProposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
+            customProposal.setNewVersion(String.valueOf(param.getNewVersion()));
+            customProposal.setEndVotingBlock(param.getEndVotingBlock().toString());
+            customProposal.setVerifier(param.getVerifier());
             customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            customProposal.updateWithProposalUpgrage(tx,param);
+            customProposal.setUrl(param.getUrl());
+
             //新增文本提案交易结构
             proposalExecuteResult.getAddProposals().add(customProposal);
             //全量数据补充
