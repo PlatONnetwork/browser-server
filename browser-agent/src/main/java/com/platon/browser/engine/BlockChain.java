@@ -9,6 +9,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
+import com.platon.browser.exception.SettleEpochChangeException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -54,11 +55,11 @@ public class BlockChain {
     // 业务数据暂存容器
     public static final BlockChainResult STAGE_BIZ_DATA = new BlockChainResult();
     // 当前结算周期轮数
-    private long curSettingEpoch;
+    private BigInteger curSettingEpoch;
     // 当前共识周期轮数
-    private long curConsensusEpoch;
+    private BigInteger curConsensusEpoch;
     // 增发周期轮数
-    private long addIssueEpoch;
+    private BigInteger addIssueEpoch;
     // 当前块
     private CustomBlock curBlock;
 
@@ -67,6 +68,9 @@ public class BlockChain {
 
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
     public static final Map<String, CustomProposal> PROPOSALS = new HashMap<>();
+
+    // 每个增发周期内有几个结算周期
+    private BigInteger settleEpochCountPerIssueEpoch;
 
     /***
      * 以下字段业务使用说明：
@@ -84,19 +88,22 @@ public class BlockChain {
 
     @PostConstruct
     private void init () {
-
+        // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
+        settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriod().divide(chainConfig.getSettingPeriod());
     }
 
     /**
      * 分析区块内的业务信息
      * @param block
      */
-    public void execute ( CustomBlock block ) {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         updateEpoch();
-        // 更新共识周期验证人和结算周期验证人列表
-        updateVerifierAndValidator();
+        // 更新共识周期验证人
+        updateValidator();
+        // 更新结算周期验证人列表
+        updateVerifier();
         // 分析交易信息, 通知质押引擎补充质押相关信息，通知提案引擎补充提案相关信息
         analyzeTransaction();
         // 通知各引擎周期临界点事件
@@ -109,32 +116,25 @@ public class BlockChain {
      * 周期变更通知：
      *  通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    private void periodChangeNotify() {
+    private void periodChangeNotify() throws SettleEpochChangeException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
-
-        if (blockNumber % chainConfig.getElectionDistance() == 0) {
+        if (blockNumber % chainConfig.getElectionDistance().longValue() == 0) {
             logger.debug("开始验证人选举：Block Number({})", blockNumber);
             stakingExecute.onElectionDistance(curBlock,this);
 
-            // 通知BlockChain实例内部做与开始验证人选举相关操作
-            onElectionDistance();
         }
 
-        if (blockNumber % chainConfig.getConsensusPeriod() == 0) {
+        if (blockNumber % chainConfig.getConsensusPeriod().longValue() == 0) {
             logger.debug("进入新共识周期：Block Number({})", blockNumber);
             stakingExecute.onNewConsEpoch(curBlock,this);
 
-            // 通知BlockChain实例内部做与共识周期切换相关操作
-            onNewConsEpoch();
         }
 
-        if (blockNumber % chainConfig.getSettingPeriod() == 0) {
+        if (blockNumber % chainConfig.getSettingPeriod().longValue() == 0) {
             logger.debug("进入新结算周期：Block Number({})", blockNumber);
             stakingExecute.onNewSettingEpoch(curBlock,this);
 
-            // 通知BlockChain实例内部做与结算周期切换相关操作
-            onNewSettingEpoch();
         }
     }
 
@@ -145,11 +145,14 @@ public class BlockChain {
     private void updateEpoch () {
         // 根据区块号是否与周期整除来触发周期相关处理方法
         // 计算共识周期轮数
-        curConsensusEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod()), 0, RoundingMode.CEILING).longValue();
+        curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+                .divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod().longValue()), 0, RoundingMode.CEILING).longValue());
         // 计算结算周期轮数
-        curSettingEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getSettingPeriod()), 0, RoundingMode.CEILING).longValue();
+        curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+                .divide(BigDecimal.valueOf(chainConfig.getSettingPeriod().longValue()), 0, RoundingMode.CEILING).longValue());
         //计算增发周期轮数
-        addIssueEpoch = BigDecimal.valueOf(curBlock.getNumber()).divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriod()), 0, RoundingMode.CEILING).longValue();
+        addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+                .divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriod().longValue()), 0, RoundingMode.CEILING).longValue());
     }
 
     /**
@@ -162,11 +165,11 @@ public class BlockChain {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifierAndValidator () {
+    private void updateValidator () {
         // 根据区块号是否整除周期来触发周期相关处理方法
         // 查询当前轮的候选人，至少需要在周期切换后出的第一个块号才可以查到，所以需要减一
         Long blockNumber = curBlock.getNumber(), prevBlockNumber = blockNumber - 1;
-        if (prevBlockNumber % chainConfig.getConsensusPeriod() == 0) {
+        if (prevBlockNumber % chainConfig.getConsensusPeriod().longValue() == 0) {
             logger.debug("共识周期切换块号:{}, 查新共识周期验证节点时的块号:{}", prevBlockNumber, blockNumber);
             // 直接查当前最新的共识周期验证人列表来初始化blockChain的curValidators属性
             try {
@@ -194,8 +197,17 @@ public class BlockChain {
                 logger.error("查询最新共识周期验证人列表失败,原因：{}", e.getMessage());
             }
         }
+    }
 
-        if (prevBlockNumber % chainConfig.getSettingPeriod() == 0) {
+    /**
+     * 在结算周期发生时触发结算周期验证人更新
+     */
+    private void updateVerifier () {
+        // 根据区块号是否整除周期来触发周期相关处理方法
+        // 查询当前轮的候选人，至少需要在周期切换后出的第一个块号才可以查到，所以需要减一
+        Long blockNumber = curBlock.getNumber(), prevBlockNumber = blockNumber - 1;
+
+        if (prevBlockNumber % chainConfig.getSettingPeriod().longValue() == 0) {
             logger.debug("结算周期切换块号:{}, 查新结算周期验证节点时的块号:{}", prevBlockNumber, blockNumber);
             // 直接查当前最新的结算周期验证人列表来初始化blockChain的curVerifiers属性
             try {
@@ -279,26 +291,5 @@ public class BlockChain {
      */
     public void commitResult () {
         STAGE_BIZ_DATA.clear();
-    }
-
-    /**
-     * 进入新的结算周期
-     */
-    private void onNewSettingEpoch () {
-
-    }
-
-    /**
-     * 进入新的共识周期变更
-     */
-    private void onNewConsEpoch () {
-
-    }
-
-    /**
-     * 进行选择验证人时触发
-     */
-    private void onElectionDistance () {
-
     }
 }

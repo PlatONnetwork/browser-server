@@ -64,6 +64,9 @@ public class CreateValidatorHandler implements EventHandler {
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();
             node.updateWithCustomStaking(staking);
+
+//            context.getNodeCache()
+
             executeResult.stageAddNode(node);
             executeResult.stageAddStaking(staking,tx);
         }

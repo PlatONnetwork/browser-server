@@ -33,31 +33,31 @@ public class CustomStaking extends Staking {
         this.setJoinTime(date);
         /** 初始化默认值 **/
         // 质押金额(犹豫期金额)
-        this.setStakingHas("0");
+        this.setStakingHas(BigInteger.ZERO.toString());
         // 质押金额(锁定金额)
-        this.setStakingLocked("0");
+        this.setStakingLocked(BigInteger.ZERO.toString());
         // 委托交易总金额(犹豫期金额)
-        this.setStatDelegateHas("0");
+        this.setStatDelegateHas(BigInteger.ZERO.toString());
         // 委托交易总金额(锁定期金额)
-        this.setStatDelegateLocked("0");
+        this.setStatDelegateLocked(BigInteger.ZERO.toString());
         // 质押金额(退回中金额)
-        this.setStakingReduction("0");
+        this.setStakingReduction(BigInteger.ZERO.toString());
         // 委托交易总金额(退回中金额)
-        this.setStatDelegateReduction("0");
+        this.setStatDelegateReduction(BigInteger.ZERO.toString());
         // 节点名称(质押节点名称)
         this.setStakingName("Unknown");
         // 节点头像(关联external_id，第三方软件获取)
         this.setStakingIcon("");
         // 预计年化率
-        this.setExpectedIncome("0");
+        this.setExpectedIncome(BigInteger.ZERO.toString());
         // 出块奖励
-        this.setBlockRewardValue("0");
+        this.setBlockRewardValue(BigInteger.ZERO.toString());
         // 上个结算周期出块奖励
-        this.setPreSetBlockRewardValue("0");
+        this.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
         // 程序版本
-        this.setProgramVersion("0");
+        this.setProgramVersion(BigInteger.ZERO.toString());
         // 质押奖励
-        this.setStakingRewardValue("0");
+        this.setStakingRewardValue(BigInteger.ZERO.toString());
         // 结算周期标识
         this.setStakingReductionEpoch(0);
         // 委托交易总数(关联的委托交易总数)
@@ -162,17 +162,19 @@ public class CustomStaking extends Staking {
     /**
      * 使用退出验证人参数更新质押记录
      * @param param
+     * @param curSettingEpoch
      */
-    public void updateWithExitValidatorParam(ExitValidatorParam param) {
-        this.setStakingHas("0");
+    public void updateWithExitValidatorParam(ExitValidatorParam param, BigInteger curSettingEpoch) {
+        this.setStakingHas(BigInteger.ZERO.toString());
         this.setLeaveTime(new Date());
         BigInteger stakingLocked = new BigInteger(getStakingLocked());
         if(stakingLocked.compareTo(BigInteger.ZERO)>0){
             this.setStakingReduction(getStakingLocked());
-            this.setStakingLocked("0");
+            this.setStakingLocked(BigInteger.ZERO.toString());
+            this.setStakingReductionEpoch(curSettingEpoch.intValue());
             this.setStatus(StatusEnum.EXITING.code);
         }else {
-            this.setStakingLocked("0");
+            this.setStakingLocked(BigInteger.ZERO.toString());
             this.setStatus(StatusEnum.EXITED.code);
         }
     }
@@ -220,6 +222,4 @@ public class CustomStaking extends Staking {
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
     }
-
-
 }

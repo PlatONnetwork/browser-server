@@ -6,5 +6,5 @@ package com.platon.browser.engine.handler;
  * @Description:
  */
 public interface EventHandler {
-    public void handle(EventContext context);
+    public void handle(EventContext context) throws Exception;
 }

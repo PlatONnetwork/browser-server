@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -31,11 +32,11 @@ public class CustomBlock extends Block {
         // 区块内委托交易总数
         this.setStatDelegateQty(0);
         // 区块中交易能量限制
-        this.setStatTxGasLimit("0");
+        this.setStatTxGasLimit(BigInteger.ZERO.toString());
         // 区块中交易实际花费值(手续费)总和，单位：von
-        this.setStatTxFee("0");
+        this.setStatTxFee(BigInteger.ZERO.toString());
         // 区块奖励，单位：von
-        this.setBlockReward("0");
+        this.setBlockReward(BigInteger.ZERO.toString());
         // 节点ID
         this.setNodeId("");
         // 节点名称
@@ -115,5 +116,8 @@ public class CustomBlock extends Block {
     }
 
 
+    public BigInteger getBlockNumber(){
+        return BigInteger.valueOf(this.getNumber());
+    }
 
 }
