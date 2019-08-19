@@ -51,12 +51,16 @@ platonconfig:
   staking_reward_rate: 2.5
   #初始发行金额
   init_issue_value: 200000000000000000000000000000000000
-  #激励合约地址
-  reward_addr:
-  #质押合约地址
-  staking_addr:
-  #锁仓合约地址
-  restricting_addr:
+
+  #锁仓账户地址
+  restricting_account_addr: '0x1000000000000000000000000000000000000001'
+  #激励池账户地址
+  stimulate_pool_account_addr: '0x1000000000000000000000000000000000000003'
+  #开发者激励基金账户地址
+  developer_stimulate_fund_account_addr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
+  #PlatOn基金会账户地址
+  platon_fund_account_addr: '0x493301712671ada506ba6ca7891f436d29185821'
+
   #质押门槛
   stake_threshold:
   #委托门槛

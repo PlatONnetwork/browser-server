@@ -29,12 +29,16 @@ public class BlockChainConfig {
     private Double stakingRewardRate;
     // 初始发行金额
     private String initIssueValue;
-    // 激励合约地址
-    private String rewardAddr;
-    // 质押合约地址
-    private String stakingAddr;
-    // 锁仓合约地址
-    private String restrictingAddr;
+
+    // 锁仓账户地址
+    private String restrictingAccountAddr;
+    // 激励池账户地址
+    private String stimulatePoolAccountAddr;
+    // 开发者激励基金账户地址
+    private String developerStimulateFundAccountAddr;
+    // PlatOn基金会账户地址
+    private String platonFundAccountAddr;
+
     // 质押门槛
     private String stakeThreshold;
     // 委托门槛
