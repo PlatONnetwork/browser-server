@@ -4,7 +4,9 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.service.DbService;
@@ -59,6 +61,12 @@ public class BlockChain {
     private long addIssueEpoch;
     // 当前块
     private CustomBlock curBlock;
+
+    // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
+    public static final NodeCache NODE_CACHE = new NodeCache();
+
+    // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
+    public static final Map<String, CustomProposal> PROPOSALS = new HashMap<>();
 
     /***
      * 以下字段业务使用说明：

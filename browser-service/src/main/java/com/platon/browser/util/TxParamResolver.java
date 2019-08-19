@@ -56,27 +56,31 @@ public class TxParamResolver {
                         // 发起质押
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
                         BigInteger stakingTyp =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
-                        //用于接受出块奖励和质押奖励的收益账户
+                        //用于接受出块奖励和质押奖励的收益账户benefitAddress
                         String addr = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
                         //被质押的节点的NodeId
                         String stakNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
-                        //外部Id
+                        //外部Id externalId
                         String extrnaId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
-                        //被质押节点的名称
+                        //被质押节点的名称 nodeName
                         String hexStakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
                         String stakNodeName = new String(Numeric.hexStringToByteArray(hexStakNodeName));
-                        //节点的第三方主页
+                        //节点的第三方主页 website
                         String hexWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
                         String webSiteAdd = new String(Numeric.hexStringToByteArray(hexWebSiteAdd));
 
-                        //节点的描述
+                        //节点的描述 details
                         String hexDeteils = Resolver.StringResolver((RlpString) rlpList1.getValues().get(7));
                         String deteils = new String(Numeric.hexStringToByteArray(hexDeteils));
 
-                        //质押的von
+                        //质押的von amount programVersion
                         BigInteger stakingAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(8));
+
                         //程序的真实版本，治理rpc获取
                         BigInteger versions =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(9));
+
+                        //程序的真实版本签名，治理rpc获取 programVersionSign
+                        //String proVersion = Resolver.StringResolver((RlpString) rlpList1.getValues().get(10));
 
                         CreateValidatorParam createValidatorParam = new CreateValidatorParam();
                         createValidatorParam.init(stakingTyp.intValue(), addr, stakNodeId, extrnaId, stakNodeName,

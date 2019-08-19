@@ -220,4 +220,6 @@ public class CustomStaking extends Staking {
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
     }
+
+
 }

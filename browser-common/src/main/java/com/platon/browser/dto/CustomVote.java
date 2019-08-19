@@ -1,7 +1,9 @@
 package com.platon.browser.dto;
 
+import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 /**
  * @Auther: Chendongming
@@ -10,4 +12,8 @@ import lombok.Data;
  */
 @Data
 public class CustomVote extends Vote {
+
+    public void bulidStructure( Vote vote){
+        BeanUtils.copyProperties(vote,this);
+    }
 }
