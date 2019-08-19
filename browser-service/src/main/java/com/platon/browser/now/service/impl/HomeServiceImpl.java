@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
@@ -45,7 +48,7 @@ public class HomeServiceImpl implements HomeService {
 	@Autowired
 	private I18nUtil i18n;
 	@Autowired
-	private NodeMapper nodeMapper;
+	private StakingMapper stakingMapper;
 
 	@Override
 	public QueryNavigationResp queryNavigation(QueryNavigationRequest req) {
@@ -86,9 +89,9 @@ public class HomeServiceImpl implements HomeService {
 					transactionDetailReq.setTxHash(keyword);
 					try {
 						// 此处调用如果查询不到交易记录会抛出BusinessException异常
-						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
-						result.setType("transaction");
-						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
+//						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
+//						result.setType("transaction");
+//						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
 					} catch (BusinessException be) {
 						log.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
 						BlockExample blockExample = new BlockExample();
@@ -159,13 +162,22 @@ public class HomeServiceImpl implements HomeService {
 
 	@Override
 	public List<StakingListNewResp> stakingListNew() {
-		List<BlockRedis> items = statisticCacheService.getBlockCache(1,8);
-//		StakingListNewResp stakingListNewResp = new StakingListNewResp();
+		StakingExample stakingExample = new StakingExample();
+		Criteria criteria = stakingExample.createCriteria();
+		criteria.andStatusEqualTo(1).andIsConsensusEqualTo(1);
+		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
+				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,id desc");
+		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+		StakingListNewResp stakingListNewResp = new StakingListNewResp();
 		List<StakingListNewResp> lists = new LinkedList<>();
-		for (BlockRedis blockRedis : items) {
-			
-			
-//			lists.add(stakingListNewResp);
+		for (int i = 0;i<stakings.size();i++) {
+			stakingListNewResp.setExpectedIncome(stakings.get(i).getExpectedIncome());
+			stakingListNewResp.setIsInit(stakings.get(i).getIsInit() == 1?true:false);
+			stakingListNewResp.setNodeId(stakings.get(i).getNodeId());
+			stakingListNewResp.setNodeName(stakings.get(i).getStakingName());
+			stakingListNewResp.setRanking(i);
+			stakingListNewResp.setStakingIcon(stakings.get(i).getStakingIcon());
+			lists.add(stakingListNewResp);
 		}
 		return lists;
 	}
