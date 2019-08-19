@@ -37,10 +37,11 @@ batch.num: ${thread.num}
 #初始化链相关的配置
 platonconfig:
   chain_id: 101
-  # 增发周期
-  add_issue_period: 20000
-  #结算周期
-  setting_period: 2500
+  # 增发周期(1466个结算周期)
+  add_issue_period: 15759500
+
+  #结算周期(43个共识轮)
+  setting_period: 10750
   #共识周期
   consensus_period: 250
   #增发率
@@ -60,7 +61,6 @@ platonconfig:
   developer_stimulate_fund_account_addr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
   platon_fund_account_addr: '0x493301712671ada506ba6ca7891f436d29185821'
-
   #质押门槛
   stake_threshold:
   #委托门槛
