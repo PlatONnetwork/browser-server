@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.result.ProposalExecuteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ProposalExecute {
     @Autowired
     private PlatonClient client;
 
-    private ProposalExecuteResult executeResult = BlockChain.BIZ_DATA.getProposalExecuteResult();
+    private ProposalExecuteResult executeResult = BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult();
 
     @PostConstruct
     private void init(){
@@ -48,20 +49,11 @@ public class ProposalExecute {
      * @param bc
      */
     public void execute(CustomTransaction tx, BlockChain bc){
-
         switch (tx.getTypeEnum()){
-            case CREATE_PROPOSAL_TEXT://提交文本提案(创建提案)
-                execute2000(tx,bc);
-                break;
-            case CREATE_PROPOSAL_UPGRADE://提交升级提案(创建提案)
-                execute2001(tx,bc);
-                break;
-            case CREATE_PROPOSAL_PARAMETER://提交参数提案(创建提案)
-                execute2002(tx,bc);
-                break;
-            case VOTING_PROPOSAL://给提案投票(提案投票)
-                execute2003(tx,bc);
-                break;
+            case CREATE_PROPOSAL_TEXT: createProposalText(tx,bc);break; //提交文本提案(创建提案)
+            case CREATE_PROPOSAL_UPGRADE: createProposalUpgrade(tx,bc);break; //提交升级提案(创建提案)
+            case CREATE_PROPOSAL_PARAMETER: createProposalParameter(tx,bc);break; //提交参数提案(创建提案)
+            case VOTING_PROPOSAL: votingProposal(tx,bc);break; //给提案投票(提案投票)
         }
         updateTxInfo(tx,bc);
     }
@@ -70,30 +62,23 @@ public class ProposalExecute {
         return executeResult;
     }
 
-    /**
-     * 清除待入库或待更新缓存，需要在入库后调用
-     */
-    public void commitResult(){
-        executeResult.clear();
-    }
-
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
     //提交文本提案(创建提案)
-    private void execute2000(CustomTransaction tx, BlockChain bc){
+    private void createProposalText(CustomTransaction tx, BlockChain bc){
 
     }
     //提交升级提案(创建提案)
-    private void execute2001(CustomTransaction tx, BlockChain bc){
+    private void createProposalUpgrade(CustomTransaction tx, BlockChain bc){
 
     }
     //提交参数提案(创建提案)
-    private void execute2002(CustomTransaction tx, BlockChain bc){
+    private void createProposalParameter(CustomTransaction tx, BlockChain bc){
 
     }
     //给提案投票(提案投票)
-    private void execute2003(CustomTransaction tx, BlockChain bc){
+    private void votingProposal(CustomTransaction tx, BlockChain bc){
 
     }
     public void checkProposalStatus(){

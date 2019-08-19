@@ -123,7 +123,6 @@ public class SpecialContractApiInvoker {
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();
-            String a = new String(Numeric.hexStringToByteArray(value));
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
             return response;
@@ -144,9 +143,9 @@ public class SpecialContractApiInvoker {
     }
 
     public static void main(String args[]){
-        String a = new String(Numeric.hexStringToByteArray("f84fb84d7b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e646964617465206973206e6f7420616c6c6f7720746f2064656c6567617465227d"));
-        //BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray("f84fb84d7b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e646964617465206973206e6f7420616c6c6f7720746f2064656c6567617465227d")), BaseResponse.class);
-        //System.out.println(response.status);
+        String a = new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d"));
+        BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d")), BaseResponse.class);
+        System.out.println(response.status);
         System.out.println(a);
     }
 }

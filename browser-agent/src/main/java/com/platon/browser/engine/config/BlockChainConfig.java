@@ -1,4 +1,4 @@
-package com.platon.browser.engine;
+package com.platon.browser.engine.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
