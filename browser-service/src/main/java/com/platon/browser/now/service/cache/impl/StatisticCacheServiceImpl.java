@@ -1,5 +1,6 @@
 package com.platon.browser.now.service.cache.impl;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.redis.dto.NetworkStatRedis;
@@ -67,4 +69,29 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 		return transactionRedisList;
 	}
 
+	public static void main(String[] args) {
+		NetworkStatRedis networkStatRedis = new NetworkStatRedis();
+		networkStatRedis.setAddIssueBegin(5000l);
+		networkStatRedis.setAddIssueEnd(100l);
+		networkStatRedis.setAddressQty(5);
+		networkStatRedis.setBlockReward("123");
+		networkStatRedis.setCreateTime(new Date());
+		networkStatRedis.setCurrentNumber(100l);
+		networkStatRedis.setCurrentTps(10);
+		networkStatRedis.setDoingProposalQty(100);
+		networkStatRedis.setId(5);
+		networkStatRedis.setIssueValue("1232");
+		networkStatRedis.setMaxTps(100);
+		networkStatRedis.setNextSetting(6l);
+		networkStatRedis.setNodeId("123456");
+		networkStatRedis.setNodeName("dfdfdf");
+		networkStatRedis.setProposalQty(10);
+		networkStatRedis.setStakingDelegationValue("12333");
+		networkStatRedis.setStakingReward("10000");
+		networkStatRedis.setStakingValue("12112121");
+		networkStatRedis.setTurnValue("12121212");
+		networkStatRedis.setTxQty(100);
+		networkStatRedis.setUpdateTime(new Date());
+		System.out.println(JSONObject.toJSONString(networkStatRedis));
+	}
 }

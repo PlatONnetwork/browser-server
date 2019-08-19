@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +59,7 @@ public class BlockServiceImpl implements BlockService {
 	private I18nUtil i18n;
 
 	@Override
-	public RespPage<BlockListResp> blockList(@Valid PageReq req) {
+	public RespPage<BlockListResp> blockList(PageReq req) {
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
 		// 小于50万条查询redis
@@ -86,13 +84,17 @@ public class BlockServiceImpl implements BlockService {
 		}
 		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(blockEnd.get(0).getNumber());
+		if(blockEnd.isEmpty()) {
+			page.setTotal(0);
+		} else {
+			page.setTotal(blockEnd.get(0).getNumber());
+		}
 		respPage.init(page, lists);
 		return respPage;
 	}
 
 	@Override
-	public RespPage<BlockListResp> blockListByNodeId(@Valid BlockListByNodeIdReq req) {
+	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
 		BlockExample blockExample = new BlockExample();
 		blockExample.setOrderByClause("number desc ");
 		Criteria criteria = blockExample.createCriteria();
@@ -117,7 +119,11 @@ public class BlockServiceImpl implements BlockService {
 		}
 		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(blockEnd.get(0).getNumber());
+		if(blockEnd.isEmpty()) {
+			page.setTotal(0);
+		} else {
+			page.setTotal(blockEnd.get(0).getNumber());
+		}
 		respPage.init(page, lists);
 		return respPage;
 	}
@@ -162,8 +168,7 @@ public class BlockServiceImpl implements BlockService {
         writer.writeRowsAndClose(rows);
         BlockDownload blockDownload = new BlockDownload();
         blockDownload.setData(baos.toByteArray());
-        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
-        blockDownload.setFilename("block-"+nodeId+"-"+ymd.format(date)+".csv");
+        blockDownload.setFilename("block-"+nodeId+"-"+date+".csv");
         blockDownload.setLength(baos.size());
         return blockDownload;
 	}
@@ -205,6 +210,7 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setStatTransferQty(block.getStatTransferQty());
 			blockDetailResp.setStatTxGasLimit(block.getStatTxGasLimit());
 			blockDetailResp.setStatTxQty(block.getStatTxQty());
+			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			
 			// 取上一个区块
 			BlockExample blockExample = new BlockExample();

@@ -17,7 +17,7 @@ public class PageReq {
      */
     private Integer pageSize = 10;
 
-    private Page pager;
+    private Page<?> pager;
 
     public Integer getPageNo() {
         return pageNo;
