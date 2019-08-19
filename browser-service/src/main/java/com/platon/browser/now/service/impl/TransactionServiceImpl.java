@@ -71,7 +71,6 @@ public class TransactionServiceImpl implements TransactionService {
         returnData.setNodeName("Unknown");
         String nodeId=returnData.getNodeId();
         if(StringUtils.isBlank(nodeId)){
-            // �����txInfo��ȡ�����ڵ�ID�����������ȡ
             BlockExample blockExample = new BlockExample();
             blockExample.createCriteria().andNumberEqualTo(initData.getBlockNumber());
             List<Block> blocks = blockMapper.selectByExample(blockExample);
@@ -85,7 +84,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
 //        if(StringUtils.isNotBlank(nodeId)){
-//            // ��ѯ�ڵ�����
 //            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
 //            returnData.setNodeName(nameMap.get(returnData.getNodeId()));
 //        }
@@ -95,7 +93,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetail getDetail(TransactionDetailReq req) {
-        // ȡ�õ�ǰ��������
         TransactionDetail transactionDetail = loadDetail(req);
         return transactionDetail;
     }
