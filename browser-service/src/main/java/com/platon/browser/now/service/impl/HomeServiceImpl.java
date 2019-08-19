@@ -15,7 +15,6 @@ import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.IsConsensusStatus;
 import com.platon.browser.enums.StakingStatus;

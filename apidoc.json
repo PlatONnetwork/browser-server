@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "title": "App接口文档",
-  "url": "http://192.168.9.190:20060/api-{chainId}",
+  "url": "http://192.168.9.190:9061/browser-server",
   "order":["home","block","transaction","address","staking","proposal"]
 }
