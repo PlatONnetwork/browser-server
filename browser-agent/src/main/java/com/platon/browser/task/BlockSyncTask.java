@@ -15,6 +15,7 @@ import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlockCollectingException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.SettleEpochChangeException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.HexTool;
@@ -152,7 +153,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start () throws BlockCollectingException {
+    public void start () throws BlockCollectingException, SettleEpochChangeException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();
@@ -173,7 +174,9 @@ public class BlockSyncTask {
             // 对区块和交易做并行分析 ||||||||||||||||||||||||||||
             analyzeBlockAndTransaction(blocks);
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            blocks.forEach(block ->blockChain.execute(block));
+            for (CustomBlock block:blocks){
+                blockChain.execute(block);
+            }
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainResult bizData = blockChain.exportResult();

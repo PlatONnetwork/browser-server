@@ -7,6 +7,7 @@ import com.platon.browser.engine.handler.*;
 import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.engine.result.StakingExecuteResult;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.SettleEpochChangeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,8 +130,6 @@ public class StakingExecute {
         loadNodes();
     }
 
-
-
     /**
      * 执行交易
      * @param tx
@@ -170,7 +169,7 @@ public class StakingExecute {
     /**
      * 进入新的结算周期
      */
-    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc){
+    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc) throws SettleEpochChangeException {
         logger.debug("进入新的结算周期:{}", block.getNumber());
         // 事件上下文
         EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);

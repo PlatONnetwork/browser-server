@@ -1,17 +1,21 @@
 package com.platon.browser.engine.handler;
 
-import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.dto.CustomUnDelegation;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.exception.SettleEpochChangeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.bean.Node;
+import org.web3j.platon.contracts.NodeContract;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +35,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private BlockChain bc;
 
     @Override
-    public void handle(EventContext context) {
+    public void handle(EventContext context) throws SettleEpochChangeException {
         tx = context.getTransaction();
         nodeCache = context.getNodeCache();
         executeResult = context.getExecuteResult();
@@ -79,19 +83,51 @@ public class NewSettleEpochHandler implements EventHandler {
     }
 
     /**
-     * 质押结算
+     * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void stakingSettle() {
+    private void stakingSettle() throws SettleEpochChangeException {
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
+        // 激励池账户地址
+        String stimulatePoolAccountAddr = bc.getChainConfig().getStimulatePoolAccountAddr();
+        // 根据当前结算块号计算出上一增发周期末的块号: (当前增发周期-1)*增发周期块数
+        BigInteger preIssuePeriodLastBlockNumber = bc.getAddIssueEpoch().multiply(bc.getChainConfig().getAddIssuePeriod());
+
+        // 前一结算周期内每个验证人所获得的平均质押奖励
+        BigInteger preVerifierStakingReward;
+        try {
+            // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
+            BigInteger preStimulatePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(stimulatePoolAccountAddr, DefaultBlockParameter.valueOf(preIssuePeriodLastBlockNumber)).send().getBalance();
+            logger.debug("前一增发周期末的激励池账户余额:{}",preStimulatePoolAccountBalance.toString());
+            // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
+            preVerifierStakingReward = BigInteger.valueOf(
+                    BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
+                    .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR) // 精度取10位小数
+                    .divide(BigDecimal.valueOf(bc.getPreVerifier().size()),16,RoundingMode.FLOOR) // 精度取10位小数
+                    .multiply(bc.getChainConfig().getStakingRewardRate()).longValue()
+            );
+            logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
+        } catch (IOException e) {
+            throw new SettleEpochChangeException("查询激励池(addr="+stimulatePoolAccountAddr+")在块号("+preIssuePeriodLastBlockNumber+")的账户余额失败:"+e.getMessage());
+        }
+
         List<CustomStaking> stakings = nodeCache.getStakingByStatus(Arrays.asList(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING));
         stakings.forEach(staking -> {
             // 调整金额状态
             BigInteger stakingLocked = new BigInteger(staking.getStakingLocked()).add(new BigInteger(staking.getStakingHas()));
             staking.setStakingLocked(stakingLocked.toString());
-            staking.setStakingHas("0");
-            if(bc.getCurSettingEpoch() > staking.getStakingReductionEpoch()+1){
+            staking.setStakingHas(BigInteger.ZERO.toString());
+            if(bc.getCurSettingEpoch().longValue() > staking.getStakingReductionEpoch()){
+                // 因为减持质押需要隔一个结算周期才会释放，所以当前周期必须要大于当前质押中的解质押发生的周期，即：
+                // 假设结算周期是500
+                // |--------|--------|--------|
+                // 1        500     1000     1500
+                // 结算周期(1~500)内的解质押会在结算周期(500~1000)结束的时候(第1000块)释放
+                // 假设周期(1~500)内做了质押A，staking.getStakingReductionEpoch()的值为1，则：
+                // 1、第500块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为1，是不会进入此代码块的
+                // 2、第1000块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为2，是会进入此代码块的
                 //
+                // 当前结算周期轮数大于质押结算周期标识，则表明前一结算周期的解质押已释放
                 staking.setStakingReduction("0");
             }
             BigInteger stakingReduction = new BigInteger(staking.getStakingReduction());
@@ -99,6 +135,42 @@ public class NewSettleEpochHandler implements EventHandler {
                 staking.setStatus(CustomStaking.StatusEnum.EXITED.code);
             }
             // 计算质押激励和年化率
+            Node node = bc.getPreVerifier().get(staking.getNodeId());
+            if(node!=null){
+                // 质押记录所属节点在前一轮结算周期的验证人列表中，则对其执行结算操作
+                // 累加质押奖励
+                BigInteger stakingRewardValue = new BigInteger(staking.getStakingRewardValue()).add(preVerifierStakingReward);
+                staking.setStakingRewardValue(stakingRewardValue.toString());
+                // 计算年化率：((前一结算周期内每个验证人所获得的平均质押奖励+前一结算周期出块奖励)/0.25)*365*100%
+                // TODO: 年化计算公式有问题，需要产品确认后再计算
+                /*BigDecimal expectedIncome = BigDecimal.valueOf(preVerifierStakingReward.longValue())
+                        .add(new BigDecimal(staking.getPreSetBlockRewardValue()))
+                        .divide(BigDecimal.valueOf(0.25),16,RoundingMode.FLOOR)
+                        .multiply(BigDecimal.valueOf(365))*/
+                staking.setExpectedIncome(BigDecimal.ZERO.toString());
+
+                /**
+                 * 每4个结算周期计算一次年化率
+                 * 收益: W1   W2    W3    W4
+                 *   |-----|-----|-----|-----|
+                 * 成本:C1   C2    C3    C4
+                 *
+                 * 年化率计算：
+                 * W1 + W2 + W3 + W4
+                 * ------------------ x 1466 x 100%
+                 * C1 + C2 + C3 + C4
+                 */
+
+                // 结算状态设置为已结算
+                staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+            }else{
+                // 年化率设置为0
+                staking.setExpectedIncome(BigInteger.ZERO.toString());
+                // 结算状态设置为未结算
+                staking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+            }
+            // 前一结算周期区块奖励设置为0
+            staking.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
         });
     }
 }
