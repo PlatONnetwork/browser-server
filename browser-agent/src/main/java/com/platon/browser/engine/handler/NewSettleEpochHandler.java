@@ -6,6 +6,7 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.result.StakingExecuteResult;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -148,7 +149,7 @@ public class NewSettleEpochHandler implements EventHandler {
 
                 CustomNode customNode;
                 try {
-                    customNode = nodeCache.getNode(node.getNodeId());
+                    customNode = nodeCache.getNode(curStaking.getNodeId());
                 } catch (NoSuchBeanException e) {
                     throw new SettleEpochChangeException("获取节点错误:"+e.getMessage());
                 }
