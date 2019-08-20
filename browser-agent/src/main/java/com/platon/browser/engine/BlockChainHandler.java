@@ -1,10 +1,10 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.*;
-import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.exception.*;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;

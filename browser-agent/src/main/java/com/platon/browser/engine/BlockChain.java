@@ -1,6 +1,7 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
@@ -10,7 +11,6 @@ import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
