@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.enums.*;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.res.BaseResp;
@@ -114,7 +115,7 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString());
 			lists.add(aliveStakingListResp);
-		}*/
+		}
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);
@@ -145,7 +146,7 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
-		}*/
+		}
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);
