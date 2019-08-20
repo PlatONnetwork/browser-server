@@ -6,6 +6,7 @@ import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.AddressService;
 import com.platon.browser.req.address.QueryDetailRequest;
+
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.util.I18nUtil;

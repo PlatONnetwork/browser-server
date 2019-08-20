@@ -19,6 +19,7 @@ import java.math.BigInteger;
 
 /**
  * 发起委托(委托)事件处理类
+ *
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
  * @Description:
@@ -28,7 +29,7 @@ public class DelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(DelegateHandler.class);
 
     @Override
-    public void handle(EventContext context) {
+    public void handle ( EventContext context ) {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
         StakingExecuteResult executeResult = context.getExecuteResult();
@@ -36,18 +37,16 @@ public class DelegateHandler implements EventHandler {
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {
             CustomNode node = nodeCache.getNode(param.getNodeId());
-
-            //获取treemap中最新一条质押数据数据
-            //CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
             try {
+                //获取treemap中最新一条质押数据数据
                 CustomStaking latestStaking = node.getLatestStaking();
+                logger.debug("委托信息:{}", JSON.toJSONString(param));
 
                 //交易数据tx_info补全
                 param.setNodeName(latestStaking.getStakingName());
                 param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
                 //todo：交易数据回填
                 tx.setTxInfo(JSON.toJSONString(param));
-
 
                 //通过委托地址+nodeId+质押块高获取委托对象
                 CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());

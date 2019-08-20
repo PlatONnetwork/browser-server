@@ -2,6 +2,7 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.NodeOpt;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,12 @@ public class CustomNodeOpt extends NodeOpt {
         this.setTxHash(tx.getHash());
         this.setBlockNumber(tx.getBlockNumber());
         this.setTimestamp(tx.getTimestamp());
+    }
+
+    public void updateWithCustomBlock(CustomBlock block) {
+        this.setTxHash("BlockHash:"+block.getHash());
+        this.setBlockNumber(block.getNumber());
+        this.setTimestamp(block.getTimestamp());
     }
 
     /**

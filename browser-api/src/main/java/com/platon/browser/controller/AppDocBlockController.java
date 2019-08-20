@@ -30,7 +30,7 @@ import com.platon.browser.util.I18nUtil;
 public class AppDocBlockController implements AppDocBlock {
 
 	private final Logger logger = LoggerFactory.getLogger(AppDocBlockController.class);
-	
+
 	@Autowired
 	private BlockService blockService;
 	

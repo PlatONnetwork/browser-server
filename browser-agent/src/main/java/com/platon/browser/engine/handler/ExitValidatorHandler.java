@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
+
 /**
  * 撤销质押(退出验证人)事件处理类
  * @Auther: Chendongming
@@ -36,7 +38,7 @@ public class ExitValidatorHandler implements EventHandler {
             CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
-            latestStaking.updateWithExitValidatorParam(param);
+            latestStaking.updateWithExitValidatorParam(param,context.getBlockChain().getCurSettingEpoch());
             executeResult.stageUpdateStaking(latestStaking,tx);
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());

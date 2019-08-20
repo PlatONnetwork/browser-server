@@ -28,6 +28,7 @@ platon:
     chainId: ${platonconfig.chain_id}
     # 增发周期
     addIssuePeriod: ${platonconfig.add_issue_period}
+
     #结算周期
     settingPeriod: ${platonconfig.setting_period}
     #共识周期

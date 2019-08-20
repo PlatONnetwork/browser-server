@@ -1,13 +1,14 @@
 package com.platon.browser.exception;
 
 /**
- * 区块搜集异常
+ * 增发周期切换异常
  * @Auther: Chendongming
  * @Date: 2019/8/17 16:27
  * @Description:
  */
-public class BlockCollectingException extends Exception {
-    public BlockCollectingException(String msg){
+public class IssueEpochChangeException extends Exception {
+    public IssueEpochChangeException(String msg){
         super(msg);
     }
+
 }

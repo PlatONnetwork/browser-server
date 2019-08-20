@@ -1,7 +1,5 @@
 package com.platon.browser.enums;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 public enum I18nEnum {
 
     // 通用
@@ -29,6 +27,8 @@ public enum I18nEnum {
     DOWNLOAD_ACCOUNT_CSV_TO,
     DOWNLOAD_ACCOUNT_CSV_VALUE,
     DOWNLOAD_ACCOUNT_CSV_STATUS,
+    DOWNLOAD_ACCOUNT_CSV_VALUE_IN,
+    DOWNLOAD_ACCOUNT_CSV_VALUE_OUT,
         // 投票
     DOWNLOAD_ACCOUNT_CSV_TARGET, // 投票目标
     DOWNLOAD_ACCOUNT_CSV_TICKET_COUNT, // 有效票/投票数

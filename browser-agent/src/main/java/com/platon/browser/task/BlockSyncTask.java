@@ -12,9 +12,7 @@ import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlockCollectingException;
-import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.HexTool;
@@ -95,14 +93,16 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () {
+    public void init () throws CandidateException {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
 
-        // 结算周期验证人
+        /**
+         * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
+          */
         if(maxBlockNumber==null){
             // 如果库里区块为空，则：
             try {
@@ -147,12 +147,12 @@ public class BlockSyncTask {
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {
-                logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
+                throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
             }
         }
     }
 
-    public void start () throws BlockCollectingException {
+    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();
@@ -173,7 +173,9 @@ public class BlockSyncTask {
             // 对区块和交易做并行分析 ||||||||||||||||||||||||||||
             analyzeBlockAndTransaction(blocks);
             // 调用BlockChain实例，分析质押、提案相关业务数据
-            blocks.forEach(block ->blockChain.execute(block));
+            for (CustomBlock block:blocks){
+                blockChain.execute(block);
+            }
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainResult bizData = blockChain.exportResult();

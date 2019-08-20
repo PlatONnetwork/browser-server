@@ -4,8 +4,12 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.*;
+import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.exception.ConsensusEpochChangeException;
+import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.SettleEpochChangeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +60,13 @@ public class StakingExecute {
     private ReportValidatorHandler reportValidatorHandler;
     @Autowired
     private NewSettleEpochHandler newSettleEpochHandler;
+    @Autowired
+    private NewConsensusEpochHandler newConsensusEpochHandler;
+    @Autowired
+    private NewElectionEpochHandler newElectionEpochHandler;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private NodeCache nodeCache = new NodeCache();
+    private NodeCache nodeCache = BlockChain.NODE_CACHE;
 
     private StakingExecuteResult executeResult= BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult();
 
@@ -135,7 +143,7 @@ public class StakingExecute {
      */
     public void execute(CustomTransaction tx, BlockChain bc){
         // 事件上下文
-        EventContext context = new EventContext(tx,bc,nodeCache,executeResult);
+        EventContext context = new EventContext(tx,bc,nodeCache,executeResult,null);
         switch (tx.getTypeEnum()){
             case CREATE_VALIDATOR: createValidatorHandler.handle(context); break; //发起质押(创建验证人)
             case EDIT_VALIDATOR: editValidatorHandler.handle(context);break; //修改质押信息(编辑验证人)
@@ -151,26 +159,30 @@ public class StakingExecute {
     /**
      * 进行验证人选举时触发
      */
-    public void onElectionDistance(CustomBlock block,BlockChain bc){
+    public void onElectionDistance(CustomBlock block,BlockChain bc) throws ElectionEpochChangeException {
         logger.debug("进行验证人选举:{}", block.getNumber());
-
+        // 事件上下文
+        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        newElectionEpochHandler.handle(context);
     }
 
     /**
      * 进入新的共识周期变更
      */
-    public void onNewConsEpoch(CustomBlock block,BlockChain bc){
+    public void onNewConsEpoch(CustomBlock block,BlockChain bc) throws ConsensusEpochChangeException {
         logger.debug("进入新的共识周期:{}", block.getNumber());
-
+        // 事件上下文
+        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        newConsensusEpochHandler.handle(context);
     }
 
     /**
      * 进入新的结算周期
      */
-    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc){
+    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc) throws SettleEpochChangeException {
         logger.debug("进入新的结算周期:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,executeResult);
+        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
 
         /**
          * 进入新的结算周期后需要变更的数据列表
@@ -183,20 +195,5 @@ public class StakingExecute {
 
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
-    }
-
-    /*************************由外部调用的方法*************************/
-    /**
-     * 更新node表中的节点出块数信息: stat_block_qty, 由blockChain.execute()调用
-     * @param nodeId
-     */
-    public void updateNodeStatBlockQty(String nodeId){
-        try {
-            CustomNode node = nodeCache.getNode(nodeId);
-            node.setStatBlockQty(node.getStatBlockQty()+1);
-            executeResult.stageUpdateNode(node);
-        } catch (NoSuchBeanException e) {
-            logger.error("{}",e.getMessage());
-        }
     }
 }

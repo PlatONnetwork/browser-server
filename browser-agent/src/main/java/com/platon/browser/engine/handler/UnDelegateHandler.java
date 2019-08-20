@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -30,13 +31,17 @@ public class UnDelegateHandler implements EventHandler {
         NodeCache nodeCache = context.getNodeCache();
         StakingExecuteResult executeResult = context.getExecuteResult();
         BlockChain bc = context.getBlockChain();
-        logger.debug("减持/撤销委托(赎回委托)");
+
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
             CustomNode node = nodeCache.getNode(param.getNodeId());
+            logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
             CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+            //交易数据回填
+            param.setNodeName(customStaking.getStakingName());
+            tx.setTxInfo(JSON.toJSONString(param));
 
             //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
             CustomDelegation customDelegation = customStaking.getDelegations().get(tx.getFrom());
@@ -53,8 +58,8 @@ public class UnDelegateHandler implements EventHandler {
              *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
              * */
 
-            BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateHas()));
-            if (delegationSum.compareTo(new BigInteger(bc.getChainConfig().getMinimumThreshold())) == -1) {
+            BigDecimal delegationSum = new BigDecimal(customDelegation.getDelegateHas()).add(new BigDecimal(customDelegation.getDelegateHas()));
+            if (delegationSum.compareTo(bc.getChainConfig().getMinimumThreshold()) == -1) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
                 customDelegation.setDelegateHas("0");
@@ -93,6 +98,7 @@ public class UnDelegateHandler implements EventHandler {
             executeResult.stageUpdateDelegation(customDelegation);
             //新增分析委托赎回结果
             executeResult.stageAddUnDelegation(customUnDelegation);
+
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
         }
