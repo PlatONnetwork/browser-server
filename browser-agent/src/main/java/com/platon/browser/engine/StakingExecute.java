@@ -196,19 +196,4 @@ public class StakingExecute {
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
-
-    /*************************由外部调用的方法*************************/
-    /**
-     * 更新node表中的节点出块数信息: stat_block_qty, 由blockChain.execute()调用
-     * @param nodeId
-     */
-    public void updateNodeStatBlockQty(String nodeId){
-        try {
-            CustomNode node = nodeCache.getNode(nodeId);
-            node.setStatBlockQty(node.getStatBlockQty()+1);
-            executeResult.stageUpdateNode(node);
-        } catch (NoSuchBeanException e) {
-            logger.error("{}",e.getMessage());
-        }
-    }
 }

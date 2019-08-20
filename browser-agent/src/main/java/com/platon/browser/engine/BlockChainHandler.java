@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.config.BlockChainConfig;
@@ -225,6 +226,22 @@ public class BlockChainHandler {
             }
         }
     }
+
+    /*************************由外部调用的方法*************************/
+    /**
+     * 更新node表中的节点出块数信息: stat_block_qty, 由blockChain.execute()调用
+     */
+    public void updateNodeStatBlockQty(){
+        CustomBlock curBlock = bc.getCurBlock();
+        try {
+            CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
+            node.setStatBlockQty(node.getStatBlockQty()+1);
+            STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateNode(node);
+        } catch (NoSuchBeanException e) {
+            logger.error("{}",e.getMessage());
+        }
+    }
+
 
     /**
      * 根据交易信息新增或更新相关记录：

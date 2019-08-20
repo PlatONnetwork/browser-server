@@ -135,8 +135,7 @@ public class BlockChain {
         //统计数据相关累加
         blockChainHandler.updateWithNetworkStat();
         // 更新node表中的节点出块数信息
-        stakingExecute.updateNodeStatBlockQty(curBlock.getNodeId());
-
+        blockChainHandler.updateNodeStatBlockQty();
     }
 
     /**
