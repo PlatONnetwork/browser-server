@@ -6,6 +6,8 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.*;
 import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.exception.ConsensusEpochChangeException;
+import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
 import org.slf4j.Logger;
@@ -58,6 +60,10 @@ public class StakingExecute {
     private ReportValidatorHandler reportValidatorHandler;
     @Autowired
     private NewSettleEpochHandler newSettleEpochHandler;
+    @Autowired
+    private NewConsensusEpochHandler newConsensusEpochHandler;
+    @Autowired
+    private NewElectionEpochHandler newElectionEpochHandler;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
     private NodeCache nodeCache = BlockChain.NODE_CACHE;
@@ -153,17 +159,21 @@ public class StakingExecute {
     /**
      * 进行验证人选举时触发
      */
-    public void onElectionDistance(CustomBlock block,BlockChain bc){
+    public void onElectionDistance(CustomBlock block,BlockChain bc) throws ElectionEpochChangeException {
         logger.debug("进行验证人选举:{}", block.getNumber());
-
+        // 事件上下文
+        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        newElectionEpochHandler.handle(context);
     }
 
     /**
      * 进入新的共识周期变更
      */
-    public void onNewConsEpoch(CustomBlock block,BlockChain bc){
+    public void onNewConsEpoch(CustomBlock block,BlockChain bc) throws ConsensusEpochChangeException {
         logger.debug("进入新的共识周期:{}", block.getNumber());
-
+        // 事件上下文
+        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        newConsensusEpochHandler.handle(context);
     }
 
     /**

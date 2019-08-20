@@ -12,10 +12,7 @@ import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.enums.InnerContractAddEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlockCollectingException;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.HexTool;
@@ -103,7 +100,9 @@ public class BlockSyncTask {
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
 
-        // 结算周期验证人
+        /**
+         * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
+          */
         if(maxBlockNumber==null){
             // 如果库里区块为空，则：
             try {
@@ -153,7 +152,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start () throws BlockCollectingException, SettleEpochChangeException {
+    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();

@@ -45,11 +45,11 @@ platonconfig:
   #共识周期
   consensus_period: 250
   #增发率
-  add_issue_rate: 2.5
+  add_issue_rate: 0.25
   #出块激励比例
-  block_reward_rate: 2.5
+  block_reward_rate: 0.5
   #质押激励比例
-  staking_reward_rate: 2.5
+  staking_reward_rate: 0.5
   #初始发行金额
   init_issue_value: 200000000000000000000000000000000000
 
@@ -62,20 +62,20 @@ platonconfig:
   #PlatOn基金会账户地址
   platon_fund_account_addr: '0x493301712671ada506ba6ca7891f436d29185821'
   #质押门槛
-  stake_threshold:
+  stake_threshold: 5000000
   #委托门槛
-  minimum_threshold:
+  minimum_threshold: 10
   #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)选举周期
   election_distance: 230
   #投票数百分比下限
   support_rate_threshold:
   #双签低处罚金额，百分比
-  duplicate_sign_low_slashing:
-  #每个共识轮低异常的出块数
-  pack_amount_abnormal:
-  #每个共识轮高异常的出块数
-  pack_amount_high_abnormal:
+  duplicate_sign_low_slashing: 1
+  #每个共识轮低异常的出块数(以10个块为基准，出块率低于或等于60%(10*0.6=6个块)，就会触发普通处罚)
+  pack_amount_abnormal: 6
+  #每个共识轮高异常的出块数(以10个块为基准，出块率低于或等于20%(10*0.2=2个块)，就会触发最高处罚)
+  pack_amount_high_abnormal: 2
   #每个共识轮低异常出块数的处罚额度，百分比
-  pack_amount_low_slash_rate:
+  pack_amount_low_slash_rate: 0.1
   #每个共识轮高异常出块数的处罚额度，百分比
-  pack_amount_high_slash_rate:
+  pack_amount_high_slash_rate: 0.5

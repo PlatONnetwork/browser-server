@@ -1,13 +1,13 @@
 package com.platon.browser.exception;
 
 /**
- * 选举周期切换异常
+ * 验证人异常
  * @Auther: Chendongming
  * @Date: 2019/8/17 16:27
  * @Description:
  */
-public class ElectionEpochChangeException extends Exception {
-    public ElectionEpochChangeException(String msg){
+public class CandidateException extends Exception {
+    public CandidateException(String msg){
         super(msg);
     }
 }

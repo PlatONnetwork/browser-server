@@ -33,8 +33,8 @@ public class CustomNodeOpt extends NodeOpt {
         this.setTimestamp(tx.getTimestamp());
     }
 
-    public void updateWithCustomBlock(CustomBlock block,BigInteger settleEpoch) {
-        this.setTxHash("SettleEpochChange:"+settleEpoch);
+    public void updateWithCustomBlock(CustomBlock block) {
+        this.setTxHash("BlockHash:"+block.getHash());
         this.setBlockNumber(block.getNumber());
         this.setTimestamp(block.getTimestamp());
     }

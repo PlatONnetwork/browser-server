@@ -15,8 +15,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import com.platon.browser.utils.HexTool;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
@@ -121,7 +120,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         updateEpoch();
@@ -144,7 +143,7 @@ public class BlockChain {
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    private void periodChangeNotify () throws SettleEpochChangeException {
+    private void periodChangeNotify() throws SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
         if (blockNumber % chainConfig.getElectionDistance().longValue() == 0) {
@@ -193,7 +192,7 @@ public class BlockChain {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateValidator () {
+    private void updateValidator () throws CandidateException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
         Long consensusPeriod = chainConfig.getConsensusPeriod().longValue();
@@ -239,6 +238,9 @@ public class BlockChain {
             } catch (Exception e) {
                 logger.error("更新共识周期验证人列表失败,原因：{}", e.getMessage());
             }
+            if(curValidator.size()==0){
+                throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+curConsensusEpoch+")");
+            }
         }
     }
 
@@ -252,7 +254,7 @@ public class BlockChain {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () {
+    private void updateVerifier () throws CandidateException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
         Long settingPeriod = chainConfig.getSettingPeriod().longValue();
@@ -298,6 +300,9 @@ public class BlockChain {
             } catch (Exception e) {
                 logger.error("更新结算周期验证人列表失败,原因：{}", e.getMessage());
             }
+            if(curVerifier.size()==0){
+                throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+curSettingEpoch+")");
+            }
         }
     }
 
@@ -309,8 +314,6 @@ public class BlockChain {
             // 链上执行失败的交易不予处理
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
             // 调用交易分析引擎分析交易，以补充相关数据
-
-
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人
                 case EDIT_VALIDATOR: // 编辑验证人

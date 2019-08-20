@@ -201,7 +201,7 @@ public class NewSettleEpochHandler implements EventHandler {
             curStaking.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
 
             // 将改动的内存暂存至待更新缓存
-            executeResult.stageUpdateStaking(curStaking,bc.getCurBlock(),bc.getCurSettingEpoch());
+            executeResult.stageUpdateStaking(curStaking,bc);
 
 
 

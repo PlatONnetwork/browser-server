@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -57,7 +58,7 @@ public class UnDelegateHandler implements EventHandler {
              *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
              * */
 
-            BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateHas()));
+            BigDecimal delegationSum = new BigDecimal(customDelegation.getDelegateHas()).add(new BigDecimal(customDelegation.getDelegateHas()));
             if (delegationSum.compareTo(bc.getChainConfig().getMinimumThreshold()) == -1) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());

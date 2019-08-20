@@ -43,19 +43,19 @@ public class BlockChainConfig {
     private String platonFundAccountAddr;
 
     // 质押门槛
-    private BigInteger stakeThreshold;
+    private BigDecimal stakeThreshold;
     // 委托门槛
-    private BigInteger minimumThreshold;
+    private BigDecimal minimumThreshold;
     // 每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
     private BigInteger electionDistance;
     // 投票数百分比下限
-    private String supportRateThreshold;
+    private BigDecimal supportRateThreshold;
     // 双签低处罚金额，百分比
     private BigDecimal duplicateSignLowSlashing;
     // 每个共识轮低异常的出块数
-    private String packAmountAbnormal;
+    private BigInteger packAmountAbnormal;
     // 每个共识轮高异常的出块数
-    private String packAmountHighAbnormal;
+    private BigInteger packAmountHighAbnormal;
     // 每个共识轮低异常出块数的处罚额度，百分比
     private BigDecimal packAmountLowSlashRate;
     // 每个共识轮高异常出块数的处罚额度，百分比

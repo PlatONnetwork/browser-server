@@ -2,6 +2,7 @@ package com.platon.browser.engine.result;
 
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.*;
+import com.platon.browser.engine.BlockChain;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -86,13 +87,12 @@ public class StakingExecuteResult {
     /**
      * 把更新后的质押暂存至待更新入库列表
      * @param staking
-     * @param block
      */
-    public void stageUpdateStaking(CustomStaking staking, CustomBlock block, BigInteger settleEpoch){
+    public void stageUpdateStaking(CustomStaking staking, BlockChain bc){
         updateStakings.add(staking);
         // 构建操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.MODIFY);
-        nodeOpt.updateWithCustomBlock(block,settleEpoch);
+        nodeOpt.updateWithCustomBlock(bc.getCurBlock());
         stageAddNodeOpt(nodeOpt);
     }
 
