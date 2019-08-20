@@ -2,6 +2,8 @@ package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVote;

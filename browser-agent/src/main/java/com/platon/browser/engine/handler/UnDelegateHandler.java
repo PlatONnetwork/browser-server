@@ -59,7 +59,7 @@ public class UnDelegateHandler implements EventHandler {
              * */
 
             BigDecimal delegationSum = new BigDecimal(customDelegation.getDelegateHas()).add(new BigDecimal(customDelegation.getDelegateHas()));
-            if (delegationSum.compareTo(bc.getChainConfig().getMinimumThreshold()) == -1) {
+            if (delegationSum.compareTo(bc.getChainConfig().getDelegateThreshold()) == -1) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
                 customDelegation.setDelegateHas("0");

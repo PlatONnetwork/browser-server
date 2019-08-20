@@ -92,7 +92,7 @@ public class NewSettleEpochHandler implements EventHandler {
         // 激励池账户地址
         String stimulatePoolAccountAddr = bc.getChainConfig().getStimulatePoolAccountAddr();
         // 根据当前结算块号计算出上一增发周期末的块号: (当前增发周期-1)*增发周期块数
-        BigInteger preIssuePeriodLastBlockNumber = bc.getAddIssueEpoch().subtract(BigInteger.ONE).multiply(bc.getChainConfig().getAddIssuePeriod());
+        BigInteger preIssuePeriodLastBlockNumber = bc.getAddIssueEpoch().subtract(BigInteger.ONE).multiply(bc.getChainConfig().getAddIssuePeriodBlockCount());
 
         // 前一结算周期内每个验证人所获得的平均质押奖励
         BigInteger preVerifierStakingReward;
@@ -108,7 +108,7 @@ public class NewSettleEpochHandler implements EventHandler {
                     BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
                     .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR) // 精度取10位小数
                     .divide(BigDecimal.valueOf(bc.getPreVerifier().size()),16,RoundingMode.FLOOR) // 精度取10位小数
-                    .multiply(bc.getChainConfig().getStakingRewardRate()).longValue()
+                    .multiply(bc.getChainConfig().getStakeRewardRate()).longValue()
             );
             logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
         } catch (IOException e) {
@@ -201,7 +201,7 @@ public class NewSettleEpochHandler implements EventHandler {
             curStaking.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
 
             // 将改动的内存暂存至待更新缓存
-            executeResult.stageUpdateStaking(curStaking,bc);
+            executeResult.stageUpdateStaking(curStaking);
 
 
 

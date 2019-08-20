@@ -99,8 +99,11 @@ public class BlockSyncTask {
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+
         /**
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
+         * 查询内置共识周期验证人初始化blockChain的curValidator属性
+         * 查询内置结算周期验证人初始化blockChain的curVerifier属性
           */
         if(maxBlockNumber==null){
             // 如果库里区块为空，则：
@@ -112,8 +115,8 @@ public class BlockSyncTask {
                     logger.debug("查询实时共识周期验证人列表...");
                     validators = client.getNodeContract().getValidatorList().send();
                 }
-                Map<String,Node> validatorMap = new HashMap<>();
-                if(validators.isStatusOk()) validators.data.forEach(node->validatorMap.put(HexTool.prefix(node.getNodeId()),node));
+                // 查询内置共识周期验证人初始化blockChain的curValidator属性
+                if(validators.isStatusOk()) validators.data.forEach(node->blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
 
                 // 根据区块号0查询结算周期验证人列表并入库
                 BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ZERO);
@@ -135,9 +138,11 @@ public class BlockSyncTask {
                         staking.setIsInit(1);
                         staking.setIsSetting(1);
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                        if(validatorMap.get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                        if(blockChain.getCurValidator().get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                         // 暂存至新增质押待入库列表
                         blockChain.STAGE_BIZ_DATA.getStakingExecuteResult().stageAddStaking(staking,null);
+                        // 查询内置结算周期验证人初始化blockChain的curVerifier属性
+                        blockChain.getCurVerifier().put(HexTool.prefix(verifier.getNodeId()),verifier);
                     });
                     BlockChainResult bcr = blockChain.exportResult();
                     service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
@@ -151,7 +156,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException {
+    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();

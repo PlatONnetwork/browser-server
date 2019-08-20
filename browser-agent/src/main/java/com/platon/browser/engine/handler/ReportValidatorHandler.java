@@ -49,7 +49,7 @@ public class ReportValidatorHandler implements EventHandler {
                 evidencesParam.setNodeName(latestStaking.getStakingName());
 
                 //多签举报，惩罚金额
-                Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashing().doubleValue();
+                Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashRate().doubleValue();
                 //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
                 latestStaking.setStakingLocked(new BigDecimal(latestStaking.getStakingLocked()).add(new BigDecimal(latestStaking.getStakingHas())).subtract(new BigDecimal(slashValue.toString())).toString());
                 //设置离开时间
@@ -75,7 +75,7 @@ public class ReportValidatorHandler implements EventHandler {
                 CustomSlash newCustomSlash = new CustomSlash();
                 newCustomSlash.updateWithSlash(tx,evidencesParam);
                 newCustomSlash.setReward(slashValue.toString());
-                newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashing().toString());
+                newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashRate().toString());
                 nodeCache.getNode(evidencesParam.getVerify()).getSlashes().add(newCustomSlash);
 
                 //新增分析多重签名结果

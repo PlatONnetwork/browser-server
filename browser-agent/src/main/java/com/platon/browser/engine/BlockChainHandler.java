@@ -3,10 +3,7 @@ package com.platon.browser.engine;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.exception.*;
 import com.platon.browser.utils.HexTool;
@@ -15,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -61,19 +60,21 @@ public class BlockChainHandler {
         // 根据区块号是否整除周期来触发周期相关处理方法
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
-        if (blockNumber % chainConfig.getElectionDistance().longValue() == 0) {
+
+        // (当前块号+选举回退块数)%共识周期区块数
+        if (blockNumber+chainConfig.getElectionBackwardBlockCount().longValue() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             logger.debug("开始验证人选举：Block Number({})", blockNumber);
             stakingExecute.onElectionDistance(curBlock, bc);
 
         }
 
-        if (blockNumber % chainConfig.getConsensusPeriod().longValue() == 0) {
+        if (blockNumber % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             logger.debug("进入新共识周期：Block Number({})", blockNumber);
             stakingExecute.onNewConsEpoch(curBlock, bc);
 
         }
 
-        if (blockNumber % chainConfig.getSettingPeriod().longValue() == 0) {
+        if (blockNumber % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             logger.debug("进入新结算周期：Block Number({})", blockNumber);
             stakingExecute.onNewSettingEpoch(curBlock, bc);
 
@@ -89,16 +90,53 @@ public class BlockChainHandler {
         // 根据区块号是否与周期整除来触发周期相关处理方法
         // 计算共识周期轮数
         BigInteger curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
-                .divide(BigDecimal.valueOf(chainConfig.getConsensusPeriod().longValue()), 0, RoundingMode.CEILING).longValue());
+                .divide(BigDecimal.valueOf(chainConfig.getConsensusPeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setCurConsensusEpoch(curConsensusEpoch);
         // 计算结算周期轮数
         BigInteger curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
-                .divide(BigDecimal.valueOf(chainConfig.getSettingPeriod().longValue()), 0, RoundingMode.CEILING).longValue());
+                .divide(BigDecimal.valueOf(chainConfig.getSettlePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setCurSettingEpoch(curSettingEpoch);
         //计算增发周期轮数
         BigInteger addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
-                .divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriod().longValue()), 0, RoundingMode.CEILING).longValue());
+                .divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setAddIssueEpoch(addIssueEpoch);
+    }
+
+    /**
+     * 在增发周期切换时更新区块奖励和质押奖励
+     */
+    public void updateBlockRewardAndStakingReward() throws IssueEpochChangeException {
+        CustomBlock curBlock = bc.getCurBlock();
+        Long blockNumber = curBlock.getNumber();
+        Long issuePeriod = chainConfig.getAddIssuePeriodBlockCount().longValue();
+        if (blockNumber==1 || blockNumber % issuePeriod == 0) {
+            // 进入增发周期
+            // 激励池账户地址
+            String stimulatePoolAccountAddr = bc.getChainConfig().getStimulatePoolAccountAddr();
+            try {
+                // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
+                BigInteger preStimulatePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(stimulatePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
+                logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,preStimulatePoolAccountBalance.toString());
+                // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
+                if(bc.getPreVerifier().size()==0){
+                    throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
+                }
+                BigDecimal settleReward = BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
+                                .multiply(bc.getChainConfig().getStakeRewardRate()) // 取出激励池余额中属于质押奖励的部分
+                                .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR) // 除以结算周期轮数，精度取10位小数
+                                .divide(BigDecimal.valueOf(bc.getPreVerifier().size()),16,RoundingMode.FLOOR); // 除以结算周期验证人数，精度取10位小数
+                bc.setSettleReward(settleReward);
+                logger.debug("当前结算周期奖励:{}",settleReward.longValue());
+
+                BigDecimal blockReward = BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
+                                .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
+                                .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),16, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
+                bc.setBlockReward(blockReward);
+                logger.debug("当前区块奖励:{}",blockReward.longValue());
+            } catch (IOException | SettleEpochChangeException e) {
+                throw new IssueEpochChangeException("查询激励池(addr="+stimulatePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
+            }
+        }
     }
 
     /**
@@ -115,7 +153,7 @@ public class BlockChainHandler {
         CustomBlock curBlock = bc.getCurBlock();
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
-        Long consensusPeriod = chainConfig.getConsensusPeriod().longValue();
+        Long consensusPeriod = chainConfig.getConsensusPeriodBlockCount().longValue();
         if (blockNumber % consensusPeriod == 0) {
             logger.debug("共识周期切换块号:{}", blockNumber);
             try {
@@ -178,7 +216,7 @@ public class BlockChainHandler {
         CustomBlock curBlock = bc.getCurBlock();
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
-        Long settingPeriod = chainConfig.getSettingPeriod().longValue();
+        Long settingPeriod = chainConfig.getSettlePeriodBlockCount().longValue();
         if (blockNumber % settingPeriod == 0) {
             logger.debug("结算周期切换块号:{}", blockNumber);
             // 直接查当前最新的共识周期验证人列表来初始化blockChain的curValidators属性
@@ -227,7 +265,6 @@ public class BlockChainHandler {
         }
     }
 
-    /*************************由外部调用的方法*************************/
     /**
      * 更新node表中的节点出块数信息: stat_block_qty, 由blockChain.execute()调用
      */
@@ -239,6 +276,37 @@ public class BlockChainHandler {
             STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateNode(node);
         } catch (NoSuchBeanException e) {
             logger.error("{}",e.getMessage());
+        }
+    }
+
+    /**
+     * 更新质押中与区块相关的信息
+     */
+    public void updateStakingRelative() throws NoSuchBeanException {
+        CustomBlock curBlock = bc.getCurBlock();
+        Node node = curValidator.get(curBlock.getNodeId());
+        if(node!=null){
+            try {
+                CustomNode customNode = NODE_CACHE.getNode(curBlock.getNodeId());
+                CustomStaking customStaking = customNode.getLatestStaking();
+                if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
+                    // 当前块出块奖励
+                    BigDecimal blockReward = new BigDecimal(curBlock.getBlockReward());
+                    // 当前共识周期出块奖励
+                    BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue())
+                            .add(blockReward);
+                    customStaking.setBlockRewardValue(curConsBlockReward.toString());
+                    // 当前结算周期出块奖励
+                    BigDecimal curSettleBlockReward = new BigDecimal(customStaking.getPreSetBlockRewardValue())
+                            .add(blockReward);
+                    // 节点出块数加1
+                    customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
+                    // 把更改后的内容暂存至待更新列表
+                    STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateStaking(customStaking);
+                }
+            } catch (NoSuchBeanException e) {
+                throw new NoSuchBeanException("更新质押中区块统计信息出错:"+e.getMessage());
+            }
         }
     }
 
@@ -301,12 +369,12 @@ public class BlockChainHandler {
             NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
             //TODO:可优化
             //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
-            NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriod().multiply(bc.getAddIssueEpoch()).longValue());
+            NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).longValue());
             //TODO:可优化
             //当前增发周期开始块高 = (每个增发周期块数 * 当前增发周期轮数) - 每个增发周期块数
-            NETWORK_STAT_CACHE.setAddIssueBegin(chainConfig.getAddIssuePeriod().multiply(bc.getAddIssueEpoch()).subtract(chainConfig.getAddIssuePeriod()).longValue());
+            NETWORK_STAT_CACHE.setAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).subtract(chainConfig.getAddIssuePeriodBlockCount()).longValue());
             //离下个结算周期剩余块高 = (每个结算周期块数 * 当前结算周期轮数) - 当前块高
-            NETWORK_STAT_CACHE.setNextSetting(chainConfig.getSettingPeriod().multiply(bc.getCurSettingEpoch()).subtract(curBlock.getBlockNumber()).longValue());
+            NETWORK_STAT_CACHE.setNextSetting(chainConfig.getSettlePeriodBlockCount().multiply(bc.getCurSettingEpoch()).subtract(curBlock.getBlockNumber()).longValue());
             //质押奖励
             NETWORK_STAT_CACHE.setStakingReward(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingRewardValue());
             if (null != NETWORK_STAT_CACHE) {

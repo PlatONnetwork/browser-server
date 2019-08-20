@@ -51,7 +51,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             }
             staking.setPreConsBlockQty(staking.getCurConsBlockQty());
             staking.setCurConsBlockQty(BigInteger.ZERO.longValue());
-            executeResult.stageUpdateStaking(staking,bc);
+            executeResult.stageUpdateStaking(staking);
         }
 
     }

@@ -3,16 +3,16 @@ package com.platon.browser.engine;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
-import com.platon.browser.exception.CandidateException;
-import com.platon.browser.exception.ConsensusEpochChangeException;
-import com.platon.browser.exception.ElectionEpochChangeException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,11 @@ public class BlockChain {
     // 当前块
     private CustomBlock curBlock;
 
+    // 区块奖励，每个增发周期更新一次
+    private BigDecimal blockReward;
+    // 当前增发周期的每个结算周期的奖励，每个增发周期更新一次
+    private BigDecimal settleReward;
+
     // 每个增发周期内有几个结算周期
     private BigInteger settleEpochCountPerIssueEpoch;
 
@@ -99,7 +105,7 @@ public class BlockChain {
         blockChainHandler.init(this);
 
         // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
-        settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriod().divide(chainConfig.getSettingPeriod());
+        settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount());
 
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
@@ -117,7 +123,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         blockChainHandler.updateEpoch();
@@ -133,6 +139,8 @@ public class BlockChain {
         blockChainHandler.updateWithNetworkStat();
         // 更新node表中的节点出块数信息
         blockChainHandler.updateNodeStatBlockQty();
+        // 更新staking表中与区块统计相关的信息
+        blockChainHandler.updateStakingRelative();
     }
 
     /**

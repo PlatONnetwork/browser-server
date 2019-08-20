@@ -24,53 +24,6 @@ platon:
   web3j:
     addresses: ${web3j.addresses}
     collect.batch-size: ${web3j.collect.batch-size}
-  config:
-    chainId: ${platonconfig.chain_id}
-    # 增发周期
-    addIssuePeriod: ${platonconfig.add_issue_period}
-
-    #结算周期
-    settingPeriod: ${platonconfig.setting_period}
-    #共识周期
-    consensusPeriod: ${platonconfig.consensus_period}
-    #增发率
-    addIssueRate: ${platonconfig.add_issue_rate}
-    #出块激励比例
-    blockRewardRate: ${platonconfig.add_issue_rate}
-    #质押激励比例
-    stakingRewardRate:  ${platonconfig.staking_reward_rate}
-    #初始发行金额
-    initIssueValue: ${platonconfig.init_issue_value}
-
-    #锁仓账户地址
-    restrictingAccountAddr: ${platonconfig.restricting_account_addr}
-    #激励池账户地址
-    stimulatePoolAccountAddr: ${platonconfig.stimulate_pool_account_addr}
-    #开发者激励基金账户地址
-    developerStimulateFundAccountAddr: ${platonconfig.developer_stimulate_fund_account_addr}
-    #PlatOn基金会账户地址
-    platonFundAccountAddr: ${platonconfig.platon_fund_account_addr}
-
-    #质押门槛
-    stakeThreshold: ${platonconfig.stake_threshold}
-    #委托门槛
-    minimumThreshold: ${platonconfig.minimum_threshold}
-    #每个共识轮中选举下一轮验证人的块高间隔(由后往前计算)
-    electionDistance: ${platonconfig.election_distance}
-    #投票数百分比下限
-    supportRateThreshold: ${platonconfig.support_rate_threshold}
-    #双签低处罚金额，百分比
-    duplicateSignLowSlashing: ${platonconfig.duplicate_sign_low_slashing}
-    #每个共识轮低异常的出块数
-    packAmountAbnormal: ${platonconfig.pack_amount_abnormal}
-    #每个共识轮高异常的出块数
-    packAmountHighAbnormal: ${platonconfig.pack_amount_high_abnormal}
-    #每个共识轮低异常出块数的处罚额度，百分比
-    packAmountLowSlashRate: ${platonconfig.pack_amount_low_slash_rate}
-    #每个共识轮高异常出块数的处罚额度，百分比
-    packAmountHighSlashRate: ${platonconfig.pack_amount_high_slash_rate}
-    #
-    foundationSubsidies: ${platonconfig.maps}
 
   # 虚假节点位置配置文件
   fake.location.filename: fakelocation.json
