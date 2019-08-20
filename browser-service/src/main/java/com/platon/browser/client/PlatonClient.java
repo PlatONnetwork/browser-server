@@ -244,7 +244,6 @@ public class PlatonClient {
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();
-            String a = new String(Numeric.hexStringToByteArray(value));
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
             return response;

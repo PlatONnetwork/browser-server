@@ -37,15 +37,15 @@ public class VotingProposalHandler implements EventHandler {
             //全量数据回填
             //支持票集合
             if(CustomProposal.OptionEnum.SUPPORT.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS.get(param.getProposalId()).getYesList().add(customVote);
+                bc.PROPOSALS_CACHE.get(param.getProposalId()).getYesList().add(customVote);
             }
             //反对票集合
             if(CustomProposal.OptionEnum.OPPOSITION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS.get(param.getProposalId()).getNoList().add(customVote);
+                bc.PROPOSALS_CACHE.get(param.getProposalId()).getNoList().add(customVote);
             }
             //弃权票集合
             if(CustomProposal.OptionEnum.ABSTENTION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS.get(param.getProposalId()).getAbstentionList().add(customVote);
+                bc.PROPOSALS_CACHE.get(param.getProposalId()).getAbstentionList().add(customVote);
             }
         }catch (NoSuchBeanException e){
             logger.error("");

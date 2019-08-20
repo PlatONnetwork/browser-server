@@ -32,7 +32,7 @@ public class ProposalExecute {
     private static Logger logger = LoggerFactory.getLogger(ProposalExecute.class);
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, CustomProposal> proposals = BlockChain.PROPOSALS;
+    private Map<String, CustomProposal> proposals = BlockChain.PROPOSALS_CACHE;
 
     @Autowired
     private ProposalMapper proposalMapper;

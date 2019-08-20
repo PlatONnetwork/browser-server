@@ -1,20 +1,30 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.NetworkStatExample;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
 import com.platon.browser.service.DbService;
 import com.platon.browser.utils.HexTool;
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
 import lombok.Data;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
@@ -51,6 +61,8 @@ public class BlockChain {
     private DbService dbService;
     @Autowired
     private PlatonClient client;
+    @Autowired
+    private NetworkStatMapper networkStatMapper;
 
     // 业务数据暂存容器
     public static final BlockChainResult STAGE_BIZ_DATA = new BlockChainResult();
@@ -67,7 +79,10 @@ public class BlockChain {
     public static final NodeCache NODE_CACHE = new NodeCache();
 
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
-    public static final Map<String, CustomProposal> PROPOSALS = new HashMap<>();
+    public static final Map <String, CustomProposal> PROPOSALS_CACHE = new HashMap <>();
+
+    // 全量统计数据
+    public static final NetworkStat NETWORK_STAT_CACHE = new NetworkStat();
 
     // 每个增发周期内有几个结算周期
     private BigInteger settleEpochCountPerIssueEpoch;
@@ -91,10 +106,19 @@ public class BlockChain {
     private void init () {
         // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
         settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriod().divide(chainConfig.getSettingPeriod());
+
+        // 数据库统计数据全量初始化
+        NetworkStatExample example = new NetworkStatExample();
+        example.setOrderByClause(" update_time desc");
+        List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
+        if (networkStats.size() != 0) {
+            BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
+        }
     }
 
     /**
      * 分析区块内的业务信息
+     *
      * @param block
      */
     public void execute ( CustomBlock block ) throws SettleEpochChangeException {
@@ -109,32 +133,35 @@ public class BlockChain {
         analyzeTransaction();
         // 通知各引擎周期临界点事件
         periodChangeNotify();
+        //统计数据相关累加
+        updateWithNetworkStat();
         // 更新node表中的节点出块数信息
         stakingExecute.updateNodeStatBlockQty(curBlock.getNodeId());
+
     }
 
     /**
      * 周期变更通知：
-     *  通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
+     * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    private void periodChangeNotify() throws SettleEpochChangeException {
+    private void periodChangeNotify () throws SettleEpochChangeException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
         if (blockNumber % chainConfig.getElectionDistance().longValue() == 0) {
             logger.debug("开始验证人选举：Block Number({})", blockNumber);
-            stakingExecute.onElectionDistance(curBlock,this);
+            stakingExecute.onElectionDistance(curBlock, this);
 
         }
 
         if (blockNumber % chainConfig.getConsensusPeriod().longValue() == 0) {
             logger.debug("进入新共识周期：Block Number({})", blockNumber);
-            stakingExecute.onNewConsEpoch(curBlock,this);
+            stakingExecute.onNewConsEpoch(curBlock, this);
 
         }
 
         if (blockNumber % chainConfig.getSettingPeriod().longValue() == 0) {
             logger.debug("进入新结算周期：Block Number({})", blockNumber);
-            stakingExecute.onNewSettingEpoch(curBlock,this);
+            stakingExecute.onNewSettingEpoch(curBlock, this);
 
         }
     }
@@ -282,6 +309,8 @@ public class BlockChain {
             // 链上执行失败的交易不予处理
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
             // 调用交易分析引擎分析交易，以补充相关数据
+
+
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人
                 case EDIT_VALIDATOR: // 编辑验证人
@@ -310,6 +339,8 @@ public class BlockChain {
             }
             // 地址相关
             //addressExecute.execute(tx);
+            //更新统计信息
+            updateWithNetworkStat();
         });
     }
 
@@ -328,5 +359,78 @@ public class BlockChain {
      */
     public void commitResult () {
         STAGE_BIZ_DATA.clear();
+    }
+
+    /**
+     * 统计设置常规值
+     */
+    public void updateWithNetworkStat () {
+        try {
+            //TODO:地址数需要地址统计
+            //当前区块高度
+            NETWORK_STAT_CACHE.setCurrentNumber(curBlock.getNumber());
+            //当前区块所属节点id
+            NETWORK_STAT_CACHE.setNodeId(curBlock.getNodeId());
+            //当前区块所属节点name
+            NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
+            //TODO:可优化
+            //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
+            NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriod().multiply(addIssueEpoch).longValue());
+            //TODO:可优化
+            //当前增发周期开始块高 = (每个增发周期块数 * 当前增发周期轮数) - 每个增发周期块数
+            NETWORK_STAT_CACHE.setAddIssueBegin(chainConfig.getAddIssuePeriod().multiply(addIssueEpoch).subtract(addIssueEpoch).longValue());
+            //离下个结算周期剩余块高 = (每个结算周期块数 * 当前结算周期轮数) - 当前块高
+            NETWORK_STAT_CACHE.setNextSetting(chainConfig.getSettingPeriod().multiply(curSettingEpoch).subtract(curBlock.getBlockNumber()).longValue());
+            //质押奖励
+            NETWORK_STAT_CACHE.setStakingReward(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingRewardValue());
+            if (null != NETWORK_STAT_CACHE) {
+                //更新时间
+                NETWORK_STAT_CACHE.setUpdateTime(new Date());
+                //累计交易总数
+                NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty() + curBlock.getStatTxQty());
+                //当前区块交易总数
+                NETWORK_STAT_CACHE.setCurrentTps(curBlock.getStatTxQty());
+                //已统计区块中最高交易个数
+                NETWORK_STAT_CACHE.setMaxTps(NETWORK_STAT_CACHE.getMaxTps() > curBlock.getStatTxQty() ? NETWORK_STAT_CACHE.getMaxTps() : curBlock.getStatTxQty());
+                //出块奖励
+                NETWORK_STAT_CACHE.setBlockReward(curBlock.getBlockReward());
+                if (curBlock.getStatProposalQty() > 0) {
+                    //累计提案总数
+                    NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + curBlock.getStatProposalQty());
+                }
+                if (curBlock.getStatStakingQty() > 0) {
+                    //统计质押金额
+                    Set <Staking> newStaking = exportResult().getStakingExecuteResult().getAddStakings();
+                    newStaking.forEach(staking -> {
+                        BigInteger stakingValue = new BigInteger(NETWORK_STAT_CACHE.getStakingValue()).add(new BigInteger(staking.getStakingHas())).add(new BigInteger(staking.getStakingLocked()));
+                        NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
+                    });
+                }
+                if (curBlock.getStatDelegateQty() > 0) {
+                    //质押已统计，本次累加上委托
+                    Set <Delegation> newDelegation = exportResult().getStakingExecuteResult().getAddDelegations();
+                    newDelegation.forEach(delegation -> {
+                        //先做委托累加
+                        BigInteger delegationValue = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()));
+                        NETWORK_STAT_CACHE.setStakingDelegationValue(delegationValue.toString());
+                    });
+                    //在累加计算好的质押金
+                    NETWORK_STAT_CACHE.setStakingDelegationValue(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()).add(new BigInteger(NETWORK_STAT_CACHE.getStakingValue())).toString());
+                }
+
+                if (exportResult().getProposalExecuteResult().getAddProposals().size() > 0 || exportResult().getProposalExecuteResult().getUpdateProposals().size() > 0) {
+                    PROPOSALS_CACHE.forEach(( hash, proposal ) -> {
+                        if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code)) {
+                            NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
+                        }
+                    });
+                }
+            }
+
+        } catch (NoSuchBeanException e) {
+            logger.error("");
+        }
+
+
     }
 }

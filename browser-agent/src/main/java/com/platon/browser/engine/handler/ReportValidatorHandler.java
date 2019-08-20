@@ -68,7 +68,8 @@ public class ReportValidatorHandler implements EventHandler {
                 latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
                 latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
                 //更新分析质押结果
-                executeResult.getUpdateStakings().add(latestStaking);
+                //executeResult.getUpdateStakings().add(latestStaking);
+                executeResult.stageUpdateStaking(latestStaking ,tx);
 
                 //新增举报交易结构
                 CustomSlash newCustomSlash = new CustomSlash();
@@ -78,7 +79,8 @@ public class ReportValidatorHandler implements EventHandler {
                 nodeCache.getNode(evidencesParam.getVerify()).getSlashes().add(newCustomSlash);
 
                 //新增分析多重签名结果
-                executeResult.getAddSlashs().add(newCustomSlash);
+                //executeResult.getAddSlashs().add(newCustomSlash);
+                executeResult.stageAddSlash(newCustomSlash);
             } catch (NoSuchBeanException e) {
                 logger.error("{}", e.getMessage());
             }
