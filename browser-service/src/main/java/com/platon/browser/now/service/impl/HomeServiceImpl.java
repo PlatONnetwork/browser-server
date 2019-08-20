@@ -169,7 +169,7 @@ public class HomeServiceImpl implements HomeService {
 		Criteria criteria = stakingExample.createCriteria();
 		criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode()).andIsConsensusEqualTo(IsConsensusStatus.YES.getCode());
 		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
-				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,id desc");
+				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 		StakingListNewResp stakingListNewResp = new StakingListNewResp();
 		List<StakingListNewResp> lists = new LinkedList<>();

@@ -50,9 +50,5 @@ public interface StakingMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int batchInsertSelective(@Param("list") List<Staking> list, @Param("selective") Staking.Column ... selective);
-    
-    
-    List<StakingNode> selectStakingAndNodeByExample(@Param("name")String name,@Param("status")Integer status,@Param("isConsensus")Integer isConsensus);
 
-    List<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id);
 }

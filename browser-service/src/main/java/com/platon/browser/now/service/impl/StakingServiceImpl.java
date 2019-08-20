@@ -5,8 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.platon.browser.dao.entity.NodeExample;
-import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.enums.*;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.res.BaseResp;
@@ -39,6 +38,9 @@ public class StakingServiceImpl implements StakingService {
 	
 	@Autowired
 	private StakingMapper stakingMapper;
+	
+	@Autowired
+	private CustomStakingMapper customStakingMapper;
 
 	@Autowired
 	private I18nUtil i18n;
@@ -91,7 +93,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), status, isConsensus);
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), status, isConsensus);
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			aliveStakingListResp.setBlockQty(stakings.get(i).getCurConsBlockQty());
@@ -132,7 +134,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<HistoryStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), null, null);
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null);
 		for (StakingNode stakingNode:stakings) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
@@ -161,7 +163,7 @@ public class StakingServiceImpl implements StakingService {
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getNodeId());
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
 		Integer size = stakings.size();
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
