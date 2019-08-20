@@ -93,7 +93,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () {
+    public void init () throws CandidateException {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
@@ -147,7 +147,7 @@ public class BlockSyncTask {
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {
-                logger.error("查询内置初始验证人列表失败,原因：{}",e.getMessage());
+                throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
             }
         }
     }
