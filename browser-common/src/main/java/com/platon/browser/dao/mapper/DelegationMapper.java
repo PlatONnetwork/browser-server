@@ -3,6 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.entity.DelegationKey;
+import com.platon.browser.dao.entity.DelegationStaking;
+
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -46,4 +48,8 @@ public interface DelegationMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int batchInsertSelective(@Param("list") List<Delegation> list, @Param("selective") Delegation.Column ... selective);
+
+	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("nodeId") String nodeId,@Param("stakingBlockNum") long stakingBlockNum);
+
+	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("delegateAddr") String delegateAddr);
 }

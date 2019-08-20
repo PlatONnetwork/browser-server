@@ -5,30 +5,50 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.enums.*;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.resp.staking.*;
-import com.platon.browser.util.I18nUtil;
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.dao.entity.DelegationExample;
+import com.platon.browser.dao.entity.DelegationStaking;
+import com.platon.browser.dao.entity.NodeOpt;
+import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.entity.StakingNode;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.dao.mapper.NodeOptMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.IsConsensusStatus;
+import com.platon.browser.enums.RetEnum;
+import com.platon.browser.enums.StakingStatus;
+import com.platon.browser.enums.StakingStatusEnum;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.NetworkStatRedis;
 import com.platon.browser.req.staking.AliveStakingListReq;
+import com.platon.browser.req.staking.DelegationListByAddressReq;
+import com.platon.browser.req.staking.DelegationListByStakingReq;
 import com.platon.browser.req.staking.HistoryStakingListReq;
-
-import javax.validation.Valid;
+import com.platon.browser.req.staking.StakingDetailsReq;
+import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.resp.staking.AliveStakingListResp;
+import com.platon.browser.resp.staking.DelegationListByAddressResp;
+import com.platon.browser.resp.staking.DelegationListByStakingResp;
+import com.platon.browser.resp.staking.HistoryStakingListResp;
+import com.platon.browser.resp.staking.StakingChangeNewResp;
+import com.platon.browser.resp.staking.StakingDetailsResp;
+import com.platon.browser.resp.staking.StakingOptRecordListResp;
+import com.platon.browser.resp.staking.StakingStatisticNewResp;
+import com.platon.browser.util.I18nUtil;
 
 @Service
 public class StakingServiceImpl implements StakingService {
@@ -41,6 +61,12 @@ public class StakingServiceImpl implements StakingService {
 	
 	@Autowired
 	private CustomStakingMapper customStakingMapper;
+	
+	@Autowired
+	private NodeOptMapper nodeOptMapper;
+	
+	@Autowired
+	private DelegationMapper delegationMapper;
 
 	@Autowired
 	private I18nUtil i18n;
@@ -205,6 +231,94 @@ public class StakingServiceImpl implements StakingService {
 				return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(), i18n.i(I18nEnum.FAILURE), null);
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+	}
+	
+	@Override
+	public RespPage<StakingOptRecordListResp> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
+		NodeOptExample nodeOptExample = new NodeOptExample();
+		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+		com.platon.browser.dao.entity.NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
+		criteria.andNodeIdEqualTo(req.getNodeId());
+		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
+		List<StakingOptRecordListResp> lists = new LinkedList<StakingOptRecordListResp>();
+		List<NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
+		for (int i = 0; i<nodeOpts.size(); i++) {
+			NodeOpt nodeOpt = nodeOpts.get(i);
+			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
+			stakingOptRecordListResp.setBlockNumber(nodeOpt.getBlockNumber());
+			stakingOptRecordListResp.setDesc(nodeOpt.getDesc());
+			stakingOptRecordListResp.setTimestamp(nodeOpt.getCreateTime().getTime());
+			stakingOptRecordListResp.setTxHash(nodeOpt.getTxHash());
+			lists.add(stakingOptRecordListResp);
+		}
+		long size = nodeOptMapper.countByExample(nodeOptExample);
+		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
+		page.setTotal(size);
+		respPage.init(page, lists);
+		return respPage;
+	}
+	
+	@Override
+	public RespPage<DelegationListByStakingResp> delegationListByStaking(@Valid DelegationListByStakingReq req) {
+		DelegationExample delegationExample = new DelegationExample();
+		com.platon.browser.dao.entity.DelegationExample.Criteria criteria = delegationExample.createCriteria();
+		criteria.andNodeIdEqualTo(req.getNodeId());
+		criteria.andStakingBlockNumEqualTo(Long.parseLong(req.getStakingBlockNum()));
+		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+		List<DelegationListByStakingResp> lists = new LinkedList<DelegationListByStakingResp>();
+		
+		List<DelegationStaking> delegationStakings = 
+				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+		for (int i = 0; i < delegationStakings.size(); i++) {
+			DelegationStaking delegationStaking = delegationStakings.get(i);
+			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
+			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
+			byStakingResp.setDelegateValue(new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
+			// "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+			byStakingResp.setDelegateLocked(delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0");
+			byStakingResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
+			lists.add(byStakingResp);
+		}
+		long size = delegationMapper.countByExample(delegationExample);
+		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
+		page.setTotal(size);
+		RespPage<DelegationListByStakingResp> respPage = new RespPage<>();
+		respPage.init(page, lists);
+		return respPage;
+	}
+	
+	@Override
+	public RespPage<DelegationListByAddressResp> delegationListByAddress(@Valid DelegationListByAddressReq req) {
+		DelegationExample delegationExample = new DelegationExample();
+		com.platon.browser.dao.entity.DelegationExample.Criteria criteria = delegationExample.createCriteria();
+		criteria.andDelegateAddrEqualTo(req.getAddress());
+		
+		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+		List<DelegationListByAddressResp> lists = new LinkedList<DelegationListByAddressResp>();
+		
+		List<DelegationStaking> delegationStakings = delegationMapper.selectDelegationAndStakingByExample(req.getAddress());
+		for (int i = 0; i < delegationStakings.size(); i++) {
+			DelegationStaking delegationStaking = delegationStakings.get(i);
+			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
+			byAddressResp.setNodeId(delegationStaking.getNodeId());
+			byAddressResp.setNodeName(delegationStaking.getStakingName());
+			byAddressResp.setDelegateValue(new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
+			byAddressResp.setDelegateHas(delegationStaking.getStatus()==2?delegationStaking.getDelegateHas():"0");
+			byAddressResp.setDelegateLocked(delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0");
+			byAddressResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
+			byAddressResp.setDelegateUnlock(delegationStaking.getStatus()==2?"0":new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
+			byAddressResp.setDelegateReduction(delegationStaking.getDelegateReduction());
+			lists.add(byAddressResp);
+		}
+		long size = delegationMapper.countByExample(delegationExample);
+		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
+		page.setTotal(size);
+		RespPage<DelegationListByAddressResp> respPage = new RespPage<>();
+		respPage.init(page, lists);
+		return respPage;
 	}
 
 }

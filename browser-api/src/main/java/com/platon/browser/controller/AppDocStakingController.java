@@ -2,8 +2,6 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -68,20 +66,17 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		return stakingService.stakingOptRecordList(req);
 	}
 
 	@Override
 	public RespPage<DelegationListByStakingResp> delegationListByStaking(@Valid DelegationListByStakingReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		return stakingService.delegationListByStaking(req);
 	}
 
 	@Override
 	public RespPage<DelegationListByAddressResp> delegationListByAddress(@Valid DelegationListByAddressReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		return stakingService.delegationListByAddress(req);
 	}
 
 }
