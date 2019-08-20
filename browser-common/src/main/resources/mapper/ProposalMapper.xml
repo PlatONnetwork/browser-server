@@ -8,9 +8,6 @@
     <result column="verifier_name" jdbcType="VARCHAR" property="verifierName" />
     <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="new_version" jdbcType="VARCHAR" property="newVersion" />
-    <result column="param_name" jdbcType="VARCHAR" property="paramName" />
-    <result column="current_value" jdbcType="VARCHAR" property="currentValue" />
-    <result column="new_value" jdbcType="VARCHAR" property="newValue" />
     <result column="end_voting_block" jdbcType="VARCHAR" property="endVotingBlock" />
     <result column="active_block" jdbcType="VARCHAR" property="activeBlock" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
@@ -21,6 +18,12 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="pip_num" jdbcType="VARCHAR" property="pipNum" />
+    <result column="pip_id" jdbcType="INTEGER" property="pipId" />
+    <result column="topic" jdbcType="VARCHAR" property="topic" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="canceled_pip_id" jdbcType="INTEGER" property="canceledPipId" />
+    <result column="canceled_topic" jdbcType="VARCHAR" property="canceledTopic" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -81,9 +84,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, `type`, verifier, verifier_name, url, new_version, param_name, current_value, 
-    new_value, end_voting_block, active_block, `timestamp`, yeas, nays, abstentions, 
-    accu_verifiers, `status`, update_time, create_time
+    hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
+    `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
+    pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -118,18 +121,20 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal (hash, `type`, verifier, 
       verifier_name, url, new_version, 
-      param_name, current_value, new_value, 
       end_voting_block, active_block, `timestamp`, 
       yeas, nays, abstentions, 
       accu_verifiers, `status`, update_time, 
-      create_time)
+      create_time, pip_num, pip_id, 
+      topic, description, canceled_pip_id, 
+      canceled_topic)
     values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{verifier,jdbcType=VARCHAR}, 
       #{verifierName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
-      #{paramName,jdbcType=VARCHAR}, #{currentValue,jdbcType=VARCHAR}, #{newValue,jdbcType=VARCHAR}, 
       #{endVotingBlock,jdbcType=VARCHAR}, #{activeBlock,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
       #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
       #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createTime,jdbcType=TIMESTAMP})
+      #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=INTEGER}, 
+      #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=INTEGER}, 
+      #{canceledTopic,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal
@@ -151,15 +156,6 @@
       </if>
       <if test="newVersion != null">
         new_version,
-      </if>
-      <if test="paramName != null">
-        param_name,
-      </if>
-      <if test="currentValue != null">
-        current_value,
-      </if>
-      <if test="newValue != null">
-        new_value,
       </if>
       <if test="endVotingBlock != null">
         end_voting_block,
@@ -191,6 +187,24 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="pipNum != null">
+        pip_num,
+      </if>
+      <if test="pipId != null">
+        pip_id,
+      </if>
+      <if test="topic != null">
+        topic,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="canceledPipId != null">
+        canceled_pip_id,
+      </if>
+      <if test="canceledTopic != null">
+        canceled_topic,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -210,15 +224,6 @@
       </if>
       <if test="newVersion != null">
         #{newVersion,jdbcType=VARCHAR},
-      </if>
-      <if test="paramName != null">
-        #{paramName,jdbcType=VARCHAR},
-      </if>
-      <if test="currentValue != null">
-        #{currentValue,jdbcType=VARCHAR},
-      </if>
-      <if test="newValue != null">
-        #{newValue,jdbcType=VARCHAR},
       </if>
       <if test="endVotingBlock != null">
         #{endVotingBlock,jdbcType=VARCHAR},
@@ -250,6 +255,24 @@
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pipNum != null">
+        #{pipNum,jdbcType=VARCHAR},
+      </if>
+      <if test="pipId != null">
+        #{pipId,jdbcType=INTEGER},
+      </if>
+      <if test="topic != null">
+        #{topic,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="canceledPipId != null">
+        #{canceledPipId,jdbcType=INTEGER},
+      </if>
+      <if test="canceledTopic != null">
+        #{canceledTopic,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultType="java.lang.Long">
@@ -278,15 +301,6 @@
       </if>
       <if test="record.newVersion != null">
         new_version = #{record.newVersion,jdbcType=VARCHAR},
-      </if>
-      <if test="record.paramName != null">
-        param_name = #{record.paramName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.currentValue != null">
-        current_value = #{record.currentValue,jdbcType=VARCHAR},
-      </if>
-      <if test="record.newValue != null">
-        new_value = #{record.newValue,jdbcType=VARCHAR},
       </if>
       <if test="record.endVotingBlock != null">
         end_voting_block = #{record.endVotingBlock,jdbcType=VARCHAR},
@@ -318,6 +332,24 @@
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.pipNum != null">
+        pip_num = #{record.pipNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pipId != null">
+        pip_id = #{record.pipId,jdbcType=INTEGER},
+      </if>
+      <if test="record.topic != null">
+        topic = #{record.topic,jdbcType=VARCHAR},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+      <if test="record.canceledPipId != null">
+        canceled_pip_id = #{record.canceledPipId,jdbcType=INTEGER},
+      </if>
+      <if test="record.canceledTopic != null">
+        canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -331,9 +363,6 @@
       verifier_name = #{record.verifierName,jdbcType=VARCHAR},
       url = #{record.url,jdbcType=VARCHAR},
       new_version = #{record.newVersion,jdbcType=VARCHAR},
-      param_name = #{record.paramName,jdbcType=VARCHAR},
-      current_value = #{record.currentValue,jdbcType=VARCHAR},
-      new_value = #{record.newValue,jdbcType=VARCHAR},
       end_voting_block = #{record.endVotingBlock,jdbcType=VARCHAR},
       active_block = #{record.activeBlock,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
@@ -343,7 +372,13 @@
       accu_verifiers = #{record.accuVerifiers,jdbcType=BIGINT},
       `status` = #{record.status,jdbcType=INTEGER},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      pip_num = #{record.pipNum,jdbcType=VARCHAR},
+      pip_id = #{record.pipId,jdbcType=INTEGER},
+      topic = #{record.topic,jdbcType=VARCHAR},
+      description = #{record.description,jdbcType=VARCHAR},
+      canceled_pip_id = #{record.canceledPipId,jdbcType=INTEGER},
+      canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -365,15 +400,6 @@
       </if>
       <if test="newVersion != null">
         new_version = #{newVersion,jdbcType=VARCHAR},
-      </if>
-      <if test="paramName != null">
-        param_name = #{paramName,jdbcType=VARCHAR},
-      </if>
-      <if test="currentValue != null">
-        current_value = #{currentValue,jdbcType=VARCHAR},
-      </if>
-      <if test="newValue != null">
-        new_value = #{newValue,jdbcType=VARCHAR},
       </if>
       <if test="endVotingBlock != null">
         end_voting_block = #{endVotingBlock,jdbcType=VARCHAR},
@@ -405,6 +431,24 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pipNum != null">
+        pip_num = #{pipNum,jdbcType=VARCHAR},
+      </if>
+      <if test="pipId != null">
+        pip_id = #{pipId,jdbcType=INTEGER},
+      </if>
+      <if test="topic != null">
+        topic = #{topic,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="canceledPipId != null">
+        canceled_pip_id = #{canceledPipId,jdbcType=INTEGER},
+      </if>
+      <if test="canceledTopic != null">
+        canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -415,9 +459,6 @@
       verifier_name = #{verifierName,jdbcType=VARCHAR},
       url = #{url,jdbcType=VARCHAR},
       new_version = #{newVersion,jdbcType=VARCHAR},
-      param_name = #{paramName,jdbcType=VARCHAR},
-      current_value = #{currentValue,jdbcType=VARCHAR},
-      new_value = #{newValue,jdbcType=VARCHAR},
       end_voting_block = #{endVotingBlock,jdbcType=VARCHAR},
       active_block = #{activeBlock,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
@@ -427,7 +468,13 @@
       accu_verifiers = #{accuVerifiers,jdbcType=BIGINT},
       `status` = #{status,jdbcType=INTEGER},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      pip_num = #{pipNum,jdbcType=VARCHAR},
+      pip_id = #{pipId,jdbcType=INTEGER},
+      topic = #{topic,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      canceled_pip_id = #{canceledPipId,jdbcType=INTEGER},
+      canceled_topic = #{canceledTopic,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -437,18 +484,19 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into proposal
-    (hash, `type`, verifier, verifier_name, url, new_version, param_name, current_value, 
-      new_value, end_voting_block, active_block, `timestamp`, yeas, nays, abstentions, 
-      accu_verifiers, `status`, update_time, create_time)
+    (hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
+      `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
+      pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.verifier,jdbcType=VARCHAR}, 
         #{item.verifierName,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.newVersion,jdbcType=VARCHAR}, 
-        #{item.paramName,jdbcType=VARCHAR}, #{item.currentValue,jdbcType=VARCHAR}, #{item.newValue,jdbcType=VARCHAR}, 
         #{item.endVotingBlock,jdbcType=VARCHAR}, #{item.activeBlock,jdbcType=VARCHAR}, 
         #{item.timestamp,jdbcType=TIMESTAMP}, #{item.yeas,jdbcType=BIGINT}, #{item.nays,jdbcType=BIGINT}, 
         #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP})
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.pipNum,jdbcType=VARCHAR}, 
+        #{item.pipId,jdbcType=INTEGER}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
+        #{item.canceledPipId,jdbcType=INTEGER}, #{item.canceledTopic,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -484,15 +532,6 @@
         <if test="'new_version'.toString() == column.value">
           #{item.newVersion,jdbcType=VARCHAR}
         </if>
-        <if test="'param_name'.toString() == column.value">
-          #{item.paramName,jdbcType=VARCHAR}
-        </if>
-        <if test="'current_value'.toString() == column.value">
-          #{item.currentValue,jdbcType=VARCHAR}
-        </if>
-        <if test="'new_value'.toString() == column.value">
-          #{item.newValue,jdbcType=VARCHAR}
-        </if>
         <if test="'end_voting_block'.toString() == column.value">
           #{item.endVotingBlock,jdbcType=VARCHAR}
         </if>
@@ -522,6 +561,24 @@
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'pip_num'.toString() == column.value">
+          #{item.pipNum,jdbcType=VARCHAR}
+        </if>
+        <if test="'pip_id'.toString() == column.value">
+          #{item.pipId,jdbcType=INTEGER}
+        </if>
+        <if test="'topic'.toString() == column.value">
+          #{item.topic,jdbcType=VARCHAR}
+        </if>
+        <if test="'description'.toString() == column.value">
+          #{item.description,jdbcType=VARCHAR}
+        </if>
+        <if test="'canceled_pip_id'.toString() == column.value">
+          #{item.canceledPipId,jdbcType=INTEGER}
+        </if>
+        <if test="'canceled_topic'.toString() == column.value">
+          #{item.canceledTopic,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

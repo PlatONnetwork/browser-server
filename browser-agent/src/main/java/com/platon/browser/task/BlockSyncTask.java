@@ -99,7 +99,6 @@ public class BlockSyncTask {
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
-
         /**
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
           */

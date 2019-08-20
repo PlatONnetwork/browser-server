@@ -1,7 +1,6 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.result.AddressExecuteResult;
 import com.platon.browser.enums.AddressEnum;

@@ -2,7 +2,7 @@
 
 #Spring应用配置
 spring:
-  profiles.active: dev
+  profiles.active: agent
   application.name: browser-agent
   #Redis集群配置
   redis:
@@ -69,6 +69,8 @@ platon:
     packAmountLowSlashRate: ${platonconfig.pack_amount_low_slash_rate}
     #每个共识轮高异常出块数的处罚额度，百分比
     packAmountHighSlashRate: ${platonconfig.pack_amount_high_slash_rate}
+    #
+    foundationSubsidies: ${platonconfig.maps}
 
   # 虚假节点位置配置文件
   fake.location.filename: fakelocation.json

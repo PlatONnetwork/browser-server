@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -60,4 +61,6 @@ public class BlockChainConfig {
     private BigDecimal packAmountLowSlashRate;
     // 每个共识轮高异常出块数的处罚额度，百分比
     private BigDecimal packAmountHighSlashRate;
+
+    private Map <String,String> foundation;
 }

@@ -20,7 +20,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.entity.StakingNode;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
@@ -115,7 +114,7 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString());
 			lists.add(aliveStakingListResp);
-		}
+		}*/
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);
@@ -146,7 +145,7 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
-		}
+		}*/
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);

@@ -80,5 +80,11 @@ platonconfig:
   pack_amount_low_slash_rate:
   #每个共识轮高异常出块数的处罚额度，百分比
   pack_amount_high_slash_rate:
+  #10年内基金会向激励池填充额度
+  foundation:
+    maps:
+      key1: 1
+      key2: 3
+
 
 

@@ -1554,6 +1554,76 @@ public class AddressExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andRpPlanIsNull() {
+            addCriterion("rp_plan is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanIsNotNull() {
+            addCriterion("rp_plan is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanEqualTo(String value) {
+            addCriterion("rp_plan =", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanNotEqualTo(String value) {
+            addCriterion("rp_plan <>", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanGreaterThan(String value) {
+            addCriterion("rp_plan >", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanGreaterThanOrEqualTo(String value) {
+            addCriterion("rp_plan >=", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanLessThan(String value) {
+            addCriterion("rp_plan <", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanLessThanOrEqualTo(String value) {
+            addCriterion("rp_plan <=", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanLike(String value) {
+            addCriterion("rp_plan like", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanNotLike(String value) {
+            addCriterion("rp_plan not like", value, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanIn(List<String> values) {
+            addCriterion("rp_plan in", values, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanNotIn(List<String> values) {
+            addCriterion("rp_plan not in", values, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanBetween(String value1, String value2) {
+            addCriterion("rp_plan between", value1, value2, "rpPlan");
+            return (Criteria) this;
+        }
+
+        public Criteria andRpPlanNotBetween(String value1, String value2) {
+            addCriterion("rp_plan not between", value1, value2, "rpPlan");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
