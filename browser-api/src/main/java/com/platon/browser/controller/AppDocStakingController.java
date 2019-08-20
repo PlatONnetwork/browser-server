@@ -63,8 +63,7 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		return stakingService.stakingDetails(req);
 	}
 
 	@Override
