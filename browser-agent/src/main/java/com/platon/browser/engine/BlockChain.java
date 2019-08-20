@@ -8,10 +8,7 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.config.BlockChainConfig;
 import com.platon.browser.engine.result.BlockChainResult;
@@ -81,7 +78,7 @@ public class BlockChain {
     public static final Map <String, CustomProposal> PROPOSALS_CACHE = new HashMap <>();
 
     // 全量统计数据
-    public static final NetworkStat NETWORK_STAT_CACHE = new NetworkStat();
+    public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
 
     // 每个增发周期内有几个结算周期
     private BigInteger settleEpochCountPerIssueEpoch;
@@ -112,6 +109,8 @@ public class BlockChain {
         List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
         if (networkStats.size() != 0) {
             BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
+        }else {
+            BeanUtils.copyProperties(new CustomNetworkStat(),NETWORK_STAT_CACHE);
         }
     }
 
