@@ -1,4 +1,5 @@
 package com.platon.browser.util;
+import	java.util.concurrent.TimeoutException;
 import	java.util.HashMap;
 import	java.lang.annotation.Target;
 import	java.util.ArrayList;
@@ -9,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -17,6 +20,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +37,7 @@ import java.util.Map;
  * Desc:
  */
 public final class MarkDownParserUtil {
+    private final static Logger logger = LoggerFactory.getLogger(MarkDownParserUtil.class);
     private static final String MARKDOWN_BEFORE_INDEX = "<article class=\"markdown-body";
     private static final String MARKDOWN_LAST_INDEX = "</article>";
 
@@ -46,6 +52,10 @@ public final class MarkDownParserUtil {
         try {
             HttpClient httpClient = HttpClients.createDefault();
             httpGet = new HttpGet(fileName);
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(1000).setConnectionRequestTimeout(1000)
+                    .setSocketTimeout(1000).build();
+            httpGet.setConfig(requestConfig);
             HttpResponse httpResponse = httpClient.execute(httpGet);
             //拿到实体
             HttpEntity httpEntity = httpResponse.getEntity();
@@ -53,7 +63,10 @@ public final class MarkDownParserUtil {
             if (httpEntity != null) {
                 return EntityUtils.toString(httpEntity, "utf-8");
             }
-        } finally {
+        }catch (HttpResponseException e){
+            logger.error("##ERROR #:HttpResponseException ${}",fileName);
+            return null;
+        }finally {
             if (httpGet != null) {
                 //释放连接
                 httpGet.releaseConnection();

@@ -41,4 +41,13 @@
       )
     </foreach>
   </insert>
+
+  <select id="selectByProsotal" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.VoteMapper.Base_Column_List" />
+    from vote where proposal_hash = #{proposalHash}
+    <if test="option != null">
+      and option= #{option}
+    </if>
+  </select>
 </mapper>

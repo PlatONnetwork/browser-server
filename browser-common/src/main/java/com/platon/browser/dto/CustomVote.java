@@ -1,6 +1,5 @@
 package com.platon.browser.dto;
 
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.param.VotingProposalParam;
 import lombok.Data;

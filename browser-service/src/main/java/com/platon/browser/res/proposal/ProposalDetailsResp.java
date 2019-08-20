@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProposalDetailsResp {
-	private String proposalHash;        //提案内部标识
-	private String title;  //提案标题
+    private String pipNum;
+    private String proposalHash;        //提案内部标识
+	private String topic;  //提案标题
 	private String description;  //提案描述
 	private String url;                 //github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md PIP编号   eip-100
 	private String type;                //提案类型   1：文本提案； 2：升级提案；  3参数提案。
@@ -27,4 +28,6 @@ public class ProposalDetailsResp {
     private String activeBlockTime;      //生效块高预计时间  (activeBlock-curBlock)*period
     private String endVotingBlockTime;    //投票块高的时间   (endVotingBlock-curBlock)*period
     private String supportRateThreshold;   //通过率
+    private String opposeRateThreshold;   //反对率
+    private String abstainRateThreshold;   //弃权率
 }

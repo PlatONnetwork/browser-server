@@ -6,8 +6,11 @@ import com.platon.browser.dao.entity.DelegationKey;
 import com.platon.browser.dao.entity.DelegationStaking;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface DelegationMapper {
     long countByExample(DelegationExample example);
 
