@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.platon.browser.dao.mapper.BlockMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.BlockExample.Criteria;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.enums.I18nEnum;

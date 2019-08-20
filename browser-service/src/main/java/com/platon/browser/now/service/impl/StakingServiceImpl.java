@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.platon.browser.dao.mapper.StakingMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.entity.StakingNode;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.IsConsensusStatus;
 import com.platon.browser.enums.StakingStatus;
@@ -84,7 +84,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), status, isConsensus);
+/*		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), status, isConsensus);
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			aliveStakingListResp.setBlockQty(stakings.get(i).getCurConsBlockQty());
@@ -106,7 +106,7 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString());
 			lists.add(aliveStakingListResp);
-		}
+		}*/
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);
@@ -125,7 +125,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<HistoryStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), null, null);
+/*		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getKey(), null, null);
 		for (StakingNode stakingNode:stakings) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
@@ -137,7 +137,7 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
-		}
+		}*/
 		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);

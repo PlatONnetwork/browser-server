@@ -37,52 +37,6 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-  <resultMap id="AndNodeResultMap" type="com.platon.browser.dao.entity.StakingNode">
-    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
-    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="staking_tx_index" jdbcType="INTEGER" property="stakingTxIndex" />
-    <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
-    <result column="staking_has" jdbcType="VARCHAR" property="stakingHas" />
-    <result column="staking_locked" jdbcType="VARCHAR" property="stakingLocked" />
-    <result column="staking_reduction_epoch" jdbcType="INTEGER" property="stakingReductionEpoch" />
-    <result column="staking_reduction" jdbcType="VARCHAR" property="stakingReduction" />
-    <result column="stat_delegate_has" jdbcType="VARCHAR" property="statDelegateHas" />
-    <result column="stat_delegate_locked" jdbcType="VARCHAR" property="statDelegateLocked" />
-    <result column="stat_delegate_reduction" jdbcType="VARCHAR" property="statDelegateReduction" />
-    <result column="stat_delegate_qty" jdbcType="INTEGER" property="statDelegateQty" />
-    <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
-    <result column="staking_name" jdbcType="VARCHAR" property="stakingName" />
-    <result column="staking_icon" jdbcType="VARCHAR" property="stakingIcon" />
-    <result column="external_id" jdbcType="VARCHAR" property="externalId" />
-    <result column="denefit_addr" jdbcType="VARCHAR" property="denefitAddr" />
-    <result column="expected_income" jdbcType="VARCHAR" property="expectedIncome" />
-    <result column="block_reward_value" jdbcType="VARCHAR" property="blockRewardValue" />
-    <result column="pre_set_block_reward_value" jdbcType="VARCHAR" property="preSetBlockRewardValue" />
-    <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
-    <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />
-    <result column="program_version" jdbcType="VARCHAR" property="programVersion" />
-    <result column="staking_reward_value" jdbcType="VARCHAR" property="stakingRewardValue" />
-    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
-    <result column="details" jdbcType="VARCHAR" property="details" />
-    <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
-    <result column="leave_time" jdbcType="TIMESTAMP" property="leaveTime" />
-    <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="is_consensus" jdbcType="INTEGER" property="isConsensus" />
-    <result column="is_setting" jdbcType="INTEGER" property="isSetting" />
-    <result column="is_init" jdbcType="INTEGER" property="isInit" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="node_node_id" jdbcType="VARCHAR" property="nodeNodeId" />
-    <result column="stat_slash_multi_qty" jdbcType="INTEGER" property="statSlashMultiQty" />
-    <result column="stat_slash_low_qty" jdbcType="INTEGER" property="statSlashLowQty" />
-    <result column="stat_block_qty" jdbcType="BIGINT" property="statBlockQty" />
-    <result column="stat_expect_block_qty" jdbcType="BIGINT" property="statExpectBlockQty" />
-    <result column="stat_reward_value" jdbcType="VARCHAR" property="statRewardValue" />
-    <result column="node_stat_verifier_time" jdbcType="INTEGER" property="nodeStatVerifierTime" />
-    <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
-    <result column="node_create_time" jdbcType="TIMESTAMP" property="nodeCreateTime" />
-    <result column="node_update_time" jdbcType="TIMESTAMP" property="nodeUpdateTime" />
-  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -869,22 +823,4 @@
       )
     </foreach>
   </insert>
-  
-  <select id="selectStakingAndNodeByExample" resultMap="AndNodeResultMap">
-    select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
-    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
-    from staking s left join node n on s.node_id = n.node_id
-    <where>
-    	<if test="name != null">
-    		and s.staking_name = #{name,jdbcType=VARCHAR}
-    	</if>
-    	<if test="status != null">
-    		and s.status = #{status,jdbcType=INTEGER}
-    	</if>
-    	<if test="isConsensus != null">
-    		and s.is_consensus = #{isConsensus,jdbcType=INTEGER}
-    	</if>
-    </where>
-    order by s.create_time desc
-  </select>
 </mapper>
