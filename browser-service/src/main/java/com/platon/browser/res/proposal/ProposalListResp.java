@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class ProposalListResp {
 	private String proposalHash; // 提案内部标识
+	private String title;  //提案标题
+	private String description;  //提案描述
 	private String url; // github地址 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md PIP编号
 						// eip-100
 	private String type; // 提案类型 1：文本提案； 2：升级提案； 3参数提案。

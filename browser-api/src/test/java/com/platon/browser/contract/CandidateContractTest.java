@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 public class CandidateContractTest extends TestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(CandidateContractTest.class);
 
-    @Autowired
-    private PlatonClient platon;
+//    @Autowired
+//    private PlatonClient platon;
 
-    @Test
+//    @Test
     public void CandidateList(){
       /*  chainsConfig.getChainIds().forEach(chainId->{
             try {

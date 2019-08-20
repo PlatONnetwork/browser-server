@@ -11,13 +11,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigInteger;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 public class TicketContractTest extends TestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(TicketContractTest.class);
 
-    @Autowired
-    private PlatonClient platon;
+//    @Autowired
+//    private PlatonClient platon;
 
     @Data
     public static class TxInfo{

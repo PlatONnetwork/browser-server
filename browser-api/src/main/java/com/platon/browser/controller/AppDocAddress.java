@@ -56,6 +56,14 @@ public interface AppDocAddress {
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
+     *       "RPPlan":[
+     *          {
+     *             "epoch":11,         //锁仓周期
+     *             "amount":111,       //锁定金额
+     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
+     *             "estimateTime":dfsdf   //预计时间
+     *          }
+     *       ]
      *    }
      * }
      */

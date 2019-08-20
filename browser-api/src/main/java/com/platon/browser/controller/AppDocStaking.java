@@ -274,6 +274,7 @@ public interface AppDocStaking {
      * 1. 功能：验证人相关的委托列表查询<br/>
      * 2. 实现逻辑：<br/>
      * - 查询mysql中delegation表关联staking，查询 delegation.is_history = false的记录
+     * - staking 与 delegation 一对多，delegation的字段需要叠加
      * @apiParamExample {json} Request-Example:
      * {
      *    "pageNo":1,                  //页数(必填)
@@ -290,11 +291,11 @@ public interface AppDocStaking {
      *   "totalPages":1,               //总页数
      *   "data":[
      *      {
-     *         "delegateAddr":"",      //委托人地址
-     *         "delegateValue":"",     //委托金额
-     *         "delegateTotalValue":"",//验证人委托的总金额
-     *         "locketValue":"",       //锁定的委托金额
-     *         "locketTotalValue:""    //验证人锁定的委托总额
+     *         "delegateAddr":"",      //委托人地址    delegation
+     *         "delegateValue":"",     //委托金额       delegation   delegate_has+delegate_locked
+     *         "delegateTotalValue":"",//验证人委托的总金额    staking    delegate_has+delegate_locked
+     *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+     *         "allDelegateLocked":"", //当前验证人总接收的锁定委托量（LAT）  staking  stat_delegate_locked
      *      }
      *   ]
      * }
@@ -330,12 +331,12 @@ public interface AppDocStaking {
      *      {
      *         "nodeId":"",            //节点id
      *         "nodeName":"",          //节点名称
-     *         "delegateValue":"",     //委托数量
-     *         "delegateHes":"",       //未锁定委托（LAT）
-     *         "delegateLocked":"",    //已锁定委托（LAT）
-     *         "allDelegateLocked":"", //当前验证人总接收的锁定委托量（LAT）
-     *         "delegateUnlock":"",    //已解除委托（LAT） 
-     *         "delegateReduction":""  //赎回中委托（LAT） 
+     *         "delegateValue":"",     //委托数量 delegation   delegateHas+delegateLocked
+     *         "delegateHas":"",       //未锁定委托（LAT） 如果关联的验证人状态正常则正常显示，如果其他情况则为零 （delegation）
+     *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
+     *         "allDelegateLocked":"", //当前验证人总接收的锁定委托量（LAT）  staking
+     *         "delegateUnlock":"",    //已解除委托（LAT）  如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation）
+     *         "delegateReduction":""  //赎回中委托（LAT） delegation
      *      }
      *   ]
      * }
