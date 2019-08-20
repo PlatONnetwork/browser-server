@@ -123,7 +123,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         blockChainHandler.updateEpoch();
@@ -131,6 +131,8 @@ public class BlockChain {
         blockChainHandler.updateValidator();
         // 更新结算周期验证人列表
         blockChainHandler.updateVerifier();
+        // 在增发周期切换时更新区块奖励和质押奖励
+        blockChainHandler.updateBlockRewardAndStakingReward();
         // 分析交易信息, 通知质押引擎补充质押相关信息，通知提案引擎补充提案相关信息
         blockChainHandler.analyzeTransaction();
         // 通知各引擎周期临界点事件
@@ -141,6 +143,8 @@ public class BlockChain {
         blockChainHandler.updateNodeStatBlockQty();
         // 更新staking表中与区块统计相关的信息
         blockChainHandler.updateStakingRelative();
+        // 更新block表中的相关信息
+        blockChainHandler.updateBlockRelative();
     }
 
     /**

@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
+import org.web3j.platon.contracts.DelegateContract;
+import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
@@ -156,7 +158,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException {
+    public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();

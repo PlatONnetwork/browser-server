@@ -90,31 +90,14 @@ public class NewSettleEpochHandler implements EventHandler {
      */
     private void stakingSettle() throws SettleEpochChangeException {
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
-        // 激励池账户地址
-        String stimulatePoolAccountAddr = bc.getChainConfig().getStimulatePoolAccountAddr();
-        // 根据当前结算块号计算出上一增发周期末的块号: (当前增发周期-1)*增发周期块数
-        BigInteger preIssuePeriodLastBlockNumber = bc.getAddIssueEpoch().subtract(BigInteger.ONE).multiply(bc.getChainConfig().getAddIssuePeriodBlockCount());
 
         // 前一结算周期内每个验证人所获得的平均质押奖励
-        BigInteger preVerifierStakingReward;
-        try {
-            // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
-            BigInteger preStimulatePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(stimulatePoolAccountAddr, DefaultBlockParameter.valueOf(preIssuePeriodLastBlockNumber)).send().getBalance();
-            logger.debug("前一增发周期末的激励池账户余额:{}",preStimulatePoolAccountBalance.toString());
-            // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
-            if(bc.getPreVerifier().size()==0){
-                throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
-            }
-            preVerifierStakingReward = BigInteger.valueOf(
-                    BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
-                    .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR) // 精度取10位小数
-                    .divide(BigDecimal.valueOf(bc.getPreVerifier().size()),16,RoundingMode.FLOOR) // 精度取10位小数
-                    .multiply(bc.getChainConfig().getStakeRewardRate()).longValue()
-            );
-            logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
-        } catch (IOException e) {
-            throw new SettleEpochChangeException("查询激励池(addr="+stimulatePoolAccountAddr+")在块号("+preIssuePeriodLastBlockNumber+")的账户余额失败:"+e.getMessage());
+        // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
+        if(bc.getPreVerifier().size()==0){
+            throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
+        BigInteger preVerifierStakingReward = BigInteger.valueOf(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),16,RoundingMode.FLOOR).longValue());
+        logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
 
         List<CustomStaking> stakings = nodeCache.getStakingByStatus(Arrays.asList(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING));
         for(CustomStaking curStaking:stakings){
