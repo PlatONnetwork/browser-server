@@ -9,7 +9,6 @@ import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.util.I18nUtil;
-import com.sun.org.apache.xml.internal.security.utils.I18n;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
