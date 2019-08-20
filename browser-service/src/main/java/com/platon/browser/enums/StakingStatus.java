@@ -19,4 +19,17 @@ public enum StakingStatus {
     public String getDesc() {
         return desc;
     }
+
+    public static String getDescByCode(Integer code) {
+        if (CANDIDATE.getCode().equals(code)) {
+            return CANDIDATE.getDesc();
+        }
+        if (ABORTING.getCode().equals(code)) {
+            return ABORTING.getDesc();
+        }
+        if (EXITED.getCode().equals(code)) {
+            return EXITED.getDesc();
+        }
+        return null;
+    }
 }

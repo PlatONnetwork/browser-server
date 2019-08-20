@@ -53,4 +53,6 @@ public interface StakingMapper {
     
     
     List<StakingNode> selectStakingAndNodeByExample(@Param("name")String name,@Param("status")Integer status,@Param("isConsensus")Integer isConsensus);
+
+    List<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id);
 }

@@ -875,6 +875,9 @@
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
     from staking s left join node n on s.node_id = n.node_id
     <where>
+        <if test="nodeId != null">
+            and s.node_id = #{nodeId,jdbcType=VARCHAR}
+        </if>
     	<if test="name != null">
     		and s.staking_name = #{name,jdbcType=VARCHAR}
     	</if>

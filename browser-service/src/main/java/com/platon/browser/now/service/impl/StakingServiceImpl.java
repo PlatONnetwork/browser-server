@@ -1,9 +1,17 @@
 package com.platon.browser.now.service.impl;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.platon.browser.dao.entity.NodeExample;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.enums.*;
+import com.platon.browser.req.staking.StakingDetailsReq;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.resp.staking.*;
+import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,17 +23,13 @@ import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.enums.IsConsensusStatus;
-import com.platon.browser.enums.StakingStatus;
-import com.platon.browser.enums.StakingStatusEnum;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.NetworkStatRedis;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
+
+import javax.validation.Valid;
 
 @Service
 public class StakingServiceImpl implements StakingService {
@@ -35,6 +39,9 @@ public class StakingServiceImpl implements StakingService {
 	
 	@Autowired
 	private StakingMapper stakingMapper;
+
+	@Autowired
+	private I18nUtil i18n;
 	
 	@Override
 	public StakingStatisticNewResp stakingStatisticNew() {
@@ -143,6 +150,59 @@ public class StakingServiceImpl implements StakingService {
 		page.setTotal(size);
 		respPage.init(page, lists);
 		return respPage;
+	}
+
+	@Override
+	public BaseResp<StakingChangeNewResp> stakingChangeNew() {
+
+		return null;
+	}
+
+	@Override
+	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		List<StakingNode> stakings = stakingMapper.selectStakingAndNodeByExample(req.getNodeId());
+		Integer size = stakings.size();
+		StakingDetailsResp resp = new StakingDetailsResp();
+		switch (size) {
+			case 0:
+				// TODO 没数据
+				break;
+			case 1: // 只有一条数据
+				StakingNode stakingNode = stakings.get(0);
+				resp.setNodeName(stakingNode.getStakingName());
+				resp.setStakingIcon(stakingNode.getStakingIcon());
+				resp.setStatus(StakingStatus.getDescByCode(stakingNode.getStatus()));
+				//质押总数=有效的质押+委托
+				resp.setTotalValue(new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
+						.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString());
+				//委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额)
+				resp.setDelegateValue(new BigDecimal(stakingNode.getStatDelegateHas())
+						.add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString());
+				resp.setStakingValue(new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString());
+				resp.setDelegateQty(Integer.toString(stakingNode.getStatDelegateQty()));
+				resp.setSlashLowQty(stakingNode.getStatSlashLowQty());
+				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
+				resp.setBlockQty(stakingNode.getStatBlockQty().intValue());
+				resp.setExpectBlockQty(Long.toString(stakingNode.getStatExpectBlockQty()));
+				resp.setExpectedIncome(stakingNode.getExpectedIncome());
+				resp.setJoinTime(sdf.format(stakingNode.getJoinTime()));
+				resp.setVerifierTime(Integer.toString(stakingNode.getStatVerifierTime()));
+				resp.setRewardValue(stakingNode.getStatRewardValue());
+				resp.setNodeId(stakingNode.getNodeId());
+				resp.setStakingAddr(stakingNode.getStakingAddr());
+				resp.setDenefitAddr(stakingNode.getDenefitAddr());
+				resp.setWebsite(stakingNode.getWebSite());
+				resp.setDetails(stakingNode.getDetails());
+				resp.setExternalId(stakingNode.getExternalId());
+				resp.setStakingBlockNum(Long.toString(stakingNode.getStakingBlockNum()));
+				resp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
+				break;
+			default:
+				// TODO 有多条数据就报错
+				return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(), i18n.i(I18nEnum.FAILURE), null);
+		}
+		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
 	}
 
 }
