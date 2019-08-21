@@ -120,13 +120,13 @@ public class BlockChainHandler {
                 // 计算当前增发周期内的每个结算周期的质押奖励
                 BigDecimal settleReward = new BigDecimal(stimulatePoolAccountBalance.toString())
                                 .multiply(bc.getChainConfig().getStakeRewardRate()) // 取出激励池余额中属于质押奖励的部分
-                                .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
+                                .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
                 bc.setSettleReward(settleReward);
                 logger.debug("当前结算周期奖励:{}",settleReward.longValue());
 
                 BigDecimal blockReward = new BigDecimal(stimulatePoolAccountBalance)
                                 .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
-                                .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),16, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
+                                .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
                 bc.setBlockReward(blockReward);
                 logger.debug("当前区块奖励:{}",blockReward.longValue());
             } catch (IOException e) {
