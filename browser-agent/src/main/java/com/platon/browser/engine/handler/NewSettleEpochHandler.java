@@ -96,7 +96,7 @@ public class NewSettleEpochHandler implements EventHandler {
         if(bc.getPreVerifier().size()==0){
             throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
-        BigInteger preVerifierStakingReward = BigInteger.valueOf(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),16,RoundingMode.FLOOR).longValue());
+        BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
         logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
 
         List<CustomStaking> stakings = nodeCache.getStakingByStatus(Arrays.asList(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING));

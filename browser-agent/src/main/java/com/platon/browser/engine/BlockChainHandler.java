@@ -115,16 +115,16 @@ public class BlockChainHandler {
             String stimulatePoolAccountAddr = bc.getChainConfig().getStimulatePoolAccountAddr();
             try {
                 // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
-                BigInteger preStimulatePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(stimulatePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
-                logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,preStimulatePoolAccountBalance.toString());
+                BigInteger stimulatePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(stimulatePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
+                logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,stimulatePoolAccountBalance.toString());
                 // 计算当前增发周期内的每个结算周期的质押奖励
-                BigDecimal settleReward = BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
+                BigDecimal settleReward = new BigDecimal(stimulatePoolAccountBalance.toString())
                                 .multiply(bc.getChainConfig().getStakeRewardRate()) // 取出激励池余额中属于质押奖励的部分
                                 .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),16, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
                 bc.setSettleReward(settleReward);
                 logger.debug("当前结算周期奖励:{}",settleReward.longValue());
 
-                BigDecimal blockReward = BigDecimal.valueOf(preStimulatePoolAccountBalance.longValue())
+                BigDecimal blockReward = new BigDecimal(stimulatePoolAccountBalance)
                                 .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
                                 .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),16, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
                 bc.setBlockReward(blockReward);
