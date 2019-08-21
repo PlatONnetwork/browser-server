@@ -31,10 +31,12 @@ public class AppDocProposalControllerTest {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
+
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
     }
+
     @Test
     public void proposalList() throws Exception{
     	PageReq pageReq = new PageReq();
@@ -46,16 +48,16 @@ public class AppDocProposalControllerTest {
     }
 
     @Test
-    public void proposalDetails()  throws Exception{
-        String requestBody="{\"proposalHash\":\"addvdfbnghm\"}";
+    public void proposalDetails() throws Exception {
+        String requestBody = "{\"proposalHash\":\"addvdfbnghm\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalDetails").
                 contentType(MediaType.APPLICATION_JSON_UTF8).
                 content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
 
     @Test
-    public void voteList()  throws Exception{
-        String requestBody="{\"proposalHash\":\"null\"}";
+    public void voteList() throws Exception {
+        String requestBody = "{\"proposalHash\":\"null\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/proposal/voteList").
                 contentType(MediaType.APPLICATION_JSON_UTF8).
                 content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
