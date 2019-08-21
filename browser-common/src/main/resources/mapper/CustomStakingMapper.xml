@@ -125,7 +125,7 @@
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
-          #{item.annualizedRateInfo,jdbcType=VARCHAR}
+          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )

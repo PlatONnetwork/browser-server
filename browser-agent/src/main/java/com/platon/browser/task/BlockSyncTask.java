@@ -31,6 +31,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -100,9 +101,11 @@ public class BlockSyncTask {
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
-        if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+        if (maxBlockNumber != null && maxBlockNumber > 0) {
+            commitBlockNumber = maxBlockNumber;
+            blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
+        }
 
-        if(maxBlockNumber>1) blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
 
         /**
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -142,6 +145,8 @@ public class BlockSyncTask {
                         staking.setStakingIcon("");
                         staking.setIsInit(1);
                         staking.setIsSetting(1);
+                        BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
+                        staking.setStakingLocked(stakingLocked.toString());
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                         if(blockChain.getCurValidator().get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                         // 暂存至新增质押待入库列表

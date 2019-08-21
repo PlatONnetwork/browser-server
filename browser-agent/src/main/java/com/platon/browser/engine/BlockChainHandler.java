@@ -126,7 +126,7 @@ public class BlockChainHandler {
 
             BigDecimal blockReward = new BigDecimal(incentivePoolAccountBalance)
                     .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
-                    .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
+                    .divide(new BigDecimal(bc.getChainConfig().getAddIssuePeriodBlockCount()),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
             bc.setBlockReward(blockReward);
             logger.debug("当前区块奖励:{}",blockReward.longValue());
         } catch (IOException e) {

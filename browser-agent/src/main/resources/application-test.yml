@@ -28,6 +28,8 @@ loglevel:
 
 #初始化链相关的配置
 platon.config:
+  #初始验证人锁定质押金(LAT)
+  initValidatorStakingLockedAmount: 10000000
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #链ID

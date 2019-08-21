@@ -17,6 +17,8 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
+    // 初始验证人锁定质押金(LAT)
+    private BigDecimal initValidatorStakingLockedAmount;
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
     // 链ID
