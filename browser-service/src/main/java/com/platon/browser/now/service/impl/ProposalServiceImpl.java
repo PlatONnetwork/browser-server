@@ -18,7 +18,6 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.util.BeanConvertUtil;
-import com.platon.browser.util.I18NUtils;
 import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +52,10 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Override
     public RespPage<ProposalListResp> list(PageReq req) {
-        RespPage<ProposalListResp> respPage = new RespPage();
+        RespPage<ProposalListResp> respPage = new RespPage<>();
         respPage.setTotalCount(0);
         respPage.setTotalPages(0);
-        Page page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
+        Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         List<Proposal> list = proposalMapper.selectByExample(null);
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());

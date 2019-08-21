@@ -82,7 +82,7 @@ public class BlockServiceImpl implements BlockService {
 		} else {
 			// TODO 是否查询超过五十万条数据
 		}
-		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
+		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(0, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		if(blockEnd.isEmpty()) {
 			page.setTotal(0);

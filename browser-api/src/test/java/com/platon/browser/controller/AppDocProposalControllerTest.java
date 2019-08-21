@@ -1,6 +1,9 @@
 package com.platon.browser.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
+import com.platon.browser.req.PageReq;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,8 +37,12 @@ public class AppDocProposalControllerTest {
     }
     @Test
     public void proposalList() throws Exception{
-                mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalList")).
-                andExpect(status().isOk()).andDo(print());
+    	PageReq pageReq = new PageReq();
+    	pageReq.setPageNo(0);
+    	pageReq.setPageSize(10);
+        mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalList").contentType(MediaType.APPLICATION_JSON_UTF8)
+            		.content(JSONObject.toJSONString(pageReq).getBytes())).
+            andExpect(status().isOk()).andDo(print());
     }
 
     @Test

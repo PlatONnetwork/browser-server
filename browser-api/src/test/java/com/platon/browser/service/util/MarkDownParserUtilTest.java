@@ -15,13 +15,13 @@ import java.io.IOException;
  * Desc:
  */
 public class MarkDownParserUtilTest {
-    @Test
+//    @Test
     public void requireMD() throws IOException {
         String fileName="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md";
         String result=MarkDownParserUtil.acquireMD(fileName);
         assertNotNull(result);
     }
-    @Test
+//    @Test
     public void parserMD() throws IOException {
         String fileName="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md";
         String mdText=MarkDownParserUtil.acquireMD(fileName);

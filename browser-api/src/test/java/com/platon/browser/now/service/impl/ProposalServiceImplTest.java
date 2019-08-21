@@ -29,7 +29,7 @@ public class ProposalServiceImplTest {
     public void list() {
         PageReq pageReq = new PageReq();
         RespPage<ProposalListResp> pages = proposalService.list(pageReq);
-        assertTrue(pages.getData().size()>0);
+        assertTrue(pages.getData().size()>=0);
     }
 
     @Test

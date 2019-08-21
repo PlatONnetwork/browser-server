@@ -7,16 +7,17 @@ import java.util.List;
 
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.transaction.TransactionDetail;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingExample.Criteria;
-import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.IsConsensusStatus;
 import com.platon.browser.enums.StakingStatus;
@@ -92,9 +93,9 @@ public class HomeServiceImpl implements HomeService {
 					transactionDetailReq.setTxHash(keyword);
 					try {
 						// 此处调用如果查询不到交易记录会抛出BusinessException异常
-//						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
-//						result.setType("transaction");
-//						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
+						TransactionDetail transactionDetail = transactionService.getDetail(transactionDetailReq);
+						result.setType("transaction");
+						queryNavigationStructResp.setTxHash(transactionDetail.getTxHash());
 					} catch (BusinessException be) {
 						log.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
 						BlockExample blockExample = new BlockExample();
@@ -120,23 +121,23 @@ public class HomeServiceImpl implements HomeService {
 	@Override
 	public BlockStatisticNewResp blockStatisticNew() {
 		/************** 组装图表数据 ************/
-		List<BlockRedis> items = statisticCacheService.getBlockCache(1,50);
+		List<BlockRedis> items = statisticCacheService.getBlockCache(0,32);
 		BlockStatisticNewResp blockStatisticNewResp = new BlockStatisticNewResp();
-		Long[] x = new Long[items.size()];
-		Double[] ya = new Double[items.size()];
-		Long[] yb = new Long[items.size()];
-		for (int i=0;i<items.size();i++){
+		Long[] x = new Long[items.size()- 2];
+		Double[] ya = new Double[items.size()- 2];
+		Long[] yb = new Long[items.size()- 2];
+		for (int i=0;i<items.size() - 2;i++){
 			BlockRedis currentBlock = items.get(i);
-			if(i==0||i==items.size()-1) continue;
-			BlockRedis previousBlock = items.get(i-1);
 			x[i] = currentBlock.getNumber();
-			BigDecimal sec = BigDecimal.valueOf(currentBlock.getTimestamp().getTime()-previousBlock.getTimestamp().getTime()).divide(BigDecimal.valueOf(1000));
-			ya[i] = sec.doubleValue();
 			if(currentBlock.getStatTxQty()==null) {
 				yb[i] = 0l;
 			} else {
 				yb[i] = Long.valueOf(currentBlock.getStatTxQty());
 			}
+			if(i==0||i==items.size()-1) continue;
+			BlockRedis previousBlock = items.get(i-1);
+			BigDecimal sec = BigDecimal.valueOf(previousBlock.getTimestamp().getTime()-currentBlock.getTimestamp().getTime()).divide(BigDecimal.valueOf(1000));
+			ya[i-1] = sec.doubleValue();
 		}
 		blockStatisticNewResp.setX(x);
 		blockStatisticNewResp.setYa(ya);
@@ -158,7 +159,7 @@ public class HomeServiceImpl implements HomeService {
 			chainStatisticNewResp.setNodeName(networkStatRedis.getNodeName());
 			chainStatisticNewResp.setProposalQty(networkStatRedis.getProposalQty());
 			BigDecimal sum = new BigDecimal(networkStatRedis.getStakingDelegationValue()).add(new BigDecimal(networkStatRedis.getStakingValue()));
-			chainStatisticNewResp.setTakingDelegationValue(sum.toString());
+			chainStatisticNewResp.setStakingDelegationValue(sum.toString());
 			chainStatisticNewResp.setTurnValue(networkStatRedis.getTurnValue());
 			chainStatisticNewResp.setTxQty(networkStatRedis.getTxQty());
 		}
@@ -173,10 +174,10 @@ public class HomeServiceImpl implements HomeService {
 		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
 				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-		StakingListNewResp stakingListNewResp = new StakingListNewResp();
 		List<StakingListNewResp> lists = new LinkedList<>();
 		for (int i = 0;i<stakings.size();i++) {
-			stakingListNewResp.setExpectedIncome(stakings.get(i).getExpectedIncome());
+			StakingListNewResp stakingListNewResp = new StakingListNewResp();
+			stakingListNewResp.setExpectedIncome(stakings.get(i).getExpectedIncome() + "%");
 			stakingListNewResp.setIsInit(stakings.get(i).getIsInit() == 1?true:false);
 			stakingListNewResp.setNodeId(stakings.get(i).getNodeId());
 			stakingListNewResp.setNodeName(stakings.get(i).getStakingName());
@@ -189,10 +190,10 @@ public class HomeServiceImpl implements HomeService {
 
 	@Override
 	public List<BlockListNewResp> blockListNew() {
-		List<BlockRedis> items = statisticCacheService.getBlockCache(1,8);
-		BlockListNewResp blockListNewResp = new BlockListNewResp();
+		List<BlockRedis> items = statisticCacheService.getBlockCache(0,8);
 		List<BlockListNewResp> lists = new LinkedList<>();
 		for (BlockRedis blockRedis : items) {
+			BlockListNewResp blockListNewResp = new BlockListNewResp();
 			blockListNewResp.setNodeId(blockRedis.getNodeId());
 			blockListNewResp.setNodeName(blockRedis.getNodeName());
 			blockListNewResp.setNumber(blockRedis.getNumber());

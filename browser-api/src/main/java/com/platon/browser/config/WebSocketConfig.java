@@ -36,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
     	// 订阅Broker名称 /topic 代表发布广播，即群发 /queue 代表点对点，即发指定用户  基于内存的单机stomp
-//        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic");
         // 全局使用的消息前缀（客户端订阅路径上会体现出来）
 //        config.setApplicationDestinationPrefixes("/app");
         
@@ -49,10 +49,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * 以/topic和/queue开头的消息会发送到stomp代理中:mq等。
          * 每个mq适用的前缀不一样且有限制。activemq支持stomp的端口为61613
          */
-        config.enableStompBrokerRelay("/topic","/queue").setRelayHost(brokenHost)
-        	.setRelayPort(Integer.parseInt(brokenPort)).setSystemLogin(systemUserName)
-        	.setSystemPasscode(systemPassword).setClientLogin(clientUserName)
-        	.setClientPasscode(clientPassword);
+//        config.enableStompBrokerRelay("/topic","/queue").setRelayHost(brokenHost)
+//        	.setRelayPort(Integer.parseInt(brokenPort)).setSystemLogin(systemUserName)
+//        	.setSystemPasscode(systemPassword).setClientLogin(clientUserName)
+//        	.setClientPasscode(clientPassword);
     }
 
     /**
