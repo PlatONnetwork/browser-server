@@ -46,6 +46,8 @@ platon.config:
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.25
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
   #激励池分配给出块激励的比例
   blockRewardRate: 0.5
   #激励池分配给质押激励的比例
@@ -67,13 +69,13 @@ platon.config:
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
-  consensusPeriodBlockCount: 250
+  consensusPeriodBlockCount: 40
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 10750
+  settlePeriodBlockCount: 120
   #每个增发周期区块总数(1466个结算周期=15759500个块)
-  addIssuePeriodBlockCount: 15759500
+  addIssuePeriodBlockCount: 1680
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 2
   #文本提案参与率: >
@@ -90,10 +92,12 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
+  #质押账户地址
+
   #激励池账户地址
-  stimulatePoolAccountAddr: '0x1000000000000000000000000000000000000003'
+  incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
-  developerStimulateFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
+  developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额>

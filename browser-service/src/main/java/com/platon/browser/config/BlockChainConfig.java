@@ -23,6 +23,8 @@ public class BlockChainConfig {
     private BigDecimal initIssueAmount;
     // 每年固定增发比例
     private BigDecimal addIssueRate;
+    // 每年增发分配给激励池的比例
+    private BigDecimal incentiveRateFromIssue;
     // 激励池分配给出块激励的比例
     private BigDecimal blockRewardRate;
     //激励池分配给质押激励的比例
@@ -68,9 +70,9 @@ public class BlockChainConfig {
     //锁仓账户地址
     private String restrictingAccountAddr;
     //激励池账户地址
-    private String stimulatePoolAccountAddr;
+    private String incentivePoolAccountAddr;
     //开发者激励基金账户地址
-    private String developerStimulateFundAccountAddr;
+    private String developerIncentiveFundAccountAddr;
     //PlatOn基金会账户地址
     private String platonFundAccountAddr;
     //10年内基金会向激励池填充额度

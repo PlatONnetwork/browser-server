@@ -1,24 +1,28 @@
-# ***************************测试配置**************************** #
+# ***************************生产配置**************************** #
 # 应用版本
-version: 0.6.0
+version: 0.7.0
 # 当前激活的配置名称(请不要修改)
-profile: batalla
-# 服务器端口号
-port: 28060
+profile: prod
 # MySQL数据库连接地址
-dburl: jdbc:mysql://127.0.0.1:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
-dbuser: root
-dbpass: Juzhen123!
-# Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-chain.config: MAIN_NET-104-["http://127.0.0.1:6792","http://127.0.0.1:6791","http://13.56.15.181:6791","http://13.56.15.181:6792"]
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+# MySQL数据库用户名
+dbuser: platon
+# MySQL数据库密码
+dbpass: platon
+web3j:
+  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  collect.batch-size: 1000
 # Redis集群节点
-redis: 127.0.0.1:7001,127.0.0.1:7002,127.0.0.1:7003,127.0.0.1:7004,127.0.0.1:7005,127.0.0.1:7006
+redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: error
-  platon: error
+  spring: debug
+  platon.task: debug
+  platon.engine: debug
+  platon.client: debug
+  platon.dao: debug
 
 #初始化链相关的配置
 platon.config:
@@ -27,6 +31,8 @@ platon.config:
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.25
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
   #激励池分配给出块激励的比例
   blockRewardRate: 0.5
   #激励池分配给质押激励的比例
@@ -39,12 +45,12 @@ platon.config:
   blockRate4HighSlash: 0.2
   #违规-低出块率: 最高处罚百分比
   blockHighSlashRate: 0.5
-  #质押门槛: 创建验证人最低的质押Token数
+  #质押门槛: 创建验证人最低的质押Token数(LAT)
   stakeThreshold: 5000000
-  #委托门槛
+  #委托门槛(LAT)
   delegateThreshold: 10
   #出块间隔(秒)
-  blockInterval: 1
+  blockInterval: 2
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
@@ -56,7 +62,7 @@ platon.config:
   #每个增发周期区块总数(1466个结算周期=15759500个块)
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 2
+  unstakeRefundSettlePeriodCount: 28
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=
@@ -71,21 +77,23 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
+  #质押账户地址
+
   #激励池账户地址
-  stimulatePoolAccountAddr: '0x1000000000000000000000000000000000000003'
+  incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
-  developerStimulateFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
+  developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额>
   foundationSubsidies: {
-    '0':62215742.4869165,
-    '1':55965742.4869165,
-    '2':49559492.4869165,
-    '3':42993086.2369165,
-    '4':36262519.8306666,
-    '5':29363689.2642633,
-    '6':22292387.9336939,
-    '7':15044304.0698633,
-    '8':7615018.10943699
+      '0':62215742.4869165,
+      '1':55965742.4869165,
+      '2':49559492.4869165,
+      '3':42993086.2369165,
+      '4':36262519.8306666,
+      '5':29363689.2642633,
+      '6':22292387.9336939,
+      '7':15044304.0698633,
+      '8':7615018.10943699
   }
