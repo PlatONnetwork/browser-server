@@ -42,7 +42,7 @@ public class NewSettleEpochHandler implements EventHandler {
         nodeCache = context.getNodeCache();
         executeResult = context.getExecuteResult();
         bc = context.getBlockChain();
-        stakingSettle();
+        //stakingSettle();
         modifyDelegationInfoOnNewSettingEpoch();
         modifyUnDelegationInfoOnNewSettingEpoch();
     }
