@@ -156,6 +156,8 @@ public class BlockSyncTask {
                 throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
             }
         }
+
+        blockChain.init();
     }
 
     public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException {

@@ -98,3 +98,5 @@ platon.config:
     '7':15044304.0698633,
     '8':7615018.10943699
   }
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md

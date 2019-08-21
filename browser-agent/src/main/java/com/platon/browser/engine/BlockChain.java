@@ -1,12 +1,13 @@
 package com.platon.browser.engine;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
@@ -49,6 +50,8 @@ public class BlockChain {
     private NodeMapper nodeMapper;
     @Autowired
     private StakingMapper stakingMapper;
+    @Autowired
+    private BlockMapper blockMapper;
     @Autowired
     private DbService dbService;
     @Autowired
@@ -99,13 +102,24 @@ public class BlockChain {
     // 当前共识周期验证人
     private Map <String, org.web3j.platon.bean.Node> curValidator = new HashMap <>();
 
-    @PostConstruct
-    private void init () {
+    //@PostConstruct
+    public void init () {
         // 初始化区块处理器
         blockChainHandler.init(this);
 
         // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
         settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount());
+
+        BlockExample blockExample = new BlockExample();
+        blockExample.setOrderByClause("number desc limit 1");
+        List<Block> blockList = blockMapper.selectByExample(blockExample);
+        if(blockList.size()>0){
+            Block block = blockList.get(0);
+            this.blockReward = new BigDecimal(block.getBlockReward());
+        }else{
+            this.blockReward = BigDecimal.ZERO;
+        }
+
 
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
