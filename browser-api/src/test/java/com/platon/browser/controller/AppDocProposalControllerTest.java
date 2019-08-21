@@ -34,7 +34,7 @@ public class AppDocProposalControllerTest {
     }
     @Test
     public void proposalList() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalList")).
+                mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalList")).
                 andExpect(status().isOk()).andDo(print());
     }
 
