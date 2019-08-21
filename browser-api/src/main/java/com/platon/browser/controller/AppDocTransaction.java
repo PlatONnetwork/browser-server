@@ -163,10 +163,10 @@ public interface AppDocTransaction {
      * - 如果txType = 1001（编辑验证人）：编辑验证人 = nodeId + nodeName + externalId + benefitAddr + programVersion + website + details
      * - 如果txType = 1002（增加质押）：增加质押 = nodeId + nodeName + value
      * - 如果txType = 1003（退出验证人）：退出验证 = nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
-     *   - 需要通过txHash关联un_staking表查询验证人信息
+     *   - 1003 需要通过txHash关联staking表查询验证人信息
      * - 如果txType = 1004（委托）：验证人 = nodeId + nodeName
      * - 如果txType = 1005（委托赎回）：委托赎回 = nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
-     *   - 需要通过txHash 关联un_delegation表查询赎回的信息
+     *   - 1005 需要通过txHash 关联un_delegation表查询赎回的信息
      * - 如果txType = 2000、2001、2002（创建提案）：创建提案 = nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
      * - 如果txType = 2003（投票提案）：投票提案 = nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
      * - 如果txType = 2004（版本声明）：版本声明 = nodeId + nodeName + declareVersion
@@ -233,9 +233,9 @@ public interface AppDocTransaction {
      *       "details":"",             //节点的描述(有长度限制，表示该节点的描述)
      *       "programVersion":"",      //程序的真实版本，治理rpc获取
      *       "applyAmount":"",         //申请赎回的金额
-     *       "redeemLocked":"",        //赎回中被锁定的金额
+     *       "redeemLocked":"",        //赎回中被锁定的金额  staing staking_reduction  
      *       "redeemStatus":"1",       //赎回状态， 1： 退回中   2：退回成功 
-     *       "redeemUnLockedBlock":"", //预计赎回到账的区块
+     *       "redeemUnLockedBlock":"", //预计赎回到账的区块  staing (staking_reduction_epoch+节点质押退回锁定周期（是否包含当前）)*结算周期区块数(C)
      *       "proposalUrl":"",         //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
      *       "proposalHash":"",        //提案id
      *       "proposalOption":"",      //投票  1：文本提案    2：升级提案   3：参数提案
