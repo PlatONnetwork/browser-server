@@ -353,7 +353,7 @@ public class BlockSyncTask {
 
         // 解析交易参数，补充交易中与交易参数相关的信息
         try {
-            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
+            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput(),blockChain.getChainConfig(),tx.getBlockNumber().toString());
             tx.setTypeEnum(txParams.getTxTypeEnum());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));

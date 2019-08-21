@@ -27,6 +27,7 @@ public enum TxTypeEnum {
     CREATE_PROPOSAL_TEXT(2000,"提交文本提案(创建提案)"),
     CREATE_PROPOSAL_UPGRADE(2001,"提交升级提案(创建提案)"),
     CREATE_PROPOSAL_PARAMETER(2002,"提交参数提案(创建提案)"),
+    CANCEL_PROPOSAL(2005,"提交取消提案"),
     VOTING_PROPOSAL(2003,"给提案投票(提案投票)"),
     DECLARE_VERSION(2004,"版本声明"),
     REPORT_VALIDATOR(3000,"举报多签(举报验证人)"),

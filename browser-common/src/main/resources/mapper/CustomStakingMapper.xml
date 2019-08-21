@@ -82,9 +82,6 @@
         <if test="'block_reward_value'.toString() == column.value">
           #{item.blockRewardValue,jdbcType=VARCHAR}
         </if>
-        <if test="'pre_set_block_reward_value'.toString() == column.value">
-          #{item.preSetBlockRewardValue,jdbcType=VARCHAR}
-        </if>
         <if test="'pre_cons_block_qty'.toString() == column.value">
           #{item.preConsBlockQty,jdbcType=BIGINT}
         </if>
@@ -126,6 +123,9 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'annualized_rate_info'.toString() == column.value">
+          #{item.annualizedRateInfo,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

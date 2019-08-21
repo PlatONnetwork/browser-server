@@ -77,4 +77,6 @@ public class BlockChainConfig {
     private String platonFundAccountAddr;
     //10年内基金会向激励池填充额度
     private Map<Integer,BigDecimal> foundationSubsidies;
+    //提案url参数模板
+    private String proposalUrlTemplate;
 }

@@ -1,18 +1,10 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.client.RestrictingBalance;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.engine.AddressExecute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * User: dongqile

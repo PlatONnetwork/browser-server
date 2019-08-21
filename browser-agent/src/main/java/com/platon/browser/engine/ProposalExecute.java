@@ -30,6 +30,9 @@ public class ProposalExecute {
     // 全量数据，需要根据业务变化，保持与数据库一致
     private Map<String, CustomProposal> proposals = BlockChain.PROPOSALS_CACHE;
 
+    public static final String pIDIDNum = "PIP-{pip_id}";
+
+    public static final String key = "{pip_id}";
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
@@ -42,7 +45,7 @@ public class ProposalExecute {
     @Autowired
     private ProposalTextHandler proposalTextHandler;
     @Autowired
-    private ProposalParameterHandler proposalParameterHandler;
+    private ProposalCancelHandler proposalCancelHandler;
     @Autowired
     private ProposalUpgradeHandler proposalUpgradeHandler;
     @Autowired
@@ -59,7 +62,7 @@ public class ProposalExecute {
             customProposal.bulidStructure(proposal);
             voteList.forEach(vote -> {
                 //关联提案的投票结果区分放入全量数据结构
-                if(vote.getProposalHash().equals(customProposal.getHash())){
+                if(vote.getProposalHash().equals(customProposal.getPipId())){
                     CustomVote customVote = new CustomVote();
                     customVote.bulidStructure(vote);
                     if(Integer.valueOf(vote.getOption()).equals(CustomProposal.OptionEnum.SUPPORT.code)){
@@ -77,11 +80,9 @@ public class ProposalExecute {
 
                 }
             });
+            proposals.put(proposal.getPipId().toString(),customProposal);
         });
-    }
 
-    public Map<String,CustomProposal> getProposals(){
-        return this.proposals;
     }
 
     /**
@@ -95,7 +96,7 @@ public class ProposalExecute {
         switch (tx.getTypeEnum()){
             case CREATE_PROPOSAL_TEXT: proposalTextHandler.handle(context);break; //提交文本提案(创建提案)
             case CREATE_PROPOSAL_UPGRADE: proposalUpgradeHandler.handle(context);break; //提交升级提案(创建提案)
-            case CREATE_PROPOSAL_PARAMETER: proposalParameterHandler.handle(context);break; //提交参数提案(创建提案)
+            case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //其他叫取消提案
             case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
         }
     }

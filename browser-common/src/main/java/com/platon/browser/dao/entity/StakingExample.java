@@ -1385,76 +1385,6 @@ public class StakingExample {
             return (Criteria) this;
         }
 
-        public Criteria andPreSetBlockRewardValueIsNull() {
-            addCriterion("pre_set_block_reward_value is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueIsNotNull() {
-            addCriterion("pre_set_block_reward_value is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueEqualTo(String value) {
-            addCriterion("pre_set_block_reward_value =", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueNotEqualTo(String value) {
-            addCriterion("pre_set_block_reward_value <>", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueGreaterThan(String value) {
-            addCriterion("pre_set_block_reward_value >", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueGreaterThanOrEqualTo(String value) {
-            addCriterion("pre_set_block_reward_value >=", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueLessThan(String value) {
-            addCriterion("pre_set_block_reward_value <", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueLessThanOrEqualTo(String value) {
-            addCriterion("pre_set_block_reward_value <=", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueLike(String value) {
-            addCriterion("pre_set_block_reward_value like", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueNotLike(String value) {
-            addCriterion("pre_set_block_reward_value not like", value, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueIn(List<String> values) {
-            addCriterion("pre_set_block_reward_value in", values, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueNotIn(List<String> values) {
-            addCriterion("pre_set_block_reward_value not in", values, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueBetween(String value1, String value2) {
-            addCriterion("pre_set_block_reward_value between", value1, value2, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreSetBlockRewardValueNotBetween(String value1, String value2) {
-            addCriterion("pre_set_block_reward_value not between", value1, value2, "preSetBlockRewardValue");
-            return (Criteria) this;
-        }
-
         public Criteria andPreConsBlockQtyIsNull() {
             addCriterion("pre_cons_block_qty is null");
             return (Criteria) this;
@@ -2332,6 +2262,76 @@ public class StakingExample {
 
         public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
             addCriterion("update_time not between", value1, value2, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoIsNull() {
+            addCriterion("annualized_rate_info is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoIsNotNull() {
+            addCriterion("annualized_rate_info is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoEqualTo(String value) {
+            addCriterion("annualized_rate_info =", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoNotEqualTo(String value) {
+            addCriterion("annualized_rate_info <>", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoGreaterThan(String value) {
+            addCriterion("annualized_rate_info >", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoGreaterThanOrEqualTo(String value) {
+            addCriterion("annualized_rate_info >=", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoLessThan(String value) {
+            addCriterion("annualized_rate_info <", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoLessThanOrEqualTo(String value) {
+            addCriterion("annualized_rate_info <=", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoLike(String value) {
+            addCriterion("annualized_rate_info like", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoNotLike(String value) {
+            addCriterion("annualized_rate_info not like", value, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoIn(List<String> values) {
+            addCriterion("annualized_rate_info in", values, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoNotIn(List<String> values) {
+            addCriterion("annualized_rate_info not in", values, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoBetween(String value1, String value2) {
+            addCriterion("annualized_rate_info between", value1, value2, "annualizedRateInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAnnualizedRateInfoNotBetween(String value1, String value2) {
+            addCriterion("annualized_rate_info not between", value1, value2, "annualizedRateInfo");
             return (Criteria) this;
         }
     }
