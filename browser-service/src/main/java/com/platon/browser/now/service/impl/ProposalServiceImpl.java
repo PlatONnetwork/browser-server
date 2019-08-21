@@ -42,7 +42,7 @@ import java.util.Objects;
  */
 @Service
 public class ProposalServiceImpl implements ProposalService {
-    Logger logger= LoggerFactory.getLogger(ProposalServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(ProposalServiceImpl.class);
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -56,7 +56,7 @@ public class ProposalServiceImpl implements ProposalService {
         RespPage<ProposalListResp> respPage = new RespPage();
         respPage.setTotalCount(0);
         respPage.setTotalPages(0);
-        req= req==null?new PageReq():req;
+        req = req == null ? new PageReq() : req;
         Page page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         List<Proposal> list = proposalMapper.selectByExample(null);
         if (!CollectionUtils.isEmpty(list)) {
@@ -81,13 +81,13 @@ public class ProposalServiceImpl implements ProposalService {
     public BaseResp<ProposalDetailsResp> get(ProposalDetailRequest req) {
         Proposal proposal = proposalMapper.selectByPrimaryKey(req.getProposalHash());
         if (Objects.isNull(proposal)) {
-            logger.error("## ERROR # get record not exist proposalHash:{}",req.getProposalHash());
-            return BaseResp.build(ErrorCodeEnum.RECORD_NOT_EXIST.getCode(), i18n.i(I18nEnum.RECORD_NOT_EXIST,req.getProposalHash()),null);
+            logger.error("## ERROR # get record not exist proposalHash:{}", req.getProposalHash());
+            return BaseResp.build(ErrorCodeEnum.RECORD_NOT_EXIST.getCode(), i18n.i(I18nEnum.RECORD_NOT_EXIST, req.getProposalHash()), null);
         }
         ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
         proposalDetailsResp.setProposalHash(req.getProposalHash());
-            List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
-            if (items != null && items.size() > 0) {
+        List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
+        if (items != null && items.size() > 0) {
             proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());
         }
         //赞成百分比
@@ -96,12 +96,13 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setAbstainRateThreshold(composeRate(proposal.getAbstentions(), proposal.getAccuVerifiers()));
         //反对百分比
         proposalDetailsResp.setOpposeRateThreshold(composeRate(proposal.getNays(), proposal.getAccuVerifiers()));
-        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),proposalDetailsResp);
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), proposalDetailsResp);
     }
 
     /**
      * 计算百分比
-     * @param divisor 除数
+     *
+     * @param divisor  除数
      * @param dividend 被除数
      * @return
      */
