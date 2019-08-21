@@ -3,6 +3,7 @@ package com.platon.browser.now.service.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.platon.browser.dao.mapper.StakingMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +30,10 @@ public class StakingServiceImpl implements StakingService {
 
 	@Autowired
 	private StatisticCacheService statisticCacheService;
-	
+
 	@Autowired
 	private StakingMapper stakingMapper;
-	
+
 	@Override
 	public StakingStatisticNewResp stakingStatisticNew() {
 		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -77,7 +78,7 @@ public class StakingServiceImpl implements StakingService {
 			default:
 				break;
 		}
-		
+
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表

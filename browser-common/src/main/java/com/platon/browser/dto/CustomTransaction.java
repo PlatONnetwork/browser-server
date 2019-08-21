@@ -129,9 +129,9 @@ public class CustomTransaction extends TransactionWithBLOBs {
             case CREATE_PROPOSAL_UPGRADE:
                 //提交升级提案(创建提案),txType=2001
                 return (T) JSON.parseObject(this.getTxInfo(), CreateProposalUpgradeParam.class);
-            case CREATE_PROPOSAL_PARAMETER:
-                //提交参数提案(创建提案),txType=2002
-                return (T) JSON.parseObject(this.getTxInfo(), CreateProposalParameterParam.class);
+            case CANCEL_PROPOSAL:
+                //取消提案,txType=2005
+                return (T) JSON.parseObject(this.getTxInfo(), CancelProposalParam.class);
             case VOTING_PROPOSAL:
                 //提案投票(提案投票),txType=2003
                 return (T) JSON.parseObject(this.getTxInfo(), VotingProposalParam.class);

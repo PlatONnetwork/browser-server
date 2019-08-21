@@ -181,8 +181,6 @@ public class NewSettleEpochHandler implements EventHandler {
                 // 结算状态设置为未结算
                 curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
             }
-            // 前一结算周期区块奖励设置为0
-            curStaking.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
 
             // 将改动的内存暂存至待更新缓存
             executeResult.stageUpdateStaking(curStaking);

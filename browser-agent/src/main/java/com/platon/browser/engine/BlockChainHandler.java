@@ -292,9 +292,7 @@ public class BlockChainHandler {
                     BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue())
                             .add(blockReward);
                     customStaking.setBlockRewardValue(curConsBlockReward.toString());
-                    // 当前结算周期出块奖励
-                    BigDecimal curSettleBlockReward = new BigDecimal(customStaking.getPreSetBlockRewardValue())
-                            .add(blockReward);
+
                     // 节点出块数加1
                     customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
                     // 把更改后的内容暂存至待更新列表
