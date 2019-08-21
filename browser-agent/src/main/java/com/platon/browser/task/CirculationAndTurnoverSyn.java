@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,14 +22,14 @@ public class CirculationAndTurnoverSyn {
     @Autowired
     private BlockChain blockChain;
 
-    @PostConstruct
+    //@PostConstruct
     private void ini(){
         //从配置文件中获取到每个增发周期对应的基金会补充金额
         Map <String,String> foundationSubsidiesMap = new HashMap <>();
         //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
         String foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().toString());
         //获取初始发行金额
-        BigInteger iniValue = blockChain.getChainConfig().getInitIssueValue();
+        BigDecimal iniValue = blockChain.getChainConfig().getInitIssueAmount();
         //获取增发比例
        // blockChain.getChainConfig().get
     }

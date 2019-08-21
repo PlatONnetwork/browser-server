@@ -27,6 +27,5 @@ public class CustomVote extends Vote {
         this.setOption(param.getOption());
         this.setTimestamp(tx.getTimestamp());
         this.setVerifier(param.getVerifier());
-        this.setProposalHash(param.getProposalId());
     }
 }

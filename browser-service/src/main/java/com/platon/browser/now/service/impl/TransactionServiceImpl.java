@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dto.CustomProposal.TypeEnum;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionDetail;
@@ -219,7 +220,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
-                    typeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
+                    TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
                     valueIn,

@@ -2,6 +2,7 @@ package com.platon.browser.util;
 
 
 import com.alibaba.fastjson.JSONArray;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.param.*;
 import lombok.Data;
@@ -13,6 +14,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class TxParamResolver {
         }
     }
 
-    public static Result analysis ( String input) {
+    public static Result analysis ( String input , BlockChainConfig bc ,String blockNumber) {
         Result result = new Result();
         result.txTypeEnum = TxTypeEnum.OTHERS;
         try {
@@ -169,13 +171,12 @@ public class TxParamResolver {
 
                         //提交提案的验证人
                         String proposalVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
-                        //提案URL，长度不超过512
-                        String proposalurl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
-                        //投票截至快高
-                        BigInteger endVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
+                        //pIDID
+                        String proposalPIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
 
                         CreateProposalTextParam createProposalTextParam = new CreateProposalTextParam();
-                        createProposalTextParam.init(proposalVerifier,"",proposalurl,endVotingRound.intValue());
+                        //todo:结束块高待补充，需确认计算方法，参数中为轮数，在此换算后为块高
+                        createProposalTextParam.init(proposalVerifier,proposalPIDID,0);
                         result.param=createProposalTextParam;
                         break;
                     case CREATE_PROPOSAL_UPGRADE: // 2001
@@ -183,39 +184,37 @@ public class TxParamResolver {
 
                         //提交提案的验证人
                         String upgradeVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
-                        //提案URL，长度不超过512
-                        String upgradelurl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        //pIDID
+                        String upgradelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
                         //升级版本
                         BigInteger newVersion =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
-                        //投票截至快高
-                        BigInteger upgradeEndVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
-                        //生效块高
-                        BigInteger upgradeActive =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(5));
+                        //投票截止区块高度
+                        BigInteger endBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
+                        //结束轮转换结束区块高度
+                        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(blockNumber,endBlockRound.toString(),bc);
 
                         CreateProposalUpgradeParam createProposalUpgradeParam = new CreateProposalUpgradeParam();
-                        createProposalUpgradeParam.init(upgradeVerifier,"",upgradelurl,upgradeEndVotingRound.intValue(),
-                                newVersion.intValue(),upgradeActive.intValue());
+                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpIDID,endBlockNumber.intValue(),
+                                newVersion.intValue());
                         result.param = createProposalUpgradeParam;
                         break;
-                    case CREATE_PROPOSAL_PARAMETER: // 2002
-                        // 提交参数提案
+                    case CANCEL_PROPOSAL: // 2005
+                        // 提交取消提案
 
                         //提交提案的验证人
-                        String paramVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
-                        //提案URL，长度不超过512
-                        String paramUrl = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
-                        //投票截至快高
-                        BigInteger paramEndVotingRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
-                        //参数名称
-                        String paramName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
-                        //当前值
-                        String currentValue = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
-                        //新的值
-                        String newValue = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String cancelVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        //本提案的pIDID
+                        String cancelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        //投票截止区块高度
+                        BigInteger cancelEndBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
+                        //被取消的pIDID
+                        String canceledProposalID =  Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        //结束轮转换结束区块高度
+                        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(blockNumber,cancelEndBlockRound.toString(),bc);
 
-                        CreateProposalParameterParam createProposalParameterParam = new CreateProposalParameterParam();
-                        createProposalParameterParam.init(paramVerifier,"",paramUrl,paramEndVotingRound.intValue(),paramName,currentValue,newValue);
-                        result.param = createProposalParameterParam;
+                        CancelProposalParam cancelProposalParam = new CancelProposalParam();
+                        cancelProposalParam.init(cancelVerifier,cancelpIDID,cancelEndBlockNumber.intValue(),canceledProposalID);
+                        result.param = cancelProposalParam;
                         break;
                     case VOTING_PROPOSAL: // 2003
                         // 给提案投票

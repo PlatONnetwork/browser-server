@@ -70,6 +70,9 @@ public class StakingExecute {
 
     private StakingExecuteResult executeResult= BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult();
 
+    /**
+     * 加载并构造节点缓存结构
+     */
     public void loadNodes(){
         List<CustomNode> nodeList = customNodeMapper.selectAll();
         List<String> nodeIds = new ArrayList<>();
@@ -132,7 +135,7 @@ public class StakingExecute {
     @PostConstruct
     private void init(){
         /***把当前库中的验证人列表加载到内存中**/
-        // 初始化当前结算周期验证人列表
+        // 加载并构造节点缓存结构
         loadNodes();
     }
 

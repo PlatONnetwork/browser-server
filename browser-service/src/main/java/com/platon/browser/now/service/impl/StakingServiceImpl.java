@@ -55,10 +55,10 @@ public class StakingServiceImpl implements StakingService {
 
 	@Autowired
 	private StatisticCacheService statisticCacheService;
-	
+
 	@Autowired
 	private StakingMapper stakingMapper;
-	
+
 	@Autowired
 	private CustomStakingMapper customStakingMapper;
 	
@@ -115,7 +115,7 @@ public class StakingServiceImpl implements StakingService {
 			default:
 				break;
 		}
-		
+
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表

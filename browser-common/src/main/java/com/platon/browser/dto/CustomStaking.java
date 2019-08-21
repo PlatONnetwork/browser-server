@@ -52,8 +52,6 @@ public class CustomStaking extends Staking {
         this.setExpectedIncome(BigInteger.ZERO.toString());
         // 出块奖励
         this.setBlockRewardValue(BigInteger.ZERO.toString());
-        // 上个结算周期出块奖励
-        this.setPreSetBlockRewardValue(BigInteger.ZERO.toString());
         // 程序版本
         this.setProgramVersion(BigInteger.ZERO.toString());
         // 质押奖励

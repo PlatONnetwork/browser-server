@@ -3,6 +3,7 @@ package com.platon.browser;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dto.CustomStaking;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -47,7 +47,7 @@
                        enableDeleteByExample="false" enableSelectByExample="false"
                        selectByExampleQueryId="false"/>&ndash;&gt;-->
 
-        <table tableName="block" domainObjectName="Block">
+       <!-- <table tableName="block" domainObjectName="Block">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -78,21 +78,6 @@
                                 replaceString=""/>
         </table>
 
-        <table tableName="proposal" domainObjectName="Proposal">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="slash" domainObjectName="Slash">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
         <table tableName="un_delegation" domainObjectName="UnDelegation">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
@@ -107,6 +92,23 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
+
+        <table tableName="proposal" domainObjectName="Proposal">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="slash" domainObjectName="Slash">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>-->
+
+        <table tableName="staking" domainObjectName="Staking">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+
 
     </context>
 </generatorConfiguration>

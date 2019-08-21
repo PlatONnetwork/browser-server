@@ -6,8 +6,6 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.service.BlockService;
-import com.platon.browser.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,10 +13,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 @SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
 
-    @Autowired
-    protected BlockService blockService;
-    @Autowired
-    protected TransactionService transactionService;
+//    @Autowired
+//    protected BlockService blockService;
+//    @Autowired
+//    protected TransactionService transactionService;
 
     @Autowired
     protected RedisTemplate<String,String> redisTemplate;

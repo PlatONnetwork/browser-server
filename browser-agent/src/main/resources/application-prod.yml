@@ -1,8 +1,8 @@
-# ***************************开发配置**************************** #
+# ***************************生产配置**************************** #
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
-profile: test
+profile: prod
 # MySQL数据库连接地址
 dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
@@ -13,18 +13,17 @@ web3j:
   addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
   collect.batch-size: 1000
 # Redis集群节点
-#redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: debug
-  platon.task: debug
-  platon.engine: debug
-  platon.client: debug
-  platon.dao: debug
-  platon.service: debug
+  spring: error
+  platon.task: error
+  platon.engine: error
+  platon.client: error
+  platon.dao: error
+  platon.service: error
 
 #初始化链相关的配置
 platon.config:
@@ -47,24 +46,24 @@ platon.config:
   blockRate4HighSlash: 0.2
   #违规-低出块率: 最高处罚百分比
   blockHighSlashRate: 0.5
-  #质押门槛: 创建验证人最低的质押Token数
+  #质押门槛: 创建验证人最低的质押Token数(LAT)
   stakeThreshold: 5000000
-  #委托门槛
+  #委托门槛(LAT)
   delegateThreshold: 10
   #出块间隔(秒)
-  blockInterval: 1
+  blockInterval: 2
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
-  consensusPeriodBlockCount: 40
+  consensusPeriodBlockCount: 250
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 120
+  settlePeriodBlockCount: 10750
   #每个增发周期区块总数(1466个结算周期=15759500个块)
-  addIssuePeriodBlockCount: 1680
+  addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 2
+  unstakeRefundSettlePeriodCount: 28
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=
@@ -79,6 +78,8 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
+  #质押账户地址
+
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
@@ -87,13 +88,13 @@ platon.config:
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额>
   foundationSubsidies: {
-    '0':62215742.4869165,
-    '1':55965742.4869165,
-    '2':49559492.4869165,
-    '3':42993086.2369165,
-    '4':36262519.8306666,
-    '5':29363689.2642633,
-    '6':22292387.9336939,
-    '7':15044304.0698633,
-    '8':7615018.10943699
+      '0':62215742.4869165,
+      '1':55965742.4869165,
+      '2':49559492.4869165,
+      '3':42993086.2369165,
+      '4':36262519.8306666,
+      '5':29363689.2642633,
+      '6':22292387.9336939,
+      '7':15044304.0698633,
+      '8':7615018.10943699
   }
