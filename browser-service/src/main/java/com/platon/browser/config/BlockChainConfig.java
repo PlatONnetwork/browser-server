@@ -17,6 +17,8 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
+    // 质押节点统计年化率最多取多少个连续周期
+    private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
     // 链ID
     private String chainId;
     // PlatON初始总发行量

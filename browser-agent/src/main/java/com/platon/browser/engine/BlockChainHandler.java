@@ -83,27 +83,60 @@ public class BlockChainHandler {
 
 
     /**
-     * 根据区块号推算并更新共识周期和结算周期轮数
+     * 初始化共识周期和结算周期轮数
+     * @param blockNumber
      */
-    public void updateEpoch () {
-        CustomBlock curBlock = bc.getCurBlock();
-        // 根据区块号是否与周期整除来触发周期相关处理方法
-        // 计算共识周期轮数
-        BigInteger curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+    public void initEpoch(Long blockNumber){
+        BigInteger curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getConsensusPeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setCurConsensusEpoch(curConsensusEpoch);
         // 计算结算周期轮数
-        BigInteger curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+        BigInteger curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getSettlePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setCurSettingEpoch(curSettingEpoch);
         //计算增发周期轮数
-        BigInteger addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(curBlock.getNumber())
+        BigInteger addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
         bc.setAddIssueEpoch(addIssueEpoch);
     }
 
     /**
+     * 根据区块号推算并更新共识周期和结算周期轮数
+     */
+    public void updateEpoch () {
+        CustomBlock curBlock = bc.getCurBlock();
+        // 根据区块号是否与周期整除来触发周期相关处理方法
+        Long blockNumber = curBlock.getNumber();
+        initEpoch(blockNumber);
+    }
+
+    public void initBlockRewardAndStakingReward(Long blockNumber) throws IssueEpochChangeException {
+        // 激励池账户地址
+        String incentivePoolAccountAddr = bc.getChainConfig().getIncentivePoolAccountAddr();
+        try {
+            // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
+            BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
+            logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,incentivePoolAccountBalance.toString());
+            // 计算当前增发周期内的每个结算周期的质押奖励
+            BigDecimal settleReward = new BigDecimal(incentivePoolAccountBalance.toString())
+                    .multiply(bc.getChainConfig().getStakeRewardRate()) // 取出激励池余额中属于质押奖励的部分
+                    .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
+            bc.setSettleReward(settleReward);
+            logger.debug("当前结算周期奖励:{}",settleReward.longValue());
+
+            BigDecimal blockReward = new BigDecimal(incentivePoolAccountBalance)
+                    .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
+                    .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
+            bc.setBlockReward(blockReward);
+            logger.debug("当前区块奖励:{}",blockReward.longValue());
+        } catch (IOException e) {
+            throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
+        }
+    }
+
+    /**
      * 在增发周期切换时更新区块奖励和质押奖励
+     * @throws IssueEpochChangeException
      */
     public void updateBlockRewardAndStakingReward() throws IssueEpochChangeException {
         CustomBlock curBlock = bc.getCurBlock();
@@ -111,27 +144,7 @@ public class BlockChainHandler {
         Long issuePeriod = chainConfig.getAddIssuePeriodBlockCount().longValue();
         if (blockNumber==1 || blockNumber % issuePeriod == 0) {
             // 进入增发周期
-            // 激励池账户地址
-            String incentivePoolAccountAddr = bc.getChainConfig().getIncentivePoolAccountAddr();
-            try {
-                // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
-                BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
-                logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,incentivePoolAccountBalance.toString());
-                // 计算当前增发周期内的每个结算周期的质押奖励
-                BigDecimal settleReward = new BigDecimal(incentivePoolAccountBalance.toString())
-                                .multiply(bc.getChainConfig().getStakeRewardRate()) // 取出激励池余额中属于质押奖励的部分
-                                .divide(BigDecimal.valueOf(bc.getSettleEpochCountPerIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
-                bc.setSettleReward(settleReward);
-                logger.debug("当前结算周期奖励:{}",settleReward.longValue());
-
-                BigDecimal blockReward = new BigDecimal(incentivePoolAccountBalance)
-                                .multiply(bc.getChainConfig().getBlockRewardRate()) // 取出激励池余额中属于区块奖励的部分
-                                .divide(BigDecimal.valueOf(bc.getAddIssueEpoch().longValue()),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
-                bc.setBlockReward(blockReward);
-                logger.debug("当前区块奖励:{}",blockReward.longValue());
-            } catch (IOException e) {
-                throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
-            }
+            initBlockRewardAndStakingReward(blockNumber);
         }
     }
 

@@ -95,12 +95,14 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws CandidateException {
+    public void init () throws CandidateException, IssueEpochChangeException {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+
+        if(maxBlockNumber>1) blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
 
         /**
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -108,6 +110,7 @@ public class BlockSyncTask {
          * 查询内置结算周期验证人初始化blockChain的curVerifier属性
           */
         if(maxBlockNumber==null){
+
             // 如果库里区块为空，则：
             try {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
@@ -157,7 +160,6 @@ public class BlockSyncTask {
             }
         }
 
-        blockChain.init();
     }
 
     public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException {

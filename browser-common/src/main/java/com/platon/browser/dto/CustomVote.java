@@ -1,6 +1,5 @@
 package com.platon.browser.dto;
 
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.param.VotingProposalParam;
 import lombok.Data;
@@ -16,7 +15,7 @@ import java.util.Date;
 @Data
 public class CustomVote extends Vote {
 
-    public void bulidStructure( Vote vote){
+    public void buildStructure( Vote vote){
         BeanUtils.copyProperties(vote,this);
     }
 
