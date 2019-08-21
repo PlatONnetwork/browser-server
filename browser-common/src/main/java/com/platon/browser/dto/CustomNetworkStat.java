@@ -1,7 +1,6 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.NetworkStat;
-import jnr.ffi.annotations.In;
 
 /**
  * User: dongqile

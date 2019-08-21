@@ -427,7 +427,8 @@ public class BlockChainHandler {
                     });
                 }
             }
-
+            //更新暂存变量
+            STAGE_BIZ_DATA.getNetworkStatResult().stageUpdateNetworkStat(NETWORK_STAT_CACHE);
         } catch (NoSuchBeanException e) {
             logger.error("");
         }

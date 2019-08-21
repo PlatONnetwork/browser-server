@@ -150,7 +150,7 @@ public class BlockSyncTask {
                         blockChain.getCurVerifier().put(HexTool.prefix(verifier.getNodeId()),verifier);
                     });
                     BlockChainResult bcr = blockChain.exportResult();
-                    service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
+                    batchSaveResult(Collections.EMPTY_LIST,bcr);
                     blockChain.commitResult();
                 }
                 // 通知质押引擎重新初始化节点缓存

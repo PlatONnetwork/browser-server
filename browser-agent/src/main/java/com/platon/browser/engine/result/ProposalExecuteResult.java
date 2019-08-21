@@ -2,6 +2,10 @@ package com.platon.browser.engine.result;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dto.CustomDelegation;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomVote;
 import lombok.Data;
 
 import java.util.*;
@@ -22,4 +26,29 @@ public class ProposalExecuteResult {
         updateProposals.clear();
         addVotes.clear();
     }
+
+    /**
+     * 把新增治理暂存至待新增入库列表
+     * @param proposal
+     */
+    public void stageAddProposals( Proposal proposal){
+        addProposals.add(proposal);
+    }
+
+    /**
+     * 把更新后的治理暂存至待更新入库列表
+     * @param proposal
+     */
+    public void stageUpdateProposals(Proposal proposal){
+        updateProposals.add(proposal);
+    }
+
+    /**
+     * 把新增治理暂存至待新增入库列表
+     * @param proposal
+     */
+    public void stageAddVotes( CustomVote proposal){
+        addVotes.add(proposal);
+    }
+
 }

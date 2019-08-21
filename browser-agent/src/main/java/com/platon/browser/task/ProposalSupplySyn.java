@@ -95,6 +95,8 @@ public class ProposalSupplySyn {
                             logger.error("[ProposalSupplySyn] update proposal info exception {}",e.getMessage());
                         }
                         infoSupply = true;
+                        bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
+
                     }
                     //需要更新的提案结果，查询类型1.投票中 2.预升级
                     if (customProposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code) || customProposal.getStatus().equals(CustomProposal.StatusEnum.PREUPGRADE.code)) {
@@ -115,6 +117,8 @@ public class ProposalSupplySyn {
                             logger.error("[ProposalSupplySyn] infoSyn send rpc fail {}", e.getMessage());
                         }
                         statusSupply = true;
+                        bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
+
                     }
                     if(infoSupply || statusSupply){
                         updateSet.add(customProposal);
@@ -122,7 +126,10 @@ public class ProposalSupplySyn {
                 });
                 if (updateSet.size() > 0) {
                     //更新数据
-                    bc.getProposalExecute().exportResult().setUpdateProposals(updateSet);
+                    updateSet.forEach(c -> {
+                        bc.STAGE_BIZ_DATA.getProposalExecuteResult().stageUpdateProposals(c);
+
+                    });
                 }
             } else {
                 logger.debug("[ProposalSupplySyn]引擎中治理数据为空，跳过治理数据补充任务...");

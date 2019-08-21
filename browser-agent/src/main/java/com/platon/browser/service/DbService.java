@@ -3,10 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.engine.result.AddressExecuteResult;
-import com.platon.browser.engine.result.BlockChainResult;
-import com.platon.browser.engine.result.ProposalExecuteResult;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.result.*;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,11 +43,15 @@ public class DbService {
     private CustomVoteMapper customVoteMapper;
     @Autowired
     private CustomAddressMapper customAddressMapper;
+    @Autowired
+    private  CustomNetworkStatMapper customNetworkStatMapper;
 
     @Autowired
     private BlockCacheService blockCacheService;
     @Autowired
     private TransactionCacheService transactionCacheService;
+    @Autowired
+    private NetworkStatCacheService networkStatCacheService;
 
     @Transactional
     public void insertOrUpdateChainInfo (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
@@ -60,16 +61,23 @@ public class DbService {
             blocks.add(block);
             transactions.addAll(block.getTransactionList());
         });
-        // 批量入库区块数据
+        // 批量入库区块数据并更新redis缓存
         if (blocks.size() > 0) {
             blockMapper.batchInsert(blocks);
             blockCacheService.update(new HashSet<>(blocks));
         }
-        // 批量入库交易数据
+        // 批量入库交易数据并更新redis缓存
         if (transactions.size() > 0) {
             transactionMapper.batchInsert(transactions);
             transactionCacheService.update(new HashSet<>(transactions));
         }
+        // 统计数据入库并更新redis缓存
+        NetworkStatResult nsr = bizData.getNetworkStatResult();
+        if(nsr.getUpdateNetworkStats().size()>0){
+            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getUpdateNetworkStats(),NetworkStat.Column.values());
+            networkStatCacheService.update(nsr.getUpdateNetworkStats());
+        }
+
 
         // 质押相关数据
         StakingExecuteResult ser = bizData.getStakingExecuteResult();

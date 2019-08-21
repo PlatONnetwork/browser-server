@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class NetworkStatCacheServiceImpl implements NetworkStatCacheService {
     private final Logger logger = LoggerFactory.getLogger(BlockCacheServiceImpl.class);
@@ -25,11 +27,11 @@ public class NetworkStatCacheServiceImpl implements NetworkStatCacheService {
     }
 
     @Override
-    public void update(NetworkStat item) {
+    public void update( Set <NetworkStat> items) {
         long startTime = System.currentTimeMillis();
         logger.debug("开始更新Redis统计缓存:timestamp({})",startTime);
         // 取出缓存中的交易总数
-        redisTemplate.opsForValue().set(networkStatCacheKey,JSON.toJSONString(item));
+        items.forEach(item -> redisTemplate.opsForValue().set(networkStatCacheKey,JSON.toJSONString(item)));
         long endTime = System.currentTimeMillis();
         logger.debug("更新Redis交易缓存结束:timestamp({}),consume({}ms)",endTime,endTime-startTime);
     }
