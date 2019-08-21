@@ -7,11 +7,13 @@ import com.platon.browser.engine.result.AddressExecuteResult;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.engine.result.StakingExecuteResult;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -45,6 +47,11 @@ public class DbService {
     @Autowired
     private CustomAddressMapper customAddressMapper;
 
+    @Autowired
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
+
     @Transactional
     public void insertOrUpdateChainInfo (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
@@ -54,9 +61,15 @@ public class DbService {
             transactions.addAll(block.getTransactionList());
         });
         // 批量入库区块数据
-        if (blocks.size() > 0) blockMapper.batchInsert(blocks);
+        if (blocks.size() > 0) {
+            blockMapper.batchInsert(blocks);
+            blockCacheService.update(new HashSet<>(blocks));
+        }
         // 批量入库交易数据
-        if (transactions.size() > 0)  transactionMapper.batchInsert(transactions);
+        if (transactions.size() > 0) {
+            transactionMapper.batchInsert(transactions);
+            transactionCacheService.update(new HashSet<>(transactions));
+        }
 
         // 质押相关数据
         StakingExecuteResult ser = bizData.getStakingExecuteResult();

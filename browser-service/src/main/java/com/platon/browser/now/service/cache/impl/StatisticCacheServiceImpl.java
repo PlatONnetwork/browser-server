@@ -22,16 +22,16 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Autowired
 	private I18nUtil i18n;
-	
-	@Value("${platon.redis.key.bolck:}")
-	private String blockCacheKeyTemplate;
-	
-	@Value("${platon.redis.key.transaction:}")
-	private String transactionCacheKeyTemplate;
-	
+
+	@Value("${platon.redis.key.bolcks:}")
+	private String blockCacheKey;
+
+	@Value("${platon.redis.key.transactions:}")
+	private String transactionCacheKey;
+
 	@Value("${platon.redis.key.networkStat:}")
-	private String networkStatCacheKeyTemplate;
-	
+	private String networkStatCacheKey;
+
 	@Value("${platon.redis.max-item:}")
 	private long maxItemNum;
 
@@ -40,7 +40,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public List<BlockRedis> getBlockCache(Integer pageNum, Integer pageSize) {
-		CachePageInfo<Class<BlockRedis>> cpi = this.getCachePageInfo(blockCacheKeyTemplate, pageNum, pageSize, BlockRedis.class, i18n,
+		CachePageInfo<Class<BlockRedis>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, BlockRedis.class, i18n,
 				redisTemplate, maxItemNum);
 		List<BlockRedis> blockRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
@@ -52,14 +52,14 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 
 	@Override
 	public NetworkStatRedis getNetworkStatCache() {
-		String value = redisTemplate.opsForValue().get(networkStatCacheKeyTemplate);
+		String value = redisTemplate.opsForValue().get(networkStatCacheKey);
 		NetworkStatRedis networkStatRedis = JSON.parseObject(value, NetworkStatRedis.class);
 		return networkStatRedis;
 	}
 
 	@Override
 	public List<TransactionRedis> getTransactionCache(Integer pageNum, Integer pageSize) {
-		CachePageInfo<Class<TransactionRedis>> cpi = this.getCachePageInfo(transactionCacheKeyTemplate, pageNum, pageSize, TransactionRedis.class, i18n,
+		CachePageInfo<Class<TransactionRedis>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, TransactionRedis.class, i18n,
 				redisTemplate, maxItemNum);
 		List<TransactionRedis> transactionRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {

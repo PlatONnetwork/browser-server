@@ -33,37 +33,15 @@ platon:
     collect.batch-size: ${web3j.collect.batch-size}
 
   fake.location.filename: fakelocation-${version}-${profile}.json
-  # 区块列表缓存和交易列表缓存配置
+  # Redis缓存配置
   redis:
     key:
-      #验证节点列表
-      node: browser:${profile}:nodes
-      #节点ID与其所出最大块号的映射
-      nodeid-maxblocknum: browser:${profile}:nodeid-maxblocknum:{nodeId}
       #区块列表
-      block: browser:${profile}:blocks
+      blocks: browser:${version}:${profile}:blocks
       #交易列表
-      transaction: browser:${profile}:transactions
+      transactions: browser:${version}:${profile}:transactions
       #统计信息
-      networkStat: browser:${profile}:networkStat
-      #总交易笔数
-      trans-count: browser:${profile}:trans-count
-      #24小时内的交易数
-      trans-count-24-hours: browser:${profile}:trans-count-24-hours
-      #地址数
-      address-count: browser:${profile}:address-count
-      #平均区块交易数
-      avg-block-trans-count: browser:${profile}:avg-block-trans-count
-      #票价
-      ticket-price: browser:${profile}:ticket-price
-      #投票数
-      vote-count: browser:${profile}:vote-count
-      #MaxTps
-      max-tps: browser:${profile}:max-tps
-      # 按地址存储的交易的键模板
-      address-trans-key-template: browser:${profile}:address-trans-list:{address}:{txType}:{txHash}:{timestamp}
-      # 按地址存储的交易数量限制
-      address-trans-max-item: 200
+      networkStat: browser:${version}:${profile}:networkStat
     max-item: 500000
 #日志配置
 logging:
