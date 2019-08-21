@@ -56,6 +56,7 @@ public class ProposalServiceImpl implements ProposalService {
         RespPage<ProposalListResp> respPage = new RespPage();
         respPage.setTotalCount(0);
         respPage.setTotalPages(0);
+        req= req==null?new PageReq():req;
         Page page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         List<Proposal> list = proposalMapper.selectByExample(null);
         if (!CollectionUtils.isEmpty(list)) {
