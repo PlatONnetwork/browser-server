@@ -18,11 +18,12 @@ redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:70
 logpath: ./logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: debug
-  platon.task: debug
-  platon.engine: debug
-  platon.client: debug
-  platon.dao: debug
+  spring: error
+  platon.task: error
+  platon.engine: error
+  platon.client: error
+  platon.dao: error
+  platon.service: error
 
 #初始化链相关的配置
 platon.config:

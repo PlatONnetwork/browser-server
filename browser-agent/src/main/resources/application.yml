@@ -42,6 +42,7 @@ logging:
   level:
     org.springframework: ${loglevel.spring}
     com.platon.browser: ${loglevel.platon}
+    com.platon.browser.service: ${loglevel.platon.service}
     com.platon.browser.task: ${loglevel.platon.task}
     com.platon.browser.engine: ${loglevel.platon.engine}
     com.platon.browser.client: ${loglevel.platon.client}

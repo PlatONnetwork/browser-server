@@ -10,11 +10,8 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 web3j:
-  #  addresses: http://192.168.9.221:6789
-  #  addresses: http://10.10.8.200:6789,http://10.10.8.201:6789,http://10.10.8.202:6789,http://10.10.8.203:6789
-  #  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
   collect.batch-size: 1000
-
 # Redis集群节点
 #redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
@@ -22,17 +19,12 @@ redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:70
 logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: error
-  platon: error
-  platon.job: error
-  platon.filter: error
-  platon.service: error
-  platon.thread: error
-# 区块分析线程池大小
-thread.num: 200
-# 区块批量采集大小
-batch.num: ${thread.num}
-
+  spring: debug
+  platon.task: debug
+  platon.engine: debug
+  platon.client: debug
+  platon.dao: debug
+  platon.service: debug
 
 #初始化链相关的配置
 platon.config:
@@ -87,8 +79,6 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
-  #质押账户地址
-
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
