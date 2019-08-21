@@ -9,6 +9,7 @@ public enum I18nEnum {
     UNKNOWN_TYPE,
     UNKNOWN_STATUS,
     UNKNOWN_LOCATION,
+    RECORD_NOT_EXIST,
 
     // 搜索
     SEARCH_KEYWORD_TOO_SHORT,
@@ -85,5 +86,8 @@ public enum I18nEnum {
 
     PENDING_ERROR_DUPLICATE,
     PENDING_ERROR_NOT_EXIST,
+
+    //proposal error
+    PROPOSAL_PARAM_ERROR,
     ;
 }

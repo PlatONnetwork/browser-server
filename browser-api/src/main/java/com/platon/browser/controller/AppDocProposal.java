@@ -2,6 +2,7 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import com.platon.browser.dto.RespPage;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +45,7 @@ public interface AppDocProposal {
      *   "data":[
      *      {
      *         "proposalHash":"",      //提案内部标识
-     *         "title":"",             //提案标题
+     *         "topic":"",             //提案标题
      *         "description":""		//提案描述
      *         "url":"",               //github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  PIP编号   eip-100
      *         "type":"",              //提案类型   1：文本提案； 2：升级提案；  3参数提案。
@@ -60,8 +61,8 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/proposalList", nickname = "", notes = "", response = ProposalListResp.class, tags = { "Proposal" })
 	@RequestMapping(value = "proposal/proposalList", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<ProposalListResp> proposalList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
-	
+	public RespPage<ProposalListResp> proposalList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
+
 	
     /**
      * @api {post} /proposal/proposalDetails b.提案详情
@@ -82,9 +83,8 @@ public interface AppDocProposal {
      *    "code": 0,                   //成功（0），失败则由相关失败码
      *    "data": {
      *       "proposalHash":"",        //提案内部标识
-     *       "title":"",             //提案标题
+     *       "topoc":"",             //提案标题
      *       "description":""		//提案描述
-     *       "descri"
      *       "url":"",                 //github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md PIP编号   eip-100
      *       "type":"",                //提案类型   1：文本提案； 2：升级提案；  3参数提案。
      *       "status":"",              //状态  1：投票中  2：通过  3：失败   4：预升级  5：升级完成   6：已取消  已通过=2 或4 或 5
@@ -105,6 +105,9 @@ public interface AppDocProposal {
      *       "activeBlockTime":"",      //生效块高预计时间  (activeBlock-curBlock)*period
      *       "endVotingBlockTime":"",    //投票块高的时间   (endVotingBlock-curBlock)*period
      *       "supportRateThreshold":""   //通过率
+	 *       "opposeRateThreshold":""   //反对率
+	 *       "abstainRateThreshold:""   //弃权率
+	 *
      *    }
      * }
      */	
@@ -148,5 +151,5 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/voteList", nickname = "", notes = "", response = VoteListResp.class, tags = { "Proposal" })
 	@RequestMapping(value = "proposal/voteList", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ", required = true)@Valid @RequestBody VoteListRequest req);
+	public RespPage<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ", required = true)@Valid @RequestBody VoteListRequest req);
 }

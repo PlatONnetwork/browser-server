@@ -5,17 +5,23 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.RespPage;
+import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.ProposalService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
+import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.util.BeanConvertUtil;
+import com.platon.browser.util.I18NUtils;
 import com.platon.browser.util.I18nUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +42,7 @@ import java.util.Objects;
  */
 @Service
 public class ProposalServiceImpl implements ProposalService {
+    Logger logger= LoggerFactory.getLogger(ProposalServiceImpl.class);
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -65,21 +72,21 @@ public class ProposalServiceImpl implements ProposalService {
             respPage.setData(listResps);
             respPage.setTotalPages(page.getPages());
             respPage.setTotalCount(page.getTotal());
-
         }
         return respPage;
     }
 
     @Override
-    public ProposalDetailsResp get(ProposalDetailRequest req) {
+    public BaseResp<ProposalDetailsResp> get(ProposalDetailRequest req) {
         Proposal proposal = proposalMapper.selectByPrimaryKey(req.getProposalHash());
         if (Objects.isNull(proposal)) {
-            throw new BusinessException(i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
+            logger.error("## ERROR # get record not exist proposalHash:{}",req.getProposalHash());
+            return BaseResp.build(ErrorCodeEnum.RECORD_NOT_EXIST.getCode(), i18n.i(I18nEnum.RECORD_NOT_EXIST,req.getProposalHash()),null);
         }
         ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
         proposalDetailsResp.setProposalHash(req.getProposalHash());
-        List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
-        if (items != null && items.size() > 0) {
+            List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
+            if (items != null && items.size() > 0) {
             proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());
         }
         //赞成百分比
@@ -88,13 +95,13 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setAbstainRateThreshold(composeRate(proposal.getAbstentions(), proposal.getAccuVerifiers()));
         //反对百分比
         proposalDetailsResp.setOpposeRateThreshold(composeRate(proposal.getNays(), proposal.getAccuVerifiers()));
-        return proposalDetailsResp;
+        return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),proposalDetailsResp);
     }
 
     /**
      * 计算百分比
-     * @param divisor
-     * @param dividend
+     * @param divisor 除数
+     * @param dividend 被除数
      * @return
      */
     private String composeRate(Long divisor, Long dividend) {
