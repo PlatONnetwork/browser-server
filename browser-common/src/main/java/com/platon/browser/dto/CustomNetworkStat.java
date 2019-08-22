@@ -10,6 +10,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 public class CustomNetworkStat extends NetworkStat {
 
     public CustomNetworkStat () {
+        this.setId(1); // 只有一条数据，默认ID为1
         this.setCurrentNumber(0L);
         this.setNodeName("");
         this.setNodeId("");

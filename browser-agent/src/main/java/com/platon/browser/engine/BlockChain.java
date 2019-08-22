@@ -122,8 +122,6 @@ public class BlockChain {
         List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
         if (networkStats.size() != 0) {
             BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
-        }else {
-            BeanUtils.copyProperties(new CustomNetworkStat(),NETWORK_STAT_CACHE);
         }
     }
 
