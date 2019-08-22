@@ -2,13 +2,14 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
-import com.platon.browser.engine.AddressExecute;
+import com.platon.browser.engine.BlockChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: dongqile
@@ -20,27 +21,35 @@ public class UpdateAccountBalanceTask {
 
     @Autowired
     private PlatonClient client;
-    @Autowired
-    private AddressExecute addressExecute;
 
-    @Scheduled(cron="0/10 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     protected void updateBalance () {
-        //1.AddressExectue获取到需要新增和更新的地址列表
-        //2.调用底层提供接口，查询列表中的所有
-        /*Map <String,Address> addMaps = addressExecute.exportResult().getAddressMap();
-        try{
-            BaseResponse <List <RestrictingBalance>> updateAddBalanceList = client.getRestrictingBalance(new ArrayList <>());
-        }catch (Exception e){
+        String resAdd = "";
+        Set <String> addresSet = BlockChain.ADDRESS_CACHE.getAll().keySet();
+        if (addresSet.size() > 0) {
+            for (String s : addresSet) {
+                if (!resAdd.equals("")) {
+                    resAdd = resAdd + ";" + s;
+                } else {
+                    resAdd = s + ";";
+                }
+            }
+            try {
+                BaseResponse <List <RestrictingBalance>> res = client.getRestrictingBalance(resAdd);
+                List <RestrictingBalance> list = res.data;
+                BlockChain.ADDRESS_CACHE.getAll().values().forEach(address->{
+                    list.forEach(restrictingBalance -> {
+                        if(restrictingBalance.getAccount().equals(address.getAddress())){
+                            address.setRestrictingBalance(restrictingBalance.getLockBalance().toString());
+                            address.setBalance(restrictingBalance.getFreeBalance().toString());
+                        }
+                    });
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-        }
-*/
-        String addreslist = "";
-        try {
-            BaseResponse <List<RestrictingBalance>> res = client.getRestrictingBalance(addreslist);
-            List<RestrictingBalance> list = res.data;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 }

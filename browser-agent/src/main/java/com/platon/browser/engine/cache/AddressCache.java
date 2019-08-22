@@ -34,4 +34,8 @@ public class AddressCache {
     public void add(CustomAddress address){
         addressMap.put(address.getAddress(),address);
     }
+
+    public Map<String, CustomAddress> getAll(){
+        return addressMap;
+    }
 }
