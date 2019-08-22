@@ -143,10 +143,9 @@ public class NodeCache {
      */
     public List<CustomStaking> getStakingByStatus(List<CustomStaking.StatusEnum> statuses){
         List<CustomStaking> returnData = new ArrayList<>();
-        nodeMap.values().forEach(node->
-                node.getStakings().values().stream()
-                        .filter(staking -> statuses.contains(CustomStaking.StatusEnum.getEnum(staking.getStatus())))
-                        .forEach(staking->returnData.add(staking)));
+        stakingSet.stream()
+                .filter(staking -> statuses.contains(CustomStaking.StatusEnum.getEnum(staking.getStatus())))
+                .forEach(staking->returnData.add(staking));
         return returnData;
     }
 
@@ -155,11 +154,9 @@ public class NodeCache {
      */
     public List<CustomDelegation> getDelegationByIsHistory(List<CustomDelegation.YesNoEnum> statuses){
         List<CustomDelegation> returnData = new ArrayList<>();
-        nodeMap.values().forEach(node->
-                node.getStakings().values().forEach(staking ->
-                        staking.getDelegations().values().stream().
-                                filter(delegation -> statuses.contains(CustomDelegation.YesNoEnum.getEnum(delegation.getIsHistory())))
-                                .forEach(delegation -> returnData.add(delegation))));
+        delegationSet.stream()
+                .filter(delegation -> statuses.contains(CustomDelegation.YesNoEnum.getEnum(delegation.getIsHistory())))
+                .forEach(delegation -> returnData.add(delegation));
         return returnData;
     }
 
