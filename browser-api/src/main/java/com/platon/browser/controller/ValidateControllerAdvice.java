@@ -32,7 +32,7 @@ public class ValidateControllerAdvice {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public BaseResp argumentNotValidHandler(MethodArgumentNotValidException e) {
+    public BaseResp<?> argumentNotValidHandler(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors=e.getBindingResult().getFieldErrors();
         Map<String,String> msg = new HashMap<>();
         String errMsg = "";
@@ -56,13 +56,13 @@ public class ValidateControllerAdvice {
      */
     @ExceptionHandler(ResponseException.class)
     @ResponseBody
-    public BaseResp responseExceptionHandler(ResponseException e) {
+    public BaseResp<?> responseExceptionHandler(ResponseException e) {
         return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(),e.getMessage(),e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
-    public BaseResp notReadableHandler(HttpMessageNotReadableException e) {
+    public BaseResp<?> notReadableHandler(HttpMessageNotReadableException e) {
         return BaseResp.build(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.REQUEST_INVALID_PARAM),null);
     }
 

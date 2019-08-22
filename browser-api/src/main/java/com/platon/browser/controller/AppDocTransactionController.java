@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.ResponseException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.req.PageReq;
@@ -66,12 +67,19 @@ public class AppDocTransactionController implements AppDocTransaction {
 
 	@Override
 	public BaseResp<TransactionDetailsResp> transactionDetails(@Valid TransactionDetailsReq req) {
-		return transactionService.transactionDetails(req);
+		TransactionDetailsResp transactionDetailsResp = transactionService.transactionDetails(req);
+		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);
 	}
 
 	@Override
 	public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
-		return transactionService.transactionDetailNavigate(req);
+		try {
+			TransactionListResp transactionListResp = transactionService.transactionDetailNavigate(req);
+			return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionListResp);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new ResponseException(i18n.i(I18nEnum.FAILURE));
+		}
 	}
 
 	private void download(HttpServletResponse response, String filename, long length, byte [] data){
