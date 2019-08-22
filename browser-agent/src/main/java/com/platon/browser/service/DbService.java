@@ -54,7 +54,7 @@ public class DbService {
     private NetworkStatCacheService networkStatCacheService;
 
     @Transactional
-    public void insertOrUpdateChainInfo (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
+    public void insertOrUpdate (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {

@@ -385,7 +385,7 @@ public class BlockSyncTask {
         try{
 
             // 串行批量入库
-            service.insertOrUpdateChainInfo(basicData,bizData);
+            service.insertOrUpdate(basicData,bizData);
         }catch (Exception e){
             logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());
