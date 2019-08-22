@@ -13,14 +13,17 @@ import java.util.Set;
  * Date: 2019/8/14
  * Time: 16:46
  */
-@Data
 public class AddressExecuteResult {
 
-    private Set<Address> addAddress =  new HashSet<>();
-    private Set<Address> updateAddress = new HashSet <>();
+    private Set<Address> stageCache =  new HashSet<>();
+
+    public void stage(Address address){
+        stageCache.add(address);
+    }
+
+    public Set<Address> export(){return stageCache;}
 
     public void clear() {
-        addAddress.clear();
-        updateAddress.clear();
+        stageCache.clear();
     }
 }

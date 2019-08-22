@@ -6,9 +6,13 @@ import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.param.CreateValidatorParam;
+import com.platon.browser.param.DelegateParam;
+import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -33,6 +37,7 @@ public class CustomAddress extends Address {
         this.setTxQty(BigInteger.ZERO.intValue());
         this.setTransferQty(BigInteger.ZERO.intValue());
         this.setStakingQty(BigInteger.ZERO.intValue());
+        this.setDelegateQty(BigInteger.ZERO.intValue());
         this.setProposalQty(BigInteger.ZERO.intValue());
         this.setCandidateCount(BigInteger.ZERO.intValue());
         this.setDelegateHes(BigInteger.ZERO.toString());
@@ -46,12 +51,10 @@ public class CustomAddress extends Address {
     }
 
     /**
-     * 更新参数tx中from地址相关的信息
+     * 更新与from地址相关的信息
      * @param tx
      */
     public void updateFromWithCustomTransaction(CustomTransaction tx) {
-        // 设置地址类型
-       // setAddressType(tx.getFrom());
 
 
     }
@@ -78,6 +81,29 @@ public class CustomAddress extends Address {
         }
         // 交易数量加一
         this.setTxQty(this.getTxQty()+1);
+        switch (tx.getTypeEnum()){
+            case TRANSFER: // 转账交易，from地址转账交易数加一
+                this.setTransferQty(this.getTransferQty()+1); // 累加转账交易总数
+                break;
+            case INCREASE_STAKING:// 增加自有质押
+            case CREATE_VALIDATOR:// 创建验证人
+            case EXIT_VALIDATOR:// 退出验证人
+            case REPORT_VALIDATOR:// 举报验证人
+            case EDIT_VALIDATOR:// 编辑验证人
+                this.setStakingQty(this.getStakingQty()+1); // 累加质押交易总数
+                break;
+            case DELEGATE:// 发起委托
+            case UN_DELEGATE:// 撤销委托
+                this.setDelegateQty(this.getDelegateQty()+1); // 累加委托交易总数
+                break;
+            case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
+            case CREATE_PROPOSAL_TEXT:// 创建文本提案
+            case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+            case DECLARE_VERSION:// 版本声明
+            case VOTING_PROPOSAL:// 提案投票
+                this.setProposalQty(this.getProposalQty()+1); // 累加提案交易总数
+                break;
+        }
     }
 
     public enum TypeEnum{
@@ -101,4 +127,14 @@ public class CustomAddress extends Address {
         public static boolean contains(TypeEnum en){return ENUMS.containsValue(en);}
      }
 
+    /********把字符串类数值转换为大整数的便捷方法********/
+    public BigInteger integerBalance(){return new BigInteger(this.getBalance());}
+    public BigInteger integerRestrictingBalance(){return new BigInteger(this.getRestrictingBalance());}
+    public BigInteger integerStakingValue(){return new BigInteger(this.getStakingValue());}
+    public BigInteger integerDelegateValue(){return new BigInteger(this.getDelegateValue());}
+    public BigInteger integerRedeemedValue(){return new BigInteger(this.getRedeemedValue());}
+    public BigInteger integerDelegateHes(){return new BigInteger(this.getDelegateHes());}
+    public BigInteger integerDelegateLocked(){return new BigInteger(this.getDelegateLocked());}
+    public BigInteger integerDelegateUnlock(){return new BigInteger(this.getDelegateUnlock());}
+    public BigInteger integerDelegateReduction(){return new BigInteger(this.getDelegateReduction());}
 }

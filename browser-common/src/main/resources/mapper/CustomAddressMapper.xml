@@ -13,7 +13,7 @@
     from address
   </select>
 
-  <insert id="batchInsertSelective" parameterType="map">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into address (
     <foreach collection="selective" item="column" separator=",">
       ${column.escapedColumnName}

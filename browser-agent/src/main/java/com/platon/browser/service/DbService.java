@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: dongqile
@@ -108,10 +109,6 @@ public class DbService {
         //批量入库新增投票数据
         if (per.getAddVotes().size() > 0) customVoteMapper.batchInsertOrUpdateSelective(per.getAddVotes(),Vote.Column.values());
 
-        // ****************新增地址相关数据*******************
-        //批量入库地址新增数据
-        if(aer.getAddAddress().size()>0) customAddressMapper.batchInsertOrUpdateSelective(aer.getAddAddress(),Address.Column.values());
-        //批量入库统计数据
         /*****************************批量新增操作 END**************************/
 
 
@@ -130,9 +127,11 @@ public class DbService {
         //批量更新提案
         if (per.getUpdateProposals().size() > 0) customProposalMapper.batchInsertOrUpdateSelective(per.getUpdateProposals(),Proposal.Column.values());
 
-        // ****************更新地址相关数据*******************
-        //批量更新地址
-        if(aer.getUpdateAddress().size()>0) customAddressMapper.batchInsertOrUpdateSelective(aer.getUpdateAddress(),Address.Column.values());
+        // ****************批量插入或更新地址相关数据*******************
+        Set<Address> addresses = aer.export();
+        if(addresses.size()>0) {
+            customAddressMapper.batchInsertOrUpdateSelective(addresses,Address.Column.values());
+        }
         /*****************************批量更新操作 END**************************/
     }
 }

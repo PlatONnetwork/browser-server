@@ -367,7 +367,7 @@ public class BlockSyncTask {
 
 
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.innerContractList.contains(tx.getTo())){
+            if(null != tx.getValue() && ! InnerContractAddrEnum.addresses.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
@@ -381,7 +381,6 @@ public class BlockSyncTask {
 
     public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
         try{
-
             // 串行批量入库
             service.insertOrUpdate(basicData,bizData);
         }catch (Exception e){
