@@ -210,7 +210,7 @@ public class DbService {
          */
 
 
-        for (Map.Entry <String, CustomAddress> customAddress : BlockChain.ADDRESS_CACHE.getAll().entrySet()) {
+        for (CustomAddress customAddress : BlockChain.ADDRESS_CACHE.getAllAddress()) {
             BigInteger stakingValue = BigInteger.ZERO;
             BigInteger delegateValue = BigInteger.ZERO;
             BigInteger statkingRedeemed = BigInteger.ZERO;
@@ -222,14 +222,14 @@ public class DbService {
             BigInteger delegateUnlock = BigInteger.ZERO;
             BigInteger delegateReduction = BigInteger.ZERO;
             for (CustomStaking stakings : BlockChain.NODE_CACHE.getAllStaking()) {
-                if (stakings.getStakingAddr().equals(customAddress.getValue().getAddress())) {
+                if (stakings.getStakingAddr().equals(customAddress.getAddress())) {
                     stakingValue = stakingValue.add(new BigInteger(stakings.getStakingHas()).add(new BigInteger(stakings.getStakingLocked())));
                     statkingRedeemed = statkingRedeemed.add(new BigInteger(stakings.getStakingReduction()));
                 }
 
             }
             for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(Collections.singletonList(CustomDelegation.YesNoEnum.NO))) {
-                if (delegation.getDelegateAddr().equals(customAddress.getValue().getAddress())) {
+                if (delegation.getDelegateAddr().equals(customAddress.getAddress())) {
                     delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
                     delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));
                     delegateHes = delegateHes.add(new BigInteger(delegation.getDelegateHas()));
@@ -250,14 +250,14 @@ public class DbService {
             redeemedValue = statkingRedeemed.add(delegateReddemed);
 
             //address引用对象更新
-            customAddress.getValue().setStakingValue(stakingValue.toString());
-            customAddress.getValue().setDelegateValue(delegateValue.toString());
-            customAddress.getValue().setRedeemedValue(redeemedValue.toString());
-            customAddress.getValue().setCandidateCount(candidateCount.intValue());
-            customAddress.getValue().setDelegateValue(delegateHes.toString());
-            customAddress.getValue().setDelegateLocked(delegateLocked.toString());
-            customAddress.getValue().setDelegateUnlock(delegateUnlock.toString());
-            customAddress.getValue().setDelegateReduction(delegateReduction.toString());
+            customAddress.setStakingValue(stakingValue.toString());
+            customAddress.setDelegateValue(delegateValue.toString());
+            customAddress.setRedeemedValue(redeemedValue.toString());
+            customAddress.setCandidateCount(candidateCount.intValue());
+            customAddress.setDelegateValue(delegateHes.toString());
+            customAddress.setDelegateLocked(delegateLocked.toString());
+            customAddress.setDelegateUnlock(delegateUnlock.toString());
+            customAddress.setDelegateReduction(delegateReduction.toString());
         }
     }
 
