@@ -113,14 +113,25 @@ public class NodeCache {
                 .getUnDelegations().add(unDelegation);
     }
 
+    /**
+     * 获取所有节点
+     * @return
+     */
     public Collection<CustomNode> getAllNode(){
         return nodeMap.values();
     }
 
+    /**
+     * 获取所有质押
+     * @return
+     */
     public Set<CustomStaking> getAllStaking(){
         return stakingSet;
     }
-
+    /**
+     * 获取所有委托
+     * @return
+     */
     public Set<CustomDelegation> getAllDelegation(){
         return delegationSet;
     }
@@ -189,9 +200,12 @@ public class NodeCache {
             if(!valid) invalidCache.add(staking);
         });
         invalidCache.forEach(staking -> {
+            // 清除质押
             nodeMap.values().forEach(node->node.getStakings().remove(staking.getStakingBlockNum()));
+            // 在所有委托缓存中清除指定实体
             delegationSet.removeAll(staking.getDelegations().values());
         });
+        // 在所有质押缓存中清除指定实体
         stakingSet.removeAll(invalidCache);
     }
 
