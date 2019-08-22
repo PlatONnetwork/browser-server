@@ -6,7 +6,11 @@ import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.result.*;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,8 @@ import java.util.*;
  */
 @Component
 public class DbService {
+    private static Logger logger = LoggerFactory.getLogger(DbService.class);
+
     @Autowired
     private BlockMapper blockMapper;
     @Autowired
@@ -80,6 +86,11 @@ public class DbService {
             networkStatCacheService.update(nsr.getUpdateNetworkStats());
         }
 
+        //质押统计数据补充
+        dataOfStakingStatistics();
+
+        //地址相关数据补充
+        dataOfAddressStatistics();
 
         // 质押相关数据
         StakingExecuteResult ser = bizData.getStakingExecuteResult();
@@ -184,7 +195,7 @@ public class DbService {
         });
     }
 
-    public void dataOfAddressStatistics () {
+    public void dataOfAddressStatistics () throws BusinessException {
         /**
          * 2.补充统计地址相关数据
          *      a.staking_value  质押的金额
@@ -193,38 +204,60 @@ public class DbService {
          *      d.candidate_count   已委托的验证人
          *      e.delegate_hes   未锁定委托
          *      f.delegate_locked   已锁定委托
-         *      g.delegate_unlock  已经解锁的 ——
+         *      g.delegate_unlock  已经解锁的
          *      h.delegate_reduction  赎回中的
          *
          */
 
+
         for (Map.Entry <String, CustomAddress> customAddress : BlockChain.ADDRESS_CACHE.getAll().entrySet()) {
             BigInteger stakingValue = BigInteger.ZERO;
             BigInteger delegateValue = BigInteger.ZERO;
+            BigInteger statkingRedeemed = BigInteger.ZERO;
+            BigInteger delegateReddemed = BigInteger.ZERO;
             BigInteger redeemedValue = BigInteger.ZERO;
             BigInteger candidateCount = BigInteger.ZERO;
             BigInteger delegateHes = BigInteger.ZERO;
             BigInteger delegateLocked = BigInteger.ZERO;
             BigInteger delegateUnlock = BigInteger.ZERO;
             BigInteger delegateReduction = BigInteger.ZERO;
-            for (CustomNode customNode : BlockChain.NODE_CACHE.getAllNode()) {
-                for (Map.Entry <Long, CustomStaking> customStakingMap : customNode.getStakings().entrySet()) {
-                    if (customStakingMap.getValue().getStakingAddr().equals(customAddress.getValue().getAddress())) {
-                        stakingValue = new BigInteger(customStakingMap.getValue().getStakingHas()).add(new BigInteger(customStakingMap.getValue().getStakingLocked()));
+            for (CustomStaking stakings : BlockChain.NODE_CACHE.getAllStaking()) {
+                if (stakings.getStakingAddr().equals(customAddress.getValue().getAddress())) {
+                    stakingValue = stakingValue.add(new BigInteger(stakings.getStakingHas()).add(new BigInteger(stakings.getStakingLocked())));
+                    statkingRedeemed = statkingRedeemed.add(new BigInteger(stakings.getStakingReduction()));
+                }
+
+            }
+            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(Collections.singletonList(CustomDelegation.YesNoEnum.NO))) {
+                if (delegation.getDelegateAddr().equals(customAddress.getValue().getAddress())) {
+                    delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
+                    delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));
+                    delegateHes = delegateHes.add(new BigInteger(delegation.getDelegateHas()));
+                    delegateLocked = delegateLocked.add(new BigInteger(delegation.getDelegateLocked()));
+                    delegateReduction = delegateReduction.add(new BigInteger(delegation.getDelegateReduction()));
+                    candidateCount = candidateCount.add(BigInteger.ONE);
+                    Integer status = new Integer(0);
+                    try {
+                        status = BlockChain.NODE_CACHE.getNode(delegation.getNodeId()).getStakings().get(delegation.getStakingBlockNum()).getStatus();
+                    } catch (NoSuchBeanException e) {
+                        throw new BusinessException("[DbService]supply Address info exception by dataOfAddressStatistics()");
                     }
-                    for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
-                        if(customDelegationMap.getValue().getDelegateAddr().equals(customAddress.getValue().getAddress()) &&
-                        customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO)){
-                            delegateValue = new BigInteger(customDelegationMap.getValue().getDelegateHas()).add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-
-
-                        }
+                    if(status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)){
+                        delegateUnlock = delegateUnlock.add(new BigInteger(delegation.getDelegateHas()));
                     }
                 }
             }
+            redeemedValue = statkingRedeemed.add(delegateReddemed);
+
+            //address引用对象更新
             customAddress.getValue().setStakingValue(stakingValue.toString());
             customAddress.getValue().setDelegateValue(delegateValue.toString());
-
+            customAddress.getValue().setRedeemedValue(redeemedValue.toString());
+            customAddress.getValue().setCandidateCount(candidateCount.intValue());
+            customAddress.getValue().setDelegateValue(delegateHes.toString());
+            customAddress.getValue().setDelegateLocked(delegateLocked.toString());
+            customAddress.getValue().setDelegateUnlock(delegateUnlock.toString());
+            customAddress.getValue().setDelegateReduction(delegateReduction.toString());
         }
     }
 
