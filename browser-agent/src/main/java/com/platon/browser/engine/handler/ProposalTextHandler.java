@@ -31,7 +31,7 @@ public class ProposalTextHandler implements EventHandler {
             //根据交易参数解析成对应文本提案结构
             CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
             CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithProposal(tx);
+            customProposal.updateWithCustomTransaction(tx);
             //获取配置文件提案参数模板
             String temp = bc.getChainConfig().getProposalUrlTemplate();
             String url = temp.replace(ProposalExecute.key,param.getPIDID());

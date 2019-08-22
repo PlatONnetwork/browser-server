@@ -85,6 +85,7 @@ public class NodeCache {
     }
 
     /**
+     * 缓存维护方法
      * 清扫全量缓存，移除历史数据
      */
     public void sweep(){
@@ -105,7 +106,5 @@ public class NodeCache {
             if(!valid) invalidCache.add(staking);
         });
         invalidCache.forEach(staking -> removeStaking(staking.getStakingBlockNum()));
-
-
     }
 }

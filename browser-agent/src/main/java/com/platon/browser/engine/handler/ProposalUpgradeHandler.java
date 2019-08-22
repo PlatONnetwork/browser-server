@@ -33,7 +33,7 @@ public class ProposalUpgradeHandler implements EventHandler{
             //根据交易参数解析成对应文本提案结构
             CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
             CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithProposal(tx);
+            customProposal.updateWithCustomTransaction(tx);
             //设置提案人
             customProposal.setVerifier(param.getVerifier());
             //设置提案人名称

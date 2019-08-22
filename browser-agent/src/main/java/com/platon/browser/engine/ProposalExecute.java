@@ -60,7 +60,7 @@ public class ProposalExecute {
         proposalList.forEach(proposal -> {
             CustomProposal customProposal = new CustomProposal();
             //构建结构
-            customProposal.bulidStructure(proposal);
+            customProposal.updateWithProposal(proposal);
             voteList.forEach(vote -> {
                 //关联提案的投票结果区分放入全量数据结构
                 if(vote.getProposalHash().equals(customProposal.getPipId())){

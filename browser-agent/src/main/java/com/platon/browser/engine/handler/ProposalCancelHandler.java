@@ -31,7 +31,7 @@ public class ProposalCancelHandler implements EventHandler{
             BlockChain bc = context.getBlockChain();
             CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
             CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithProposal(tx);
+            customProposal.updateWithCustomTransaction(tx);
             //设置提案人
             customProposal.setVerifier(param.getVerifier());
             //设置提案人名称

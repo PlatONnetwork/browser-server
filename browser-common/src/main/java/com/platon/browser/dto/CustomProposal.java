@@ -14,9 +14,6 @@ import java.util.*;
  */
 @Data
 public class CustomProposal extends Proposal {
-
-
-
     //赞成票
     private List <CustomVote> yesList = new ArrayList <>();
     //否决票
@@ -26,12 +23,11 @@ public class CustomProposal extends Proposal {
 
     public static final String queryFlag = "inquiry";
 
-
-    public void bulidStructure ( Proposal proposal ) {
+    public void updateWithProposal(Proposal proposal) {
         BeanUtils.copyProperties(proposal, this);
     }
 
-    public void updateWithProposal ( CustomTransaction tx ) {
+    public void updateWithCustomTransaction(CustomTransaction tx) {
         this.setHash(tx.getHash());
         this.setYeas(0L);
         this.setNays(0L);
@@ -40,13 +36,13 @@ public class CustomProposal extends Proposal {
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
         this.setTimestamp(tx.getTimestamp());
-        this.setStatus(StatusEnum.VOTEING.code);
+        this.setStatus(StatusEnum.VOTING.code);
         //设置成查询中，以便任务过滤并查询分析主题&描述
         this.setTopic(queryFlag);
         this.setDescription(queryFlag);
     }
 
-    public void updateInfoWithProposal(ProposalMarkDownDto proposalMarkDownDto)throws Exception{
+    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto)throws Exception{
        this.setTopic(proposalMarkDownDto.getTopic());
        this.setDescription(proposalMarkDownDto.getDescription());
     }
@@ -58,34 +54,26 @@ public class CustomProposal extends Proposal {
         ABSTENTION(3, "弃权");
         public int code;
         public String desc;
-
         OptionEnum ( int code, String desc ) {
             this.code = code;
             this.desc = desc;
         }
-
         public int getCode () {
             return code;
         }
-
         public String getDesc () {
             return desc;
         }
-
         private static Map <Integer, OptionEnum> ENUMS = new HashMap <>();
-
         static {
             Arrays.asList(OptionEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
-
         public static OptionEnum getEnum ( Integer code ) {
             return ENUMS.get(code);
         }
-
         public static boolean contains ( int code ) {
             return ENUMS.containsKey(code);
         }
-
         public static boolean contains ( OptionEnum en ) {
             return ENUMS.containsValue(en);
         }
@@ -97,76 +85,60 @@ public class CustomProposal extends Proposal {
         CANCEL(3, "取消提案");
         public int code;
         public String desc;
-
         TypeEnum ( int code, String desc ) {
             this.code = code;
             this.desc = desc;
         }
-
         public int getCode () {
             return code;
         }
-
         public String getDesc () {
             return desc;
         }
-
         private static Map <Integer, TypeEnum> ENUMS = new HashMap <>();
-
         static {
             Arrays.asList(TypeEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
-
         public static TypeEnum getEnum ( Integer code ) {
             return ENUMS.get(code);
         }
-
         public static boolean contains ( int code ) {
             return ENUMS.containsKey(code);
         }
-
         public static boolean contains ( TypeEnum en ) {
             return ENUMS.containsValue(en);
         }
     }
 
     public enum StatusEnum {
-        VOTEING(1, "投票中"),
+        VOTING(1, "投票中"),
         PASS(2, "通过"),
         FAIL(3, "失败"),
-        PREUPGRADE(4, "预升级"),
+        PRE_UPGRADE(4, "预升级"),
         FINISH(5, "生效"),
         CANCEL(6, "被取消");
         public int code;
         public String desc;
-
         StatusEnum ( int code, String desc ) {
             this.code = code;
             this.desc = desc;
         }
-
         public int getCode () {
             return code;
         }
-
         public String getDesc () {
             return desc;
         }
-
         private static Map <Integer, StatusEnum> ENUMS = new HashMap <>();
-
         static {
             Arrays.asList(StatusEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
-
         public static StatusEnum getEnum ( Integer code ) {
             return ENUMS.get(code);
         }
-
         public static boolean contains ( int code ) {
             return ENUMS.containsKey(code);
         }
-
         public static boolean contains ( TypeEnum en ) {
             return ENUMS.containsValue(en);
         }

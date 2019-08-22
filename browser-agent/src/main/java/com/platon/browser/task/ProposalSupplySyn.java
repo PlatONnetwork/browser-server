@@ -59,10 +59,10 @@ public class ProposalSupplySyn {
                         String proposalMarkString = MarkDownParserUtil.parserMD(customProposal.getUrl());
                         ProposalMarkDownDto proposalMarkDownDto = JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
                         if (customProposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code)  ) {
-                            customProposal.updateInfoWithProposal(proposalMarkDownDto);
+                            customProposal.updateWithProposalMarkDown(proposalMarkDownDto);
                         }
                         if(customProposal.getType().equals(CustomProposal.TypeEnum.CANCEL.code)){
-                            customProposal.updateInfoWithProposal(proposalMarkDownDto);
+                            customProposal.updateWithProposalMarkDown(proposalMarkDownDto);
                             //若是取消提案，则需要补充被取消提案相关信息
                             String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(customProposal.getCanceledPipId()).getUrl());
                             ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString,ProposalMarkDownDto.class);
@@ -76,7 +76,7 @@ public class ProposalSupplySyn {
 
                 }
                 //需要更新的提案结果，查询类型1.投票中 2.预升级
-                if (customProposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code) || customProposal.getStatus().equals(CustomProposal.StatusEnum.PREUPGRADE.code)) {
+                if (customProposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code) || customProposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
                     //发送rpc请求查询提案结果
                     try {
                         BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(customProposal.getPipId().toString()).send();

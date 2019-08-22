@@ -28,4 +28,14 @@ public class ProposalCache {
     public Map<Integer, CustomProposal> getAll(){
         return proposalMap;
     }
+
+    /**
+     * 缓存维护方法
+     * 清扫全量缓存，移除历史数据
+     */
+    public void sweep() {
+        /**
+         *
+         */
+    }
 }
