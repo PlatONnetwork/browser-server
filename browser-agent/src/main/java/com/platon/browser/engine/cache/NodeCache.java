@@ -76,4 +76,27 @@ public class NodeCache {
                                         .forEach(unDelegation -> returnData.add(unDelegation)))));
         return returnData;
     }
+
+    /**
+     * 清扫全量缓存，移除历史数据
+     */
+    public void sweep(){
+        // 取所有已退出状态质押记录
+        List<CustomStaking> exitedStakings = getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.EXITED));
+        List<CustomStaking> invalidCache = new ArrayList<>();
+        exitedStakings.forEach(staking -> {
+            boolean valid = false;
+            for(CustomDelegation delegation:staking.getDelegations().values()){
+                if(CustomDelegation.YesNoEnum.NO.code==delegation.getIsHistory()){
+                    // 只要有一条委托是非历史状态，则它所属的质押记录就不能从缓存中删除，标记其为有效
+                    valid = true;
+                    break;
+                }
+            }
+            if(!valid) invalidCache.add(staking);
+        });
+        invalidCache.forEach(staking -> {
+
+        });
+    }
 }

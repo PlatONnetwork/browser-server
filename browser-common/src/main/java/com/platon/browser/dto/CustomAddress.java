@@ -51,22 +51,6 @@ public class CustomAddress extends Address {
     }
 
     /**
-     * 更新与from地址相关的信息
-     * @param tx
-     */
-    public void updateFromWithCustomTransaction(CustomTransaction tx) {
-
-
-    }
-    /**
-     * 更新参数tx中to地址相关的信息
-     * @param tx
-     */
-    public void updateToWithCustomTransaction(CustomTransaction tx) {
-
-    }
-
-    /**
      * 更新与地址是from还是to无关的通用属性
      * @param tx
      */
