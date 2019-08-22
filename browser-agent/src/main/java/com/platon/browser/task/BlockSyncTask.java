@@ -378,7 +378,7 @@ public class BlockSyncTask {
         return tx;
     }
 
-    public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
+    public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData) throws BusinessException {
         try{
             // 串行批量入库
             service.insertOrUpdate(basicData,bizData);
