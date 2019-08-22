@@ -1,10 +1,12 @@
 package com.platon.browser.now.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
+import com.platon.browser.dao.mapper.UnDelegationMapper;
 import com.platon.browser.dto.CustomProposal.TypeEnum;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
@@ -16,11 +18,16 @@ import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.TransactionRedis;
 import com.platon.browser.req.PageReq;
+import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
+import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.transaction.TransactionDetailReq;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -50,6 +57,8 @@ public class TransactionServiceImpl implements TransactionService {
     private I18nUtil i18n;
     @Autowired
     private BlockMapper blockMapper;
+    @Autowired
+    private UnDelegationMapper unDelegationMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
 
@@ -256,4 +265,170 @@ public class TransactionServiceImpl implements TransactionService {
         accountDownload.setLength(byteArrayOutputStream.size());
         return accountDownload;
     }
+    
+    @Override
+    public BaseResp<TransactionDetailsResp> transactionDetails(@Valid TransactionDetailsReq req) {
+    	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
+    	TransactionDetailsResp resp = new TransactionDetailsResp();
+    	if(transaction!=null) {
+    		resp.setTxHash(transaction.getHash());
+    		resp.setFrom(transaction.getFrom());
+    		resp.setTo(transaction.getTo());
+    		resp.setTimestamp(transaction.getTimestamp().getTime());
+    		resp.setServerTime(new Date().getTime());
+    		// "confirmNum":444,         //区块确认数
+    		List<TransactionRedis> items = statisticCacheService.getTransactionCache(0, 1);
+    		resp.setConfirmNum(String.valueOf(items.get(0).getBlockNumber()-transaction.getBlockNumber()));
+    		resp.setBlockNumber(transaction.getBlockNumber());
+    		resp.setGasLimit(Long.parseLong(transaction.getGasLimit()));
+    		resp.setGasUsed(Long.parseLong(transaction.getGasUsed()));
+    		resp.setGasPrice(Long.parseLong(transaction.getGasPrice()));
+    		resp.setValue(Long.parseLong(transaction.getValue()));
+    		resp.setActualTxCost(transaction.getActualTxCost());
+    		resp.setTxType(transaction.getTxType());
+    		resp.setInput(transaction.getInput());
+    		resp.setTxInfo(transaction.getTxInfo());
+    		resp.setFailReason(transaction.getFailReason());
+    		/*
+    		 * "first":false,            //是否第一条记录
+    		 * "last":true,              //是否最后一条记录
+    		 */
+    		TransactionExample condition = new TransactionExample();
+    		condition.createCriteria().andSequenceLessThan(transaction.getSequence());
+    		PageHelper.startPage(1,1);
+    		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
+    		if(transactionList.size()==0){
+    			resp.setFirst(true);
+    		}
+    		condition = new TransactionExample();
+    		condition.createCriteria().andSequenceGreaterThan(transaction.getSequence());
+    		PageHelper.startPage(1,1);
+    		transactionList = transactionMapper.selectByExample(condition);
+    		if(transactionList.size()==0){
+    			resp.setLast(true);
+    		}
+    		
+    		resp.setReceiveType("account");
+    		String txInfo = transaction.getTxInfo();
+    		JSONObject txInfoJson = JSONObject.parseObject(txInfo);
+    		UnDelegation unDelegation = null;
+    		switch (transaction.getTxType()) {
+			case "1000":
+				resp.setBenefitAddr(txInfoJson.getString("benefitAddress"));
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				resp.setExternalId(txInfoJson.getString("externalId"));
+				resp.setWebsite(txInfoJson.getString("website"));
+				resp.setDetails(txInfoJson.getString("details"));
+				resp.setProgramVersion(txInfoJson.getString("programVersion"));
+				resp.setValue(txInfoJson.getLong("amount"));
+				break;
+			case "1001":
+				resp.setBenefitAddr(txInfoJson.getString("benefitAddress"));
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				resp.setExternalId(txInfoJson.getString("externalId"));
+				resp.setWebsite(txInfoJson.getString("website"));
+				resp.setDetails(txInfoJson.getString("details"));
+				resp.setProgramVersion(txInfoJson.getString("programVersion"));
+				break;
+			case "1002":
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				resp.setValue(txInfoJson.getLong("amount"));
+				break;
+			case "1003":
+				// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
+				if(unDelegation!=null) {
+					resp.setApplyAmount(unDelegation.getApplyAmount());
+					resp.setRedeemLocked(unDelegation.getRedeemLocked());
+					resp.setRedeemStatus(unDelegation.getStatus().toString());
+					resp.setRedeemUnLockedBlock(unDelegation.getStakingBlockNum().toString());
+				}
+				break;
+			case "1004":
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				break;
+			case "1005":
+				// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
+				// 通过txHash关联un_delegation表
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
+				if(unDelegation!=null) {
+					resp.setApplyAmount(unDelegation.getApplyAmount());
+					resp.setRedeemLocked(unDelegation.getRedeemLocked());
+					resp.setRedeemStatus(unDelegation.getStatus().toString());
+				}
+				break;
+			case "2000":
+			case "2001":
+			case "2002":
+				// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				
+				break;
+			case "2003":
+				// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
+				resp.setNodeId(txInfoJson.getString("nodeId"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				break;
+			case "2004":
+				resp.setNodeId(txInfoJson.getString("activeNode"));
+				resp.setNodeName(txInfoJson.getString("nodeName"));
+				resp.setDeclareVersion(txInfoJson.getString("version"));
+				break;
+			case "4000":
+				// RPAccount + value + RPPlan
+				resp.setRPAccount(txInfoJson.getString("account"));
+				resp.setValue(txInfoJson.getJSONObject("plan").getLong("amount"));
+//				resp.setRPPlan();
+				break;
+			}
+    	}
+    	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+    }
+    
+    @Override
+    public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
+    	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
+    	TransactionExample condition = new TransactionExample();
+    	TransactionExample.Criteria criteria = condition.createCriteria();
+    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+    	case PREV:
+	    	criteria.andSequenceLessThan(currentDetail.getSequence());
+	    	condition.setOrderByClause("sequence desc");
+	    	break;
+    	case NEXT:
+	    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
+	    	condition.setOrderByClause("sequence asc");
+	    	break;
+    	}
+    	PageHelper.startPage(1,1);
+    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+    	if(transactions.size()==0){
+    		logger.error("invalid transaction hash {}",req.getTxHash());
+    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
+    	}
+
+    	TransactionWithBLOBs transaction = transactions.get(0);
+    	TransactionListResp resp = new TransactionListResp();
+    	resp.setTxHash(transaction.getHash());
+    	resp.setFrom(transaction.getFrom());
+    	resp.setTo(transaction.getTo());
+    	resp.setValue(transaction.getValue());
+    	resp.setActualTxCost(transaction.getActualTxCost());
+    	resp.setTxType(transaction.getTxType());
+    	resp.setServerTime(new Date().getTime());
+    	resp.setTimestamp(transaction.getTimestamp().getTime());
+    	resp.setBlockNumber(transaction.getBlockNumber());
+    	resp.setFailReason(transaction.getFailReason());
+    	resp.setReceiveType(transaction.getReceiveType());
+    	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+    }
+    
 }
