@@ -278,11 +278,14 @@ public class StakingServiceImpl implements StakingService {
 			DelegationStaking delegationStaking = delegationStakings.get(i);
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
-			byStakingResp.setDelegateValue(new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
+			String delValue = new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
+			byStakingResp.setDelegateValue(EnergonUtil.format(Convert.fromVon(delValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			// "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
-			byStakingResp.setDelegateLocked(delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0");
-			byStakingResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
+			String deleLock = delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0";
+			byStakingResp.setDelegateLocked(EnergonUtil.format(Convert.fromVon(deleLock, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			
+			byStakingResp.setAllDelegateLocked(EnergonUtil.format(Convert.fromVon(delegationStaking.getStatDelegateLocked(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			lists.add(byStakingResp);
 		}
 		long size = delegationMapper.countByExample(delegationExample);
@@ -308,13 +311,17 @@ public class StakingServiceImpl implements StakingService {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			byAddressResp.setNodeId(delegationStaking.getNodeId());
 			byAddressResp.setNodeName(delegationStaking.getStakingName());
-			byAddressResp.setDelegateValue(new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
-			byAddressResp.setDelegateHas(delegationStaking.getStatus()==2?delegationStaking.getDelegateHas():"0");
-			byAddressResp.setDelegateLocked(delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0");
-			byAddressResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
-			byAddressResp.setDelegateUnlock(delegationStaking.getStatus()==2?"0":new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString());
+			String deleValue = new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
+			byAddressResp.setDelegateValue(EnergonUtil.format(Convert.fromVon(deleValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			String deletgateHas = delegationStaking.getStatus()==2?delegationStaking.getDelegateHas():"0";
+			byAddressResp.setDelegateHas(EnergonUtil.format(Convert.fromVon(deletgateHas, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			String deletgateLock = delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0";
+			byAddressResp.setDelegateLocked(EnergonUtil.format(Convert.fromVon(deletgateLock, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			byAddressResp.setAllDelegateLocked(EnergonUtil.format(Convert.fromVon(delegationStaking.getStatDelegateLocked(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			String deletgateUnLock = delegationStaking.getStatus()==2?"0":new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
+			byAddressResp.setDelegateUnlock(EnergonUtil.format(Convert.fromVon(deletgateUnLock, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			byAddressResp.setDelegateReduction(delegationStaking.getDelegateReduction());
 			lists.add(byAddressResp);
 		}

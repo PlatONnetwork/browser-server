@@ -22,6 +22,11 @@ loglevel:
 
 #初始化链相关的配置
 platon.config:
+  #初始验证人锁定质押金(LAT)
+  initValidatorStakingLockedAmount: 10000000
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #链ID
   chainId: 101
   #PlatON初始总发行量
   initIssueAmount: 10000000000
@@ -73,8 +78,6 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
-  #质押账户地址
-
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址

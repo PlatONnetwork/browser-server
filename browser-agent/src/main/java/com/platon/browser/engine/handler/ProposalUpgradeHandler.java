@@ -60,7 +60,7 @@ public class ProposalUpgradeHandler implements EventHandler{
             customProposal.setCanceledPipId(0);
             customProposal.setCanceledTopic("");
             //新增文本提案交易结构
-            proposalExecuteResult.getAddProposals().add(customProposal);
+            proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
             bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
         }catch (NoSuchBeanException e){

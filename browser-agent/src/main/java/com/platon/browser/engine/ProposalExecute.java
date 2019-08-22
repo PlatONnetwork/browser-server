@@ -64,7 +64,7 @@ public class ProposalExecute {
                 //关联提案的投票结果区分放入全量数据结构
                 if(vote.getProposalHash().equals(customProposal.getPipId())){
                     CustomVote customVote = new CustomVote();
-                    customVote.bulidStructure(vote);
+                    customVote.buildStructure(vote);
                     if(Integer.valueOf(vote.getOption()).equals(CustomProposal.OptionEnum.SUPPORT.code)){
                         //构建提案关联支持票结构
                         customProposal.getYesList().add(customVote);
@@ -99,10 +99,6 @@ public class ProposalExecute {
             case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //其他叫取消提案
             case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
         }
-    }
-
-    public ProposalExecuteResult exportResult(){
-        return executeResult;
     }
 
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){

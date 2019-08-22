@@ -3,10 +3,8 @@ package com.platon.browser.service;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.engine.result.AddressExecuteResult;
-import com.platon.browser.engine.result.BlockChainResult;
-import com.platon.browser.engine.result.ProposalExecuteResult;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.result.*;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: dongqile
@@ -46,30 +45,42 @@ public class DbService {
     private CustomVoteMapper customVoteMapper;
     @Autowired
     private CustomAddressMapper customAddressMapper;
+    @Autowired
+    private  CustomNetworkStatMapper customNetworkStatMapper;
 
     @Autowired
     private BlockCacheService blockCacheService;
     @Autowired
     private TransactionCacheService transactionCacheService;
+    @Autowired
+    private NetworkStatCacheService networkStatCacheService;
+
 
     @Transactional
-    public void insertOrUpdateChainInfo (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
+    public void insertOrUpdate (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {
             blocks.add(block);
             transactions.addAll(block.getTransactionList());
         });
-        // 批量入库区块数据
+        // 批量入库区块数据并更新redis缓存
         if (blocks.size() > 0) {
             blockMapper.batchInsert(blocks);
             blockCacheService.update(new HashSet<>(blocks));
         }
-        // 批量入库交易数据
+        // 批量入库交易数据并更新redis缓存
         if (transactions.size() > 0) {
             transactionMapper.batchInsert(transactions);
             transactionCacheService.update(new HashSet<>(transactions));
         }
+        // 统计数据入库并更新redis缓存
+        NetworkStatResult nsr = bizData.getNetworkStatResult();
+        if(nsr.getUpdateNetworkStats().size()>0){
+            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getUpdateNetworkStats(),NetworkStat.Column.values());
+            networkStatCacheService.update(nsr.getUpdateNetworkStats());
+        }
+
 
         // 质押相关数据
         StakingExecuteResult ser = bizData.getStakingExecuteResult();
@@ -100,10 +111,6 @@ public class DbService {
         //批量入库新增投票数据
         if (per.getAddVotes().size() > 0) customVoteMapper.batchInsertOrUpdateSelective(per.getAddVotes(),Vote.Column.values());
 
-        // ****************新增地址相关数据*******************
-        //批量入库地址新增数据
-        if(aer.getAddAddress().size()>0) customAddressMapper.batchInsertOrUpdateSelective(aer.getAddAddress(),Address.Column.values());
-        //批量入库统计数据
         /*****************************批量新增操作 END**************************/
 
 
@@ -122,9 +129,38 @@ public class DbService {
         //批量更新提案
         if (per.getUpdateProposals().size() > 0) customProposalMapper.batchInsertOrUpdateSelective(per.getUpdateProposals(),Proposal.Column.values());
 
-        // ****************更新地址相关数据*******************
-        //批量更新地址
-        if(aer.getUpdateAddress().size()>0) customAddressMapper.batchInsertOrUpdateSelective(aer.getUpdateAddress(),Address.Column.values());
+        // ****************批量插入或更新地址相关数据*******************
+        Set<Address> addresses = aer.export();
+        if(addresses.size()>0) {
+            customAddressMapper.batchInsertOrUpdateSelective(addresses,Address.Column.values());
+        }
         /*****************************批量更新操作 END**************************/
+
+
     }
+
+    public void dataStatistics(){
+        //1.补充统计质押相关数据
+        //  a.stat_delegate_has  关联的委托记录中犹豫期金额汇总
+        //  b.stat_delegate_locked  关联的委托记录中锁定期金额汇总
+        //  c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
+        //  d.stat_delegate_qty  关联的委托地址数
+        BlockChain.NODE_CACHE.getAll().forEach((nodeId,node) ->{
+                node.getStakings().forEach((blockNumber,staking)->{
+                    
+                });
+        });
+        //2.补充统计地址相关数据
+        //  a.staking_value  质押的金额
+        //  b.delegate_value  委托的金额
+        //  c.redeemed_value   赎回中的金额，包含委托和质押
+        //  d.candidate_count   已委托的验证人
+        //  e.delegate_hes   未锁定委托
+        //  f.delegate_locked   已锁定委托
+        //  g.delegate_unlock  已经解锁的
+        //  h.delegate_reduction  赎回中的
+
+    }
+
+
 }

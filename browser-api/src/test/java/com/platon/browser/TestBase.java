@@ -6,6 +6,8 @@ import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.TransactionTypeEnum;
+import com.platon.browser.now.service.BlockService;
+import com.platon.browser.now.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;

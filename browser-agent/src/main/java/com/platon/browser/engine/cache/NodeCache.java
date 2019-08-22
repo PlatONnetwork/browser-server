@@ -33,6 +33,9 @@ public class NodeCache {
         nodeMap.put(node.getNodeId(),node);
     }
 
+    public Map<String, CustomNode> getAll(){
+        return nodeMap;
+    }
     /**
      * 获取指定状态的所有质押信息
      * @param statuses

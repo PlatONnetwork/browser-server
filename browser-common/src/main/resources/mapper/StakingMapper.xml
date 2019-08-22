@@ -35,7 +35,9 @@
     <result column="is_init" jdbcType="INTEGER" property="isInit" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="annualized_rate_info" jdbcType="VARCHAR" property="annualizedRateInfo" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Staking">
+    <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -101,9 +103,27 @@
     stat_delegate_reduction, stat_delegate_qty, stat_verifier_time, staking_name, staking_icon, 
     external_id, denefit_addr, expected_income, block_reward_value, pre_cons_block_qty, 
     cur_cons_block_qty, program_version, staking_reward_value, web_site, details, join_time, 
-    leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time, 
+    leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time
+  </sql>
+  <sql id="Blob_Column_List">
     annualized_rate_info
   </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.StakingExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from staking
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.StakingExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -118,9 +138,11 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.StakingKey" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.StakingKey" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from staking
     where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
@@ -160,7 +182,7 @@
       #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP}, 
       #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{isConsensus,jdbcType=INTEGER}, 
       #{isSetting,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{annualizedRateInfo,jdbcType=VARCHAR})
+      #{updateTime,jdbcType=TIMESTAMP}, #{annualizedRateInfo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Staking">
     insert into staking
@@ -369,7 +391,7 @@
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="annualizedRateInfo != null">
-        #{annualizedRateInfo,jdbcType=VARCHAR},
+        #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -482,9 +504,49 @@
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.annualizedRateInfo != null">
-        annualized_rate_info = #{record.annualizedRateInfo,jdbcType=VARCHAR},
+        annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
     </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update staking
+    set staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      staking_tx_index = #{record.stakingTxIndex,jdbcType=INTEGER},
+      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
+      staking_has = #{record.stakingHas,jdbcType=VARCHAR},
+      staking_locked = #{record.stakingLocked,jdbcType=VARCHAR},
+      staking_reduction_epoch = #{record.stakingReductionEpoch,jdbcType=INTEGER},
+      staking_reduction = #{record.stakingReduction,jdbcType=VARCHAR},
+      stat_delegate_has = #{record.statDelegateHas,jdbcType=VARCHAR},
+      stat_delegate_locked = #{record.statDelegateLocked,jdbcType=VARCHAR},
+      stat_delegate_reduction = #{record.statDelegateReduction,jdbcType=VARCHAR},
+      stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
+      stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
+      staking_name = #{record.stakingName,jdbcType=VARCHAR},
+      staking_icon = #{record.stakingIcon,jdbcType=VARCHAR},
+      external_id = #{record.externalId,jdbcType=VARCHAR},
+      denefit_addr = #{record.denefitAddr,jdbcType=VARCHAR},
+      expected_income = #{record.expectedIncome,jdbcType=VARCHAR},
+      block_reward_value = #{record.blockRewardValue,jdbcType=VARCHAR},
+      pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
+      cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      program_version = #{record.programVersion,jdbcType=VARCHAR},
+      staking_reward_value = #{record.stakingRewardValue,jdbcType=VARCHAR},
+      web_site = #{record.webSite,jdbcType=VARCHAR},
+      details = #{record.details,jdbcType=VARCHAR},
+      join_time = #{record.joinTime,jdbcType=TIMESTAMP},
+      leave_time = #{record.leaveTime,jdbcType=TIMESTAMP},
+      `status` = #{record.status,jdbcType=INTEGER},
+      is_consensus = #{record.isConsensus,jdbcType=INTEGER},
+      is_setting = #{record.isSetting,jdbcType=INTEGER},
+      is_init = #{record.isInit,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -523,8 +585,7 @@
       is_setting = #{record.isSetting,jdbcType=INTEGER},
       is_init = #{record.isInit,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -626,9 +687,46 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="annualizedRateInfo != null">
-        annualized_rate_info = #{annualizedRateInfo,jdbcType=VARCHAR},
+        annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
     </set>
+    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
+      and node_id = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Staking">
+    update staking
+    set staking_tx_index = #{stakingTxIndex,jdbcType=INTEGER},
+      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
+      staking_has = #{stakingHas,jdbcType=VARCHAR},
+      staking_locked = #{stakingLocked,jdbcType=VARCHAR},
+      staking_reduction_epoch = #{stakingReductionEpoch,jdbcType=INTEGER},
+      staking_reduction = #{stakingReduction,jdbcType=VARCHAR},
+      stat_delegate_has = #{statDelegateHas,jdbcType=VARCHAR},
+      stat_delegate_locked = #{statDelegateLocked,jdbcType=VARCHAR},
+      stat_delegate_reduction = #{statDelegateReduction,jdbcType=VARCHAR},
+      stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
+      stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
+      staking_name = #{stakingName,jdbcType=VARCHAR},
+      staking_icon = #{stakingIcon,jdbcType=VARCHAR},
+      external_id = #{externalId,jdbcType=VARCHAR},
+      denefit_addr = #{denefitAddr,jdbcType=VARCHAR},
+      expected_income = #{expectedIncome,jdbcType=VARCHAR},
+      block_reward_value = #{blockRewardValue,jdbcType=VARCHAR},
+      pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
+      cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      program_version = #{programVersion,jdbcType=VARCHAR},
+      staking_reward_value = #{stakingRewardValue,jdbcType=VARCHAR},
+      web_site = #{webSite,jdbcType=VARCHAR},
+      details = #{details,jdbcType=VARCHAR},
+      join_time = #{joinTime,jdbcType=TIMESTAMP},
+      leave_time = #{leaveTime,jdbcType=TIMESTAMP},
+      `status` = #{status,jdbcType=INTEGER},
+      is_consensus = #{isConsensus,jdbcType=INTEGER},
+      is_setting = #{isSetting,jdbcType=INTEGER},
+      is_init = #{isInit,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
     where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -664,8 +762,7 @@
       is_setting = #{isSetting,jdbcType=INTEGER},
       is_init = #{isInit,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      annualized_rate_info = #{annualizedRateInfo,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -698,7 +795,7 @@
         #{item.webSite,jdbcType=VARCHAR}, #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, 
         #{item.leaveTime,jdbcType=TIMESTAMP}, #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, 
         #{item.isSetting,jdbcType=INTEGER}, #{item.isInit,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=VARCHAR}
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         )
     </foreach>
   </insert>
@@ -817,7 +914,7 @@
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
-          #{item.annualizedRateInfo,jdbcType=VARCHAR}
+          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         </if>
       </foreach>
       )

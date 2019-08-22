@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 public class CustomVote extends Vote {
 
-    public void bulidStructure( Vote vote){
+    public void buildStructure( Vote vote){
         BeanUtils.copyProperties(vote,this);
     }
 

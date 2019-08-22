@@ -27,6 +27,11 @@ web3j:
 
 #初始化链相关的配置
 platon.config:
+  #初始验证人锁定质押金(LAT)
+  initValidatorStakingLockedAmount: 10000000
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #链ID
   chainId: 101
   #PlatON初始总发行量
   initIssueAmount: 10000000000
@@ -98,6 +103,8 @@ platon.config:
     '7':15044304.0698633,
     '8':7615018.10943699
   }
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
 
 brokenHost: 192.168.16.173  
 brokenPort: 61613

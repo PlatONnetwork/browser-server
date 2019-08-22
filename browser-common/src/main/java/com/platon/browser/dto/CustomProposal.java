@@ -3,6 +3,7 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Proposal;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.platon.bean.TallyResult;
 
 import java.util.*;
 
@@ -43,6 +44,11 @@ public class CustomProposal extends Proposal {
         //设置成查询中，以便任务过滤并查询分析主题&描述
         this.setTopic(queryFlag);
         this.setDescription(queryFlag);
+    }
+
+    public void updateInfoWithProposal(ProposalMarkDownDto proposalMarkDownDto)throws Exception{
+       this.setTopic(proposalMarkDownDto.getTopic());
+       this.setDescription(proposalMarkDownDto.getDescription());
     }
 
 

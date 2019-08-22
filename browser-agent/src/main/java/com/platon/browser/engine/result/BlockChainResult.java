@@ -1,5 +1,6 @@
 package com.platon.browser.engine.result;
 
+import com.platon.browser.dto.CustomNetworkStat;
 import lombok.Data;
 
 /**
@@ -12,9 +13,12 @@ public class BlockChainResult {
     private ProposalExecuteResult proposalExecuteResult=new ProposalExecuteResult();
     private StakingExecuteResult stakingExecuteResult=new StakingExecuteResult();
     private AddressExecuteResult addressExecuteResult =new AddressExecuteResult();
+    private NetworkStatResult networkStatResult =new NetworkStatResult();
+
     public void clear(){
         proposalExecuteResult.clear();
         stakingExecuteResult.clear();
         addressExecuteResult.clear();
+        networkStatResult.clear();
     }
 }

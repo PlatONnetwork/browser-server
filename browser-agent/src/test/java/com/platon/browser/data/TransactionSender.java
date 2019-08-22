@@ -1,5 +1,6 @@
 package com.platon.browser.data;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import java.util.List;
 public class TransactionSender {
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-    private Credentials credentials = WalletUtils.loadCredentials("11111111","D:\\Workspace\\browser-server\\browser-agent\\src\\test\\resources\\wallet.json");
+    private Credentials credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
@@ -42,6 +43,7 @@ public class TransactionSender {
     @Test
     public void transfer() throws Exception {
         Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+        logger.error("{}",Hex.toHexString(credentials.getEcKeyPair().getPrivateKey().toByteArray()));
         BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
         Transfer.sendFunds(
                 web3j,

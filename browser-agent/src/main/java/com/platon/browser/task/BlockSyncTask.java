@@ -9,7 +9,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.result.BlockChainResult;
-import com.platon.browser.enums.InnerContractAddEnum;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.*;
@@ -24,13 +24,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
-import org.web3j.platon.contracts.DelegateContract;
-import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -95,12 +94,16 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws CandidateException {
+    public void init () throws CandidateException, IssueEpochChangeException {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
-        if (maxBlockNumber != null && maxBlockNumber > 0) commitBlockNumber = maxBlockNumber;
+        if (maxBlockNumber != null && maxBlockNumber > 0) {
+            commitBlockNumber = maxBlockNumber;
+            blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
+        }
+
 
         /**
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -108,6 +111,7 @@ public class BlockSyncTask {
          * 查询内置结算周期验证人初始化blockChain的curVerifier属性
           */
         if(maxBlockNumber==null){
+
             // 如果库里区块为空，则：
             try {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
@@ -139,6 +143,8 @@ public class BlockSyncTask {
                         staking.setStakingIcon("");
                         staking.setIsInit(1);
                         staking.setIsSetting(1);
+                        BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
+                        staking.setStakingLocked(stakingLocked.toString());
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                         if(blockChain.getCurValidator().get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                         // 暂存至新增质押待入库列表
@@ -147,7 +153,7 @@ public class BlockSyncTask {
                         blockChain.getCurVerifier().put(HexTool.prefix(verifier.getNodeId()),verifier);
                     });
                     BlockChainResult bcr = blockChain.exportResult();
-                    service.insertOrUpdateChainInfo(Collections.EMPTY_LIST,bcr);
+                    batchSaveResult(Collections.EMPTY_LIST,bcr);
                     blockChain.commitResult();
                 }
                 // 通知质押引擎重新初始化节点缓存
@@ -156,6 +162,7 @@ public class BlockSyncTask {
                 throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
             }
         }
+
     }
 
     public void start () throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException {
@@ -360,7 +367,7 @@ public class BlockSyncTask {
 
 
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddEnum.innerContractList.contains(tx.getTo())){
+            if(null != tx.getValue() && ! InnerContractAddrEnum.addresses.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
@@ -374,9 +381,8 @@ public class BlockSyncTask {
 
     public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
         try{
-
             // 串行批量入库
-            service.insertOrUpdateChainInfo(basicData,bizData);
+            service.insertOrUpdate(basicData,bizData);
         }catch (Exception e){
             logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());

@@ -1,19 +1,22 @@
 package com.platon.browser.engine;
 
+import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
-import com.platon.browser.dao.mapper.NetworkStatMapper;
-import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
+import com.platon.browser.task.BlockSyncTask;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,8 @@ public class BlockChain {
     @Autowired
     private StakingMapper stakingMapper;
     @Autowired
+    private BlockMapper blockMapper;
+    @Autowired
     private DbService dbService;
     @Autowired
     private PlatonClient client;
@@ -67,6 +72,8 @@ public class BlockChain {
     public static final Map <String, CustomProposal> PROPOSALS_CACHE = new HashMap <>();
     // 全量统计数据
     public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
+    // 全量数据，需要根据业务变化，保持与数据库一致
+    public static final AddressCache ADDRESS_CACHE = new AddressCache();
     // 当前结算周期轮数
     private BigInteger curSettingEpoch;
     // 当前共识周期轮数
@@ -84,7 +91,6 @@ public class BlockChain {
     // 每个增发周期内有几个结算周期
     private BigInteger settleEpochCountPerIssueEpoch;
 
-
     /***
      * 以下字段业务使用说明：
      * 在当前共识周期发生选举的时候，需要对上一共识周期的验证节点计算出块率，如果发现出块率低的节点，就要看此节点是否在curValidator中，如果在则
@@ -99,8 +105,14 @@ public class BlockChain {
     // 当前共识周期验证人
     private Map <String, org.web3j.platon.bean.Node> curValidator = new HashMap <>();
 
+    // 使用特定区块号初始化区块奖励和结算周期奖励
+    public void initBlockRewardAndSettleReward(Long blockNumber) throws IssueEpochChangeException {
+        blockChainHandler.initEpoch(blockNumber);
+        blockChainHandler.initBlockRewardAndStakingReward(blockNumber);
+    }
+
     @PostConstruct
-    private void init () {
+    private void init () throws IssueEpochChangeException {
         // 初始化区块处理器
         blockChainHandler.init(this);
 
@@ -113,8 +125,6 @@ public class BlockChain {
         List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
         if (networkStats.size() != 0) {
             BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
-        }else {
-            BeanUtils.copyProperties(new CustomNetworkStat(),NETWORK_STAT_CACHE);
         }
     }
 
@@ -162,5 +172,4 @@ public class BlockChain {
     public void commitResult () {
         STAGE_BIZ_DATA.clear();
     }
-
 }

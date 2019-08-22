@@ -58,7 +58,7 @@ public class ProposalCancelHandler implements EventHandler{
             customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.get(param.getPIDID().toString()).getTopic());
             customProposal.setNewVersion("");
             //更新新增提案列表
-            proposalExecuteResult.getAddProposals().add(customProposal);
+            proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
             bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
         }catch (Exception e){

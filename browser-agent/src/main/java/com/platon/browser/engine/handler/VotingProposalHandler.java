@@ -33,8 +33,8 @@ public class VotingProposalHandler implements EventHandler {
             CustomVote customVote = new CustomVote();
             customVote.updateWithVote(tx,param);
             customVote.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            proposalExecuteResult.getAddVotes().add(customVote);
             //全量数据回填
+            proposalExecuteResult.stageAddVotes(customVote);
             //支持票集合
             if(CustomProposal.OptionEnum.SUPPORT.code == Integer.valueOf(customVote.getOption())){
                 bc.PROPOSALS_CACHE.get(param.getProposalId()).getYesList().add(customVote);

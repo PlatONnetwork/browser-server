@@ -2,8 +2,6 @@ package com.platon.browser.now.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -12,9 +10,7 @@ import com.platon.browser.dao.entity.VoteExample;
 import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.VoteService;
-import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.VoteListRequest;
-import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.res.proposal.VoteListResp;
 import com.platon.browser.util.BeanConvertUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -37,10 +33,10 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public RespPage<VoteListResp> queryByProposal(VoteListRequest voteListRequest) {
-        RespPage<VoteListResp> respPage = new RespPage();
+        RespPage<VoteListResp> respPage = new RespPage<>();
         respPage.setTotalCount(0);
         respPage.setTotalPages(0);
-        Page page = PageHelper.startPage(voteListRequest.getPageNo(), voteListRequest.getPageSize(), true);
+        Page<?> page = PageHelper.startPage(voteListRequest.getPageNo(), voteListRequest.getPageSize(), true);
         VoteExample voteExample = new VoteExample();
         VoteExample.Criteria criteria = voteExample.createCriteria();
         criteria.andProposalHashEqualTo(voteListRequest.getProposalHash());

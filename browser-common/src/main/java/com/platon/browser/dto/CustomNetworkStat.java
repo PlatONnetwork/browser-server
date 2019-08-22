@@ -1,7 +1,6 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.NetworkStat;
-import jnr.ffi.annotations.In;
 
 /**
  * User: dongqile
@@ -11,6 +10,7 @@ import jnr.ffi.annotations.In;
 public class CustomNetworkStat extends NetworkStat {
 
     public CustomNetworkStat () {
+        this.setId(1); // 只有一条数据，默认ID为1
         this.setCurrentNumber(0L);
         this.setNodeName("");
         this.setNodeId("");

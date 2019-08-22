@@ -19,15 +19,21 @@ public interface StakingMapper {
 
     int insertSelective(Staking record);
 
+    List<Staking> selectByExampleWithBLOBs(StakingExample example);
+
     List<Staking> selectByExample(StakingExample example);
 
     Staking selectByPrimaryKey(StakingKey key);
 
     int updateByExampleSelective(@Param("record") Staking record, @Param("example") StakingExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") Staking record, @Param("example") StakingExample example);
+
     int updateByExample(@Param("record") Staking record, @Param("example") StakingExample example);
 
     int updateByPrimaryKeySelective(Staking record);
+
+    int updateByPrimaryKeyWithBLOBs(Staking record);
 
     int updateByPrimaryKey(Staking record);
 
