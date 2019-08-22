@@ -80,29 +80,29 @@ public class CustomProposal extends Proposal {
     }
 
     public enum TypeEnum {
-        TEXT(1, "文本提案"),
-        UPGRADE(2, "升级提案"),
-        CANCEL(3, "取消提案");
-        public int code;
+        TEXT("1", "文本提案"),
+        UPGRADE("2", "升级提案"),
+        CANCEL("3", "取消提案");
+        public String code;
         public String desc;
-        TypeEnum ( int code, String desc ) {
+        TypeEnum ( String code, String desc ) {
             this.code = code;
             this.desc = desc;
         }
-        public int getCode () {
+        public String getCode () {
             return code;
         }
         public String getDesc () {
             return desc;
         }
-        private static Map <Integer, TypeEnum> ENUMS = new HashMap <>();
+        private static Map <String, TypeEnum> ENUMS = new HashMap <>();
         static {
             Arrays.asList(TypeEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
-        public static TypeEnum getEnum ( Integer code ) {
+        public static TypeEnum getEnum ( String code ) {
             return ENUMS.get(code);
         }
-        public static boolean contains ( int code ) {
+        public static boolean contains ( String code ) {
             return ENUMS.containsKey(code);
         }
         public static boolean contains ( TypeEnum en ) {
