@@ -161,7 +161,7 @@ public class DbService {
          *      c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
          *      d.stat_delegate_qty  关联的委托地址数
          */
-        BlockChain.NODE_CACHE.getAll().values().forEach(node -> {
+        BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
             for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
                 //只统计不为历史的委托数据
                 BigInteger statDelegateHas = BigInteger.ZERO;
@@ -207,8 +207,8 @@ public class DbService {
             BigInteger delegateLocked = BigInteger.ZERO;
             BigInteger delegateUnlock = BigInteger.ZERO;
             BigInteger delegateReduction = BigInteger.ZERO;
-            for (Map.Entry <String, CustomNode> customNodeEntry : BlockChain.NODE_CACHE.getAll().entrySet()) {
-                for (Map.Entry <Long, CustomStaking> customStakingMap : customNodeEntry.getValue().getStakings().entrySet()) {
+            for (CustomNode customNode : BlockChain.NODE_CACHE.getAllNode()) {
+                for (Map.Entry <Long, CustomStaking> customStakingMap : customNode.getStakings().entrySet()) {
                     if (customStakingMap.getValue().getStakingAddr().equals(customAddress.getValue().getAddress())) {
                         stakingValue = new BigInteger(customStakingMap.getValue().getStakingHas()).add(new BigInteger(customStakingMap.getValue().getStakingLocked()));
                     }

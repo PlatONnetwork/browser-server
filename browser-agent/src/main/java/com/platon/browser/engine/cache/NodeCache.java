@@ -1,9 +1,6 @@
 package com.platon.browser.engine.cache;
 
-import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomUnDelegation;
+import com.platon.browser.dto.*;
 import com.platon.browser.exception.NoSuchBeanException;
 
 import java.util.*;
@@ -17,6 +14,8 @@ import java.util.*;
 public class NodeCache {
     // <节点ID - 节点实体>
     private Map<String, CustomNode> nodeMap = new TreeMap<>();
+    private Set<CustomStaking> stakingSet = new HashSet<>();
+    private Set<CustomDelegation> delegationSet = new HashSet<>();
     /**
      * 根据节点ID获取节点
      * @param nodeId
@@ -28,13 +27,87 @@ public class NodeCache {
         if(node==null) throw new NoSuchBeanException("节点(id="+nodeId+")的节点不存在");
         return node;
     }
-    public void add(CustomNode node){
+
+    /**
+     * 添加节点，同时更新stakingSet和delegationSet全量缓存
+     * @param node
+     */
+    public void addNode(CustomNode node){
         nodeMap.put(node.getNodeId(),node);
+        node.getStakings().forEach((stakingBlockNumber,staking)->{
+            stakingSet.add(staking);
+            staking.getDelegations().forEach((delegationAddr,delegation)->delegationSet.add(delegation));
+        });
     }
 
-    public Map<String, CustomNode> getAll(){
-        return nodeMap;
+    /**
+     * 添加委托，同时更新delegationSet全量缓存
+     * @param staking
+     */
+    public void addStaking(CustomStaking staking) throws NoSuchBeanException {
+        getNode(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
+        stakingSet.add(staking);
+        staking.getDelegations().forEach((delegationAddr,delegation)->delegationSet.add(delegation));
     }
+
+    /**
+     * 添加委托, 同时更新delegationSet全量缓存
+     * @param delegation
+     */
+    public void addDelegation(CustomDelegation delegation) throws NoSuchBeanException {
+        getNode(delegation.getNodeId())
+                .getStakings()
+                .get(delegation.getStakingBlockNum())
+                .getDelegations()
+                .put(delegation.getDelegateAddr(),delegation);
+        delegationSet.add(delegation);
+    }
+
+    /**
+     * 添加解委托
+     * @param unDelegation
+     */
+    public void addUnDelegation(CustomUnDelegation unDelegation) throws NoSuchBeanException {
+        getNode(unDelegation.getNodeId())
+                .getStakings()
+                .get(unDelegation.getStakingBlockNum())
+                .getDelegations()
+                .get(unDelegation.getDelegateAddr())
+                .getUnDelegations().add(unDelegation);
+    }
+
+    /**
+     * 添加操作日志
+     * @param nodeOpt
+     */
+    public void addNodeOpt(CustomNodeOpt nodeOpt) throws NoSuchBeanException {
+        getNode(nodeOpt.getNodeId())
+                .getNodeOpts()
+                .add(nodeOpt);
+    }
+
+    /**
+     * 添加节点惩罚
+     * @param slash
+     */
+    public void addSlash(CustomSlash slash) throws NoSuchBeanException {
+        getNode(slash.getNodeId())
+                .getSlashes()
+                .add(slash);
+    }
+
+    public Collection<CustomNode> getAllNode(){
+        return nodeMap.values();
+    }
+
+    public Set<CustomStaking> getAllStaking(){
+        return stakingSet;
+    }
+
+    public Set<CustomDelegation> getAllDelegation(){
+        return delegationSet;
+    }
+
     /**
      * 获取指定状态的所有质押信息
      * @param statuses
@@ -76,13 +149,6 @@ public class NodeCache {
         return returnData;
     }
 
-    /**
-     * 根据质押区块号删除缓存中的质押记录
-     * @param stakingBlockNumber
-     */
-    public void removeStaking(Long stakingBlockNumber){
-        nodeMap.values().forEach(node->node.getStakings().remove(stakingBlockNumber));
-    }
 
     /**
      * 缓存维护方法
@@ -105,6 +171,10 @@ public class NodeCache {
             }
             if(!valid) invalidCache.add(staking);
         });
-        invalidCache.forEach(staking -> removeStaking(staking.getStakingBlockNum()));
+        invalidCache.forEach(staking -> {
+            nodeMap.values().forEach(node->node.getStakings().remove(staking.getStakingBlockNum()));
+            delegationSet.removeAll(staking.getDelegations().values());
+        });
+        stakingSet.removeAll(invalidCache);
     }
 }

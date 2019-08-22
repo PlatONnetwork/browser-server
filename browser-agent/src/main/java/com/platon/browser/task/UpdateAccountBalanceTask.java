@@ -22,7 +22,7 @@ public class UpdateAccountBalanceTask {
     @Autowired
     private PlatonClient client;
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    //@Scheduled(cron = "0/10 * * * * ?")
     protected void updateBalance () {
         String resAdd = "";
         Set <String> addresSet = BlockChain.ADDRESS_CACHE.getAll().keySet();

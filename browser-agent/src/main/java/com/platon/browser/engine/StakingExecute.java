@@ -78,45 +78,41 @@ public class StakingExecute {
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> {
             nodeIds.add(node.getNodeId());
-            nodeCache.add(node);
+            nodeCache.addNode(node);
         });
         if(nodeIds.size()==0) return;
         // |-加载质押记录
         List<CustomStaking> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
-        // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
-        Map<String, CustomStaking> stakingMap = new HashMap<>();
         stakings.forEach(staking->{
             try {
-                nodeCache.getNode(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
+                nodeCache.addStaking(staking);
             } catch (NoSuchBeanException e) {
                 logger.error("构造缓存错误:{}, 无法向其关联质押(stakingBlockNumber={})",e.getMessage(),staking.getStakingBlockNum());
             }
-            stakingMap.put(staking.getStakingMapKey(),staking);
         });
         // |-加载委托记录
         List<CustomDelegation> delegations = customDelegationMapper.selectByNodeIdList(nodeIds);
-        // <节点ID+质押块号 - 质押记录> 映射, 方便【撤销委托记录】的添加
-        Map<String, CustomDelegation> delegationMap = new HashMap<>();
         delegations.forEach(delegation->{
-            CustomStaking staking = stakingMap.get(delegation.getStakingMapKey());
-            if(staking!=null) {
-                staking.getDelegations().put(delegation.getDelegateAddr(),delegation);
-                delegationMap.put(delegation.getDelegationMapKey(),delegation);
+            try {
+                nodeCache.addDelegation(delegation);
+            } catch (NoSuchBeanException e) {
+                logger.error("构造缓存错误:{}, 无法向其关联委托(stakingBlockNumber={})",e.getMessage(),delegation.getStakingBlockNum());
             }
         });
         // |-加载撤销委托记录
         List<CustomUnDelegation> unDelegations = customUnDelegationMapper.selectByNodeIdList(nodeIds);
         unDelegations.forEach(unDelegation->{
-            CustomDelegation delegation = delegationMap.get(unDelegation.getDelegationMapKey());
-            if(delegation!=null){
-                delegation.getUnDelegations().add(unDelegation);
+            try {
+                nodeCache.addUnDelegation(unDelegation);
+            } catch (NoSuchBeanException e) {
+                logger.error("构造缓存错误:{}, 无法向其关联解委托(stakingBlockNumber={})",e.getMessage(),unDelegation.getStakingBlockNum());
             }
         });
         // |-加载节点操作记录
         List<CustomNodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
         nodeOpts.forEach(opt-> {
             try {
-                nodeCache.getNode(opt.getNodeId()).getNodeOpts().add(opt);
+                nodeCache.addNodeOpt(opt);
             } catch (NoSuchBeanException e) {
                 logger.error("构造缓存错误:{}, 无法向其关联节点操作日志(id={})",e.getMessage(),opt.getId());
             }
@@ -125,7 +121,7 @@ public class StakingExecute {
         List<CustomSlash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
         slashes.forEach(slash -> {
             try {
-                nodeCache.getNode(slash.getNodeId()).getSlashes().add(slash);
+                nodeCache.addSlash(slash);
             } catch (NoSuchBeanException e) {
                 logger.error("构造缓存错误:{}, 无法向其关联节点惩罚记录(slashTxHash={})",e.getMessage(),slash.getHash());
             }

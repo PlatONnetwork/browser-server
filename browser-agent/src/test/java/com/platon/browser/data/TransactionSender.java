@@ -118,4 +118,15 @@ public class TransactionSender {
         ).send();
         logger.debug("res:{}",res);
     }
+
+    // 发送解委托交易
+    @Test
+    public void unDelegate() throws Exception {
+        BaseResponse res = delegateContract.unDelegate(
+                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                BigInteger.valueOf(53086),
+                BigInteger.valueOf(1000)
+        ).send();
+        logger.debug("res:{}",res);
+    }
 }
