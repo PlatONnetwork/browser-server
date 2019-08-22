@@ -70,8 +70,4 @@ public class AddressExecute {
         executeResult.stage(fromAddress);
         executeResult.stage(toAddress);
     }
-
-    public void commitResult () {
-        executeResult.clear();
-    }
 }

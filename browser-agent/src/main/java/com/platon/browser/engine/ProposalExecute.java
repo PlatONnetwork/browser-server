@@ -101,10 +101,6 @@ public class ProposalExecute {
         }
     }
 
-    public ProposalExecuteResult exportResult(){
-        return executeResult;
-    }
-
     private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
