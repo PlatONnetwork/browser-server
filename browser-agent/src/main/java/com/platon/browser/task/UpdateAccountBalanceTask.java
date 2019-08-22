@@ -1,10 +1,14 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.engine.AddressExecute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.BaseResponse;
+
+import java.util.List;
 
 /**
  * User: dongqile
@@ -30,5 +34,13 @@ public class UpdateAccountBalanceTask {
 
         }
 */
+        String addreslist = "";
+        try {
+            BaseResponse <List<RestrictingBalance>> res = client.getRestrictingBalance(addreslist);
+            List<RestrictingBalance> list = res.data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

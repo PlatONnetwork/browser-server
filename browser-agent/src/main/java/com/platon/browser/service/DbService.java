@@ -3,6 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.result.*;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class DbService {
     private TransactionCacheService transactionCacheService;
     @Autowired
     private NetworkStatCacheService networkStatCacheService;
+
 
     @Transactional
     public void insertOrUpdate (List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
@@ -133,5 +135,32 @@ public class DbService {
             customAddressMapper.batchInsertOrUpdateSelective(addresses,Address.Column.values());
         }
         /*****************************批量更新操作 END**************************/
+
+
     }
+
+    public void dataStatistics(){
+        //1.补充统计质押相关数据
+        //  a.stat_delegate_has  关联的委托记录中犹豫期金额汇总
+        //  b.stat_delegate_locked  关联的委托记录中锁定期金额汇总
+        //  c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
+        //  d.stat_delegate_qty  关联的委托地址数
+        BlockChain.NODE_CACHE.getAll().forEach((nodeId,node) ->{
+                node.getStakings().forEach((blockNumber,staking)->{
+                    
+                });
+        });
+        //2.补充统计地址相关数据
+        //  a.staking_value  质押的金额
+        //  b.delegate_value  委托的金额
+        //  c.redeemed_value   赎回中的金额，包含委托和质押
+        //  d.candidate_count   已委托的验证人
+        //  e.delegate_hes   未锁定委托
+        //  f.delegate_locked   已锁定委托
+        //  g.delegate_unlock  已经解锁的
+        //  h.delegate_reduction  赎回中的
+
+    }
+
+
 }
