@@ -4,7 +4,7 @@ version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: dev
 # 服务器端口号
-port: 8061
+port: 9061
 # MySQL数据库连接地址
 dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 dbuser: platon
@@ -105,3 +105,10 @@ platon.config:
   }
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+
+brokenHost: 192.168.16.173  
+brokenPort: 61613
+system.username: admin
+system.password: admin
+client.username: guest
+client.password: guest

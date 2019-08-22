@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiParam;
 public interface AppDocBlock {
 	
     /**
-     *
      * @api {post} /block/blockList a.区块列表
      * @apiVersion 1.0.0
      * @apiName blockList
@@ -65,7 +64,7 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockList", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
+    public RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
 	
      /**
      *
@@ -89,7 +88,7 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockListByNodeId", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockListByNodeId", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq ", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
+    public RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
      * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date c.导出节点的区块列表
@@ -151,13 +150,14 @@ public interface AppDocBlock {
      *       "statTransferQty":11,     //块内转账交易总数
      *       "statDelegateQty":11,     //块内委托交易总数
      *       "statStakingQty":11,      //块内验证人交易总数
-     *       "statProposalQty":11      //块内治理交易总数
+     *       "statProposalQty":11,      //块内治理交易总数
+     *       "serverTime":17       //当前服务器的时间
      *    }
      * }
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq ", required = true)@Valid @RequestBody BlockDetailsReq req);
+    public BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq", required = true)@Valid @RequestBody BlockDetailsReq req);
 	
 	
     /**
@@ -177,5 +177,5 @@ public interface AppDocBlock {
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
 	@RequestMapping(value = "block/blockDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq ", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
+    public BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
 }

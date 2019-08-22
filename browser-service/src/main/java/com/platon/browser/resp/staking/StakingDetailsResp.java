@@ -10,14 +10,14 @@ public class StakingDetailsResp {
     private String totalValue;          //质押总数=有效的质押+委托
     private String delegateValue;       //委托总数
     private String stakingValue;        //质押总数
-    private String delegateQty;         //委托人数
+    private Integer delegateQty;         //委托人数
     private Integer slashLowQty;         //低出块率举报次数
     private Integer slashMultiQty;       //多签举报次数
-    private Integer blockQty;           //产生的区块数
-    private String expectBlockQty;      //预计的出块数
+    private Long blockQty;           //产生的区块数
+    private Long expectBlockQty;      //预计的出块数
     private String expectedIncome;      //预计年收化率（从验证人加入时刻开始计算）
     private String joinTime;            //加入时间
-    private String verifierTime;        //进入共识验证轮次数
+    private Integer verifierTime;        //进入共识验证轮次数
     private String rewardValue;         //累计的收益 
     private String nodeId;              //节点id
     private String stakingAddr;         //发起质押的账户地址

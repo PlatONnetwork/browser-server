@@ -54,9 +54,9 @@ public class BlockController  {
     */
 /**
      * @apiDeprecated
-     * @api {post} block/blockList a.区块列表
+     * @api {post} block/blockLista a.区块列表
      *       @apiVersion 1.0.0
-     *       @apiName blockList
+     *       @apiName blockLista
      *       @apiGroup block
      *       @apiDescription 区块列表
      *       @apiParamExample {json} Request-Example:
@@ -107,9 +107,9 @@ public class BlockController  {
     */
 /**
      * @apiDeprecated
-     * @api {post} block/blockDetails b.区块详情
+     * @api {post} block/blockDetailsa b.区块详情
      * @apiVersion 1.0.0
-     * @apiName blockDetails
+     * @apiName blockDetailsa
      * @apiGroup block
      * @apiDescription 区块详情
      * @apiParamExample {json} Request-Example:
@@ -162,9 +162,9 @@ public class BlockController  {
     */
 /**
      * @apiDeprecated
-     * @api {post} block/blockDetailNavigate c.区块详情前后跳转浏览
+     * @api {post} block/blockDetailNavigatea c.区块详情前后跳转浏览
      * @apiVersion 1.0.0
-     * @apiName blockDetailNavigate
+     * @apiName blockDetailNavigatea
      * @apiGroup block
      * @apiDescription 区块详情前后跳转浏览
      * @apiParamExample {json} Request-Example:
@@ -213,9 +213,9 @@ public class BlockController  {
     */
 /**
      * @apiDeprecated
-     * @api {post} block/transactionList d.区块交易列表
+     * @api {post} block/transactionLista d.区块交易列表
      * @apiVersion 1.0.0
-     * @apiName transactionList
+     * @apiName transactionLista
      * @apiGroup block
      * @apiDescription 区块交易列表
      * @apiParamExample {json} Request-Example:

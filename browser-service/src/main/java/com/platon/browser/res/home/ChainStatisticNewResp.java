@@ -12,7 +12,7 @@ public class ChainStatisticNewResp {
 	private Integer maxTps; // 最大交易TPS
 	private String turnValue; // 当前流通量
 	private String issueValue; // 当前发行量
-	private String takingDelegationValue; // 当前质押总数=有效的质押+委托
+	private String stakingDelegationValue; // 当前质押总数=有效的质押+委托
 	private Integer addressQty; // 地址数
 	private Integer proposalQty; // 总提案数
 	private Integer doingProposalQty; // 进行中提案数

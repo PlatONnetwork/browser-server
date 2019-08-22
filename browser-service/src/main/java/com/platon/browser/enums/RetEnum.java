@@ -15,7 +15,7 @@ public enum RetEnum {
     private String name;
     private int code;
 
-    private RetEnum(int code, String name){
+    RetEnum(int code, String name){
         this.name = name;
         this.code = code;
     }

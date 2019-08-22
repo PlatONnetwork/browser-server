@@ -25,18 +25,19 @@ public class NodeTool {
 
     /**
      * 通过区块计算节点公钥
+     *
      * @param block
      * @return
      * @throws Exception
      */
-    public static String calculateNodePublicKey(PlatonBlock.Block block) throws Exception {
+    public static String calculateNodePublicKey(PlatonBlock.Block block){
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
-        if(publicKey.length()<128) for (int i=0;i<(128-publicKey.length());i++) publicKey ="0"+publicKey;
+        if (publicKey.length() < 128) for (int i = 0; i < (128 - publicKey.length()); i++) publicKey = "0" + publicKey;
         return publicKey;
     }
 
-    public static BigInteger testBlock ( PlatonBlock.Block block) throws Exception{
+    public static BigInteger testBlock(PlatonBlock.Block block){
 
         String extraData = block.getExtraData();
 
@@ -47,27 +48,27 @@ public class NodeTool {
 
         byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
         byte v = signatureBytes[64];
-        byte[] r = (byte[]) Arrays.copyOfRange(signatureBytes, 0, 32);
-        byte[] s = (byte[]) Arrays.copyOfRange(signatureBytes, 32, 64);
+        byte[] r = Arrays.copyOfRange(signatureBytes, 0, 32);
+        byte[] s = Arrays.copyOfRange(signatureBytes, 32, 64);
 
 
-        BigInteger publicKey = Sign.recoverFromSignature((byte) v, new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s)), msgHash);
+        BigInteger publicKey = Sign.recoverFromSignature( v, new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s)), msgHash);
         return publicKey;
     }
 
-    private static byte[] getMsgHash ( PlatonBlock.Block block ) {
+    private static byte[] getMsgHash(PlatonBlock.Block block) {
         byte[] signData = encode(block);
         return Hash.sha3(signData);
     }
 
-    private static byte[] encode ( PlatonBlock.Block block ) {
-        List <RlpType> values = asRlpValues(block);
+    private static byte[] encode(PlatonBlock.Block block) {
+        List<RlpType> values = asRlpValues(block);
         RlpList rlpList = new RlpList(values);
         return RlpEncoder.encode(rlpList);
     }
 
-    static List <RlpType> asRlpValues ( PlatonBlock.Block block ) {
-        List <RlpType> result = new ArrayList <>();
+    static List<RlpType> asRlpValues(PlatonBlock.Block block) {
+        List<RlpType> result = new ArrayList<>();
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));
         //UncleHash   common.Hash    `json:"sha3Uncles"       gencodec:"required"`
@@ -103,7 +104,7 @@ public class NodeTool {
         return result;
     }
 
-    static byte[] decodeHash ( String hex ) {
+    static byte[] decodeHash(String hex) {
         byte[] result = Hex.decode(Numeric.cleanHexPrefix(hex));
         return result;
     }

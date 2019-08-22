@@ -20,7 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 public class RedisQueryTest extends TestBase {
 
     private static Logger logger = LoggerFactory.getLogger(RedisQueryTest.class);
@@ -34,7 +34,7 @@ public class RedisQueryTest extends TestBase {
     private String keyPrefix="browser:0.7.0:test:chain1:ticket:{blockNumber}:{txHash}:{ticketId}";
     private String keyPrefix2="browser:{version}:{active}:{chainId}:tra_list:{address}:{txHash}:{txType}:{createTime}";
 
-    @Test
+//    @Test
     public void queryTest() throws FileNotFoundException {
         String a = tranListPrefix.replace("{}","203");
         logger.error(tranListPrefix);

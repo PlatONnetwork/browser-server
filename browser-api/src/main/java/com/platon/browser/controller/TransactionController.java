@@ -65,9 +65,9 @@ public class TransactionController {
     */
 /**
       * @apiDeprecated
-      * @api {post} transaction/transactionList a.交易列表
+      * @api {post} transaction/transactionLista a.交易列表
       * @apiVersion 1.0.0
-      * @apiName transactionList
+      * @apiName transactionLista
       * @apiGroup transaction
       * @apiDescription 交易列表
       * @apiParamExample {json} Request-Example:
@@ -142,9 +142,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post} transaction/transactionDetails b.交易详情
+     * @api {post} transaction/transactionDetailsa b.交易详情
      * @apiVersion 1.0.0
-     * @apiName transactionDetails
+     * @apiName transactionDetailsa
      * @apiGroup transaction
      * @apiDescription 交易详情
      * @apiParamExample {json} Request-Example:
@@ -229,9 +229,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post} transaction/transactionDetailNavigate c.交易详情前后跳转浏览
+     * @api {post} transaction/transactionDetailNavigatea c.交易详情前后跳转浏览
      * @apiVersion 1.0.0
-     * @apiName transactionDetailNavigate
+     * @apiName transactionDetailNavigatea
      * @apiGroup transaction
      * @apiDescription 交易详情前后跳转浏览
      * @apiParamExample {json} Request-Example:
@@ -328,9 +328,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post} transaction/pendingList d.待处理交易列表
+     * @api {post} transaction/pendingLista d.待处理交易列表
      * @apiVersion 1.0.0
-     * @apiName pendingList
+     * @apiName pendingLista
      * @apiGroup transaction
      * @apiDescription 待处理交易列表
      * @apiParamExample {json} Request-Example:
@@ -405,9 +405,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post} transaction/pendingDetails e.待处理交易详情
+     * @api {post} transaction/pendingDetailsa e.待处理交易详情
      * @apiVersion 1.0.0
-     * @apiName pendingDetails
+     * @apiName pendingDetailsa
      * @apiGroup transaction
      * @apiDescription 待处理交易详情
      * @apiParamExample {json} Request-Example:
@@ -494,9 +494,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post}  transaction/addressDetails g.查询地址详情
+     * @api {post}  transaction/addressDetailsa g.查询地址详情
      * @apiVersion 1.0.0
-     * @apiName addressDetails
+     * @apiName addressDetailsa
      * @apiGroup transaction
      * @apiDescription 查询地址详情
      * @apiParamExample {json} Request-Example:
@@ -648,9 +648,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {post} transaction/contractDetails i.查询合约详情
+     * @api {post} transaction/contractDetailsa i.查询合约详情
      * @apiVersion 1.0.0
-     * @apiName contractDetails
+     * @apiName contractDetailsa
      * @apiGroup transaction
      * @apiDescription 查询合约详情
      * @apiParamExample {json} Request-Example:
@@ -744,9 +744,9 @@ public class TransactionController {
     */
 /**
      * @apiDeprecated
-     * @api {get} transaction/contractDownload?cid=:cid&address=:address&date=:date j.导出合约详情
+     * @api {get} transaction/contractDownloada?cid=:cid&address=:address&date=:date j.导出合约详情
      * @apiVersion 1.0.0
-     * @apiName contractDownload
+     * @apiName contractDownloada
      * @apiGroup transaction
      * @apiDescription 导出合约详情
      * @apiParam {String} cid 链ID

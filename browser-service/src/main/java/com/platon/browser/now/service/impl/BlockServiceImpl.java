@@ -67,7 +67,7 @@ public class BlockServiceImpl implements BlockService {
 			List<BlockRedis> items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 			BlockListResp blockListNewResp = new BlockListResp();
 			for (int i = 0; i < items.size(); i++) {
-				blockListNewResp.setBlockReward(items.get(i).getBlockReward());
+				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(items.get(i).getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				blockListNewResp.setGasUsed(items.get(i).getGasUsed());
 				blockListNewResp.setNodeId(items.get(i).getNodeId());
 				blockListNewResp.setNodeName(items.get(i).getNodeName());
@@ -82,7 +82,7 @@ public class BlockServiceImpl implements BlockService {
 		} else {
 			// TODO 是否查询超过五十万条数据
 		}
-		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
+		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(0, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		if(blockEnd.isEmpty()) {
 			page.setTotal(0);
@@ -105,7 +105,7 @@ public class BlockServiceImpl implements BlockService {
 		List<BlockListResp> lists = new LinkedList<>();
 		for (Block block : blocks) {
 			BlockListResp blockListResp = new BlockListResp();
-			blockListResp.setBlockReward(block.getBlockReward());
+			blockListResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockListResp.setGasUsed(block.getGasUsed());
 			blockListResp.setNodeId(block.getNodeId());
 			blockListResp.setNodeName(block.getNodeName());
@@ -196,7 +196,7 @@ public class BlockServiceImpl implements BlockService {
 		Block block = blockMapper.selectByPrimaryKey(blockNumber);
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
-			blockDetailResp.setBlockReward(block.getBlockReward());
+			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockDetailResp.setExtraData(block.getExtraData());
 			blockDetailResp.setGasLimit(block.getGasLimit());
 			blockDetailResp.setGasUsed(block.getGasUsed());
@@ -211,6 +211,8 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setStatTxGasLimit(block.getStatTxGasLimit());
 			blockDetailResp.setStatTxQty(block.getStatTxQty());
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
+			blockDetailResp.setServerTime(new Date().getTime());
+			blockDetailResp.setSize(block.getSize());
 			
 			// 取上一个区块
 			BlockExample blockExample = new BlockExample();

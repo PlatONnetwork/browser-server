@@ -5,5 +5,6 @@ import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 
 public interface AddressService {
-    BaseResp<QueryDetailResp> getDetails(QueryDetailRequest req);
+
+	public BaseResp<QueryDetailResp> getDetails(QueryDetailRequest req);
 }

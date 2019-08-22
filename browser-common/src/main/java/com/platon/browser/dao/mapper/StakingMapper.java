@@ -54,4 +54,5 @@ public interface StakingMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int batchInsertSelective(@Param("list") List<Staking> list, @Param("selective") Staking.Column ... selective);
+
 }

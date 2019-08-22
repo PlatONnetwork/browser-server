@@ -15,10 +15,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 @SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
 
-    @Autowired
-    protected BlockService blockService;
-    @Autowired
-    protected TransactionService transactionService;
+//    @Autowired
+//    protected BlockService blockService;
+//    @Autowired
+//    protected TransactionService transactionService;
 
     @Autowired
     protected RedisTemplate<String,String> redisTemplate;

@@ -2,13 +2,13 @@
 <html>
 <head>
     <title>STOMP OVER SOCKJS</title>
-    <script src="//cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
     <script src="https://cdn.bootcss.com/sockjs-client/1.0.0/sockjs.min.js"></script>
     <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript">
         // websocket连接地址
-        var serverAddress = 'http://localhost:8061/browser-api/platon-websocket';
+        var serverAddress = 'http://127.0.0.1:9061/browser-server/platon-websocket';
         // 链ID
         var chainId = '1';
 
@@ -47,18 +47,18 @@
                 $scope.data.connected = false;
             }
 
-            // ***************节点消息***************
+            // ***************趋势图消息***************
             // 初始数据
-            $scope.nodeInit = function () {
-                stompClient.subscribe('/app/node/init?cid='+chainId, function (msg) {
-                    console.log(JSON.stringify(msg.body));
-                }, {'message': '434343434'});
+             $scope.nodeInit = function () {
+                 stompClient.subscribe('/topic/block/statistic/new', function (msg) {
+                     console.log(JSON.stringify(msg.body));
+                 }, {'message': '434343434'});
             }
 
             var nodeSubHandle;
             // 订阅消息
             $scope.nodeSub = function () {
-                nodeSubHandle = stompClient.subscribe('/topic/node/new?cid='+chainId, function (msg) {
+                nodeSubHandle = stompClient.subscribe('/topic/block/statistic/new', function (msg) {
                     console.log(JSON.stringify(msg.body));
                 });
             }
@@ -90,7 +90,7 @@
             // **************统计消息***************
             // 初始数据
             $scope.statisticInit = function () {
-                stompClient.subscribe('/app/statistic/init?cid='+chainId, function (msg) {
+                stompClient.subscribe('/topic/chain/statistic/new', function (msg) {
                     console.log(JSON.stringify(msg.body));
                 }, {'message': '434343434'});
             }
@@ -98,7 +98,7 @@
             var statisticSubHandle;
             // 订阅消息
             $scope.statisticSub = function () {
-                statisticSubHandle = stompClient.subscribe('/topic/statistic/new?cid='+chainId, function (msg) {
+                statisticSubHandle = stompClient.subscribe('/topic/chain/statistic/new', function (msg) {
                     console.log(JSON.stringify(msg.body));
                 });
             }
@@ -155,7 +155,7 @@
 <button type="button" ng-disabled="data.connected" ng-click="connect()">连接</button>
 <button type="button" ng-click="disconnect()" ng-disabled="!data.connected">断开</button>
 
-<br/>节点信息<br/>
+<br/>趋势图信息<br/>
 <button type="button" ng-click="nodeInit()">初始数据</button>
 <button type="button" ng-click="nodeSub()">订阅</button>
 <button type="button" ng-click="nodeUnsub()">取消订阅</button>
