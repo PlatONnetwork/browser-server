@@ -145,7 +145,7 @@ public class NodeCache {
         List<CustomStaking> returnData = new ArrayList<>();
         stakingSet.stream()
                 .filter(staking -> statuses.contains(CustomStaking.StatusEnum.getEnum(staking.getStatus())))
-                .forEach(staking->returnData.add(staking));
+                .forEach(returnData::add);
         return returnData;
     }
 
@@ -156,7 +156,7 @@ public class NodeCache {
         List<CustomDelegation> returnData = new ArrayList<>();
         delegationSet.stream()
                 .filter(delegation -> statuses.contains(CustomDelegation.YesNoEnum.getEnum(delegation.getIsHistory())))
-                .forEach(delegation -> returnData.add(delegation));
+                .forEach(returnData::add);
         return returnData;
     }
 
@@ -165,12 +165,9 @@ public class NodeCache {
      */
     public List<CustomUnDelegation> getUnDelegationByStatus(List<CustomUnDelegation.StatusEnum> statuses){
         List<CustomUnDelegation> returnData = new ArrayList<>();
-        nodeMap.values().forEach(node->
-                node.getStakings().values().forEach(staking ->
-                        staking.getDelegations().values().forEach(delegate->
-                                delegate.getUnDelegations().stream()
-                                        .filter(unDelegation->statuses.contains(CustomUnDelegation.StatusEnum.getEnum(unDelegation.getStatus())))
-                                        .forEach(unDelegation -> returnData.add(unDelegation)))));
+        delegationSet.forEach(delegate->delegate.getUnDelegations().stream()
+                .filter(unDelegation->statuses.contains(CustomUnDelegation.StatusEnum.getEnum(unDelegation.getStatus())))
+                .forEach(returnData::add));
         return returnData;
     }
 
