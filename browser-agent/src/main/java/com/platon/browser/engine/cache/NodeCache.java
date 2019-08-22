@@ -5,10 +5,8 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomUnDelegation;
 import com.platon.browser.exception.NoSuchBeanException;
-import lombok.Data;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @Auther: Chendongming
