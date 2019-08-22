@@ -76,7 +76,6 @@ public class ReportValidatorHandler implements EventHandler {
                 newCustomSlash.updateWithSlash(tx,evidencesParam);
                 newCustomSlash.setReward(slashValue.toString());
                 newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashRate().toString());
-                nodeCache.getNode(evidencesParam.getVerify()).getSlashes().add(newCustomSlash);
 
                 //新增分析多重签名结果
                 //executeResult.getAddSlashs().add(newCustomSlash);

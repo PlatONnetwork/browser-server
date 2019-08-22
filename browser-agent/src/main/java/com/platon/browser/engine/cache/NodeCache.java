@@ -1,7 +1,13 @@
 package com.platon.browser.engine.cache;
 
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.CustomDelegation;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomUnDelegation;
+import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,10 +18,41 @@ import java.util.*;
  * @Description:
  */
 public class NodeCache {
+    private static Logger logger = LoggerFactory.getLogger(NodeCache.class);
     // <节点ID - 节点实体>
     private Map<String, CustomNode> nodeMap = new TreeMap<>();
     private Set<CustomStaking> stakingSet = new HashSet<>();
     private Set<CustomDelegation> delegationSet = new HashSet<>();
+
+    public void init(List<CustomNode> nodeList,
+                     List<CustomStaking> stakingList,
+                     List<CustomDelegation> delegationList,
+                     List<CustomUnDelegation> unDelegationList
+    ) throws CacheConstructException {
+        nodeList.forEach(node->nodeMap.put(node.getNodeId(),node));
+        for (CustomStaking staking:stakingList){
+            try {
+                addStaking(staking);
+            } catch (NoSuchBeanException e) {
+                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联质押(stakingBlockNumber="+staking.getStakingBlockNum()+")");
+            }
+        }
+        for (CustomDelegation delegation:delegationList){
+            try {
+                addDelegation(delegation);
+            } catch (NoSuchBeanException e) {
+                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联委托(stakingBlockNumber="+delegation.getStakingBlockNum()+")");
+            }
+        }
+        for (CustomUnDelegation unDelegation:unDelegationList){
+            try {
+                addUnDelegation(unDelegation);
+            } catch (NoSuchBeanException e) {
+                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联解委托(stakingBlockNumber="+unDelegation.getStakingBlockNum()+")");
+            }
+        }
+    }
+
     /**
      * 根据节点ID获取节点
      * @param nodeId
@@ -74,26 +111,6 @@ public class NodeCache {
                 .getDelegations()
                 .get(unDelegation.getDelegateAddr())
                 .getUnDelegations().add(unDelegation);
-    }
-
-    /**
-     * 添加操作日志
-     * @param nodeOpt
-     */
-    public void addNodeOpt(CustomNodeOpt nodeOpt) throws NoSuchBeanException {
-        getNode(nodeOpt.getNodeId())
-                .getNodeOpts()
-                .add(nodeOpt);
-    }
-
-    /**
-     * 添加节点惩罚
-     * @param slash
-     */
-    public void addSlash(CustomSlash slash) throws NoSuchBeanException {
-        getNode(slash.getNodeId())
-                .getSlashes()
-                .add(slash);
     }
 
     public Collection<CustomNode> getAllNode(){
@@ -177,4 +194,6 @@ public class NodeCache {
         });
         stakingSet.removeAll(invalidCache);
     }
+
+
 }

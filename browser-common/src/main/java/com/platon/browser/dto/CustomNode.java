@@ -18,8 +18,6 @@ import java.util.*;
 public class CustomNode extends Node {
     // <质押区块号 - 质押实体>
     private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
-    private List<Slash> slashes = new ArrayList<>();
-    private List<NodeOpt> nodeOpts = new ArrayList<>();
 
      public CustomNode(){
          Date date = new Date();
