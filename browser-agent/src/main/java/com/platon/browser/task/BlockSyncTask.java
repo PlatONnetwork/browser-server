@@ -11,7 +11,6 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
-import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import com.platon.browser.util.TxParamResolver;
@@ -368,7 +367,7 @@ public class BlockSyncTask {
 
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
             if(null != tx.getValue() && ! InnerContractAddrEnum.addresses.contains(tx.getTo())){
-                tx.setTxType(String.valueOf(TxTypeEnum.TRANSFER.code));
+                tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
         }catch (Exception e){

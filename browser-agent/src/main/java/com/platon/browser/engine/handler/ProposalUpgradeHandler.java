@@ -25,7 +25,7 @@ public class ProposalUpgradeHandler implements EventHandler{
 
 
     @Override
-    public void handle ( EventContext context ) {
+    public void handle ( EventContext context ) throws NoSuchBeanException {
         try {
             CustomTransaction tx = context.getTransaction();
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
@@ -62,9 +62,9 @@ public class ProposalUpgradeHandler implements EventHandler{
             //新增文本提案交易结构
             proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
-            bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
+            bc.PROPOSALS_CACHE.add(customProposal);
         }catch (NoSuchBeanException e){
-            logger.error("");
+            throw new NoSuchBeanException("缓存中找不到对应的升级提案:"+e.getMessage());
         }
 
     }

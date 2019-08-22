@@ -13,6 +13,7 @@ import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
@@ -69,7 +70,7 @@ public class BlockChain {
     // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
     public static final NodeCache NODE_CACHE = new NodeCache();
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
-    public static final Map <String, CustomProposal> PROPOSALS_CACHE = new HashMap <>();
+    public static final ProposalCache PROPOSALS_CACHE = new ProposalCache();
     // 全量统计数据
     public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
     // 全量数据，需要根据业务变化，保持与数据库一致

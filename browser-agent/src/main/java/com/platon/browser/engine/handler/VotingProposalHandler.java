@@ -23,7 +23,7 @@ public class VotingProposalHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandler.class);
 
     @Override
-    public void handle ( EventContext context ) {
+    public void handle ( EventContext context ) throws NoSuchBeanException {
         try{
             CustomTransaction tx = context.getTransaction();
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
@@ -37,18 +37,18 @@ public class VotingProposalHandler implements EventHandler {
             proposalExecuteResult.stageAddVotes(customVote);
             //支持票集合
             if(CustomProposal.OptionEnum.SUPPORT.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.get(param.getProposalId()).getYesList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getYesList().add(customVote);
             }
             //反对票集合
             if(CustomProposal.OptionEnum.OPPOSITION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.get(param.getProposalId()).getNoList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getNoList().add(customVote);
             }
             //弃权票集合
             if(CustomProposal.OptionEnum.ABSTENTION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.get(param.getProposalId()).getAbstentionList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getAbstentionList().add(customVote);
             }
         }catch (NoSuchBeanException e){
-            logger.error("");
+            throw new NoSuchBeanException("缓存中找不到对应的投票提案:"+e.getMessage());
         }
 
 

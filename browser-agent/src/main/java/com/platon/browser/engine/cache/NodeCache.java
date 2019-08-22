@@ -9,6 +9,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import java.util.*;
 
 /**
+ * 节点进程缓存
  * @Auther: Chendongming
  * @Date: 2019/8/17 18:03
  * @Description:
@@ -76,13 +77,23 @@ public class NodeCache {
     }
 
     /**
+     * 根据质押区块号删除缓存中的质押记录
+     * @param stakingBlockNumber
+     */
+    public void removeStaking(Long stakingBlockNumber){
+        nodeMap.values().forEach(node->node.getStakings().remove(stakingBlockNumber));
+    }
+
+    /**
      * 清扫全量缓存，移除历史数据
      */
     public void sweep(){
+        /************清楚质押记录***********/
         // 取所有已退出状态质押记录
-        List<CustomStaking> exitedStakings = getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.EXITED));
+        List<CustomStaking> exitedStakingList = getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.EXITED));
+        // 用于记录无效的质押记录（其所有委托均已变成历史）
         List<CustomStaking> invalidCache = new ArrayList<>();
-        exitedStakings.forEach(staking -> {
+        exitedStakingList.forEach(staking -> {
             boolean valid = false;
             for(CustomDelegation delegation:staking.getDelegations().values()){
                 if(CustomDelegation.YesNoEnum.NO.code==delegation.getIsHistory()){
@@ -93,8 +104,8 @@ public class NodeCache {
             }
             if(!valid) invalidCache.add(staking);
         });
-        invalidCache.forEach(staking -> {
+        invalidCache.forEach(staking -> removeStaking(staking.getStakingBlockNum()));
 
-        });
+
     }
 }

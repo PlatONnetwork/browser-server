@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalExecute;
 import com.platon.browser.engine.result.ProposalExecuteResult;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CancelProposalParam;
 import com.platon.browser.util.RoundCalculation;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class ProposalCancelHandler implements EventHandler{
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandler.class);
 
     @Override
-    public void handle ( EventContext context ) {
+    public void handle ( EventContext context ) throws NoSuchBeanException {
         try {
             CustomTransaction tx = context.getTransaction();
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
@@ -55,14 +56,15 @@ public class ProposalCancelHandler implements EventHandler{
             //设置被取消的提案id
             customProposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));
             //全局内存变量中查询对应需要取消的提案主题
-            customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.get(param.getPIDID().toString()).getTopic());
+            customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getPIDID())).getTopic());
             customProposal.setNewVersion("");
             //更新新增提案列表
             proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
-            bc.PROPOSALS_CACHE.put(customProposal.getPipId().toString(),customProposal);
+            bc.PROPOSALS_CACHE.add(customProposal);
         }catch (Exception e){
-            logger.error("");
+            logger.error("{}",e.getMessage());
+            throw new NoSuchBeanException("缓存中找不到对应的取消提案:"+e.getMessage());
         }
 
     }

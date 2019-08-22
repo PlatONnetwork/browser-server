@@ -3,7 +3,7 @@ package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.enums.TxTypeEnum;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.param.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,7 @@ public class TxParamResolver {
     @Data
     public static class Result {
         private Object param;
-        private TxTypeEnum txTypeEnum;
+        private CustomTransaction.TxTypeEnum txTypeEnum;
         public <T> T convert(Class<T> clazz){
             return (T)param;
         }
@@ -38,7 +38,7 @@ public class TxParamResolver {
 
     public static Result analysis ( String input , BlockChainConfig bc ,String blockNumber) {
         Result result = new Result();
-        result.txTypeEnum = TxTypeEnum.OTHERS;
+        result.txTypeEnum = CustomTransaction.TxTypeEnum.OTHERS;
         try {
             if (StringUtils.isNotEmpty(input) && !input.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
@@ -50,7 +50,7 @@ public class TxParamResolver {
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
 
-                TxTypeEnum typeEnum = TxTypeEnum.getEnum(txCode.intValue());
+                CustomTransaction.TxTypeEnum typeEnum = CustomTransaction.TxTypeEnum.getEnum(txCode.intValue());
                 result.txTypeEnum = typeEnum;
 
                 switch (typeEnum) {
@@ -279,7 +279,7 @@ public class TxParamResolver {
                 }
             }
         } catch (Exception e) {
-            result.txTypeEnum = TxTypeEnum.OTHERS;
+            result.txTypeEnum = CustomTransaction.TxTypeEnum.OTHERS;
             return result;
         }
         return result;

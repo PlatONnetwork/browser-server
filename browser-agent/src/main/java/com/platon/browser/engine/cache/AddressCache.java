@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 地址实体进程缓存
  * @Auther: Chendongming
  * @Date: 2019/8/17 18:03
  * @Description:

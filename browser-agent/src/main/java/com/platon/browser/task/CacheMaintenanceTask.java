@@ -17,7 +17,7 @@ import java.util.Map;
 public class CacheMaintenanceTask {
 
     private static final NodeCache NODE_CACHE = BlockChain.NODE_CACHE;
-    private static final Map<String, CustomProposal> PROPOSAL_CACHE = BlockChain.PROPOSALS_CACHE;
+    //private static final Map<String, CustomProposal> PROPOSAL_CACHE = BlockChain.PROPOSALS_CACHE;
 
 
     @Scheduled(cron="0/10 * * * * ?")

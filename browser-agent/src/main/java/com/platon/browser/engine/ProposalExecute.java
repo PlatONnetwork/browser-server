@@ -7,8 +7,10 @@ import com.platon.browser.dao.mapper.VoteMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVote;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.*;
 import com.platon.browser.engine.result.ProposalExecuteResult;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -28,7 +29,7 @@ public class ProposalExecute {
     private static Logger logger = LoggerFactory.getLogger(ProposalExecute.class);
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private Map<String, CustomProposal> proposals = BlockChain.PROPOSALS_CACHE;
+    private ProposalCache proposalCache = BlockChain.PROPOSALS_CACHE;
 
     public static final String pIDIDNum = "PIP-{pip_id}";
 
@@ -80,7 +81,7 @@ public class ProposalExecute {
 
                 }
             });
-            proposals.put(proposal.getPipId().toString(),customProposal);
+            proposalCache.add(customProposal);
         });
 
     }
@@ -90,7 +91,7 @@ public class ProposalExecute {
      * @param tx
      * @param bc
      */
-    public void execute(CustomTransaction tx, BlockChain bc){
+    public void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
         // 事件上下文
         EventContext context = new EventContext(tx,bc,null,null,executeResult);
         switch (tx.getTypeEnum()){

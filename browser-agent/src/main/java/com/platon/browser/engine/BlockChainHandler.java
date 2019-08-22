@@ -321,9 +321,10 @@ public class BlockChainHandler {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () {
+    public void analyzeTransaction () throws NoSuchBeanException {
         CustomBlock curBlock = bc.getCurBlock();
-        curBlock.getTransactionList().forEach(tx -> {
+
+        for (CustomTransaction tx:curBlock.getTransactionList()){
             // 链上执行失败的交易不予处理
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
             // 调用交易分析引擎分析交易，以补充相关数据
@@ -357,7 +358,7 @@ public class BlockChainHandler {
             addressExecute.execute(tx);
             //更新统计信息
             updateWithNetworkStat();
-        });
+        }
     }
 
 
@@ -420,11 +421,11 @@ public class BlockChainHandler {
                 }
 
                 if (BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getAddProposals().size() > 0 || BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getUpdateProposals().size() > 0) {
-                    PROPOSALS_CACHE.forEach(( hash, proposal ) -> {
+                    /*PROPOSALS_CACHE.getAll(( hash, proposal ) -> {
                         if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                         }
-                    });
+                    });*/
                 }
             }
             //更新暂存变量
