@@ -25,5 +25,6 @@ public class BlockDetailResp {
     private Integer statDelegateQty;
     private Integer statStakingQty;
     private Integer statProposalQty;
-    
+    private Long serverTime;
+    private Integer size;
 }

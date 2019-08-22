@@ -1,15 +1,15 @@
 package com.platon.browser.now.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -48,6 +48,7 @@ import com.platon.browser.resp.staking.StakingChangeNewResp;
 import com.platon.browser.resp.staking.StakingDetailsResp;
 import com.platon.browser.resp.staking.StakingOptRecordListResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;
+import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 
 @Service
@@ -78,12 +79,12 @@ public class StakingServiceImpl implements StakingService {
 		if(networkStatRedis != null) {
 			stakingStatisticNewResp.setAddIssueBegin(networkStatRedis.getAddIssueBegin());
 			stakingStatisticNewResp.setAddIssueEnd(networkStatRedis.getAddIssueEnd());
-			stakingStatisticNewResp.setBlockReward(networkStatRedis.getBlockReward());
+			stakingStatisticNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(networkStatRedis.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurrentNumber());
 			stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
 			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSetting());
-			stakingStatisticNewResp.setStakingDelegationValue(networkStatRedis.getStakingDelegationValue());
-			stakingStatisticNewResp.setStakingReward(networkStatRedis.getStakingReward());
+			stakingStatisticNewResp.setStakingDelegationValue(EnergonUtil.format(Convert.fromVon(networkStatRedis.getStakingDelegationValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			stakingStatisticNewResp.setStakingReward(EnergonUtil.format(Convert.fromVon(networkStatRedis.getStakingReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			stakingStatisticNewResp.setStakingValue(networkStatRedis.getStakingValue());
 		}
 		return stakingStatisticNewResp;
@@ -125,8 +126,9 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setBlockQty(stakings.get(i).getCurConsBlockQty());
 			aliveStakingListResp.setDelegateQty(stakings.get(i).getStatDelegateQty());
 			//委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额)
-			aliveStakingListResp.setDelegateValue(new BigDecimal(stakings.get(i).getStatDelegateHas())
-					.add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString());
+			String sumAmount = new BigDecimal(stakings.get(i).getStatDelegateHas())
+					.add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
+			aliveStakingListResp.setDelegateValue(EnergonUtil.format(Convert.fromVon(sumAmount, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			aliveStakingListResp.setExpectedIncome(stakings.get(i).getExpectedIncome());
 			aliveStakingListResp.setIsInit(stakings.get(i).getIsInit().intValue() == 1?true:false);
 			aliveStakingListResp.setIsRecommend(stakings.get(i).getIsRecommend().intValue() == 1?true:false);
@@ -138,8 +140,9 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setStakingIcon(stakings.get(i).getStakingIcon());
 			aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus()));
 			//质押总数=有效的质押+委托
-			aliveStakingListResp.setTotalValue(new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
-					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString());
+			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
+					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
+			aliveStakingListResp.setTotalValue(EnergonUtil.format(Convert.fromVon(totalValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			lists.add(aliveStakingListResp);
 		}
 		long size = stakingMapper.countByExample(stakingExample);
@@ -187,7 +190,7 @@ public class StakingServiceImpl implements StakingService {
 	}
 
 	@Override
-	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {
+	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
 		Integer size = stakings.size();
@@ -202,21 +205,23 @@ public class StakingServiceImpl implements StakingService {
 				resp.setStakingIcon(stakingNode.getStakingIcon());
 				resp.setStatus(StakingStatus.getDescByCode(stakingNode.getStatus()));
 				//质押总数=有效的质押+委托
-				resp.setTotalValue(new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
-						.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString());
+				String totalValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
+						.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
+				resp.setTotalValue(EnergonUtil.format(Convert.fromVon(totalValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				//委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额)
-				resp.setDelegateValue(new BigDecimal(stakingNode.getStatDelegateHas())
-						.add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString());
-				resp.setStakingValue(new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString());
-				resp.setDelegateQty(Integer.toString(stakingNode.getStatDelegateQty()));
+				String delValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
+				resp.setDelegateValue(EnergonUtil.format(Convert.fromVon(delValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+				String stakingValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString();
+				resp.setStakingValue(EnergonUtil.format(Convert.fromVon(stakingValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+				resp.setDelegateQty(stakingNode.getStatDelegateQty());
 				resp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
-				resp.setBlockQty(stakingNode.getStatBlockQty().intValue());
-				resp.setExpectBlockQty(Long.toString(stakingNode.getStatExpectBlockQty()));
+				resp.setBlockQty(stakingNode.getStatBlockQty());
+				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
 				resp.setExpectedIncome(stakingNode.getExpectedIncome());
 				resp.setJoinTime(sdf.format(stakingNode.getJoinTime()));
-				resp.setVerifierTime(Integer.toString(stakingNode.getStatVerifierTime()));
-				resp.setRewardValue(stakingNode.getStatRewardValue());
+				resp.setVerifierTime(stakingNode.getStatVerifierTime());
+				resp.setRewardValue(EnergonUtil.format(Convert.fromVon(stakingNode.getStatRewardValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				resp.setNodeId(stakingNode.getNodeId());
 				resp.setStakingAddr(stakingNode.getStakingAddr());
 				resp.setDenefitAddr(stakingNode.getDenefitAddr());
@@ -234,7 +239,7 @@ public class StakingServiceImpl implements StakingService {
 	}
 	
 	@Override
-	public RespPage<StakingOptRecordListResp> stakingOptRecordList(@Valid StakingOptRecordListReq req) {
+	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
 		NodeOptExample nodeOptExample = new NodeOptExample();
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		com.platon.browser.dao.entity.NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
@@ -259,7 +264,7 @@ public class StakingServiceImpl implements StakingService {
 	}
 	
 	@Override
-	public RespPage<DelegationListByStakingResp> delegationListByStaking(@Valid DelegationListByStakingReq req) {
+	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req) {
 		DelegationExample delegationExample = new DelegationExample();
 		com.platon.browser.dao.entity.DelegationExample.Criteria criteria = delegationExample.createCriteria();
 		criteria.andNodeIdEqualTo(req.getNodeId());
@@ -289,7 +294,7 @@ public class StakingServiceImpl implements StakingService {
 	}
 	
 	@Override
-	public RespPage<DelegationListByAddressResp> delegationListByAddress(@Valid DelegationListByAddressReq req) {
+	public RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req) {
 		DelegationExample delegationExample = new DelegationExample();
 		com.platon.browser.dao.entity.DelegationExample.Criteria criteria = delegationExample.createCriteria();
 		criteria.andDelegateAddrEqualTo(req.getAddress());

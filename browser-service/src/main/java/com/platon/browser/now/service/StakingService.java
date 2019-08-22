@@ -10,8 +10,6 @@ import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.resp.staking.*;
 
-import javax.validation.Valid;
-
 public interface StakingService {
 	
 	public StakingStatisticNewResp stakingStatisticNew();
@@ -22,12 +20,12 @@ public interface StakingService {
 
 	BaseResp<StakingChangeNewResp> stakingChangeNew();
 
-	BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req);
+	BaseResp<StakingDetailsResp> stakingDetails( StakingDetailsReq req);
 
-	public RespPage<StakingOptRecordListResp> stakingOptRecordList(@Valid StakingOptRecordListReq req);
+	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req);
 
-	public RespPage<DelegationListByStakingResp> delegationListByStaking(@Valid DelegationListByStakingReq req);
+	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req);
 
-	public RespPage<DelegationListByAddressResp> delegationListByAddress(@Valid DelegationListByAddressReq req);
+	public RespPage<DelegationListByAddressResp> delegationListByAddress( DelegationListByAddressReq req);
 	
 }

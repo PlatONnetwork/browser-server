@@ -56,14 +56,14 @@ public class ProposalServiceImpl implements ProposalService {
         respPage.setTotalCount(0);
         respPage.setTotalPages(0);
         req = req == null ? new PageReq() : req;
-        Page page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
+        Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         List<Proposal> list = proposalMapper.selectByExample(null);
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
             for (Proposal proposal : list) {
                 ProposalListResp proposalListResp = BeanConvertUtil.beanConvert(proposal, ProposalListResp.class);
                 proposalListResp.setProposalHash(proposal.getHash());
-                List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
+                List<BlockRedis> items = statisticCacheService.getBlockCache(0, 1);
                 if (items != null && items.size() > 0) {
                     proposalListResp.setCurBlock(items.get(0).getNumber().toString());
                 }
@@ -85,7 +85,7 @@ public class ProposalServiceImpl implements ProposalService {
         }
         ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
         proposalDetailsResp.setProposalHash(req.getProposalHash());
-        List<BlockRedis> items = statisticCacheService.getBlockCache(1, 1);
+        List<BlockRedis> items = statisticCacheService.getBlockCache(0, 1);
         if (items != null && items.size() > 0) {
             proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());
         }

@@ -10,7 +10,6 @@ import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.enums.TxTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
@@ -21,6 +20,7 @@ import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -29,12 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
 
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -43,7 +45,6 @@ import java.util.*;
 public class TransactionServiceImpl implements TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
-    private TxTypeEnum typeEnum;
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
@@ -104,19 +105,19 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionListResp> lists = new LinkedList<>();
         List<TransactionRedis> items = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
         TransactionListResp transactionListResp = new TransactionListResp();
-        for (int i = 0; i < items.size(); i++) {
-            transactionListResp.setTxHash(items.get(i).getHash());
-            transactionListResp.setFrom(items.get(i).getFrom());
-            transactionListResp.setTo(items.get(i).getTo());
-            transactionListResp.setValue(items.get(i).getValue());
-            transactionListResp.setActualTxCost(items.get(i).getActualTxCost());
-            transactionListResp.setTxType(items.get(i).getTxType());
+        for (TransactionRedis transactionRedis:items) {
+            transactionListResp.setTxHash(transactionRedis.getHash());
+            transactionListResp.setFrom(transactionRedis.getFrom());
+            transactionListResp.setTo(transactionRedis.getTo());
+            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transactionRedis.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transactionRedis.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setTxType(transactionRedis.getTxType());
             transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(items.get(i).getTimestamp().getTime());
-            transactionListResp.setBlockNumber(items.get(i).getBlockNumber());
+            transactionListResp.setTimestamp(transactionRedis.getTimestamp().getTime());
+            transactionListResp.setBlockNumber(transactionRedis.getBlockNumber());
             //TODO
             transactionListResp.setFailReason("");
-            transactionListResp.setReceiveType(items.get(i).getReceiveType());
+            transactionListResp.setReceiveType(transactionRedis.getReceiveType());
             lists.add(transactionListResp);
         }
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -137,19 +138,19 @@ public class TransactionServiceImpl implements TransactionService {
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         TransactionListResp transactionListResp = new TransactionListResp();
-        for (int i = 0; i < items.size(); i++) {
-            transactionListResp.setTxHash(items.get(i).getHash());
-            transactionListResp.setFrom(items.get(i).getFrom());
-            transactionListResp.setTo(items.get(i).getTo());
-            transactionListResp.setValue(items.get(i).getValue());
-            transactionListResp.setActualTxCost(items.get(i).getActualTxCost());
-            transactionListResp.setTxType(items.get(i).getTxType());
+        for (Transaction transaction:items) {
+            transactionListResp.setTxHash(transaction.getHash());
+            transactionListResp.setFrom(transaction.getFrom());
+            transactionListResp.setTo(transaction.getTo());
+            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setTxType(transaction.getTxType());
             transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(items.get(i).getTimestamp().getTime());
-            transactionListResp.setBlockNumber(items.get(i).getBlockNumber());
+            transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
+            transactionListResp.setBlockNumber(transaction.getBlockNumber());
             //TODO
             transactionListResp.setFailReason("");
-            transactionListResp.setReceiveType(items.get(i).getReceiveType());
+            transactionListResp.setReceiveType(transaction.getReceiveType());
             lists.add(transactionListResp);
         }
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -175,19 +176,19 @@ public class TransactionServiceImpl implements TransactionService {
         transactionExample.or(second);
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         TransactionListResp transactionListResp = new TransactionListResp();
-        for (int i = 0; i < items.size(); i++) {
-            transactionListResp.setTxHash(items.get(i).getHash());
-            transactionListResp.setFrom(items.get(i).getFrom());
-            transactionListResp.setTo(items.get(i).getTo());
-            transactionListResp.setValue(items.get(i).getValue());
-            transactionListResp.setActualTxCost(items.get(i).getActualTxCost());
-            transactionListResp.setTxType(items.get(i).getTxType());
+        for (Transaction transaction:items) {
+            transactionListResp.setTxHash(transaction.getHash());
+            transactionListResp.setFrom(transaction.getFrom());
+            transactionListResp.setTo(transaction.getTo());
+            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+            transactionListResp.setTxType(transaction.getTxType());
             transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(items.get(i).getTimestamp().getTime());
-            transactionListResp.setBlockNumber(items.get(i).getBlockNumber());
+            transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
+            transactionListResp.setBlockNumber(transaction.getBlockNumber());
             //TODO
             transactionListResp.setFailReason("");
-            transactionListResp.setReceiveType(items.get(i).getReceiveType());
+            transactionListResp.setReceiveType(transaction.getReceiveType());
             lists.add(transactionListResp);
         }
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -206,6 +207,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .andToEqualTo(address);
         // 限制最多导出3万条记录
         PageHelper.startPage(1,30000);
+        transactionExample.or(first);
         transactionExample.or(second);
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         List<Object[]> rows = new ArrayList<>();
@@ -223,8 +225,8 @@ public class TransactionServiceImpl implements TransactionService {
                     TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
-                    valueIn,
-                    valueOut,
+                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
+                    EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
                     transaction.getGasUsed()
             };
             rows.add(row);

@@ -150,7 +150,8 @@ public interface AppDocBlock {
      *       "statTransferQty":11,     //块内转账交易总数
      *       "statDelegateQty":11,     //块内委托交易总数
      *       "statStakingQty":11,      //块内验证人交易总数
-     *       "statProposalQty":11      //块内治理交易总数
+     *       "statProposalQty":11,      //块内治理交易总数
+     *       "serverTime":17       //当前服务器的时间
      *    }
      * }
      */
