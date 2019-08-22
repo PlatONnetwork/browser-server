@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.result.BlockChainResult;
 import com.platon.browser.exception.*;
@@ -71,6 +72,8 @@ public class BlockChain {
     public static final Map <String, CustomProposal> PROPOSALS_CACHE = new HashMap <>();
     // 全量统计数据
     public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
+    // 全量数据，需要根据业务变化，保持与数据库一致
+    public static final AddressCache ADDRESS_CACHE = new AddressCache();
     // 当前结算周期轮数
     private BigInteger curSettingEpoch;
     // 当前共识周期轮数

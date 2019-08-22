@@ -1,20 +1,18 @@
 package com.platon.browser.engine;
 
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.CustomAddressMapper;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.result.AddressExecuteResult;
-import com.platon.browser.enums.AddressEnum;
-import com.platon.browser.enums.InnerContractAddEnum;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: dongqile
@@ -26,22 +24,49 @@ public class AddressExecute {
     private static Logger logger = LoggerFactory.getLogger(AddressExecute.class);
 
     @Autowired
-    private AddressMapper addressMapper;
+    private CustomAddressMapper customAddressMapper;
 
     private AddressExecuteResult addressExecuteResult = new AddressExecuteResult();
 
-    private Map <String, Address> addressMap = new HashMap <>();
+    // 全量数据，需要根据业务变化，保持与数据库一致
+    private AddressCache addressCache = BlockChain.ADDRESS_CACHE;
 
     @PostConstruct
     private void init () {
         // 初始化全量数据
-        List <Address> addresseList = addressMapper.selectByExample(null);
-        addresseList.forEach(address -> addressMap.put(address.getAddress(), address));
+        List<CustomAddress> addresses = customAddressMapper.selectAll();
+        addresses.forEach(address -> addressCache.add(address));
     }
 
-    public void execute ( CustomTransaction tx ) {
+    public void execute (CustomTransaction tx) {
+        String from = tx.getFrom(),to = tx.getTo();
+        // 取from地址缓存，不存在则新建
+        CustomAddress fromAddress;
+        try {
+            fromAddress = addressCache.getAddress(from);
+        } catch (NoSuchBeanException e) {
+            logger.debug("缓存中没有from地址({})记录，添加一条",from);
+            fromAddress = new CustomAddress();
+            fromAddress.setAddress(from);
+        }
+
+        // 取to地址缓存，不存在则新建
+        CustomAddress toAddress;
+        try {
+            toAddress = addressCache.getAddress(to);
+        } catch (NoSuchBeanException e) {
+            logger.debug("缓存中没有to地址({})记录，添加一条",to);
+            toAddress = new CustomAddress();
+            toAddress.setAddress(to);
+        }
+
+        // 更新与地址是from还是to无关的通用属性
+        fromAddress.updateWithCustomTransaction(tx);
+        toAddress.updateWithCustomTransaction(tx);
+
+
         //入库前对address进行数据分析统计
-        if (addressMap.get(tx.getFrom()).equals(null) || addressMap.get(tx.getTo()).equals(null)) {
+        /*if (addressMap.get(tx.getFrom()).equals(null) || addressMap.get(tx.getTo()).equals(null)) {
             //【全量记录】中未查询到，则新增
             Address address = new Address();
             if (addressMap.get(tx.getFrom()).equals(null)) {
@@ -52,7 +77,7 @@ public class AddressExecute {
             if (addressMap.get(tx.getTo()).equals(null)) {
                 address.setAddress(tx.getTo());
                 if (InnerContractAddEnum.innerContractList.contains(tx.getTo())) {
-                    address.setType(AddressEnum.INNERCONTRACT.getCode());
+                    address.setType(AddressEnum.INNER_CONTRACT.getCode());
                 }
                 address.setType(AddressEnum.ACCOUNT.getCode());
             }
@@ -127,8 +152,15 @@ public class AddressExecute {
             addressMap.put(address.getAddress(), address);
             //若为存在address，添加到更新Set记录中
             addressExecuteResult.getUpdateAddress().add(address);
-        }
+        }*/
 
+
+    }
+
+    private void updateTo(String to, CustomTransaction tx) {
+    }
+
+    private void updateFrom(String from, CustomTransaction tx) {
 
     }
 
@@ -137,8 +169,7 @@ public class AddressExecute {
     }
 
     public void commitResult () {
-        addressExecuteResult.getAddAddress().clear();
-        addressExecuteResult.getUpdateAddress().clear();
+        addressExecuteResult.clear();
     }
 /*
     public void statisticsAddressInfo ( TreeMap <String, Staking> stakingCache, TreeMap <String, Delegation> delegationCache ) {

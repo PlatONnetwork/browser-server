@@ -354,7 +354,7 @@ public class BlockChainHandler {
                 case MPC:
             }
             // 地址相关
-            //addressExecute.execute(tx);
+            addressExecute.execute(tx);
             //更新统计信息
             updateWithNetworkStat();
         });
