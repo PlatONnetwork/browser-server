@@ -231,7 +231,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
-                    TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
+                    TypeEnum.getEnum(transaction.getTxType()).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
@@ -267,7 +267,7 @@ public class TransactionServiceImpl implements TransactionService {
         accountDownload.setLength(byteArrayOutputStream.size());
         return accountDownload;
     }
-    
+
     @Override
     public BaseResp<TransactionDetailsResp> transactionDetails(@Valid TransactionDetailsReq req) {
     	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
@@ -309,7 +309,7 @@ public class TransactionServiceImpl implements TransactionService {
     		if(transactionList.size()==0){
     			resp.setLast(true);
     		}
-    		
+
     		resp.setReceiveType("account");
     		String txInfo = transaction.getTxInfo();
     		JSONObject txInfoJson = JSONObject.parseObject(txInfo);
@@ -372,7 +372,7 @@ public class TransactionServiceImpl implements TransactionService {
 			case "2002":
 				// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
 				resp.setNodeName(txInfoJson.getString("nodeName"));
-				
+
 				break;
 			case "2003":
 				// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
@@ -394,7 +394,7 @@ public class TransactionServiceImpl implements TransactionService {
     	}
     	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
     }
-    
+
     @Override
     public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
     	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
@@ -432,5 +432,5 @@ public class TransactionServiceImpl implements TransactionService {
     	resp.setReceiveType(transaction.getReceiveType());
     	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
     }
-    
+
 }
