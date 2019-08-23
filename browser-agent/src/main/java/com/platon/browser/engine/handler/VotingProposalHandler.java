@@ -29,6 +29,10 @@ public class VotingProposalHandler implements EventHandler {
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
             BlockChain bc = context.getBlockChain();
             VotingProposalParam param = tx.getTxParam(VotingProposalParam.class);
+            param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            param.setPIDID(bc.PROPOSALS_CACHE.getProposal(new Integer(param.getProposalId())).getPipId().toString());
+            param.setProposalType(bc.PROPOSALS_CACHE.getProposal(new Integer(param.getProposalId())).getType());
+            tx.setTxInfo(JSON.toJSONString(param));
             logger.debug("投票信息:{}", JSON.toJSONString(param));
             CustomVote customVote = new CustomVote();
             customVote.updateWithVote(tx,param);

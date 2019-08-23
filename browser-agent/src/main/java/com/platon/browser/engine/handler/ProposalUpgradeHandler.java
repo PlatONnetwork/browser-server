@@ -41,6 +41,7 @@ public class ProposalUpgradeHandler implements EventHandler {
             try {
                 customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
                 //交易信息回填
+                param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
                 tx.setTxInfo(JSON.toJSONString(param));
             } catch (NoSuchBeanException e) {
                 throw new NoSuchBeanException("缓存中找不到对应的升级提案:" + e.getMessage());

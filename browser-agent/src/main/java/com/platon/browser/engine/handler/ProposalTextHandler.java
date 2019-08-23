@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -33,6 +34,9 @@ public class ProposalTextHandler implements EventHandler {
             CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
             CustomProposal customProposal = new CustomProposal();
             customProposal.updateWithCustomTransaction(tx);
+            //交易信息回填
+            param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            tx.setTxInfo(JSON.toJSONString(param));
             //获取配置文件提案参数模板
             String temp = bc.getChainConfig().getProposalUrlTemplate();
             String url = temp.replace(ProposalExecute.key,param.getPIDID());

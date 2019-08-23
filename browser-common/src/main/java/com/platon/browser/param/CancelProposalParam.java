@@ -30,6 +30,11 @@ public class CancelProposalParam {
      */
     private String canceledProposalID;
 
+    /**
+     * 节点名称
+     */
+    private String nodeName;
+
 
     public void init(String verifier,String pIDID,Integer endVotingRound,String canceledProposalID){
         this.setVerifier(verifier);

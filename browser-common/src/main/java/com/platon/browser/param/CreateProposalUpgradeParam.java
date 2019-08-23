@@ -32,7 +32,10 @@ public class CreateProposalUpgradeParam {
      */
     private Integer newVersion;
 
-
+    /**
+     * 节点名称
+     */
+    private String nodeName;
 
 
     public void init( String verifier, String pIDID, Integer endVotingRound,Integer newVersion){

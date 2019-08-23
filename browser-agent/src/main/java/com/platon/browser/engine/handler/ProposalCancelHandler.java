@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -30,6 +31,8 @@ public class ProposalCancelHandler implements EventHandler{
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
             BlockChain bc = context.getBlockChain();
             CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
+            param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            tx.setTxInfo(JSON.toJSONString(param));
             CustomProposal customProposal = new CustomProposal();
             customProposal.updateWithCustomTransaction(tx);
             //设置提案人

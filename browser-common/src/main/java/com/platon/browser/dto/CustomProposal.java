@@ -82,7 +82,7 @@ public class CustomProposal extends Proposal {
     public enum TypeEnum {
         TEXT("1", "文本提案"),
         UPGRADE("2", "升级提案"),
-        CANCEL("3", "取消提案");
+        CANCEL("4", "取消提案");
         public String code;
         public String desc;
         TypeEnum ( String code, String desc ) {
