@@ -20,10 +20,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import javax.validation.constraints.Min;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -62,15 +60,24 @@ public class BlockCacheServiceImpl implements BlockCacheService {
         long cacheItemCount = redisTemplate.opsForZSet().size(blocksCacheKey);
         // 待入库列表
         Set<ZSetOperations.TypedTuple<String>> stageSet = new HashSet<>();
+        class MinMax{Long minOffset=Long.MAX_VALUE,maxOffset=Long.MIN_VALUE;}
+        MinMax mm=new MinMax();
+        items.forEach(item->{
+            Long score = item.getNumber();
+            if(score<mm.minOffset) mm.minOffset=score;
+            if(score>mm.maxOffset) mm.maxOffset=score;
+        });
+        // 查询在缓存中是否有值
+        Set<String> exist = redisTemplate.opsForZSet().rangeByScore(blocksCacheKey,mm.minOffset,mm.maxOffset);
+        Set<Long> existScore = new HashSet<>();
+        exist.forEach(item->{
+            Block block = JSON.parseObject(item,Block.class);
+            existScore.add(block.getNumber());
+        });
         items.forEach(item -> {
-            Long startOffset=0l,endOffset=0l,score=0l;
-            startOffset=endOffset=score = item.getNumber();
-            // 根据score来判断缓存中的记录是否已经存在
-            Set<String> exist = redisTemplate.opsForZSet().rangeByScore(blocksCacheKey,startOffset,endOffset);
-            if(exist.size()==0){
-                // 在缓存中不存在的才放入缓存
-                stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));
-            }
+            if(existScore.contains(item.getNumber())) return;
+            // 在缓存中不存在的才放入缓存
+            stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getNumber().doubleValue()));
         });
         if(stageSet.size()>0){
             redisTemplate.opsForZSet().add(blocksCacheKey, stageSet);
