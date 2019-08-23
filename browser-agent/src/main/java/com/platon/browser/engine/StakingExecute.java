@@ -8,10 +8,7 @@ import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.*;
 import com.platon.browser.engine.result.StakingExecuteResult;
-import com.platon.browser.exception.CacheConstructException;
-import com.platon.browser.exception.ConsensusEpochChangeException;
-import com.platon.browser.exception.ElectionEpochChangeException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +92,7 @@ public class StakingExecute {
      * @param tx
      * @param bc
      */
-    public void execute(CustomTransaction tx, BlockChain bc){
+    public void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
         // 事件上下文
         EventContext context = new EventContext(tx,bc,nodeCache,executeResult,null);
         switch (tx.getTypeEnum()){
