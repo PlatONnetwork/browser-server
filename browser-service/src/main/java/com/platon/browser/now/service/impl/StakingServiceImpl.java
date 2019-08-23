@@ -166,7 +166,9 @@ public class StakingServiceImpl implements StakingService {
 		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null);
 		for (StakingNode stakingNode:stakings) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
-			historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+			if(stakingNode.getLeaveTime()!=null) {
+				historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+			}
 			historyStakingListResp.setNodeId(stakingNode.getNodeId());
 			historyStakingListResp.setNodeName(stakingNode.getStakingName());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());

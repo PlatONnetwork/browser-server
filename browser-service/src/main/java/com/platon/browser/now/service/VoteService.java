@@ -1,7 +1,6 @@
 package com.platon.browser.now.service;
 
 import com.platon.browser.dto.RespPage;
-import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.proposal.VoteListResp;
 
