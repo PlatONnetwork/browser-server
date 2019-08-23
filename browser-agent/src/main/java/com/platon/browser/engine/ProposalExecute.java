@@ -11,6 +11,7 @@ import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.*;
 import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,8 @@ public class ProposalExecute {
     private ProposalUpgradeHandler proposalUpgradeHandler;
     @Autowired
     private VotingProposalHandler votingProposalHandler;
+    @Autowired
+    private DeclareVersionHandler declareVersionHandler;
 
     @PostConstruct
     private void init(){
@@ -99,6 +102,7 @@ public class ProposalExecute {
             case CREATE_PROPOSAL_UPGRADE: proposalUpgradeHandler.handle(context);break; //提交升级提案(创建提案)
             case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //其他叫取消提案
             case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
+            case DECLARE_VERSION: declareVersionHandler.handle(context);break;//版本声明
         }
     }
 

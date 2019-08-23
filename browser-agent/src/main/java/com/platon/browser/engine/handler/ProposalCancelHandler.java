@@ -46,12 +46,14 @@ public class ProposalCancelHandler implements EventHandler{
             //从交易解析参数获取需要设置pIDID
             customProposal.setPipId(new Integer(param.getPIDID()));
             //解析器将轮数换成结束块高直接使用
-            customProposal.setEndVotingBlock(param.getEndVotingBlock().toString());
+            //结束轮转换结束区块高度
+            BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+            customProposal.setEndVotingBlock(cancelEndBlockNumber.toString());
             //设置pIDIDNum
             String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
             customProposal.setPipNum(pIDIDNum);
             //设置生效时间
-            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingBlock().toString(),bc.getChainConfig());
+            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
             customProposal.setActiveBlock(decActiveNumber.toString());
             //设置被取消的提案id
             customProposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));

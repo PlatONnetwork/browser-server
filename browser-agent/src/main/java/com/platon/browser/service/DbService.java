@@ -172,6 +172,7 @@ public class DbService {
          *      c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
          *      d.stat_delegate_qty  关联的委托地址数
          */
+
         BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
             for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
                 //只统计不为历史的委托数据
@@ -196,6 +197,7 @@ public class DbService {
     }
 
     public void dataOfAddressStatistics () throws BusinessException {
+
         /**
          * 2.补充统计地址相关数据
          *      a.staking_value  质押的金额
@@ -208,7 +210,6 @@ public class DbService {
          *      h.delegate_reduction  赎回中的
          *
          */
-
 
         for (CustomAddress customAddress : BlockChain.ADDRESS_CACHE.getAllAddress()) {
             BigInteger stakingValue = BigInteger.ZERO;
@@ -242,7 +243,7 @@ public class DbService {
                     } catch (NoSuchBeanException e) {
                         throw new BusinessException("[DbService]supply Address info exception by dataOfAddressStatistics()");
                     }
-                    if(status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)){
+                    if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
                         delegateUnlock = delegateUnlock.add(new BigInteger(delegation.getDelegateHas()));
                     }
                 }

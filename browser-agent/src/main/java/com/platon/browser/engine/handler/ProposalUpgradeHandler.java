@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -39,6 +40,8 @@ public class ProposalUpgradeHandler implements EventHandler {
             //设置提案人名称
             try {
                 customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+                //交易信息回填
+                tx.setTxInfo(JSON.toJSONString(param));
             } catch (NoSuchBeanException e) {
                 throw new NoSuchBeanException("缓存中找不到对应的升级提案:" + e.getMessage());
             }
@@ -52,12 +55,13 @@ public class ProposalUpgradeHandler implements EventHandler {
             //从交易解析参数获取需要设置pIDID
             customProposal.setPipId(new Integer(param.getPIDID()));
             //解析器将轮数换成结束块高直接使用
-            customProposal.setEndVotingBlock(param.getEndVotingBlock().toString());
+            BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+            customProposal.setEndVotingBlock(endBlockNumber.toString());
             //设置pIDIDNum
             String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key, param.getPIDID());
             customProposal.setPipNum(pIDIDNum);
             //设置生效时间
-            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingBlock().toString(), bc.getChainConfig());
+            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
             customProposal.setActiveBlock(decActiveNumber.toString());
             //设置新版本号
             customProposal.setNewVersion(String.valueOf(param.getNewVersion()));

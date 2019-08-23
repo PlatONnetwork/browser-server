@@ -21,15 +21,10 @@ public class CreateProposalTextParam {
      */
     private String pIDID;
 
-    /**
-     * 提案投票截止块高（EpochSize*N-20，不超过2周的块高）
-     */
-    private Integer endVotingBlock;
 
-    public void init(String verifier,String pIDID,Integer endVotingBlock){
+    public void init(String verifier,String pIDID){
         this.setVerifier(verifier);
         this.setPIDID(pIDID);
-        this.setEndVotingBlock(endVotingBlock);
     }
 
 

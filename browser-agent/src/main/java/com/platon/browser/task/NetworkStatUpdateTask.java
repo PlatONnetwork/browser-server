@@ -28,7 +28,7 @@ public class NetworkStatUpdateTask {
     @Autowired
     private PlatonClient platonClient;
 
-    @Scheduled(cron = "0/1 * * * * ?")
+    @Scheduled(cron = "0/5  * * * * ?")
     protected void start () {
         try {
             //从配置文件中获取到每个增发周期对应的基金会补充金额

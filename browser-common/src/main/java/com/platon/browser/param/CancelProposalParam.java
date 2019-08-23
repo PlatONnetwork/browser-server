@@ -23,7 +23,7 @@ public class CancelProposalParam {
     /**
      * 提案投票截止块高（EpochSize*N-20，不超过2周的块高
      */
-    private Integer endVotingBlock;
+    private Integer endVotingRound;
 
     /**
      * 被取消的目标提案
@@ -31,10 +31,10 @@ public class CancelProposalParam {
     private String canceledProposalID;
 
 
-    public void init(String verifier,String pIDID,Integer endVotingBlock,String canceledProposalID){
+    public void init(String verifier,String pIDID,Integer endVotingRound,String canceledProposalID){
         this.setVerifier(verifier);
         this.setPIDID(pIDID);
-        this.setEndVotingBlock(endVotingBlock);
+        this.setEndVotingRound(endVotingRound);
         this.setCanceledProposalID(canceledProposalID);
 
 

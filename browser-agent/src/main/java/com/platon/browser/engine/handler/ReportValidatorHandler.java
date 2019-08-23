@@ -47,6 +47,7 @@ public class ReportValidatorHandler implements EventHandler {
 
                 //交易数据回填
                 evidencesParam.setNodeName(latestStaking.getStakingName());
+                evidencesParam.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
 
                 //多签举报，惩罚金额
                 Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashRate().doubleValue();
