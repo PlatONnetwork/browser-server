@@ -101,6 +101,7 @@ public class BlockSyncTask {
         if (maxBlockNumber != null && maxBlockNumber > 0) {
             commitBlockNumber = maxBlockNumber;
             blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
+            blockChain.initCandidate(maxBlockNumber);
         }
 
 
