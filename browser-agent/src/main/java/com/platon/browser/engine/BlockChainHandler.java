@@ -115,7 +115,9 @@ public class BlockChainHandler {
         String incentivePoolAccountAddr = bc.getChainConfig().getIncentivePoolAccountAddr();
         try {
             // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
-            BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j().platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send().getBalance();
+            BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j()
+                    .platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)))
+                    .send().getBalance();
             logger.debug("区块号=({})时激励池账户余额:{}",blockNumber,incentivePoolAccountBalance.toString());
             // 计算当前增发周期内的每个结算周期的质押奖励
             BigDecimal settleReward = new BigDecimal(incentivePoolAccountBalance.toString())
