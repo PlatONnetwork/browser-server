@@ -11,14 +11,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.platon.browser.BrowserApiApplication;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
-import com.platon.browser.dto.transaction.TransactionDetail;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
-import com.platon.browser.req.transaction.TransactionDetailReq;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 
@@ -44,12 +42,12 @@ public class TransactionServiceImplTest {
 		assertNotNull(resp);
 	}
 	
-	@Test
+//	@Test
 	public void getTransactionListByBlock() {
 		TransactionListByBlockRequest req = new TransactionListByBlockRequest();
 		req.setBlockNumber(56779);
 		req.setTxType("0");
-		RespPage<TransactionListResp> resp = this.transactionService.getTransactionListByBlock(req);
+		RespPage<TransactionListResp>  resp = this.transactionService.getTransactionListByBlock(req);
 		assertNotNull(resp);
 	}
 	
@@ -61,7 +59,7 @@ public class TransactionServiceImplTest {
 		assertNotNull(resp);
 	}
 	
-	@Test
+//	@Test
 	public void transactionListByAddressDownload() {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
 		String date = "2019-08-21";

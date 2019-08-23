@@ -180,8 +180,8 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingChangeNewResp> stakingChangeNew() {
-
-		return null;
+		StakingChangeNewResp stakingChangeNewResp = new StakingChangeNewResp();
+		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), stakingChangeNewResp);
 	}
 
 	@Override

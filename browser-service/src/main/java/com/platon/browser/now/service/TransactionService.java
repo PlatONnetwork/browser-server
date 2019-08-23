@@ -1,7 +1,5 @@
 package com.platon.browser.now.service;
 
-import javax.validation.Valid;
-
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.req.PageReq;

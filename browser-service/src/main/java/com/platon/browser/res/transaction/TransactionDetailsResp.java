@@ -45,7 +45,7 @@ public class TransactionDetailsResp {
     private String proposalOption;      //投票  1：文本提案    2：升级提案   3：参数提案
     private String proposalNewVersion;  //升级提案的版本
     private String declareVersion;      //声明的版本 
-    private String txReceiptStatus;     //交易状态
+    private Integer txReceiptStatus;     //交易状态
     
     private String evidence;//证据
     private Integer reportType;//举报类型:1：区块双签
