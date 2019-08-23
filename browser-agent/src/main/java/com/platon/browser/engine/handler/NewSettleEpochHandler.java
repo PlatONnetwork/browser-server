@@ -6,19 +6,15 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
-import com.platon.browser.utils.HexTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.Node;
-import org.web3j.platon.contracts.NodeContract;
-import org.web3j.protocol.core.DefaultBlockParameter;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -37,14 +33,14 @@ public class NewSettleEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewSettleEpochHandler.class);
     private CustomTransaction tx;
     private NodeCache nodeCache;
-    private StakingExecuteResult executeResult;
+    private StakingStage stakingStage;
     private BlockChain bc;
 
     @Override
     public void handle(EventContext context) throws SettleEpochChangeException {
         tx = context.getTransaction();
         nodeCache = context.getNodeCache();
-        executeResult = context.getExecuteResult();
+        stakingStage = context.getStakingStage();
         bc = context.getBlockChain();
         stakingSettle();
         modifyDelegationInfoOnNewSettingEpoch();
@@ -69,7 +65,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
             }
             //添加需要更新的委托的信息到委托更新列表
-            executeResult.stageUpdateDelegation(delegation);
+            stakingStage.updateDelegation(delegation);
         });
     }
 
@@ -84,7 +80,7 @@ public class NewSettleEpochHandler implements EventHandler {
             //当锁定期金额为零时，认为此笔赎回委托交易已经完成
             unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
             //添加需要更新的赎回委托信息到赎回委托更新列表
-            executeResult.stageUpdateUnDelegation(unDelegation);
+            stakingStage.updateUnDelegation(unDelegation);
         });
     }
 
@@ -240,7 +236,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 // 更新节点的质押金累计字段
                 customNode.setStatRewardValue(curStaking.getStakingRewardValue());
                 // 将改动的内存暂存至待更新缓存
-                executeResult.stageUpdateNode(customNode);
+                stakingStage.updateNode(customNode);
             }else{
                 // 年化率设置为0
                 curStaking.setExpectedIncome(BigInteger.ZERO.toString());
@@ -248,7 +244,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
             }
             // 将改动的内存暂存至待更新缓存
-            executeResult.stageUpdateStaking(curStaking);
+            stakingStage.updateStaking(curStaking);
         }
     }
 }

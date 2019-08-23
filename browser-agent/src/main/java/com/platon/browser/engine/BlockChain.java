@@ -1,23 +1,18 @@
 package com.platon.browser.engine;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
-import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
-import com.platon.browser.engine.result.BlockChainResult;
+import com.platon.browser.engine.stage.BlockChainResult;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
-import com.platon.browser.task.BlockSyncTask;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +61,7 @@ public class BlockChain {
     private BlockChainHandler blockChainHandler;
 
     // 业务数据暂存容器
-    public static final BlockChainResult STAGE_BIZ_DATA = new BlockChainResult();
+    public static final BlockChainResult STAGE_DATA = new BlockChainResult();
     // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
     public static final NodeCache NODE_CACHE = new NodeCache();
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
@@ -139,7 +134,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException, BusinessException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         blockChainHandler.updateEpoch();
@@ -169,13 +164,13 @@ public class BlockChain {
      * @return
      */
     public BlockChainResult exportResult () {
-        return STAGE_BIZ_DATA;
+        return STAGE_DATA;
     }
 
     /**
      * 清除分析后的业务数据
      */
     public void commitResult () {
-        STAGE_BIZ_DATA.clear();
+        STAGE_DATA.clear();
     }
 }

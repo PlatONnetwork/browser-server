@@ -1,17 +1,22 @@
 package com.platon.browser.engine.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalExecute;
-import com.platon.browser.engine.result.ProposalExecuteResult;
+import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalTextParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 
 /**
  * 治理相关(提交文本提案)事件处理类
@@ -23,53 +28,53 @@ import org.springframework.stereotype.Component;
 public class ProposalTextHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalTextHandler.class);
 
-
     @Override
-    public void handle ( EventContext context ){
+    public void handle ( EventContext context ) throws BusinessException {
+        CustomTransaction tx = context.getTransaction();
+        ProposalStage proposalStage = context.getProposalStage();
+        BlockChain bc = context.getBlockChain();
+        //根据交易参数解析成对应文本提案结构
+        CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
+        CustomProposal proposal = new CustomProposal();
+        proposal.updateWithCustomTransaction(tx);
+        CustomNode node;
         try {
-            CustomTransaction tx = context.getTransaction();
-            ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
-            BlockChain bc = context.getBlockChain();
-            //根据交易参数解析成对应文本提案结构
-            CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
-            CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithCustomTransaction(tx);
-            //交易信息回填
-            param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            tx.setTxInfo(JSON.toJSONString(param));
-            //获取配置文件提案参数模板
-            String temp = bc.getChainConfig().getProposalUrlTemplate();
-            String url = temp.replace(ProposalExecute.key,param.getPIDID());
-            //设置url
-            customProposal.setUrl(url);
-            //从交易解析参数获取需要设置pIDID
-            customProposal.setPipId(new Integer(param.getPIDID()));
-            //解析器将轮数换成结束块高直接使用
-            customProposal.setEndVotingBlock("");
-            //设置pIDIDNum
-            String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
-            customProposal.setPipNum(pIDIDNum);
-            //设置提案类型
-            customProposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
-            //设置提案人
-            customProposal.setVerifier(param.getVerifier());
-            //设置提案人名称
-            try {
-                customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            }catch (NoSuchBeanException e){
-                throw new NoSuchBeanException("缓存中找不到对应的文本提案:"+e.getMessage());
-            }
-            //新增文本提案交易结构
-            customProposal.setCanceledPipId(0);
-            customProposal.setCanceledTopic("");
-            proposalExecuteResult.stageAddProposals(customProposal);
-            //全量数据补充
-            bc.PROPOSALS_CACHE.add(customProposal);
-        }catch (Exception e){
-            logger.error("[ProposalTextHandler] exception {}",e.getMessage());
+            node = NODE_CACHE.getNode(param.getVerifier());
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
-
+        CustomStaking staking;
+        try {
+            staking = node.getLatestStaking();
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理文本提案出错:"+e.getMessage());
+        }
+        //交易信息回填
+        param.setNodeName(staking.getStakingName());
+        tx.setTxInfo(JSON.toJSONString(param));
+        //获取配置文件提案参数模板
+        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String url = temp.replace(ProposalExecute.key,param.getPIDID());
+        //设置url
+        proposal.setUrl(url);
+        //从交易解析参数获取需要设置pIDID
+        proposal.setPipId(new Integer(param.getPIDID()));
+        //解析器将轮数换成结束块高直接使用
+        proposal.setEndVotingBlock("");
+        //设置pIDIDNum
+        String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
+        proposal.setPipNum(pIDIDNum);
+        //设置提案类型
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
+        //设置提案人
+        proposal.setVerifier(param.getVerifier());
+        //设置提案人名称
+        proposal.setVerifierName(staking.getStakingName());
+        //新增文本提案交易结构
+        proposal.setCanceledPipId(0);
+        proposal.setCanceledTopic("");
+        proposalStage.insertProposal(proposal);
+        //全量数据补充
+        PROPOSALS_CACHE.addProposal(proposal);
     }
-
-
 }

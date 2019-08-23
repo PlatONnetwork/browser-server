@@ -4,9 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.DelegateParam;
 import com.platon.browser.param.UnDelegateParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ public class UnDelegateHandler implements EventHandler {
     public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
-        StakingExecuteResult executeResult = context.getExecuteResult();
+        StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
 
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
@@ -100,9 +99,9 @@ public class UnDelegateHandler implements EventHandler {
             nodeCache.addUnDelegation(customUnDelegation);
 
             //更新分析委托结果
-            executeResult.stageUpdateDelegation(customDelegation);
+            stakingStage.updateDelegation(customDelegation);
             //新增分析委托赎回结果
-            executeResult.stageAddUnDelegation(customUnDelegation);
+            stakingStage.insertUnDelegation(customUnDelegation);
 
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());

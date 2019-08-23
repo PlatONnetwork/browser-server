@@ -5,12 +5,10 @@ import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateParam;
-import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,7 +30,7 @@ public class DelegateHandler implements EventHandler {
     public void handle ( EventContext context ) {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
-        StakingExecuteResult executeResult = context.getExecuteResult();
+        StakingStage stakingStage = context.getStakingStage();
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {
@@ -57,7 +55,7 @@ public class DelegateHandler implements EventHandler {
                     customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
                     customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
                     //更新分析结果UpdateSet
-                    executeResult.stageUpdateDelegation(customDelegation);
+                    stakingStage.updateDelegation(customDelegation);
                 }
 
                 //若不存在，则说明该地址有对此节点做过委托
@@ -69,7 +67,7 @@ public class DelegateHandler implements EventHandler {
                     nodeCache.addDelegation(newCustomDelegation);
 
                     //新增分析结果AddSet
-                    executeResult.stageAddDelegation(newCustomDelegation);
+                    stakingStage.insertDelegation(newCustomDelegation);
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}", e.getMessage());

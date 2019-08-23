@@ -4,11 +4,9 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.*;
+import com.platon.browser.engine.stage.*;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,10 +78,10 @@ public class DbService {
             transactionCacheService.update(new HashSet <>(transactions));
         }
         // 统计数据入库并更新redis缓存
-        NetworkStatResult nsr = bizData.getNetworkStatResult();
-        if (nsr.getUpdateNetworkStats().size() > 0) {
-            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getUpdateNetworkStats(), NetworkStat.Column.values());
-            networkStatCacheService.update(nsr.getUpdateNetworkStats());
+        NetworkStatStage nsr = bizData.getNetworkStatStage();
+        if (nsr.getNetworkStatUpdateStage().size() > 0) {
+            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getNetworkStatUpdateStage(), NetworkStat.Column.values());
+            networkStatCacheService.update(nsr.getNetworkStatUpdateStage());
         }
 
         //质押统计数据补充
@@ -93,41 +91,41 @@ public class DbService {
         dataOfAddressStatistics();
 
         // 质押相关数据
-        StakingExecuteResult ser = bizData.getStakingExecuteResult();
+        StakingStage ser = bizData.getStakingStage();
         // 提案相关数据
-        ProposalExecuteResult per = bizData.getProposalExecuteResult();
+        ProposalStage per = bizData.getProposalStage();
         // 地址相关数据
-        AddressExecuteResult aer = bizData.getAddressExecuteResult();
+        AddressStage aer = bizData.getAddressStage();
 
         /*****************************批量新增操作 START**************************/
 
         // ****************新增节点质押相关数据*******************
         //批量入库新增节点数据
-        if (ser.getAddNodes().size() > 0)
-            customNodeMapper.batchInsertOrUpdateSelective(ser.getAddNodes(), Node.Column.values());
+        if (ser.getNodeInsertStage().size() > 0)
+            customNodeMapper.batchInsertOrUpdateSelective(ser.getNodeInsertStage(), Node.Column.values());
         //批量入库新增质押数据
-        if (ser.getAddStakings().size() > 0)
-            customStakingMapper.batchInsertOrUpdateSelective(ser.getAddStakings(), Staking.Column.values());
+        if (ser.getStakingInsertStage().size() > 0)
+            customStakingMapper.batchInsertOrUpdateSelective(ser.getStakingInsertStage(), Staking.Column.values());
         //批量入库新增委托数据
-        if (ser.getAddDelegations().size() > 0)
-            customDelegationMapper.batchInsertOrUpdateSelective(ser.getAddDelegations(), Delegation.Column.values());
+        if (ser.getDelegationInsertStage().size() > 0)
+            customDelegationMapper.batchInsertOrUpdateSelective(ser.getDelegationInsertStage(), Delegation.Column.values());
         //批量入库新增解委托数据
-        if (ser.getAddUnDelegations().size() > 0)
-            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getAddUnDelegations(), UnDelegation.Column.values());
+        if (ser.getUnDelegationInsertStage().size() > 0)
+            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getUnDelegationInsertStage(), UnDelegation.Column.values());
         //批量入库新增惩罚数据
-        if (ser.getAddSlashs().size() > 0)
-            customSlashMapper.batchInsertOrUpdateSelective(ser.getAddSlashs(), Slash.Column.values());
+        if (ser.getSlashInsertStage().size() > 0)
+            customSlashMapper.batchInsertOrUpdateSelective(ser.getSlashInsertStage(), Slash.Column.values());
         //批量入库新增操作数据
-        if (ser.getAddNodeOpts().size() > 0)
-            customNodeOptMapper.batchInsertOrUpdateSelective(ser.getAddNodeOpts(), NodeOpt.Column.values());
+        if (ser.getNodeOptInsertStage().size() > 0)
+            customNodeOptMapper.batchInsertOrUpdateSelective(ser.getNodeOptInsertStage(), NodeOpt.Column.values());
 
         // ****************新增提案相关数据*******************
         //批量入库新增治理数据
-        if (per.getAddProposals().size() > 0)
-            customProposalMapper.batchInsertOrUpdateSelective(per.getAddProposals(), Proposal.Column.values());
+        if (per.getProposalInsertStage().size() > 0)
+            customProposalMapper.batchInsertOrUpdateSelective(per.getProposalInsertStage(), Proposal.Column.values());
         //批量入库新增投票数据
-        if (per.getAddVotes().size() > 0)
-            customVoteMapper.batchInsertOrUpdateSelective(per.getAddVotes(), Vote.Column.values());
+        if (per.getVoteInsertStage().size() > 0)
+            customVoteMapper.batchInsertOrUpdateSelective(per.getVoteInsertStage(), Vote.Column.values());
 
         /*****************************批量新增操作 END**************************/
 
@@ -135,25 +133,26 @@ public class DbService {
         /*****************************批量更新操作 START**************************/
         // ****************更新质押相关数据*******************
         //批量入库或更新节点数据
-        if (ser.getUpdateNodes().size() > 0)
-            customNodeMapper.batchInsertOrUpdateSelective(ser.getUpdateNodes(), Node.Column.values());
+        if (ser.getNodeUpdateStage().size() > 0)
+            customNodeMapper.batchInsertOrUpdateSelective(ser.getNodeUpdateStage(), Node.Column.values());
         //批量入库更新质押数据
-        if (ser.getUpdateStakings().size() > 0)
-            customStakingMapper.batchInsertOrUpdateSelective(ser.getUpdateStakings(), Staking.Column.values());
+        if (ser.getStakingUpdateStage().size() > 0)
+            customStakingMapper.batchInsertOrUpdateSelective(ser.getStakingUpdateStage(), Staking.Column.values());
         //批量入库更新委托数据
-        if (ser.getUpdateDelegations().size() > 0)
-            customDelegationMapper.batchInsertOrUpdateSelective(ser.getUpdateDelegations(), Delegation.Column.values());
+        if (ser.getDelegationUpdateStage().size() > 0)
+            customDelegationMapper.batchInsertOrUpdateSelective(ser.getDelegationUpdateStage(), Delegation.Column.values());
         //批量入库更新解委托数据
-        if (ser.getUpdateUnDelegations().size() > 0)
-            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getUpdateUnDelegations(), UnDelegation.Column.values());
+        if (ser.getUnDelegationUpdateStage().size() > 0)
+            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getUnDelegationUpdateStage(), UnDelegation.Column.values());
 
         // ****************更新提案相关数据*******************
         //批量更新提案
-        if (per.getUpdateProposals().size() > 0)
-            customProposalMapper.batchInsertOrUpdateSelective(per.getUpdateProposals(), Proposal.Column.values());
+        if (per.getProposalUpdateStage().size() > 0)
+            customProposalMapper.batchInsertOrUpdateSelective(per.getProposalUpdateStage(), Proposal.Column.values());
 
         // ****************批量插入或更新地址相关数据*******************
-        Set <Address> addresses = aer.export();
+        Set <Address> addresses = aer.getAddressUpdateStage();
+        addresses.addAll(aer.getAddressInsertStage());
         if (addresses.size() > 0) {
             customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
         }

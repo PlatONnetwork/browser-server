@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomProposalMapper">
-
   <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomProposal" extends="com.platon.browser.dao.mapper.ProposalMapper.BaseResultMap"/>
-
+  <!--查询所有提案-->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="com.platon.browser.dao.mapper.ProposalMapper.Base_Column_List" />
+    from proposal
+  </select>
   <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into proposal (
     <foreach collection="selective" item="column" separator=",">
@@ -31,15 +38,6 @@
         </if>
         <if test="'new_version'.toString() == column.value">
           #{item.newVersion,jdbcType=VARCHAR}
-        </if>
-        <if test="'param_name'.toString() == column.value">
-          #{item.paramName,jdbcType=VARCHAR}
-        </if>
-        <if test="'current_value'.toString() == column.value">
-          #{item.currentValue,jdbcType=VARCHAR}
-        </if>
-        <if test="'new_value'.toString() == column.value">
-          #{item.newValue,jdbcType=VARCHAR}
         </if>
         <if test="'end_voting_block'.toString() == column.value">
           #{item.endVotingBlock,jdbcType=VARCHAR}
@@ -70,6 +68,24 @@
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'pip_num'.toString() == column.value">
+          #{item.pipNum,jdbcType=VARCHAR}
+        </if>
+        <if test="'pip_id'.toString() == column.value">
+          #{item.pipId,jdbcType=INTEGER}
+        </if>
+        <if test="'topic'.toString() == column.value">
+          #{item.topic,jdbcType=VARCHAR}
+        </if>
+        <if test="'description'.toString() == column.value">
+          #{item.description,jdbcType=VARCHAR}
+        </if>
+        <if test="'canceled_pip_id'.toString() == column.value">
+          #{item.canceledPipId,jdbcType=INTEGER}
+        </if>
+        <if test="'canceled_topic'.toString() == column.value">
+          #{item.canceledTopic,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

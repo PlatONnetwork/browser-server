@@ -5,7 +5,7 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class CreateValidatorHandler implements EventHandler {
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
-        StakingExecuteResult executeResult = context.getExecuteResult();
+        StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
@@ -49,7 +49,7 @@ public class CreateValidatorHandler implements EventHandler {
                     // 把最新质押信息添加至缓存
                     node.getStakings().put(tx.getBlockNumber(),newStaking);
                     // 把最新质押信息添加至待入库列表
-                    executeResult.stageAddStaking(newStaking,tx);
+                    stakingStage.insertStaking(newStaking,tx);
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}",e.getMessage());
@@ -69,8 +69,8 @@ public class CreateValidatorHandler implements EventHandler {
             // 节点添加到缓存中
             nodeCache.addNode(node);
             // 新节点和新质押记录暂存到待入库列表中
-            executeResult.stageAddNode(node);
-            executeResult.stageAddStaking(staking,tx);
+            stakingStage.insertNode(node);
+            stakingStage.insertStaking(staking,tx);
         }
     }
 }

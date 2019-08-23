@@ -6,7 +6,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.EvidencesParam;
 import com.platon.browser.param.ReportValidatorParam;
@@ -33,7 +33,7 @@ public class ReportValidatorHandler implements EventHandler {
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
-        StakingExecuteResult executeResult = context.getExecuteResult();
+        StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
         // 获取交易入参
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
@@ -69,7 +69,7 @@ public class ReportValidatorHandler implements EventHandler {
                 latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
                 latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
                 //更新分析质押结果
-                executeResult.stageUpdateStaking(latestStaking ,tx);
+                stakingStage.updateStaking(latestStaking ,tx);
 
                 //新增举报交易结构
                 CustomSlash newCustomSlash = new CustomSlash();
@@ -78,7 +78,7 @@ public class ReportValidatorHandler implements EventHandler {
                 newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashRate().toString());
 
                 //新增分析多重签名结果
-                executeResult.stageAddSlash(newCustomSlash);
+                stakingStage.insertSlash(newCustomSlash);
             } catch (NoSuchBeanException e) {
                 logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             }

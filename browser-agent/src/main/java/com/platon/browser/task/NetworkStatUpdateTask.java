@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+
 /**
  * User: dongqile
  * Date: 2019/8/20
@@ -61,7 +63,7 @@ public class NetworkStatUpdateTask {
             //数据回填内存中
             blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.toString());
             blockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.toString());
-            blockChain.exportResult().getNetworkStatResult().stageUpdateNetworkStat(blockChain.NETWORK_STAT_CACHE);
+            STAGE_DATA.getNetworkStatStage().updateNetworkStat(blockChain.NETWORK_STAT_CACHE);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }

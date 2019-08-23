@@ -1,11 +1,14 @@
 package com.platon.browser.engine.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalExecute;
-import com.platon.browser.engine.result.ProposalExecuteResult;
+import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CancelProposalParam;
 import com.platon.browser.util.RoundCalculation;
@@ -14,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 
 /**
  * User: dongqile
@@ -25,52 +31,66 @@ public class ProposalCancelHandler implements EventHandler{
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandler.class);
 
     @Override
-    public void handle ( EventContext context ) throws NoSuchBeanException {
+    public void handle ( EventContext context ) throws BusinessException {
+        CustomTransaction tx = context.getTransaction();
+        ProposalStage proposalStage = context.getProposalStage();
+        BlockChain bc = context.getBlockChain();
+        CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
+
+        CustomNode node;
         try {
-            CustomTransaction tx = context.getTransaction();
-            ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
-            BlockChain bc = context.getBlockChain();
-            CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
-            param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            tx.setTxInfo(JSON.toJSONString(param));
-            CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithCustomTransaction(tx);
-            //设置提案人
-            customProposal.setVerifier(param.getVerifier());
-            //设置提案人名称
-            customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            //设置提案为升级类型
-            customProposal.setType(String.valueOf(CustomProposal.TypeEnum.CANCEL.code));
-            //获取配置文件提案参数模板
-            String temp = bc.getChainConfig().getProposalUrlTemplate();
-            String url = temp.replace(ProposalExecute.key,param.getPIDID());
-            //设置url
-            customProposal.setUrl(url);
-            //从交易解析参数获取需要设置pIDID
-            customProposal.setPipId(new Integer(param.getPIDID()));
-            //解析器将轮数换成结束块高直接使用
-            //结束轮转换结束区块高度
-            BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
-            customProposal.setEndVotingBlock(cancelEndBlockNumber.toString());
-            //设置pIDIDNum
-            String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
-            customProposal.setPipNum(pIDIDNum);
-            //设置生效时间
-            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
-            customProposal.setActiveBlock(decActiveNumber.toString());
-            //设置被取消的提案id
-            customProposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));
-            //全局内存变量中查询对应需要取消的提案主题
-            customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.getProposal(param.getCanceledProposalID()).getTopic());
-            customProposal.setNewVersion("");
-            //更新新增提案列表
-            proposalExecuteResult.stageAddProposals(customProposal);
-            //全量数据补充
-            bc.PROPOSALS_CACHE.add(customProposal);
-        }catch (Exception e){
-            logger.error("{}",e.getMessage());
-            throw new NoSuchBeanException("缓存中找不到对应的取消提案:"+e.getMessage());
+            node = NODE_CACHE.getNode(param.getVerifier());
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理取消提案出错:"+e.getMessage());
+        }
+        CustomStaking staking;
+        try {
+            staking = node.getLatestStaking();
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理取消提案出错:"+e.getMessage());
         }
 
+        param.setNodeName(staking.getStakingName());
+        tx.setTxInfo(JSON.toJSONString(param));
+        CustomProposal proposal = new CustomProposal();
+        proposal.updateWithCustomTransaction(tx);
+        //设置提案人
+        proposal.setVerifier(param.getVerifier());
+        //设置提案人名称
+        proposal.setVerifierName(staking.getStakingName());
+        //设置提案为升级类型
+        proposal.setType(CustomProposal.TypeEnum.CANCEL.code);
+        //获取配置文件提案参数模板
+        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String url = temp.replace(ProposalExecute.key,param.getPIDID());
+        //设置url
+        proposal.setUrl(url);
+        //从交易解析参数获取需要设置pIDID
+        proposal.setPipId(new Integer(param.getPIDID()));
+        //解析器将轮数换成结束块高直接使用
+        //结束轮转换结束区块高度
+        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        proposal.setEndVotingBlock(cancelEndBlockNumber.toString());
+        //设置pIDIDNum
+        String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
+        proposal.setPipNum(pIDIDNum);
+        //设置生效时间
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        proposal.setActiveBlock(decActiveNumber.toString());
+        //设置被取消的提案id
+        proposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));
+        //全局内存变量中查询对应需要取消的提案主题
+        CustomProposal targetProposal;
+        try {
+            targetProposal = PROPOSALS_CACHE.getProposal(param.getCanceledProposalID());
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("缓存中不存在被取消的目标提案:"+e.getMessage());
+        }
+        proposal.setCanceledTopic(targetProposal.getTopic());
+        proposal.setNewVersion("");
+        //更新新增提案列表
+        proposalStage.insertProposal(proposal);
+        //全量数据补充
+        PROPOSALS_CACHE.addProposal(proposal);
     }
 }

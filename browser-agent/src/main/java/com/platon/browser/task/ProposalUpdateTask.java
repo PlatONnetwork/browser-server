@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * User: dongqile
@@ -60,9 +61,9 @@ public class ProposalUpdateTask {
                         proposal.setCanceledTopic(cancelProp.getDescription());
                     }
                     // 添加至全量缓存
-                    PROPOSALS_CACHE.add(proposal);
+                    PROPOSALS_CACHE.addProposal(proposal);
                     // 暂存至待入库列表
-                    BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().stageUpdateProposals(proposal);
+                    STAGE_DATA.getProposalStage().updateProposal(proposal);
                 } catch (Exception e) {
                     logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(),e.getMessage());
                 }
@@ -83,9 +84,9 @@ public class ProposalUpdateTask {
                     //设置状态
                     proposal.setStatus(result.data.getStatus());
                     // 添加至全量缓存
-                    PROPOSALS_CACHE.add(proposal);
+                    PROPOSALS_CACHE.addProposal(proposal);
                     // 暂存至待入库列表
-                    BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().stageUpdateProposals(proposal);
+                    STAGE_DATA.getProposalStage().updateProposal(proposal);
                 } catch (Exception e) {
                     logger.error("更新提案({})的结果出错:{}", proposal.getPipId(), e.getMessage());
                 }

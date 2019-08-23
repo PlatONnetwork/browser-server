@@ -4,7 +4,7 @@ import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.AddressCache;
-import com.platon.browser.engine.result.AddressExecuteResult;
+import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class AddressExecute {
     @Autowired
     private CustomAddressMapper customAddressMapper;
 
-    private AddressExecuteResult executeResult = BlockChain.STAGE_BIZ_DATA.getAddressExecuteResult();
+    private AddressStage addressStage = BlockChain.STAGE_DATA.getAddressStage();
     // 全量数据，需要根据业务变化，保持与数据库一致
     private AddressCache addressCache = BlockChain.ADDRESS_CACHE;
 
@@ -67,7 +67,7 @@ public class AddressExecute {
         fromAddress.updateWithCustomTransaction(tx);
         toAddress.updateWithCustomTransaction(tx);
 
-        executeResult.stage(fromAddress);
-        executeResult.stage(toAddress);
+        addressStage.insertAddress(fromAddress);
+        addressStage.insertAddress(toAddress);
     }
 }

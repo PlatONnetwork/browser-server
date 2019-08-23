@@ -1,11 +1,14 @@
 package com.platon.browser.engine.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalExecute;
-import com.platon.browser.engine.result.ProposalExecuteResult;
+import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalUpgradeParam;
 import com.platon.browser.util.RoundCalculation;
@@ -14,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 
 /**
  * User: dongqile
@@ -24,56 +30,61 @@ import java.math.BigDecimal;
 public class ProposalUpgradeHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpgradeHandler.class);
 
-
     @Override
-    public void handle ( EventContext context ) throws NoSuchBeanException {
+    public void handle ( EventContext context ) throws BusinessException {
+        CustomTransaction tx = context.getTransaction();
+        ProposalStage proposalStage = context.getProposalStage();
+        BlockChain bc = context.getBlockChain();
+        //根据交易参数解析成对应文本提案结构
+        CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
+        CustomProposal proposal = new CustomProposal();
+        proposal.updateWithCustomTransaction(tx);
+        //设置提案人
+        proposal.setVerifier(param.getVerifier());
+
+        CustomNode node;
         try {
-            CustomTransaction tx = context.getTransaction();
-            ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
-            BlockChain bc = context.getBlockChain();
-            //根据交易参数解析成对应文本提案结构
-            CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
-            CustomProposal customProposal = new CustomProposal();
-            customProposal.updateWithCustomTransaction(tx);
-            //设置提案人
-            customProposal.setVerifier(param.getVerifier());
-            //设置提案人名称
-            try {
-                customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-                //交易信息回填
-                param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-                tx.setTxInfo(JSON.toJSONString(param));
-            } catch (NoSuchBeanException e) {
-                throw new NoSuchBeanException("缓存中找不到对应的升级提案:" + e.getMessage());
-            }
-            //设置提案为升级类型
-            customProposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
-            //获取配置文件提案参数模板
-            String temp = bc.getChainConfig().getProposalUrlTemplate();
-            String url = temp.replace(ProposalExecute.key, param.getPIDID());
-            //设置url
-            customProposal.setUrl(url);
-            //从交易解析参数获取需要设置pIDID
-            customProposal.setPipId(new Integer(param.getPIDID()));
-            //解析器将轮数换成结束块高直接使用
-            BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
-            customProposal.setEndVotingBlock(endBlockNumber.toString());
-            //设置pIDIDNum
-            String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key, param.getPIDID());
-            customProposal.setPipNum(pIDIDNum);
-            //设置生效时间
-            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
-            customProposal.setActiveBlock(decActiveNumber.toString());
-            //设置新版本号
-            customProposal.setNewVersion(String.valueOf(param.getNewVersion()));
-            customProposal.setCanceledPipId(0);
-            customProposal.setCanceledTopic("");
-            //新增文本提案交易结构
-            proposalExecuteResult.stageAddProposals(customProposal);
-            //全量数据补充
-            bc.PROPOSALS_CACHE.add(customProposal);
-        } catch (Exception e) {
-            logger.error("[ProposalUpgradeHandler] exception {}",e.getMessage());
+            node = NODE_CACHE.getNode(param.getVerifier());
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
+        CustomStaking staking;
+        try {
+            staking = node.getLatestStaking();
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("处理文本提案出错:"+e.getMessage());
+        }
+
+        proposal.setVerifierName(staking.getStakingName());
+        //交易信息回填
+        param.setNodeName(staking.getStakingName());
+        tx.setTxInfo(JSON.toJSONString(param));
+
+        //设置提案为升级类型
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
+        //获取配置文件提案参数模板
+        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String url = temp.replace(ProposalExecute.key, param.getPIDID());
+        //设置url
+        proposal.setUrl(url);
+        //从交易解析参数获取需要设置pIDID
+        proposal.setPipId(new Integer(param.getPIDID()));
+        //解析器将轮数换成结束块高直接使用
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        proposal.setEndVotingBlock(endBlockNumber.toString());
+        //设置pIDIDNum
+        String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key, param.getPIDID());
+        proposal.setPipNum(pIDIDNum);
+        //设置生效时间
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
+        proposal.setActiveBlock(decActiveNumber.toString());
+        //设置新版本号
+        proposal.setNewVersion(String.valueOf(param.getNewVersion()));
+        proposal.setCanceledPipId(0);
+        proposal.setCanceledTopic("");
+        //新增文本提案交易结构
+        proposalStage.insertProposal(proposal);
+        //全量数据补充
+        PROPOSALS_CACHE.addProposal(proposal);
     }
 }

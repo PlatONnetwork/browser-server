@@ -7,7 +7,7 @@ import com.platon.browser.dao.mapper.CustomUnDelegationMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.*;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class StakingExecute {
     // 全量数据，需要根据业务变化，保持与数据库一致
     private NodeCache nodeCache = BlockChain.NODE_CACHE;
 
-    private StakingExecuteResult executeResult= BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult();
+    private StakingStage stakingStage= BlockChain.STAGE_DATA.getStakingStage();
 
     /**
      * 加载并构造节点缓存结构
@@ -82,19 +82,18 @@ public class StakingExecute {
 
     @PostConstruct
     private void init() throws CacheConstructException {
-        /***把当前库中的验证人列表加载到内存中**/
         // 加载并构造节点缓存结构
         loadNodes();
     }
 
     /**
      * 执行交易
-     * @param tx
-     * @param bc
+     * @param tx 交易
+     * @param bc BlockChain
      */
-    public void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
+    void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
         // 事件上下文
-        EventContext context = new EventContext(tx,bc,nodeCache,executeResult,null);
+        EventContext context = new EventContext(tx,bc,nodeCache,stakingStage,null);
         switch (tx.getTypeEnum()){
             case CREATE_VALIDATOR: createValidatorHandler.handle(context); break; //发起质押(创建验证人)
             case EDIT_VALIDATOR: editValidatorHandler.handle(context);break; //修改质押信息(编辑验证人)
@@ -110,32 +109,32 @@ public class StakingExecute {
     /**
      * 进行验证人选举时触发
      */
-    public void onElectionDistance(CustomBlock block,BlockChain bc) throws ElectionEpochChangeException {
+    void onElectionDistance(CustomBlock block, BlockChain bc) throws ElectionEpochChangeException {
         logger.debug("进行验证人选举:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
         newElectionEpochHandler.handle(context);
     }
 
     /**
      * 进入新的共识周期变更
      */
-    public void onNewConsEpoch(CustomBlock block,BlockChain bc) throws ConsensusEpochChangeException {
+    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws ConsensusEpochChangeException {
         logger.debug("进入新的共识周期:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
         newConsensusEpochHandler.handle(context);
     }
 
     /**
      * 进入新的结算周期
      */
-    public void  onNewSettingEpoch(CustomBlock block,BlockChain bc) throws SettleEpochChangeException {
+    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws SettleEpochChangeException {
         logger.debug("进入新的结算周期:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,executeResult,null);
+        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
 
-        /**
+        /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息
          * 2.委托信息

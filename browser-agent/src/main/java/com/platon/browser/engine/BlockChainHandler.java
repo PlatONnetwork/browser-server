@@ -301,7 +301,7 @@ public class BlockChainHandler {
         try {
             CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
             node.setStatBlockQty(node.getStatBlockQty()+1);
-            STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateNode(node);
+            STAGE_DATA.getStakingStage().updateNode(node);
         } catch (NoSuchBeanException e) {
             logger.error("{}",e.getMessage());
         }
@@ -328,7 +328,7 @@ public class BlockChainHandler {
                     // 节点出块数加1
                     customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
                     // 把更改后的内容暂存至待更新列表
-                    STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateStaking(customStaking);
+                    STAGE_DATA.getStakingStage().updateStaking(customStaking);
                 }
             } catch (NoSuchBeanException e) {
                 logger.debug("找不到符合条件的质押信息:{}",e.getMessage());
@@ -340,7 +340,7 @@ public class BlockChainHandler {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () throws NoSuchBeanException {
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException {
         CustomBlock curBlock = bc.getCurBlock();
 
         for (CustomTransaction tx:curBlock.getTransactionList()){
@@ -421,7 +421,7 @@ public class BlockChainHandler {
                 }
                 if (curBlock.getStatStakingQty() > 0) {
                     //统计质押金额
-                    Set <Staking> newStaking = BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult().getAddStakings();
+                    Set <Staking> newStaking = STAGE_DATA.getStakingStage().getStakingInsertStage();
                     newStaking.forEach(staking -> {
                         BigInteger stakingValue = new BigInteger(NETWORK_STAT_CACHE.getStakingValue()).add(new BigInteger(staking.getStakingHas())).add(new BigInteger(staking.getStakingLocked()));
                         NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
@@ -429,7 +429,7 @@ public class BlockChainHandler {
                 }
                 if (curBlock.getStatDelegateQty() > 0) {
                     //质押已统计，本次累加上委托
-                    Set <Delegation> newDelegation = BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult().getAddDelegations();
+                    Set <Delegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
                     newDelegation.forEach(delegation -> {
                         //先做委托累加
                         BigInteger delegationValue = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()));
@@ -439,7 +439,7 @@ public class BlockChainHandler {
                     NETWORK_STAT_CACHE.setStakingDelegationValue(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()).add(new BigInteger(NETWORK_STAT_CACHE.getStakingValue())).toString());
                 }
 
-                if (BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getAddProposals().size() > 0 || BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getUpdateProposals().size() > 0) {
+                if (STAGE_DATA.getProposalStage().getProposalInsertStage().size() > 0 || STAGE_DATA.getProposalStage().getProposalUpdateStage().size() > 0) {
                     /*PROPOSALS_CACHE.getAll(( hash, proposal ) -> {
                         if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
@@ -448,7 +448,7 @@ public class BlockChainHandler {
                 }
             }
             //更新暂存变量
-            STAGE_BIZ_DATA.getNetworkStatResult().stageUpdateNetworkStat(NETWORK_STAT_CACHE);
+            STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
         } catch (NoSuchBeanException e) {
             logger.error("");
         }

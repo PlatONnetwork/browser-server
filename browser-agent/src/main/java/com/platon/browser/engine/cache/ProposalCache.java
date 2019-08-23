@@ -1,8 +1,9 @@
 package com.platon.browser.engine.cache;
 
 import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomVote;
+import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
-import javafx.print.Collation;
 
 import java.util.*;
 
@@ -13,16 +14,42 @@ import java.util.*;
  * @Description:
  */
 public class ProposalCache {
-    // <提案ID(提案交易hash) - 提案实体>
+    // <提案交易hash - 提案实体>
     private Map<String, CustomProposal> proposalMap = new HashMap<>();
+
+    public void init(List<CustomProposal> proposalList,List<CustomVote> voteList) throws CacheConstructException {
+        proposalList.forEach(proposal -> addProposal(proposal));
+        for (CustomVote vote:voteList) {
+            try {
+                addVote(vote);
+            } catch (NoSuchBeanException e) {
+                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联投票(proposalHash="+vote.getProposalHash()+",hash="+vote.getHash()+")");
+            }
+        }
+    }
 
     public CustomProposal getProposal(String hash) throws NoSuchBeanException {
         CustomProposal proposal = proposalMap.get(hash);
         if(proposal==null) throw new NoSuchBeanException("提案(hash="+hash+")的不存在");
         return proposal;
     }
-    public void add(CustomProposal proposal){
+    public void addProposal(CustomProposal proposal){
         proposalMap.put(proposal.getHash(),proposal);
+    }
+
+    public void addVote(CustomVote vote) throws NoSuchBeanException {
+        CustomProposal proposal = getProposal(vote.getProposalHash());
+        switch (vote.getOptionEnum()){
+            case SUPPORT: // 关联支持票
+                proposal.getYesList().add(vote);
+                break;
+            case ABSTENTION: // 关联反对票
+                proposal.getNoList().add(vote);
+                break;
+            case OPPOSITION: // 关联弃权票
+                proposal.getAbstentionList().add(vote);
+                break;
+        }
     }
 
     public Collection<CustomProposal> getAllProposal(){
@@ -39,7 +66,7 @@ public class ProposalCache {
          * 升级提案：状态为【3、5、6】时表示提案已经结束，需要从缓存删除
          */
         List<CustomProposal> invalidCache = new ArrayList<>();
-        proposalMap.values().stream().forEach(proposal -> {
+        proposalMap.values().forEach(proposal -> {
             CustomProposal.TypeEnum typeEnum = CustomProposal.TypeEnum.getEnum(proposal.getType());
             CustomProposal.StatusEnum statusEnum = CustomProposal.StatusEnum.getEnum(proposal.getStatus());
             if(typeEnum== CustomProposal.TypeEnum.TEXT||typeEnum== CustomProposal.TypeEnum.CANCEL){
