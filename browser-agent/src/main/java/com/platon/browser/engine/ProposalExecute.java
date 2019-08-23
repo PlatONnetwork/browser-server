@@ -102,7 +102,7 @@ public class ProposalExecute {
         }
     }
 
-    private void updateTxInfo(CustomTransaction tx, BlockChain bc){
+/*    private void updateTxInfo(CustomTransaction tx, BlockChain bc){
 
     }
     public void checkProposalStatus(){
@@ -110,5 +110,5 @@ public class ProposalExecute {
     }
     private void updateProposalStatus(){
 
-    }
+    }*/
 }

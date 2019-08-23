@@ -26,7 +26,7 @@ public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
 
     @Override
-    public void handle(EventContext context) {
+    public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
         StakingExecuteResult executeResult = context.getExecuteResult();
@@ -106,6 +106,7 @@ public class UnDelegateHandler implements EventHandler {
 
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
+            throw  new NoSuchBeanException("缓存中找不到对应的接触质押信息:");
         }
     }
 }

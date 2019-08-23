@@ -23,7 +23,7 @@ public class ProposalTextHandler implements EventHandler {
 
 
     @Override
-    public void handle ( EventContext context ) throws NoSuchBeanException {
+    public void handle ( EventContext context ){
         try {
             CustomTransaction tx = context.getTransaction();
             ProposalExecuteResult proposalExecuteResult = context.getProposalExecuteResult();
@@ -49,15 +49,19 @@ public class ProposalTextHandler implements EventHandler {
             //设置提案人
             customProposal.setVerifier(param.getVerifier());
             //设置提案人名称
-            customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            try {
+                customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            }catch (NoSuchBeanException e){
+                throw new NoSuchBeanException("缓存中找不到对应的文本提案:"+e.getMessage());
+            }
             //新增文本提案交易结构
             customProposal.setCanceledPipId(0);
             customProposal.setCanceledTopic("");
             proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
             bc.PROPOSALS_CACHE.add(customProposal);
-        }catch (NoSuchBeanException e){
-            throw new NoSuchBeanException("缓存中找不到对应的文本提案:"+e.getMessage());
+        }catch (Exception e){
+            logger.error("[ProposalTextHandler] exception {}",e.getMessage());
         }
 
     }
