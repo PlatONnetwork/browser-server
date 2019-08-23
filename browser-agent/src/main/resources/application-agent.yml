@@ -65,7 +65,7 @@ platon.config:
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 240
+  settlePeriodBlockCount: 120
   #每个增发周期区块总数(1466个结算周期=15759500个块)
   addIssuePeriodBlockCount: 1680
   #节点质押退回锁定的结算周期数
@@ -82,15 +82,13 @@ platon.config:
   minProposalUpgradePassRate: 0.667
   #双签低处罚百分比
   duplicateSignLowSlashRate: 1
-  #锁仓账户地址
-  restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
   developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
-  #10年内基金会向激励池填充额度: <第几年-补贴金额>
+  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '0':62215742.4869165,
     '1':55965742.4869165,

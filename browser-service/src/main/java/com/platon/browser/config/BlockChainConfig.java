@@ -71,8 +71,6 @@ public class BlockChainConfig {
     private BigDecimal minProposalUpgradePassRate;
     //双签低处罚百分比
     private BigDecimal duplicateSignLowSlashRate;
-    //锁仓账户地址
-    private String restrictingAccountAddr;
     //激励池账户地址
     private String incentivePoolAccountAddr;
     //开发者激励基金账户地址

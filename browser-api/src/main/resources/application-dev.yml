@@ -81,17 +81,13 @@ platon.config:
   minProposalUpgradePassRate: 0.667
   #双签低处罚百分比
   duplicateSignLowSlashRate: 1
-  #锁仓账户地址
-  restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
-  #质押账户地址
-
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
   developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
-  #10年内基金会向激励池填充额度: <第几年-补贴金额>
+  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '0':62215742.4869165,
     '1':55965742.4869165,
@@ -105,6 +101,7 @@ platon.config:
   }
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+
 
 brokenHost: 192.168.16.173
 brokenPort: 61613
