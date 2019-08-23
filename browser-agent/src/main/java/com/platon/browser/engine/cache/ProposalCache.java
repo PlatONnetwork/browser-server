@@ -2,11 +2,9 @@ package com.platon.browser.engine.cache;
 
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.exception.NoSuchBeanException;
+import javafx.print.Collation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 提案进程缓存
@@ -27,8 +25,8 @@ public class ProposalCache {
         proposalMap.put(proposal.getPipId(),proposal);
     }
 
-    public Map<Integer, CustomProposal> getAll(){
-        return proposalMap;
+    public Collection<CustomProposal> getAllProposal(){
+        return proposalMap.values();
     }
 
     /**
