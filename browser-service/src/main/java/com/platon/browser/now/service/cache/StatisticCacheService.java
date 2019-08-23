@@ -2,9 +2,9 @@ package com.platon.browser.now.service.cache;
 
 import java.util.List;
 
+import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.redis.dto.NetworkStatRedis;
-import com.platon.browser.redis.dto.TransactionRedis;
 
 public interface StatisticCacheService {
 	
@@ -24,5 +24,5 @@ public interface StatisticCacheService {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<TransactionRedis> getTransactionCache(Integer pageNum, Integer pageSize);
+	public TransactionCacheDto getTransactionCache(Integer pageNum, Integer pageSize);
 }

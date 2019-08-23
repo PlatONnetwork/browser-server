@@ -15,6 +15,7 @@ import java.util.List;
 import com.platon.browser.dao.mapper.BlockMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
@@ -65,22 +66,28 @@ public class BlockServiceImpl implements BlockService {
 		// 小于50万条查询redis
 		if (req.getPageNo().intValue() * req.getPageSize().intValue() < 500000) {
 			List<BlockRedis> items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
-			BlockListResp blockListNewResp = new BlockListResp();
-			for (int i = 0; i < items.size(); i++) {
-				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(items.get(i).getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-				blockListNewResp.setGasUsed(items.get(i).getGasUsed());
-				blockListNewResp.setNodeId(items.get(i).getNodeId());
-				blockListNewResp.setNodeName(items.get(i).getNodeName());
-				blockListNewResp.setNumber(items.get(i).getNumber());
+			for (BlockRedis blockRedis:items) {
+				BlockListResp blockListNewResp = new BlockListResp();
+				BeanUtils.copyProperties(blockRedis, blockListNewResp);
+				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(blockRedis.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				blockListNewResp.setServerTime(new Date().getTime());
-				blockListNewResp.setSize(items.get(i).getSize());
-				blockListNewResp.setStatTxGasLimit(blockListNewResp.getStatTxGasLimit());
-				blockListNewResp.setStatTxQty(items.get(i).getStatTxQty());
-				blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
+				blockListNewResp.setTimestamp(blockRedis.getTimestamp().getTime());
 				lists.add(blockListNewResp);
 			}
 		} else {
-			// TODO 是否查询超过五十万条数据
+			//查询超过五十万条数据
+			BlockExample blockExample = new BlockExample();
+			blockExample.setOrderByClause(" number desc");
+			PageHelper.startPage(req.getPageNo(), req.getPageSize());
+			List<Block> blocks = blockMapper.selectByExample(blockExample);
+			for(Block block:blocks) {
+				BlockListResp blockListNewResp = new BlockListResp();
+				BeanUtils.copyProperties(block, blockListNewResp);
+				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+				blockListNewResp.setServerTime(new Date().getTime());
+				blockListNewResp.setTimestamp(block.getTimestamp().getTime());
+				lists.add(blockListNewResp);
+			}
 		}
 		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(0, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -105,15 +112,9 @@ public class BlockServiceImpl implements BlockService {
 		List<BlockListResp> lists = new LinkedList<>();
 		for (Block block : blocks) {
 			BlockListResp blockListResp = new BlockListResp();
+			BeanUtils.copyProperties(block, blockListResp);
 			blockListResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			blockListResp.setGasUsed(block.getGasUsed());
-			blockListResp.setNodeId(block.getNodeId());
-			blockListResp.setNodeName(block.getNodeName());
-			blockListResp.setNumber(block.getNumber());
 			blockListResp.setServerTime(new Date().getTime());
-			blockListResp.setSize(block.getSize());
-			blockListResp.setStatTxGasLimit(block.getStatTxGasLimit());
-			blockListResp.setStatTxQty(block.getStatTxQty());
 			blockListResp.setTimestamp(block.getTimestamp().getTime());
 			lists.add(blockListResp);
 		}
@@ -196,23 +197,10 @@ public class BlockServiceImpl implements BlockService {
 		Block block = blockMapper.selectByPrimaryKey(blockNumber);
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
+			BeanUtils.copyProperties(block, blockDetailResp);
 			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			blockDetailResp.setExtraData(block.getExtraData());
-			blockDetailResp.setGasLimit(block.getGasLimit());
-			blockDetailResp.setGasUsed(block.getGasUsed());
-			blockDetailResp.setHash(block.getHash());
-			blockDetailResp.setNodeId(block.getNodeId());
-			blockDetailResp.setNodeName(block.getNodeName());
-			blockDetailResp.setNumber(block.getNumber());
-			blockDetailResp.setParentHash(block.getParentHash());
-			blockDetailResp.setStatDelegateQty(block.getStatDelegateQty());
-			blockDetailResp.setStatProposalQty(block.getStatProposalQty());
-			blockDetailResp.setStatTransferQty(block.getStatTransferQty());
-			blockDetailResp.setStatTxGasLimit(block.getStatTxGasLimit());
-			blockDetailResp.setStatTxQty(block.getStatTxQty());
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
-			blockDetailResp.setSize(block.getSize());
 			
 			// 取上一个区块
 			BlockExample blockExample = new BlockExample();

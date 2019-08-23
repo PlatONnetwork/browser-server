@@ -25,8 +25,8 @@ public class ProposalDetailsResp {
     private Integer nays;              //反对的人
     private Integer abstentions;         //弃权的人
     private String accuVerifiers;        //总人数
-    private String activeBlockTime;      //生效块高预计时间  (activeBlock-curBlock)*period
-    private String endVotingBlockTime;    //投票块高的时间   (endVotingBlock-curBlock)*period
+    private Long activeBlockTime;      //生效块高预计时间  (activeBlock-curBlock)*period
+    private Long endVotingBlockTime;    //投票块高的时间   (endVotingBlock-curBlock)*period
     private String supportRateThreshold;   //通过率
     private String opposeRateThreshold;   //反对率
     private String abstainRateThreshold;   //弃权率

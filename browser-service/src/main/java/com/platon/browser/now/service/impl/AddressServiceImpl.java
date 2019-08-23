@@ -14,6 +14,7 @@ import com.platon.browser.util.I18nUtil;
 
 import java.math.RoundingMode;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
@@ -32,25 +33,13 @@ public class AddressServiceImpl implements AddressService {
         Address item = addressMapper.selectByPrimaryKey(req.getAddress());
         QueryDetailResp resp = new QueryDetailResp();
         if (item != null) {
-            resp.setType(item.getType());
+        	BeanUtils.copyProperties(item, resp);
             resp.setBalance(EnergonUtil.format(Convert.fromVon(item.getBalance(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             resp.setRestrictingBalance(EnergonUtil.format(Convert.fromVon(item.getRestrictingBalance(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-            resp.setStakingValue(item.getStakingValue());
-            resp.setDelegateValue(item.getDelegateValue());
-            resp.setRedeemedValue(item.getRedeemedValue());
-            resp.setTxQty(item.getTxQty());
-            resp.setTransferQty(item.getTransferQty());
-            resp.setDelegateQty(item.getDelegateQty());
-            resp.setStakingQty(item.getStakingQty());
-            resp.setProposalQty(item.getProposalQty());
-            resp.setCandidateCount(item.getCandidateCount());
             resp.setDelegateHes(EnergonUtil.format(Convert.fromVon(item.getDelegateHes(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             resp.setDelegateLocked(EnergonUtil.format(Convert.fromVon(item.getDelegateLocked(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             resp.setDelegateUnlock(EnergonUtil.format(Convert.fromVon(item.getDelegateUnlock(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             resp.setDelegateReduction(EnergonUtil.format(Convert.fromVon(item.getDelegateReduction(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-            resp.setContractName(item.getContractName());
-            resp.setContractCreate(item.getContractCreate());
-            resp.setContractCreateHash(item.getContractCreatehash());
         }
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
     }

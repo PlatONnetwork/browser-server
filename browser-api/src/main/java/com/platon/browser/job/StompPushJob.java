@@ -67,8 +67,8 @@ public class StompPushJob {
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushStakingListNew() {
-    	List<StakingListNewResp> lists = homeService.stakingListNew();
-		BaseResp<List<StakingListNewResp>> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
+    	StakingListNewResp stakingListNewResp = homeService.stakingListNew();
+		BaseResp<StakingListNewResp> resp = BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
 		messagingTemplate.convertAndSend("/topic/staking/list/new", resp);
     }
     

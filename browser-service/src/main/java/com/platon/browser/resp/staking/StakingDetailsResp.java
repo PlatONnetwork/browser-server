@@ -25,6 +25,6 @@ public class StakingDetailsResp {
     private String website;             //节点的第三方主页
     private String details;             //节点的描述
     private String externalId;          //身份证id
-    private String stakingBlockNum;     //最新的质押交易块高
+    private Long stakingBlockNum;     //最新的质押交易块高
     private String statDelegateReduction;//待提取的委托
 }

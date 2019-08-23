@@ -177,7 +177,9 @@ public interface AppDocHome {
      * {
      *    "errMsg":"",                 //描述信息
      *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "data":[
+     *    "data":{
+     *    "isRefresh":false    //false不用全量刷新、true全量刷新
+     *    "dataList":[
      *       {
      *          "nodeId":"",           //出块节点Id
      *          "nodeName":"",         //出块节点名称
@@ -186,10 +188,10 @@ public interface AppDocHome {
      *          "expectedIncome":"",   //预计年收化率（从验证人加入时刻开始计算）
      *          "isInit":true          //是否为初始化的验证人，如果是expectedIncome不显示数值
      *       }
-     *    ]
+     *    ]}
      * }
      */
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
-	public BaseResp<List<StakingListNewResp>> stakingListNew();
+	public BaseResp<StakingListNewResp> stakingListNew();
 }

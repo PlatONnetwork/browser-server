@@ -2,11 +2,11 @@ package com.platon.browser.now.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
@@ -77,15 +77,10 @@ public class StakingServiceImpl implements StakingService {
 		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
 		StakingStatisticNewResp stakingStatisticNewResp = new StakingStatisticNewResp();
 		if(networkStatRedis != null) {
-			stakingStatisticNewResp.setAddIssueBegin(networkStatRedis.getAddIssueBegin());
-			stakingStatisticNewResp.setAddIssueEnd(networkStatRedis.getAddIssueEnd());
+			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
 			stakingStatisticNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(networkStatRedis.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			stakingStatisticNewResp.setCurrentNumber(networkStatRedis.getCurrentNumber());
-			stakingStatisticNewResp.setIssueValue(networkStatRedis.getIssueValue());
-			stakingStatisticNewResp.setNextSetting(networkStatRedis.getNextSetting());
 			stakingStatisticNewResp.setStakingDelegationValue(EnergonUtil.format(Convert.fromVon(networkStatRedis.getStakingDelegationValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			stakingStatisticNewResp.setStakingReward(EnergonUtil.format(Convert.fromVon(networkStatRedis.getStakingReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			stakingStatisticNewResp.setStakingValue(networkStatRedis.getStakingValue());
 		}
 		return stakingStatisticNewResp;
 	}
@@ -93,10 +88,12 @@ public class StakingServiceImpl implements StakingService {
 	@Override
 	public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req) {
 		StakingExample stakingExample = new StakingExample();
+		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
+				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Integer status = null;
 		Integer isConsensus = null;
-		Criteria criteria = stakingExample.createCriteria();
+		StakingExample.Criteria criteria = stakingExample.createCriteria();
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andStakingNameEqualTo(req.getKey());
 		}
@@ -123,22 +120,20 @@ public class StakingServiceImpl implements StakingService {
 		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), status, isConsensus);
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
+			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
 			aliveStakingListResp.setBlockQty(stakings.get(i).getCurConsBlockQty());
 			aliveStakingListResp.setDelegateQty(stakings.get(i).getStatDelegateQty());
 			//委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额)
 			String sumAmount = new BigDecimal(stakings.get(i).getStatDelegateHas())
 					.add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
 			aliveStakingListResp.setDelegateValue(EnergonUtil.format(Convert.fromVon(sumAmount, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			aliveStakingListResp.setExpectedIncome(stakings.get(i).getExpectedIncome());
 			aliveStakingListResp.setIsInit(stakings.get(i).getIsInit().intValue() == 1?true:false);
 			aliveStakingListResp.setIsRecommend(stakings.get(i).getIsRecommend().intValue() == 1?true:false);
-			aliveStakingListResp.setNodeId(stakings.get(i).getNodeId());
-			aliveStakingListResp.setNodeName(stakings.get(i).getStakingName());
 			aliveStakingListResp.setRanking(i + 1);
 			aliveStakingListResp.setSlashLowQty(stakings.get(i).getStatSlashLowQty());
 			aliveStakingListResp.setSlashMultiQty(stakings.get(i).getStatSlashMultiQty());
-			aliveStakingListResp.setStakingIcon(stakings.get(i).getStakingIcon());
 			aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus()));
+			aliveStakingListResp.setNodeName(stakings.get(i).getStakingName());
 			//质押总数=有效的质押+委托
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
@@ -166,13 +161,11 @@ public class StakingServiceImpl implements StakingService {
 		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null);
 		for (StakingNode stakingNode:stakings) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
+			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
 			historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
-			historyStakingListResp.setNodeId(stakingNode.getNodeId());
 			historyStakingListResp.setNodeName(stakingNode.getStakingName());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
-			historyStakingListResp.setStakingIcon(stakingNode.getStakingIcon());
-			historyStakingListResp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
 		}
@@ -191,7 +184,6 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
 		Integer size = stakings.size();
 		StakingDetailsResp resp = new StakingDetailsResp();
@@ -201,8 +193,8 @@ public class StakingServiceImpl implements StakingService {
 				break;
 			case 1: // 只有一条数据
 				StakingNode stakingNode = stakings.get(0);
+				BeanUtils.copyProperties(stakingNode, resp);
 				resp.setNodeName(stakingNode.getStakingName());
-				resp.setStakingIcon(stakingNode.getStakingIcon());
 				resp.setStatus(StakingStatus.getDescByCode(stakingNode.getStatus()));
 				//质押总数=有效的质押+委托
 				String totalValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
@@ -218,18 +210,8 @@ public class StakingServiceImpl implements StakingService {
 				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 				resp.setBlockQty(stakingNode.getStatBlockQty());
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
-				resp.setExpectedIncome(stakingNode.getExpectedIncome());
-				resp.setJoinTime(sdf.format(stakingNode.getJoinTime()));
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());
 				resp.setRewardValue(EnergonUtil.format(Convert.fromVon(stakingNode.getStatRewardValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-				resp.setNodeId(stakingNode.getNodeId());
-				resp.setStakingAddr(stakingNode.getStakingAddr());
-				resp.setDenefitAddr(stakingNode.getDenefitAddr());
-				resp.setWebsite(stakingNode.getWebSite());
-				resp.setDetails(stakingNode.getDetails());
-				resp.setExternalId(stakingNode.getExternalId());
-				resp.setStakingBlockNum(Long.toString(stakingNode.getStakingBlockNum()));
-				resp.setStatDelegateReduction(stakingNode.getStatDelegateReduction());
 				break;
 			default:
 				// TODO 有多条数据就报错
@@ -247,13 +229,10 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
 		List<StakingOptRecordListResp> lists = new LinkedList<StakingOptRecordListResp>();
 		List<NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
-		for (int i = 0; i<nodeOpts.size(); i++) {
-			NodeOpt nodeOpt = nodeOpts.get(i);
+		for (NodeOpt nodeOpt: nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
-			stakingOptRecordListResp.setBlockNumber(nodeOpt.getBlockNumber());
-			stakingOptRecordListResp.setDesc(nodeOpt.getDesc());
+			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
 			stakingOptRecordListResp.setTimestamp(nodeOpt.getCreateTime().getTime());
-			stakingOptRecordListResp.setTxHash(nodeOpt.getTxHash());
 			lists.add(stakingOptRecordListResp);
 		}
 		long size = nodeOptMapper.countByExample(nodeOptExample);
@@ -274,8 +253,7 @@ public class StakingServiceImpl implements StakingService {
 		
 		List<DelegationStaking> delegationStakings = 
 				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
-		for (int i = 0; i < delegationStakings.size(); i++) {
-			DelegationStaking delegationStaking = delegationStakings.get(i);
+		for (DelegationStaking delegationStaking: delegationStakings) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
 			String delValue = new BigDecimal(delegationStaking.getDelegateHas())
@@ -306,10 +284,9 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByAddressResp> lists = new LinkedList<DelegationListByAddressResp>();
 		
 		List<DelegationStaking> delegationStakings = delegationMapper.selectDelegationAndStakingByExample(req.getAddress());
-		for (int i = 0; i < delegationStakings.size(); i++) {
-			DelegationStaking delegationStaking = delegationStakings.get(i);
+		for (DelegationStaking delegationStaking:  delegationStakings) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
-			byAddressResp.setNodeId(delegationStaking.getNodeId());
+			BeanUtils.copyProperties(delegationStaking, byAddressResp);
 			byAddressResp.setNodeName(delegationStaking.getStakingName());
 			String deleValue = new BigDecimal(delegationStaking.getDelegateHas())
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
@@ -322,7 +299,6 @@ public class StakingServiceImpl implements StakingService {
 			String deletgateUnLock = delegationStaking.getStatus()==2?"0":new BigDecimal(delegationStaking.getDelegateHas())
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
 			byAddressResp.setDelegateUnlock(EnergonUtil.format(Convert.fromVon(deletgateUnLock, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-			byAddressResp.setDelegateReduction(delegationStaking.getDelegateReduction());
 			lists.add(byAddressResp);
 		}
 		long size = delegationMapper.countByExample(delegationExample);

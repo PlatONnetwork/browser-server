@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.redis.dto.NetworkStatRedis;
@@ -58,7 +59,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	}
 
 	@Override
-	public List<TransactionRedis> getTransactionCache(Integer pageNum, Integer pageSize) {
+	public TransactionCacheDto getTransactionCache(Integer pageNum, Integer pageSize) {
 		CachePageInfo<Class<TransactionRedis>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, TransactionRedis.class, i18n,
 				redisTemplate, maxItemNum);
 		List<TransactionRedis> transactionRedisList = new LinkedList<>();
@@ -66,7 +67,8 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 			TransactionRedis transactionRedis = JSON.parseObject(str, TransactionRedis.class);
 			transactionRedisList.add(transactionRedis);
 		});
-		return transactionRedisList;
+		TransactionCacheDto transactionCacheDto = new TransactionCacheDto(transactionRedisList, cpi.page);
+		return transactionCacheDto;
 	}
 
 	public static void main(String[] args) {

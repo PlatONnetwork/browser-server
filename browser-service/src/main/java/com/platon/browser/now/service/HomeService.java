@@ -26,5 +26,5 @@ public interface HomeService {
 	
 	public List<BlockListNewResp> blockListNew();
 	
-	public List<StakingListNewResp> stakingListNew();
+	public StakingListNewResp stakingListNew();
 }

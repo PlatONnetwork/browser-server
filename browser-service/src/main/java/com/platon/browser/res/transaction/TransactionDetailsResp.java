@@ -13,10 +13,10 @@ public class TransactionDetailsResp {
     private Long serverTime;      //服务器时间
     private String confirmNum;         //区块确认数
     private Long blockNumber;    //交易所在区块高度
-    private Long gasLimit;           //能量限制
-    private Long gasUsed;          //能量消耗
-    private Long gasPrice;        //能量价格
-    private Long value;            //金额(单位:von)
+    private String gasLimit;           //能量限制
+    private String gasUsed;          //能量消耗
+    private String gasPrice;        //能量价格
+    private String value;            //金额(单位:von)
     private String actualTxCost;      //交易费用(单位:von)
     private String txType;              //交易类型
     private String input;               //附加输入数据
@@ -38,7 +38,7 @@ public class TransactionDetailsResp {
     private String programVersion;      //程序的真实版本，治理rpc获取
     private String applyAmount;         //申请赎回的金额
     private String redeemLocked;        //赎回中被锁定的金额
-    private String redeemStatus;      //赎回状态， 1： 退回中   2：退回成功 
+    private Integer redeemStatus;      //赎回状态， 1： 退回中   2：退回成功 
     private String redeemUnLockedBlock; //预计赎回到账的区块
     private String proposalUrl;         //提案的github地址  https://github.com/ethereum/EIPs/blob/master/EIPS/eip-100.md  eip-100为提案id
     private String proposalHash;        //提案id
@@ -46,4 +46,13 @@ public class TransactionDetailsResp {
     private String proposalNewVersion;  //升级提案的版本
     private String declareVersion;      //声明的版本 
     private String txReceiptStatus;     //交易状态
+    
+    private String evidence;//证据
+    private Integer reportType;//举报类型:1：区块双签
+    private String reportRewards;//举报奖励
+    private Integer reportStatus;//举报状态 \r\n1：失败\r\n2：成功
+    
+    private Integer pipNum;//提案pip编号
+    private Integer proposalStatus;//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
+    private String proposalTitle;//提案标题
 }

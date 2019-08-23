@@ -242,6 +242,13 @@ public interface AppDocTransaction {
      *       "proposalNewVersion":"",  //升级提案的版本
      *       "declareVersion":"",      //声明的版本 
      *       "txReceiptStatus":"",     //交易状态 1:成功 2：失败
+     *       "evidence":"",   //证据
+     *       "reportType":"",//举报类型:1：区块双签
+     *       "reportRewards":"",//举报奖励
+     *       "reportStatus":"",//举报状态 \r\n1：失败\r\n2：成功
+     *       "pipNum":"",//提案pip编号
+     *       "proposalStatus":"",//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
+     *       "proposalTitle":"",//提案标题
      *        --可选信息结束
      * }
      */	
