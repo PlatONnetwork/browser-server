@@ -162,7 +162,9 @@ public class StakingServiceImpl implements StakingService {
 		for (StakingNode stakingNode:stakings) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
-			historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+			if(stakingNode.getLeaveTime()!=null) {
+				historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+			}
 			historyStakingListResp.setNodeName(stakingNode.getStakingName());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
@@ -252,7 +254,7 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByStakingResp> lists = new LinkedList<DelegationListByStakingResp>();
 		
 		List<DelegationStaking> delegationStakings = 
-				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
 		for (DelegationStaking delegationStaking: delegationStakings) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
@@ -283,7 +285,8 @@ public class StakingServiceImpl implements StakingService {
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByAddressResp> lists = new LinkedList<DelegationListByAddressResp>();
 		
-		List<DelegationStaking> delegationStakings = delegationMapper.selectDelegationAndStakingByExample(req.getAddress());
+		List<DelegationStaking> delegationStakings = 
+				delegationMapper.selectDelegationAndStakingByExample(null,null,req.getAddress());
 		for (DelegationStaking delegationStaking:  delegationStakings) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationStaking, byAddressResp);

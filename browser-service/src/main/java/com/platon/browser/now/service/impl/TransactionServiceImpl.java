@@ -1,5 +1,23 @@
 package com.platon.browser.now.service.impl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -10,12 +28,14 @@ import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.UnDelegationMapper;
-import com.platon.browser.dto.CustomProposal.TypeEnum;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.enums.StakingStatus;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
@@ -41,30 +61,15 @@ import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
-import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -142,6 +147,7 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionListResp transactionListResp = new TransactionListResp();
         for (TransactionRedis transactionRedis:items) {
         	BeanUtils.copyProperties(transactionRedis, transactionListResp);
+        	transactionListResp.setTxHash(transactionRedis.getHash());
             transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transactionRedis.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transactionRedis.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             transactionListResp.setServerTime(new Date().getTime());
@@ -244,7 +250,8 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
-                    TypeEnum.getEnum(transaction.getTxType()).getDesc(),
+//                  TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
+                    TransactionTypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).desc,
                     transaction.getFrom(),
                     transaction.getTo(),
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),

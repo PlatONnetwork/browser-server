@@ -373,7 +373,7 @@
   <select id="selectDelegationAndStakingByExample" resultMap="AndStakingResultMap">
   	SELECT 
 		t1.delegate_addr,t1.staking_block_num,t1.node_id,t1.delegate_has,t1.delegate_locked,t1.delegate_reduction,
-		t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name,
+		t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>
