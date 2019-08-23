@@ -52,7 +52,6 @@ public interface DelegationMapper {
      */
     int batchInsertSelective(@Param("list") List<Delegation> list, @Param("selective") Delegation.Column ... selective);
 
-	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("nodeId") String nodeId,@Param("stakingBlockNum") long stakingBlockNum);
+	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("nodeId") String nodeId,@Param("stakingBlockNum") Long stakingBlockNum,@Param("delegateAddr") String delegateAddr);
 
-	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("delegateAddr") String delegateAddr);
 }

@@ -273,7 +273,7 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByStakingResp> lists = new LinkedList<DelegationListByStakingResp>();
 		
 		List<DelegationStaking> delegationStakings = 
-				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
 		for (int i = 0; i < delegationStakings.size(); i++) {
 			DelegationStaking delegationStaking = delegationStakings.get(i);
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
@@ -305,7 +305,8 @@ public class StakingServiceImpl implements StakingService {
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByAddressResp> lists = new LinkedList<DelegationListByAddressResp>();
 		
-		List<DelegationStaking> delegationStakings = delegationMapper.selectDelegationAndStakingByExample(req.getAddress());
+		List<DelegationStaking> delegationStakings = 
+				delegationMapper.selectDelegationAndStakingByExample(null,null,req.getAddress());
 		for (int i = 0; i < delegationStakings.size(); i++) {
 			DelegationStaking delegationStaking = delegationStakings.get(i);
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();

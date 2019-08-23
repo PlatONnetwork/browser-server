@@ -1,17 +1,45 @@
 package com.platon.browser.now.service.impl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.BlockExample;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.UnDelegationMapper;
-import com.platon.browser.dto.CustomProposal.TypeEnum;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionDetail;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
@@ -22,31 +50,12 @@ import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.req.transaction.TransactionDetailReq;
-import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
-import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
-import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -231,7 +240,8 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
-                    TypeEnum.getEnum(transaction.getTxType()).getDesc(),
+//                  TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
+                    TransactionTypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).desc,
                     transaction.getFrom(),
                     transaction.getTo(),
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
@@ -269,7 +279,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public BaseResp<TransactionDetailsResp> transactionDetails(@Valid TransactionDetailsReq req) {
+    public TransactionDetailsResp transactionDetails(@Valid TransactionDetailsReq req) {
     	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(transaction!=null) {
@@ -392,11 +402,11 @@ public class TransactionServiceImpl implements TransactionService {
 				break;
 			}
     	}
-    	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+    	return resp;
     }
 
     @Override
-    public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
+    public TransactionListResp transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
     	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
     	TransactionExample condition = new TransactionExample();
     	TransactionExample.Criteria criteria = condition.createCriteria();
@@ -430,7 +440,7 @@ public class TransactionServiceImpl implements TransactionService {
     	resp.setBlockNumber(transaction.getBlockNumber());
     	resp.setFailReason(transaction.getFailReason());
     	resp.setReceiveType(transaction.getReceiveType());
-    	return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
+    	return resp;
     }
 
 }

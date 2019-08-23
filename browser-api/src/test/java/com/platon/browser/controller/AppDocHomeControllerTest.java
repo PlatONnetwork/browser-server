@@ -17,15 +17,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.req.PageReq;
 
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BrowserApiApplication.class)
 @AutoConfigureMockMvc
-public class AppDocProposalControllerTest {
+public class AppDocHomeControllerTest {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -34,32 +32,13 @@ public class AppDocProposalControllerTest {
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
     }
-
+    
     @Test
-    public void proposalList() throws Exception{
-    	PageReq pageReq = new PageReq();
-    	pageReq.setPageNo(0);
-    	pageReq.setPageSize(10);
-        mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalList")
-        	.contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content(JSONObject.toJSONString(pageReq).getBytes()))
-        	.andExpect(status().isOk()).andDo(print());
-    }
-
-    @Test
-    public void proposalDetails() throws Exception {
-        String requestBody = "{\"proposalHash\":\"addvdfbnghm\"}";
-        mockMvc.perform(MockMvcRequestBuilders.post("/proposal/proposalDetails")
-        	.contentType(MediaType.APPLICATION_JSON_UTF8)
-        	.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
-    }
-
-    @Test
-    public void voteList() throws Exception {
-        String requestBody = "{\"proposalHash\":\"null\"}";
-        mockMvc.perform(MockMvcRequestBuilders.post("/proposal/voteList")
+    public void queryNavigation() throws Exception{
+    	String requestBody = "{\"parameter\":\"plan\"}";
+    	mockMvc.perform(MockMvcRequestBuilders.post("/home/queryNavigation")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
+    		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
     
 }
