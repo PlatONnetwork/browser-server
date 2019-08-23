@@ -55,7 +55,7 @@ public class ProposalUpdateTask {
                     if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
                         proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                         //若是取消提案，则需要补充被取消提案相关信息
-                        String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getCanceledPipId()).getUrl());
+                        String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
                         ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString, ProposalMarkDownDto.class);
                         proposal.setCanceledTopic(cancelProp.getDescription());
                     }

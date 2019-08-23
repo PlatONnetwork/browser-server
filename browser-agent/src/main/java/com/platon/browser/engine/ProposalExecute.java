@@ -66,7 +66,7 @@ public class ProposalExecute {
             customProposal.updateWithProposal(proposal);
             voteList.forEach(vote -> {
                 //关联提案的投票结果区分放入全量数据结构
-                if(vote.getProposalHash().equals(customProposal.getPipId())){
+                if(vote.getProposalHash().equals(customProposal.getHash())){
                     CustomVote customVote = new CustomVote();
                     customVote.buildStructure(vote);
                     if(Integer.valueOf(vote.getOption()).equals(CustomProposal.OptionEnum.SUPPORT.code)){

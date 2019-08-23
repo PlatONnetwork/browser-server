@@ -13,16 +13,16 @@ import java.util.*;
  * @Description:
  */
 public class ProposalCache {
-    // <提案ID（pipId） - 提案实体>
-    private Map<Integer, CustomProposal> proposalMap = new HashMap<>();
+    // <提案ID(提案交易hash) - 提案实体>
+    private Map<String, CustomProposal> proposalMap = new HashMap<>();
 
-    public CustomProposal getProposal(Integer pipId) throws NoSuchBeanException {
-        CustomProposal proposal = proposalMap.get(pipId);
-        if(proposal==null) throw new NoSuchBeanException("提案(pipId="+pipId+")的不存在");
+    public CustomProposal getProposal(String hash) throws NoSuchBeanException {
+        CustomProposal proposal = proposalMap.get(hash);
+        if(proposal==null) throw new NoSuchBeanException("提案(hash="+hash+")的不存在");
         return proposal;
     }
     public void add(CustomProposal proposal){
-        proposalMap.put(proposal.getPipId(),proposal);
+        proposalMap.put(proposal.getHash(),proposal);
     }
 
     public Collection<CustomProposal> getAllProposal(){
@@ -58,6 +58,6 @@ public class ProposalCache {
             }
         });
         // 删除无效提案
-        invalidCache.forEach(proposal -> proposalMap.remove(proposal.getPipId()));
+        invalidCache.forEach(proposal -> proposalMap.remove(proposal.getHash()));
     }
 }

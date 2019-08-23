@@ -30,8 +30,8 @@ public class VotingProposalHandler implements EventHandler {
             BlockChain bc = context.getBlockChain();
             VotingProposalParam param = tx.getTxParam(VotingProposalParam.class);
             param.setNodeName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
-            param.setPIDID(bc.PROPOSALS_CACHE.getProposal(new Integer(param.getProposalId())).getPipId().toString());
-            param.setProposalType(bc.PROPOSALS_CACHE.getProposal(new Integer(param.getProposalId())).getType());
+            param.setPIDID(bc.PROPOSALS_CACHE.getProposal(param.getProposalId()).getPipId().toString());
+            param.setProposalType(bc.PROPOSALS_CACHE.getProposal(param.getProposalId()).getType());
             tx.setTxInfo(JSON.toJSONString(param));
             logger.debug("投票信息:{}", JSON.toJSONString(param));
             CustomVote customVote = new CustomVote();
@@ -41,15 +41,15 @@ public class VotingProposalHandler implements EventHandler {
             proposalExecuteResult.stageAddVotes(customVote);
             //支持票集合
             if(CustomProposal.OptionEnum.SUPPORT.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getYesList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(param.getProposalId()).getYesList().add(customVote);
             }
             //反对票集合
             if(CustomProposal.OptionEnum.OPPOSITION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getNoList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(param.getProposalId()).getNoList().add(customVote);
             }
             //弃权票集合
             if(CustomProposal.OptionEnum.ABSTENTION.code == Integer.valueOf(customVote.getOption())){
-                bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getProposalId())).getAbstentionList().add(customVote);
+                bc.PROPOSALS_CACHE.getProposal(param.getProposalId()).getAbstentionList().add(customVote);
             }
         }catch (NoSuchBeanException e){
             throw new NoSuchBeanException("缓存中找不到对应的投票提案:"+e.getMessage());

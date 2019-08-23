@@ -61,7 +61,7 @@ public class ProposalCancelHandler implements EventHandler{
             //设置被取消的提案id
             customProposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));
             //全局内存变量中查询对应需要取消的提案主题
-            customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.getProposal(Integer.valueOf(param.getPIDID())).getTopic());
+            customProposal.setCanceledTopic(bc.PROPOSALS_CACHE.getProposal(param.getCanceledProposalID()).getTopic());
             customProposal.setNewVersion("");
             //更新新增提案列表
             proposalExecuteResult.stageAddProposals(customProposal);
