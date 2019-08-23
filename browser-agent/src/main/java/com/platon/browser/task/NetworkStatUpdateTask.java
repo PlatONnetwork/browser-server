@@ -32,11 +32,9 @@ public class NetworkStatUpdateTask {
     protected void start () {
         try {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
-            Map <Integer,BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
-
+            Map <Integer, BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
             //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
             BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().toString());
-            if(foundationValue == null) return;
             //获取初始发行金额
             BigDecimal iniValue = blockChain.getChainConfig().getInitIssueAmount();
             //获取增发比例
@@ -49,8 +47,7 @@ public class NetworkStatUpdateTask {
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-            BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue);
-
+            BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
             BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
@@ -65,8 +62,8 @@ public class NetworkStatUpdateTask {
             blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.toString());
             blockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.toString());
             blockChain.exportResult().getNetworkStatResult().stageUpdateNetworkStat(blockChain.NETWORK_STAT_CACHE);
-        }catch (Exception e){
-            logger.error("计算发行量和流通量出错:{}",e.getMessage());
+        } catch (Exception e) {
+            logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }
     }
 }
