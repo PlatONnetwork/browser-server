@@ -144,8 +144,8 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionListResp> lists = new LinkedList<>();
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
         List<TransactionRedis> items = transactionCacheDto.getTransactionRedisList();
-        TransactionListResp transactionListResp = new TransactionListResp();
         for (TransactionRedis transactionRedis:items) {
+        	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transactionRedis, transactionListResp);
         	transactionListResp.setTxHash(transactionRedis.getHash());
             transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transactionRedis.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
@@ -173,8 +173,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        TransactionListResp transactionListResp = new TransactionListResp();
         for (TransactionWithBLOBs transaction:items) {
+        	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
             transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
@@ -207,8 +207,8 @@ public class TransactionServiceImpl implements TransactionService {
         transactionExample.or(first);
         transactionExample.or(second);
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        TransactionListResp transactionListResp = new TransactionListResp();
         for (TransactionWithBLOBs transaction:items) {
+        	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
             transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));

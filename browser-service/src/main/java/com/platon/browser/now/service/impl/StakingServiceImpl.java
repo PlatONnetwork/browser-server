@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -152,6 +153,10 @@ public class StakingServiceImpl implements StakingService {
 		StakingExample stakingExample = new StakingExample();
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Criteria criteria = stakingExample.createCriteria();
+		List<Integer> status = new ArrayList<Integer>();
+		status.add(StakingStatus.ABORTING.getCode());
+		status.add(StakingStatus.EXITED.getCode());
+		criteria.andStatusIn(status);
 		if(StringUtils.isNotBlank(req.getKey())) {
 			criteria.andStakingNameEqualTo(req.getKey());
 		}
@@ -191,13 +196,12 @@ public class StakingServiceImpl implements StakingService {
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
 			case 0:
-				// TODO 没数据
-				break;
-			case 1: // 只有一条数据
+				return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(), i18n.i(I18nEnum.FAILURE), null);
+			default: // 只有一条数据
 				StakingNode stakingNode = stakings.get(0);
 				BeanUtils.copyProperties(stakingNode, resp);
 				resp.setNodeName(stakingNode.getStakingName());
-				resp.setStatus(StakingStatus.getDescByCode(stakingNode.getStatus()));
+				resp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 				//质押总数=有效的质押+委托
 				String totalValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
 						.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
@@ -214,10 +218,8 @@ public class StakingServiceImpl implements StakingService {
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());
 				resp.setRewardValue(EnergonUtil.format(Convert.fromVon(stakingNode.getStatRewardValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 				break;
-			default:
-				// TODO 有多条数据就报错
-				return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(), i18n.i(I18nEnum.FAILURE), null);
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
 	}

@@ -196,6 +196,6 @@
     		and s.is_consensus = #{isConsensus,jdbcType=INTEGER}
     	</if>
     </where>
-    order by s.create_time desc
+    order by s.staking_block_num desc
   </select>
 </mapper>

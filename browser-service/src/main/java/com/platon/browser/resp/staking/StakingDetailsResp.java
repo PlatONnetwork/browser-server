@@ -6,7 +6,7 @@ import lombok.Data;
 public class StakingDetailsResp {
 	private String nodeName;            //验证人名称
     private String stakingIcon;         //验证人图标
-    private String status;              //状态   1:候选中  2:活跃中  3:出块中
+    private Integer status;              //状态   1:候选中  2:活跃中  3:出块中
     private String totalValue;          //质押总数=有效的质押+委托
     private String delegateValue;       //委托总数
     private String stakingValue;        //质押总数
@@ -27,4 +27,5 @@ public class StakingDetailsResp {
     private String externalId;          //身份证id
     private Long stakingBlockNum;     //最新的质押交易块高
     private String statDelegateReduction;//待提取的委托
+    private Long leaveTime;  //退出时间
 }

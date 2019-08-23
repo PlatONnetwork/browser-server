@@ -1,7 +1,7 @@
 package com.platon.browser.enums;
 
 public enum StakingStatusEnum {
-	ALL("all", null),CANDIDATE("candidate" ,1),ACTIVE("active", 2),ABORTING("aboring",4),EXITED("exited",5);
+	ALL("all", null),CANDIDATE("candidate" ,1),ACTIVE("active", 2),ABORTING("aboring",3),EXITED("exited",4);
 	
 	private String name;
 	

@@ -75,8 +75,11 @@ public class HomeServiceImpl implements HomeService {
 		QueryNavigationResp result = new QueryNavigationResp();
 		QueryNavigationStructResp queryNavigationStructResp = new QueryNavigationStructResp();
 		if (isNumber) {
-			result.setType("block");
-			queryNavigationStructResp.setNumber(Long.valueOf(keyword));
+			Block block = blockMapper.selectByPrimaryKey(Long.valueOf(keyword));
+			if(block != null) {
+				result.setType("block");
+				queryNavigationStructResp.setNumber(Long.valueOf(keyword));
+			}
 		} else {
 			// 为false则可能为区块交易hash或者为账户
 			if (keyword.length() <= 2)
@@ -88,9 +91,15 @@ public class HomeServiceImpl implements HomeService {
 					queryNavigationStructResp.setAddress(keyword);
 				}
 				if (keyword.length() == 130) {
-					// 节点Id或名称
-					result.setType("staking");
-					queryNavigationStructResp.setNodeId(keyword);
+					// 节点Id
+					StakingExample stakingExample = new StakingExample();
+					StakingExample.Criteria criteria = stakingExample.createCriteria();
+					criteria.andNodeIdEqualTo(keyword);
+					List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+					if(stakings.size() > 0) {
+						result.setType("staking");
+						queryNavigationStructResp.setNodeId(stakings.get(0).getNodeId());
+					}
 				}
 				if (keyword.length() == 66) {
 					/**
