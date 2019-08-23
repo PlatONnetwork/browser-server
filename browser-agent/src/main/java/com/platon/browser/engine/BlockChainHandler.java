@@ -310,7 +310,7 @@ public class BlockChainHandler {
     /**
      * 更新质押中与区块相关的信息
      */
-    public void updateStakingRelative() throws NoSuchBeanException {
+    public void updateStakingRelative() {
         CustomBlock curBlock = bc.getCurBlock();
         Node node = curValidator.get(curBlock.getNodeId());
         if(node!=null){
@@ -331,7 +331,7 @@ public class BlockChainHandler {
                     STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateStaking(customStaking);
                 }
             } catch (NoSuchBeanException e) {
-                throw new NoSuchBeanException("更新质押中区块统计信息出错:"+e.getMessage());
+                logger.debug("找不到符合条件的质押信息:{}",e.getMessage());
             }
         }
     }

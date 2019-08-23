@@ -401,6 +401,9 @@ public class BlockSyncTask {
         try{
             // 串行批量入库
             service.insertOrUpdate(basicData,bizData);
+            // 缓存整理
+            BlockChain.NODE_CACHE.sweep();
+            BlockChain.PROPOSALS_CACHE.sweep();
         }catch (Exception e){
             logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());
