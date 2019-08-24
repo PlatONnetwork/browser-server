@@ -25,4 +25,12 @@ public class NetworkStatStage {
         networkStatInsertStage.clear();
         networkStatUpdateStage.clear();
     }
+
+    public Set<NetworkStat> getNetworkStatInsertStage() {
+        return networkStatInsertStage;
+    }
+
+    public Set<NetworkStat> getNetworkStatUpdateStage() {
+        return networkStatUpdateStage;
+    }
 }

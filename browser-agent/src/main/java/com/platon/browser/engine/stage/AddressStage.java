@@ -1,7 +1,6 @@
 package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.Address;
-import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +11,6 @@ import java.util.Set;
  * Date: 2019/8/14
  * Time: 16:46
  */
-@Data
 public class AddressStage {
     private Set<Address> addressInsertStage =  new HashSet<>();
     private Set<Address> addressUpdateStage =  new HashSet<>();
@@ -25,5 +23,13 @@ public class AddressStage {
     public void clear() {
         addressInsertStage.clear();
         addressUpdateStage.clear();
+    }
+
+    public Set<Address> getAddressInsertStage() {
+        return addressInsertStage;
+    }
+
+    public Set<Address> getAddressUpdateStage() {
+        return addressUpdateStage;
     }
 }

@@ -33,9 +33,9 @@ public class BlockChainHandler {
     private static Logger logger = LoggerFactory.getLogger(BlockChainHandler.class);
 
     private BlockChain bc;
-    private StakingExecute stakingExecute;
-    private ProposalExecute proposalExecute;
-    private AddressExecute addressExecute;
+    private StakingEngine stakingExecute;
+    private ProposalEngine proposalExecute;
+    private AddressEngine addressExecute;
     private BlockChainConfig chainConfig;
     private PlatonClient client;
     private Map<String, Node> preVerifier,curVerifier,preValidator,curValidator;

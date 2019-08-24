@@ -2,8 +2,6 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
-import com.platon.browser.dto.CustomVote;
-import lombok.Data;
 
 import java.util.*;
 
@@ -12,7 +10,6 @@ import java.util.*;
  * @Date: 2019/8/10 16:47
  * @Description:
  */
-@Data
 public class ProposalStage {
     // 插入或更新数据
     private Set<Proposal> proposalInsertStage = new HashSet<>();
@@ -40,4 +37,19 @@ public class ProposalStage {
         voteUpdateStage.add(vote);
     }
 
+    public Set<Proposal> getProposalInsertStage() {
+        return proposalInsertStage;
+    }
+
+    public Set<Proposal> getProposalUpdateStage() {
+        return proposalUpdateStage;
+    }
+
+    public Set<Vote> getVoteInsertStage() {
+        return voteInsertStage;
+    }
+
+    public Set<Vote> getVoteUpdateStage() {
+        return voteUpdateStage;
+    }
 }

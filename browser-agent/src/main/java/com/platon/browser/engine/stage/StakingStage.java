@@ -2,7 +2,6 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.*;
-import lombok.Data;
 
 import java.util.*;
 
@@ -11,7 +10,6 @@ import java.util.*;
  * @Date: 2019/8/10 16:47
  * @Description:
  */
-@Data
 public class StakingStage {
     // 插入或更新数据
     private Set<Node> nodeInsertStage = new HashSet<>();
@@ -103,5 +101,54 @@ public class StakingStage {
     }
     public void updateNodeOpt(NodeOpt nodeOpt){
         nodeOptUpdateStage.add(nodeOpt);
+    }
+
+
+    public Set<Node> getNodeInsertStage() {
+        return nodeInsertStage;
+    }
+
+    public Set<Node> getNodeUpdateStage() {
+        return nodeUpdateStage;
+    }
+
+    public Set<Staking> getStakingInsertStage() {
+        return stakingInsertStage;
+    }
+
+    public Set<Staking> getStakingUpdateStage() {
+        return stakingUpdateStage;
+    }
+
+    public Set<Delegation> getDelegationInsertStage() {
+        return delegationInsertStage;
+    }
+
+    public Set<Delegation> getDelegationUpdateStage() {
+        return delegationUpdateStage;
+    }
+
+    public Set<UnDelegation> getUnDelegationInsertStage() {
+        return unDelegationInsertStage;
+    }
+
+    public Set<UnDelegation> getUnDelegationUpdateStage() {
+        return unDelegationUpdateStage;
+    }
+
+    public Set<Slash> getSlashInsertStage() {
+        return slashInsertStage;
+    }
+
+    public Set<Slash> getSlashUpdateStage() {
+        return slashUpdateStage;
+    }
+
+    public Set<NodeOpt> getNodeOptInsertStage() {
+        return nodeOptInsertStage;
+    }
+
+    public Set<NodeOpt> getNodeOptUpdateStage() {
+        return nodeOptUpdateStage;
     }
 }

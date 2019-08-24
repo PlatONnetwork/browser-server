@@ -60,7 +60,7 @@ public class DbService {
 
 
     @Transactional
-    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
+    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {

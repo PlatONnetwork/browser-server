@@ -10,7 +10,7 @@ import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
-import com.platon.browser.engine.stage.BlockChainResult;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import lombok.Data;
@@ -39,11 +39,11 @@ public class BlockChain {
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private StakingExecute stakingExecute;
+    private StakingEngine stakingExecute;
     @Autowired
-    private ProposalExecute proposalExecute;
+    private ProposalEngine proposalExecute;
     @Autowired
-    private AddressExecute addressExecute;
+    private AddressEngine addressExecute;
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
@@ -61,7 +61,7 @@ public class BlockChain {
     private BlockChainHandler blockChainHandler;
 
     // 业务数据暂存容器
-    public static final BlockChainResult STAGE_DATA = new BlockChainResult();
+    public static final BlockChainStage STAGE_DATA = new BlockChainStage();
     // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
     public static final NodeCache NODE_CACHE = new NodeCache();
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
@@ -163,7 +163,7 @@ public class BlockChain {
      *
      * @return
      */
-    public BlockChainResult exportResult () {
+    public BlockChainStage exportResult () {
         return STAGE_DATA;
     }
 

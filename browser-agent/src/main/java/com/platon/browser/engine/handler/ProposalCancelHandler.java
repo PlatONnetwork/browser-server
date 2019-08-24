@@ -6,7 +6,7 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.ProposalExecute;
+import com.platon.browser.engine.ProposalEngine;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -62,7 +62,7 @@ public class ProposalCancelHandler implements EventHandler{
         proposal.setType(CustomProposal.TypeEnum.CANCEL.code);
         //获取配置文件提案参数模板
         String temp = bc.getChainConfig().getProposalUrlTemplate();
-        String url = temp.replace(ProposalExecute.key,param.getPIDID());
+        String url = temp.replace(ProposalEngine.key,param.getPIDID());
         //设置url
         proposal.setUrl(url);
         //从交易解析参数获取需要设置pIDID
@@ -72,7 +72,7 @@ public class ProposalCancelHandler implements EventHandler{
         BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
         proposal.setEndVotingBlock(cancelEndBlockNumber.toString());
         //设置pIDIDNum
-        String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
+        String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
         BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());

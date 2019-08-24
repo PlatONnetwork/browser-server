@@ -9,7 +9,7 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.stage.BlockChainResult;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.*;
@@ -147,7 +147,7 @@ public class BlockSyncTask {
                         // 查询内置结算周期验证人初始化blockChain的curVerifier属性
                         blockChain.getCurVerifier().put(HexTool.prefix(verifier.getNodeId()),verifier);
                     });
-                    BlockChainResult bcr = blockChain.exportResult();
+                    BlockChainStage bcr = blockChain.exportResult();
                     batchSave(Collections.emptyList(),bcr);
                     blockChain.commitResult();
                 }
@@ -204,7 +204,7 @@ public class BlockSyncTask {
             }
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
-                BlockChainResult bizData = blockChain.exportResult();
+                BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
             } catch (BusinessException e) {
                 break;
@@ -380,7 +380,7 @@ public class BlockSyncTask {
         }
     }
 
-    private void batchSave(List<CustomBlock> basicData, BlockChainResult bizData) throws BusinessException {
+    private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
             // 串行批量入库
             service.insertOrUpdate(basicData,bizData);

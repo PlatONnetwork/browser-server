@@ -6,7 +6,7 @@ import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.ProposalExecute;
+import com.platon.browser.engine.ProposalEngine;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -54,7 +54,7 @@ public class ProposalTextHandler implements EventHandler {
         tx.setTxInfo(JSON.toJSONString(param));
         //获取配置文件提案参数模板
         String temp = bc.getChainConfig().getProposalUrlTemplate();
-        String url = temp.replace(ProposalExecute.key,param.getPIDID());
+        String url = temp.replace(ProposalEngine.key,param.getPIDID());
         //设置url
         proposal.setUrl(url);
         //从交易解析参数获取需要设置pIDID
@@ -62,7 +62,7 @@ public class ProposalTextHandler implements EventHandler {
         //解析器将轮数换成结束块高直接使用
         proposal.setEndVotingBlock("");
         //设置pIDIDNum
-        String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
+        String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置提案类型
         proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
