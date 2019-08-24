@@ -318,8 +318,6 @@ public class BlockChainHandler {
                 CustomNode customNode = NODE_CACHE.getNode(curBlock.getNodeId());
                 CustomStaking customStaking = customNode.getLatestStaking();
                 if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
-                    // 当前块出块奖励
-                    BigDecimal blockReward = new BigDecimal(curBlock.getBlockReward());
                     // 当前共识周期出块奖励
                     BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
                     customStaking.setBlockRewardValue(curConsBlockReward.toString());
@@ -413,7 +411,7 @@ public class BlockChainHandler {
                 //已统计区块中最高交易个数
                 NETWORK_STAT_CACHE.setMaxTps(NETWORK_STAT_CACHE.getMaxTps() > curBlock.getStatTxQty() ? NETWORK_STAT_CACHE.getMaxTps() : curBlock.getStatTxQty());
                 //出块奖励
-                NETWORK_STAT_CACHE.setBlockReward(curBlock.getBlockReward());
+                NETWORK_STAT_CACHE.setBlockReward(bc.getBlockReward().toString());
                 if (curBlock.getStatProposalQty() > 0) {
                     //累计提案总数
                     NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + curBlock.getStatProposalQty());

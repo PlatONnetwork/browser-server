@@ -18,7 +18,7 @@ public class ProposalCache {
     private Map<String, CustomProposal> proposalMap = new HashMap<>();
 
     public void init(List<CustomProposal> proposalList,List<CustomVote> voteList) throws CacheConstructException {
-        proposalList.forEach(proposal -> addProposal(proposal));
+        proposalList.forEach(this::addProposal);
         for (CustomVote vote:voteList) {
             try {
                 addVote(vote);
