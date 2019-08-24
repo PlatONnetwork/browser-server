@@ -63,6 +63,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
             if(InnerContractAddrEnum.addresses.contains(receipt.getTo())){
                 // 第一种：ppos内置合约交易类型
+                // 成功：logs.get(0).getData()来解析出Status字段，并且为true
+                // 失败：非成功
                 List<Log> logs =  receipt.getLogs();
                 if(logs==null||logs.size()==0){
                     this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
@@ -79,10 +81,14 @@ public class CustomTransaction extends TransactionWithBLOBs {
                 // 第二种：非第一种
                 //成功：交易回执的状态： status为空或者status=1，代表成功
                 //失败：非成功
-                this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
+                if(receipt.isStatusOK()){
+                    this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+                }else {
+                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                }
             }
         }catch (Exception e){
-            throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
+            throw new BeanCreateOrUpdateException("使用交易回执更新交易出错:"+e.getMessage());
         }
     }
 
