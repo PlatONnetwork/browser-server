@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Data
 public class CustomStaking extends Staking {
-    // <质押块高-质押记录> 映射
+    // <委托交易from-质押记录> 映射
     private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     public CustomStaking() {

@@ -181,10 +181,10 @@ public class DbService {
                     BigInteger statDelegateQty = BigInteger.ZERO;
                     for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
                         if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO)) {
-                            statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
-                            statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-                            statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
-                            statDelegateQty.add(BigInteger.ONE);
+                            statDelegateHas = statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
+                            statDelegateLocked = statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
+                            statDelegateReduction = statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
+                            statDelegateQty = statDelegateQty.add(BigInteger.ONE);
                         }
                     }
                     customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());

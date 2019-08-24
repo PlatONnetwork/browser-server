@@ -45,7 +45,7 @@ public class DelegateHandler implements EventHandler {
                 param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
                 //todo：交易数据回填
                 tx.setTxInfo(JSON.toJSONString(param));
-                CustomDelegation customDelegation = latestStaking.getDelegations().get(String.valueOf(latestStaking.getStakingBlockNum()));
+                CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
                 //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
                 //更新犹豫期金额
                 if (customDelegation != null) {
