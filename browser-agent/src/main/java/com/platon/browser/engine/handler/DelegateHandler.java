@@ -53,6 +53,8 @@ public class DelegateHandler implements EventHandler {
                     customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
                     //更新分析结果UpdateSet
                     stakingStage.updateDelegation(customDelegation);
+                    //添加委托缓存
+                    nodeCache.addDelegation(customDelegation);
                 }
 
                 //若不存在，则说明该地址有对此节点做过委托
