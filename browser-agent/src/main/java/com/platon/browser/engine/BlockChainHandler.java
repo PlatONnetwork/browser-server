@@ -158,14 +158,14 @@ public class BlockChainHandler {
         try {
             // 获取链上实时区块号
             Long settingPeriod = chainConfig.getSettlePeriodBlockCount().longValue();
-            Long realTimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
+            Long curChainBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
             /****************************更新前一轮结算验证人列表************************/
             if (curVerifier.size()>0) {
                 // 如果curValidator有元素，则把它们转存到preValidator
                 preVerifier.clear();
                 preVerifier.putAll(curVerifier);
             }else {
-                // 如果curVerifier为空，则使用当前结算周期切换区块号查询前一轮结算周期验证人
+                // 如果curVerifier为空，则使用当前区块号查询历史结算周期验证人
                 BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
                 if (result.isStatusOk()) {
                     curVerifier.clear();
@@ -174,7 +174,7 @@ public class BlockChainHandler {
             }
 
             /****************************更新当前轮结算验证人列表************************/
-            if(realTimeBlockNumber>blockNumber && realTimeBlockNumber<(blockNumber+settingPeriod)){
+            if(curChainBlockNumber>blockNumber && curChainBlockNumber<(blockNumber+settingPeriod)){
                 // 如果链上实时区块号大于当前同步区块号，且链上实时区块号<(blockNumber+settingPeriod)时,
                 // 即当前区块号和链上实时区块号处在同一结算周期时，则查询实时结算验证人列表作为当前结算轮验证人列表
                 BaseResponse <List <Node>> result = client.getNodeContract().getVerifierList().send();
@@ -184,7 +184,7 @@ public class BlockChainHandler {
                 }
             }
 
-            if(realTimeBlockNumber>=(blockNumber+settingPeriod)){
+            if(curChainBlockNumber>=(blockNumber+settingPeriod)){
                 // 如果链上实时区块号>=(blockNumber+settingPeriod)，则查询(blockNumber+1)时的共识验证人列表
                 BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber+1));
                 if (result.isStatusOk()) {

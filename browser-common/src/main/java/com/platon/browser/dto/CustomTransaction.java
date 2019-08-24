@@ -6,12 +6,18 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.*;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.BeanUtils;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.platon.BaseResponse;
 import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
 import org.web3j.utils.JSONUtil;
 import org.web3j.utils.Numeric;
 
@@ -70,7 +76,17 @@ public class CustomTransaction extends TransactionWithBLOBs {
                     this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
                 }else {
                     Log log = logs.get(0);
-                    BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(log.getData())), BaseResponse.class);
+                    String data = log.getData();
+                    if(StringUtils.isNotBlank(data)) {
+                        data=data.replace("0x","");
+                    }else{
+                        this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                    }
+                    RlpList b = RlpDecoder.decode(Hex.decode(data));
+                    RlpList group = (RlpList) b.getValues().get(0);
+                    RlpString out = (RlpString) group.getValues().get(0);
+                    String res = new String(out.getBytes());
+                    BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
                     if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
                     if(response!=null){
                         if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
