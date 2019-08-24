@@ -1,5 +1,6 @@
 package com.platon.browser.engine.stage;
 
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import lombok.Data;
 
@@ -26,6 +27,12 @@ public class NetworkStatStage {
         networkStatUpdateStage.clear();
     }
 
+
+    public Set<NetworkStat> exportNetworkStat(){
+        Set<NetworkStat> returnData = new HashSet<>(networkStatInsertStage);
+        returnData.addAll(networkStatUpdateStage);
+        return returnData;
+    }
     public Set<NetworkStat> getNetworkStatInsertStage() {
         return networkStatInsertStage;
     }
@@ -33,4 +40,6 @@ public class NetworkStatStage {
     public Set<NetworkStat> getNetworkStatUpdateStage() {
         return networkStatUpdateStage;
     }
+
+
 }

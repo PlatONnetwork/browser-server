@@ -1,5 +1,6 @@
 package com.platon.browser.engine.stage;
 
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 
@@ -35,6 +36,18 @@ public class ProposalStage {
     }
     public void updateVote( Vote vote){
         voteUpdateStage.add(vote);
+    }
+
+    public Set<Proposal> exportProposal(){
+        Set<Proposal> returnData = new HashSet<>(proposalInsertStage);
+        returnData.addAll(proposalUpdateStage);
+        return returnData;
+    }
+
+    public Set<Vote> exportVote(){
+        Set<Vote> returnData = new HashSet<>(voteInsertStage);
+        returnData.addAll(voteUpdateStage);
+        return returnData;
     }
 
     public Set<Proposal> getProposalInsertStage() {
