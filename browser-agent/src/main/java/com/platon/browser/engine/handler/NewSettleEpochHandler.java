@@ -9,6 +9,7 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,8 @@ public class NewSettleEpochHandler implements EventHandler {
             delegation.setDelegateReduction("0");
             //并判断经过一个结算周期后该委托的对应赎回是否全部完成，若完成则将委托设置为历史节点
             //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
-            if (new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(delegation.getDelegateReduction())) == BigInteger.ZERO) {
+            BigInteger sumAoumt = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(delegation.getDelegateReduction()));
+            if (sumAoumt.compareTo(BigInteger.ZERO) == 0) {
                 delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
             }
             //添加需要更新的委托的信息到委托更新列表
