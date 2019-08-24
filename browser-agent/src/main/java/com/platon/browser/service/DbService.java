@@ -162,7 +162,7 @@ public class DbService {
     }
 
 
-    public void dataOfStakingStatistics () {
+    public void dataOfStakingStatistics () throws Exception{
 
         /**
          *  1.补充统计质押相关数据
@@ -171,28 +171,32 @@ public class DbService {
          *      c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
          *      d.stat_delegate_qty  关联的委托地址数
          */
-
-        BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
-            for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
-                //只统计不为历史的委托数据
-                BigInteger statDelegateHas = BigInteger.ZERO;
-                BigInteger statDelegateLocked = BigInteger.ZERO;
-                BigInteger statDelegateReduction = BigInteger.ZERO;
-                BigInteger statDelegateQty = BigInteger.ZERO;
-                for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
-                    if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO)) {
-                        statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
-                        statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-                        statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
-                        statDelegateQty.add(BigInteger.ONE);
+        try {
+            BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
+                for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
+                    //只统计不为历史的委托数据
+                    BigInteger statDelegateHas = BigInteger.ZERO;
+                    BigInteger statDelegateLocked = BigInteger.ZERO;
+                    BigInteger statDelegateReduction = BigInteger.ZERO;
+                    BigInteger statDelegateQty = BigInteger.ZERO;
+                    for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
+                        if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO)) {
+                            statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
+                            statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
+                            statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
+                            statDelegateQty.add(BigInteger.ONE);
+                        }
                     }
+                    customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
+                    customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
+                    customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
+                    customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
                 }
-                customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
-                customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
-                customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
-                customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
-            }
-        });
+            });
+        } catch (Exception e) {
+            throw new Exception("[DbService]supply Address info exception on dataOfStakingStatistics()");
+        }
+
     }
 
     public void dataOfAddressStatistics () throws BusinessException {
@@ -240,7 +244,7 @@ public class DbService {
                     try {
                         status = BlockChain.NODE_CACHE.getNode(delegation.getNodeId()).getStakings().get(delegation.getStakingBlockNum()).getStatus();
                     } catch (NoSuchBeanException e) {
-                        throw new BusinessException("[DbService]supply Address info exception by dataOfAddressStatistics()");
+                        throw new BusinessException("[DbService]supply Address info exception on dataOfAddressStatistics()");
                     }
                     if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
                         delegateUnlock = delegateUnlock.add(new BigInteger(delegation.getDelegateHas()));

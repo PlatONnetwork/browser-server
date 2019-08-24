@@ -2,6 +2,8 @@ package com.platon.browser.data;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.util.Resolver;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,9 +145,17 @@ public class SpecialContractApiInvoker {
     }
 
     public static void main(String args[]){
-        String a = new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d"));
+       // String a = new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d"));
+        String input = "0xf84e838203ec8180b842b84000cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000838203e8";
+        RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
+        List <RlpType> rlpTypes = rlpList.getValues();
+        RlpList rlpList1 = (RlpList) rlpTypes.get(0);
+        RlpString rlpString = (RlpString) rlpList1.getValues().get(0);
+        String stringValue = Numeric.toHexString(rlpString.getBytes());
+        String res = new String(Numeric.hexStringToByteArray(stringValue));
+        System.out.println(res);
         BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d")), BaseResponse.class);
         System.out.println(response.status);
-        System.out.println(a);
+        //System.out.println(a);
     }
 }

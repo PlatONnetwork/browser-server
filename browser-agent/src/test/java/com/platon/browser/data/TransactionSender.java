@@ -37,14 +37,14 @@ import java.util.List;
 public class TransactionSender {
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
     private Credentials credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
     public TransactionSender() throws IOException, CipherException {}
 
-    // 发送转账交易
+/*    // 发送转账交易
     @Test
     public void transfer() throws Exception {
         //Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
@@ -111,13 +111,13 @@ public class TransactionSender {
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000"
         ).send();
         logger.debug("res:{}",res);
-    }
+    }*/
 
     // 发送委托交易
     @Test
     public void delegate() throws Exception {
         BaseResponse res = delegateContract.delegate(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                "0x15245d4dceeb7552b52d70e56c53fc86aa030eab6b7b325e430179902884fca3d684b0e896ea421864a160e9c18418e4561e9a72f911e2511c29204a857de71a",
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 BigInteger.valueOf(1000)
         ).send();
@@ -125,7 +125,7 @@ public class TransactionSender {
     }
 
     // 发送解委托交易
-    @Test
+   /* @Test
     public void unDelegate() throws Exception {
         BaseResponse res = delegateContract.unDelegate(
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
@@ -133,7 +133,7 @@ public class TransactionSender {
                 BigInteger.valueOf(1000)
         ).send();
         logger.debug("res:{}",res);
-    }
+    }*/
 
     @Test
     public void getBlockNumber() throws IssueEpochChangeException, IOException {
