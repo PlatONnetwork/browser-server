@@ -48,7 +48,7 @@ public class BlockSyncTask {
     @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
-    private DbService service;
+    private DbService dbService;
 
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
@@ -383,7 +383,7 @@ public class BlockSyncTask {
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
             // 串行批量入库
-            service.insertOrUpdate(basicData,bizData);
+            dbService.insertOrUpdate(basicData,bizData);
             // 缓存整理
             BlockChain.NODE_CACHE.sweep();
             BlockChain.PROPOSALS_CACHE.sweep();

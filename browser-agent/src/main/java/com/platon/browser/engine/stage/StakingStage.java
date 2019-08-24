@@ -104,6 +104,37 @@ public class StakingStage {
     }
 
 
+    public Set<Node> exportNode(){
+        Set<Node> returnData = new HashSet<>(nodeInsertStage);
+        returnData.addAll(nodeUpdateStage);
+        return returnData;
+    }
+    public Set<Staking> exportStaking(){
+        Set<Staking> returnData = new HashSet<>(stakingInsertStage);
+        returnData.addAll(stakingUpdateStage);
+        return returnData;
+    }
+    public Set<Delegation> exportDelegation(){
+        Set<Delegation> returnData = new HashSet<>(delegationInsertStage);
+        returnData.addAll(delegationUpdateStage);
+        return returnData;
+    }
+    public Set<UnDelegation> exportUnDelegation(){
+        Set<UnDelegation> returnData = new HashSet<>(unDelegationInsertStage);
+        returnData.addAll(unDelegationUpdateStage);
+        return returnData;
+    }
+    public Set<Slash> exportSlash(){
+        Set<Slash> returnData = new HashSet<>(slashInsertStage);
+        returnData.addAll(slashUpdateStage);
+        return returnData;
+    }
+    public Set<NodeOpt> exportNodeOpt(){
+        Set<NodeOpt> returnData = new HashSet<>(nodeOptInsertStage);
+        returnData.addAll(nodeOptUpdateStage);
+        return returnData;
+    }
+
     public Set<Node> getNodeInsertStage() {
         return nodeInsertStage;
     }

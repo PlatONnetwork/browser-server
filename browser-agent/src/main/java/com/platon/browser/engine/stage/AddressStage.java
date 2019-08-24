@@ -24,12 +24,18 @@ public class AddressStage {
         addressInsertStage.clear();
         addressUpdateStage.clear();
     }
+    public Set<Address> exportAddress(){
+        Set<Address> returnData = new HashSet<>(addressInsertStage);
+        returnData.addAll(addressUpdateStage);
+        return returnData;
+    }
 
     public Set<Address> getAddressInsertStage() {
         return addressInsertStage;
     }
-
     public Set<Address> getAddressUpdateStage() {
         return addressUpdateStage;
     }
+
+
 }
