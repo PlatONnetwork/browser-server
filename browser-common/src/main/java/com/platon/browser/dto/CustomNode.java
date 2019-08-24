@@ -1,8 +1,6 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -23,7 +21,7 @@ public class CustomNode extends Node {
          Date date = new Date();
          this.setUpdateTime(date);
          this.setCreateTime(date);
-          /** 初始化默认值 **/
+          /* 初始化默认值 */
           // 多签举报次数
           this.setStatSlashMultiQty(0);
           // 出块率低举报次数
@@ -47,21 +45,6 @@ public class CustomNode extends Node {
     public void updateWithCustomStaking(CustomStaking staking) {
         this.setNodeId(staking.getNodeId());
         this.setCreateTime(new Date());
-    }
-
-    /**
-     * 取最近的x条质押记录
-     * @param x
-     * @return
-     * @throws NoSuchBeanException
-     */
-    public List<CustomStaking> getLatestXStakings(int x) throws NoSuchBeanException {
-        List<CustomStaking> returnData  = new ArrayList<>();
-        for (Map.Entry<Long,CustomStaking> entry:stakings.descendingMap().descendingMap().entrySet()){
-            returnData.add(entry.getValue());
-            if(returnData.size()==x) break;
-        }
-        return returnData;
     }
 
     /**

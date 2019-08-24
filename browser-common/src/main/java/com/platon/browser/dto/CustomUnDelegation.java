@@ -17,10 +17,6 @@ import java.util.Map;
 @Data
 public class CustomUnDelegation extends UnDelegation {
 
-    public String getDelegationMapKey(){
-        return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
-    }
-
     public void updateWithUnDelegateParam( UnDelegateParam param, CustomTransaction tx){
         this.setApplyAmount(param.getAmount());
         this.setDelegateAddr(tx.getFrom());

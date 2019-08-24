@@ -20,11 +20,11 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/13 14:36
- * @Description:
+ * @Description: 质押实体扩展类
  */
 @Data
 public class CustomStaking extends Staking {
-    // <委托交易from-质押记录> 映射
+    // <委托交易发送者地址-质押记录> 映射
     private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     public CustomStaking() {
@@ -32,7 +32,7 @@ public class CustomStaking extends Staking {
         this.setCreateTime(date);
         this.setUpdateTime(date);
         this.setJoinTime(date);
-        /** 初始化默认值 **/
+        /* 初始化默认值 */
         // 质押金额(犹豫期金额)
         this.setStakingHas(BigInteger.ZERO.toString());
         // 质押金额(锁定金额)

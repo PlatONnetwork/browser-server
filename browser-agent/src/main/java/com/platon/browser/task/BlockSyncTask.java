@@ -45,23 +45,17 @@ import java.util.concurrent.*;
  */
 @Component
 public class BlockSyncTask {
+    private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
+    private static ExecutorService THREAD_POOL;
 
     @Autowired
     private CustomBlockMapper customBlockMapper;
     @Autowired
     private DbService dbService;
-
-    private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
-
-    private static ExecutorService THREAD_POOL;
-
-    private static ExecutorService TX_THREAD_POOL;
-
     @Autowired
     private BlockChain blockChain;
     @Autowired
     private BlockChainConfig chainConfig;
-
     @Autowired
     private PlatonClient client;
 
@@ -96,14 +90,12 @@ public class BlockSyncTask {
     public void init () throws CandidateException, IssueEpochChangeException {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
-        TX_THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize * 2);
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         if (maxBlockNumber != null && maxBlockNumber > 0) {
             commitBlockNumber = maxBlockNumber;
             blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
             blockChain.initCandidate(maxBlockNumber);
         }
-
 
         /*
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -244,7 +236,7 @@ public class BlockSyncTask {
                     if(initData!=null) {
                         try{
                             CustomBlock block = new CustomBlock();
-                            block.init(initData);
+                            block.updateWithBlock(initData);
                             result.concurrentBlockMap.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
                             logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
@@ -289,7 +281,7 @@ public class BlockSyncTask {
         blocks.forEach(b -> {
             List <CustomTransaction> txList = b.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
-            txList.forEach(tx ->TX_THREAD_POOL.submit(() -> {
+            txList.forEach(tx ->THREAD_POOL.submit(() -> {
                 try {
                     updateTransaction(tx);
                 } catch (Exception e) {

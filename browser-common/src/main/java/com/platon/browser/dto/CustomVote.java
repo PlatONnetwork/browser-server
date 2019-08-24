@@ -18,10 +18,6 @@ import java.util.Map;
 @Data
 public class CustomVote extends Vote {
 
-    public void buildStructure( Vote vote){
-        BeanUtils.copyProperties(vote,this);
-    }
-
     public void updateWithVote( CustomTransaction tx, VotingProposalParam param ){
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());

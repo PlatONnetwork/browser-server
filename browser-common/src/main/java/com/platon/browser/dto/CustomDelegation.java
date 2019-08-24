@@ -1,17 +1,15 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.param.DelegateParam;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 import java.util.*;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/14 12:08
- * @Description:
+ * @Description: 委托实体扩展类
  */
 @Data
 public class CustomDelegation extends Delegation {
@@ -25,7 +23,7 @@ public class CustomDelegation extends Delegation {
         this.setNodeId(param.getNodeId());
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
-        this.setSequence(Long.valueOf(tx.getBlockNumber())+tx.getTransactionIndex());
+        this.setSequence(tx.getBlockNumber()+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }

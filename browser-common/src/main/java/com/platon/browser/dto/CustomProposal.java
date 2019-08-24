@@ -2,8 +2,6 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Proposal;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
-import org.web3j.platon.bean.TallyResult;
 
 import java.util.*;
 
@@ -38,7 +36,7 @@ public class CustomProposal extends Proposal {
         this.setDescription(queryFlag);
     }
 
-    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto)throws Exception{
+    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto) {
        this.setTopic(proposalMarkDownDto.getTopic());
        this.setDescription(proposalMarkDownDto.getDescription());
     }
