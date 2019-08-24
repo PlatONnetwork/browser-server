@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler;
 
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.StakingStage;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -33,7 +33,7 @@ public class NewConsensusEpochHandler implements EventHandler {
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
 
-        List<CustomStaking> stakings = nodeCache.getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.CANDIDATE));
+        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakings){
             Node node = bc.getCurValidator().get(staking.getNodeId());
             if(node!=null){
@@ -56,7 +56,5 @@ public class NewConsensusEpochHandler implements EventHandler {
                 logger.error("更新共识验证人(nodeId={})验证轮数出错:{}",nodeId,e.getMessage());
             }
         });
-
     }
-
 }

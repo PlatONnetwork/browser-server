@@ -198,6 +198,10 @@ public class CustomStaking extends Staking {
         }
     }
 
+    public StatusEnum getStatusEnum(){
+        return StatusEnum.getEnum(this.getStatus());
+    }
+
     public enum StatusEnum{
         CANDIDATE(1, "候选中"),
         EXITING(2, "退出中"),

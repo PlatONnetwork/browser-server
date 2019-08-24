@@ -198,7 +198,7 @@ public class DbService {
                 }
 
             }
-            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(Collections.singletonList(CustomDelegation.YesNoEnum.NO))) {
+            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO)) {
                 if (delegation.getDelegateAddr().equals(customAddress.getAddress())) {
                     delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
                     delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));

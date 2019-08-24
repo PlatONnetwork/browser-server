@@ -18,16 +18,6 @@ public class CustomDelegation extends Delegation {
 
     private List<CustomUnDelegation> unDelegations = new ArrayList<>();
 
-    // delegation与staking的关联键
-    public String getStakingMapKey(){
-        return this.getNodeId()+this.getStakingBlockNum();
-    }
-
-    // delegation与un_delegation的关联键
-    public String getDelegationMapKey(){
-        return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
-    }
-
     public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
         this.setDelegateHas(param.getAmount());
         this.setDelegateLocked("0");
@@ -38,6 +28,10 @@ public class CustomDelegation extends Delegation {
         this.setSequence(Long.valueOf(tx.getBlockNumber())+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
+    }
+
+    public YesNoEnum getIsHistoryEnum() {
+        return YesNoEnum.getEnum(this.getIsHistory());
     }
 
 

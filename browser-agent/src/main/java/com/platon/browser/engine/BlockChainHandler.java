@@ -321,8 +321,7 @@ public class BlockChainHandler {
                     // 当前块出块奖励
                     BigDecimal blockReward = new BigDecimal(curBlock.getBlockReward());
                     // 当前共识周期出块奖励
-                    BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue())
-                            .add(blockReward);
+                    BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
                     customStaking.setBlockRewardValue(curConsBlockReward.toString());
 
                     // 节点出块数加1
@@ -331,7 +330,7 @@ public class BlockChainHandler {
                     STAGE_DATA.getStakingStage().updateStaking(customStaking);
                 }
             } catch (NoSuchBeanException e) {
-                logger.debug("找不到符合条件的质押信息:{}",e.getMessage());
+                logger.error("找不到符合条件的质押信息:{}",e.getMessage());
             }
         }
     }
