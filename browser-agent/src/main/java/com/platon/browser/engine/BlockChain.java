@@ -60,6 +60,8 @@ public class BlockChain {
     @Autowired
     private BlockChainHandler blockChainHandler;
 
+    // 节点名称缓存 <节点ID-节点名称>
+    public static final Map<String,String> NODE_NAME_MAP = new HashMap<>();
     // 业务数据暂存容器
     public static final BlockChainStage STAGE_DATA = new BlockChainStage();
     // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
@@ -156,6 +158,10 @@ public class BlockChain {
         blockChainHandler.updateStakingRelative();
         // 更新block表中的相关信息
         blockChainHandler.updateBlockRelative();
+
+        // 更新当前区块的节点名称
+        String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
+        curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
     }
 
     /**

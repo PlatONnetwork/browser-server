@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
+
 /**
  * 发起质押(创建验证人)事件处理类
  * @Auther: Chendongming
@@ -53,6 +55,9 @@ public class CreateValidatorHandler implements EventHandler {
                     node.getStakings().put(tx.getBlockNumber(),newStaking);
                     // 把最新质押信息添加至待入库列表
                     stakingStage.insertStaking(newStaking,tx);
+
+                    // 更新节点名称映射缓存
+                    NODE_NAME_MAP.put(newStaking.getNodeId(),newStaking.getStakingName());
                 }
                 if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
                     // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
@@ -79,6 +84,9 @@ public class CreateValidatorHandler implements EventHandler {
             // 新节点和新质押记录暂存到待入库列表中
             stakingStage.insertNode(node);
             stakingStage.insertStaking(staking,tx);
+
+            // 更新节点名称映射缓存
+            NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName());
         }
     }
 }
