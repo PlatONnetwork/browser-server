@@ -5,6 +5,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.ConsensusEpochChangeException;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import org.web3j.platon.bean.Node;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * 结算周期变更事件处理类
@@ -23,15 +26,12 @@ import java.util.List;
 @Component
 public class NewConsensusEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewConsensusEpochHandler.class);
-    private NodeCache nodeCache;
-    private StakingStage stakingStage;
-    private BlockChain bc;
 
     @Override
     public void handle(EventContext context) throws ConsensusEpochChangeException {
-        nodeCache = context.getNodeCache();
-        stakingStage = context.getStakingStage();
-        bc = context.getBlockChain();
+        NodeCache nodeCache = context.getNodeCache();
+        StakingStage stakingStage = context.getStakingStage();
+        BlockChain bc = context.getBlockChain();
 
         List<CustomStaking> stakings = nodeCache.getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.CANDIDATE));
         for (CustomStaking staking:stakings){
@@ -46,6 +46,16 @@ public class NewConsensusEpochHandler implements EventHandler {
             staking.setCurConsBlockQty(BigInteger.ZERO.longValue());
             stakingStage.updateStaking(staking);
         }
+
+        // 更新node表中的共识验证轮数: stat_verifier_time
+        bc.getCurValidator().forEach((nodeId,validator)->{
+            try {
+                CustomNode node = NODE_CACHE.getNode(nodeId);
+                node.setStatVerifierTime(node.getStatVerifierTime()+1);
+            } catch (NoSuchBeanException e) {
+                logger.error("更新共识验证人(nodeId={})验证轮数出错:{}",nodeId,e.getMessage());
+            }
+        });
 
     }
 

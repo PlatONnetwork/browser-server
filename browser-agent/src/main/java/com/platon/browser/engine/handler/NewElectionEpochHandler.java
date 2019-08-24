@@ -27,15 +27,12 @@ import java.util.List;
 @Component
 public class NewElectionEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewElectionEpochHandler.class);
-    private NodeCache nodeCache;
-    private StakingStage stakingStage;
-    private BlockChain bc;
 
     @Override
     public void handle(EventContext context) throws ElectionEpochChangeException {
-        nodeCache = context.getNodeCache();
-        stakingStage = context.getStakingStage();
-        bc = context.getBlockChain();
+        NodeCache nodeCache = context.getNodeCache();
+        StakingStage stakingStage = context.getStakingStage();
+        BlockChain bc = context.getBlockChain();
 
         if(bc.getCurConsensusEpoch().longValue()==1){
             // 因为第一轮共识没有前一轮，所以不处理
@@ -56,7 +53,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 // 判断当前出块率是否小于等于最高处罚百分比
                 boolean isHighSlash = blockRate.compareTo(bc.getChainConfig().getBlockRate4HighSlash())<=0;
                 // 确定处罚比例
-                BigDecimal slashRate = isHighSlash?bc.getChainConfig().getBlockHighSlashRate():bc.getChainConfig().getBlockLowSlashRate();
+                BigDecimal slashRate = isHighSlash? bc.getChainConfig().getBlockHighSlashRate(): bc.getChainConfig().getBlockLowSlashRate();
                 // 总的质押金：（犹豫+锁定）
                 BigDecimal totalAmount = stakingHas.add(stakingLocked);
                 // 处罚金额

@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
@@ -58,6 +59,8 @@ public class BlockSyncTask {
 
     @Autowired
     private BlockChain blockChain;
+    @Autowired
+    private BlockChainConfig chainConfig;
 
     @Autowired
     private PlatonClient client;
@@ -132,6 +135,8 @@ public class BlockSyncTask {
                         CustomNode node = new CustomNode();
                         node.updateWithNode(verifier);
                         node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
+                        node.setStatVerifierTime(BigInteger.ONE.intValue());
+                        node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
                         BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
 
                         CustomStaking staking = new CustomStaking();

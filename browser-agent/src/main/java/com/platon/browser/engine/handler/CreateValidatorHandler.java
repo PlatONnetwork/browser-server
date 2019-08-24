@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BlockChainException;
@@ -28,6 +29,7 @@ public class CreateValidatorHandler implements EventHandler {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
+        BlockChain bc = context.getBlockChain();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
@@ -68,6 +70,7 @@ public class CreateValidatorHandler implements EventHandler {
             CustomStaking staking = new CustomStaking();
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();
+            node.setStatExpectBlockQty(bc.getChainConfig().getExpectBlockCount().longValue());
             node.updateWithCustomStaking(staking);
             // 把质押记录添加到节点质押记录列表中
             node.getStakings().put(staking.getStakingBlockNum(),staking);
