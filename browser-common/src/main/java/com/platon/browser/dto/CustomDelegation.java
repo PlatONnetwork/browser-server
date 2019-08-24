@@ -35,7 +35,7 @@ public class CustomDelegation extends Delegation {
         this.setNodeId(param.getNodeId());
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
-        this.setSequence(Long.valueOf(tx.getBlockNumber())*100000+tx.getTransactionIndex());
+        this.setSequence(Long.valueOf(tx.getBlockNumber())+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }
