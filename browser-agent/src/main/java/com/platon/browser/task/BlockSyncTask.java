@@ -307,8 +307,8 @@ public class BlockSyncTask {
         }
         blocks.forEach(block->{
             Stat stat = new Stat();
-            block.getTransactionList().forEach(ti->{
-                switch (ti.getTypeEnum()){
+            block.getTransactionList().forEach(transaction->{
+                switch (transaction.getTypeEnum()){
                     case TRANSFER: // 转账交易数总和
                         stat.transferQty++;
                         break;
@@ -332,9 +332,9 @@ public class BlockSyncTask {
                         break;
                 }
                 // 累加当前区块内所有交易的手续费
-                stat.txFee = stat.txFee.add(new BigDecimal(ti.getActualTxCost()));
+                stat.txFee = stat.txFee.add(new BigDecimal(transaction.getActualTxCost()));
                 // 累加当前区块内所有交易的GasLimit
-                stat.txGasLimit = stat.txGasLimit+Integer.parseInt(ti.getGasLimit());
+                stat.txGasLimit = stat.txGasLimit+Integer.parseInt(transaction.getGasLimit());
             });
             block.setStatDelegateQty(stat.delegateQty);
             block.setStatProposalQty(stat.proposalQty);

@@ -2,17 +2,23 @@ package com.platon.browser.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.param.*;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+import org.web3j.platon.BaseResponse;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.JSONUtil;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,49 +52,38 @@ public class CustomTransaction extends TransactionWithBLOBs {
         }
     }
 
+    /**
+     * 根据交易回执设置交易的成功标识
+     * @param receipt
+     * @throws BeanCreateOrUpdateException
+     */
     public void updateWithTransactionReceipt (TransactionReceipt receipt) throws BeanCreateOrUpdateException {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            // TODO: 需要与后台商榷交易是否成功的判断标准
-
-            this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
-
-            /*
-            // 关于交易是否成功的判断(此做法是否合理有待商榷)：
-            // 1、交易回执logs为空列表时：
-            //     a、根据交易的to地址是否是内置合约地址来判断是否是合约调用；
-            //     b、如果to地址不是内置合约地址，则可能是转账或其它未知交易：
-            //
-            // 2、交易回执logs有内容时：
-            //     a、需要解码logs.get(0).getData()来解析出status字段，用于确定交易是否成功；
-            //
-            // 例子：转账和委托失败，交易回执中的logs都为空
-            List <Log> logs =  receipt.getLogs();
-            if(logs.size()==0){
-                this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-            }else {
-                BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(logs.get(0).getData())), BaseResponse.class);
-                if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                if(response!=null){
-                    if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                    else this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+            if(InnerContractAddrEnum.addresses.contains(receipt.getTo())){
+                // 第一种：ppos内置合约交易类型
+                List<Log> logs =  receipt.getLogs();
+                if(logs==null||logs.size()==0){
+                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                }else {
+                    Log log = logs.get(0);
+                    BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(log.getData())), BaseResponse.class);
+                    if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                    if(response!=null){
+                        if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+                        else this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                    }
                 }
-            }*/
+            }else {
+                // 第二种：非第一种
+                //成功：交易回执的状态： status为空或者status=1，代表成功
+                //失败：非成功
+                this.setTxReceiptStatus(receipt.isStatusOK()?TxReceiptStatusEnum.SUCCESS.code:TxReceiptStatusEnum.FAILURE.code);
+            }
         }catch (Exception e){
             throw new BeanCreateOrUpdateException("CustomTransaction.update() error:"+e.getMessage());
         }
-/*        if(this.getTo().equals(InnerContractAddEnum.LOCKCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.STAKINGCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.PUNISHCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.FOUNDATION.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.GOVERNMENTCONTRACT.getAddress()) ||
-                this.getTo().equals(InnerContractAddEnum.EXCITATIONCONTRACT.getAddress()) ||
-                "0x" != code )
-        {
-            this.setReceiveType("contract");
-        }else
-            this.setReceiveType("account");*/
     }
 
     /**

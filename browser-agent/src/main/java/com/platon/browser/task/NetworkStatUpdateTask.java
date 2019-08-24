@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public class NetworkStatUpdateTask {
 
     @Scheduled(cron = "0/5  * * * * ?")
     protected void start () {
+        CustomBlock curBlock = blockChain.getCurBlock();
+        if(curBlock==null) return;
         try {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
             Map <Integer, BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
@@ -45,7 +48,7 @@ public class NetworkStatUpdateTask {
             String developerIncentiveFundAccountAddr = blockChain.getChainConfig().getDeveloperIncentiveFundAccountAddr();
             //rpc查询实时激励池余额
             BigInteger incentivePoolAccountBalance = platonClient.getWeb3j().platonGetBalance(developerIncentiveFundAccountAddr,
-                    DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
+                    DefaultBlockParameter.valueOf(BigInteger.valueOf(curBlock.getBlockNumber().longValue()))).send().getBalance();
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
