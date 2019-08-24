@@ -4,17 +4,17 @@ version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: test
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
-dbuser: platon
+dbuser: root
 # MySQL数据库密码
-dbpass: platon
+dbpass: Juzhen123!
 web3j:
   addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
   collect.batch-size: 1000
 # Redis集群节点
 #redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
-redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+redis: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
 # 日志文件存储文件
 logpath: /opt/browser-0.7.2/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
