@@ -91,7 +91,7 @@ public class StakingExecute {
      * @param tx 交易
      * @param bc BlockChain
      */
-    void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
+    void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException, BlockChainException {
         // 事件上下文
         EventContext context = new EventContext(tx,bc,nodeCache,stakingStage,null);
         switch (tx.getTypeEnum()){

@@ -159,7 +159,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start() throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException, BusinessException {
+    public void start() throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException, BusinessException, BlockChainException {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();
@@ -263,12 +263,10 @@ public class BlockSyncTask {
 
         if (result.concurrentBlockMap.size() > 0) {
             // 查看已采块是否连续，把缺失的区块号放入重试列表
-            Set <Long> collectedNumbers = result.concurrentBlockMap.keySet();
-            List <Long> collectedList = new ArrayList <>(collectedNumbers);
-            collectedList.sort(Long::compareTo);
-            long start = collectedList.get(0), end = collectedList.get(collectedList.size() - 1);
+            Set <Long> collected = result.concurrentBlockMap.keySet();
+            long start = Collections.min(collected), end = Collections.max(collected);
             for (long i = start; i < end; i++) {
-                if (!collectedList.contains(i)) result.retryNumbers.add(BigInteger.valueOf(i));
+                if (!collected.contains(i)) result.retryNumbers.add(BigInteger.valueOf(i));
             }
         }
 

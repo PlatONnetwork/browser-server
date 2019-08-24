@@ -134,7 +134,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException, BusinessException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException, BusinessException, BlockChainException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         blockChainHandler.updateEpoch();

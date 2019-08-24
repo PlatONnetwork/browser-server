@@ -340,7 +340,7 @@ public class BlockChainHandler {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () throws NoSuchBeanException, BusinessException {
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
         CustomBlock curBlock = bc.getCurBlock();
 
         for (CustomTransaction tx:curBlock.getTransactionList()){

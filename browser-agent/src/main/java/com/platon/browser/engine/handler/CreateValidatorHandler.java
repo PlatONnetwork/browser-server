@@ -6,6 +6,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class CreateValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(CreateValidatorHandler.class);
 
     @Override
-    public void handle(EventContext context) {
+    public void handle(EventContext context) throws BlockChainException {
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
@@ -50,6 +51,10 @@ public class CreateValidatorHandler implements EventHandler {
                     node.getStakings().put(tx.getBlockNumber(),newStaking);
                     // 把最新质押信息添加至待入库列表
                     stakingStage.insertStaking(newStaking,tx);
+                }
+                if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
+                    // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
+                    throw new BlockChainException("链上重复质押同一节点(nodeId="+node.getNodeId()+")");
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}",e.getMessage());
