@@ -29,7 +29,7 @@ public class NodeCache {
                      List<CustomDelegation> delegationList,
                      List<CustomUnDelegation> unDelegationList
     ) throws CacheConstructException {
-        nodeList.forEach(node->nodeMap.put(node.getNodeId(),node));
+        nodeList.forEach(this::addNode);
         for (CustomStaking staking:stakingList){
             try {
                 addStaking(staking);
