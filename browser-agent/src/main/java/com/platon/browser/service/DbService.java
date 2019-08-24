@@ -236,7 +236,7 @@ public class DbService {
                     delegateLocked = delegateLocked.add(new BigInteger(delegation.getDelegateLocked()));
                     delegateReduction = delegateReduction.add(new BigInteger(delegation.getDelegateReduction()));
                     candidateCount = candidateCount.add(BigInteger.ONE);
-                    Integer status = new Integer(0);
+                    Integer status = 0;
                     try {
                         status = BlockChain.NODE_CACHE.getNode(delegation.getNodeId()).getStakings().get(delegation.getStakingBlockNum()).getStatus();
                     } catch (NoSuchBeanException e) {
