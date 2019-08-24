@@ -87,8 +87,12 @@ public class CustomTransaction extends TransactionWithBLOBs {
                     BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
                     if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
                     if(response!=null){
-                        if(response.status) this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                        else this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                        if(response.status) {
+                            this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+                        }else{
+                            this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+                            this.setFailReason(response.errMsg);
+                        }
                     }
                 }
             }else {
