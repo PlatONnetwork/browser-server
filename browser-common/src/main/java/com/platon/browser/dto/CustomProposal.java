@@ -2,8 +2,6 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Proposal;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
-import org.web3j.platon.bean.TallyResult;
 
 import java.util.*;
 
@@ -23,10 +21,6 @@ public class CustomProposal extends Proposal {
 
     public static final String queryFlag = "inquiry";
 
-    public void updateWithProposal(Proposal proposal) {
-        BeanUtils.copyProperties(proposal, this);
-    }
-
     public void updateWithCustomTransaction(CustomTransaction tx) {
         this.setHash(tx.getHash());
         this.setYeas(0L);
@@ -42,47 +36,15 @@ public class CustomProposal extends Proposal {
         this.setDescription(queryFlag);
     }
 
-    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto)throws Exception{
+    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto) {
        this.setTopic(proposalMarkDownDto.getTopic());
        this.setDescription(proposalMarkDownDto.getDescription());
-    }
-
-
-    public enum OptionEnum {
-        SUPPORT(1, "支持"),
-        OPPOSITION(2, "反对"),
-        ABSTENTION(3, "弃权");
-        public int code;
-        public String desc;
-        OptionEnum ( int code, String desc ) {
-            this.code = code;
-            this.desc = desc;
-        }
-        public int getCode () {
-            return code;
-        }
-        public String getDesc () {
-            return desc;
-        }
-        private static Map <Integer, OptionEnum> ENUMS = new HashMap <>();
-        static {
-            Arrays.asList(OptionEnum.values()).forEach(en -> ENUMS.put(en.code, en));
-        }
-        public static OptionEnum getEnum ( Integer code ) {
-            return ENUMS.get(code);
-        }
-        public static boolean contains ( int code ) {
-            return ENUMS.containsKey(code);
-        }
-        public static boolean contains ( OptionEnum en ) {
-            return ENUMS.containsValue(en);
-        }
     }
 
     public enum TypeEnum {
         TEXT("1", "文本提案"),
         UPGRADE("2", "升级提案"),
-        CANCEL("3", "取消提案");
+        CANCEL("4", "取消提案");
         public String code;
         public String desc;
         TypeEnum ( String code, String desc ) {

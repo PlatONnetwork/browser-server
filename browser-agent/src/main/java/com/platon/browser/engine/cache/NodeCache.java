@@ -29,7 +29,7 @@ public class NodeCache {
                      List<CustomDelegation> delegationList,
                      List<CustomUnDelegation> unDelegationList
     ) throws CacheConstructException {
-        nodeList.forEach(node->nodeMap.put(node.getNodeId(),node));
+        nodeList.forEach(this::addNode);
         for (CustomStaking staking:stakingList){
             try {
                 addStaking(staking);
@@ -138,13 +138,13 @@ public class NodeCache {
 
     /**
      * 获取指定状态的所有质押信息
-     * @param statuses
      * @return
      */
-    public List<CustomStaking> getStakingByStatus(List<CustomStaking.StatusEnum> statuses){
+    public List<CustomStaking> getStakingByStatus(CustomStaking.StatusEnum... statusArr){
+        List<?> statuses = Arrays.asList(statusArr);
         List<CustomStaking> returnData = new ArrayList<>();
         stakingSet.stream()
-                .filter(staking -> statuses.contains(CustomStaking.StatusEnum.getEnum(staking.getStatus())))
+                .filter(staking -> statuses.contains(staking.getStatusEnum()))
                 .forEach(returnData::add);
         return returnData;
     }
@@ -152,10 +152,11 @@ public class NodeCache {
     /**
      * 获取指定状态的委托信息
      */
-    public List<CustomDelegation> getDelegationByIsHistory(List<CustomDelegation.YesNoEnum> statuses){
+    public List<CustomDelegation> getDelegationByIsHistory(CustomDelegation.YesNoEnum... statusArr){
+        List<?> statuses = Arrays.asList(statusArr);
         List<CustomDelegation> returnData = new ArrayList<>();
         delegationSet.stream()
-                .filter(delegation -> statuses.contains(CustomDelegation.YesNoEnum.getEnum(delegation.getIsHistory())))
+                .filter(delegation -> statuses.contains(delegation.getIsHistoryEnum()))
                 .forEach(returnData::add);
         return returnData;
     }
@@ -163,10 +164,11 @@ public class NodeCache {
     /**
     * 获取指定状态的解委托信息
      */
-    public List<CustomUnDelegation> getUnDelegationByStatus(List<CustomUnDelegation.StatusEnum> statuses){
+    public List<CustomUnDelegation> getUnDelegationByStatus(CustomUnDelegation.StatusEnum... statusArr){
+        List<?> statuses = Arrays.asList(statusArr);
         List<CustomUnDelegation> returnData = new ArrayList<>();
         delegationSet.forEach(delegate->delegate.getUnDelegations().stream()
-                .filter(unDelegation->statuses.contains(CustomUnDelegation.StatusEnum.getEnum(unDelegation.getStatus())))
+                .filter(unDelegation->statuses.contains(unDelegation.getStatusEnum()))
                 .forEach(returnData::add));
         return returnData;
     }
@@ -179,7 +181,7 @@ public class NodeCache {
     public void sweep(){
         /************清楚质押记录***********/
         // 取所有已退出状态质押记录
-        List<CustomStaking> exitedStakingList = getStakingByStatus(Collections.singletonList(CustomStaking.StatusEnum.EXITED));
+        List<CustomStaking> exitedStakingList = getStakingByStatus(CustomStaking.StatusEnum.EXITED);
         // 用于记录无效的质押记录（其所有委托均已变成历史）
         List<CustomStaking> invalidCache = new ArrayList<>();
         exitedStakingList.forEach(staking -> {

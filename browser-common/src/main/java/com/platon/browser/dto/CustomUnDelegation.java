@@ -1,6 +1,5 @@
 package com.platon.browser.dto;
 
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.param.UnDelegateParam;
 import lombok.Data;
@@ -18,10 +17,6 @@ import java.util.Map;
 @Data
 public class CustomUnDelegation extends UnDelegation {
 
-    public String getDelegationMapKey(){
-        return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
-    }
-
     public void updateWithUnDelegateParam( UnDelegateParam param, CustomTransaction tx){
         this.setApplyAmount(param.getAmount());
         this.setDelegateAddr(tx.getFrom());
@@ -30,6 +25,10 @@ public class CustomUnDelegation extends UnDelegation {
         this.setNodeId(param.getNodeId());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
+    }
+
+    public StatusEnum getStatusEnum(){
+        return StatusEnum.getEnum(this.getStatus());
     }
 
     public enum StatusEnum{
@@ -44,13 +43,13 @@ public class CustomUnDelegation extends UnDelegation {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map <Integer, CustomStaking.StatusEnum> ENUMS = new HashMap <>();
+        private static Map <Integer, StatusEnum> ENUMS = new HashMap <>();
         static {
-            Arrays.asList(CustomStaking.StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
-        public static CustomStaking.StatusEnum getEnum( Integer code){
+            Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static StatusEnum getEnum( Integer code){
             return ENUMS.get(code);
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
-        public static boolean contains( CustomStaking.StatusEnum en){return ENUMS.containsValue(en);}
+        public static boolean contains( StatusEnum en){return ENUMS.containsValue(en);}
     }
 }

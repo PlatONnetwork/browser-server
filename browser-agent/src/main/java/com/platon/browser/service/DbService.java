@@ -4,11 +4,9 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.*;
+import com.platon.browser.engine.stage.*;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +60,7 @@ public class DbService {
 
 
     @Transactional
-    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainResult bizData ) throws Exception {
+    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) throws Exception {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {
@@ -80,10 +78,10 @@ public class DbService {
             transactionCacheService.update(new HashSet <>(transactions));
         }
         // 统计数据入库并更新redis缓存
-        NetworkStatResult nsr = bizData.getNetworkStatResult();
-        if (nsr.getUpdateNetworkStats().size() > 0) {
-            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getUpdateNetworkStats(), NetworkStat.Column.values());
-            networkStatCacheService.update(nsr.getUpdateNetworkStats());
+        NetworkStatStage nsr = bizData.getNetworkStatStage();
+        if (nsr.getNetworkStatUpdateStage().size() > 0) {
+            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getNetworkStatUpdateStage(), NetworkStat.Column.values());
+            networkStatCacheService.update(nsr.getNetworkStatUpdateStage());
         }
 
         //质押统计数据补充
@@ -92,78 +90,45 @@ public class DbService {
         //地址相关数据补充
         dataOfAddressStatistics();
 
-        // 质押相关数据
-        StakingExecuteResult ser = bizData.getStakingExecuteResult();
-        // 提案相关数据
-        ProposalExecuteResult per = bizData.getProposalExecuteResult();
-        // 地址相关数据
-        AddressExecuteResult aer = bizData.getAddressExecuteResult();
+        // ****************批量新增或更新质押相关数据*******************
+        StakingStage ser = bizData.getStakingStage();
+        // 批量入库或更新节点数据
+        Set<Node> nodes = ser.exportNode();
+        if(nodes.size()>0) customNodeMapper.batchInsertOrUpdateSelective(nodes, Node.Column.values());
+        // 批量入库或更新质押数据
+        Set<Staking> stakings = ser.exportStaking();
+        if(stakings.size()>0) customStakingMapper.batchInsertOrUpdateSelective(stakings, Staking.Column.values());
+        // 批量入库或更新委托数据
+        Set<Delegation> delegations = ser.exportDelegation();
+        if(delegations.size()>0) customDelegationMapper.batchInsertOrUpdateSelective(delegations, Delegation.Column.values());
+        // 批量入库或更新解委托数据
+        Set<UnDelegation> unDelegations = ser.exportUnDelegation();
+        if(unDelegations.size()>0) customUnDelegationMapper.batchInsertOrUpdateSelective(unDelegations, UnDelegation.Column.values());
+        // 批量入库或更新惩罚数据
+        Set<Slash> slashes = ser.exportSlash();
+        if(slashes.size()>0) customSlashMapper.batchInsertOrUpdateSelective(slashes, Slash.Column.values());
+        // 批量入库或更新节点操作数据
+        Set<NodeOpt> nodeOpts = ser.exportNodeOpt();
+        if(nodeOpts.size()>0) customNodeOptMapper.batchInsertOrUpdateSelective(nodeOpts, NodeOpt.Column.values());
 
-        /*****************************批量新增操作 START**************************/
+        // ****************批量新增或更新提案相关数据*******************
+        ProposalStage per = bizData.getProposalStage();
+        // 批量入库或更新提案数据
+        Set<Proposal> proposals = per.exportProposal();
+        if(proposals.size()>0) customProposalMapper.batchInsertOrUpdateSelective(proposals, Proposal.Column.values());
+        // 批量入库或更新投票数据
+        Set<Vote> votes = per.exportVote();
+        if(votes.size()>0) customVoteMapper.batchInsertOrUpdateSelective(votes, Vote.Column.values());
 
-        // ****************新增节点质押相关数据*******************
-        //批量入库新增节点数据
-        if (ser.getAddNodes().size() > 0)
-            customNodeMapper.batchInsertOrUpdateSelective(ser.getAddNodes(), Node.Column.values());
-        //批量入库新增质押数据
-        if (ser.getAddStakings().size() > 0)
-            customStakingMapper.batchInsertOrUpdateSelective(ser.getAddStakings(), Staking.Column.values());
-        //批量入库新增委托数据
-        if (ser.getAddDelegations().size() > 0)
-            customDelegationMapper.batchInsertOrUpdateSelective(ser.getAddDelegations(), Delegation.Column.values());
-        //批量入库新增解委托数据
-        if (ser.getAddUnDelegations().size() > 0)
-            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getAddUnDelegations(), UnDelegation.Column.values());
-        //批量入库新增惩罚数据
-        if (ser.getAddSlashs().size() > 0)
-            customSlashMapper.batchInsertOrUpdateSelective(ser.getAddSlashs(), Slash.Column.values());
-        //批量入库新增操作数据
-        if (ser.getAddNodeOpts().size() > 0)
-            customNodeOptMapper.batchInsertOrUpdateSelective(ser.getAddNodeOpts(), NodeOpt.Column.values());
-
-        // ****************新增提案相关数据*******************
-        //批量入库新增治理数据
-        if (per.getAddProposals().size() > 0)
-            customProposalMapper.batchInsertOrUpdateSelective(per.getAddProposals(), Proposal.Column.values());
-        //批量入库新增投票数据
-        if (per.getAddVotes().size() > 0)
-            customVoteMapper.batchInsertOrUpdateSelective(per.getAddVotes(), Vote.Column.values());
-
-        /*****************************批量新增操作 END**************************/
-
-
-        /*****************************批量更新操作 START**************************/
-        // ****************更新质押相关数据*******************
-        //批量入库或更新节点数据
-        if (ser.getUpdateNodes().size() > 0)
-            customNodeMapper.batchInsertOrUpdateSelective(ser.getUpdateNodes(), Node.Column.values());
-        //批量入库更新质押数据
-        if (ser.getUpdateStakings().size() > 0)
-            customStakingMapper.batchInsertOrUpdateSelective(ser.getUpdateStakings(), Staking.Column.values());
-        //批量入库更新委托数据
-        if (ser.getUpdateDelegations().size() > 0)
-            customDelegationMapper.batchInsertOrUpdateSelective(ser.getUpdateDelegations(), Delegation.Column.values());
-        //批量入库更新解委托数据
-        if (ser.getUpdateUnDelegations().size() > 0)
-            customUnDelegationMapper.batchInsertOrUpdateSelective(ser.getUpdateUnDelegations(), UnDelegation.Column.values());
-
-        // ****************更新提案相关数据*******************
-        //批量更新提案
-        if (per.getUpdateProposals().size() > 0)
-            customProposalMapper.batchInsertOrUpdateSelective(per.getUpdateProposals(), Proposal.Column.values());
-
-        // ****************批量插入或更新地址相关数据*******************
-        Set <Address> addresses = aer.export();
-        if (addresses.size() > 0) {
-            customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
-        }
-        /*****************************批量更新操作 END**************************/
-
-
+        // ****************批量新增或更新地址相关数据*******************
+        AddressStage aer = bizData.getAddressStage();
+        // 批量入库或更新投票数据
+        Set<Address> addresses = aer.exportAddress();
+        if(addresses.size()>0) customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
     }
 
 
-    public void dataOfStakingStatistics () {
+    public void dataOfStakingStatistics () throws Exception{
 
         /**
          *  1.补充统计质押相关数据
@@ -172,28 +137,32 @@ public class DbService {
          *      c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
          *      d.stat_delegate_qty  关联的委托地址数
          */
-
-        BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
-            for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
-                //只统计不为历史的委托数据
-                BigInteger statDelegateHas = BigInteger.ZERO;
-                BigInteger statDelegateLocked = BigInteger.ZERO;
-                BigInteger statDelegateReduction = BigInteger.ZERO;
-                BigInteger statDelegateQty = BigInteger.ZERO;
-                for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
-                    if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO)) {
-                        statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
-                        statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-                        statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
-                        statDelegateQty.add(BigInteger.ONE);
+        try {
+            BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
+                for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
+                    //只统计不为历史的委托数据
+                    BigInteger statDelegateHas = BigInteger.ZERO;
+                    BigInteger statDelegateLocked = BigInteger.ZERO;
+                    BigInteger statDelegateReduction = BigInteger.ZERO;
+                    BigInteger statDelegateQty = BigInteger.ZERO;
+                    for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
+                        if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO.code)) {
+                            statDelegateHas = statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
+                            statDelegateLocked = statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
+                            statDelegateReduction = statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
+                            statDelegateQty = statDelegateQty.add(BigInteger.ONE);
+                        }
                     }
+                    customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
+                    customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
+                    customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
+                    customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
                 }
-                customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
-                customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
-                customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
-                customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
-            }
-        });
+            });
+        } catch (Exception e) {
+            throw new Exception("[DbService]supply Address info exception on dataOfStakingStatistics()");
+        }
+
     }
 
     public void dataOfAddressStatistics () throws BusinessException {
@@ -229,7 +198,7 @@ public class DbService {
                 }
 
             }
-            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(Collections.singletonList(CustomDelegation.YesNoEnum.NO))) {
+            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO)) {
                 if (delegation.getDelegateAddr().equals(customAddress.getAddress())) {
                     delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
                     delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));
@@ -237,11 +206,11 @@ public class DbService {
                     delegateLocked = delegateLocked.add(new BigInteger(delegation.getDelegateLocked()));
                     delegateReduction = delegateReduction.add(new BigInteger(delegation.getDelegateReduction()));
                     candidateCount = candidateCount.add(BigInteger.ONE);
-                    Integer status = new Integer(0);
+                    Integer status = 0;
                     try {
                         status = BlockChain.NODE_CACHE.getNode(delegation.getNodeId()).getStakings().get(delegation.getStakingBlockNum()).getStatus();
                     } catch (NoSuchBeanException e) {
-                        throw new BusinessException("[DbService]supply Address info exception by dataOfAddressStatistics()");
+                        throw new BusinessException("[DbService]supply Address info exception on dataOfAddressStatistics()");
                     }
                     if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
                         delegateUnlock = delegateUnlock.add(new BigInteger(delegation.getDelegateHas()));

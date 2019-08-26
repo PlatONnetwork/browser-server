@@ -1,23 +1,18 @@
 package com.platon.browser.engine;
 
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
-import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
-import com.platon.browser.engine.result.BlockChainResult;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
-import com.platon.browser.task.BlockSyncTask;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +39,11 @@ public class BlockChain {
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private StakingExecute stakingExecute;
+    private StakingEngine stakingExecute;
     @Autowired
-    private ProposalExecute proposalExecute;
+    private ProposalEngine proposalExecute;
     @Autowired
-    private AddressExecute addressExecute;
+    private AddressEngine addressExecute;
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
@@ -65,8 +60,10 @@ public class BlockChain {
     @Autowired
     private BlockChainHandler blockChainHandler;
 
+    // 节点名称缓存 <节点ID-节点名称>
+    public static final Map<String,String> NODE_NAME_MAP = new HashMap<>();
     // 业务数据暂存容器
-    public static final BlockChainResult STAGE_BIZ_DATA = new BlockChainResult();
+    public static final BlockChainStage STAGE_DATA = new BlockChainStage();
     // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
     public static final NodeCache NODE_CACHE = new NodeCache();
     // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
@@ -139,7 +136,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException {
+    public void execute ( CustomBlock block ) throws SettleEpochChangeException, CandidateException, ConsensusEpochChangeException, ElectionEpochChangeException, NoSuchBeanException, IssueEpochChangeException, BusinessException, BlockChainException {
         curBlock = block;
         // 推算并更新共识周期和结算周期
         blockChainHandler.updateEpoch();
@@ -161,6 +158,10 @@ public class BlockChain {
         blockChainHandler.updateStakingRelative();
         // 更新block表中的相关信息
         blockChainHandler.updateBlockRelative();
+
+        // 更新当前区块的节点名称
+        String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
+        curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
     }
 
     /**
@@ -168,14 +169,14 @@ public class BlockChain {
      *
      * @return
      */
-    public BlockChainResult exportResult () {
-        return STAGE_BIZ_DATA;
+    public BlockChainStage exportResult () {
+        return STAGE_DATA;
     }
 
     /**
      * 清除分析后的业务数据
      */
     public void commitResult () {
-        STAGE_BIZ_DATA.clear();
+        STAGE_DATA.clear();
     }
 }

@@ -26,31 +26,30 @@ public class CustomSlash extends Slash {
         this.setHash(tx.getHash());
         this.setUpdateTime(new Date());
         this.setCreateTime(new Date());
-        this.setStatus(SuccFailEnum.SUCC.code);
+        this.setStatus(StatusEnum.SUCCESS.code);
         this.setIsQuit(YesNoEnum.YES.code);
     }
 
-
-    public enum SuccFailEnum{
-        FAIL(1, "失败"),
-        SUCC(2, "成功")
+    public enum StatusEnum{
+        FAILURE(1, "失败"),
+        SUCCESS(2, "成功")
         ;
         public int code;
         public String desc;
-        SuccFailEnum(int code, String desc) {
+        StatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map <Integer, CustomSlash.SuccFailEnum> ENUMS = new HashMap <>();
+        private static Map <Integer, StatusEnum> ENUMS = new HashMap <>();
         static {
-            Arrays.asList(CustomSlash.SuccFailEnum.values()).forEach(en->ENUMS.put(en.code,en));}
-        public static CustomSlash.SuccFailEnum getEnum( Integer code){
+            Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static StatusEnum getEnum( Integer code){
             return ENUMS.get(code);
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
-        public static boolean contains( CustomSlash.SuccFailEnum en){return ENUMS.containsValue(en);}
+        public static boolean contains(StatusEnum en){return ENUMS.containsValue(en);}
     }
 
 

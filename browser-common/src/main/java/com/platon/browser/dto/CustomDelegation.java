@@ -1,32 +1,20 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.param.DelegateParam;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 import java.util.*;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/14 12:08
- * @Description:
+ * @Description: 委托实体扩展类
  */
 @Data
 public class CustomDelegation extends Delegation {
 
     private List<CustomUnDelegation> unDelegations = new ArrayList<>();
-
-    // delegation与staking的关联键
-    public String getStakingMapKey(){
-        return this.getNodeId()+this.getStakingBlockNum();
-    }
-
-    // delegation与un_delegation的关联键
-    public String getDelegationMapKey(){
-        return this.getDelegateAddr()+this.getNodeId()+this.getStakingBlockNum();
-    }
 
     public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
         this.setDelegateHas(param.getAmount());
@@ -35,9 +23,13 @@ public class CustomDelegation extends Delegation {
         this.setNodeId(param.getNodeId());
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
-        this.setSequence(Long.valueOf(param.getStakingBlockNum())*100000+tx.getTransactionIndex());
+        this.setSequence(tx.getBlockNumber()+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
+    }
+
+    public YesNoEnum getIsHistoryEnum() {
+        return YesNoEnum.getEnum(this.getIsHistory());
     }
 
 

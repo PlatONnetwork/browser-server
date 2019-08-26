@@ -28,7 +28,7 @@ public class CustomAddress extends Address {
         Date date = new Date();
         this.setUpdateTime(date);
         this.setCreateTime(date);
-        /** 初始化默认值 **/
+        /* 初始化默认值 */
         this.setBalance(BigInteger.ZERO.toString());
         this.setRestrictingBalance(BigInteger.ZERO.toString());
         this.setStakingValue(BigInteger.ZERO.toString());
@@ -52,7 +52,7 @@ public class CustomAddress extends Address {
 
     /**
      * 更新与地址是from还是to无关的通用属性
-     * @param tx
+     * @param tx 交易
      */
     public void updateWithCustomTransaction(CustomTransaction tx) {
         // 设置地址类型

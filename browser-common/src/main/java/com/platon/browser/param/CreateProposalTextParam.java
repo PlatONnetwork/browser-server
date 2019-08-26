@@ -21,6 +21,11 @@ public class CreateProposalTextParam {
      */
     private String pIDID;
 
+    /**
+     * 节点名称
+     */
+    private String nodeName;
+
 
     public void init(String verifier,String pIDID){
         this.setVerifier(verifier);

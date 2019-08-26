@@ -2,7 +2,6 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.NodeOpt;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;

@@ -3,30 +3,30 @@ package com.platon.browser.engine.handler;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.engine.result.ProposalExecuteResult;
-import com.platon.browser.engine.result.StakingExecuteResult;
+import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import lombok.Data;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:12
- * @Description:
+ * @Description: 事件上下文
  */
 @Data
 public class EventContext {
     private CustomTransaction transaction;
     private BlockChain blockChain;
     private NodeCache nodeCache;
-    private StakingExecuteResult executeResult;
-    private ProposalExecuteResult proposalExecuteResult;
+    private StakingStage stakingStage;
+    private ProposalStage proposalStage;
 
-    public EventContext(CustomTransaction transaction, BlockChain blockChain, NodeCache nodeCache, StakingExecuteResult executeResult,
-                        ProposalExecuteResult proposalExecuteResult) {
+    public EventContext(CustomTransaction transaction, BlockChain blockChain, NodeCache nodeCache, StakingStage stakingStage,
+                        ProposalStage proposalStage) {
         this.transaction = transaction;
         this.blockChain = blockChain;
         this.nodeCache = nodeCache;
-        this.executeResult = executeResult;
-        this.proposalExecuteResult = proposalExecuteResult;
+        this.stakingStage = stakingStage;
+        this.proposalStage = proposalStage;
     }
 
 }

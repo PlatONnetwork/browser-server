@@ -1,7 +1,9 @@
 package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
+
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * User: dongqile
@@ -30,9 +34,11 @@ public class NetworkStatUpdateTask {
 
     @Scheduled(cron = "0/5  * * * * ?")
     protected void start () {
+        CustomBlock curBlock = blockChain.getCurBlock();
+        if(curBlock==null) return;
         try {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
-            Map <Integer,BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
+            Map <Integer, BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
             //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
             BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().toString());
             //获取初始发行金额
@@ -43,17 +49,16 @@ public class NetworkStatUpdateTask {
             String developerIncentiveFundAccountAddr = blockChain.getChainConfig().getDeveloperIncentiveFundAccountAddr();
             //rpc查询实时激励池余额
             BigInteger incentivePoolAccountBalance = platonClient.getWeb3j().platonGetBalance(developerIncentiveFundAccountAddr,
-                    DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
+                    DefaultBlockParameter.valueOf(BigInteger.valueOf(curBlock.getBlockNumber().longValue()))).send().getBalance();
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-            BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue);
-
+            BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
-            BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS,
+            BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
             //rpc获取质押余额
-            BigInteger stakingContractBalance = platonClient.getWeb3j().platonGetBalance(StakingContract.STAKING_CONTRACT_ADDRESS,
+            BigInteger stakingContractBalance = platonClient.getWeb3j().platonGetBalance(InnerContractAddrEnum.STAKING_CONTRACT.address,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
 
             //计算流通量
@@ -62,11 +67,9 @@ public class NetworkStatUpdateTask {
             //数据回填内存中
             blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.toString());
             blockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.toString());
-            blockChain.exportResult().getNetworkStatResult().stageUpdateNetworkStat(blockChain.NETWORK_STAT_CACHE);
-        }catch (Exception e){
-           logger.error("[CirculationAndTurnoverSyn] syn balance exception {}",e.getMessage());
+            STAGE_DATA.getNetworkStatStage().updateNetworkStat(blockChain.NETWORK_STAT_CACHE);
+        } catch (Exception e) {
+            logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }
-
     }
-
 }

@@ -50,7 +50,7 @@ public class TxParamResolver {
                 RlpString rl = (RlpString) rlpList2.getValues().get(0);
                 BigInteger txCode = new BigInteger(1, rl.getBytes());
 
-                CustomTransaction.TxTypeEnum typeEnum = CustomTransaction.TxTypeEnum.getEnum(txCode.intValue());
+                CustomTransaction.TxTypeEnum typeEnum = CustomTransaction.TxTypeEnum.getEnum(txCode.toString());
                 result.txTypeEnum = typeEnum;
 
                 switch (typeEnum) {

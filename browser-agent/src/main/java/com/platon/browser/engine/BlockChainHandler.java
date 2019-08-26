@@ -5,7 +5,9 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.*;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.*;
+import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,9 @@ public class BlockChainHandler {
     private static Logger logger = LoggerFactory.getLogger(BlockChainHandler.class);
 
     private BlockChain bc;
-    private StakingExecute stakingExecute;
-    private ProposalExecute proposalExecute;
-    private AddressExecute addressExecute;
+    private StakingEngine stakingExecute;
+    private ProposalEngine proposalExecute;
+    private AddressEngine addressExecute;
     private BlockChainConfig chainConfig;
     private PlatonClient client;
     private Map<String, Node> preVerifier,curVerifier,preValidator,curValidator;
@@ -112,7 +114,7 @@ public class BlockChainHandler {
 
     public void initBlockRewardAndStakingReward(Long blockNumber) throws IssueEpochChangeException {
         // 激励池账户地址
-        String incentivePoolAccountAddr = bc.getChainConfig().getIncentivePoolAccountAddr();
+        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
         try {
             // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
             BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j()
@@ -155,45 +157,57 @@ public class BlockChainHandler {
      * @param blockNumber
      */
     public void initVerifier(Long blockNumber) {
-        try {
-            // 获取链上实时区块号
-            Long settingPeriod = chainConfig.getSettlePeriodBlockCount().longValue();
-            Long realTimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
-            /****************************更新前一轮结算验证人列表************************/
-            if (curVerifier.size()>0) {
-                // 如果curValidator有元素，则把它们转存到preValidator
-                preVerifier.clear();
-                preVerifier.putAll(curVerifier);
-            }else {
-                // 如果curVerifier为空，则使用当前结算周期切换区块号查询前一轮结算周期验证人
-                BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
-                if (result.isStatusOk()) {
-                    curVerifier.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
 
-            /****************************更新当前轮结算验证人列表************************/
-            if(realTimeBlockNumber>blockNumber && realTimeBlockNumber<(blockNumber+settingPeriod)){
-                // 如果链上实时区块号大于当前同步区块号，且链上实时区块号<(blockNumber+settingPeriod)时,
-                // 即当前区块号和链上实时区块号处在同一结算周期时，则查询实时结算验证人列表作为当前结算轮验证人列表
-                BaseResponse <List <Node>> result = client.getNodeContract().getVerifierList().send();
+        Long blockCountPerEpoch = chainConfig.getSettlePeriodBlockCount().longValue();
+        BaseResponse <List <Node>> result;
+        try {
+            // 取当前结算周期的上一结算周期最后一个块号，通过此块号必定能查到前一结算周期验证人
+            long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
+            result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
+            if (result.isStatusOk()) {
+                preVerifier.clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
+            }
+        } catch (Exception e) {
+            logger.error("更新前一结算周期验证人列表失败,原因：{}", e.getMessage());
+        }
+
+        try {
+            // 取当前结算周期最后一个块号、
+            long curEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
+            // 取当前结算周期
+            long curEpoch = EpochUtil.getEpoch(blockNumber,blockCountPerEpoch);
+
+
+            // 取链上实时区块号
+            long realtimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
+            // 取当前结算周期最后一个块号、
+            long realtimeEpoch = EpochUtil.getCurEpochLastBlockNumber(realtimeBlockNumber,blockCountPerEpoch);
+            if(realtimeBlockNumber>curEpochLastBlockNumber){
+                // 假设：每个结算周期区块总数是100，当前区块号是250，当前链上实时最新块号是330
+                // 1、如果链上实时区块号大于当前区块号所在结算周期最后一个块，则通过当前区块号查询当前结算周期的验证人列表
+                // |----x----|-----
+                // 200 250  300 330
+                result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
                 if (result.isStatusOk()) {
                     curVerifier.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
                 }
             }
 
-            if(realTimeBlockNumber>=(blockNumber+settingPeriod)){
-                // 如果链上实时区块号>=(blockNumber+settingPeriod)，则查询(blockNumber+1)时的共识验证人列表
-                BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber+1));
+            if(realtimeEpoch==curEpoch){
+                // 假设：每个结算周期区块总数是100，当前区块号是320，当前链上实时最新块号是350
+                // 2、如果当前区块号所在结算周期与链上实时结算周期相同，则查询实时列表
+                // |--------|---x-----
+                // 200     300 320  350
+                result = client.getNodeContract().getVerifierList().send();
                 if (result.isStatusOk()) {
                     curVerifier.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
                 }
             }
         } catch (Exception e) {
-            logger.error("更新结算周期验证人列表失败,原因：{}", e.getMessage());
+            logger.error("更新当前结算周期验证人列表失败,原因：{}", e.getMessage());
         }
     }
 
@@ -301,7 +315,7 @@ public class BlockChainHandler {
         try {
             CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
             node.setStatBlockQty(node.getStatBlockQty()+1);
-            STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateNode(node);
+            STAGE_DATA.getStakingStage().updateNode(node);
         } catch (NoSuchBeanException e) {
             logger.error("{}",e.getMessage());
         }
@@ -318,20 +332,17 @@ public class BlockChainHandler {
                 CustomNode customNode = NODE_CACHE.getNode(curBlock.getNodeId());
                 CustomStaking customStaking = customNode.getLatestStaking();
                 if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
-                    // 当前块出块奖励
-                    BigDecimal blockReward = new BigDecimal(curBlock.getBlockReward());
                     // 当前共识周期出块奖励
-                    BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue())
-                            .add(blockReward);
+                    BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
                     customStaking.setBlockRewardValue(curConsBlockReward.toString());
 
                     // 节点出块数加1
                     customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
                     // 把更改后的内容暂存至待更新列表
-                    STAGE_BIZ_DATA.getStakingExecuteResult().stageUpdateStaking(customStaking);
+                    STAGE_DATA.getStakingStage().updateStaking(customStaking);
                 }
             } catch (NoSuchBeanException e) {
-                logger.debug("找不到符合条件的质押信息:{}",e.getMessage());
+                logger.error("找不到符合条件的质押信息:{}",e.getMessage());
             }
         }
     }
@@ -340,7 +351,7 @@ public class BlockChainHandler {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () throws NoSuchBeanException {
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
         CustomBlock curBlock = bc.getCurBlock();
 
         for (CustomTransaction tx:curBlock.getTransactionList()){
@@ -414,14 +425,14 @@ public class BlockChainHandler {
                 //已统计区块中最高交易个数
                 NETWORK_STAT_CACHE.setMaxTps(NETWORK_STAT_CACHE.getMaxTps() > curBlock.getStatTxQty() ? NETWORK_STAT_CACHE.getMaxTps() : curBlock.getStatTxQty());
                 //出块奖励
-                NETWORK_STAT_CACHE.setBlockReward(curBlock.getBlockReward());
+                NETWORK_STAT_CACHE.setBlockReward(bc.getBlockReward().toString());
                 if (curBlock.getStatProposalQty() > 0) {
                     //累计提案总数
                     NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + curBlock.getStatProposalQty());
                 }
                 if (curBlock.getStatStakingQty() > 0) {
                     //统计质押金额
-                    Set <Staking> newStaking = BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult().getAddStakings();
+                    Set <Staking> newStaking = STAGE_DATA.getStakingStage().getStakingInsertStage();
                     newStaking.forEach(staking -> {
                         BigInteger stakingValue = new BigInteger(NETWORK_STAT_CACHE.getStakingValue()).add(new BigInteger(staking.getStakingHas())).add(new BigInteger(staking.getStakingLocked()));
                         NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
@@ -429,7 +440,7 @@ public class BlockChainHandler {
                 }
                 if (curBlock.getStatDelegateQty() > 0) {
                     //质押已统计，本次累加上委托
-                    Set <Delegation> newDelegation = BlockChain.STAGE_BIZ_DATA.getStakingExecuteResult().getAddDelegations();
+                    Set <Delegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
                     newDelegation.forEach(delegation -> {
                         //先做委托累加
                         BigInteger delegationValue = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()));
@@ -439,7 +450,7 @@ public class BlockChainHandler {
                     NETWORK_STAT_CACHE.setStakingDelegationValue(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()).add(new BigInteger(NETWORK_STAT_CACHE.getStakingValue())).toString());
                 }
 
-                if (BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getAddProposals().size() > 0 || BlockChain.STAGE_BIZ_DATA.getProposalExecuteResult().getUpdateProposals().size() > 0) {
+                if (STAGE_DATA.getProposalStage().getProposalInsertStage().size() > 0 || STAGE_DATA.getProposalStage().getProposalUpdateStage().size() > 0) {
                     /*PROPOSALS_CACHE.getAll(( hash, proposal ) -> {
                         if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
@@ -448,7 +459,7 @@ public class BlockChainHandler {
                 }
             }
             //更新暂存变量
-            STAGE_BIZ_DATA.getNetworkStatResult().stageUpdateNetworkStat(NETWORK_STAT_CACHE);
+            STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
         } catch (NoSuchBeanException e) {
             logger.error("");
         }

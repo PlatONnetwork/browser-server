@@ -1,5 +1,6 @@
 package com.platon.browser.client;
 
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.job.Web3DetectJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.ContractAddress;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
@@ -118,12 +120,12 @@ public class PlatonClient {
     }
 
     private void updateContract(){
-        delegateContract = DelegateContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, DelegateContract.DELEGATE_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        nodeContract = NodeContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, NodeContract.NODE_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        proposalContract = ProposalContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, ProposalContract.PROPOSAL_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        slashContract = SlashContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, SlashContract.SLASH_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
-        stakingContract = StakingContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, StakingContract.STAKING_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        delegateContract = DelegateContract.load(currentValidWeb3j);
+        nodeContract = NodeContract.load(currentValidWeb3j);
+        proposalContract = ProposalContract.load(currentValidWeb3j);
+        restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j);
+        slashContract = SlashContract.load(currentValidWeb3j);
+        stakingContract = StakingContract.load(currentValidWeb3j);
     }
 
     public void updateCurrentValidWeb3j(){
@@ -215,7 +217,7 @@ public class PlatonClient {
         return new RemoteCall<>((Callable<BaseResponse<List<Node>>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(NodeContract.NODE_CONTRACT_ADDRESS, NodeContract.NODE_CONTRACT_ADDRESS, encodedFunction),
+                    Transaction.createEthCallTransaction(InnerContractAddrEnum.NODE_CONTRACT.address, InnerContractAddrEnum.NODE_CONTRACT.address, encodedFunction),
                     DefaultBlockParameter.valueOf(blockNumber)
             ).send();
             String value = ethCall.getValue();
@@ -240,7 +242,7 @@ public class PlatonClient {
         return new RemoteCall<>((Callable<BaseResponse<List<RestrictingBalance>>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, encodedFunction),
+                    Transaction.createEthCallTransaction(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, encodedFunction),
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();

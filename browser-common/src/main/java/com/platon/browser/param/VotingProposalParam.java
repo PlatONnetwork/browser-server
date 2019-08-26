@@ -39,6 +39,23 @@ public class VotingProposalParam {
      */
     private String versionSign;
 
+    /**
+     * 被取消的提案的pidid
+     */
+    private String pIDID;
+
+    /**
+     * 被取消的提案的类型
+     */
+    private String proposalType;
+
+    /**
+     * 投票的验证人节点名称
+     */
+    private String nodeName;
+
+
+
     public void init(String verifier,String proposalId,String option,String programVersion,String versionSign){
         this.setVerifier(verifier);
         this.setProposalId(proposalId);

@@ -1,8 +1,9 @@
 package com.platon.browser.enums;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.web3j.platon.ContractAddress;
+import org.web3j.tx.PlatOnContract;
+
+import java.util.*;
 
 /**
  * \*
@@ -12,12 +13,13 @@ import java.util.List;
  * \
  */
 public enum InnerContractAddrEnum {
-    LOCK_CONTRACT("0x1000000000000000000000000000000000000001","锁仓合约"),
-    STAKING_CONTRACT("0x1000000000000000000000000000000000000002","质押合约"),
-    EXCITATION_CONTRACT("0x1000000000000000000000000000000000000003","激励池合约"),
-    PUNISH_CONTRACT("0x1000000000000000000000000000000000000004","惩罚合约"),
-    GOVERNANCE_CONTRACT("0x1000000000000000000000000000000000000005","治理合约"),
-    FOUNDATION("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219","基金会");
+    RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"锁仓合约"),
+    STAKING_CONTRACT(ContractAddress.STAKING_CONTRACT_ADDRESS,"质押合约"),
+    DELEGATE_CONTRACT(ContractAddress.DELEGATE_CONTRACT_ADDRESS,"质押合约"),
+    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"惩罚合约"),
+    PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
+    INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
+    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约");
 
     public String address;
     public String desc;
@@ -35,7 +37,7 @@ public enum InnerContractAddrEnum {
         return desc;
     }
 
-    public static List<String> addresses = new ArrayList <>();
+    public static Set<String> addresses = new HashSet<>();
 
     static {
         Arrays.asList(InnerContractAddrEnum.values()).forEach(innerContractAddEnum-> addresses.add(innerContractAddEnum.address));

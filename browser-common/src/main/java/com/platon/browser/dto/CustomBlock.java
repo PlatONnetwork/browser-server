@@ -1,6 +1,7 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.Data;
@@ -11,16 +12,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static java.util.Comparator.*;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 14:20
- * @Description:
+ * @Description: 区块实体扩展类
  */
 @Data
 public class CustomBlock extends Block {
 
     public CustomBlock(){
-        /** 初始化默认值 **/
+        /* 初始化默认值 */
         // 区块内交易数（区块所含交易个数）
         this.setStatTxQty(0);
         // 区块内转账交易总数
@@ -45,29 +48,29 @@ public class CustomBlock extends Block {
 
     /**
      * 使用原生交易信息初始化交易信息
-     * @param initData
+     * @param block 原生区块
      */
-    public void init(PlatonBlock.Block initData) throws Exception {
-        BeanUtils.copyProperties(initData,this);
+    public void updateWithBlock(PlatonBlock.Block block) {
+        BeanUtils.copyProperties(block,this);
         // 属性类型转换
-        this.setNumber(initData.getNumber().longValue());
-        this.setTimestamp(new Date(initData.getTimestamp().longValue()));
-        this.setSize(initData.getSize().intValue());
-        this.setGasLimit(initData.getGasLimit().toString());
-        this.setGasUsed(initData.getGasUsed().toString());
+        this.setNumber(block.getNumber().longValue());
+        this.setTimestamp(new Date(block.getTimestamp().longValue()));
+        this.setSize(block.getSize().intValue());
+        this.setGasLimit(block.getGasLimit().toString());
+        this.setGasUsed(block.getGasUsed().toString());
         Date date = new Date();
         this.setCreateTime(date);
         this.setUpdateTime(date);
         // 交易总数
-        this.setStatTxQty(initData.getTransactions().size());
-        this.setGasLimit(initData.getGasLimit().toString());
+        this.setStatTxQty(block.getTransactions().size());
+        this.setGasLimit(block.getGasLimit().toString());
 
-        String publicKey = NodeTool.calculateNodePublicKey(initData);
+        String publicKey = NodeTool.calculateNodePublicKey(block);
         if(publicKey!=null) this.setNodeId(HexTool.prefix(publicKey));
 
         try{
             // 抽取交易信息
-            initData.getTransactions().forEach(tr -> {
+            block.getTransactions().forEach(tr -> {
                 CustomTransaction transaction = new CustomTransaction();
                 transaction.updateWithTransactionResult(tr);
                 transaction.setTimestamp(this.getTimestamp());
@@ -81,8 +84,8 @@ public class CustomBlock extends Block {
         }
 
         class Stat {
-            int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
-            BigDecimal txFee = BigDecimal.ZERO;
+            private int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
+            private BigDecimal txFee = BigDecimal.ZERO;
         }
         Stat stat = new Stat();
         this.setStatDelegateQty(stat.delegateQty);
@@ -93,11 +96,7 @@ public class CustomBlock extends Block {
         this.setStatTxFee(stat.txFee.toString());
 
         // 确保区块内的交易顺序
-        Collections.sort(transactionList,(c1,c2)->{
-            if(c1.getTransactionIndex()>c2.getTransactionIndex())return 1;
-            if(c1.getTransactionIndex()<c2.getTransactionIndex())return -1;
-            return 0;
-        });
+        transactionList.sort(comparing(Transaction::getTransactionIndex));
     }
 
     private List<CustomTransaction> transactionList = new ArrayList<>();
