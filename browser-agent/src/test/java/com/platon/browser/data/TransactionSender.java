@@ -17,6 +17,7 @@ import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.ChainId;
 import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
 import org.web3j.utils.Convert;
@@ -33,13 +34,14 @@ import java.util.List;
  * @Description:
  */
 public class TransactionSender {
+	private static String chainId = "100";
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-    private Credentials credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+    private Credentials credentials = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
-    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
-    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
-    RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
+    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
+    RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
     public TransactionSender() throws IOException, CipherException {}
 
     // 发送转账交易
@@ -52,7 +54,7 @@ public class TransactionSender {
 	        Transfer.sendFunds(
 	                web3j,
 	                credentials,
-	                "101",
+	                chainId,
 	                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
 	                BigDecimal.valueOf(100),
 	                Convert.Unit.VON
@@ -132,5 +134,13 @@ public class TransactionSender {
     	BaseResponse res = restrictingPlanContract.createRestrictingPlan("", null).send();
         logger.debug("res:{}",res);
     }
+    
+    public static void main(String[] args) throws IOException, CipherException {
+    	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
+    	byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
+        String privateKey = Hex.toHexString(byteArray);
+
+        logger.debug("Private Key:{}",privateKey);
+	}
     
 }
