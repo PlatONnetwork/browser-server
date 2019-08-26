@@ -6,10 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 待入库或更新地址实体阶段状态暂存类
- * User: dongqile
- * Date: 2019/8/14
- * Time: 16:46
+ * @Auther: Chendongming
+ * @Date: 2019/8/10 16:47
+ * @Description: 地址统计信息新增或修改暂存类，入库后各容器需要清空
  */
 public class AddressStage {
     private Set<Address> addressInsertStage =  new HashSet<>();

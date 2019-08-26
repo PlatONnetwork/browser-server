@@ -49,7 +49,7 @@ public class AccountTool {
                 credentials,
                 chainId,
                 "0x0127de1d120dc61b57ab51afcc0fa59022a1be94",
-                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(500000000),
                 Convert.Unit.LAT
         ).send();
         BigInteger balance = currentValidWeb3j.platonGetBalance("0x0127de1d120dc61b57ab51afcc0fa59022a1be94", DefaultBlockParameterName.LATEST).send().getBalance();

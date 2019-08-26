@@ -22,9 +22,9 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 
 /**
- * User: dongqile
- * Date: 2019/8/19
- * Time: 10:38
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:47
+ * @Description: 治理相关(提交文本提案)事件处理类
  */
 @Component
 public class ProposalUpgradeHandler implements EventHandler {

@@ -1,9 +1,9 @@
 package com.platon.browser.engine.stage;
 
 /**
- * User: dongqile
- * Date: 2019/8/10
- * Time: 18:07
+ * @Auther: Chendongming
+ * @Date: 2019/8/10 16:47
+ * @Description: 区块链业务信息新增或修改暂存类，入库后各容器需要清空
  */
 public class BlockChainStage {
     private ProposalStage proposalStage=new ProposalStage();

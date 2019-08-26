@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:47
- * @Description:
+ * @Description: 提案新增或修改暂存类，入库后各容器需要清空
  */
 public class ProposalStage {
     // 插入或更新数据

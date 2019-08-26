@@ -18,10 +18,9 @@ import java.util.List;
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
- * 结算周期变更事件处理类
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
- * @Description:
+ * @Description: 结算周期变更事件处理类
  */
 @Component
 public class NewConsensusEpochHandler implements EventHandler {

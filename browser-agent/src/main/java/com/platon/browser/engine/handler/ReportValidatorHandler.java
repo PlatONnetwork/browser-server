@@ -20,10 +20,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 举报多签(举报验证人)事件处理类
- * @Auther: Chendongming
- * @Date: 2019/8/17 20:09
- * @Description:
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:47
+ * @Description: 举报多签(举报验证人)事件处理类
  */
 @Component
 public class ReportValidatorHandler implements EventHandler {

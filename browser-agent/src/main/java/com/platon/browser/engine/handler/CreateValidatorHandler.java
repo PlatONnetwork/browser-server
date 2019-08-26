@@ -17,10 +17,9 @@ import org.springframework.stereotype.Component;
 import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 
 /**
- * 发起质押(创建验证人)事件处理类
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
- * @Description:
+ * @Description: 发起质押(创建验证人)事件处理类
  */
 @Component
 public class CreateValidatorHandler implements EventHandler {

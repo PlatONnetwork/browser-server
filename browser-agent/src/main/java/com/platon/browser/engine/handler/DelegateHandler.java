@@ -16,11 +16,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 
 /**
- * 发起委托(委托)事件处理类
- *
- * @Auther: Chendongming
+ * @Auther: dongqile
  * @Date: 2019/8/17 20:09
- * @Description:
+ * @Description: 发起委托(委托)事件处理类
  */
 @Component
 public class DelegateHandler implements EventHandler {

@@ -8,9 +8,9 @@ import com.platon.browser.param.DeclareVersionParam;
 import org.springframework.stereotype.Component;
 
 /**
- * User: dongqile
- * Date: 2019/8/23
- * Time: 15:57
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 声明版本事件处理类
  */
 @Component
 public class DeclareVersionHandler implements EventHandler{

@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 撤销质押(退出验证人)事件处理类
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
- * @Description:
+ * @Description: 撤销质押(退出验证人)事件处理类
  */
 @Component
 public class ExitValidatorHandler implements EventHandler {

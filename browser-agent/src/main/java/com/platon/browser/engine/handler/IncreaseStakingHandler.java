@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 增持质押(增加自有质押)事件处理类
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
- * @Description:
+ * @Description: 增持质押(增加自有质押)事件处理类
  */
 @Component
 public class IncreaseStakingHandler implements EventHandler {

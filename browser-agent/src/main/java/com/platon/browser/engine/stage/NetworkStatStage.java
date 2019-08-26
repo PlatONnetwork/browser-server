@@ -1,6 +1,5 @@
 package com.platon.browser.engine.stage;
 
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import lombok.Data;
 
@@ -8,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * User: dongqile
- * Date: 2019/8/21
- * Time: 17:39
+ * @Auther: Chendongming
+ * @Date: 2019/8/10 16:47
+ * @Description: 统计信息新增或修改暂存类，入库后各容器需要清空
  */
 @Data
 public class NetworkStatStage {

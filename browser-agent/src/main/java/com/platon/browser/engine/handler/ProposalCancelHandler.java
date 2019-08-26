@@ -22,9 +22,9 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 
 /**
- * User: dongqile
- * Date: 2019/8/19
- * Time: 13:45
+ * @Auther: dongqile
+ * @Date: 2019/8/19 20:09
+ * @Description: 取消提案事件处理类
  */
 @Component
 public class ProposalCancelHandler implements EventHandler{

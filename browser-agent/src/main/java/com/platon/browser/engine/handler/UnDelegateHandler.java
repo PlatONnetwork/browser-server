@@ -15,10 +15,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * 减持/撤销委托(赎回委托)事件处理类
- * @Auther: Chendongming
- * @Date: 2019/8/17 20:09
- * @Description:
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:47
+ * @Description: 减持/撤销委托(赎回委托)事件处理类
  */
 @Component
 public class UnDelegateHandler implements EventHandler {
