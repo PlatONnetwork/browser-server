@@ -73,6 +73,8 @@ public class StakingEngine {
 
     private StakingStage stakingStage= BlockChain.STAGE_DATA.getStakingStage();
 
+    private EventContext context = new EventContext();
+
     /**
      * 加载并构造节点缓存结构
      */
@@ -94,6 +96,8 @@ public class StakingEngine {
     private void init() throws CacheConstructException {
         // 加载并构造节点缓存结构
         loadNodes();
+
+        context.setStakingStage(stakingStage);
     }
 
     /**
@@ -103,7 +107,8 @@ public class StakingEngine {
      */
     void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException, BlockChainException {
         // 事件上下文
-        EventContext context = new EventContext(tx,bc,nodeCache,stakingStage,null);
+        context.setBlockChain(bc);
+        context.setTransaction(tx);
         switch (tx.getTypeEnum()){
             case CREATE_VALIDATOR: createValidatorHandler.handle(context); break; //发起质押(创建验证人)
             case EDIT_VALIDATOR: editValidatorHandler.handle(context);break; //修改质押信息(编辑验证人)
@@ -122,7 +127,7 @@ public class StakingEngine {
     void onElectionDistance(CustomBlock block, BlockChain bc) throws ElectionEpochChangeException {
         logger.debug("进行验证人选举:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
+        context.setBlockChain(bc);
         newElectionEpochHandler.handle(context);
     }
 
@@ -132,7 +137,7 @@ public class StakingEngine {
     void onNewConsEpoch(CustomBlock block, BlockChain bc) throws ConsensusEpochChangeException {
         logger.debug("进入新的共识周期:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
+        context.setBlockChain(bc);
         newConsensusEpochHandler.handle(context);
     }
 
@@ -142,7 +147,7 @@ public class StakingEngine {
     void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws SettleEpochChangeException {
         logger.debug("进入新的结算周期:{}", block.getNumber());
         // 事件上下文
-        EventContext context = new EventContext(null,bc,nodeCache,stakingStage,null);
+        context.setBlockChain(bc);
 
         /*
          * 进入新的结算周期后需要变更的数据列表

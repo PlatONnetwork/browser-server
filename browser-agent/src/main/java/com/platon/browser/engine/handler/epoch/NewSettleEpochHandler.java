@@ -22,6 +22,8 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
@@ -31,14 +33,12 @@ import java.util.List;
 public class NewSettleEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewSettleEpochHandler.class);
     private CustomTransaction tx;
-    private NodeCache nodeCache;
     private StakingStage stakingStage;
     private BlockChain bc;
 
     @Override
     public void handle(EventContext context) throws SettleEpochChangeException {
         tx = context.getTransaction();
-        nodeCache = context.getNodeCache();
         stakingStage = context.getStakingStage();
         bc = context.getBlockChain();
         stakingSettle();
@@ -51,7 +51,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private void modifyDelegationInfoOnNewSettingEpoch () {
         //由于结算周期的变更，对所有的节点下的质押的委托更新
         //只需变更不为历史节点的委托数据(isHistory=NO(2))
-        List<CustomDelegation> delegations = nodeCache.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
+        List<CustomDelegation> delegations = NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
         delegations.forEach(delegation->{
             //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
             delegation.setDelegateLocked(new BigInteger(delegation.getDelegateLocked()).add(new BigInteger(delegation.getDelegateHas())).toString());
@@ -73,7 +73,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private void modifyUnDelegationInfoOnNewSettingEpoch () {
         //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
         //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
+        List<CustomUnDelegation> unDelegations = NODE_CACHE.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
         unDelegations.forEach(unDelegation -> {
             //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
             unDelegation.setRedeemLocked("0");
@@ -100,7 +100,7 @@ public class NewSettleEpochHandler implements EventHandler {
         BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
         logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
 
-        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
+        List<CustomStaking> stakings = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
         for(CustomStaking curStaking:stakings){
             // 调整金额状态
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
@@ -135,7 +135,7 @@ public class NewSettleEpochHandler implements EventHandler {
 
                 CustomNode customNode;
                 try {
-                    customNode = nodeCache.getNode(curStaking.getNodeId());
+                    customNode = NODE_CACHE.getNode(curStaking.getNodeId());
                 } catch (NoSuchBeanException e) {
                     throw new SettleEpochChangeException("获取节点错误:"+e.getMessage());
                 }

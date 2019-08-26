@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:47
@@ -33,7 +35,6 @@ public class ReportValidatorHandler implements EventHandler {
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
         // 获取交易入参
@@ -43,7 +44,7 @@ public class ReportValidatorHandler implements EventHandler {
         //通过结果获取，证据中的举报人的nodeId
         evidencesParams.forEach(evidencesParam -> {
             try {
-                CustomStaking latestStaking = nodeCache.getNode(evidencesParam.getVerify()).getLatestStaking();
+                CustomStaking latestStaking = NODE_CACHE.getNode(evidencesParam.getVerify()).getLatestStaking();
                 logger.debug("多签举报信息:{}", JSON.toJSONString(param));
 
                 //交易数据回填

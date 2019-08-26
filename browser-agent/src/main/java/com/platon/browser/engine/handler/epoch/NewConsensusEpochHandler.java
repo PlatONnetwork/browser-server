@@ -30,11 +30,10 @@ public class NewConsensusEpochHandler implements EventHandler {
 
     @Override
     public void handle(EventContext context) throws ConsensusEpochChangeException {
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
 
-        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
+        List<CustomStaking> stakings = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakings){
             Node node = bc.getCurValidator().get(staking.getNodeId());
             if(node!=null){

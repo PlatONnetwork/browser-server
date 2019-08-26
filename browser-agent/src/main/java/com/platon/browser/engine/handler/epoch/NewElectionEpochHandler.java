@@ -32,7 +32,6 @@ public class NewElectionEpochHandler implements EventHandler {
 
     @Override
     public void handle(EventContext context) throws ElectionEpochChangeException {
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
 
@@ -41,7 +40,7 @@ public class NewElectionEpochHandler implements EventHandler {
             return;
         }
 
-        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
+        List<CustomStaking> stakings = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakings){
             // 根据前一个共识周期的出块数判断是否触发最低处罚
             // 计算出块率
@@ -92,7 +91,7 @@ public class NewElectionEpochHandler implements EventHandler {
 
                 // 更新被处罚节点统计信息（如果存在）
                 try {
-                    CustomNode customNode = nodeCache.getNode(staking.getNodeId());
+                    CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
                     customNode.setStatSlashLowQty(customNode.getStatSlashLowQty()+1);
                     stakingStage.updateNode(customNode);
                 } catch (NoSuchBeanException e) {

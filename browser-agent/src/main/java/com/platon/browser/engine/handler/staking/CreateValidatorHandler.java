@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 
 /**
@@ -30,14 +31,13 @@ public class CreateValidatorHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws BlockChainException {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
         try {
-            CustomNode node = nodeCache.getNode(param.getNodeId());
+            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             /** 业务逻辑说明：
              *  1、如果当前质押交易质押的是已经质押过的节点，则:
              *     a、查询节点的有效质押记录（即staking表中status=1的记录），如果存在则不做任何处理（因为链上不允许对已质押的节点再做质押，即使重复质押交易成功，也不会对已质押节点造成任何影响）；
@@ -81,7 +81,7 @@ public class CreateValidatorHandler implements EventHandler {
             // 把质押记录添加到节点质押记录列表中
             node.getStakings().put(staking.getStakingBlockNum(),staking);
             // 节点添加到缓存中
-            nodeCache.addNode(node);
+            NODE_CACHE.addNode(node);
             // 新节点和新质押记录暂存到待入库列表中
             stakingStage.insertNode(node);
             stakingStage.insertStaking(staking,tx);

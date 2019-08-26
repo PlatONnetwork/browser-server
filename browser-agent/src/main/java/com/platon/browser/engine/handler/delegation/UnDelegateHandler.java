@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:47
@@ -28,13 +30,12 @@ public class UnDelegateHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         BlockChain bc = context.getBlockChain();
 
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
-            CustomNode node = nodeCache.getNode(param.getNodeId());
+            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
@@ -97,7 +98,7 @@ public class UnDelegateHandler implements EventHandler {
             }
 
             // 添加至解委托缓存
-            nodeCache.addUnDelegation(customUnDelegation);
+            NODE_CACHE.addUnDelegation(customUnDelegation);
 
             //更新分析委托结果
             stakingStage.updateDelegation(customDelegation);

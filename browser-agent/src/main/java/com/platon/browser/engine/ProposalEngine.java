@@ -55,12 +55,16 @@ public class ProposalEngine {
     @Autowired
     private DeclareVersionHandler declareVersionHandler;
 
+    private EventContext context = new EventContext();
+
     @PostConstruct
     private void init() throws CacheConstructException {
         // 初始化全量数据
         List<CustomProposal> proposalList = customProposalMapper.selectAll();
         List<CustomVote> voteList = customVoteMapper.selectAll();
         proposalCache.init(proposalList,voteList);
+
+        context.setProposalStage(proposalStage);
     }
 
     /**
@@ -70,7 +74,8 @@ public class ProposalEngine {
      */
     void execute(CustomTransaction tx, BlockChain bc) throws BusinessException, NoSuchBeanException {
         // 事件上下文
-        EventContext context = new EventContext(tx,bc,null,null,proposalStage);
+        context.setBlockChain(bc);
+        context.setTransaction(tx);
         switch (tx.getTypeEnum()){
             case CREATE_PROPOSAL_TEXT: proposalTextHandler.handle(context);break; //提交文本提案(创建提案)
             case CREATE_PROPOSAL_UPGRADE: proposalUpgradeHandler.handle(context);break; //提交升级提案(创建提案)

@@ -105,45 +105,59 @@ public class BlockSyncTask {
             // 如果库里区块为空，则：
             try {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
-                BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ZERO);
-                if(!validators.isStatusOk()){
+                BaseResponse<List<Node>> result = client.getHistoryValidatorList(BigInteger.ZERO);
+                if(!result.isStatusOk()){
                     logger.debug("查询实时共识周期验证人列表...");
-                    validators = client.getNodeContract().getValidatorList().send();
+                    result = client.getNodeContract().getValidatorList().send();
+                    if(!result.isStatusOk()){
+                        throw new CandidateException("底层链查询实时共识周期验证节点列表出错:"+result.errMsg);
+                    }
                 }
                 // 查询内置共识周期验证人初始化blockChain的curValidator属性
                 Set<String> validatorSet = new HashSet<>();
-                if(validators.isStatusOk()) validators.data.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
+                result.data.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
 
                 // 根据区块号0查询结算周期验证人列表并入库
-                BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ZERO);
-                if(!verifiers.isStatusOk()){
+                result = client.getHistoryVerifierList(BigInteger.ZERO);
+                if(!result.isStatusOk()){
                     logger.debug("查询实时结算周期验证人列表...");
-                    verifiers = client.getNodeContract().getVerifierList().send();
+                    result = client.getNodeContract().getVerifierList().send();
+                    if(!result.isStatusOk()){
+                        throw new CandidateException("底层链查询实时结算周期验证节点列表出错:"+result.errMsg);
+                    }
                 }
-                if(verifiers.isStatusOk()) {
-                    verifiers.data.stream().filter(Objects::nonNull).forEach(verifier->{
-                        CustomNode node = new CustomNode();
-                        node.updateWithNode(verifier);
-                        node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
-                        node.setStatVerifierTime(BigInteger.ONE.intValue());
-                        node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
-                        BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
+                Set<String> verifierSet = new HashSet<>();
+                result.data.forEach(node->verifierSet.add(HexTool.prefix(node.getNodeId())));
 
-                        CustomStaking staking = new CustomStaking();
-                        staking.updateWithNode(verifier);
-                        staking.setIsInit(1);
-                        staking.setIsSetting(1);
-                        BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
-                        staking.setStakingLocked(stakingLocked.toString());
-                        // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                        if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
-                        // 暂存至新增质押待入库列表
-                        BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
-                    });
-                    BlockChainStage bcr = blockChain.exportResult();
-                    batchSave(Collections.emptyList(),bcr);
-                    blockChain.commitResult();
+                result = client.getNodeContract().getCandidateList().send();
+                if(!result.isStatusOk()){
+                    throw new CandidateException("底层链查询候选验证节点列表出错:"+result.errMsg);
                 }
+
+                result.data.stream().filter(Objects::nonNull).forEach(candidate->{
+                    CustomNode node = new CustomNode();
+                    node.updateWithNode(candidate);
+                    node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
+                    node.setStatVerifierTime(BigInteger.ONE.intValue());
+                    node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
+                    BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
+
+                    CustomStaking staking = new CustomStaking();
+                    staking.updateWithNode(candidate);
+                    staking.setIsInit(1);
+                    staking.setIsSetting(1);
+                    BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
+                    staking.setStakingLocked(stakingLocked.toString());
+                    // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
+                    if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                    if(verifierSet.contains(node.getNodeId())) staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                    // 暂存至新增质押待入库列表
+                    BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
+                });
+                BlockChainStage bcr = blockChain.exportResult();
+                batchSave(Collections.emptyList(),bcr);
+                blockChain.commitResult();
+
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
             } catch (Exception e) {

@@ -4,25 +4,27 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
-import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
-import org.web3j.platon.bean.Node;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -30,7 +32,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @Auther: Chendongming
@@ -94,6 +95,10 @@ public class BlockChain {
     // 每个增发周期内有几个结算周期
     private BigInteger settleEpochCountPerIssueEpoch;
 
+
+    @Autowired
+    private NetworkStatStatisticHandler networkStatStatisticHandler;
+
     /***
      * 以下字段业务使用说明：
      * 在当前共识周期发生选举的时候，需要对上一共识周期的验证节点计算出块率，如果发现出块率低的节点，就要看此节点是否在curValidator中，如果在则
@@ -147,22 +152,63 @@ public class BlockChain {
         // 在增发周期切换时更新区块奖励和质押奖励
         blockChainHandler.updateBlockRewardAndStakingReward();
         // 分析交易信息, 通知质押引擎补充质押相关信息，通知提案引擎补充提案相关信息
-        blockChainHandler.analyzeTransaction();
+        analyzeTransaction();
         // 通知各引擎周期临界点事件
         blockChainHandler.periodChangeNotify();
         //统计数据相关累加
-        blockChainHandler.updateWithNetworkStat();
+        EventContext context = new EventContext();
+        context.setBlockChain(this);
+        networkStatStatisticHandler.handle(context);
         // 更新node表中的节点出块数信息
         blockChainHandler.updateNodeStatBlockQty();
         // 更新staking表中与区块统计相关的信息
         blockChainHandler.updateStakingRelative();
         // 更新block表中的相关信息
         blockChainHandler.updateBlockRelative();
-
         // 更新当前区块的节点名称
         String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
         curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
     }
+
+    /**
+     * 根据交易信息新增或更新相关记录：
+     */
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
+        for (CustomTransaction tx:curBlock.getTransactionList()){
+            // 链上执行失败的交易不予处理
+            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
+            // 调用交易分析引擎分析交易，以补充相关数据
+            switch (tx.getTypeEnum()) {
+                case CREATE_VALIDATOR: // 创建验证人
+                case EDIT_VALIDATOR: // 编辑验证人
+                case INCREASE_STAKING: // 增持质押
+                case EXIT_VALIDATOR: // 撤销质押
+                case DELEGATE: // 发起委托
+                case UN_DELEGATE: // 撤销委托
+                case REPORT_VALIDATOR: // 举报多签验证人
+                    stakingExecute.execute(tx, this);
+                    break;
+                case CREATE_PROPOSAL_TEXT: // 创建文本提案
+                case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
+                case CREATE_PROPOSAL_PARAMETER: // 创建参数提案
+                case VOTING_PROPOSAL: // 给提案投票
+                case DUPLICATE_SIGN: // 双签举报
+                    proposalExecute.execute(tx, this);
+                    break;
+                case CONTRACT_CREATION: // 合约发布(合约创建)
+                    logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
+                    break;
+                case TRANSFER: // 转账
+                    logger.debug("转账: txHash({}),from({}),to({})", tx.getHash(), tx.getFrom(), tx.getTo());
+                    break;
+                case OTHERS: // 其它
+                case MPC:
+            }
+            // 统计地址相关信息
+            addressExecute.execute(tx,this);
+        }
+    }
+
 
     /**
      * 导出需要入库的业务数据

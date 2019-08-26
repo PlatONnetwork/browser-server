@@ -196,5 +196,12 @@ public class TransactionSender {
 
         BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
         logger.error("{}",blockNumber);
+
+        try {
+            BaseResponse <List <Node>> result = nodeContract.getCandidateList().send();
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

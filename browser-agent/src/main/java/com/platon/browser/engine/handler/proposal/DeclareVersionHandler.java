@@ -9,6 +9,8 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DeclareVersionParam;
 import org.springframework.stereotype.Component;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:09
@@ -19,10 +21,9 @@ public class DeclareVersionHandler implements EventHandler {
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         DeclareVersionParam param = tx.getTxParam(DeclareVersionParam.class);
         try {
-            String nodeName = nodeCache.getNode(param.getActiveNode()).getLatestStaking().getStakingName();
+            String nodeName = NODE_CACHE.getNode(param.getActiveNode()).getLatestStaking().getStakingName();
             param.setNodeName(nodeName);
             //交易txinfo回填
             tx.setTxInfo(JSON.toJSONString(param));
