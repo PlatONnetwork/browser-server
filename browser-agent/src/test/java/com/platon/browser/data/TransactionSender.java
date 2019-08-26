@@ -75,6 +75,7 @@ public class TransactionSender {
         builder.setWebSite("www.baidu.com");
         builder.setExternalId("ex-id-001");
         builder.setDetails("balabalabala");
+        builder.setBlsPubKey("aaaa");
         ProgramVersion pv = new ProgramVersion();
         pv.setProgramVersion(BigInteger.ZERO);
         pv.setProgramVersionSign("0.7.0");
