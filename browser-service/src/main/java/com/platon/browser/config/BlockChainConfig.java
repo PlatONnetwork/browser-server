@@ -91,4 +91,6 @@ public class BlockChainConfig {
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;
+    //文本提案默认结束轮数
+    private String proposalTextEndRound;
 }

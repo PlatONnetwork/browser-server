@@ -33,9 +33,9 @@ public class RoundCalculation {
             BigDecimal consensusCount = new BigDecimal(bc.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
-            BigDecimal belongToCon = belongToConList[0];
+            BigDecimal belongToCon = belongToConList[1];
             //转换结束快高
-            BigDecimal endBlockNumber = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txEndRound).multiply(consensusCount).subtract(new BigDecimal(20));
+            BigDecimal endBlockNumber = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txEndRound.multiply(consensusCount)).subtract(new BigDecimal(20));
             return endBlockNumber;
         } catch (Exception e) {
             logger.error("[RoundCalculation] exception");
@@ -57,9 +57,9 @@ public class RoundCalculation {
             BigDecimal consensusCount = new BigDecimal(bc.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
-            BigDecimal belongToCon = belongToConList[0];
+            BigDecimal belongToCon = belongToConList[1];
             //转换生效块高
-            BigDecimal activeBlockNum = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound).multiply(consensusCount).add(BigDecimal.ONE);
+            BigDecimal activeBlockNum = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.add(new BigDecimal("4")).multiply(consensusCount)).add(BigDecimal.ONE);
             return activeBlockNum;
         } catch (Exception e) {
             return BigDecimal.ZERO;

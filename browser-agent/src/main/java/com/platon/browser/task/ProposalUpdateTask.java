@@ -39,7 +39,7 @@ public class ProposalUpdateTask {
      * a.http请求查询github治理提案的相关信息并补充
      * b.根据platon底层rpc接口查询提案结果
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/1 * * * * ?")
     protected void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;
@@ -92,5 +92,9 @@ public class ProposalUpdateTask {
                 }
             }
         }
+    }
+
+    public static void main ( String[] args ) {
+
     }
 }
