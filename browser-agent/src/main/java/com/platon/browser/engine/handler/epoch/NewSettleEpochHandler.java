@@ -90,11 +90,6 @@ public class NewSettleEpochHandler implements EventHandler {
      */
     private void stakingSettle() throws SettleEpochChangeException {
 
-        if(bc.getCurSettingEpoch().longValue()==1){
-            // 第一个结算周期没有上一个结算周期，不做结算操作
-            return;
-        }
-
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
 
         // 前一结算周期内每个验证人所获得的平均质押奖励

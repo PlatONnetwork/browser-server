@@ -94,7 +94,6 @@ public class BlockSyncTask {
         if (maxBlockNumber != null && maxBlockNumber > 0) {
             commitBlockNumber = maxBlockNumber;
             blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
-            blockChain.initCandidate(maxBlockNumber);
         }
 
         /*
@@ -108,17 +107,16 @@ public class BlockSyncTask {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
                 BaseResponse<List<Node>> validators = client.getHistoryValidatorList(BigInteger.ZERO);
                 if(!validators.isStatusOk()){
-                    logger.debug("通过区块号[{}]查询历史共识周期验证人列表为空:{}",BigInteger.ONE,validators.errMsg);
                     logger.debug("查询实时共识周期验证人列表...");
                     validators = client.getNodeContract().getValidatorList().send();
                 }
                 // 查询内置共识周期验证人初始化blockChain的curValidator属性
-                if(validators.isStatusOk()) validators.data.forEach(node->blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()),node));
+                Set<String> validatorSet = new HashSet<>();
+                if(validators.isStatusOk()) validators.data.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
 
                 // 根据区块号0查询结算周期验证人列表并入库
                 BaseResponse<List<Node>> verifiers = client.getHistoryVerifierList(BigInteger.ZERO);
                 if(!verifiers.isStatusOk()){
-                    logger.debug("通过区块号[{}]查询历史结算周期验证人列表为空:{}",BigInteger.ONE,verifiers.errMsg);
                     logger.debug("查询实时结算周期验证人列表...");
                     verifiers = client.getNodeContract().getVerifierList().send();
                 }
@@ -138,11 +136,9 @@ public class BlockSyncTask {
                         BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
                         staking.setStakingLocked(stakingLocked.toString());
                         // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                        if(blockChain.getCurValidator().get(node.getNodeId())!=null) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                        if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                         // 暂存至新增质押待入库列表
                         BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
-                        // 查询内置结算周期验证人初始化blockChain的curVerifier属性
-                        blockChain.getCurVerifier().put(HexTool.prefix(verifier.getNodeId()),verifier);
                     });
                     BlockChainStage bcr = blockChain.exportResult();
                     batchSave(Collections.emptyList(),bcr);

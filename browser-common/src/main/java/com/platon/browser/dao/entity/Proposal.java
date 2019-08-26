@@ -45,7 +45,7 @@ public class Proposal {
 
     private String description;
 
-    private Integer canceledPipId;
+    private String canceledPipId;
 
     private String canceledTopic;
 
@@ -209,12 +209,12 @@ public class Proposal {
         this.description = description == null ? null : description.trim();
     }
 
-    public Integer getCanceledPipId() {
+    public String getCanceledPipId() {
         return canceledPipId;
     }
 
-    public void setCanceledPipId(Integer canceledPipId) {
-        this.canceledPipId = canceledPipId;
+    public void setCanceledPipId(String canceledPipId) {
+        this.canceledPipId = canceledPipId == null ? null : canceledPipId.trim();
     }
 
     public String getCanceledTopic() {
@@ -253,7 +253,7 @@ public class Proposal {
         pipId("pip_id", "pipId", "INTEGER", false),
         topic("topic", "topic", "VARCHAR", false),
         description("description", "description", "VARCHAR", false),
-        canceledPipId("canceled_pip_id", "canceledPipId", "INTEGER", false),
+        canceledPipId("canceled_pip_id", "canceledPipId", "VARCHAR", false),
         canceledTopic("canceled_topic", "canceledTopic", "VARCHAR", false);
 
         /**

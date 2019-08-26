@@ -6,8 +6,9 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 @Mapper
-public interface VoteMapper extends CustomVoteMapper{
+public interface VoteMapper {
     long countByExample(VoteExample example);
 
     int deleteByExample(VoteExample example);

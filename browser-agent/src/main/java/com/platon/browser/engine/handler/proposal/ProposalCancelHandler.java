@@ -80,7 +80,7 @@ public class ProposalCancelHandler implements EventHandler {
         BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置被取消的提案id
-        proposal.setCanceledPipId(new Integer(param.getCanceledProposalID()));
+        proposal.setCanceledPipId(param.getCanceledProposalID());
         //全局内存变量中查询对应需要取消的提案主题
         CustomProposal targetProposal;
         try {

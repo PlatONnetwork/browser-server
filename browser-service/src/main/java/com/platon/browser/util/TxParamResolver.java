@@ -173,10 +173,10 @@ public class TxParamResolver {
                         String proposalVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //pIDID
                         String proposalPIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
-
+                        String PIDID =  new String(Numeric.hexStringToByteArray(proposalPIDID));
                         CreateProposalTextParam createProposalTextParam = new CreateProposalTextParam();
                         //todo:结束块高待补充，需确认计算方法，参数中为轮数，在此换算后为块高
-                        createProposalTextParam.init(proposalVerifier,proposalPIDID);
+                        createProposalTextParam.init(proposalVerifier,PIDID);
                         result.param=createProposalTextParam;
                         break;
                     case CREATE_PROPOSAL_UPGRADE: // 2001
