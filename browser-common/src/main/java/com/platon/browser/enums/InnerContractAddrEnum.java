@@ -19,8 +19,7 @@ public enum InnerContractAddrEnum {
     SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"惩罚合约"),
     PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
-    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约"),
-    FOUNDATION("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219","基金会");
+    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约");
 
     public String address;
     public String desc;
