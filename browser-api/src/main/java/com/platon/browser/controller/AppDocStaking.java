@@ -147,6 +147,7 @@ public interface AppDocStaking {
      *         "slashLowQty":11,       //低出块率举报次数
      *         "slashMultiQty":11,     //多签举报次数
      *         "leaveTime":11          //退出时间
+     *         "blockQty":11,          //产生的区块数
      *      }
      *   ]
      * }
@@ -221,7 +222,8 @@ public interface AppDocStaking {
      *       "details":"",             //节点的描述
      *       "externalId":"",          //身份证id
      *       "stakingBlockNum":"",     //最新的质押交易块高
-     *       "statDelegateReduction":""//待提取的委托
+     *       "statDelegateReduction":"",//待提取的委托
+     *       "isInit":true           //是否为初始节点 
      *    }
      * }
      */	

@@ -12,6 +12,7 @@ import org.web3j.platon.StakingAmountType;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
+import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -19,6 +20,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Convert.Unit;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -37,39 +39,43 @@ public class TransactionSender {
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+    RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
     public TransactionSender() throws IOException, CipherException {}
 
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
-        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-        logger.error("{}",Hex.toHexString(credentials.getEcKeyPair().getPrivateKey().toByteArray()));
-        BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
-        Transfer.sendFunds(
-                web3j,
-                credentials,
-                "101",
-                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
-                BigDecimal.valueOf(100),
-                Convert.Unit.VON
-        ).send();
-        BigInteger balance = web3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
-        logger.debug("balance:{}",balance);
+    	for(int i=0; i < 30;i++) {
+	        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+	        logger.error("{}",Hex.toHexString(credentials.getEcKeyPair().getPrivateKey().toByteArray()));
+	        BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+	        Transfer.sendFunds(
+	                web3j,
+	                credentials,
+	                "101",
+	                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
+	                BigDecimal.valueOf(100),
+	                Convert.Unit.VON
+	        ).send();
+	        BigInteger balance = web3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
+	        logger.debug("balance:{}",balance);
+    	}
     }
 
     // 发送质押交易
     @Test
     public void staking() throws Exception {
+    	BigDecimal bigDecimal = Convert.toVon("5000000", Unit.LAT);
         BaseResponse res = stakingContract.staking(
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
-                BigInteger.valueOf(40000),
+                bigDecimal.toBigInteger(),
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
                 "",
                 "cdm",
                 "www.baidu.com",
                 "baidu",
-                BigInteger.ZERO
+                BigInteger.valueOf(70)
         ).send();
         logger.debug("res:{}",res);
     }
@@ -118,4 +124,13 @@ public class TransactionSender {
         ).send();
         logger.debug("res:{}",res);
     }
+    
+ // 发送委托交易
+    @Test
+    public void restricting() throws Exception {
+    	
+    	BaseResponse res = restrictingPlanContract.createRestrictingPlan("", null).send();
+        logger.debug("res:{}",res);
+    }
+    
 }

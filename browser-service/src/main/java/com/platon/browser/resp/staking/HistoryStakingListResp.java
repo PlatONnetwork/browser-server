@@ -12,4 +12,5 @@ public class HistoryStakingListResp {
 	private Integer slashLowQty;       //低出块率举报次数
 	private Integer slashMultiQty;     //多签举报次数
 	private Long leaveTime;      //退出时间
+	private Long blockQty;          //产生的区块数
 }

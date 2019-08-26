@@ -94,12 +94,16 @@ public class StakingServiceImpl implements StakingService {
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Integer status = null;
 		Integer isConsensus = null;
+		String name = null;
 		StakingExample.Criteria criteria = stakingExample.createCriteria();
 		if(StringUtils.isNotBlank(req.getKey())) {
-			criteria.andStakingNameEqualTo(req.getKey());
+			criteria.andStakingNameLike(req.getKey());
+			name = req.getKey();
 		}
 		switch (StakingStatusEnum.valueOf(req.getQueryStatus().toUpperCase())) {
 			case ALL:
+				status = StakingStatus.CANDIDATE.getCode();
+				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode());
 				break;
 			case ACTIVE:
 				//活跃中代表即使后续同时也是共识周期验证人
@@ -118,7 +122,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), status, isConsensus);
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
@@ -129,7 +133,9 @@ public class StakingServiceImpl implements StakingService {
 					.add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
 			aliveStakingListResp.setDelegateValue(EnergonUtil.format(Convert.fromVon(sumAmount, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			aliveStakingListResp.setIsInit(stakings.get(i).getIsInit().intValue() == 1?true:false);
-			aliveStakingListResp.setIsRecommend(stakings.get(i).getIsRecommend().intValue() == 1?true:false);
+			if(stakings.get(i).getIsRecommend() != null) {
+				aliveStakingListResp.setIsRecommend(Integer.valueOf(1).compareTo(stakings.get(i).getIsRecommend()) == 0?true:false);
+			}
 			aliveStakingListResp.setRanking(i + 1);
 			aliveStakingListResp.setSlashLowQty(stakings.get(i).getStatSlashLowQty());
 			aliveStakingListResp.setSlashMultiQty(stakings.get(i).getStatSlashMultiQty());
@@ -170,6 +176,7 @@ public class StakingServiceImpl implements StakingService {
 			if(stakingNode.getLeaveTime()!=null) {
 				historyStakingListResp.setLeaveTime(stakingNode.getLeaveTime().getTime());
 			}
+			historyStakingListResp.setBlockQty(stakingNode.getCurConsBlockQty());
 			historyStakingListResp.setNodeName(stakingNode.getStakingName());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
@@ -200,6 +207,7 @@ public class StakingServiceImpl implements StakingService {
 			default: // 只有一条数据
 				StakingNode stakingNode = stakings.get(0);
 				BeanUtils.copyProperties(stakingNode, resp);
+				resp.setIsInit(stakingNode.getIsInit().intValue() == 1?true:false);
 				resp.setNodeName(stakingNode.getStakingName());
 				resp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 				//质押总数=有效的质押+委托
@@ -217,8 +225,12 @@ public class StakingServiceImpl implements StakingService {
 				resp.setBlockQty(stakingNode.getStatBlockQty());
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());
-				resp.setRewardValue(EnergonUtil.format(Convert.fromVon(stakingNode.getStatRewardValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+				if(StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {
+					resp.setRewardValue(EnergonUtil.format(Convert.fromVon(stakingNode.getStatRewardValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+				}
+				if(stakingNode.getLeaveTime() != null) {
+					resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+				}
 				break;
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);
@@ -228,7 +240,7 @@ public class StakingServiceImpl implements StakingService {
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
 		NodeOptExample nodeOptExample = new NodeOptExample();
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-		com.platon.browser.dao.entity.NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
+		NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
 		criteria.andNodeIdEqualTo(req.getNodeId());
 		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
 		List<StakingOptRecordListResp> lists = new LinkedList<StakingOptRecordListResp>();

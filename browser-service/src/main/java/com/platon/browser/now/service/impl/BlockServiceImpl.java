@@ -138,6 +138,7 @@ public class BlockServiceImpl implements BlockService {
         BlockExample blockExample = new BlockExample();
         Criteria criteria = blockExample.createCriteria();
         criteria.andNodeIdEqualTo(nodeId);
+//        criteria.andCreateTimeGreaterThan(value)
         List<Block> blockList = blockMapper.selectByExample(blockExample);
         List<Object[]> rows = new ArrayList<>();
         blockList.forEach(block->{

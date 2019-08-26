@@ -28,4 +28,5 @@ public class StakingDetailsResp {
     private Long stakingBlockNum;     //最新的质押交易块高
     private String statDelegateReduction;//待提取的委托
     private Long leaveTime;  //退出时间
+    private Boolean isInit;          //是否为初始节点 
 }
