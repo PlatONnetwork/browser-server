@@ -153,113 +153,6 @@ public class BlockChainHandler {
     }
 
     /**
-     * 使用特定区块号初始化验证人信息
-     * @param blockNumber
-     */
-    public void initVerifier(Long blockNumber) {
-
-        Long blockCountPerEpoch = chainConfig.getSettlePeriodBlockCount().longValue();
-        BaseResponse <List <Node>> result;
-        try {
-            // 取当前结算周期的上一结算周期最后一个块号，通过此块号必定能查到前一结算周期验证人
-            long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
-            result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
-            if (result.isStatusOk()) {
-                preVerifier.clear();
-                result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
-            }
-        } catch (Exception e) {
-            logger.error("更新前一结算周期验证人列表失败,原因：{}", e.getMessage());
-        }
-
-        try {
-            // 取当前结算周期最后一个块号、
-            long curEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
-            // 取当前结算周期
-            long curEpoch = EpochUtil.getEpoch(blockNumber,blockCountPerEpoch);
-
-
-            // 取链上实时区块号
-            long realtimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
-            // 取当前结算周期最后一个块号、
-            long realtimeEpoch = EpochUtil.getCurEpochLastBlockNumber(realtimeBlockNumber,blockCountPerEpoch);
-            if(realtimeBlockNumber>curEpochLastBlockNumber){
-                // 假设：每个结算周期区块总数是100，当前区块号是250，当前链上实时最新块号是330
-                // 1、如果链上实时区块号大于当前区块号所在结算周期最后一个块，则通过当前区块号查询当前结算周期的验证人列表
-                // |----x----|-----
-                // 200 250  300 330
-                result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
-                if (result.isStatusOk()) {
-                    curVerifier.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
-
-            if(realtimeEpoch==curEpoch){
-                // 假设：每个结算周期区块总数是100，当前区块号是320，当前链上实时最新块号是350
-                // 2、如果当前区块号所在结算周期与链上实时结算周期相同，则查询实时列表
-                // |--------|---x-----
-                // 200     300 320  350
-                result = client.getNodeContract().getVerifierList().send();
-                if (result.isStatusOk()) {
-                    curVerifier.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
-        } catch (Exception e) {
-            logger.error("更新当前结算周期验证人列表失败,原因：{}", e.getMessage());
-        }
-    }
-
-    /**
-     * 使用特定区块号初始化共识验证人信息
-     * @param blockNumber
-     */
-    public void initValidator(Long blockNumber){
-        try {
-            Long consensusPeriod = chainConfig.getConsensusPeriodBlockCount().longValue();
-            // 获取链上实时区块号
-            Long realTimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
-
-            /****************************更新前一轮共识验证人列表************************/
-            if (curValidator.size()>0) {
-                // 如果curValidator有元素，则把它们转存到preValidator
-                preValidator.clear();
-                preValidator.putAll(curValidator);
-            }else {
-                // 如果curValidator为空，则使用当前共识周期切换区块号查询前一轮共识周期验证人
-                BaseResponse<List<Node>> result = client.getHistoryValidatorList(BigInteger.valueOf(blockNumber));
-                if (result.isStatusOk()) {
-                    curValidator.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> preValidator.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
-
-            /****************************更新当前轮共识验证人列表************************/
-            if(realTimeBlockNumber>blockNumber && realTimeBlockNumber<(blockNumber+consensusPeriod)){
-                // 如果链上实时区块号大于当前同步区块号，且链上实时区块号<(blockNumber+consensusPeriod)时,
-                // 即当前区块号和链上实时区块号处在同一共识周期时，则查询实时共识验证人列表作为当前共识轮验证人列表
-                BaseResponse <List <Node>> result = client.getNodeContract().getValidatorList().send();
-                if (result.isStatusOk()) {
-                    curValidator.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
-
-            if(realTimeBlockNumber>=(blockNumber+consensusPeriod)){
-                // 如果链上实时区块号>=(blockNumber+consensusPeriod)，则查询(blockNumber+1)时的共识验证人列表
-                BaseResponse <List <Node>> result = client.getHistoryValidatorList(BigInteger.valueOf(blockNumber+1));
-                if (result.isStatusOk()) {
-                    curValidator.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
-        } catch (Exception e) {
-            logger.error("更新共识周期验证人列表失败,原因：{}", e.getMessage());
-        }
-    }
-
-    /**
      * 更新共识周期验证人和结算周期验证人映射缓存
      * // 假设当前链上最高区块号为750
      * 1         250        500        750
@@ -276,7 +169,29 @@ public class BlockChainHandler {
         Long consensusPeriod = chainConfig.getConsensusPeriodBlockCount().longValue();
         if (blockNumber % consensusPeriod == 0) {
             logger.debug("共识周期切换块号:{}", blockNumber);
-            initValidator(blockNumber);
+            try {
+                BaseResponse <List <Node>> result;
+                // ==================================更新前一周期验证人列表=======================================
+                // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+                result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
+                if (result.isStatusOk()) {
+                    preValidator.clear();
+                    result.data.stream().filter(Objects::nonNull).forEach(node -> preValidator.put(HexTool.prefix(node.getNodeId()), node));
+                }
+
+                // ==================================更新当前周期验证人列表=======================================
+                BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+                result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
+                if (!result.isStatusOk()) {
+                    // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+                    result = client.getNodeContract().getValidatorList().send();
+                }
+                curValidator.clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()), node));
+            } catch (Exception e) {
+                logger.error("更新共识周期验证人列表失败,原因：{}", e.getMessage());
+            }
             if(curValidator.size()==0){
                 throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
             }
@@ -300,7 +215,29 @@ public class BlockChainHandler {
         Long settingPeriod = chainConfig.getSettlePeriodBlockCount().longValue();
         if (blockNumber % settingPeriod == 0) {
             logger.debug("结算周期切换块号:{}", blockNumber);
-            initVerifier(blockNumber);
+            try {
+                BaseResponse <List <Node>> result;
+                // ==================================更新前一周期验证人列表=======================================
+                // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
+                if (result.isStatusOk()) {
+                    preVerifier.clear();
+                    result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
+                }
+
+                // ==================================更新当前周期验证人列表=======================================
+                BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+                result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
+                if (!result.isStatusOk()) {
+                    // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+                    result = client.getNodeContract().getVerifierList().send();
+                }
+                curVerifier.clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
+            } catch (Exception e) {
+                logger.error("更新周期验证人列表失败,原因：{}", e.getMessage());
+            }
             if(curVerifier.size()==0){
                 throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
             }

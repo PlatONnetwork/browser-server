@@ -13,12 +13,16 @@ import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
+import com.platon.browser.utils.EpochUtil;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.Node;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -26,6 +30,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Auther: Chendongming
@@ -107,11 +112,6 @@ public class BlockChain {
     public void initBlockRewardAndSettleReward(Long blockNumber) throws IssueEpochChangeException {
         blockChainHandler.initEpoch(blockNumber);
         blockChainHandler.initBlockRewardAndStakingReward(blockNumber);
-    }
-    // 使用特定区块号初始化验证人信息
-    public void initCandidate(Long blockNumber){
-        blockChainHandler.initValidator(blockNumber);
-        blockChainHandler.initVerifier(blockNumber);
     }
 
     @PostConstruct
