@@ -7,6 +7,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVote;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.*;
+import com.platon.browser.engine.handler.proposal.*;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;

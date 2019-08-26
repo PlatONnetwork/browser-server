@@ -1,0 +1,250 @@
+package com.platon.browser.engine.handler.epoch;
+
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.*;
+import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
+import com.platon.browser.engine.bean.PeriodValueElement;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.SettleEpochChangeException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.web3j.platon.bean.Node;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.List;
+
+/**
+ * @Auther: Chendongming
+ * @Date: 2019/8/17 20:09
+ * @Description: 结算周期变更事件处理类
+ */
+@Component
+public class NewSettleEpochHandler implements EventHandler {
+    private static Logger logger = LoggerFactory.getLogger(NewSettleEpochHandler.class);
+    private CustomTransaction tx;
+    private NodeCache nodeCache;
+    private StakingStage stakingStage;
+    private BlockChain bc;
+
+    @Override
+    public void handle(EventContext context) throws SettleEpochChangeException {
+        tx = context.getTransaction();
+        nodeCache = context.getNodeCache();
+        stakingStage = context.getStakingStage();
+        bc = context.getBlockChain();
+        stakingSettle();
+        modifyDelegationInfoOnNewSettingEpoch();
+        modifyUnDelegationInfoOnNewSettingEpoch();
+    }
+
+
+    //结算周期变更导致的委托数据的变更
+    private void modifyDelegationInfoOnNewSettingEpoch () {
+        //由于结算周期的变更，对所有的节点下的质押的委托更新
+        //只需变更不为历史节点的委托数据(isHistory=NO(2))
+        List<CustomDelegation> delegations = nodeCache.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
+        delegations.forEach(delegation->{
+            //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
+            delegation.setDelegateLocked(new BigInteger(delegation.getDelegateLocked()).add(new BigInteger(delegation.getDelegateHas())).toString());
+            //累加后的犹豫期金额至为0
+            delegation.setDelegateHas("0");
+            delegation.setDelegateReduction("0");
+            //并判断经过一个结算周期后该委托的对应赎回是否全部完成，若完成则将委托设置为历史节点
+            //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
+            BigInteger sumAoumt = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(delegation.getDelegateReduction()));
+            if (sumAoumt.compareTo(BigInteger.ZERO) == 0) {
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+            }
+            //添加需要更新的委托的信息到委托更新列表
+            stakingStage.updateDelegation(delegation);
+        });
+    }
+
+    //结算周期变更导致的委托赎回的变更
+    private void modifyUnDelegationInfoOnNewSettingEpoch () {
+        //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
+        //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
+        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
+        unDelegations.forEach(unDelegation -> {
+            //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
+            unDelegation.setRedeemLocked("0");
+            //当锁定期金额为零时，认为此笔赎回委托交易已经完成
+            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
+            //添加需要更新的赎回委托信息到赎回委托更新列表
+            stakingStage.updateUnDelegation(unDelegation);
+        });
+    }
+
+    /**
+     * 对上一结算周期的质押节点结算
+     * 对所有候选中和退出中的节点进行结算
+     */
+    private void stakingSettle() throws SettleEpochChangeException {
+        // 结算周期切换时对所有候选中和退出中状态的节点进行结算
+
+        // 前一结算周期内每个验证人所获得的平均质押奖励
+        // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
+        if(bc.getPreVerifier().size()==0){
+            throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
+        }
+        BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
+        logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
+
+        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
+        for(CustomStaking curStaking:stakings){
+            // 调整金额状态
+            BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
+            curStaking.setStakingLocked(stakingLocked.toString());
+            curStaking.setStakingHas(BigInteger.ZERO.toString());
+            if(bc.getCurSettingEpoch().longValue() > curStaking.getStakingReductionEpoch()){
+                // 因为减持质押需要隔一个结算周期才会释放，所以当前周期必须要大于当前质押中的解质押发生的周期，即：
+                // 假设结算周期是500
+                // |--------|--------|--------|
+                // 1        500     1000     1500
+                // 结算周期(1~500)内的解质押会在结算周期(500~1000)结束的时候(第1000块)释放
+                // 假设周期(1~500)内做了质押A，staking.getStakingReductionEpoch()的值为1，则：
+                // 1、第500块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为1，是不会进入此代码块的
+                // 2、第1000块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为2，是会进入此代码块的
+                //
+                // 当前结算周期轮数大于质押结算周期标识，则表明前一结算周期的解质押已释放
+                curStaking.setStakingReduction("0");
+            }
+            BigInteger stakingReduction = curStaking.integerStakingReduction();
+            if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
+                curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+            }
+
+
+            // 计算质押激励和年化率
+            Node node = bc.getPreVerifier().get(curStaking.getNodeId());
+            if(node!=null){
+                // 质押记录所属节点在前一轮结算周期的验证人列表中，则对其执行结算操作
+                // 累加质押奖励
+                BigInteger stakingRewardValue = curStaking.integerStakingReward().add(preVerifierStakingReward);
+                curStaking.setStakingRewardValue(stakingRewardValue.toString());
+
+                CustomNode customNode;
+                try {
+                    customNode = nodeCache.getNode(curStaking.getNodeId());
+                } catch (NoSuchBeanException e) {
+                    throw new SettleEpochChangeException("获取节点错误:"+e.getMessage());
+                }
+
+                if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.code){
+                    // 只有候选中的记录才需要计算年化率：(((前4个结算周期内验证人所获得的平均质押奖励+前4结算周期出块奖励)/前四个结算周期质押成本)/1466)*100%
+
+                    /**
+                     * 业务处理逻辑：
+                     * 每4个结算周期计算一次年化率
+                     * 收益:     W0    W1    W2    W3    W4
+                     *          |-----|-----|-----|-----|
+                     * 结算周期： S0    S1    S2    S3    S4
+                     * 成本:     C1    C2    C3    C4    C5
+                     *
+                     * 年化率计算：
+                     * W1 + W2 + W3 + W4
+                     * ------------------ x 一个增发周期内的结算周期总数 x 100%
+                     * C1 + C2 + C3 + C4
+                     */
+                    // 年化率推算信息
+                    String annualizedRateInfo = curStaking.getAnnualizedRateInfo();
+                    AnnualizedRateInfo ari;
+                    if(StringUtils.isBlank(annualizedRateInfo)){
+                        // 如果年化率推算信息为空，则证明是新质押，只需要把成本记录下来即可
+                        ari = new AnnualizedRateInfo();
+                        // 下一周期的质押成本：锁定+犹豫
+                        BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
+                        ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
+                    }else{
+                        ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
+                        // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
+                        // 1、添加上一周期的收益
+                        BigInteger profit = curStaking.integerStakingReward().add(curStaking.integerBlockReward());
+                        ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
+                        // 2、添加下一周期的质押成本
+                        BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
+                        ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
+                        // 保留指定数量最新的记录
+                        if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+                            // 按结算周期由大到小排序
+                            ari.getProfit().sort((c1, c2) -> {
+                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
+                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
+                                return 0;
+                            });
+                            // 删除多余的元素
+                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--){
+                                ari.getProfit().remove(i);
+                            }
+                        }
+
+                        // 保留指定数量最新的记录
+                        if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+                            // 按结算周期由大到小排序
+                            ari.getCost().sort((c1, c2) -> {
+                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
+                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
+                                return 0;
+                            });
+                            // 删除多余的元素
+                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--){
+                                ari.getCost().remove(i);
+                            }
+                        }
+                    }
+                    class AnnualizedSum{
+                        BigInteger profitSum=BigInteger.ZERO;
+                        BigInteger costSum=BigInteger.ZERO;
+                        BigDecimal getAnnualizedRate(){
+                            if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
+                            BigDecimal rate = new BigDecimal(profitSum)
+                                    .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR)
+                                    .multiply(new BigDecimal(bc.getSettleEpochCountPerIssueEpoch()))
+                                    .multiply(BigDecimal.valueOf(100));
+                            return rate.setScale(2,RoundingMode.FLOOR);
+                        }
+                    }
+                    AnnualizedSum as = new AnnualizedSum();
+                    ari.getProfit().forEach(ele->as.profitSum=as.profitSum.add(ele.getValue()));
+
+                    // 按周期从大到小排序
+                    ari.getCost().sort((c1, c2) -> {
+                        if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
+                        if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
+                        return 0;
+                    });
+                    // 忽略最大的周期
+                    for (int i=1;i<ari.getCost().size();i++){
+                        PeriodValueElement pve = ari.getCost().get(i);
+                        as.costSum=as.costSum.add(pve.getValue());
+                    }
+                    curStaking.setExpectedIncome(as.getAnnualizedRate().toString());
+                    curStaking.setAnnualizedRateInfo(JSON.toJSONString(ari));
+                }
+
+                // 结算状态设置为已结算
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                // 更新节点的质押金累计字段
+                customNode.setStatRewardValue(curStaking.getStakingRewardValue());
+                // 将改动的内存暂存至待更新缓存
+                stakingStage.updateNode(customNode);
+            }else{
+                // 年化率设置为0
+                curStaking.setExpectedIncome(BigInteger.ZERO.toString());
+                // 结算状态设置为未结算
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+            }
+            // 将改动的内存暂存至待更新缓存
+            stakingStage.updateStaking(curStaking);
+        }
+    }
+}

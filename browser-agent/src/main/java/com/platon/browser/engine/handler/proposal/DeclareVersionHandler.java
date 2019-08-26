@@ -1,8 +1,10 @@
-package com.platon.browser.engine.handler;
+package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DeclareVersionParam;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @Description: 声明版本事件处理类
  */
 @Component
-public class DeclareVersionHandler implements EventHandler{
+public class DeclareVersionHandler implements EventHandler {
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
