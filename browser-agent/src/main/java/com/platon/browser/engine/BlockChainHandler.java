@@ -207,7 +207,7 @@ public class BlockChainHandler {
                 curValidator.clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> curValidator.put(HexTool.prefix(node.getNodeId()), node));
             } catch (Exception e) {
-                logger.error("更新共识周期验证人列表失败,原因：{}", e.getMessage());
+                throw new CandidateException(e.getMessage());
             }
             if(curValidator.size()==0){
                 throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
@@ -258,7 +258,7 @@ public class BlockChainHandler {
                 curVerifier.clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
             } catch (Exception e) {
-                logger.error("更新周期验证人列表失败,原因：{}", e.getMessage());
+                throw new CandidateException(e.getMessage());
             }
             if(curVerifier.size()==0){
                 throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
