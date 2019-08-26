@@ -25,7 +25,7 @@ public class CreateProposalUpgradeParam {
     /**
      * 提案投票截止块高（EpochSize*N-20，不超过2周的块高）
      */
-    private Integer endVotingBlock;
+    private Integer endVotingRound;
 
     /**
      * 升级版本
@@ -34,10 +34,11 @@ public class CreateProposalUpgradeParam {
 
 
 
-    public void init( String verifier, String pIDID, Integer endVotingBlock,Integer newVersion){
+
+    public void init( String verifier, String pIDID, Integer endVotingRound,Integer newVersion){
         this.setVerifier(verifier);
         this.setPIDID(pIDID);
-        this.setEndVotingBlock(endVotingBlock);
+        this.setEndVotingRound(endVotingRound);
         this.setNewVersion(newVersion);
     }
 }

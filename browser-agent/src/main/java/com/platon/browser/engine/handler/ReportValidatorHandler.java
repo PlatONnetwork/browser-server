@@ -47,6 +47,7 @@ public class ReportValidatorHandler implements EventHandler {
 
                 //交易数据回填
                 evidencesParam.setNodeName(latestStaking.getStakingName());
+                evidencesParam.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
 
                 //多签举报，惩罚金额
                 Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashRate().doubleValue();
@@ -68,7 +69,6 @@ public class ReportValidatorHandler implements EventHandler {
                 latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
                 latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
                 //更新分析质押结果
-                //executeResult.getUpdateStakings().add(latestStaking);
                 executeResult.stageUpdateStaking(latestStaking ,tx);
 
                 //新增举报交易结构
@@ -76,13 +76,11 @@ public class ReportValidatorHandler implements EventHandler {
                 newCustomSlash.updateWithSlash(tx,evidencesParam);
                 newCustomSlash.setReward(slashValue.toString());
                 newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashRate().toString());
-                nodeCache.getNode(evidencesParam.getVerify()).getSlashes().add(newCustomSlash);
 
                 //新增分析多重签名结果
-                //executeResult.getAddSlashs().add(newCustomSlash);
                 executeResult.stageAddSlash(newCustomSlash);
             } catch (NoSuchBeanException e) {
-                logger.error("{}", e.getMessage());
+                logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             }
 
             tx.setTxInfo(JSON.toJSONString(param));

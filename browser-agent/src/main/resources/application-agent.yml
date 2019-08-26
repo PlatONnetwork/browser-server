@@ -10,17 +10,13 @@ dbuser: platon
 # MySQL数据库密码
 dbpass: platon
 web3j:
-  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  addresses: http://192.168.120.76:6797
   collect.batch-size: 1000
-chain:
-  # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
-  config: MAIN_NET-1-http://192.168.120.88:6789
-  # 要采集哪个ID的链
-  active: 1
 # Redis集群节点
+#redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
 # 日志文件存储文件
-logpath: ./logs/${spring.application.name}-${version}-${profile}.log
+logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: debug
@@ -69,7 +65,7 @@ platon.config:
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 120
+  settlePeriodBlockCount: 240
   #每个增发周期区块总数(1466个结算周期=15759500个块)
   addIssuePeriodBlockCount: 1680
   #节点质押退回锁定的结算周期数
@@ -88,8 +84,6 @@ platon.config:
   duplicateSignLowSlashRate: 1
   #锁仓账户地址
   restrictingAccountAddr: '0x1000000000000000000000000000000000000001'
-  #质押账户地址
-
   #激励池账户地址
   incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
@@ -108,6 +102,5 @@ platon.config:
     '7':15044304.0698633,
     '8':7615018.10943699
   }
-
-
-
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md

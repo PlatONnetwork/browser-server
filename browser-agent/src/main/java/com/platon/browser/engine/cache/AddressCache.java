@@ -3,8 +3,10 @@ package com.platon.browser.engine.cache;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.exception.NoSuchBeanException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 地址实体进程缓存
@@ -34,4 +36,10 @@ public class AddressCache {
     public void add(CustomAddress address){
         addressMap.put(address.getAddress(),address);
     }
+
+    public Collection<CustomAddress> getAllAddress(){
+        return addressMap.values();
+    }
+
+
 }

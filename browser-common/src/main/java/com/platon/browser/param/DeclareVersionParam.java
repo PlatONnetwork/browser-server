@@ -21,8 +21,18 @@ public class DeclareVersionParam {
      */
     private Integer version;
 
-    public void init(String activeNode,Integer version){
+    /**
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
+     * 声明的版本签名
+     */
+    private String versionSigns;
+    public void init(String activeNode,Integer version,String versionSigns){
         this.setActiveNode(activeNode);
         this.setVersion(version);
+        this.setVersionSigns(versionSigns);
     }
 }

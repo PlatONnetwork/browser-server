@@ -65,7 +65,9 @@ public class DelegateHandler implements EventHandler {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
                     newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
-                    latestStaking.getDelegations().put(tx.getFrom(), newCustomDelegation);
+                    // 添加至委托缓存
+                    nodeCache.addDelegation(newCustomDelegation);
+
                     //新增分析结果AddSet
                     executeResult.stageAddDelegation(newCustomDelegation);
                 }

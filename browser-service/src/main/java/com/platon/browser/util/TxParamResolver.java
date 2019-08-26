@@ -162,7 +162,7 @@ public class TxParamResolver {
                         BigInteger unDelegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         UnDelegateParam unDelegateParam = new UnDelegateParam();
-                        unDelegateParam.init(stakingBlockNum,unDelegateNodeId,unDelegateAmount.toString(),"");
+                        unDelegateParam.init(new BigInteger(stakingBlockNum.replace("0x",""),16).toString(),unDelegateNodeId,unDelegateAmount.toString());
                         result.param = unDelegateParam;
                         break;
 
@@ -176,7 +176,7 @@ public class TxParamResolver {
 
                         CreateProposalTextParam createProposalTextParam = new CreateProposalTextParam();
                         //todo:结束块高待补充，需确认计算方法，参数中为轮数，在此换算后为块高
-                        createProposalTextParam.init(proposalVerifier,proposalPIDID,0);
+                        createProposalTextParam.init(proposalVerifier,proposalPIDID);
                         result.param=createProposalTextParam;
                         break;
                     case CREATE_PROPOSAL_UPGRADE: // 2001
@@ -191,10 +191,9 @@ public class TxParamResolver {
                         //投票截止区块高度
                         BigInteger endBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
                         //结束轮转换结束区块高度
-                        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(blockNumber,endBlockRound.toString(),bc);
 
                         CreateProposalUpgradeParam createProposalUpgradeParam = new CreateProposalUpgradeParam();
-                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpIDID,endBlockNumber.intValue(),
+                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpIDID,endBlockRound.intValue(),
                                 newVersion.intValue());
                         result.param = createProposalUpgradeParam;
                         break;
@@ -209,11 +208,10 @@ public class TxParamResolver {
                         BigInteger cancelEndBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //被取消的pIDID
                         String canceledProposalID =  Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
-                        //结束轮转换结束区块高度
-                        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(blockNumber,cancelEndBlockRound.toString(),bc);
+
 
                         CancelProposalParam cancelProposalParam = new CancelProposalParam();
-                        cancelProposalParam.init(cancelVerifier,cancelpIDID,cancelEndBlockNumber.intValue(),canceledProposalID);
+                        cancelProposalParam.init(cancelVerifier,cancelpIDID,cancelEndBlockRound.intValue(),canceledProposalID);
                         result.param = cancelProposalParam;
                         break;
                     case VOTING_PROPOSAL: // 2003
@@ -231,7 +229,7 @@ public class TxParamResolver {
                         String versionSign = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         VotingProposalParam votingProposalParam = new VotingProposalParam();
-                        votingProposalParam.init(voteVerifier,proposalID,option.toString());
+                        votingProposalParam.init(voteVerifier,proposalID,option.toString(),programVersions.toString(),versionSign);
                         result.param = votingProposalParam;
                         break;
                     case DECLARE_VERSION: // 2004
@@ -244,7 +242,7 @@ public class TxParamResolver {
                         //声明的版本签名，有rpc的getProgramVersion接口获取
                         String versionSigns = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
                         DeclareVersionParam declareVersionParam = new DeclareVersionParam();
-                        declareVersionParam.init(activeNode,version.intValue());
+                        declareVersionParam.init(activeNode,version.intValue(),versionSigns);
                         result.param = declareVersionParam;
                         break;
                     case REPORT_VALIDATOR: // 3000

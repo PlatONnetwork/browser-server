@@ -26,7 +26,7 @@ public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
 
     @Override
-    public void handle(EventContext context) {
+    public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
         NodeCache nodeCache = context.getNodeCache();
         StakingExecuteResult executeResult = context.getExecuteResult();
@@ -92,8 +92,13 @@ public class UnDelegateHandler implements EventHandler {
             if (new BigInteger(customUnDelegation.getRedeemLocked()) == BigInteger.ZERO) {
                 //锁定期赎回金额为0则表示：本次赎回的金额在犹豫期金额足够，全部扣除，本次委托赎回已经完成
                 customUnDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
-            } else
+            } else {
                 customUnDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.code);
+            }
+
+            // 添加至解委托缓存
+            nodeCache.addUnDelegation(customUnDelegation);
+
             //更新分析委托结果
             executeResult.stageUpdateDelegation(customDelegation);
             //新增分析委托赎回结果
@@ -101,6 +106,7 @@ public class UnDelegateHandler implements EventHandler {
 
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
+            throw  new NoSuchBeanException("缓存中找不到对应的接触质押信息:");
         }
     }
 }

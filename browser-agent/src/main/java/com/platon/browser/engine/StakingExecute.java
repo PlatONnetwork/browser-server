@@ -1,15 +1,14 @@
 package com.platon.browser.engine;
 
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomDelegationMapper;
+import com.platon.browser.dao.mapper.CustomNodeMapper;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.CustomUnDelegationMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.*;
-import com.platon.browser.engine.result.ProposalExecuteResult;
 import com.platon.browser.engine.result.StakingExecuteResult;
-import com.platon.browser.exception.ConsensusEpochChangeException;
-import com.platon.browser.exception.ElectionEpochChangeException;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -34,10 +31,6 @@ public class StakingExecute {
     private CustomNodeMapper customNodeMapper;
     @Autowired
     private CustomStakingMapper customStakingMapper;
-    @Autowired
-    private CustomNodeOptMapper customNodeOptMapper;
-    @Autowired
-    private CustomSlashMapper customSlashMapper;
     @Autowired
     private CustomDelegationMapper customDelegationMapper;
     @Autowired
@@ -73,67 +66,22 @@ public class StakingExecute {
     /**
      * 加载并构造节点缓存结构
      */
-    public void loadNodes(){
+    public void loadNodes() throws CacheConstructException {
         List<CustomNode> nodeList = customNodeMapper.selectAll();
         List<String> nodeIds = new ArrayList<>();
-        nodeList.forEach(node -> {
-            nodeIds.add(node.getNodeId());
-            nodeCache.add(node);
-        });
+        nodeList.forEach(node -> nodeIds.add(node.getNodeId()));
         if(nodeIds.size()==0) return;
         // |-加载质押记录
-        List<CustomStaking> stakings = customStakingMapper.selectByNodeIdList(nodeIds);
-        // <节点ID+质押块号 - 质押记录> 映射, 方便【委托记录】的添加
-        Map<String, CustomStaking> stakingMap = new HashMap<>();
-        stakings.forEach(staking->{
-            try {
-                nodeCache.getNode(staking.getNodeId()).getStakings().put(staking.getStakingBlockNum(),staking);
-            } catch (NoSuchBeanException e) {
-                logger.error("构造缓存错误:{}, 无法向其关联质押(stakingBlockNumber={})",e.getMessage(),staking.getStakingBlockNum());
-            }
-            stakingMap.put(staking.getStakingMapKey(),staking);
-        });
+        List<CustomStaking> stakingList = customStakingMapper.selectByNodeIdList(nodeIds);
         // |-加载委托记录
-        List<CustomDelegation> delegations = customDelegationMapper.selectByNodeIdList(nodeIds);
-        // <节点ID+质押块号 - 质押记录> 映射, 方便【撤销委托记录】的添加
-        Map<String, CustomDelegation> delegationMap = new HashMap<>();
-        delegations.forEach(delegation->{
-            CustomStaking staking = stakingMap.get(delegation.getStakingMapKey());
-            if(staking!=null) {
-                staking.getDelegations().put(delegation.getDelegateAddr(),delegation);
-                delegationMap.put(delegation.getDelegationMapKey(),delegation);
-            }
-        });
+        List<CustomDelegation> delegationList = customDelegationMapper.selectByNodeIdList(nodeIds);
         // |-加载撤销委托记录
-        List<CustomUnDelegation> unDelegations = customUnDelegationMapper.selectByNodeIdList(nodeIds);
-        unDelegations.forEach(unDelegation->{
-            CustomDelegation delegation = delegationMap.get(unDelegation.getDelegationMapKey());
-            if(delegation!=null){
-                delegation.getUnDelegations().add(unDelegation);
-            }
-        });
-        // |-加载节点操作记录
-        List<CustomNodeOpt> nodeOpts = customNodeOptMapper.selectByNodeIdList(nodeIds);
-        nodeOpts.forEach(opt-> {
-            try {
-                nodeCache.getNode(opt.getNodeId()).getNodeOpts().add(opt);
-            } catch (NoSuchBeanException e) {
-                logger.error("构造缓存错误:{}, 无法向其关联节点操作日志(id={})",e.getMessage(),opt.getId());
-            }
-        });
-        // |-加载节点惩罚记录
-        List<CustomSlash> slashes = customSlashMapper.selectByNodeIdList(nodeIds);
-        slashes.forEach(slash -> {
-            try {
-                nodeCache.getNode(slash.getNodeId()).getSlashes().add(slash);
-            } catch (NoSuchBeanException e) {
-                logger.error("构造缓存错误:{}, 无法向其关联节点惩罚记录(slashTxHash={})",e.getMessage(),slash.getHash());
-            }
-        });
+        List<CustomUnDelegation> unDelegationList = customUnDelegationMapper.selectByNodeIdList(nodeIds);
+        nodeCache.init(nodeList,stakingList,delegationList,unDelegationList);
     }
 
     @PostConstruct
-    private void init(){
+    private void init() throws CacheConstructException {
         /***把当前库中的验证人列表加载到内存中**/
         // 加载并构造节点缓存结构
         loadNodes();
@@ -144,7 +92,7 @@ public class StakingExecute {
      * @param tx
      * @param bc
      */
-    public void execute(CustomTransaction tx, BlockChain bc){
+    public void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException {
         // 事件上下文
         EventContext context = new EventContext(tx,bc,nodeCache,executeResult,null);
         switch (tx.getTypeEnum()){

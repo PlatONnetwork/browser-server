@@ -101,6 +101,7 @@ public class BlockSyncTask {
         if (maxBlockNumber != null && maxBlockNumber > 0) {
             commitBlockNumber = maxBlockNumber;
             blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
+            blockChain.initCandidate(maxBlockNumber);
         }
 
 
@@ -168,7 +169,25 @@ public class BlockSyncTask {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();
-            for (long blockNumber=commitBlockNumber+1; blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++) blockNumbers.add(BigInteger.valueOf(blockNumber));
+            BigInteger curChainBlockNumber;
+            try {
+                curChainBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber();
+            } catch (IOException e) {
+                throw new BlockCollectingException("取链上最新区块号失败:"+e.getMessage());
+            }
+            for (long blockNumber=commitBlockNumber+1; blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++) {
+                // 如果块号>当前链上块号,则不再累加
+                if(blockNumber>curChainBlockNumber.longValue()) break;
+                blockNumbers.add(BigInteger.valueOf(blockNumber));
+            }
+            if(blockNumbers.size()==0){
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
+                }
+                continue;
+            }
             // 并行采集区块 ||||||||||||||||||||||||||||
             Result collectedResult = new Result();
             getBlockAndTransaction(blockNumbers, collectedResult);
@@ -378,10 +397,13 @@ public class BlockSyncTask {
         return tx;
     }
 
-    public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData){
+    public void batchSaveResult(List<CustomBlock> basicData, BlockChainResult bizData) throws BusinessException {
         try{
             // 串行批量入库
             service.insertOrUpdate(basicData,bizData);
+            // 缓存整理
+            BlockChain.NODE_CACHE.sweep();
+            BlockChain.PROPOSALS_CACHE.sweep();
         }catch (Exception e){
             logger.error("入库失败！原因："+e.getMessage());
             throw new BusinessException("入库失败！原因："+e.getMessage());

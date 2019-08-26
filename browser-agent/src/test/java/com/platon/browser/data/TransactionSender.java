@@ -23,6 +23,8 @@ import org.web3j.tx.gas.DefaultWasmGasProvider;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
+import com.platon.browser.exception.IssueEpochChangeException;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,6 +39,7 @@ public class TransactionSender {
 	private static String chainId = "100";
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private Credentials credentials = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
@@ -47,21 +50,21 @@ public class TransactionSender {
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
-    	for(int i=0; i < 30;i++) {
+//    	for(int i=0; i < 30;i++) {
 	        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 	        logger.error("{}",Hex.toHexString(credentials.getEcKeyPair().getPrivateKey().toByteArray()));
-	        BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+	        BigInteger blockNumber = currentValidWeb3j.platonBlockNumber().send().getBlockNumber();
 	        Transfer.sendFunds(
-	                web3j,
+	        		currentValidWeb3j,
 	                credentials,
-	                chainId,
+	                chainId, 
 	                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
 	                BigDecimal.valueOf(100),
 	                Convert.Unit.VON
 	        ).send();
-	        BigInteger balance = web3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
-	        logger.debug("balance:{}",balance);
-    	}
+	        BigInteger balance = currentValidWeb3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
+	        logger.debug("balance:{}",balance);        
+//    	}
     }
 
     // 发送质押交易
@@ -143,4 +146,73 @@ public class TransactionSender {
         logger.debug("Private Key:{}",privateKey);
 	}
     
+    
+
+    // 发送解委托交易
+    @Test
+    public void unDelegate() throws Exception {
+        BaseResponse res = delegateContract.unDelegate(
+                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                BigInteger.valueOf(53086),
+                BigInteger.valueOf(1000)
+        ).send();
+        logger.debug("res:{}",res);
+    }
+
+    @Test
+    public void getBlockNumber() throws IssueEpochChangeException, IOException {
+        Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+        long blockNum = 11777;
+        /*while (true){
+            try {
+                PlatonBlock.Block block = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNum)),true).send().getBlock();
+                if(block==null){
+                    logger.error("loss:{}",blockNum);
+                }
+            } catch (IOException e) {
+                logger.error("loss:{}",blockNum);
+                e.printStackTrace();
+            }
+
+            ++blockNum;
+        }*/
+
+
+        /*Integer[] numbers = {11777,11829,11870,11889,11900,11939};
+        for (Integer blockNum:numbers){
+            try {
+                PlatonBlock.Block block = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNum)),true).send().getBlock();
+                if(block==null){
+                    logger.error("loss:{}",blockNum);
+                }
+            } catch (IOException e) {
+                logger.error("loss:{}",blockNum);
+                e.printStackTrace();
+            }
+        }*/
+
+        /*String incentivePoolAccountAddr = "0x1000000000000000000000000000000000000003";
+        try {
+            // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
+            BigInteger incentivePoolAccountBalance = web3j.platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter
+                    .valueOf(BigInteger.valueOf(1))).send().getBalance();
+            logger.debug("激励池账户余额:{}",incentivePoolAccountBalance.toString());
+            // 计算当前增发周期内的每个结算周期的质押奖励
+            BigDecimal settleReward = new BigDecimal(incentivePoolAccountBalance.toString())
+                    .multiply(BigDecimal.valueOf(0.5)) // 取出激励池余额中属于质押奖励的部分
+                    .divide(BigDecimal.valueOf(1680/240),0, RoundingMode.FLOOR); // 除以结算周期轮数，精度取16位小数
+            logger.debug("当前结算周期奖励:{}",settleReward.longValue());
+
+            BigDecimal blockReward = new BigDecimal(incentivePoolAccountBalance)
+                    .multiply(BigDecimal.valueOf(0.5)) // 取出激励池余额中属于区块奖励的部分
+                    .divide(BigDecimal.valueOf(1680),0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，精度取10位小数
+            logger.debug("当前区块奖励:{}",blockReward.longValue());
+        } catch (IOException e) {
+            throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+1+")的账户余额失败:"+e.getMessage());
+
+        }*/
+
+        BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+        logger.error("{}",blockNumber);
+    }
 }

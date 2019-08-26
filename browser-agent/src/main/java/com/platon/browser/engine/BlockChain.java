@@ -111,6 +111,11 @@ public class BlockChain {
         blockChainHandler.initEpoch(blockNumber);
         blockChainHandler.initBlockRewardAndStakingReward(blockNumber);
     }
+    // 使用特定区块号初始化验证人信息
+    public void initCandidate(Long blockNumber){
+        blockChainHandler.initValidator(blockNumber);
+        blockChainHandler.initVerifier(blockNumber);
+    }
 
     @PostConstruct
     private void init () throws IssueEpochChangeException {

@@ -17,7 +17,7 @@ public class CacheMaintenanceTask {
     private static final NodeCache NODE_CACHE = BlockChain.NODE_CACHE;
     private static final ProposalCache PROPOSAL_CACHE = BlockChain.PROPOSALS_CACHE;
 
-    @Scheduled(cron="0/10 * * * * ?")
+    //@Scheduled(cron="0/10 * * * * ?")
     private void start(){
         NODE_CACHE.sweep();
         PROPOSAL_CACHE.sweep();

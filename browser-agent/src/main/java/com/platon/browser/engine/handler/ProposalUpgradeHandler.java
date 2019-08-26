@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -20,7 +21,7 @@ import java.math.BigDecimal;
  * Time: 10:38
  */
 @Component
-public class ProposalUpgradeHandler implements EventHandler{
+public class ProposalUpgradeHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpgradeHandler.class);
 
 
@@ -37,23 +38,30 @@ public class ProposalUpgradeHandler implements EventHandler{
             //设置提案人
             customProposal.setVerifier(param.getVerifier());
             //设置提案人名称
-            customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+            try {
+                customProposal.setVerifierName(bc.NODE_CACHE.getNode(param.getVerifier()).getLatestStaking().getStakingName());
+                //交易信息回填
+                tx.setTxInfo(JSON.toJSONString(param));
+            } catch (NoSuchBeanException e) {
+                throw new NoSuchBeanException("缓存中找不到对应的升级提案:" + e.getMessage());
+            }
             //设置提案为升级类型
             customProposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
             //获取配置文件提案参数模板
             String temp = bc.getChainConfig().getProposalUrlTemplate();
-            String url = temp.replace(ProposalExecute.key,param.getPIDID());
+            String url = temp.replace(ProposalExecute.key, param.getPIDID());
             //设置url
             customProposal.setUrl(url);
             //从交易解析参数获取需要设置pIDID
             customProposal.setPipId(new Integer(param.getPIDID()));
             //解析器将轮数换成结束块高直接使用
-            customProposal.setEndVotingBlock(param.getEndVotingBlock().toString());
+            BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+            customProposal.setEndVotingBlock(endBlockNumber.toString());
             //设置pIDIDNum
-            String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key,param.getPIDID());
+            String pIDIDNum = ProposalExecute.pIDIDNum.replace(ProposalExecute.key, param.getPIDID());
             customProposal.setPipNum(pIDIDNum);
             //设置生效时间
-            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingBlock().toString(),bc.getChainConfig());
+            BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
             customProposal.setActiveBlock(decActiveNumber.toString());
             //设置新版本号
             customProposal.setNewVersion(String.valueOf(param.getNewVersion()));
@@ -63,9 +71,8 @@ public class ProposalUpgradeHandler implements EventHandler{
             proposalExecuteResult.stageAddProposals(customProposal);
             //全量数据补充
             bc.PROPOSALS_CACHE.add(customProposal);
-        }catch (NoSuchBeanException e){
-            throw new NoSuchBeanException("缓存中找不到对应的升级提案:"+e.getMessage());
+        } catch (Exception e) {
+            logger.error("[ProposalUpgradeHandler] exception {}",e.getMessage());
         }
-
     }
 }
