@@ -30,7 +30,7 @@ public class EpochUtil {
      */
     public static final Long getPreEpochLastBlockNumber(Long blockNumber,Long blockCountPerEpoch) throws BlockNumberException {
         Long curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
-        if(curEpoch<=1) throw new BlockNumberException("当前周期为("+curEpoch+"),没有上一周期");
+        if(curEpoch<=0) throw new BlockNumberException("当前周期为("+curEpoch+"),没有上一周期");
         Long prevEpoch = curEpoch-1;
         Long prevEpochLastBlockNumber = prevEpoch*blockCountPerEpoch;
         return prevEpochLastBlockNumber;
