@@ -5,6 +5,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.*;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.*;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
@@ -113,7 +114,7 @@ public class BlockChainHandler {
 
     public void initBlockRewardAndStakingReward(Long blockNumber) throws IssueEpochChangeException {
         // 激励池账户地址
-        String incentivePoolAccountAddr = bc.getChainConfig().getIncentivePoolAccountAddr();
+        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
         try {
             // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
             BigInteger incentivePoolAccountBalance = bc.getClient().getWeb3j()

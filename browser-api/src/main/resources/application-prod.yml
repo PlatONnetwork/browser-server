@@ -78,8 +78,6 @@ platon.config:
   minProposalUpgradePassRate: 0.667
   #双签低处罚百分比
   duplicateSignLowSlashRate: 1
-  #激励池账户地址
-  incentivePoolAccountAddr: '0x1000000000000000000000000000000000000003'
   #开发者激励基金账户地址
   developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
