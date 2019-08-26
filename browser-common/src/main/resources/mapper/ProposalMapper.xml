@@ -22,7 +22,7 @@
     <result column="pip_id" jdbcType="INTEGER" property="pipId" />
     <result column="topic" jdbcType="VARCHAR" property="topic" />
     <result column="description" jdbcType="VARCHAR" property="description" />
-    <result column="canceled_pip_id" jdbcType="INTEGER" property="canceledPipId" />
+    <result column="canceled_pip_id" jdbcType="VARCHAR" property="canceledPipId" />
     <result column="canceled_topic" jdbcType="VARCHAR" property="canceledTopic" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -133,7 +133,7 @@
       #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
       #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=INTEGER}, 
-      #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=INTEGER}, 
+      #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=VARCHAR}, 
       #{canceledTopic,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
@@ -268,7 +268,7 @@
         #{description,jdbcType=VARCHAR},
       </if>
       <if test="canceledPipId != null">
-        #{canceledPipId,jdbcType=INTEGER},
+        #{canceledPipId,jdbcType=VARCHAR},
       </if>
       <if test="canceledTopic != null">
         #{canceledTopic,jdbcType=VARCHAR},
@@ -345,7 +345,7 @@
         description = #{record.description,jdbcType=VARCHAR},
       </if>
       <if test="record.canceledPipId != null">
-        canceled_pip_id = #{record.canceledPipId,jdbcType=INTEGER},
+        canceled_pip_id = #{record.canceledPipId,jdbcType=VARCHAR},
       </if>
       <if test="record.canceledTopic != null">
         canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
@@ -377,7 +377,7 @@
       pip_id = #{record.pipId,jdbcType=INTEGER},
       topic = #{record.topic,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
-      canceled_pip_id = #{record.canceledPipId,jdbcType=INTEGER},
+      canceled_pip_id = #{record.canceledPipId,jdbcType=VARCHAR},
       canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -444,7 +444,7 @@
         description = #{description,jdbcType=VARCHAR},
       </if>
       <if test="canceledPipId != null">
-        canceled_pip_id = #{canceledPipId,jdbcType=INTEGER},
+        canceled_pip_id = #{canceledPipId,jdbcType=VARCHAR},
       </if>
       <if test="canceledTopic != null">
         canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
@@ -473,7 +473,7 @@
       pip_id = #{pipId,jdbcType=INTEGER},
       topic = #{topic,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
-      canceled_pip_id = #{canceledPipId,jdbcType=INTEGER},
+      canceled_pip_id = #{canceledPipId,jdbcType=VARCHAR},
       canceled_topic = #{canceledTopic,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -496,7 +496,7 @@
         #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
         #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.pipNum,jdbcType=VARCHAR}, 
         #{item.pipId,jdbcType=INTEGER}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
-        #{item.canceledPipId,jdbcType=INTEGER}, #{item.canceledTopic,jdbcType=VARCHAR})
+        #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -575,7 +575,7 @@
           #{item.description,jdbcType=VARCHAR}
         </if>
         <if test="'canceled_pip_id'.toString() == column.value">
-          #{item.canceledPipId,jdbcType=INTEGER}
+          #{item.canceledPipId,jdbcType=VARCHAR}
         </if>
         <if test="'canceled_topic'.toString() == column.value">
           #{item.canceledTopic,jdbcType=VARCHAR}

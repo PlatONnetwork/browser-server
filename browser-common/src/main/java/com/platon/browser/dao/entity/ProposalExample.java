@@ -1425,52 +1425,62 @@ public class ProposalExample {
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdEqualTo(Integer value) {
+        public Criteria andCanceledPipIdEqualTo(String value) {
             addCriterion("canceled_pip_id =", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdNotEqualTo(Integer value) {
+        public Criteria andCanceledPipIdNotEqualTo(String value) {
             addCriterion("canceled_pip_id <>", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdGreaterThan(Integer value) {
+        public Criteria andCanceledPipIdGreaterThan(String value) {
             addCriterion("canceled_pip_id >", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdGreaterThanOrEqualTo(Integer value) {
+        public Criteria andCanceledPipIdGreaterThanOrEqualTo(String value) {
             addCriterion("canceled_pip_id >=", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdLessThan(Integer value) {
+        public Criteria andCanceledPipIdLessThan(String value) {
             addCriterion("canceled_pip_id <", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdLessThanOrEqualTo(Integer value) {
+        public Criteria andCanceledPipIdLessThanOrEqualTo(String value) {
             addCriterion("canceled_pip_id <=", value, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdIn(List<Integer> values) {
+        public Criteria andCanceledPipIdLike(String value) {
+            addCriterion("canceled_pip_id like", value, "canceledPipId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCanceledPipIdNotLike(String value) {
+            addCriterion("canceled_pip_id not like", value, "canceledPipId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCanceledPipIdIn(List<String> values) {
             addCriterion("canceled_pip_id in", values, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdNotIn(List<Integer> values) {
+        public Criteria andCanceledPipIdNotIn(List<String> values) {
             addCriterion("canceled_pip_id not in", values, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdBetween(Integer value1, Integer value2) {
+        public Criteria andCanceledPipIdBetween(String value1, String value2) {
             addCriterion("canceled_pip_id between", value1, value2, "canceledPipId");
             return (Criteria) this;
         }
 
-        public Criteria andCanceledPipIdNotBetween(Integer value1, Integer value2) {
+        public Criteria andCanceledPipIdNotBetween(String value1, String value2) {
             addCriterion("canceled_pip_id not between", value1, value2, "canceledPipId");
             return (Criteria) this;
         }

@@ -82,7 +82,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置新版本号
         proposal.setNewVersion(String.valueOf(param.getNewVersion()));
-        proposal.setCanceledPipId(0);
+        proposal.setCanceledPipId("");
         proposal.setCanceledTopic("");
         //新增文本提案交易结构
         proposalStage.insertProposal(proposal);

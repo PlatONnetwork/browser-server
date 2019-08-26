@@ -72,7 +72,7 @@ public class ProposalTextHandler implements EventHandler {
         //设置提案人名称
         proposal.setVerifierName(staking.getStakingName());
         //新增文本提案交易结构
-        proposal.setCanceledPipId(0);
+        proposal.setCanceledPipId("");
         proposal.setCanceledTopic("");
         proposalStage.insertProposal(proposal);
         //全量数据补充
