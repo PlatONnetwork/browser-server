@@ -20,10 +20,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.utils.JSONUtil;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -61,11 +58,11 @@ public class CustomTransaction extends TransactionWithBLOBs {
      * @param receipt
      * @throws BeanCreateOrUpdateException
      */
-    public void updateWithTransactionReceipt (TransactionReceipt receipt) throws BeanCreateOrUpdateException {
+    public void updateWithTransactionReceipt (TransactionReceipt receipt,Set<String> innerContractAddr) throws BeanCreateOrUpdateException {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            if(InnerContractAddrEnum.addresses.contains(receipt.getTo())){
+            if(innerContractAddr.contains(receipt.getTo())){
                 // 第一种：ppos内置合约交易类型
                 // 成功：logs.get(0).getData()来解析出Status字段，并且为true
                 // 失败：非成功

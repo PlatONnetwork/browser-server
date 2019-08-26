@@ -1,12 +1,16 @@
 package com.platon.browser.config;
 
+import com.platon.browser.enums.InnerContractAddrEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @Auther: Chendongming
@@ -17,6 +21,14 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
+    public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.addresses);
+
+    @PostConstruct
+    private void init(){
+        INNER_CONTRACT_ADDR.add(developerIncentiveFundAccountAddr);
+        INNER_CONTRACT_ADDR.add(platonFundAccountAddr);
+    }
+
     // 初始验证人锁定质押金(LAT)
     private BigDecimal initValidatorStakingLockedAmount;
     // 质押节点统计年化率最多取多少个连续周期

@@ -351,7 +351,7 @@ public class BlockSyncTask {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
             // 如果交易回执存在，则更新交易中与回执相关的信息
-            if(receipt.isPresent()) tx.updateWithTransactionReceipt(receipt.get());
+            if(receipt.isPresent()) tx.updateWithTransactionReceipt(receipt.get(),BlockChainConfig.INNER_CONTRACT_ADDR);
         }catch (IOException e){
             logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
             throw e;
