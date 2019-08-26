@@ -159,19 +159,25 @@ public class BlockChainHandler {
     public void initVerifier(Long blockNumber) {
 
         Long blockCountPerEpoch = chainConfig.getSettlePeriodBlockCount().longValue();
-
+        BaseResponse <List <Node>> result;
         try {
             // 取当前结算周期的上一结算周期最后一个块号，通过此块号必定能查到前一结算周期验证人
             long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
-            // 取当前结算周期最后一个块号、
-            long curEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
-            // 取当前结算周期
-            long curEpoch = EpochUtil.getEpoch(blockNumber,blockCountPerEpoch);
-            BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
+            result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
             if (result.isStatusOk()) {
                 preVerifier.clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
             }
+        } catch (Exception e) {
+            logger.error("更新前一结算周期验证人列表失败,原因：{}", e.getMessage());
+        }
+
+        try {
+            // 取当前结算周期最后一个块号、
+            long curEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
+            // 取当前结算周期
+            long curEpoch = EpochUtil.getEpoch(blockNumber,blockCountPerEpoch);
+
 
             // 取链上实时区块号
             long realtimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
@@ -201,7 +207,7 @@ public class BlockChainHandler {
                 }
             }
         } catch (Exception e) {
-            logger.error("更新结算周期验证人列表失败,原因：{}", e.getMessage());
+            logger.error("更新当前结算周期验证人列表失败,原因：{}", e.getMessage());
         }
     }
 
