@@ -322,7 +322,7 @@ public class TransactionServiceImpl implements TransactionService {
     		//暂时只有账户合约
     		resp.setReceiveType("account");
     		String txInfo = transaction.getTxInfo();
-    		switch (CustomTransaction.TxTypeEnum.getEnum(Integer.parseInt(transaction.getTxType()))) {
+    		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType())) {
 	    		//创建验证人
 				case CREATE_VALIDATOR:
 					CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);

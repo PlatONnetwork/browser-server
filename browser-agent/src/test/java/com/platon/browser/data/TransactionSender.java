@@ -18,6 +18,7 @@ import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ChainId;
 import org.web3j.tx.Transfer;
@@ -40,11 +41,10 @@ import java.util.List;
 public class TransactionSender {
 	private static String chainId = "100";
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
-    //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-
-    private String chainId = "100";
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-    private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+//    private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
+    private Credentials credentials = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
@@ -53,46 +53,50 @@ public class TransactionSender {
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
-        Transfer.sendFunds(
-                currentValidWeb3j,
-                credentials,
-                chainId,
-                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
-                BigDecimal.valueOf(100),
-                Convert.Unit.VON
-        ).send();
-        BigInteger balance = currentValidWeb3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
-        logger.debug("balance:{}",balance);
+    	for(int i=0;i<30;i++) {
+	        Transfer.sendFunds(
+	                currentValidWeb3j,
+	                credentials,
+	                chainId,
+	                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
+	                BigDecimal.valueOf(100),
+	                Convert.Unit.VON
+	        ).send();
+	        BigInteger balance = currentValidWeb3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
+	        logger.debug("balance:{}",balance);
+    	}
     }
 
     // 发送质押交易
     @Test
     public void staking() throws Exception {
-        StakingParam.Builder builder = new StakingParam.Builder();
-        builder.setNodeId("0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000");
-        builder.setAmount(BigInteger.valueOf(5000000));
-        builder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
-        builder.setStakingAmountType(StakingAmountType.FREE_AMOUNT_TYPE);
-        builder.setNodeName("cdm");
-        builder.setWebSite("www.baidu.com");
-        builder.setExternalId("ex-id-001");
-        builder.setDetails("balabalabala");
-        builder.setBlsPubKey("aaaa");
-        ProgramVersion pv = new ProgramVersion();
-        pv.setProgramVersion(BigInteger.ZERO);
-        pv.setProgramVersionSign("0.7.0");
-        builder.setProcessVersion(pv);
-        StakingParam stakingParam = builder.build();
-        BaseResponse res = stakingContract.staking(stakingParam).send();
-        logger.debug("res:{}",res);
+    	String externalId = "";
+        String nodeName = "chendai-node1";
+        String webSite = "www.baidu.com";
+        String details = "chendai-node1-details";
+        BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT).add(BigDecimal.valueOf(1L));
+        
+        PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
+               .setNodeId("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7")
+               .setAmount(stakingAmount.toBigInteger())  
+               .setStakingAmountType(StakingAmountType.FREE_AMOUNT_TYPE)
+               .setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219")
+               .setExternalId(externalId)
+               .setNodeName(nodeName)
+               .setWebSite(webSite)
+               .setDetails(details)
+               .setBlsPubKey("5c5fa09a6caad18b7bd35c3a8991948763df4d7ea11070295b32c0f7d499d041f8645dab84537d85d95811c34faebea42ef4066b3dda6920b5f35e8a163506b7")
+               .build()).send();
+        BaseResponse baseResponse = stakingContract.getStakingResult(platonSendTransaction).send();
+        System.out.println(baseResponse.toString());
+        logger.debug("res:{}",baseResponse);
     }
 
     // 修改质押信息(编辑验证人)
     @Test
     public void updateStakingInfo() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
         BaseResponse res = stakingContract.updateStakingInfo(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
                 "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
                 "PID-002","cdm-004","WWW.CCC.COM","Node of CDM"
         ).send();
@@ -102,9 +106,8 @@ public class TransactionSender {
     // 增持质押(增加自有质押)
     @Test
     public void addStaking() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
         BaseResponse res = stakingContract.addStaking(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
+                "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 BigInteger.valueOf(555)
         ).send();
@@ -114,9 +117,8 @@ public class TransactionSender {
     // 撤销质押(退出验证人)
     @Test
     public void unStaking() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
         BaseResponse res = stakingContract.unStaking(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000"
+                "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7"
         ).send();
         logger.debug("res:{}",res);
     }
@@ -132,13 +134,6 @@ public class TransactionSender {
         logger.debug("res:{}",res);
     }
     
- // 发送委托交易
-    @Test
-    public void restricting() throws Exception {
-    	
-    	BaseResponse res = restrictingPlanContract.createRestrictingPlan("", null).send();
-        logger.debug("res:{}",res);
-    }
     
     public static void main(String[] args) throws IOException, CipherException {
     	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
