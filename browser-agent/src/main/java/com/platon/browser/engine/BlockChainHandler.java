@@ -6,6 +6,7 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.*;
 import com.platon.browser.exception.*;
+import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,38 +156,44 @@ public class BlockChainHandler {
      * @param blockNumber
      */
     public void initVerifier(Long blockNumber) {
+
+        Long blockCountPerEpoch = chainConfig.getSettlePeriodBlockCount().longValue();
+
         try {
-            // 获取链上实时区块号
-            Long settingPeriod = chainConfig.getSettlePeriodBlockCount().longValue();
-            Long curChainBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
-            /****************************更新前一轮结算验证人列表************************/
-            if (curVerifier.size()>0) {
-                // 如果curValidator有元素，则把它们转存到preValidator
+            // 取当前结算周期的上一结算周期最后一个块号，通过此块号必定能查到前一结算周期验证人
+            long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
+            // 取当前结算周期最后一个块号、
+            long curEpochLastBlockNumber = EpochUtil.getCurEpochLastBlockNumber(blockNumber,blockCountPerEpoch);
+            // 取当前结算周期
+            long curEpoch = EpochUtil.getEpoch(blockNumber,blockCountPerEpoch);
+            BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
+            if (result.isStatusOk()) {
                 preVerifier.clear();
-                preVerifier.putAll(curVerifier);
-            }else {
-                // 如果curVerifier为空，则使用当前区块号查询历史结算周期验证人
-                BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
-                if (result.isStatusOk()) {
-                    curVerifier.clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
-                }
+                result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
             }
 
-            /****************************更新当前轮结算验证人列表************************/
-            if(curChainBlockNumber>blockNumber && curChainBlockNumber<(blockNumber+settingPeriod)){
-                // 如果链上实时区块号大于当前同步区块号，且链上实时区块号<(blockNumber+settingPeriod)时,
-                // 即当前区块号和链上实时区块号处在同一结算周期时，则查询实时结算验证人列表作为当前结算轮验证人列表
-                BaseResponse <List <Node>> result = client.getNodeContract().getVerifierList().send();
+            // 取链上实时区块号
+            long realtimeBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber().longValue();
+            // 取当前结算周期最后一个块号、
+            long realtimeEpoch = EpochUtil.getCurEpochLastBlockNumber(realtimeBlockNumber,blockCountPerEpoch);
+            if(realtimeBlockNumber>curEpochLastBlockNumber){
+                // 假设：每个结算周期区块总数是100，当前区块号是250，当前链上实时最新块号是330
+                // 1、如果链上实时区块号大于当前区块号所在结算周期最后一个块，则通过当前区块号查询当前结算周期的验证人列表
+                // |----x----|-----
+                // 200 250  300 330
+                result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber));
                 if (result.isStatusOk()) {
                     curVerifier.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));
                 }
             }
 
-            if(curChainBlockNumber>=(blockNumber+settingPeriod)){
-                // 如果链上实时区块号>=(blockNumber+settingPeriod)，则查询(blockNumber+1)时的共识验证人列表
-                BaseResponse <List <Node>> result = client.getHistoryVerifierList(BigInteger.valueOf(blockNumber+1));
+            if(realtimeEpoch==curEpoch){
+                // 假设：每个结算周期区块总数是100，当前区块号是320，当前链上实时最新块号是350
+                // 2、如果当前区块号所在结算周期与链上实时结算周期相同，则查询实时列表
+                // |--------|---x-----
+                // 200     300 320  350
+                result = client.getNodeContract().getVerifierList().send();
                 if (result.isStatusOk()) {
                     curVerifier.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> curVerifier.put(HexTool.prefix(node.getNodeId()), node));

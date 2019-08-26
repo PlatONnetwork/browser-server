@@ -2,7 +2,9 @@ package com.platon.browser.data;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.util.Resolver;
+import jnr.ffi.annotations.In;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.web3j.abi.Utils;
 import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.platon.BaseResponse;
+import org.web3j.platon.ContractAddress;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
@@ -49,7 +52,7 @@ public class SpecialContractApiInvoker {
     // 特殊合约接口测试
     @Test
     public void getCandidates() throws Exception {
-        NodeContract nodeContract = NodeContract.load(currentValidWeb3j,new ReadonlyTransactionManager(currentValidWeb3j, NodeContract.NODE_CONTRACT_ADDRESS),new DefaultWasmGasProvider());
+        NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
 
 /*        // 当前区块号
         BigInteger blockNumber = currentValidWeb3j.platonBlockNumber().send().getBlockNumber();
@@ -102,7 +105,7 @@ public class SpecialContractApiInvoker {
         return new RemoteCall<>((Callable<BaseResponse<List<Node>>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(NodeContract.NODE_CONTRACT_ADDRESS, NodeContract.NODE_CONTRACT_ADDRESS, encodedFunction),
+                    Transaction.createEthCallTransaction(InnerContractAddrEnum.NODE_CONTRACT.address, InnerContractAddrEnum.NODE_CONTRACT.address, encodedFunction),
                     DefaultBlockParameter.valueOf(blockNumber)
             ).send();
             String value = ethCall.getValue();
@@ -121,7 +124,7 @@ public class SpecialContractApiInvoker {
         return new RemoteCall<>((Callable<BaseResponse<List<RestrictingBalance>>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS, encodedFunction),
+                    Transaction.createEthCallTransaction(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, encodedFunction),
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();

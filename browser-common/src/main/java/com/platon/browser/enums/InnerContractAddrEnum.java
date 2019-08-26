@@ -1,5 +1,6 @@
 package com.platon.browser.enums;
 
+import org.web3j.platon.ContractAddress;
 import org.web3j.tx.PlatOnContract;
 
 import java.util.*;
@@ -12,11 +13,13 @@ import java.util.*;
  * \
  */
 public enum InnerContractAddrEnum {
-    RESTRICTING_PLAN_CONTRACT(PlatOnContract.RESTRICTING_PLAN_CONTRACT_ADDRESS,"锁仓合约"),
-    STAKING_CONTRACT(PlatOnContract.STAKING_CONTRACT_ADDRESS,"质押合约"),
-    SLASH_CONTRACT(PlatOnContract.SLASH_CONTRACT_ADDRESS,"惩罚合约"),
-    PROPOSAL_CONTRACT(PlatOnContract.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
-    INCENTIVE_POOL_CONTRACT("0x1000000000000000000000000000000000000003","激励池合约"),
+    RESTRICTING_PLAN_CONTRACT(ContractAddress.RESTRICTING_PLAN_CONTRACT_ADDRESS,"锁仓合约"),
+    STAKING_CONTRACT(ContractAddress.STAKING_CONTRACT_ADDRESS,"质押合约"),
+    DELEGATE_CONTRACT(ContractAddress.DELEGATE_CONTRACT_ADDRESS,"质押合约"),
+    SLASH_CONTRACT(ContractAddress.SLASH_CONTRACT_ADDRESS,"惩罚合约"),
+    PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"治理(提案)合约"),
+    INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
+    NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约"),
     FOUNDATION("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219","基金会");
 
     public String address;

@@ -3,6 +3,7 @@ package com.platon.browser.task;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +55,10 @@ public class NetworkStatUpdateTask {
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
             BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
-            BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(RestrictingPlanContract.RESTRICTING_PLAN_CONTRACT_ADDRESS,
+            BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
             //rpc获取质押余额
-            BigInteger stakingContractBalance = platonClient.getWeb3j().platonGetBalance(StakingContract.STAKING_CONTRACT_ADDRESS,
+            BigInteger stakingContractBalance = platonClient.getWeb3j().platonGetBalance(InnerContractAddrEnum.STAKING_CONTRACT.address,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
 
             //计算流通量

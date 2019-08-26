@@ -11,6 +11,8 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.StakingAmountType;
 import org.web3j.platon.bean.Node;
+import org.web3j.platon.bean.ProgramVersion;
+import org.web3j.platon.bean.StakingParam;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.StakingContract;
@@ -41,7 +43,7 @@ public class TransactionSender {
     private String chainId = "100";
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
-    NodeContract nodeContract = NodeContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider());
+    NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
     public TransactionSender() throws IOException, CipherException {}
@@ -64,17 +66,21 @@ public class TransactionSender {
     // 发送质押交易
     @Test
     public void staking() throws Exception {
-        BaseResponse res = stakingContract.staking(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
-                BigInteger.valueOf(5000000),
-                StakingAmountType.FREE_AMOUNT_TYPE,
-                "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
-                "",
-                "cdm",
-                "www.baidu.com",
-                "baidu",
-                BigInteger.ZERO
-        ).send();
+        StakingParam.Builder builder = new StakingParam.Builder();
+        builder.setNodeId("0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000");
+        builder.setAmount(BigInteger.valueOf(5000000));
+        builder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+        builder.setStakingAmountType(StakingAmountType.FREE_AMOUNT_TYPE);
+        builder.setNodeName("cdm");
+        builder.setWebSite("www.baidu.com");
+        builder.setExternalId("ex-id-001");
+        builder.setDetails("balabalabala");
+        ProgramVersion pv = new ProgramVersion();
+        pv.setProgramVersion(BigInteger.ZERO);
+        pv.setProgramVersionSign("0.7.0");
+        builder.setProcessVersion(pv);
+        StakingParam stakingParam = builder.build();
+        BaseResponse res = stakingContract.staking(stakingParam).send();
         logger.debug("res:{}",res);
     }
 
