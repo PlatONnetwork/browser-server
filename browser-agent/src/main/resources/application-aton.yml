@@ -4,7 +4,7 @@ version: 0.7
 # 当前激活的配置名称(请不要修改)
 profile: dev
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://192.168.9.191:3306/platon_aton_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 # MySQL数据库用户名
 dbuser: platon
 # MySQL数据库密码
