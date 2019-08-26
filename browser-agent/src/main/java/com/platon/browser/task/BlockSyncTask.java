@@ -38,6 +38,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 09:14
@@ -153,6 +155,9 @@ public class BlockSyncTask {
                     if(verifierSet.contains(node.getNodeId())) staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
                     // 暂存至新增质押待入库列表
                     BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
+
+                    // 更新节点名称映射缓存
+                    NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName());
                 });
                 BlockChainStage bcr = blockChain.exportResult();
                 batchSave(Collections.emptyList(),bcr);
