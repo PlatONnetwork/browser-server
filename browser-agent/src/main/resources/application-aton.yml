@@ -99,4 +99,4 @@ platon.config:
     '9':7615018.1094369
   }
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  proposalUrlTemplate: https://github.com/danielgogo/PIPs/PIP-{pip_id}.md

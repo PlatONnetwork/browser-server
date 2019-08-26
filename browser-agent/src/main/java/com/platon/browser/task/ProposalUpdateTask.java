@@ -72,7 +72,7 @@ public class ProposalUpdateTask {
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code) || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
                 //发送rpc请求查询提案结果
                 try {
-                    BaseResponse<TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getPipId().toString()).send();
+                    BaseResponse<TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
                     //设置赞成票
                     proposal.setYeas(result.data.getYeas().longValue());
                     //设置反对票
