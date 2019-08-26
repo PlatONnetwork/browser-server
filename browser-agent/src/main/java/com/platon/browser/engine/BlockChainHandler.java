@@ -187,7 +187,9 @@ public class BlockChainHandler {
                 // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
                 BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
                 result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
-                if (result.isStatusOk()) {
+                if (!result.isStatusOk()) {
+                    throw new CandidateException("【底层出错】查询块号在【"+prevEpochLastBlockNumber+"】的历史共识周期验证节点列表出错,请检查Agent共识周期块数设置是否与链一致:"+result.errMsg);
+                }else{
                     preValidator.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> preValidator.put(HexTool.prefix(node.getNodeId()), node));
                 }
@@ -199,7 +201,7 @@ public class BlockChainHandler {
                     // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
                     result = client.getNodeContract().getValidatorList().send();
                     if(!result.isStatusOk()){
-                        throw new CandidateException("【更新当前共识周期验证人列表】底层链查询实时共识周期验证节点列表出错:"+result.errMsg);
+                        throw new CandidateException("【底层出错】底层链查询实时共识周期验证节点列表出错:"+result.errMsg);
                     }
                 }
                 curValidator.clear();
@@ -236,7 +238,9 @@ public class BlockChainHandler {
                 // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
                 BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
                 result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
-                if (result.isStatusOk()) {
+                if (!result.isStatusOk()) {
+                    throw new CandidateException("【底层出错】底层链查询块号在【"+prevEpochLastBlockNumber+"】的历史结算周期验证节点列表出错,请检查Agent共识周期块数设置是否与链一致:"+result.errMsg);
+                }else{
                     preVerifier.clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> preVerifier.put(HexTool.prefix(node.getNodeId()), node));
                 }
@@ -248,7 +252,7 @@ public class BlockChainHandler {
                     // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
                     result = client.getNodeContract().getVerifierList().send();
                     if(!result.isStatusOk()){
-                        throw new CandidateException("【更新当前结算周期验证人列表】底层链查询实时结算周期验证节点列表出错:"+result.errMsg);
+                        throw new CandidateException("【底层出错】底层链查询实时结算周期验证节点列表出错:"+result.errMsg);
                     }
                 }
                 curVerifier.clear();
