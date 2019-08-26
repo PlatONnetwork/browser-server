@@ -131,20 +131,27 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public BlockDownload blockListByNodeIdDownload(String nodeId, String date) {
-		SimpleDateFormat ymdhms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        logger.info("导出数据起始日期：{},结束日期：{}",date,ymdhms.format(new Date()));
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date now = new Date();
+        logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
         // 限制最多导出3万条记录
         PageHelper.startPage(1,30000);
         BlockExample blockExample = new BlockExample();
         Criteria criteria = blockExample.createCriteria();
         criteria.andNodeIdEqualTo(nodeId);
-//        criteria.andCreateTimeGreaterThan(value)
+        try {
+        	criteria.andCreateTimeBetween(dateFormat.parse(date), now);
+		} catch (Exception e) {
+			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
+    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
+		}
+//      criteria.andCreateTimeGreaterThan(value)
         List<Block> blockList = blockMapper.selectByExample(blockExample);
         List<Object[]> rows = new ArrayList<>();
         blockList.forEach(block->{
             Object[] row = {
                     block.getNumber(),
-                    ymdhms.format(block.getTimestamp()),
+                    dateFormat.format(block.getTimestamp()),
                     block.getStatTxQty(),
                     EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
                     EnergonUtil.format(Convert.fromVon(block.getGasUsed(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))

@@ -225,18 +225,28 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public AccountDownload transactionListByAddressDownload(String address, String date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date currentServerTime = new Date();
-        logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, simpleDateFormat.format(currentServerTime));
-        TransactionExample transactionExample = new TransactionExample();
-        TransactionExample.Criteria first = transactionExample.createCriteria()
-                .andFromEqualTo(address);
-        TransactionExample.Criteria second = transactionExample.createCriteria()
-                .andToEqualTo(address);
+        logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
+        TransactionExample transactionExample = new TransactionExample();  
+        
+        TransactionExample.Criteria first = transactionExample.createCriteria();
+        TransactionExample.Criteria second = transactionExample.createCriteria();
+        first.andFromEqualTo(address);
+        second.andToEqualTo(address);
+        try {
+        	first.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
+        	second.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
+		} catch (Exception e) {
+			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
+    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
+		}
+        
         // 限制最多导出3万条记录
         PageHelper.startPage(1,30000);
         transactionExample.or(first);
         transactionExample.or(second);
+        
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         List<Object[]> rows = new ArrayList<>();
 
