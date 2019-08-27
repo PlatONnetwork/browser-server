@@ -62,7 +62,7 @@ public class TransactionServiceImplTest {
 //	@Test
 	public void transactionListByAddressDownload() {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
-		String date = "2019-08-21 00:00:01";
+		String date = "2019-08-21";
 		// TODO
 		AccountDownload accountDownload = this.transactionService.transactionListByAddressDownload(address, date);
 		assertNotNull(accountDownload.getData());
