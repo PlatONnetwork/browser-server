@@ -3,12 +3,10 @@ package com.platon.browser.res.block;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
-import lombok.Data;
-
 public class BlockDetailResp {
     private Long number;
     private Long timestamp;
-    private Integer statTxQty;
+    private Integer txQty;
     private String hash;
     private String parentHash;
     private String nodeName;
@@ -23,10 +21,10 @@ public class BlockDetailResp {
     private boolean first;
     // 是否最后一条
     private boolean last;
-    private Integer statTransferQty;
-    private Integer statDelegateQty;
-    private Integer statStakingQty;
-    private Integer statProposalQty;
+    private Integer transferQty;
+    private Integer delegateQty;
+    private Integer stakingQty;
+    private Integer proposalQty;
     private Long serverTime;
     private Integer size;
 	public Long getNumber() {
@@ -40,12 +38,6 @@ public class BlockDetailResp {
 	}
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
-	}
-	public Integer getStatTxQty() {
-		return statTxQty;
-	}
-	public void setStatTxQty(Integer statTxQty) {
-		this.statTxQty = statTxQty;
 	}
 	public String getHash() {
 		return hash;
@@ -120,30 +112,6 @@ public class BlockDetailResp {
 	public void setLast(boolean last) {
 		this.last = last;
 	}
-	public Integer getStatTransferQty() {
-		return statTransferQty;
-	}
-	public void setStatTransferQty(Integer statTransferQty) {
-		this.statTransferQty = statTransferQty;
-	}
-	public Integer getStatDelegateQty() {
-		return statDelegateQty;
-	}
-	public void setStatDelegateQty(Integer statDelegateQty) {
-		this.statDelegateQty = statDelegateQty;
-	}
-	public Integer getStatStakingQty() {
-		return statStakingQty;
-	}
-	public void setStatStakingQty(Integer statStakingQty) {
-		this.statStakingQty = statStakingQty;
-	}
-	public Integer getStatProposalQty() {
-		return statProposalQty;
-	}
-	public void setStatProposalQty(Integer statProposalQty) {
-		this.statProposalQty = statProposalQty;
-	}
 	public Long getServerTime() {
 		return serverTime;
 	}
@@ -155,6 +123,36 @@ public class BlockDetailResp {
 	}
 	public void setSize(Integer size) {
 		this.size = size;
+	}
+	public Integer getTxQty() {
+		return txQty;
+	}
+	public void setTxQty(Integer txQty) {
+		this.txQty = txQty;
+	}
+	public Integer getTransferQty() {
+		return transferQty;
+	}
+	public void setTransferQty(Integer transferQty) {
+		this.transferQty = transferQty;
+	}
+	public Integer getDelegateQty() {
+		return delegateQty;
+	}
+	public void setDelegateQty(Integer delegateQty) {
+		this.delegateQty = delegateQty;
+	}
+	public Integer getStakingQty() {
+		return stakingQty;
+	}
+	public void setStakingQty(Integer stakingQty) {
+		this.stakingQty = stakingQty;
+	}
+	public Integer getProposalQty() {
+		return proposalQty;
+	}
+	public void setProposalQty(Integer proposalQty) {
+		this.proposalQty = proposalQty;
 	}
     
 }

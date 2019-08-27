@@ -187,7 +187,7 @@
             and s.node_id = #{nodeId,jdbcType=VARCHAR}
         </if>
     	<if test="name != null">
-    		and s.staking_name = #{name,jdbcType=VARCHAR}
+    		and s.staking_name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
     	</if>
     	<if test="status != null">
     		and s.status = #{status,jdbcType=INTEGER}
