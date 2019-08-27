@@ -124,7 +124,6 @@ public class StakingEngine {
      * 进行验证人选举时触发
      */
     void onElectionDistance(CustomBlock block, BlockChain bc) throws ElectionEpochChangeException {
-        logger.debug("进行验证人选举:{}", block.getNumber());
         // 事件上下文
         newElectionEpochHandler.handle(context);
     }
@@ -133,7 +132,6 @@ public class StakingEngine {
      * 进入新的共识周期变更
      */
     void onNewConsEpoch(CustomBlock block, BlockChain bc) throws ConsensusEpochChangeException, CandidateException {
-        logger.debug("进入新的共识周期:{}", block.getNumber());
         // 事件上下文
         newConsensusEpochHandler.handle(context);
     }
@@ -142,7 +140,6 @@ public class StakingEngine {
      * 进入新的结算周期
      */
     void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws SettleEpochChangeException, CandidateException {
-        logger.debug("进入新的结算周期:{}", block.getNumber());
         /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息
