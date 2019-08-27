@@ -96,7 +96,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws CandidateException, IssueEpochChangeException {
+    public void init () throws Exception {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
@@ -161,7 +161,7 @@ public class BlockSyncTask {
                     BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
 
                     CustomStaking staking = new CustomStaking();
-                    staking.updateWithNode(candidate);
+                    staking.updateWithNode(verifier);
                     staking.setIsInit(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
                     // 内置节点默认设置状态为1
@@ -183,7 +183,7 @@ public class BlockSyncTask {
 
                 // 通知质押引擎重新初始化节点缓存
                 blockChain.getStakingExecute().loadNodes();
-            } catch (Exception e) {
+            } catch (IOException | CacheConstructException | BusinessException e) {
                 throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
             }
         }
