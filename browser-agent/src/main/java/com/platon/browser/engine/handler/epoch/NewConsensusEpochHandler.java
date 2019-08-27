@@ -92,7 +92,6 @@ public class NewConsensusEpochHandler implements EventHandler {
     private void updateValidator() throws CandidateException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
-        logger.debug("共识周期切换块号:{}", blockNumber);
         try {
             BaseResponse<List <Node>> result;
             // ==================================更新前一周期验证人列表=======================================
