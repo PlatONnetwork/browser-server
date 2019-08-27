@@ -206,6 +206,19 @@ public class BlockServiceImpl implements BlockService {
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
 			BeanUtils.copyProperties(block, blockDetailResp);
+			/*
+			private Integer txQty;
+			private Integer transferQty;
+		    private Integer delegateQty;
+		    private Integer stakingQty;
+		    private Integer proposalQty;
+			 */
+			blockDetailResp.setTxQty(block.getStatTxQty());
+			blockDetailResp.setTransferQty(block.getStatTransferQty());
+			blockDetailResp.setDelegateQty(block.getStatDelegateQty());
+			blockDetailResp.setStakingQty(block.getStatStakingQty());
+			blockDetailResp.setProposalQty(block.getStatProposalQty());
+			
 			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());

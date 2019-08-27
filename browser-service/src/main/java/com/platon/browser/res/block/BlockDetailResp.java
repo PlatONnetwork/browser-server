@@ -6,7 +6,7 @@ import lombok.Data;
 public class BlockDetailResp {
     private Long number;
     private Long timestamp;
-    private Integer statTxQty;
+    private Integer txQty;
     private String hash;
     private String parentHash;
     private String nodeName;
@@ -21,10 +21,10 @@ public class BlockDetailResp {
     private boolean first;
     // 是否最后一条
     private boolean last;
-    private Integer statTransferQty;
-    private Integer statDelegateQty;
-    private Integer statStakingQty;
-    private Integer statProposalQty;
+    private Integer transferQty;
+    private Integer delegateQty;
+    private Integer stakingQty;
+    private Integer proposalQty;
     private Long serverTime;
     private Integer size;
 }
