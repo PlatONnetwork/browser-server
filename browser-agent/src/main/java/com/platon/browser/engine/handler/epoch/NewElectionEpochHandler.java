@@ -11,6 +11,7 @@ import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -29,11 +30,12 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 @Component
 public class NewElectionEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewElectionEpochHandler.class);
+    @Autowired
+    private BlockChain bc;
 
     @Override
     public void handle(EventContext context) throws ElectionEpochChangeException {
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
 
         if(bc.getCurConsensusEpoch().longValue()==1){
             // 因为第一轮共识没有前一轮，所以不处理

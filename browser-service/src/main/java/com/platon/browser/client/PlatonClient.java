@@ -1,6 +1,7 @@
 package com.platon.browser.client;
 
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.job.Web3DetectJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class PlatonClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     /**
-     * 查询区块历史的验证人队列
+     * 查询结算周期历史验证人队列
      */
     public static final int GET_HISTORY_VERIFIERLIST_FUNC_TYPE = 1106;
     /**
@@ -221,7 +222,14 @@ public class PlatonClient {
                     DefaultBlockParameter.valueOf(blockNumber)
             ).send();
             String value = ethCall.getValue();
+            if("0x".equals(value)){
+                // 证明没数据,返回空响应
+                return new BaseResponse<>();
+            }
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            if(response==null||response.data==null){
+                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
+            }
             response.data = JSONUtil.parseArray((String) response.data, Node.class);
             return response;
         });
@@ -246,7 +254,14 @@ public class PlatonClient {
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();
+            if("0x".equals(value)){
+                // 证明没数据,返回空响应
+                return new BaseResponse<>();
+            }
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            if(response==null||response.data==null){
+                throw new ContractInvokeException("查询锁仓计划合约出错: 入参(addresses="+addresses+"),响应(ethCall.getValue()="+value+")");
+            }
             response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
             return response;
         }).send();

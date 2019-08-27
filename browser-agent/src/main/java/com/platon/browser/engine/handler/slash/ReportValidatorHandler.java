@@ -14,6 +14,7 @@ import com.platon.browser.param.EvidencesParam;
 import com.platon.browser.param.ReportValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -31,12 +32,12 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 @Component
 public class ReportValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ReportValidatorHandler.class);
-
+    @Autowired
+    private BlockChain bc;
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
         // 获取交易入参
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);

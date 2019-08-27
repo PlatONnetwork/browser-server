@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler.statistic;
 
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -9,6 +10,7 @@ import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.ADDRESS_CACHE;
@@ -21,7 +23,10 @@ import static com.platon.browser.engine.BlockChain.ADDRESS_CACHE;
 @Component
 public class AddressStatisticHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(AddressStatisticHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle(EventContext context) {
         AddressStage addressStage = context.getAddressStage();

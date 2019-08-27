@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.NodeCache;
@@ -11,6 +12,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.UnDelegateParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -26,12 +28,14 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 @Component
 public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
 
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {

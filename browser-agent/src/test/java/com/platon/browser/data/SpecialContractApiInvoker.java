@@ -47,7 +47,8 @@ import java.util.concurrent.Callable;
  */
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
 
     // 特殊合约接口测试
     @Test

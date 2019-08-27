@@ -66,6 +66,20 @@ public class NodeCache {
     }
 
     /**
+     * 根据节点ID和质押区块号获取质押信息
+     * @param nodeId
+     * @param stakingNumber
+     * @return
+     * @throws NoSuchBeanException
+     */
+    public CustomStaking getStaking(String nodeId,Long stakingNumber) throws NoSuchBeanException {
+        CustomNode node = getNode(nodeId);
+        CustomStaking staking = node.getStakings().get(stakingNumber);
+        if(staking==null) throw new NoSuchBeanException("节点未(id="+nodeId+")且质押区块号为("+stakingNumber+")的质押记录不存在");
+        return staking;
+    }
+
+    /**
      * 添加节点，同时更新stakingSet和delegationSet全量缓存
      * @param node
      */

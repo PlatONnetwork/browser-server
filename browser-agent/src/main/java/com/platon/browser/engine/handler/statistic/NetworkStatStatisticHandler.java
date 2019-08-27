@@ -11,8 +11,10 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -30,10 +32,13 @@ import static com.platon.browser.engine.BlockChain.*;
 public class NetworkStatStatisticHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NetworkStatStatisticHandler.class);
 
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
+
     @Override
     public void handle(EventContext context) {
-        BlockChain bc = context.getBlockChain();
-        BlockChainConfig chainConfig = bc.getChainConfig();
         CustomBlock curBlock = bc.getCurBlock();
         try {
             //TODO:地址数需要地址统计

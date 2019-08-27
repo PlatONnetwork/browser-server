@@ -107,7 +107,6 @@ public class StakingEngine {
      */
     void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException, BlockChainException {
         // 事件上下文
-        context.setBlockChain(bc);
         context.setTransaction(tx);
         switch (tx.getTypeEnum()){
             case CREATE_VALIDATOR: createValidatorHandler.handle(context); break; //发起质押(创建验证人)
@@ -125,30 +124,22 @@ public class StakingEngine {
      * 进行验证人选举时触发
      */
     void onElectionDistance(CustomBlock block, BlockChain bc) throws ElectionEpochChangeException {
-        logger.debug("进行验证人选举:{}", block.getNumber());
         // 事件上下文
-        context.setBlockChain(bc);
         newElectionEpochHandler.handle(context);
     }
 
     /**
      * 进入新的共识周期变更
      */
-    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws ConsensusEpochChangeException {
-        logger.debug("进入新的共识周期:{}", block.getNumber());
+    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws Exception {
         // 事件上下文
-        context.setBlockChain(bc);
         newConsensusEpochHandler.handle(context);
     }
 
     /**
      * 进入新的结算周期
      */
-    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws SettleEpochChangeException {
-        logger.debug("进入新的结算周期:{}", block.getNumber());
-        // 事件上下文
-        context.setBlockChain(bc);
-
+    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws Exception {
         /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息

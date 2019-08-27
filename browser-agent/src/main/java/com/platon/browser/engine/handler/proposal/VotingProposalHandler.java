@@ -11,6 +11,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.VotingProposalParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -25,13 +26,13 @@ import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 public class VotingProposalHandler implements EventHandler {
 
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandler.class);
-
+    @Autowired
+    private BlockChain bc;
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         try{
             CustomTransaction tx = context.getTransaction();
             ProposalStage proposalStage = context.getProposalStage();
-            BlockChain bc = context.getBlockChain();
             VotingProposalParam param = tx.getTxParam(VotingProposalParam.class);
 
             CustomNode node;

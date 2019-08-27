@@ -16,7 +16,6 @@ import lombok.Data;
 @Data
 public class EventContext {
     private CustomTransaction transaction;
-    private BlockChain blockChain;
     private StakingStage stakingStage;
     private ProposalStage proposalStage;
     private AddressStage addressStage;

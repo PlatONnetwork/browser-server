@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
@@ -16,6 +17,7 @@ import com.platon.browser.param.CreateProposalUpgradeParam;
 import com.platon.browser.util.RoundCalculation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -31,12 +33,14 @@ import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 @Component
 public class ProposalUpgradeHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpgradeHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
-        BlockChain bc = context.getBlockChain();
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
@@ -65,7 +69,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         //设置提案为升级类型
         proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
         //获取配置文件提案参数模板
-        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String temp = chainConfig.getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key, param.getPIDID());
         //设置url
         proposal.setUrl(url);
