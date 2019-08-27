@@ -68,41 +68,51 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws Exception {
+    private void updateVerifier () throws CandidateException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
-        try {
-            BaseResponse<List <Node>> result;
-            // ==================================更新前一周期验证人列表=======================================
-            bc.getPreVerifier().clear();
-            bc.getPreVerifier().putAll(bc.getCurVerifier());
-            if(bc.getPreVerifier().size()==0){
-                // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
-                if (!result.isStatusOk()) {
-                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
-                }else{
-                    bc.getPreVerifier().clear();
-                    result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
-                }
-            }
+        BaseResponse<List <Node>> result;
 
-            // ==================================更新当前周期验证人列表=======================================
-            BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
-            result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
-            if (!result.isStatusOk()) {
-                // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
-                result = client.getNodeContract().getVerifierList().send();
-                if(!result.isStatusOk()){
-                    throw new CandidateException(String.format("【底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
-                }
+        // ==================================更新前一周期验证人列表=======================================
+        bc.getPreVerifier().clear();
+        bc.getPreVerifier().putAll(bc.getCurVerifier());
+        if(bc.getPreVerifier().size()==0){
+            // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+            try {
+                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
+            } catch (Exception e) {
+                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,e.getMessage()));
             }
-            bc.getCurVerifier().clear();
-            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-        } catch (IOException e) {
-            throw new CandidateException(e.getMessage());
+            if (!result.isStatusOk()) {
+                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
+            }else{
+                bc.getPreVerifier().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            }
         }
+
+        // ==================================更新当前周期验证人列表=======================================
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+        try {
+            result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
+        } catch (Exception e) {
+            throw new CandidateException(String.format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+        }
+        if (!result.isStatusOk()) {
+            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+            try {
+                result = client.getNodeContract().getVerifierList().send();
+            } catch (Exception e) {
+                throw new CandidateException(String.format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
+            }
+            if(!result.isStatusOk()){
+                throw new CandidateException(String.format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
+            }
+        }
+        bc.getCurVerifier().clear();
+        result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+
         if(bc.getCurVerifier().size()==0){
             throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
