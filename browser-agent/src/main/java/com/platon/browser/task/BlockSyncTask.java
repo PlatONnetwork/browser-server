@@ -10,6 +10,8 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.AddressCacheUpdater;
+import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
@@ -60,6 +62,10 @@ public class BlockSyncTask {
     private BlockChainConfig chainConfig;
     @Autowired
     private PlatonClient client;
+    @Autowired
+    private AddressCacheUpdater addressCacheUpdater;
+    @Autowired
+    private StakingCacheUpdater stakingCacheUpdater;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -221,6 +227,9 @@ public class BlockSyncTask {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
+                // 入库前更新统计信息
+                addressCacheUpdater.updateAddressStatistics();
+                stakingCacheUpdater.updateStakingStatistics();
             } catch (BusinessException e) {
                 break;
             }

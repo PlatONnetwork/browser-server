@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -101,6 +102,8 @@ public class BlockChain {
 
     @Autowired
     private NetworkStatStatisticHandler networkStatStatisticHandler;
+    @Autowired
+    private NewIssueEpochHandler newIssueEpochHandler;
 
     /***
      * 以下字段业务使用说明：
@@ -214,27 +217,33 @@ public class BlockChain {
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    public void epochChangeEvent() throws SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException {
+    public void epochChangeEvent() throws SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, IssueEpochChangeException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
 
         // (当前块号+选举回退块数)%共识周期区块数
         if (blockNumber+chainConfig.getElectionBackwardBlockCount().longValue() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
-            logger.debug("开始验证人选举：Block Number({})", blockNumber);
+            logger.debug("选举验证人：Block Number({})", blockNumber);
             stakingExecute.onElectionDistance(curBlock, this);
 
         }
 
         if (blockNumber % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
-            logger.debug("进入新共识周期：Block Number({})", blockNumber);
+            logger.debug("共识周期切换：Block Number({})", blockNumber);
             stakingExecute.onNewConsEpoch(curBlock, this);
 
         }
 
         if (blockNumber % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
-            logger.debug("进入新结算周期：Block Number({})", blockNumber);
+            logger.debug("结算周期切换：Block Number({})", blockNumber);
             stakingExecute.onNewSettingEpoch(curBlock, this);
 
+        }
+
+        if (blockNumber % chainConfig.getAddIssuePeriodBlockCount().longValue() == 0) {
+            logger.debug("增发周期切换：Block Number({})", blockNumber);
+            EventContext context = new EventContext();
+            newIssueEpochHandler.handle(context);
         }
     }
 
