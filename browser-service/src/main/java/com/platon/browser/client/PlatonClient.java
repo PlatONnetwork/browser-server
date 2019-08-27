@@ -222,6 +222,10 @@ public class PlatonClient {
                     DefaultBlockParameter.valueOf(blockNumber)
             ).send();
             String value = ethCall.getValue();
+            if("0x".equals(value)){
+                // 证明没数据,返回空响应
+                return new BaseResponse<>();
+            }
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             if(response==null||response.data==null){
                 throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
@@ -250,6 +254,10 @@ public class PlatonClient {
                     DefaultBlockParameterName.LATEST
             ).send();
             String value = ethCall.getValue();
+            if("0x".equals(value)){
+                // 证明没数据,返回空响应
+                return new BaseResponse<>();
+            }
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             if(response==null||response.data==null){
                 throw new ContractInvokeException("查询锁仓计划合约出错: 入参(addresses="+addresses+"),响应(ethCall.getValue()="+value+")");
