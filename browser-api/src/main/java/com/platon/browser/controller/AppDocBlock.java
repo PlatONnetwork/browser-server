@@ -133,7 +133,7 @@ public interface AppDocBlock {
      *    "data": {
      *       "number":19988,           //区块高度
      *       "timestamp":123123123879, //出块时间
-     *       "statTxQty":1288,         //块内交易总数
+     *       "txQty":1288,         //块内交易总数
      *       "hash":"0x1238",          //区块hash
      *       "parentHash":"0x234",     //父区块hash
      *       "nodeId":"",              //出块节点id
@@ -147,10 +147,10 @@ public interface AppDocBlock {
      *       "extraData":"xxx",        //附加数据
      *       "first":false,            //是否第一条记录
      *       "last":true,              //是否最后一条记录
-     *       "statTransferQty":11,     //块内转账交易总数
-     *       "statDelegateQty":11,     //块内委托交易总数
-     *       "statStakingQty":11,      //块内验证人交易总数
-     *       "statProposalQty":11,      //块内治理交易总数
+     *       "transferQty":11,     //块内转账交易总数
+     *       "delegateQty":11,     //块内委托交易总数
+     *       "stakingQty":11,      //块内验证人交易总数
+     *       "proposalQty":11,      //块内治理交易总数
      *       "serverTime":17       //当前服务器的时间
      *    }
      * }
