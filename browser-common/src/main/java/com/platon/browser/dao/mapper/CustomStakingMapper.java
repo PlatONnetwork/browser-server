@@ -1,5 +1,6 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dto.CustomStaking;
@@ -16,6 +17,6 @@ public interface CustomStakingMapper {
     int batchInsertOrUpdateSelective(@Param("list") Set<Staking> list, @Param("selective") Staking.Column... selective);
     
     
-    List<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id,@Param("name")String name,@Param("status")Integer status,@Param("isConsensus")Integer isConsensus);
+    Page<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id,@Param("name")String name,@Param("status")Integer status,@Param("isConsensus")Integer isConsensus);
 
 }

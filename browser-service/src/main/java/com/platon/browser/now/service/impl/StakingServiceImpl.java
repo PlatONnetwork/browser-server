@@ -88,32 +88,32 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req) {
-		StakingExample stakingExample = new StakingExample();
-		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
-				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
+//		StakingExample stakingExample = new StakingExample();
+//		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
+//				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Integer status = null;
 		Integer isConsensus = null;
-		String name = null;
-		StakingExample.Criteria criteria = stakingExample.createCriteria();
-		if(StringUtils.isNotBlank(req.getKey())) {
-			criteria.andStakingNameLike(req.getKey());
-			name = req.getKey();
-		}
+		String name = req.getKey();
+//		StakingExample.Criteria criteria = stakingExample.createCriteria();
+//		if(StringUtils.isNotBlank(req.getKey())) {
+//			criteria.andStakingNameLike(req.getKey());
+//			name = req.getKey();
+//		}
 		switch (StakingStatusEnum.valueOf(req.getQueryStatus().toUpperCase())) {
 			case ALL:
-				status = StakingStatus.CANDIDATE.getCode();
-				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode());
+//				status = StakingStatus.CANDIDATE.getCode();
+//				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode());
 				break;
 			case ACTIVE:
 				//活跃中代表即使后续同时也是共识周期验证人
-				status = StakingStatus.CANDIDATE.getCode();
+				status = StakingStatusEnum.ACTIVE.getCode();
 				isConsensus = IsConsensusStatus.YES.getCode();
-				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode()).andIsConsensusEqualTo(IsConsensusStatus.YES.getCode());
+//				criteria.andStatusEqualTo(status).andIsConsensusEqualTo(isConsensus);
 				break;
 			case CANDIDATE:
-				status = StakingStatus.CANDIDATE.getCode();
-				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode());
+				status = StakingStatusEnum.CANDIDATE.getCode();
+//				criteria.andStatusEqualTo(status);
 				break;
 			default:
 				break;
@@ -122,7 +122,10 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
+//		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
+		Page<StakingNode> stakingPage = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
+		List<StakingNode> stakings = stakingPage.getResult();
+		
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
@@ -147,9 +150,9 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(EnergonUtil.format(Convert.fromVon(totalValue, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			lists.add(aliveStakingListResp);
 		}
-		long size = stakingMapper.countByExample(stakingExample);
+//		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(size);
+		page.setTotal(stakingPage.getTotal());
 		respPage.init(page, lists);
 		return respPage;
 	}
