@@ -73,10 +73,9 @@ public class NewSettleEpochHandler implements EventHandler {
         try {
             BaseResponse<List <Node>> result;
             // ==================================更新前一周期验证人列表=======================================
+            bc.getPreVerifier().clear();
+            bc.getPreVerifier().putAll(bc.getCurVerifier());
             if(bc.getCurVerifier().size()>0){
-                bc.getPreVerifier().clear();
-                bc.getPreVerifier().putAll(bc.getCurVerifier());
-            }else{
                 // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
                 BigInteger prevEpochFirstBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getSettlePeriodBlockCount()).add(BigInteger.ONE);
                 result = client.getHistoryVerifierList(prevEpochFirstBlockNumber);
@@ -87,7 +86,6 @@ public class NewSettleEpochHandler implements EventHandler {
                     result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
                 }
             }
-
 
             // ==================================更新当前周期验证人列表=======================================
             BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);

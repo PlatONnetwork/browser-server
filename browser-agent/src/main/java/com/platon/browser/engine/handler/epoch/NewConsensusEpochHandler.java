@@ -95,10 +95,9 @@ public class NewConsensusEpochHandler implements EventHandler {
         try {
             BaseResponse<List <Node>> result;
             // ==================================更新前一周期验证人列表=======================================
+            bc.getPreValidator().clear();
+            bc.getPreValidator().putAll(bc.getCurValidator());
             if(bc.getCurValidator().size()>0){
-                bc.getPreValidator().clear();
-                bc.getPreValidator().putAll(bc.getCurValidator());
-            }else{
                 // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
                 BigInteger prevEpochFirstBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getConsensusPeriodBlockCount()).add(BigInteger.ONE);
                 result = client.getHistoryValidatorList(prevEpochFirstBlockNumber);
