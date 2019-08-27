@@ -238,7 +238,6 @@ public class TransactionServiceImpl implements TransactionService {
         
         // 限制最多导出3万条记录
         PageHelper.startPage(1,30000);
-//        transactionExample.or(first);
         transactionExample.or(second);
         
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
