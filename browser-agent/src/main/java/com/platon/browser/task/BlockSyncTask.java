@@ -180,7 +180,7 @@ public class BlockSyncTask {
         }
     }
 
-    public void start() throws BlockCollectingException, SettleEpochChangeException, ConsensusEpochChangeException, ElectionEpochChangeException, CandidateException, NoSuchBeanException, IssueEpochChangeException, BusinessException, BlockChainException {
+    public void start() throws Exception {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
             List <BigInteger> blockNumbers = new ArrayList <>();

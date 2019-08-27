@@ -44,7 +44,7 @@ public class NewConsensusEpochHandler implements EventHandler {
     private StakingStage stakingStage;
 
     @Override
-    public void handle(EventContext context) throws ConsensusEpochChangeException, CandidateException {
+    public void handle(EventContext context) throws Exception {
         stakingStage = context.getStakingStage();
 
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
@@ -90,7 +90,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateValidator() throws CandidateException {
+    private void updateValidator() throws Exception {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         try {
@@ -100,7 +100,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             bc.getPreValidator().putAll(bc.getCurValidator());
             if(bc.getPreValidator().size()==0){
                 // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
-                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getConsensusPeriodBlockCount()).add(BigInteger.ONE);
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
                 result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
                 if (!result.isStatusOk()) {
                     throw new CandidateException(String.format("【底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,blockNumber,result.errMsg));
@@ -122,7 +122,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             }
             bc.getCurValidator().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new CandidateException(e.getMessage());
         }
         if(bc.getCurValidator().size()==0){

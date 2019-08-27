@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -48,7 +49,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private StakingStage stakingStage;
 
     @Override
-    public void handle(EventContext context) throws SettleEpochChangeException, CandidateException {
+    public void handle(EventContext context) throws Exception {
         stakingStage = context.getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
         settle(); // 结算
@@ -67,7 +68,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws CandidateException {
+    private void updateVerifier () throws Exception {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         try {
@@ -77,7 +78,7 @@ public class NewSettleEpochHandler implements EventHandler {
             bc.getPreVerifier().putAll(bc.getCurVerifier());
             if(bc.getPreVerifier().size()==0){
                 // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getSettlePeriodBlockCount()).add(BigInteger.ONE);
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
                 result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
                 if (!result.isStatusOk()) {
                     throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
@@ -99,7 +100,7 @@ public class NewSettleEpochHandler implements EventHandler {
             }
             bc.getCurVerifier().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new CandidateException(e.getMessage());
         }
         if(bc.getCurVerifier().size()==0){

@@ -1,6 +1,7 @@
 package com.platon.browser.client;
 
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.job.Web3DetectJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -222,6 +223,9 @@ public class PlatonClient {
             ).send();
             String value = ethCall.getValue();
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            if(response==null||response.data==null){
+                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+"), 可能原因(链上实时区块号小于"+blockNumber+")");
+            }
             response.data = JSONUtil.parseArray((String) response.data, Node.class);
             return response;
         });
@@ -247,6 +251,9 @@ public class PlatonClient {
             ).send();
             String value = ethCall.getValue();
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            if(response==null||response.data==null){
+                throw new ContractInvokeException("查询锁仓计划合约出错: 入参(addresses="+addresses+"),响应(ethCall.getValue()="+value+")");
+            }
             response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
             return response;
         }).send();

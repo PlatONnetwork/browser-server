@@ -131,7 +131,7 @@ public class StakingEngine {
     /**
      * 进入新的共识周期变更
      */
-    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws ConsensusEpochChangeException, CandidateException {
+    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws Exception {
         // 事件上下文
         newConsensusEpochHandler.handle(context);
     }
@@ -139,7 +139,7 @@ public class StakingEngine {
     /**
      * 进入新的结算周期
      */
-    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws SettleEpochChangeException, CandidateException {
+    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws Exception {
         /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息
