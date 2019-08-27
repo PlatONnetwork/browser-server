@@ -50,7 +50,7 @@ public class PlatonClient {
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     /**
-     * 查询区块历史的验证人队列
+     * 查询结算周期历史验证人队列
      */
     public static final int GET_HISTORY_VERIFIERLIST_FUNC_TYPE = 1106;
     /**
@@ -224,7 +224,7 @@ public class PlatonClient {
             String value = ethCall.getValue();
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             if(response==null||response.data==null){
-                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+"), 可能原因(链上实时区块号小于"+blockNumber+")");
+                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
             }
             response.data = JSONUtil.parseArray((String) response.data, Node.class);
             return response;
