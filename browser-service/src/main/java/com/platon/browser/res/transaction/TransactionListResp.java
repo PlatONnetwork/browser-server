@@ -1,5 +1,8 @@
 package com.platon.browser.res.transaction;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomLatSerializer;
+
 import lombok.Data;
 
 @Data
@@ -16,4 +19,80 @@ public class TransactionListResp {
     private String failReason;        //失败原因
     private String receiveType; //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
                                     //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
+    private Integer txReceiptStatus;     //交易状态
+	public String getTxHash() {
+		return txHash;
+	}
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
+	}
+	public String getFrom() {
+		return from;
+	}
+	public void setFrom(String from) {
+		this.from = from;
+	}
+	public String getTo() {
+		return to;
+	}
+	public void setTo(String to) {
+		this.to = to;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getActualTxCost() {
+		return actualTxCost;
+	}
+	public void setActualTxCost(String actualTxCost) {
+		this.actualTxCost = actualTxCost;
+	}
+	public String getTxType() {
+		return txType;
+	}
+	public void setTxType(String txType) {
+		this.txType = txType;
+	}
+	public Long getServerTime() {
+		return serverTime;
+	}
+	public void setServerTime(Long serverTime) {
+		this.serverTime = serverTime;
+	}
+	public Long getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
+	}
+	public Long getBlockNumber() {
+		return blockNumber;
+	}
+	public void setBlockNumber(Long blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+	public String getFailReason() {
+		return failReason;
+	}
+	public void setFailReason(String failReason) {
+		this.failReason = failReason;
+	}
+	public String getReceiveType() {
+		return receiveType;
+	}
+	public void setReceiveType(String receiveType) {
+		this.receiveType = receiveType;
+	}
+	public Integer getTxReceiptStatus() {
+		return txReceiptStatus;
+	}
+	public void setTxReceiptStatus(Integer txReceiptStatus) {
+		this.txReceiptStatus = txReceiptStatus;
+	}
+    
 }

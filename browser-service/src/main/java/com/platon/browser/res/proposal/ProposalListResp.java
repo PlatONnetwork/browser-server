@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ProposalListResp {
-	private String pipNum;
+	private String pipNum; //pip num
 	private String proposalHash; // 提案内部标识
 	private String topic;  //提案标题
 	private String description;  //提案描述

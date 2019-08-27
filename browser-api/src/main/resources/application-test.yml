@@ -6,7 +6,7 @@ profile: test
 # 服务器端口号
 port: 9061
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
 dbuser: root
 dbpass: Juzhen123!
 # Platon链配置,格式【{chainName1}-{chainId1}-{http://nodeIP1:port1}[,{chainName2}-{chainId2}-{http://nodeIP2:port2}]】，多个链配置使用逗号分隔
@@ -17,8 +17,8 @@ redis: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.17
 logpath: /opt/console/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
-  spring: error
-  platon: error
+  spring: debug
+  platon: debug
 web3j:
   addresses: http://192.168.9.221:6789
 

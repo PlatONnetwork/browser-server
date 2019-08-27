@@ -2,9 +2,9 @@ package com.platon.browser.res.transaction;
 
 import java.util.List;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomLatSerializer;
 
-@Data
 public class TransactionDetailsResp {
 	private String txHash;      //交易hash
     private String from;       //发送方地址
@@ -55,4 +55,289 @@ public class TransactionDetailsResp {
     private Integer pipNum;//提案pip编号
     private Integer proposalStatus;//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
     private String proposalTitle;//提案标题
+	public String getTxHash() {
+		return txHash;
+	}
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
+	}
+	public String getFrom() {
+		return from;
+	}
+	public void setFrom(String from) {
+		this.from = from;
+	}
+	public String getTo() {
+		return to;
+	}
+	public void setTo(String to) {
+		this.to = to;
+	}
+	public Long getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
+	}
+	public Long getServerTime() {
+		return serverTime;
+	}
+	public void setServerTime(Long serverTime) {
+		this.serverTime = serverTime;
+	}
+	public String getConfirmNum() {
+		return confirmNum;
+	}
+	public void setConfirmNum(String confirmNum) {
+		this.confirmNum = confirmNum;
+	}
+	public Long getBlockNumber() {
+		return blockNumber;
+	}
+	public void setBlockNumber(Long blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+	public String getGasLimit() {
+		return gasLimit;
+	}
+	public void setGasLimit(String gasLimit) {
+		this.gasLimit = gasLimit;
+	}
+	public String getGasUsed() {
+		return gasUsed;
+	}
+	public void setGasUsed(String gasUsed) {
+		this.gasUsed = gasUsed;
+	}
+	public String getGasPrice() {
+		return gasPrice;
+	}
+	public void setGasPrice(String gasPrice) {
+		this.gasPrice = gasPrice;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+	public String getActualTxCost() {
+		return actualTxCost;
+	}
+	public void setActualTxCost(String actualTxCost) {
+		this.actualTxCost = actualTxCost;
+	}
+	public String getTxType() {
+		return txType;
+	}
+	public void setTxType(String txType) {
+		this.txType = txType;
+	}
+	public String getInput() {
+		return input;
+	}
+	public void setInput(String input) {
+		this.input = input;
+	}
+	public String getTxInfo() {
+		return txInfo;
+	}
+	public void setTxInfo(String txInfo) {
+		this.txInfo = txInfo;
+	}
+	public String getFailReason() {
+		return failReason;
+	}
+	public void setFailReason(String failReason) {
+		this.failReason = failReason;
+	}
+	public Boolean getFirst() {
+		return first;
+	}
+	public void setFirst(Boolean first) {
+		this.first = first;
+	}
+	public Boolean getLast() {
+		return last;
+	}
+	public void setLast(Boolean last) {
+		this.last = last;
+	}
+	public String getReceiveType() {
+		return receiveType;
+	}
+	public void setReceiveType(String receiveType) {
+		this.receiveType = receiveType;
+	}
+	public String getRPAccount() {
+		return RPAccount;
+	}
+	public void setRPAccount(String rPAccount) {
+		RPAccount = rPAccount;
+	}
+	public String getRPNum() {
+		return RPNum;
+	}
+	public void setRPNum(String rPNum) {
+		RPNum = rPNum;
+	}
+	public List<TransactionDetailsRPPlanResp> getRPPlan() {
+		return RPPlan;
+	}
+	public void setRPPlan(List<TransactionDetailsRPPlanResp> rPPlan) {
+		RPPlan = rPPlan;
+	}
+	public List<TransactionDetailsEvidencesResp> getEvidences() {
+		return evidences;
+	}
+	public void setEvidences(List<TransactionDetailsEvidencesResp> evidences) {
+		this.evidences = evidences;
+	}
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public String getNodeName() {
+		return nodeName;
+	}
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+	public String getBenefitAddr() {
+		return benefitAddr;
+	}
+	public void setBenefitAddr(String benefitAddr) {
+		this.benefitAddr = benefitAddr;
+	}
+	public String getExternalId() {
+		return externalId;
+	}
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
+	public String getWebsite() {
+		return website;
+	}
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+	public String getDetails() {
+		return details;
+	}
+	public void setDetails(String details) {
+		this.details = details;
+	}
+	public String getProgramVersion() {
+		return programVersion;
+	}
+	public void setProgramVersion(String programVersion) {
+		this.programVersion = programVersion;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getApplyAmount() {
+		return applyAmount;
+	}
+	public void setApplyAmount(String applyAmount) {
+		this.applyAmount = applyAmount;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getRedeemLocked() {
+		return redeemLocked;
+	}
+	public void setRedeemLocked(String redeemLocked) {
+		this.redeemLocked = redeemLocked;
+	}
+	public Integer getRedeemStatus() {
+		return redeemStatus;
+	}
+	public void setRedeemStatus(Integer redeemStatus) {
+		this.redeemStatus = redeemStatus;
+	}
+	public String getRedeemUnLockedBlock() {
+		return redeemUnLockedBlock;
+	}
+	public void setRedeemUnLockedBlock(String redeemUnLockedBlock) {
+		this.redeemUnLockedBlock = redeemUnLockedBlock;
+	}
+	public String getProposalUrl() {
+		return proposalUrl;
+	}
+	public void setProposalUrl(String proposalUrl) {
+		this.proposalUrl = proposalUrl;
+	}
+	public String getProposalHash() {
+		return proposalHash;
+	}
+	public void setProposalHash(String proposalHash) {
+		this.proposalHash = proposalHash;
+	}
+	public String getProposalOption() {
+		return proposalOption;
+	}
+	public void setProposalOption(String proposalOption) {
+		this.proposalOption = proposalOption;
+	}
+	public String getProposalNewVersion() {
+		return proposalNewVersion;
+	}
+	public void setProposalNewVersion(String proposalNewVersion) {
+		this.proposalNewVersion = proposalNewVersion;
+	}
+	public String getDeclareVersion() {
+		return declareVersion;
+	}
+	public void setDeclareVersion(String declareVersion) {
+		this.declareVersion = declareVersion;
+	}
+	public Integer getTxReceiptStatus() {
+		return txReceiptStatus;
+	}
+	public void setTxReceiptStatus(Integer txReceiptStatus) {
+		this.txReceiptStatus = txReceiptStatus;
+	}
+	public String getEvidence() {
+		return evidence;
+	}
+	public void setEvidence(String evidence) {
+		this.evidence = evidence;
+	}
+	public Integer getReportType() {
+		return reportType;
+	}
+	public void setReportType(Integer reportType) {
+		this.reportType = reportType;
+	}
+	public String getReportRewards() {
+		return reportRewards;
+	}
+	public void setReportRewards(String reportRewards) {
+		this.reportRewards = reportRewards;
+	}
+	public Integer getReportStatus() {
+		return reportStatus;
+	}
+	public void setReportStatus(Integer reportStatus) {
+		this.reportStatus = reportStatus;
+	}
+	public Integer getPipNum() {
+		return pipNum;
+	}
+	public void setPipNum(Integer pipNum) {
+		this.pipNum = pipNum;
+	}
+	public Integer getProposalStatus() {
+		return proposalStatus;
+	}
+	public void setProposalStatus(Integer proposalStatus) {
+		this.proposalStatus = proposalStatus;
+	}
+	public String getProposalTitle() {
+		return proposalTitle;
+	}
+	public void setProposalTitle(String proposalTitle) {
+		this.proposalTitle = proposalTitle;
+	}
+    
 }

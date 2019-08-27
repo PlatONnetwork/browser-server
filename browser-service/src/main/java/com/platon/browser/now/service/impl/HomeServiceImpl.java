@@ -13,7 +13,6 @@ import com.platon.browser.dao.mapper.TransactionMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Block;
@@ -38,7 +37,6 @@ import com.platon.browser.res.home.QueryNavigationResp;
 import com.platon.browser.res.home.QueryNavigationStructResp;
 import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.res.home.StakingListResp;
-import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -174,7 +172,7 @@ public class HomeServiceImpl implements HomeService {
 		if(networkStatRedis != null) {
 			BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
 			BigDecimal sum = new BigDecimal(networkStatRedis.getStakingDelegationValue()).add(new BigDecimal(networkStatRedis.getStakingValue()));
-			chainStatisticNewResp.setStakingDelegationValue(EnergonUtil.format(Convert.fromVon(sum, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+			chainStatisticNewResp.setStakingDelegationValue(sum.toString());
 		}
 		return chainStatisticNewResp;
 	}

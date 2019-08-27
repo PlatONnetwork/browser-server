@@ -43,28 +43,28 @@ public class TransactionSender {
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
     private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-//    private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
+    private Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
     private Credentials credentials = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
-    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
+    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,new DefaultWasmGasProvider(),chainId);
     public TransactionSender() throws IOException, CipherException {}
 
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
-    	for(int i=0;i<30;i++) {
+//    	for(int i=0;i<30;i++) {
 	        Transfer.sendFunds(
 	                currentValidWeb3j,
 	                credentials,
 	                chainId,
-	                "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b",
-	                BigDecimal.valueOf(100),
-	                Convert.Unit.VON
+	                "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+	                BigDecimal.valueOf(1),
+	                Convert.Unit.LAT
 	        ).send();
-	        BigInteger balance = currentValidWeb3j.platonGetBalance("0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b", DefaultBlockParameterName.LATEST).send().getBalance();
+	        BigInteger balance = currentValidWeb3j.platonGetBalance("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219", DefaultBlockParameterName.LATEST).send().getBalance();
 	        logger.debug("balance:{}",balance);
-    	}
+//    	}
     }
 
     // 发送质押交易
@@ -85,7 +85,7 @@ public class TransactionSender {
                .setNodeName(nodeName)
                .setWebSite(webSite)
                .setDetails(details)
-               .setBlsPubKey("5c5fa09a6caad18b7bd35c3a8991948763df4d7ea11070295b32c0f7d499d041f8645dab84537d85d95811c34faebea42ef4066b3dda6920b5f35e8a163506b7")
+               .setBlsPubKey("b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f")
                .build()).send();
         BaseResponse baseResponse = stakingContract.getStakingResult(platonSendTransaction).send();
         System.out.println(baseResponse.toString());
@@ -127,16 +127,17 @@ public class TransactionSender {
     @Test
     public void delegate() throws Exception {
         BaseResponse res = delegateContract.delegate(
-                "0x15245d4dceeb7552b52d70e56c53fc86aa030eab6b7b325e430179902884fca3d684b0e896ea421864a160e9c18418e4561e9a72f911e2511c29204a857de71a",
+                "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 BigInteger.valueOf(1000)
         ).send();
-        logger.debug("res:{}",res);
+        logger.debug("res:{}",res); 
     }
     
     
     public static void main(String[] args) throws IOException, CipherException {
-    	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
+//    	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
+    	Credentials credentials = WalletUtils.loadCredentials("11111111", "D:\\blockchain\\file\\60ceca9c1290ee56b98d4e160ef0453f7c40d219");
     	byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
         String privateKey = Hex.toHexString(byteArray);
 
@@ -149,8 +150,8 @@ public class TransactionSender {
     @Test
     public void unDelegate() throws Exception {
         BaseResponse res = delegateContract.unDelegate(
-                "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
-                BigInteger.valueOf(53086),
+                "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
+                BigInteger.valueOf(1288),
                 BigInteger.valueOf(1000)
         ).send();
         logger.debug("res:{}",res);

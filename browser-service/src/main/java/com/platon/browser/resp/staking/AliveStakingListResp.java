@@ -1,8 +1,8 @@
 package com.platon.browser.resp.staking;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomLatSerializer;
 
-@Data
 public class AliveStakingListResp {
 
 	private Integer ranking;           //排行
@@ -19,4 +19,92 @@ public class AliveStakingListResp {
 	private String expectedIncome;    //预计年收化率（从验证人加入时刻开始计算）
 	private Boolean isRecommend;     //是否官方推荐
 	private Boolean isInit;          //是否为初始节点 
+	public Integer getRanking() {
+		return ranking;
+	}
+	public void setRanking(Integer ranking) {
+		this.ranking = ranking;
+	}
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public String getNodeName() {
+		return nodeName;
+	}
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+	public String getStakingIcon() {
+		return stakingIcon;
+	}
+	public void setStakingIcon(String stakingIcon) {
+		this.stakingIcon = stakingIcon;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getTotalValue() {
+		return totalValue;
+	}
+	public void setTotalValue(String totalValue) {
+		this.totalValue = totalValue;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getDelegateValue() {
+		return delegateValue;
+	}
+	public void setDelegateValue(String delegateValue) {
+		this.delegateValue = delegateValue;
+	}
+	public Integer getDelegateQty() {
+		return delegateQty;
+	}
+	public void setDelegateQty(Integer delegateQty) {
+		this.delegateQty = delegateQty;
+	}
+	public Integer getSlashLowQty() {
+		return slashLowQty;
+	}
+	public void setSlashLowQty(Integer slashLowQty) {
+		this.slashLowQty = slashLowQty;
+	}
+	public Integer getSlashMultiQty() {
+		return slashMultiQty;
+	}
+	public void setSlashMultiQty(Integer slashMultiQty) {
+		this.slashMultiQty = slashMultiQty;
+	}
+	public Long getBlockQty() {
+		return blockQty;
+	}
+	public void setBlockQty(Long blockQty) {
+		this.blockQty = blockQty;
+	}
+	public String getExpectedIncome() {
+		return expectedIncome;
+	}
+	public void setExpectedIncome(String expectedIncome) {
+		this.expectedIncome = expectedIncome;
+	}
+	public Boolean getIsRecommend() {
+		return isRecommend;
+	}
+	public void setIsRecommend(Boolean isRecommend) {
+		this.isRecommend = isRecommend;
+	}
+	public Boolean getIsInit() {
+		return isInit;
+	}
+	public void setIsInit(Boolean isInit) {
+		this.isInit = isInit;
+	}
+	
+	
 }

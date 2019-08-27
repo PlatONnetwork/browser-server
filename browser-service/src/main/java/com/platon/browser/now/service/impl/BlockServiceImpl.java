@@ -69,7 +69,6 @@ public class BlockServiceImpl implements BlockService {
 			for (BlockRedis blockRedis:items) {
 				BlockListResp blockListNewResp = new BlockListResp();
 				BeanUtils.copyProperties(blockRedis, blockListNewResp);
-				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(blockRedis.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				blockListNewResp.setServerTime(new Date().getTime());
 				blockListNewResp.setTimestamp(blockRedis.getTimestamp().getTime());
 				lists.add(blockListNewResp);
@@ -83,7 +82,6 @@ public class BlockServiceImpl implements BlockService {
 			for(Block block:blocks) {
 				BlockListResp blockListNewResp = new BlockListResp();
 				BeanUtils.copyProperties(block, blockListNewResp);
-				blockListNewResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 				blockListNewResp.setServerTime(new Date().getTime());
 				blockListNewResp.setTimestamp(block.getTimestamp().getTime());
 				lists.add(blockListNewResp);
@@ -113,7 +111,6 @@ public class BlockServiceImpl implements BlockService {
 		for (Block block : blocks) {
 			BlockListResp blockListResp = new BlockListResp();
 			BeanUtils.copyProperties(block, blockListResp);
-			blockListResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockListResp.setServerTime(new Date().getTime());
 			blockListResp.setTimestamp(block.getTimestamp().getTime());
 			lists.add(blockListResp);
@@ -199,7 +196,6 @@ public class BlockServiceImpl implements BlockService {
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
 			BeanUtils.copyProperties(block, blockDetailResp);
-			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			

@@ -148,8 +148,6 @@ public class TransactionServiceImpl implements TransactionService {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transactionRedis, transactionListResp);
         	transactionListResp.setTxHash(transactionRedis.getHash());
-            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transactionRedis.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transactionRedis.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transactionRedis.getTimestamp().getTime());
             lists.add(transactionListResp);
@@ -177,8 +175,6 @@ public class TransactionServiceImpl implements TransactionService {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
-            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
@@ -211,8 +207,6 @@ public class TransactionServiceImpl implements TransactionService {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
-            transactionListResp.setValue(EnergonUtil.format(Convert.fromVon(transaction.getValue(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-            transactionListResp.setActualTxCost(EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
@@ -254,8 +248,8 @@ public class TransactionServiceImpl implements TransactionService {
                     TransactionTypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).desc,
                     transaction.getFrom(),
                     transaction.getTo(),
-                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
-                    EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
+                    EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
+                    EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
                     transaction.getGasUsed()
             };
             rows.add(row);
@@ -365,8 +359,8 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setNodeName(staking.getStakingName());
 						//升级金额等于锁定加犹豫金额
 						BigDecimal sum = new BigDecimal(staking.getStakingHas()).add(new BigDecimal(staking.getStakingLocked()));
-						resp.setApplyAmount(EnergonUtil.format(Convert.fromVon(sum, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-						resp.setRedeemLocked(EnergonUtil.format(Convert.fromVon(staking.getStakingReduction(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+						resp.setApplyAmount(sum.toString());
+						resp.setRedeemLocked(staking.getStakingReduction());
 						//只有已退出，则金额才会退回到账户
 						resp.setRedeemStatus(staking.getStatus() == StakingStatus.EXITED.getCode()?2:1);
 						//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
@@ -390,8 +384,8 @@ public class TransactionServiceImpl implements TransactionService {
 					resp.setNodeName(unDelegateParam.getNodeName());
 					UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
 					if(unDelegation!=null) {
-						resp.setApplyAmount(EnergonUtil.format(Convert.fromVon(unDelegation.getApplyAmount(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
-						resp.setRedeemLocked(EnergonUtil.format(Convert.fromVon(unDelegation.getRedeemLocked(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
+						resp.setApplyAmount(unDelegation.getApplyAmount());
+						resp.setRedeemLocked(unDelegation.getRedeemLocked());
 						resp.setRedeemStatus(unDelegation.getStatus());
 					}
 					break;

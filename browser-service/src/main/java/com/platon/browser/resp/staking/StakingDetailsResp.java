@@ -1,8 +1,8 @@
 package com.platon.browser.resp.staking;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomLatSerializer;
 
-@Data
 public class StakingDetailsResp {
 	private String nodeName;            //验证人名称
     private String stakingIcon;         //验证人图标
@@ -29,4 +29,159 @@ public class StakingDetailsResp {
     private String statDelegateReduction;//待提取的委托
     private Long leaveTime;  //退出时间
     private Boolean isInit;          //是否为初始节点 
+	public String getNodeName() {
+		return nodeName;
+	}
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+	public String getStakingIcon() {
+		return stakingIcon;
+	}
+	public void setStakingIcon(String stakingIcon) {
+		this.stakingIcon = stakingIcon;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getTotalValue() {
+		return totalValue;
+	}
+	public void setTotalValue(String totalValue) {
+		this.totalValue = totalValue;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getDelegateValue() {
+		return delegateValue;
+	}
+	public void setDelegateValue(String delegateValue) {
+		this.delegateValue = delegateValue;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getStakingValue() {
+		return stakingValue;
+	}
+	public void setStakingValue(String stakingValue) {
+		this.stakingValue = stakingValue;
+	}
+	public Integer getDelegateQty() {
+		return delegateQty;
+	}
+	public void setDelegateQty(Integer delegateQty) {
+		this.delegateQty = delegateQty;
+	}
+	public Integer getSlashLowQty() {
+		return slashLowQty;
+	}
+	public void setSlashLowQty(Integer slashLowQty) {
+		this.slashLowQty = slashLowQty;
+	}
+	public Integer getSlashMultiQty() {
+		return slashMultiQty;
+	}
+	public void setSlashMultiQty(Integer slashMultiQty) {
+		this.slashMultiQty = slashMultiQty;
+	}
+	public Long getBlockQty() {
+		return blockQty;
+	}
+	public void setBlockQty(Long blockQty) {
+		this.blockQty = blockQty;
+	}
+	public Long getExpectBlockQty() {
+		return expectBlockQty;
+	}
+	public void setExpectBlockQty(Long expectBlockQty) {
+		this.expectBlockQty = expectBlockQty;
+	}
+	public String getExpectedIncome() {
+		return expectedIncome;
+	}
+	public void setExpectedIncome(String expectedIncome) {
+		this.expectedIncome = expectedIncome;
+	}
+	public String getJoinTime() {
+		return joinTime;
+	}
+	public void setJoinTime(String joinTime) {
+		this.joinTime = joinTime;
+	}
+	public Integer getVerifierTime() {
+		return verifierTime;
+	}
+	public void setVerifierTime(Integer verifierTime) {
+		this.verifierTime = verifierTime;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getRewardValue() {
+		return rewardValue;
+	}
+	public void setRewardValue(String rewardValue) {
+		this.rewardValue = rewardValue;
+	}
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public String getStakingAddr() {
+		return stakingAddr;
+	}
+	public void setStakingAddr(String stakingAddr) {
+		this.stakingAddr = stakingAddr;
+	}
+	public String getDenefitAddr() {
+		return denefitAddr;
+	}
+	public void setDenefitAddr(String denefitAddr) {
+		this.denefitAddr = denefitAddr;
+	}
+	public String getWebsite() {
+		return website;
+	}
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+	public String getDetails() {
+		return details;
+	}
+	public void setDetails(String details) {
+		this.details = details;
+	}
+	public String getExternalId() {
+		return externalId;
+	}
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
+	public Long getStakingBlockNum() {
+		return stakingBlockNum;
+	}
+	public void setStakingBlockNum(Long stakingBlockNum) {
+		this.stakingBlockNum = stakingBlockNum;
+	}
+	public String getStatDelegateReduction() {
+		return statDelegateReduction;
+	}
+	public void setStatDelegateReduction(String statDelegateReduction) {
+		this.statDelegateReduction = statDelegateReduction;
+	}
+	public Long getLeaveTime() {
+		return leaveTime;
+	}
+	public void setLeaveTime(Long leaveTime) {
+		this.leaveTime = leaveTime;
+	}
+	public Boolean getIsInit() {
+		return isInit;
+	}
+	public void setIsInit(Boolean isInit) {
+		this.isInit = isInit;
+	}
+    
 }

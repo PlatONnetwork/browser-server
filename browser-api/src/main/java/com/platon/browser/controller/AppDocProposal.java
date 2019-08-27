@@ -54,7 +54,8 @@ public interface AppDocProposal {
      *         "endVotingBlock":"",    //投票结算的快高
      *         "newVersion":"",        //升级提案升级的版本
      *         "paramName":"",         //参数名
-     *         "timestamp":123123879   //提案时间
+     *         "timestamp":123123879,   //提案时间
+     *         "pipNum":1212 //pip num
      *      }
      *   ]
      * }
@@ -104,10 +105,10 @@ public interface AppDocProposal {
      *       "accuVerifiers":"",        //总人数
      *       "activeBlockTime":"",      //生效块高预计时间  (activeBlock-curBlock)*period
      *       "endVotingBlockTime":"",    //投票块高的时间   (endVotingBlock-curBlock)*period
-     *       "supportRateThreshold":""   //通过率
-	 *       "opposeRateThreshold":""   //反对率
-	 *       "abstainRateThreshold:""   //弃权率
-	 *
+     *       "supportRateThreshold":"",   //通过率
+	 *       "opposeRateThreshold":"",   //反对率
+	 *       "abstainRateThreshold:"",   //弃权率
+	 *		 "pipNum":1212 //pip num
      *    }
      * }
      */	
