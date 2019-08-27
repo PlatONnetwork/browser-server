@@ -91,7 +91,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateValidator() throws CandidateException {
+    private void updateValidator() throws Exception {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         BaseResponse<List <Node>> result;
@@ -104,6 +104,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             try {
                 result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
             }
             if (!result.isStatusOk()) {
@@ -116,16 +117,13 @@ public class NewConsensusEpochHandler implements EventHandler {
 
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
-        try {
-            result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
-        } catch (Exception e) {
-            throw new CandidateException(format("【查询当前共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",nextEpochFirstBlockNumber,e.getMessage()));
-        }
+        result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
                 result = client.getNodeContract().getValidatorList().send();
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
