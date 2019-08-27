@@ -75,12 +75,12 @@ public class NewSettleEpochHandler implements EventHandler {
             // ==================================更新前一周期验证人列表=======================================
             bc.getPreVerifier().clear();
             bc.getPreVerifier().putAll(bc.getCurVerifier());
-            if(bc.getCurVerifier().size()>0){
+            if(bc.getPreVerifier().size()==0){
                 // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-                BigInteger prevEpochFirstBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getSettlePeriodBlockCount()).add(BigInteger.ONE);
-                result = client.getHistoryVerifierList(prevEpochFirstBlockNumber);
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getSettlePeriodBlockCount()).add(BigInteger.ONE);
+                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
                 if (!result.isStatusOk()) {
-                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),当前块号({}),错误详情:%s]",prevEpochFirstBlockNumber,prevEpochFirstBlockNumber,blockNumber,result.errMsg));
+                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
                 }else{
                     bc.getPreVerifier().clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
@@ -149,7 +149,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void settle() throws SettleEpochChangeException {
+    private void settle() throws SettleEpochChangeException, CandidateException {
 
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
 

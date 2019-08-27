@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
@@ -97,12 +98,12 @@ public class NewConsensusEpochHandler implements EventHandler {
             // ==================================更新前一周期验证人列表=======================================
             bc.getPreValidator().clear();
             bc.getPreValidator().putAll(bc.getCurValidator());
-            if(bc.getCurValidator().size()>0){
+            if(bc.getPreValidator().size()==0){
                 // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
-                BigInteger prevEpochFirstBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getConsensusPeriodBlockCount()).add(BigInteger.ONE);
-                result = client.getHistoryValidatorList(prevEpochFirstBlockNumber);
+                BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getConsensusPeriodBlockCount()).add(BigInteger.ONE);
+                result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
                 if (!result.isStatusOk()) {
-                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),当前块号({}),错误详情:%s]",prevEpochFirstBlockNumber,prevEpochFirstBlockNumber,blockNumber,result.errMsg));
+                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,blockNumber,result.errMsg));
                 }else{
                     bc.getPreValidator().clear();
                     result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
