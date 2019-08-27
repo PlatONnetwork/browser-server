@@ -206,7 +206,9 @@ public interface AppDocTransaction {
      *       "txInfo":"{jsonObject}"   //附加输入数据解析后的结构
      *       "failReason":"",          //失败原因
      *       "first":false,            //是否第一条记录
-     *       "last":true,              //是否最后一条记录
+     *       "preHash":"",
+     *       "last":true,
+     *       "nextHash":"",              //是否最后一条记录
      *       "receiveType":"account",  //此字段表示的是to字段存储的账户类型：account-钱包地址，contract-合约地址，
      *                                 //前端页面在点击接收方的地址时，根据此字段来决定是跳转到账户详情还是合约详情
      *        --交易基本信息结束

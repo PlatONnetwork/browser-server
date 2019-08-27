@@ -128,7 +128,7 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public BlockDownload blockListByNodeIdDownload(String nodeId, String date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
         logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
         // 限制最多导出3万条记录

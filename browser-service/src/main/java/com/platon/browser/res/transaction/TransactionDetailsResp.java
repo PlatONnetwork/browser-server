@@ -55,6 +55,10 @@ public class TransactionDetailsResp {
     private Integer pipNum;//提案pip编号
     private Integer proposalStatus;//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
     private String proposalTitle;//提案标题
+    
+    private String preHash;// 上一条记录
+    private String nextHash;// 下一条记录
+    
 	public String getTxHash() {
 		return txHash;
 	}
@@ -338,6 +342,18 @@ public class TransactionDetailsResp {
 	}
 	public void setProposalTitle(String proposalTitle) {
 		this.proposalTitle = proposalTitle;
+	}
+	public String getPreHash() {
+		return preHash;
+	}
+	public void setPreHash(String preHash) {
+		this.preHash = preHash;
+	}
+	public String getNextHash() {
+		return nextHash;
+	}
+	public void setNextHash(String nextHash) {
+		this.nextHash = nextHash;
 	}
     
 }
