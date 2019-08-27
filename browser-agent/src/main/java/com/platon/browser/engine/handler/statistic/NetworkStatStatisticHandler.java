@@ -24,7 +24,7 @@ import java.util.Set;
 import static com.platon.browser.engine.BlockChain.*;
 
 /**
- * @Auther: Chendongming
+ * @Auther: dongqile
  * @Date: 2019/8/17 20:09
  * @Description: 统计信息处理类
  */

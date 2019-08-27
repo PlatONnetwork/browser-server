@@ -10,7 +10,6 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
-import com.platon.browser.exception.ConsensusEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;

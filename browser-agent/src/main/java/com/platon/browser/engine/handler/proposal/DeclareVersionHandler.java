@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.exception.NoSuchBeanException;
