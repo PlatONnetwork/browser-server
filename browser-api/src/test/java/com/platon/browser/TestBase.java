@@ -1,16 +1,15 @@
 package com.platon.browser;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dto.block.BlockListItem;
 import com.platon.browser.dto.transaction.TransactionListItem;
 import com.platon.browser.enums.TransactionTypeEnum;
-import com.platon.browser.now.service.BlockService;
-import com.platon.browser.now.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
@@ -70,7 +69,7 @@ public class TestBase extends TestData {
 
     protected Transaction getOneVoteTransaction( String chainId){
         TransactionExample example = new TransactionExample();
-        example.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.TRANSACTION_VOTE_TICKET.code);
+        example.createCriteria().andTxTypeEqualTo(TransactionTypeEnum.VOTING_PROPOSAL.code);
         return null;
     }
 }
