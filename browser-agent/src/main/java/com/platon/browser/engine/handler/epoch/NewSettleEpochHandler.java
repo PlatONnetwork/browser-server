@@ -73,15 +73,21 @@ public class NewSettleEpochHandler implements EventHandler {
         try {
             BaseResponse<List <Node>> result;
             // ==================================更新前一周期验证人列表=======================================
-            // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-            result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
-            if (!result.isStatusOk()) {
-                throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
-            }else{
+            if(bc.getCurVerifier().size()>0){
                 bc.getPreVerifier().clear();
-                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                bc.getPreVerifier().putAll(bc.getCurVerifier());
+            }else{
+                // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+                BigInteger prevEpochFirstBlockNumber = BigInteger.valueOf(blockNumber).subtract(chainConfig.getSettlePeriodBlockCount()).add(BigInteger.ONE);
+                result = client.getHistoryVerifierList(prevEpochFirstBlockNumber);
+                if (!result.isStatusOk()) {
+                    throw new CandidateException(String.format("【底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),当前块号({}),错误详情:%s]",prevEpochFirstBlockNumber,prevEpochFirstBlockNumber,blockNumber,result.errMsg));
+                }else{
+                    bc.getPreVerifier().clear();
+                    result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                }
             }
+
 
             // ==================================更新当前周期验证人列表=======================================
             BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
