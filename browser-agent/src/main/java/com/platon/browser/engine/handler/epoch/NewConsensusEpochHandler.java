@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static java.lang.String.format;
 
 /**
  * @Auther: Chendongming
@@ -103,10 +104,10 @@ public class NewConsensusEpochHandler implements EventHandler {
             try {
                 result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
             } catch (Exception e) {
-                throw new CandidateException(String.format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,blockNumber,e.getMessage()));
+                throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
             }
             if (!result.isStatusOk()) {
-                throw new CandidateException(String.format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,blockNumber,result.errMsg));
+                throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
             }else{
                 bc.getPreValidator().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
@@ -118,17 +119,17 @@ public class NewConsensusEpochHandler implements EventHandler {
         try {
             result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
         } catch (Exception e) {
-            throw new CandidateException(String.format("【查询当前共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:[可能原因:(1.Agent共识周期块数设置与链上不一致;2.底层链在共识周期切换块号【%s】未记录共识周期验证人历史.),错误详情:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,blockNumber,e.getMessage()));
+            throw new CandidateException(format("【查询当前共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",nextEpochFirstBlockNumber,e.getMessage()));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
                 result = client.getNodeContract().getValidatorList().send();
             } catch (Exception e) {
-                throw new CandidateException(String.format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
+                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
-                throw new CandidateException(String.format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
+                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
             }
         }
         bc.getCurValidator().clear();

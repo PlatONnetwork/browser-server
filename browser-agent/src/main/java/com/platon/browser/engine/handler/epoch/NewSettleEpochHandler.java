@@ -82,10 +82,10 @@ public class NewSettleEpochHandler implements EventHandler {
             try {
                 result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
             } catch (Exception e) {
-                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,e.getMessage()));
+                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
             }
             if (!result.isStatusOk()) {
-                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",prevEpochLastBlockNumber,prevEpochLastBlockNumber,result.errMsg));
+                throw new CandidateException(String.format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
             }else{
                 bc.getPreVerifier().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
@@ -97,7 +97,7 @@ public class NewSettleEpochHandler implements EventHandler {
         try {
             result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
         } catch (Exception e) {
-            throw new CandidateException(String.format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:[可能原因:(1.Agent结算周期块数设置与链上不一致;2.底层链在结算周期切换块号【%s】未记录结算周期验证人历史.),错误详情:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+            throw new CandidateException(String.format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,e.getMessage()));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
