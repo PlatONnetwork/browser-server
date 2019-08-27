@@ -186,6 +186,7 @@ public class TxParamResolver {
                         String upgradeVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //pIDID
                         String upgradelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String upgradelpidid =  new String(Numeric.hexStringToByteArray(upgradelpIDID));
                         //升级版本
                         BigInteger newVersion =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //投票截止区块高度
@@ -193,7 +194,7 @@ public class TxParamResolver {
                         //结束轮转换结束区块高度
 
                         CreateProposalUpgradeParam createProposalUpgradeParam = new CreateProposalUpgradeParam();
-                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpIDID,endBlockRound.intValue(),
+                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpidid,endBlockRound.intValue(),
                                 newVersion.intValue());
                         result.param = createProposalUpgradeParam;
                         break;
@@ -204,6 +205,7 @@ public class TxParamResolver {
                         String cancelVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //本提案的pIDID
                         String cancelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String cancelpidid =  new String(Numeric.hexStringToByteArray(cancelpIDID));
                         //投票截止区块高度
                         BigInteger cancelEndBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //被取消的pIDID
@@ -211,7 +213,7 @@ public class TxParamResolver {
 
 
                         CancelProposalParam cancelProposalParam = new CancelProposalParam();
-                        cancelProposalParam.init(cancelVerifier,cancelpIDID,cancelEndBlockRound.intValue(),canceledProposalID);
+                        cancelProposalParam.init(cancelVerifier,cancelpidid,cancelEndBlockRound.intValue(),canceledProposalID);
                         result.param = cancelProposalParam;
                         break;
                     case VOTING_PROPOSAL: // 2003
@@ -221,6 +223,7 @@ public class TxParamResolver {
                         String voteVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //提案ID
                         String proposalID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String proposalid =  new String(Numeric.hexStringToByteArray(proposalID));
                         //投票选项
                         BigInteger option =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //节点代码版本，有rpc的getProgramVersion接口获取
@@ -229,7 +232,7 @@ public class TxParamResolver {
                         String versionSign = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         VotingProposalParam votingProposalParam = new VotingProposalParam();
-                        votingProposalParam.init(voteVerifier,proposalID,option.toString(),programVersions.toString(),versionSign);
+                        votingProposalParam.init(voteVerifier,proposalid,option.toString(),programVersions.toString(),versionSign);
                         result.param = votingProposalParam;
                         break;
                     case DECLARE_VERSION: // 2004
