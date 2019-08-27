@@ -55,8 +55,18 @@ public class TransactionDetailsResp {
     private Integer pipNum;//提案pip编号
     private Integer proposalStatus;//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
     private String proposalTitle;//提案标题
+    
+    private String txAmount; //交易手续费
+    
+    @JsonSerialize(using = CustomLatSerializer.class)
 	public String getTxHash() {
 		return txHash;
+	}
+	public String getTxAmount() {
+		return txAmount;
+	}
+	public void setTxAmount(String txAmount) {
+		this.txAmount = txAmount;
 	}
 	public void setTxHash(String txHash) {
 		this.txHash = txHash;
@@ -121,6 +131,7 @@ public class TransactionDetailsResp {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getActualTxCost() {
 		return actualTxCost;
 	}

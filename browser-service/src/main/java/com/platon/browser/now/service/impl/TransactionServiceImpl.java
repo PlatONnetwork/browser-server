@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,7 +338,7 @@ public class TransactionServiceImpl implements TransactionService {
 					resp.setWebsite(createValidatorParam.getWebsite());
 					resp.setDetails(createValidatorParam.getDetails());
 					resp.setProgramVersion(createValidatorParam.getProgramVersion());
-					resp.setValue(createValidatorParam.getAmount());
+					resp.setTxAmount(createValidatorParam.getAmount());
 					break;
 				//编辑验证人
 				case EDIT_VALIDATOR:
@@ -353,8 +354,18 @@ public class TransactionServiceImpl implements TransactionService {
 				case INCREASE_STAKING:
 					IncreaseStakingParam increaseStakingParam = JSONObject.parseObject(txInfo, IncreaseStakingParam.class);
 					resp.setNodeId(increaseStakingParam.getNodeId());
-					resp.setNodeName(increaseStakingParam.getNodeName());
-					resp.setValue(increaseStakingParam.getAmount());
+					if(StringUtils.isNotBlank(increaseStakingParam.getNodeName())) {
+						resp.setNodeName(increaseStakingParam.getNodeName());
+					} else {
+						StakingExample stakingExample = new StakingExample();
+						stakingExample.setOrderByClause(" staking_block_num desc");
+						stakingExample.createCriteria().andNodeIdEqualTo(increaseStakingParam.getNodeId());
+						List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+						if(stakings.size()>0) {
+							resp.setNodeName(stakings.get(0).getStakingName());
+						}
+					}
+					resp.setTxAmount(increaseStakingParam.getAmount());
 					break;
 				//退出验证人
 				case EXIT_VALIDATOR:

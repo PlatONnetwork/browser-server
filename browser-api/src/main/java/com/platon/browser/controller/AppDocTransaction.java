@@ -250,6 +250,7 @@ public interface AppDocTransaction {
      *       "pipNum":"",//提案pip编号
      *       "proposalStatus":"",//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
      *       "proposalTitle":"",//提案标题
+     *       "txAmount" : ""  //交易金额包括质押数量
      *        --可选信息结束
      * }
      */	
