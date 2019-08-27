@@ -47,7 +47,6 @@ public class AddressEngine {
     }
 
     public void execute (CustomTransaction tx,BlockChain bc) {
-        context.setBlockChain(bc);
         context.setTransaction(tx);
         addressStatisticHandler.handle(context);
     }

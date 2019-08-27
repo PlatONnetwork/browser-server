@@ -14,6 +14,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -27,12 +28,12 @@ import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 @Component
 public class CreateValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(CreateValidatorHandler.class);
-
+    @Autowired
+    private BlockChain bc;
     @Override
     public void handle(EventContext context) throws BlockChainException {
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));

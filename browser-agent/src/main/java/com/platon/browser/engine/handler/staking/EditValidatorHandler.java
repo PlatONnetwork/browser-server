@@ -13,6 +13,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -27,10 +28,12 @@ import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 public class EditValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(EditValidatorHandler.class);
 
+    @Autowired
+    private BlockChain bc;
+
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
-        BlockChain bc = context.getBlockChain();
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);

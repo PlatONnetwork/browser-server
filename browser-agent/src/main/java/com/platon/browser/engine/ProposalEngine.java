@@ -74,7 +74,6 @@ public class ProposalEngine {
      */
     void execute(CustomTransaction tx, BlockChain bc) throws BusinessException, NoSuchBeanException {
         // 事件上下文
-        context.setBlockChain(bc);
         context.setTransaction(tx);
         switch (tx.getTypeEnum()){
             case CREATE_PROPOSAL_TEXT: proposalTextHandler.handle(context);break; //提交文本提案(创建提案)

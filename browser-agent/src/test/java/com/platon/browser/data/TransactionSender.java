@@ -198,7 +198,7 @@ public class TransactionSender {
         logger.error("{}",blockNumber);
 
         try {
-            BaseResponse <List <Node>> result = nodeContract.getCandidateList().send();
+            BaseResponse <List <Node>> result = nodeContract.getValidatorList().send();
             System.out.println(result);
         } catch (Exception e) {
             e.printStackTrace();

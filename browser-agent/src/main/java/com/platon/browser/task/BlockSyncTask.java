@@ -93,9 +93,12 @@ public class BlockSyncTask {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
+        // 更新当前所在周期的区块奖励和结算周期质押奖励
         if (maxBlockNumber != null && maxBlockNumber > 0) {
             commitBlockNumber = maxBlockNumber;
-            blockChain.initBlockRewardAndSettleReward(maxBlockNumber);
+            blockChain.updateReward(maxBlockNumber);
+        }else{
+            blockChain.updateReward(0l);
         }
 
         /*
