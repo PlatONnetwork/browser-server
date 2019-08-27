@@ -216,7 +216,6 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setStakingQty(block.getStatStakingQty());
 			blockDetailResp.setProposalQty(block.getStatProposalQty());
 			
-			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			
