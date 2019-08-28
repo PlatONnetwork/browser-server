@@ -206,6 +206,7 @@ public class BlockSyncTask {
                 blockNumbers.add(BigInteger.valueOf(blockNumber));
             }
             if(blockNumbers.size()==0){
+                logger.info("当前链最高块({}),等待链出下一个块...",curChainBlockNumber);
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
