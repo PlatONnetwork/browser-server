@@ -304,6 +304,7 @@ public class BlockChain {
             this.blockReward=blockReward;
             logger.debug("当前区块奖励:{}",blockReward.toString());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
         }
     }
