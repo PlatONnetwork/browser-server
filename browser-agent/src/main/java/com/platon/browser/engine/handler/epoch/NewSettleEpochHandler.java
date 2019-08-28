@@ -179,18 +179,8 @@ public class NewSettleEpochHandler implements EventHandler {
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
             curStaking.setStakingLocked(stakingLocked.toString());
             curStaking.setStakingHas(BigInteger.ZERO.toString());
-            // 当前结算周期轮数-减持质押时的结算轮数==指定的质押退回所要经过的结算周期轮数
-            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) == chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
-                // 因为减持质押需要隔一个结算周期才会释放，所以当前周期必须要大于当前质押中的解质押发生的周期，即：
-                // 假设结算周期是500
-                // |--------|--------|--------|
-                // 1        500     1000     1500
-                // 结算周期(1~500)内的解质押会在结算周期(500~1000)结束的时候(第1000块)释放
-                // 假设周期(1~500)内做了质押A，staking.getStakingReductionEpoch()的值为1，则：
-                // 1、第500块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为1，是不会进入此代码块的
-                // 2、第1000块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为2，是会进入此代码块的
-                //
-                // 当前结算周期轮数大于质押结算周期标识，则表明前一结算周期的解质押已释放
+            // 当前结算周期轮数-减持质押时的结算轮数>=指定的质押退回所要经过的结算周期轮数
+            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
             BigInteger stakingReduction = curStaking.integerStakingReduction();
