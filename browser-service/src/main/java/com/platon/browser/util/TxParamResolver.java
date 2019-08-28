@@ -223,7 +223,6 @@ public class TxParamResolver {
                         String voteVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //提案ID
                         String proposalID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
-                        String proposalid =  new String(Numeric.hexStringToByteArray(proposalID));
                         //投票选项
                         BigInteger option =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //节点代码版本，有rpc的getProgramVersion接口获取
@@ -232,7 +231,7 @@ public class TxParamResolver {
                         String versionSign = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
 
                         VotingProposalParam votingProposalParam = new VotingProposalParam();
-                        votingProposalParam.init(voteVerifier,proposalid,option.toString(),programVersions.toString(),versionSign);
+                        votingProposalParam.init(voteVerifier,proposalID,option.toString(),programVersions.toString(),versionSign);
                         result.param = votingProposalParam;
                         break;
                     case DECLARE_VERSION: // 2004
