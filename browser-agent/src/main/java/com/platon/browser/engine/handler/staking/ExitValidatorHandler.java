@@ -41,6 +41,11 @@ public class ExitValidatorHandler implements EventHandler {
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithExitValidatorParam(param,bc.getCurSettingEpoch());
+            //交易info数据回填补充
+            param.setNodeName(latestStaking.getStakingName());
+            param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+            String txinfo = JSON.toJSONString(param);
+            tx.setTxInfo(txinfo);
             stakingStage.updateStaking(latestStaking,tx);
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
