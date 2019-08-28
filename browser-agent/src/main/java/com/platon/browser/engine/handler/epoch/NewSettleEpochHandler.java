@@ -179,7 +179,8 @@ public class NewSettleEpochHandler implements EventHandler {
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
             curStaking.setStakingLocked(stakingLocked.toString());
             curStaking.setStakingHas(BigInteger.ZERO.toString());
-            if(bc.getCurSettingEpoch().longValue() > curStaking.getStakingReductionEpoch()){
+            // 当前结算周期轮数-减持质押时的结算轮数==指定的质押退回所要经过的结算周期轮数
+            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) == chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
                 // 因为减持质押需要隔一个结算周期才会释放，所以当前周期必须要大于当前质押中的解质押发生的周期，即：
                 // 假设结算周期是500
                 // |--------|--------|--------|
