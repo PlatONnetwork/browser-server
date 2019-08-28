@@ -11,6 +11,7 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.handler.epoch.NewConsensusEpochHandler;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
@@ -103,6 +104,8 @@ public class BlockChain {
     @Autowired
     private NetworkStatStatisticHandler networkStatStatisticHandler;
     @Autowired
+    private NewConsensusEpochHandler newConsensusEpochHandler;
+    @Autowired
     private NewIssueEpochHandler newIssueEpochHandler;
 
     /***
@@ -116,10 +119,13 @@ public class BlockChain {
     private Map <String, org.web3j.platon.bean.Node> curValidator = new HashMap <>();// 当前共识周期验证人
 
     @PostConstruct
-    private void init () throws IssueEpochChangeException {
+    private void init () throws Exception {
         // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
         settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount());
-
+        // 初始化共识验证人列表
+        curBlock = new CustomBlock(); // 为了调用newConsensusEpochHandler.updateValidator()必须要有一个块
+        curBlock.setNumber(1L);
+        newConsensusEpochHandler.updateValidator();
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
@@ -222,7 +228,7 @@ public class BlockChain {
         Long blockNumber = curBlock.getNumber();
 
         // (当前块号+选举回退块数)%共识周期区块数
-        if (blockNumber+chainConfig.getElectionBackwardBlockCount().longValue() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
+        if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             logger.debug("选举验证人：Block Number({})", blockNumber);
             stakingExecute.onElectionDistance(curBlock, this);
 

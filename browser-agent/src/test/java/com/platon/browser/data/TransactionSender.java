@@ -1,13 +1,10 @@
 package com.platon.browser.data;
 
-import com.platon.browser.exception.IssueEpochChangeException;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.StakingAmountType;
 import org.web3j.platon.bean.Node;
@@ -17,9 +14,7 @@ import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
@@ -28,7 +23,6 @@ import org.web3j.utils.Convert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -41,7 +35,8 @@ public class TransactionSender {
     //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 
     private String chainId = "100";
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6787"));
     private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
@@ -142,7 +137,7 @@ public class TransactionSender {
     }
 
     @Test
-    public void getBlockNumber() throws IssueEpochChangeException, IOException {
+    public void getBlockNumber() throws IOException {
         Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
         long blockNum = 11777;
         /*while (true){
@@ -198,10 +193,16 @@ public class TransactionSender {
         logger.error("{}",blockNumber);
 
         try {
-            BaseResponse <List <Node>> result = nodeContract.getValidatorList().send();
+            BaseResponse <List <Node>> result = nodeContract.getVerifierList().send();
             System.out.println(result);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        BigDecimal bg = Convert.toVon("1", Convert.Unit.LAT);
+        System.out.println(bg);
+        bg = Convert.fromVon("10000000000000000000000000", Convert.Unit.LAT);
+        System.out.println(bg);
     }
 }

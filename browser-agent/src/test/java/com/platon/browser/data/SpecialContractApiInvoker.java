@@ -167,16 +167,10 @@ public class SpecialContractApiInvoker {
         System.out.println(response.status);*/
         //System.out.println(a);
 
-        try {
-            BaseResponse<List<Node>> nodes = getHistoryValidatorList(BigInteger.valueOf(80000));
-            logger.debug("{}",nodes);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         try {
-            BaseResponse<List<Node>>  nodes = getHistoryVerifierList(BigInteger.valueOf(80000));
+            BaseResponse<List<Node>>  nodes = getHistoryVerifierList(BigInteger.valueOf(0));
             logger.debug("{}",nodes);
         } catch (Exception e) {
             e.printStackTrace();

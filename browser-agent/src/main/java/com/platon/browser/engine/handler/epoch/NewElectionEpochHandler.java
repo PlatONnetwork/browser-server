@@ -68,7 +68,7 @@ public class NewElectionEpochHandler implements EventHandler {
                     staking.setStakingHas(BigInteger.ZERO.toString());
                     staking.setLeaveTime(new Date());
                     if(lockedAmount.compareTo(BigDecimal.ZERO)>0){
-                        staking.setStakingReduction(lockedAmount.toString());
+                        staking.setStakingReduction(lockedAmount.setScale(0,RoundingMode.FLOOR).toString());
                         staking.setStakingLocked(BigInteger.ZERO.toString());
                         staking.setStakingReductionEpoch(bc.getCurSettingEpoch().intValue());
                         staking.setStatus(CustomStaking.StatusEnum.EXITING.code);
@@ -81,9 +81,9 @@ public class NewElectionEpochHandler implements EventHandler {
                 } else {
                     if(stakingHas.compareTo(slashAmount)>=0){
                         // 如果犹豫期金额大于等于处罚金额
-                        staking.setStakingHas(stakingHas.subtract(slashAmount).toString());
+                        staking.setStakingHas(stakingHas.subtract(slashAmount).setScale(0,RoundingMode.CEILING).toString());
                     }else{
-                        staking.setStakingLocked(stakingLocked.add(stakingHas).subtract(slashAmount).toString());
+                        staking.setStakingLocked(stakingLocked.add(stakingHas).subtract(slashAmount).setScale(0,RoundingMode.FLOOR).toString());
                         staking.setStakingHas(BigInteger.ZERO.toString());
                     }
                 }
@@ -92,19 +92,11 @@ public class NewElectionEpochHandler implements EventHandler {
 
                 // 更新被处罚节点统计信息（如果存在）
                 try {
-                    CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
-                    customNode.setStatSlashLowQty(customNode.getStatSlashLowQty()+1);
-                    stakingStage.updateNode(customNode);
-                } catch (NoSuchBeanException e) {
-                    logger.error("更新被处罚节点统计信息出错：{}",e.getMessage());
-                }
-
-                // 节点中的出块率低处罚次数+1
-                try {
                     CustomNode node = NODE_CACHE.getNode(staking.getNodeId());
                     node.setStatSlashLowQty(node.getStatSlashLowQty()+1);
+                    stakingStage.updateNode(node);
                 } catch (NoSuchBeanException e) {
-                    logger.error("更新节点出块率低处罚次数出错:{}",e.getMessage());
+                    logger.error("更新被处罚节点统计信息出错：{}",e.getMessage());
                 }
             }
         }
