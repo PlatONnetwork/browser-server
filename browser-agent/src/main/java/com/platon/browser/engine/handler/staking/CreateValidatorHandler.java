@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.staking;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -63,7 +64,7 @@ public class CreateValidatorHandler implements EventHandler {
                 }
                 if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
                     // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
-                    logger.error("[DuplicateStakingError]链上重复质押同一节点(nodeId={})",node.getNodeId());
+                    logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), JSON.toJSONString(param));
                 }
             } catch (NoSuchBeanException e) {
                 logger.error("{}",e.getMessage());
