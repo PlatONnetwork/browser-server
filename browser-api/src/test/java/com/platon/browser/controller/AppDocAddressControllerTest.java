@@ -35,7 +35,7 @@ public class AppDocAddressControllerTest {
     
     @Test
     public void details() throws Exception{
-    	String requestBody = "{\"address\":\"0x\"}";
+    	String requestBody = "{\"address\":\"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/address/details")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());

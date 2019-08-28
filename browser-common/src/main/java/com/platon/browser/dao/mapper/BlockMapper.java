@@ -1,5 +1,6 @@
 package com.platon.browser.dao.mapper;
 
+import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import java.util.List;
@@ -20,7 +21,7 @@ public interface BlockMapper {
 
     List<Block> selectByExampleWithBLOBs(BlockExample example);
 
-    List<Block> selectByExample(BlockExample example);
+    Page<Block> selectByExample(BlockExample example);
 
     Block selectByPrimaryKey(Long number);
 

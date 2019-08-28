@@ -105,7 +105,8 @@ public class BlockServiceImpl implements BlockService {
 		Criteria criteria = blockExample.createCriteria();
 		criteria.andNodeIdEqualTo(req.getNodeId());
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-		List<Block> blocks = blockMapper.selectByExample(blockExample);
+		Page<Block> blockPage = blockMapper.selectByExample(blockExample);
+		List<Block> blocks = blockPage.getResult();
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
 		for (Block block : blocks) {
@@ -115,13 +116,14 @@ public class BlockServiceImpl implements BlockService {
 			blockListResp.setTimestamp(block.getTimestamp().getTime());
 			lists.add(blockListResp);
 		}
-		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		if(blockEnd.isEmpty()) {
-			page.setTotal(0);
-		} else {
-			page.setTotal(blockEnd.get(0).getNumber());
-		}
+//		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
+//		if(blockEnd.isEmpty()) {
+//			page.setTotal(0);
+//		} else {
+//			page.setTotal(blockEnd.get(0).getNumber());
+//		}
+		page.setTotal(blockPage.getTotal());
 		respPage.init(page, lists);
 		return respPage;
 	}
