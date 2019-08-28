@@ -46,20 +46,21 @@ public class TransactionDetailsResp {
     private String proposalNewVersion;  //升级提案的版本
     private String declareVersion;      //声明的版本 
     private Integer txReceiptStatus;     //交易状态
+    private String voteStatus;      //投票选项 1:支持  2:反对 3:弃权
     
     private String evidence;//证据
     private Integer reportType;//举报类型:1：区块双签
     private String reportRewards;//举报奖励
     private Integer reportStatus;//举报状态 \r\n1：失败\r\n2：成功
     
-    private Integer pipNum;//提案pip编号
+    private String pipNum;//提案pip编号
     private Integer proposalStatus;//提案状态\r\n1：投票中\r\n2：通过\r\n3：失败\r\n4：预升级\r\n5：升级完成
     private String proposalTitle;//提案标题
     
     private String preHash;// 上一条记录
     private String nextHash;// 下一条记录
     
-    private String txAmount; //交易手续费
+    private String txAmount; //惨剧费用
     
 
 	public String getTxHash() {
@@ -116,12 +117,14 @@ public class TransactionDetailsResp {
 	public void setGasUsed(String gasUsed) {
 		this.gasUsed = gasUsed;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getGasPrice() {
 		return gasPrice;
 	}
 	public void setGasPrice(String gasPrice) {
 		this.gasPrice = gasPrice;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getValue() {
 		return value;
 	}
@@ -329,10 +332,10 @@ public class TransactionDetailsResp {
 	public void setReportStatus(Integer reportStatus) {
 		this.reportStatus = reportStatus;
 	}
-	public Integer getPipNum() {
+	public String getPipNum() {
 		return pipNum;
 	}
-	public void setPipNum(Integer pipNum) {
+	public void setPipNum(String pipNum) {
 		this.pipNum = pipNum;
 	}
 	public Integer getProposalStatus() {
@@ -365,6 +368,12 @@ public class TransactionDetailsResp {
 	}
 	public void setTxAmount(String txAmount) {
 		this.txAmount = txAmount;
+	}
+	public String getVoteStatus() {
+		return voteStatus;
+	}
+	public void setVoteStatus(String voteStatus) {
+		this.voteStatus = voteStatus;
 	}
 
 }

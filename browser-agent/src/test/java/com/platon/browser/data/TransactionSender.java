@@ -53,18 +53,18 @@ public class TransactionSender {
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
-//    	for(int i=0;i<30;i++) {
+    	for(int i=0;i<30;i++) {
 	        Transfer.sendFunds(
 	                currentValidWeb3j,
 	                credentials,
 	                chainId,
 	                "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
-	                BigDecimal.valueOf(1000000),
+	                BigDecimal.valueOf(10),
 	                Convert.Unit.LAT
 	        ).send();
 	        BigInteger balance = currentValidWeb3j.platonGetBalance("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219", DefaultBlockParameterName.LATEST).send().getBalance();
 	        logger.debug("balance:{}",balance);
-//    	}
+    	}
     }
 
     // 发送质押交易
@@ -151,7 +151,7 @@ public class TransactionSender {
     public void unDelegate() throws Exception {
         BaseResponse res = delegateContract.unDelegate(
                 "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
-                BigInteger.valueOf(1288),
+                BigInteger.valueOf(259),
                 BigInteger.valueOf(1000)
         ).send();
         logger.debug("res:{}",res);

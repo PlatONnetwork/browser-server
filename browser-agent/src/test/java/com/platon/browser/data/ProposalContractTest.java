@@ -79,7 +79,7 @@ public class ProposalContractTest {
     @Test
     public void submitTextProposal() {
         try {
-        	Proposal proposal = Proposal.createSubmitTextProposalParam(nodeId, "2");
+        	Proposal proposal = Proposal.createSubmitTextProposalParam(nodeId, "1");
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
             BaseResponse baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_TEXT_FUNC_TYPE).send();
             System.out.println("发起提案结果："+baseResponse.toString());
@@ -99,8 +99,8 @@ public class ProposalContractTest {
     public void submitVersionProposal() {
         try {
         	BigInteger newVersion =  BigInteger.valueOf(20000);
-        	BigInteger endVotingRounds =  BigInteger.valueOf(1);
-            Proposal proposal = Proposal.createSubmitVersionProposalParam(nodeId, "1", newVersion,endVotingRounds);
+        	BigInteger endVotingRounds =  BigInteger.valueOf(2);
+            Proposal proposal = Proposal.createSubmitVersionProposalParam(nodeId, "2", newVersion,endVotingRounds);
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
             BaseResponse baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
             System.out.println("发起提案结果："+baseResponse.toString());
@@ -117,7 +117,7 @@ public class ProposalContractTest {
     public void voteForProposal(String proposalID) {
         vote(proposalID, 
         		"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7", 
-        		"http://192.168.112.171:8789", VoteOption.YEAS);
+        		"http://192.168.112.172:8789", VoteOption.YEAS);
 //       
 //        vote(proposalID, 
 //        		"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85", 

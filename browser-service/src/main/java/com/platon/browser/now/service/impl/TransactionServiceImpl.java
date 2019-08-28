@@ -24,12 +24,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.CustomVoteMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.UnDelegationMapper;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
@@ -52,6 +54,8 @@ import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.param.PlanParam;
 import com.platon.browser.param.ReportValidatorParam;
 import com.platon.browser.param.UnDelegateParam;
+import com.platon.browser.param.VotingProposalParam;
+import com.platon.browser.redis.dto.NetworkStatRedis;
 import com.platon.browser.redis.dto.TransactionRedis;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
@@ -90,6 +94,8 @@ public class TransactionServiceImpl implements TransactionService {
     private SlashMapper slashMapper;
     @Autowired
     private ProposalMapper proposalMapper;
+    @Autowired
+    private CustomVoteMapper customVoteMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
     @Autowired
@@ -302,9 +308,8 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTimestamp(transaction.getTimestamp().getTime());
     		resp.setServerTime(new Date().getTime());
     		// "confirmNum":444,         //区块确认数
-    		TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(0, 1);
-    		List<TransactionRedis> items = transactionCacheDto.getTransactionRedisList();
-    		resp.setConfirmNum(String.valueOf(items.get(0).getBlockNumber()-transaction.getBlockNumber()));
+    		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
+    		resp.setConfirmNum(String.valueOf(networkStatRedis.getCurrentNumber()-transaction.getBlockNumber()));
     		/*
     		 * "first":false,            //是否第一条记录
     		 * "last":true,              //是否最后一条记录
@@ -375,9 +380,12 @@ public class TransactionServiceImpl implements TransactionService {
 					// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 					ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
 					resp.setNodeId(exitValidatorParam.getNodeId());
+					resp.setNodeName(exitValidatorParam.getNodeName());
 					StakingKey stakingKey = new StakingKey();
 					stakingKey.setNodeId(exitValidatorParam.getNodeId());
-					stakingKey.setStakingBlockNum(transaction.getBlockNumber());
+					if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
+						stakingKey.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
+					}
 					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
 					if(staking!=null) {
 						resp.setNodeName(staking.getStakingName());
@@ -398,6 +406,7 @@ public class TransactionServiceImpl implements TransactionService {
 					DelegateParam delegateParam = JSONObject.parseObject(txInfo, DelegateParam.class);
 					resp.setNodeId(delegateParam.getNodeId());
 					resp.setNodeName(delegateParam.getNodeName());
+					resp.setTxAmount(delegateParam.getAmount());
 					break;
 				//委托赎回
 				case UN_DELEGATE:
@@ -425,27 +434,49 @@ public class TransactionServiceImpl implements TransactionService {
 //					break;
 				case CREATE_PROPOSAL_PARAMETER:
 					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
-					//TODO 暂无
-					break;
-				case VOTING_PROPOSAL:
-					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
-//					VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
-//					resp.setProposalHash(votingProposalParam.getProposalId());
-//					resp.setProposalOption(votingProposalParam.getOption());
 					Proposal proposal = proposalMapper.selectByPrimaryKey(req.getTxHash());
 					if(proposal != null) {
-						resp.setProposalHash(proposal.getPipNum());
-						resp.setPipNum(proposal.getPipId());
+						resp.setNodeId(proposal.getVerifier());
+						resp.setNodeName(proposal.getVerifierName());
+						resp.setProposalHash(req.getTxHash());
+						resp.setPipNum(proposal.getPipNum());
 						resp.setProposalTitle(proposal.getTopic());
 						resp.setProposalStatus(proposal.getStatus());
 						resp.setProposalOption(proposal.getType());
 						resp.setProposalNewVersion(proposal.getNewVersion());
+						resp.setProposalUrl(proposal.getUrl());
+					}
+					break;
+				case VOTING_PROPOSAL:
+					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
+//					VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
+					CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
+					if(customVoteProposal != null) {
+						resp.setNodeId(customVoteProposal.getVerifier());
+						resp.setNodeName(customVoteProposal.getVerifierName());
+						resp.setProposalOption(customVoteProposal.getType());
+						resp.setProposalHash(req.getTxHash());
+						resp.setProposalNewVersion(customVoteProposal.getNewVersion());
+						resp.setPipNum(customVoteProposal.getPipNum());
+						resp.setProposalTitle(customVoteProposal.getTopic());
+						resp.setProposalUrl(customVoteProposal.getUrl());
+						resp.setVoteStatus(customVoteProposal.getOption());
 					}
 					break;
 				case DECLARE_VERSION:
 					DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
 					resp.setNodeId(declareVersionParam.getActiveNode());
-//					resp.setNodeName(txInfoJson.getString("nodeName"));
+					if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
+						resp.setNodeName(declareVersionParam.getNodeName());
+					} else {
+						StakingExample stakingExample = new StakingExample();
+						stakingExample.setOrderByClause(" staking_block_num desc");
+						stakingExample.createCriteria().andNodeIdEqualTo(declareVersionParam.getActiveNode());
+						List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+						if(stakings.size()>0) {
+							resp.setNodeName(stakings.get(0).getStakingName());
+						}
+					}
 					resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 					break;
 				case REPORT_VALIDATOR:
