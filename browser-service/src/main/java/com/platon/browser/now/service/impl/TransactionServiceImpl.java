@@ -316,6 +316,7 @@ public class TransactionServiceImpl implements TransactionService {
     		 */
     		TransactionExample condition = new TransactionExample();
     		condition.createCriteria().andSequenceLessThan(transaction.getSequence());
+    		condition.setOrderByClause("sequence DESC");
     		PageHelper.startPage(1,1);
     		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
@@ -325,6 +326,7 @@ public class TransactionServiceImpl implements TransactionService {
     		}
     		condition = new TransactionExample();
     		condition.createCriteria().andSequenceGreaterThan(transaction.getSequence());
+    		condition.setOrderByClause("sequence ASC");
     		PageHelper.startPage(1,1);
     		transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
