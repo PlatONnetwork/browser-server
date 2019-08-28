@@ -128,7 +128,7 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public BlockDownload blockListByNodeIdDownload(String nodeId, String date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
         logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
         // 限制最多导出3万条记录
@@ -216,7 +216,6 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setStakingQty(block.getStatStakingQty());
 			blockDetailResp.setProposalQty(block.getStatProposalQty());
 			
-			blockDetailResp.setBlockReward(EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)));
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			

@@ -62,7 +62,7 @@ public class TransactionServiceImplTest {
 //	@Test
 	public void transactionListByAddressDownload() {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
-		String date = "2019-08-21 00:00:01";
+		String date = "2019-08-21";
 		// TODO
 		AccountDownload accountDownload = this.transactionService.transactionListByAddressDownload(address, date);
 		assertNotNull(accountDownload.getData());
@@ -76,7 +76,7 @@ public class TransactionServiceImplTest {
 		assertNotNull(resp);
 	}
 	
-	@Test
+//	@Test
 	public void transactionDetailNavigate() {
 		TransactionDetailNavigateReq req = new TransactionDetailNavigateReq();
 		req.setTxHash("0x215eb99a9ee0d0e75e88a99897aa2b71711c09a7296a66591fa88e9c39b13a6f");

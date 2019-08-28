@@ -220,7 +220,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public AccountDownload transactionListByAddressDownload(String address, String date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
         TransactionExample transactionExample = new TransactionExample();  
@@ -239,7 +239,6 @@ public class TransactionServiceImpl implements TransactionService {
         
         // 限制最多导出3万条记录
         PageHelper.startPage(1,30000);
-        transactionExample.or(first);
         transactionExample.or(second);
         
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
@@ -248,15 +247,15 @@ public class TransactionServiceImpl implements TransactionService {
         items.forEach(transaction -> {
 
             boolean toIsAddress = address.equals(transaction.getTo());
-            String valueIn = toIsAddress? transaction.getValue() : "";
-            String valueOut = !toIsAddress? transaction.getValue() : "";
+            String valueIn = toIsAddress? transaction.getValue() : "0";
+            String valueOut = !toIsAddress? transaction.getValue() : "0";
 
             Object[] row = {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
 //                  TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
-                    TransactionTypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).desc,
+                    TransactionTypeEnum.getEnum(transaction.getTxType()).desc,
                     transaction.getFrom(),
                     transaction.getTo(),
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
@@ -316,6 +315,8 @@ public class TransactionServiceImpl implements TransactionService {
     		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
     			resp.setFirst(true);
+    		}else {
+    			resp.setPreHash(transactionList.get(0).getHash());
     		}
     		condition = new TransactionExample();
     		condition.createCriteria().andSequenceGreaterThan(transaction.getSequence());
@@ -323,6 +324,8 @@ public class TransactionServiceImpl implements TransactionService {
     		transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
     			resp.setLast(true);
+    		}else {
+    			resp.setNextHash(transactionList.get(0).getHash());
     		}
     		//暂时只有账户合约
     		resp.setReceiveType("account");
