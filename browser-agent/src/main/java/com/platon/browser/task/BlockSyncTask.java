@@ -166,8 +166,8 @@ public class BlockSyncTask {
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
                     // 内置节点默认设置状态为1
                     staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
-                    BigDecimal stakingLocked = Convert.toVon(blockChain.getChainConfig().getInitValidatorStakingLockedAmount(), Convert.Unit.LAT);
-                    staking.setStakingLocked(stakingLocked.toString());
+                    // 设置内置节点默认初始质押锁定金额
+                    if(candidate!=null) staking.setStakingLocked(candidate.getReleased().toString());
                     // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
