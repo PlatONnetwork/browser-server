@@ -42,7 +42,7 @@ public class StakingInfoUpdateTask {
     private static final String fingerprintpPer = "_/api/1.0/user/autocomplete.json?q=";
 
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/3  * * * * ?")
     protected void start () {
         String keyStoreUrl = blockChain.getChainConfig().getKeyStore();
         try {
@@ -55,6 +55,7 @@ public class StakingInfoUpdateTask {
                     String userName = getUserName(keyStoreInfo);
                     String income = getIncome(keyStoreInfo);
                     customStaking.setExpectedIncome(income);
+                    customStaking.setExternalName(userName);
                     //TODO:数据回填username
                 } catch (IOException e) {
                     logger.error("");
