@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -15,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.utils.Convert;
@@ -23,7 +26,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.Slash;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionExample;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.dao.mapper.CustomVoteMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dao.mapper.SlashMapper;
@@ -37,9 +48,10 @@ import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
+import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.enums.StakingStatus;
+import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
@@ -66,14 +78,9 @@ import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.springframework.beans.BeanUtils;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -206,7 +213,7 @@ public class TransactionServiceImpl implements TransactionService {
         	second.andTxTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         }
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        transactionExample.or(first);
+//        transactionExample.or(first);
         transactionExample.or(second);
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         for (TransactionWithBLOBs transaction:items) {
