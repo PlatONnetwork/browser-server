@@ -346,7 +346,7 @@ public class BlockSyncTask {
                     case TRANSFER: // 转账交易数总和
                         stat.transferQty++;
                         break;
-                    case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
+                    case CANCEL_PROPOSAL://提交取消提案
                     case CREATE_PROPOSAL_TEXT:// 创建文本提案
                     case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
                     case DECLARE_VERSION:// 版本声明
@@ -399,7 +399,7 @@ public class BlockSyncTask {
 
         // 解析交易参数，补充交易中与交易参数相关的信息
         try {
-            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput(),blockChain.getChainConfig(),tx.getBlockNumber().toString());
+            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());

@@ -35,8 +35,7 @@ public class ProposalCancelHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandler.class);
     @Autowired
     private BlockChain bc;
-    @Autowired
-    private BlockChainConfig chainConfig;
+
 
     @Override
     public void handle ( EventContext context ) throws BusinessException {

@@ -39,11 +39,11 @@ public class ProposalUpdateTask {
      * a.http请求查询github治理提案的相关信息并补充
      * b.根据platon底层rpc接口查询提案结果
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/1 * * * * ?")
     protected void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;
-        Set <Proposal> updateSet = new HashSet <>();
+        if(proposalCache.getAllProposal().size() == 0)return;
         for (CustomProposal proposal : proposalCache.getAllProposal()) {//如果已经补充则无需补充
             try {
                 String proposalMarkString = MarkDownParserUtil.parserMD(MarkDownParserUtil.acquireMD(proposal.getUrl()));
@@ -52,9 +52,10 @@ public class ProposalUpdateTask {
                 if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                     //若是取消提案，则需要补充被取消提案相关信息
-                    String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
-                    ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString, ProposalMarkDownDto.class);
-                    proposal.setCanceledTopic(cancelProp.getDescription());
+/*                    String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
+                    ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString, ProposalMarkDownDto.class);*/
+                    proposalCache.getProposal(proposal.getCanceledPipId()).getTopic();
+                    proposal.setCanceledTopic(proposalCache.getProposal(proposal.getCanceledPipId()).getTopic());
                 }
                 // 添加至全量缓存
                 PROPOSALS_CACHE.addProposal(proposal);
