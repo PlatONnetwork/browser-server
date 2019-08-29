@@ -8,28 +8,29 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNetworkStat;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.handler.EventContext;
-import com.platon.browser.engine.handler.epoch.NewConsensusEpochHandler;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.*;
+import com.platon.browser.exception.BlockChainException;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.IssueEpochChangeException;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.DbService;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.bean.Node;
 import org.web3j.protocol.core.DefaultBlockParameter;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -104,9 +105,9 @@ public class BlockChain {
     @Autowired
     private NetworkStatStatisticHandler networkStatStatisticHandler;
     @Autowired
-    private NewConsensusEpochHandler newConsensusEpochHandler;
-    @Autowired
     private NewIssueEpochHandler newIssueEpochHandler;
+    @Autowired
+    private NodeCacheUpdater nodeCacheUpdater;
 
     /***
      * 以下字段业务使用说明：
@@ -122,10 +123,6 @@ public class BlockChain {
     private void init () throws Exception {
         // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
         settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount());
-        // 初始化共识验证人列表
-        curBlock = new CustomBlock(); // 为了调用newConsensusEpochHandler.updateValidator()必须要有一个块
-        curBlock.setNumber(1L);
-        newConsensusEpochHandler.updateValidator();
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
@@ -144,19 +141,21 @@ public class BlockChain {
         curBlock = block;
         // 推算并更新共识周期和结算周期轮数
         updateEpoch(curBlock.getNumber());
+        // 更新staking表中与区块统计相关的信息
+        stakingCacheUpdater.updateStakingPerBlock();
+        // 设置区块奖励
+        curBlock.setBlockReward(blockReward.toString());
         // 分析交易信息，调用业务引擎提取业务数据信息
         analyzeTransaction();
         // 通知各引擎周期临界点事件
         epochChangeEvent();
-        // 设置区块奖励
-        curBlock.setBlockReward(blockReward.toString());
+        // 更新node表中的节点出块数信息
+        nodeCacheUpdater.updateStatBlockQty();
+
         // 统计数据相关累加
         EventContext context = new EventContext();
         networkStatStatisticHandler.handle(context);
-        // 更新node表中的节点出块数信息
-        nodeCacheUpdater.updateStatBlockQty();
-        // 更新staking表中与区块统计相关的信息
-        stakingCacheUpdater.updateStakingPerBlock();
+
         // 更新当前区块的节点名称
         String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
         curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
@@ -182,7 +181,7 @@ public class BlockChain {
                     break;
                 case CREATE_PROPOSAL_TEXT: // 创建文本提案
                 case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
-                case CANCEL_PROPOSAL: // 创建取消提案
+                case CREATE_PROPOSAL_PARAMETER: // 创建参数提案
                 case VOTING_PROPOSAL: // 给提案投票
                 case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx, this);
@@ -227,8 +226,8 @@ public class BlockChain {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
 
-        // (当前块号+选举回退块数)%共识周期区块数
-        if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
+        // (当前块号+选举回退块数)%共识周期区块数==0 && 当前共识周期不是第一个共识周期
+        if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0&&curConsensusEpoch.longValue()>1) {
             logger.debug("选举验证人：Block Number({})", blockNumber);
             stakingExecute.onElectionDistance(curBlock, this);
 

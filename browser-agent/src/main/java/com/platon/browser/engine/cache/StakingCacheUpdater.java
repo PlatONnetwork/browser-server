@@ -30,6 +30,7 @@ public class StakingCacheUpdater {
     @Autowired
     private BlockChain bc;
 
+    String tpl = "节点ID:NODEID,现块号:CUR_NUM,前轮块数:PRE_COUNT,现轮块数:CUR_COUNT";
     /**
      * 更新质押中与区块相关的信息, 每采集到一个区块调用一次
      */
@@ -37,10 +38,13 @@ public class StakingCacheUpdater {
         CustomBlock curBlock = bc.getCurBlock();
         Node node = bc.getCurValidator().get(curBlock.getNodeId());
         if(node!=null){
+            String info = tpl.replace("NODEID",curBlock.getNodeId().substring(0,10))
+                    .replace("CUR_NUM",curBlock.getBlockNumber().toString());
             try {
                 CustomNode customNode = NODE_CACHE.getNode(curBlock.getNodeId());
                 CustomStaking customStaking = customNode.getLatestStaking();
                 if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
+                    info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
                     // 当前共识周期出块奖励
                     BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
                     customStaking.setBlockRewardValue(curConsBlockReward.toString());
@@ -48,10 +52,12 @@ public class StakingCacheUpdater {
                     customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
                     // 把更改后的内容暂存至待更新列表
                     STAGE_DATA.getStakingStage().updateStaking(customStaking);
+                    info = info.replace("CUR_COUNT",customStaking.getCurConsBlockQty().toString());
                 }
             } catch (NoSuchBeanException e) {
-                logger.error("找不到符合条件的质押信息:{}",e.getMessage());
+                logger.error("更新出块奖励和共识出块数错误,找不到符合条件的质押信息:{}",e.getMessage());
             }
+            logger.debug("出块统计:{}", info);
         }
     }
 

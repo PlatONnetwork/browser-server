@@ -8,7 +8,6 @@ import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -107,11 +106,10 @@ public class CustomStaking extends Staking {
      * @param node
      */
     public void updateWithNode(org.web3j.platon.bean.Node node){
-        BeanUtils.copyProperties(node,this);
         // 质押区块高度
         if(node.getStakingBlockNum()!=null) this.setStakingBlockNum(node.getStakingBlockNum().longValue());
         // 质押节点地址
-        this.setNodeId(HexTool.prefix(this.getNodeId()));
+        this.setNodeId(HexTool.prefix(node.getNodeId()));
         // 发起质押交易的索引
         if(node.getStakingTxIndex()!=null) this.setStakingTxIndex(node.getStakingTxIndex().intValue());
         // 发起质押的账户地址
@@ -126,6 +124,7 @@ public class CustomStaking extends Staking {
         this.setStakingName(node.getNodeName());
         // 节点的第三方主页
         this.setWebSite(node.getWebsite());
+        this.setDetails(node.getDetails());
     }
 
     /**

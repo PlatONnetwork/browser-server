@@ -117,6 +117,9 @@ public class NewSettleEpochHandler implements EventHandler {
         if(bc.getCurVerifier().size()==0){
             throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
+
+        logger.debug("前一轮结算周期验证人:{}",JSON.toJSONString(bc.getPreVerifier(),true));
+        logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
 

@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler.epoch;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
@@ -16,11 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.crypto.Hash;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -55,6 +59,11 @@ public class NewConsensusEpochHandler implements EventHandler {
      */
     private void updateStaking(){
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
+        //if(stakingList.size()!=4) throw new RuntimeException("质押信息少于4条！");
+        Long blockNumber = bc.getCurBlock().getNumber();
+        // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
+        Map<String,String> consensusInfo = new HashMap<>();
+        String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
         for (CustomStaking staking:stakingList){
             Node node = bc.getCurValidator().get(staking.getNodeId());
             if(node!=null){
@@ -63,6 +72,11 @@ public class NewConsensusEpochHandler implements EventHandler {
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
+
+            String info = tpl.replace("PRE_QTY",staking.getPreConsBlockQty().toString())
+                    .replace("CUR_QTY",staking.getCurConsBlockQty().toString())
+                    .replace("VER_ROUND",staking.getStatVerifierTime().toString());
+            consensusInfo.put(staking.getNodeId(),info);
             staking.setPreConsBlockQty(staking.getCurConsBlockQty());
             staking.setCurConsBlockQty(BigInteger.ZERO.longValue());
             stakingStage.updateStaking(staking);
@@ -77,6 +91,8 @@ public class NewConsensusEpochHandler implements EventHandler {
                 logger.error("更新共识验证人(nodeId={})验证轮数出错:{}",nodeId,e.getMessage());
             }
         });
+
+        logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }
 
     /**
@@ -89,7 +105,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    public void updateValidator() throws Exception {
+    private void updateValidator() throws Exception {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         BaseResponse<List <Node>> result;
@@ -97,7 +113,7 @@ public class NewConsensusEpochHandler implements EventHandler {
         bc.getPreValidator().clear();
         bc.getPreValidator().putAll(bc.getCurValidator());
         if(bc.getPreValidator().size()==0){
-            // 入参区块号属于前一共识周期，因此可以通过它查询前一共识周期验证人历史列表
+            // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
             BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
             try {
                 result = client.getHistoryValidatorList(prevEpochLastBlockNumber);

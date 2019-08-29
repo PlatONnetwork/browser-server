@@ -1,11 +1,11 @@
 package com.platon.browser.util;
 
 import com.platon.browser.param.PlanParam;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.platon.contracts.DelegateContract;
-import org.web3j.rlp.*;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
-import sun.swing.BakedArrayList;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
