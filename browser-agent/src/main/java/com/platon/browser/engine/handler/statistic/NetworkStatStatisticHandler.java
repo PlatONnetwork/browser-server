@@ -47,7 +47,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //当前区块所属节点id
             NETWORK_STAT_CACHE.setNodeId(curBlock.getNodeId());
             //当前区块所属节点name
-            NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
+            NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName().equals(null)? "Unknow" : NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
             //TODO:可优化
             //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
             NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).longValue());
@@ -104,7 +104,9 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //更新暂存变量
             STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
         } catch (NoSuchBeanException e) {
-            logger.error("");
+           // logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",e.getMessage());
+            logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",curBlock.getBlockNumber());
+            e.printStackTrace();
         }
     }
 }

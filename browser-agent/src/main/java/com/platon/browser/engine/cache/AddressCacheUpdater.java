@@ -1,6 +1,7 @@
 package com.platon.browser.engine.cache;
 
 import com.platon.browser.dao.entity.Delegation;
+import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
@@ -55,7 +56,7 @@ public class AddressCacheUpdater {
                 }
 
             }
-            for (Delegation delegation : NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO)) {
+            for (CustomDelegation delegation : NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO)) {
                 if (delegation.getDelegateAddr().equals(customAddress.getAddress())) {
                     delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
                     delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));

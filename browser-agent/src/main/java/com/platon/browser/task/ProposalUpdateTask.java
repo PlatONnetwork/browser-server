@@ -65,7 +65,8 @@ public class ProposalUpdateTask {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
-            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code) || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
+            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code) || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)
+            || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code)) {
                 //发送rpc请求查询提案结果
                 try {
                     BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();

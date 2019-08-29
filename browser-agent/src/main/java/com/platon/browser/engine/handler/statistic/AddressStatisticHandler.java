@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.ADDRESS_CACHE;
+import static com.platon.browser.engine.BlockChain.NETWORK_STAT_CACHE;
 
 /**
  * @Auther: Chendongming
@@ -63,5 +64,6 @@ public class AddressStatisticHandler implements EventHandler {
 
         addressStage.insertAddress(fromAddress);
         addressStage.insertAddress(toAddress);
+        NETWORK_STAT_CACHE.setAddressQty(ADDRESS_CACHE.getAllAddress().size());
     }
 }

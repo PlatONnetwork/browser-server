@@ -106,8 +106,7 @@ public class BlockChain {
     private NetworkStatStatisticHandler networkStatStatisticHandler;
     @Autowired
     private NewIssueEpochHandler newIssueEpochHandler;
-    @Autowired
-    private NodeCacheUpdater nodeCacheUpdater;
+
 
     /***
      * 以下字段业务使用说明：
