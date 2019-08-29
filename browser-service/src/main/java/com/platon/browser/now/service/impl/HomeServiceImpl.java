@@ -195,16 +195,21 @@ public class HomeServiceImpl implements HomeService {
 		StakingExample stakingExample = new StakingExample();
 		Criteria criteria = stakingExample.createCriteria();
 		criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode()).andIsConsensusEqualTo(IsConsensusStatus.YES.getCode());
-		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
-				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
+		stakingExample.setOrderByClause("cast(staking_has as Decimal(30)) + cast(staking_locked as UNSIGNED  as Decimal(30))"
+				+ " + cast(stat_delegate_has as UNSIGNED  as Decimal(30)) + cast(stat_delegate_locked as UNSIGNED  as Decimal(30)),program_version,staking_addr,node_id,staking_block_num desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 		 
 		List<StakingListResp> lists = new LinkedList<>();
 		for (int i = 0;i<stakings.size();i++) {
 			StakingListResp stakingListResp = new StakingListResp();
-			BeanUtils.copyProperties(stakings.get(i), stakingListNewResp);
+			BeanUtils.copyProperties(stakings.get(i), stakingListResp);
 			stakingListResp.setExpectedIncome(stakings.get(i).getExpectedIncome() + "%");
 			stakingListResp.setIsInit(stakings.get(i).getIsInit() == 1?true:false);
+			stakingListResp.setNodeName(stakings.get(i).getStakingName());
+			//质押总数=有效的质押+委托
+			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
+					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
+			stakingListResp.setTotalValue(totalValue);
 			stakingListResp.setRanking(i);
 			lists.add(stakingListResp);
 		}

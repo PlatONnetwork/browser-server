@@ -54,7 +54,6 @@ import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.param.PlanParam;
 import com.platon.browser.param.ReportValidatorParam;
 import com.platon.browser.param.UnDelegateParam;
-import com.platon.browser.param.VotingProposalParam;
 import com.platon.browser.redis.dto.NetworkStatRedis;
 import com.platon.browser.redis.dto.TransactionRedis;
 import com.platon.browser.req.PageReq;

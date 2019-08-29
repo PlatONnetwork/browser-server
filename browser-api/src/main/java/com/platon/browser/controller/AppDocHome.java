@@ -187,6 +187,7 @@ public interface AppDocHome {
      *          "ranking":333,         //节点排行
      *          "expectedIncome":"",   //预计年收化率（从验证人加入时刻开始计算）
      *          "isInit":true          //是否为初始化的验证人，如果是expectedIncome不显示数值
+     *          "totalValue":"",        //质押总数=有效的质押+委托
      *       }
      *    ]}
      * }
