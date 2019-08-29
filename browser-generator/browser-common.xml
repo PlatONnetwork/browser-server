@@ -24,7 +24,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_aton_0.7_dev?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
                         userId="platon"
                         password="platon"/>
 
@@ -100,21 +100,23 @@
                                 replaceString=""/>
         </table>
 
-        <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
 
         <table tableName="vote" domainObjectName="Vote">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>-->
-        <table tableName="proposal" domainObjectName="Proposal">
+        </table>
+
+                <table tableName="proposal" domainObjectName="Proposal">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
+-->
 
 
+        <table tableName="staking" domainObjectName="Staking">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
     </context>
 </generatorConfiguration>

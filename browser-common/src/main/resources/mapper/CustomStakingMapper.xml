@@ -59,7 +59,6 @@
     <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
     from staking where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
-
   <!--批量选择性插入或更新-->
   <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into staking (
@@ -170,6 +169,9 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'external_name'.toString() == column.value">
+          #{item.externalName,jdbcType=VARCHAR}
+        </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         </if>
@@ -177,7 +179,6 @@
       )
     </foreach>
   </insert>
-    
   <select id="selectStakingAndNodeByExample" resultMap="AndNodeResultMap">
     select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time

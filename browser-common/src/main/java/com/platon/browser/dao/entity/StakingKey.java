@@ -65,6 +65,7 @@ public class StakingKey {
         isInit("is_init", "isInit", "INTEGER", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        externalName("external_name", "externalName", "VARCHAR", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

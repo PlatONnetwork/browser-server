@@ -2264,6 +2264,76 @@ public class StakingExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andExternalNameIsNull() {
+            addCriterion("external_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameIsNotNull() {
+            addCriterion("external_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameEqualTo(String value) {
+            addCriterion("external_name =", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameNotEqualTo(String value) {
+            addCriterion("external_name <>", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameGreaterThan(String value) {
+            addCriterion("external_name >", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameGreaterThanOrEqualTo(String value) {
+            addCriterion("external_name >=", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameLessThan(String value) {
+            addCriterion("external_name <", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameLessThanOrEqualTo(String value) {
+            addCriterion("external_name <=", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameLike(String value) {
+            addCriterion("external_name like", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameNotLike(String value) {
+            addCriterion("external_name not like", value, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameIn(List<String> values) {
+            addCriterion("external_name in", values, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameNotIn(List<String> values) {
+            addCriterion("external_name not in", values, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameBetween(String value1, String value2) {
+            addCriterion("external_name between", value1, value2, "externalName");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalNameNotBetween(String value1, String value2) {
+            addCriterion("external_name not between", value1, value2, "externalName");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
