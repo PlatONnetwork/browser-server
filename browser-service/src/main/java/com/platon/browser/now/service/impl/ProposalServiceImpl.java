@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -100,11 +101,11 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setAbstainRateThreshold(composeRate(proposal.getAbstentions(), proposal.getAccuVerifiers()));
         //反对百分比
         proposalDetailsResp.setOpposeRateThreshold(composeRate(proposal.getNays(), proposal.getAccuVerifiers()));
-        
-        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
-        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
-        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
-        
+        if(!CustomProposal.TypeEnum.TEXT.getCode().equals(proposalDetailsResp.getType())){
+	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
+	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
+	        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
+        }
         BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
         		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());

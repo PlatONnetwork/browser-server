@@ -441,6 +441,8 @@ public class TransactionServiceImpl implements TransactionService {
 //					resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
 //					break;
 				case CREATE_PROPOSAL_PARAMETER:
+					
+				case CANCEL_PROPOSAL:
 					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
 					Proposal proposal = proposalMapper.selectByPrimaryKey(req.getTxHash());
 					if(proposal != null) {
