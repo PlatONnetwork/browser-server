@@ -180,7 +180,7 @@ public class BlockChain {
                     break;
                 case CREATE_PROPOSAL_TEXT: // 创建文本提案
                 case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
-                case CREATE_PROPOSAL_PARAMETER: // 创建参数提案
+                case CANCEL_PROPOSAL: // 创建参数提案
                 case VOTING_PROPOSAL: // 给提案投票
                 case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx, this);
