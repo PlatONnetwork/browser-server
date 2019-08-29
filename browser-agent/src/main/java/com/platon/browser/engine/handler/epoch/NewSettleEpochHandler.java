@@ -73,37 +73,42 @@ public class NewSettleEpochHandler implements EventHandler {
         BaseResponse<List <Node>> result;
 
         // ==================================更新前一周期验证人列表=======================================
-        bc.getPreVerifier().clear();
-        bc.getPreVerifier().putAll(bc.getCurVerifier());
-        if(bc.getPreVerifier().size()==0){
-            // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-            try {
-                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
-            }
-            if (!result.isStatusOk()) {
-                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
-            }else{
-                bc.getPreVerifier().clear();
-                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
-            }
+        // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+        BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+        try {
+            result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
+        }
+        if (!result.isStatusOk()) {
+            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
+        }else{
+            bc.getPreVerifier().clear();
+            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            logger.debug("前一轮结算周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
         try {
             result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
         }
+        if(result.isStatusOk()){
+            bc.getCurVerifier().clear();
+            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            logger.debug("当前轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+        }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
                 result = client.getNodeContract().getVerifierList().send();
+                bc.getCurVerifier().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("当前轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
                 throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
             }
@@ -111,14 +116,12 @@ public class NewSettleEpochHandler implements EventHandler {
                 throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
             }
         }
-        bc.getCurVerifier().clear();
-        result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
 
         if(bc.getCurVerifier().size()==0){
             throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
 
-        logger.debug("前一轮结算周期验证人:{}",JSON.toJSONString(bc.getPreVerifier(),true));
+
         logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
