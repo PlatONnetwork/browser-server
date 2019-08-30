@@ -34,10 +34,16 @@ public class CreateValidatorHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws BlockChainException {
         CustomTransaction tx = context.getTransaction();
+
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
+
+        //添加质押快高到txinfo，数据回填
+        param.setBlockNumber(tx.getBlockNumber().toString());
+        tx.setTxInfo(JSON.toJSONString(param));
+
         try {
             CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             /** 业务逻辑说明：
@@ -58,9 +64,6 @@ public class CreateValidatorHandler implements EventHandler {
                     node.getStakings().put(tx.getBlockNumber(),newStaking);
                     // 把最新质押信息添加至待入库列表
                     stakingStage.insertStaking(newStaking,tx);
-                    //添加质押快高到txinfo，数据回填
-                    param.setBlockNumber(tx.getBlockNumber().toString());
-                    tx.setTxInfo(JSON.toJSONString(param));
                     // 更新节点名称映射缓存
                     NODE_NAME_MAP.put(newStaking.getNodeId(),newStaking.getStakingName());
                 }
