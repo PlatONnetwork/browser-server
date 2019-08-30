@@ -57,6 +57,11 @@ public class CreateValidatorParam {
      */
     private String programVersion;
 
+    /**
+     * blockNumber
+     */
+    private String blockNumber;
+
     public void init(Integer type, String benefitAddress,
                      String nodeId,String externalId,String nodeName,
                      String website ,String details,String amount, String programVersion){
