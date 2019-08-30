@@ -118,8 +118,13 @@ public class BlockSyncTask {
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber);
-        result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
+        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
+        try {
+            result = client.getHistoryValidatorList(nextEpochLastBlockNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CandidateException(format("【查询当前共识周期验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
+        }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
@@ -160,12 +165,12 @@ public class BlockSyncTask {
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
         try {
-            result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
+            result = client.getHistoryVerifierList(nextEpochLastBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表

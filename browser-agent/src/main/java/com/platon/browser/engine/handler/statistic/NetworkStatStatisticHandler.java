@@ -106,7 +106,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
         } catch (NoSuchBeanException e) {
            // logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",e.getMessage());
             logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",curBlock.getBlockNumber());
-            e.printStackTrace();
+            logger.error("{}",e.getMessage());
         }
     }
 }

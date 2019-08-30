@@ -36,7 +36,7 @@ public class TransactionSender {
 
     private String chainId = "100";
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6787"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
     private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
@@ -138,7 +138,7 @@ public class TransactionSender {
 
     @Test
     public void getBlockNumber() throws IOException {
-        Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+        Web3j web3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
         long blockNum = 11777;
         /*while (true){
             try {

@@ -112,6 +112,9 @@ public class NewConsensusEpochHandler implements EventHandler {
         // ==================================更新前一周期验证人列表=======================================
         bc.getPreValidator().clear();
         bc.getPreValidator().putAll(bc.getCurValidator());
+        if(bc.getPreValidator().size()>0){
+            logger.debug("前一轮共识周期(最后块号{})验证人(倒换):{}",blockNumber,JSON.toJSONString(bc.getPreValidator(),true));
+        }
         if(bc.getPreValidator().size()==0){
             // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
             BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
@@ -126,16 +129,26 @@ public class NewConsensusEpochHandler implements EventHandler {
             }else{
                 bc.getPreValidator().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("前一轮共识周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getPreValidator(),true));
             }
         }
 
+
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
         result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
+        if(result.isStatusOk()){
+            bc.getCurValidator().clear();
+            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
+            logger.debug("当前轮共识周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+        }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
                 result = client.getNodeContract().getValidatorList().send();
+                bc.getCurValidator().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("当前轮共识周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
@@ -144,8 +157,7 @@ public class NewConsensusEpochHandler implements EventHandler {
                 throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
             }
         }
-        bc.getCurValidator().clear();
-        result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
+
 
         if(bc.getCurValidator().size()==0){
             throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
