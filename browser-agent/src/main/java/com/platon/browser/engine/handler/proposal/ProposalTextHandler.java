@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
@@ -13,9 +14,13 @@ import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalTextParam;
+import com.platon.browser.util.RoundCalculation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
@@ -28,12 +33,14 @@ import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 @Component
 public class ProposalTextHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalTextHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
-        BlockChain bc = context.getBlockChain();
         //根据交易参数解析成对应文本提案结构
         CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
         CustomProposal proposal = new CustomProposal();
@@ -61,7 +68,9 @@ public class ProposalTextHandler implements EventHandler {
         //从交易解析参数获取需要设置pIDID
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
-        proposal.setEndVotingBlock("");
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),bc.getChainConfig().getProposalTextEndRound(),bc.getChainConfig());
+
+        proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);

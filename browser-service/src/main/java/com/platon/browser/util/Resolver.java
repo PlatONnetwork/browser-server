@@ -1,11 +1,14 @@
 package com.platon.browser.util;
 
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.platon.contracts.DelegateContract;
-import org.web3j.rlp.*;
+import com.platon.browser.param.PlanParam;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,22 +34,19 @@ public  class Resolver {
         return stringValue;
     }
 
-    public static BigInteger[] ObjectResolver ( RlpString rlpString ) {
-        BigInteger[] list = new BigInteger[]{};
+    public static List<PlanParam> ObjectResolver ( RlpString rlpString ) {
+        List<PlanParam> list = new ArrayList <>();
         RlpList bean = RlpDecoder.decode(rlpString.getBytes());
         List <RlpType> beanList = ((RlpList) bean.getValues().get(0)).getValues();
-        byte[] paramaBytes = new byte[0];
-        byte[] parambBytes = new byte[0];
         for (RlpType beanType : beanList) {
             RlpList beanTypeList = (RlpList) beanType;
             RlpString parama = (RlpString) beanTypeList.getValues().get(0);
             RlpString paramb = (RlpString) beanTypeList.getValues().get(1);
-            paramaBytes = RlpEncoder.encode(parama);
-            parambBytes = RlpEncoder.encode(paramb);
-            list[0] = new BigInteger(1, paramaBytes);
-            list[1] = new BigInteger(1, parambBytes);
+            PlanParam planParam = new PlanParam();
+            planParam.setEpoch(parama.asPositiveBigInteger().intValue());
+            planParam.setAmount(paramb.asPositiveBigInteger().toString());
+            list.add(planParam);
         }
         return list;
     }
-
 }

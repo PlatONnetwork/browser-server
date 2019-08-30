@@ -36,7 +36,7 @@ public class TxParamResolver {
         }
     }
 
-    public static Result analysis ( String input , BlockChainConfig bc ,String blockNumber) {
+    public static Result analysis ( String input ) {
         Result result = new Result();
         result.txTypeEnum = CustomTransaction.TxTypeEnum.OTHERS;
         try {
@@ -186,6 +186,7 @@ public class TxParamResolver {
                         String upgradeVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //pIDID
                         String upgradelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String upgradelpidid =  new String(Numeric.hexStringToByteArray(upgradelpIDID));
                         //升级版本
                         BigInteger newVersion =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //投票截止区块高度
@@ -193,7 +194,7 @@ public class TxParamResolver {
                         //结束轮转换结束区块高度
 
                         CreateProposalUpgradeParam createProposalUpgradeParam = new CreateProposalUpgradeParam();
-                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpIDID,endBlockRound.intValue(),
+                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpidid,endBlockRound.intValue(),
                                 newVersion.intValue());
                         result.param = createProposalUpgradeParam;
                         break;
@@ -204,6 +205,7 @@ public class TxParamResolver {
                         String cancelVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
                         //本提案的pIDID
                         String cancelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String cancelpidid =  new String(Numeric.hexStringToByteArray(cancelpIDID));
                         //投票截止区块高度
                         BigInteger cancelEndBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //被取消的pIDID
@@ -211,7 +213,7 @@ public class TxParamResolver {
 
 
                         CancelProposalParam cancelProposalParam = new CancelProposalParam();
-                        cancelProposalParam.init(cancelVerifier,cancelpIDID,cancelEndBlockRound.intValue(),canceledProposalID);
+                        cancelProposalParam.init(cancelVerifier,cancelpidid,cancelEndBlockRound.intValue(),canceledProposalID);
                         result.param = cancelProposalParam;
                         break;
                     case VOTING_PROPOSAL: // 2003
@@ -263,12 +265,8 @@ public class TxParamResolver {
                         String account = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
 
                         // RestrictingPlan 类型的列表（数组）
-                        BigInteger[] arrayList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
-                        PlanParam planDto = new PlanParam();
-                        planDto.setEpoch(arrayList[0].intValue());
-                        planDto.setAmount(arrayList[1].toString());
-                        List<PlanParam> planDtoList = new ArrayList <>();
-                        planDtoList.add(planDto);
+                        List<PlanParam> planDtoList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
+
                         CreateRestrictingParam createRestrictingParam = new CreateRestrictingParam();
                         createRestrictingParam.setPlan(planDtoList);
                         createRestrictingParam.setAccount(account);
@@ -278,9 +276,29 @@ public class TxParamResolver {
             }
         } catch (Exception e) {
             result.txTypeEnum = CustomTransaction.TxTypeEnum.OTHERS;
+            e.printStackTrace();
             return result;
         }
         return result;
     }
 
+    public static void main ( String[] args ) {
+       TxParamResolver.analysis("0xf683820fa0959460ceca9c1290ee56b98d4e160ef0453f7c40d2199bdacb6489884563918244f40000cd8281c889880853a0d2313c0000");
+
+        RlpList rlp = RlpDecoder.decode(Hex.decode("f683820fa0959460ceca9c1290ee56b98d4e160ef0453f7c40d2199bdacb6489884563918244f40000cd8281c889880853a0d2313c0000"));
+
+        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+
+        System.out.println(((RlpString)RlpDecoder.decode(((RlpString)rlpList.get(0)).getBytes()).getValues().get(0)).asPositiveBigInteger());
+        System.out.println(((RlpString)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes()).getValues().get(0)).asString());
+
+
+        ((RlpList)((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(2)).getBytes())).getValues().get(0)).getValues()
+                .stream()
+                .forEach(rl -> {
+                    RlpList rlpL = (RlpList)rl;
+                    System.out.println(((RlpString)rlpL.getValues().get(0)).asPositiveBigInteger());
+                    System.out.println(((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
+                });
+    }
 }

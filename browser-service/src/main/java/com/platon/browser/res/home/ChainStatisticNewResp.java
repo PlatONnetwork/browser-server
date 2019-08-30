@@ -52,12 +52,14 @@ public class ChainStatisticNewResp {
 	public void setMaxTps(Integer maxTps) {
 		this.maxTps = maxTps;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getTurnValue() {
 		return turnValue;
 	}
 	public void setTurnValue(String turnValue) {
 		this.turnValue = turnValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getIssueValue() {
 		return issueValue;
 	}

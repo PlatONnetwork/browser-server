@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+
 /**
  * User: dongqile
  * Date: 2019/8/13
@@ -83,13 +85,6 @@ public class DbService {
             customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getNetworkStatUpdateStage(), NetworkStat.Column.values());
             networkStatCacheService.update(nsr.getNetworkStatUpdateStage());
         }
-
-        //质押统计数据补充
-        dataOfStakingStatistics();
-
-        //地址相关数据补充
-        dataOfAddressStatistics();
-
         // ****************批量新增或更新质押相关数据*******************
         StakingStage ser = bizData.getStakingStage();
         // 批量入库或更新节点数据
@@ -126,110 +121,4 @@ public class DbService {
         Set<Address> addresses = aer.exportAddress();
         if(addresses.size()>0) customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
     }
-
-
-    public void dataOfStakingStatistics () throws Exception{
-
-        /**
-         *  1.补充统计质押相关数据
-         *      a.stat_delegate_has  关联的委托记录中犹豫期金额汇总
-         *      b.stat_delegate_locked  关联的委托记录中锁定期金额汇总
-         *      c.stat_delegate_reduction   关联的委托记录中退回中金额汇总
-         *      d.stat_delegate_qty  关联的委托地址数
-         */
-        try {
-            BlockChain.NODE_CACHE.getAllNode().forEach(node -> {
-                for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
-                    //只统计不为历史的委托数据
-                    BigInteger statDelegateHas = BigInteger.ZERO;
-                    BigInteger statDelegateLocked = BigInteger.ZERO;
-                    BigInteger statDelegateReduction = BigInteger.ZERO;
-                    BigInteger statDelegateQty = BigInteger.ZERO;
-                    for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
-                        if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO.code)) {
-                            statDelegateHas = statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
-                            statDelegateLocked = statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-                            statDelegateReduction = statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
-                            statDelegateQty = statDelegateQty.add(BigInteger.ONE);
-                        }
-                    }
-                    customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
-                    customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
-                    customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
-                    customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
-                }
-            });
-        } catch (Exception e) {
-            throw new Exception("[DbService]supply Address info exception on dataOfStakingStatistics()");
-        }
-
-    }
-
-    public void dataOfAddressStatistics () throws BusinessException {
-
-        /**
-         * 2.补充统计地址相关数据
-         *      a.staking_value  质押的金额
-         *      b.delegate_value  委托的金额
-         *      c.redeemed_value   赎回中的金额，包含委托和质押
-         *      d.candidate_count   已委托的验证人
-         *      e.delegate_hes   未锁定委托
-         *      f.delegate_locked   已锁定委托
-         *      g.delegate_unlock  已经解锁的
-         *      h.delegate_reduction  赎回中的
-         *
-         */
-
-        for (CustomAddress customAddress : BlockChain.ADDRESS_CACHE.getAllAddress()) {
-            BigInteger stakingValue = BigInteger.ZERO;
-            BigInteger delegateValue = BigInteger.ZERO;
-            BigInteger statkingRedeemed = BigInteger.ZERO;
-            BigInteger delegateReddemed = BigInteger.ZERO;
-            BigInteger redeemedValue = BigInteger.ZERO;
-            BigInteger candidateCount = BigInteger.ZERO;
-            BigInteger delegateHes = BigInteger.ZERO;
-            BigInteger delegateLocked = BigInteger.ZERO;
-            BigInteger delegateUnlock = BigInteger.ZERO;
-            BigInteger delegateReduction = BigInteger.ZERO;
-            for (CustomStaking stakings : BlockChain.NODE_CACHE.getAllStaking()) {
-                if (stakings.getStakingAddr().equals(customAddress.getAddress())) {
-                    stakingValue = stakingValue.add(new BigInteger(stakings.getStakingHas()).add(new BigInteger(stakings.getStakingLocked())));
-                    statkingRedeemed = statkingRedeemed.add(new BigInteger(stakings.getStakingReduction()));
-                }
-
-            }
-            for (Delegation delegation : BlockChain.NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO)) {
-                if (delegation.getDelegateAddr().equals(customAddress.getAddress())) {
-                    delegateValue = delegateValue.add(new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())));
-                    delegateReddemed = delegateReddemed.add(new BigInteger(delegation.getDelegateReduction()));
-                    delegateHes = delegateHes.add(new BigInteger(delegation.getDelegateHas()));
-                    delegateLocked = delegateLocked.add(new BigInteger(delegation.getDelegateLocked()));
-                    delegateReduction = delegateReduction.add(new BigInteger(delegation.getDelegateReduction()));
-                    candidateCount = candidateCount.add(BigInteger.ONE);
-                    Integer status = 0;
-                    try {
-                        status = BlockChain.NODE_CACHE.getNode(delegation.getNodeId()).getStakings().get(delegation.getStakingBlockNum()).getStatus();
-                    } catch (NoSuchBeanException e) {
-                        throw new BusinessException("[DbService]supply Address info exception on dataOfAddressStatistics()");
-                    }
-                    if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
-                        delegateUnlock = delegateUnlock.add(new BigInteger(delegation.getDelegateHas()));
-                    }
-                }
-            }
-            redeemedValue = statkingRedeemed.add(delegateReddemed);
-
-            //address引用对象更新
-            customAddress.setStakingValue(stakingValue.toString());
-            customAddress.setDelegateValue(delegateValue.toString());
-            customAddress.setRedeemedValue(redeemedValue.toString());
-            customAddress.setCandidateCount(candidateCount.intValue());
-            customAddress.setDelegateValue(delegateHes.toString());
-            customAddress.setDelegateLocked(delegateLocked.toString());
-            customAddress.setDelegateUnlock(delegateUnlock.toString());
-            customAddress.setDelegateReduction(delegateReduction.toString());
-        }
-    }
-
-
 }

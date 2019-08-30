@@ -1,7 +1,12 @@
 package com.platon.browser.enums;
 
 public enum StakingStatusEnum {
-	ALL("all", null),CANDIDATE("candidate" ,1),ACTIVE("active", 2),ABORTING("aboring",3),EXITED("exited",4);
+	ALL("all", null),//全部
+	CANDIDATE("candidate" ,1),//候选中
+	ACTIVE("active", 2),//活跃中
+	BLOCK("block", 3),//出块中
+	ABORTING("aboring",4),//推出中
+	EXITED("exited",5);//已退出
 	
 	private String name;
 	

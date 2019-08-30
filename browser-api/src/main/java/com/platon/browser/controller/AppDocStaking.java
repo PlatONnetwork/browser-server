@@ -221,6 +221,7 @@ public interface AppDocStaking {
      *       "website":"",             //节点的第三方主页
      *       "details":"",             //节点的描述
      *       "externalId":"",          //身份证id
+     *       "externalUrl":"",          //身份证url
      *       "stakingBlockNum":"",     //最新的质押交易块高
      *       "statDelegateReduction":"",//待提取的委托
      *       "isInit":true           //是否为初始节点 

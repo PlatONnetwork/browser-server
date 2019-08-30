@@ -1,11 +1,12 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -13,9 +14,12 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -25,16 +29,18 @@ import java.math.BigInteger;
 @Component
 public class DelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(DelegateHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {
-            CustomNode node = nodeCache.getNode(param.getNodeId());
+            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             try {
                 //获取treemap中最新一条质押数据数据
                 CustomStaking latestStaking = node.getLatestStaking();
@@ -54,7 +60,7 @@ public class DelegateHandler implements EventHandler {
                     //更新分析结果UpdateSet
                     stakingStage.updateDelegation(customDelegation);
                     //添加委托缓存
-                    nodeCache.addDelegation(customDelegation);
+                    NODE_CACHE.addDelegation(customDelegation);
                 }
 
                 //若不存在，则说明该地址有对此节点做过委托
@@ -63,7 +69,7 @@ public class DelegateHandler implements EventHandler {
                     newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
                     // 添加至委托缓存
-                    nodeCache.addDelegation(newCustomDelegation);
+                    NODE_CACHE.addDelegation(newCustomDelegation);
 
                     //新增分析结果AddSet
                     stakingStage.insertDelegation(newCustomDelegation);

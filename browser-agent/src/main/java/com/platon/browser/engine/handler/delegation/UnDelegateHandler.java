@@ -1,9 +1,9 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -11,10 +11,13 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.UnDelegateParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -24,17 +27,18 @@ import java.math.BigInteger;
 @Component
 public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
-
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
 
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
-            CustomNode node = nodeCache.getNode(param.getNodeId());
+            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
@@ -97,7 +101,7 @@ public class UnDelegateHandler implements EventHandler {
             }
 
             // 添加至解委托缓存
-            nodeCache.addUnDelegation(customUnDelegation);
+            NODE_CACHE.addUnDelegation(customUnDelegation);
 
             //更新分析委托结果
             stakingStage.updateDelegation(customDelegation);

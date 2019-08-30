@@ -13,8 +13,10 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 
 /**
@@ -26,17 +28,18 @@ import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 public class EditValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(EditValidatorHandler.class);
 
+    @Autowired
+    private BlockChain bc;
+
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
-        BlockChain bc = context.getBlockChain();
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
         logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = nodeCache.getNode(param.getNodeId());
+            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithEditValidatorParam(param);

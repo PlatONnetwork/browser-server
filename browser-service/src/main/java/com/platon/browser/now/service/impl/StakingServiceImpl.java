@@ -12,17 +12,15 @@ import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
-import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeOptMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.IsConsensusStatus;
@@ -56,9 +54,6 @@ public class StakingServiceImpl implements StakingService {
 	private StatisticCacheService statisticCacheService;
 
 	@Autowired
-	private StakingMapper stakingMapper;
-
-	@Autowired
 	private CustomStakingMapper customStakingMapper;
 	
 	@Autowired
@@ -82,32 +77,20 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req) {
-//		StakingExample stakingExample = new StakingExample();
-//		stakingExample.setOrderByClause("cast(staking_has as UNSIGNED INTEGER) + cast(staking_locked as UNSIGNED INTEGER)"
-//				+ " + cast(stat_delegate_has as UNSIGNED INTEGER) + cast(stat_delegate_locked as UNSIGNED INTEGER),program_version,staking_addr,node_id,staking_block_num desc");
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Integer status = null;
 		Integer isConsensus = null;
 		String name = req.getKey();
-//		StakingExample.Criteria criteria = stakingExample.createCriteria();
-//		if(StringUtils.isNotBlank(req.getKey())) {
-//			criteria.andStakingNameLike(req.getKey());
-//			name = req.getKey();
-//		}
 		switch (StakingStatusEnum.valueOf(req.getQueryStatus().toUpperCase())) {
 			case ALL:
-//				status = StakingStatus.CANDIDATE.getCode();
-//				criteria.andStatusEqualTo(StakingStatus.CANDIDATE.getCode());
 				break;
 			case ACTIVE:
 				//活跃中代表即使后续同时也是共识周期验证人
 				status = StakingStatusEnum.ACTIVE.getCode();
 				isConsensus = IsConsensusStatus.YES.getCode();
-//				criteria.andStatusEqualTo(status).andIsConsensusEqualTo(isConsensus);
 				break;
 			case CANDIDATE:
 				status = StakingStatusEnum.CANDIDATE.getCode();
-//				criteria.andStatusEqualTo(status);
 				break;
 			default:
 				break;
@@ -116,10 +99,10 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		//根据条件和状态进行查询列表
-//		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
-		Page<StakingNode> stakingPage = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
+		Page<StakingNode> stakingPage = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus,null);
 		List<StakingNode> stakings = stakingPage.getResult();
-		
+		//查询出块节点
+		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
@@ -136,7 +119,12 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setRanking(i + 1);
 			aliveStakingListResp.setSlashLowQty(stakings.get(i).getStatSlashLowQty());
 			aliveStakingListResp.setSlashMultiQty(stakings.get(i).getStatSlashMultiQty());
-			aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus()));
+			if(stakings.get(i).getNodeId().equals(networkStatRedis.getNodeId())) {
+				aliveStakingListResp.setStatus(StakingStatusEnum.BLOCK.getCode());
+			} else {
+				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus()));
+			}
+			
 			aliveStakingListResp.setNodeName(stakings.get(i).getStakingName());
 			//质押总数=有效的质押+委托
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
@@ -144,7 +132,6 @@ public class StakingServiceImpl implements StakingService {
 			aliveStakingListResp.setTotalValue(totalValue);
 			lists.add(aliveStakingListResp);
 		}
-//		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(stakingPage.getTotal());
 		respPage.init(page, lists);
@@ -153,21 +140,15 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<HistoryStakingListResp> historyStakingList(HistoryStakingListReq req) {
-		StakingExample stakingExample = new StakingExample();
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-		Criteria criteria = stakingExample.createCriteria();
 		List<Integer> status = new ArrayList<Integer>();
 		status.add(StakingStatus.ABORTING.getCode());
 		status.add(StakingStatus.EXITED.getCode());
-		criteria.andStatusIn(status);
-		if(StringUtils.isNotBlank(req.getKey())) {
-			criteria.andStakingNameEqualTo(req.getKey());
-		}
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<HistoryStakingListResp>();
 		//根据条件和状态进行查询列表
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null);
-		for (StakingNode stakingNode:stakings) {
+		Page<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null, status);
+		for (StakingNode stakingNode:stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
 			if(stakingNode.getLeaveTime()!=null) {
@@ -180,9 +161,8 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
 		}
-		long size = stakingMapper.countByExample(stakingExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(size);
+		page.setTotal(stakings.getTotal());
 		respPage.init(page, lists);
 		return respPage;
 	}
@@ -195,7 +175,7 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null, null);
 		Integer size = stakings.size();
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
@@ -221,7 +201,10 @@ public class StakingServiceImpl implements StakingService {
 				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 				resp.setBlockQty(stakingNode.getStatBlockQty());
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
+				resp.setWebsite(stakingNode.getWebSite());
+				resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());
+				resp.setJoinTime(stakingNode.getJoinTime().getTime());
 				if(StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {
 					resp.setRewardValue(stakingNode.getStatRewardValue());
 				}
@@ -266,6 +249,8 @@ public class StakingServiceImpl implements StakingService {
 		
 		List<DelegationStaking> delegationStakings = 
 				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
+		String allDelegate = "0";
+		String allLockDelegate = "0";
 		for (DelegationStaking delegationStaking: delegationStakings) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
@@ -276,9 +261,13 @@ public class StakingServiceImpl implements StakingService {
 			String deleLock = delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0";
 			byStakingResp.setDelegateLocked(deleLock);
 			
-			byStakingResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
+			allDelegate = new BigDecimal(allDelegate).add(new BigDecimal(delValue).add(new BigDecimal(deleLock))).toString();
+			allLockDelegate = new BigDecimal(allLockDelegate).add(new BigDecimal(deleLock)).toString();
+			byStakingResp.setAllDelegateLocked(allDelegate);
+			byStakingResp.setDelegateTotalValue(allDelegate);
 			lists.add(byStakingResp);
 		}
+		
 		long size = delegationMapper.countByExample(delegationExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
 		page.setTotal(size);

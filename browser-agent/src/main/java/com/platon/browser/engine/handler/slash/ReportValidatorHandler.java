@@ -5,7 +5,6 @@ import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -14,12 +13,15 @@ import com.platon.browser.param.EvidencesParam;
 import com.platon.browser.param.ReportValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -29,13 +31,12 @@ import java.util.List;
 @Component
 public class ReportValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ReportValidatorHandler.class);
-
+    @Autowired
+    private BlockChain bc;
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         StakingStage stakingStage = context.getStakingStage();
-        BlockChain bc = context.getBlockChain();
         // 获取交易入参
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
@@ -43,7 +44,7 @@ public class ReportValidatorHandler implements EventHandler {
         //通过结果获取，证据中的举报人的nodeId
         evidencesParams.forEach(evidencesParam -> {
             try {
-                CustomStaking latestStaking = nodeCache.getNode(evidencesParam.getVerify()).getLatestStaking();
+                CustomStaking latestStaking = NODE_CACHE.getNode(evidencesParam.getVerify()).getLatestStaking();
                 logger.debug("多签举报信息:{}", JSON.toJSONString(param));
 
                 //交易数据回填

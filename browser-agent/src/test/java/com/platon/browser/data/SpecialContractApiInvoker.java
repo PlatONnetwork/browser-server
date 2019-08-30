@@ -1,8 +1,10 @@
 package com.platon.browser.data;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.util.Resolver;
 import jnr.ffi.annotations.In;
 import org.bouncycastle.util.encoders.Hex;
@@ -33,6 +35,7 @@ import org.web3j.utils.JSONUtil;
 import org.web3j.utils.Numeric;
 import org.web3j.utils.PlatOnUtil;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +50,9 @@ import java.util.concurrent.Callable;
  */
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
+    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
+    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
 
     // 特殊合约接口测试
     @Test
@@ -78,7 +83,7 @@ public class SpecialContractApiInvoker {
     }
 
 
-    public BaseResponse<List<Node>> getHistoryVerifierList(BigInteger blockNumber) throws Exception {
+    public static BaseResponse<List<Node>> getHistoryVerifierList(BigInteger blockNumber) throws Exception {
         BaseResponse<List<Node>> nodes = nodeCall(
                 blockNumber,
                 PlatonClient.GET_HISTORY_VERIFIERLIST_FUNC_TYPE
@@ -86,7 +91,7 @@ public class SpecialContractApiInvoker {
         return nodes;
     }
 
-    public BaseResponse<List<Node>> getHistoryValidatorList(BigInteger blockNumber) throws Exception {
+    public static BaseResponse<List<Node>> getHistoryValidatorList(BigInteger blockNumber) throws Exception {
         BaseResponse<List<Node>> nodes = nodeCall(
                 blockNumber,
                 PlatonClient.GET_HISTORY_VALIDATORLIST_FUNC_TYPE
@@ -95,7 +100,7 @@ public class SpecialContractApiInvoker {
     }
 
 
-    public RemoteCall<BaseResponse<List<Node>>> nodeCall(BigInteger blockNumber, int funcType) {
+    public static RemoteCall<BaseResponse<List<Node>>> nodeCall(BigInteger blockNumber, int funcType) {
         final Function function = new Function(
                 funcType,
                 Collections.singletonList(new Uint256(blockNumber)),
@@ -110,6 +115,9 @@ public class SpecialContractApiInvoker {
             ).send();
             String value = ethCall.getValue();
             BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            if(response==null||response.data==null){
+                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
+            }
             response.data = JSONUtil.parseArray((String) response.data, Node.class);
             return response;
         });
@@ -149,7 +157,7 @@ public class SpecialContractApiInvoker {
 
     public static void main(String args[]){
        // String a = new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d"));
-        String input = "0xf84e838203ec8180b842b84000cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000838203e8";
+        /*String input = "0xf84e838203ec8180b842b84000cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000838203e8";
         RlpList rlpList = RlpDecoder.decode(Hex.decode(input.replace("0x", "")));
         List <RlpType> rlpTypes = rlpList.getValues();
         RlpList rlpList1 = (RlpList) rlpTypes.get(0);
@@ -158,7 +166,25 @@ public class SpecialContractApiInvoker {
         String res = new String(Numeric.hexStringToByteArray(stringValue));
         System.out.println(res);
         BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray("0xf848b8467b22537461747573223a66616c73652c2244617461223a22222c224572724d7367223a22546869732063616e64696461746520697320616c726561647920657869737473227d")), BaseResponse.class);
-        System.out.println(response.status);
+        System.out.println(response.status);*/
         //System.out.println(a);
+
+
+
+        try {
+            List<Node>  node0 = getHistoryValidatorList(BigInteger.valueOf(3639)).data;
+            logger.debug("{}", JSON.toJSONString(node0,true));
+
+            List<Node>  node1 = getHistoryValidatorList(BigInteger.valueOf(3640)).data;
+            logger.debug("{}", JSON.toJSONString(node1,true));
+
+            List<Node>  node2 = getHistoryValidatorList(BigInteger.valueOf(3679)).data;
+            logger.debug("{}", JSON.toJSONString(node2,true));
+
+            List<Node>  node3 = getHistoryValidatorList(BigInteger.valueOf(3680)).data;
+            logger.debug("{}", JSON.toJSONString(node2,true));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

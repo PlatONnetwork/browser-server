@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -43,6 +44,7 @@ public class NetworkStatUpdateTask {
             BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().toString());
             //获取初始发行金额
             BigDecimal iniValue = blockChain.getChainConfig().getInitIssueAmount();
+            BigDecimal iniValueVon = Convert.toVon(iniValue, Convert.Unit.LAT);
             //获取增发比例
             BigDecimal addIssueRate = blockChain.getChainConfig().getAddIssueRate();
             //获取激励池地址
@@ -53,7 +55,7 @@ public class NetworkStatUpdateTask {
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-            BigDecimal circulation = iniValue.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
+            BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
             BigInteger lockContractBalance = platonClient.getWeb3j().platonGetBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();

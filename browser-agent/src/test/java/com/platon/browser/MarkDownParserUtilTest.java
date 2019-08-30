@@ -23,11 +23,19 @@ public class MarkDownParserUtilTest {
     }
     @Test
     public void parserMD() throws IOException {
-        String fileName="https://github.com/Vivi728/TestPIP/blob/master/Cancellation-template.md";
+        String fileName="https://github.com/danielgogo/PIPs/blob/master/PIP-1.md";
         String mdText=MarkDownParserUtil.acquireMD(fileName);
         String text=MarkDownParserUtil.parserMD(mdText);
         //assertEquals(text, "{\"author\":\"Vitalik Buterin (@vbuterin)\",\"created\":\"2016-04-28\",\"title\":\"Change difficulty adjustment to target mean block time including uncles\",\"type\":\"Standards Track\",\"category\":\"Core\",\"eip\":\"100\",\"status\":\"Final\"}");
 
+    }
+
+    @Test
+    public void require()throws IOException{
+        String id  ="5FD68B690010632B";
+        String fileName = "https://keybase.io/_/api/1.0/user/autocomplete.json?q=" + id;
+        String res = MarkDownParserUtil.httpGet(fileName);
+        System.out.println(res);
     }
 }
 

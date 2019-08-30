@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.param.UnDelegateParam;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +17,10 @@ import java.util.Map;
  */
 @Data
 public class CustomUnDelegation extends UnDelegation {
+
+    public CustomUnDelegation(){
+        this.setRedeemLocked(BigDecimal.ZERO.toString());
+    }
 
     public void updateWithUnDelegateParam( UnDelegateParam param, CustomTransaction tx){
         this.setApplyAmount(param.getAmount());

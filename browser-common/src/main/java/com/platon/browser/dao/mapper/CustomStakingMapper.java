@@ -12,11 +12,13 @@ import java.util.Set;
 
 @Mapper
 public interface CustomStakingMapper {
-    List<CustomStaking> selectByNodeId(@Param("nodeId")String nodeId);
-    List<CustomStaking> selectByNodeIdList(@Param("nodeIds")List<String> nodeIds);
-    int batchInsertOrUpdateSelective(@Param("list") Set<Staking> list, @Param("selective") Staking.Column... selective);
-    
-    
-    Page<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id,@Param("name")String name,@Param("status")Integer status,@Param("isConsensus")Integer isConsensus);
+	List<CustomStaking> selectByNodeId(@Param("nodeId") String nodeId);
+
+	List<CustomStaking> selectByNodeIdList(@Param("nodeIds") List<String> nodeIds);
+
+	int batchInsertOrUpdateSelective(@Param("list") Set<Staking> list, @Param("selective") Staking.Column... selective);
+
+	Page<StakingNode> selectStakingAndNodeByExample(@Param("nodeId") String node_id, @Param("name") String name,
+			@Param("status") Integer status, @Param("isConsensus") Integer isConsensus, @Param("statusList") List<Integer> statusList);
 
 }

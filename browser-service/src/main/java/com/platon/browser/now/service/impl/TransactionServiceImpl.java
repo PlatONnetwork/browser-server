@@ -25,6 +25,7 @@ import org.web3j.utils.Convert;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Slash;
@@ -347,6 +348,11 @@ public class TransactionServiceImpl implements TransactionService {
 	    		//创建验证人
 				case CREATE_VALIDATOR:
 					CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
+					StakingKey stakingKey = new StakingKey();
+					stakingKey.setNodeId(createValidatorParam.getNodeId());
+//					stakingKey.setStakingBlockNum(stakingBlockNum);
+					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
 					resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
 					resp.setNodeId(createValidatorParam.getNodeId());
 					resp.setNodeName(createValidatorParam.getNodeName());
@@ -359,11 +365,15 @@ public class TransactionServiceImpl implements TransactionService {
 				//编辑验证人
 				case EDIT_VALIDATOR:
 					EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
+					StakingKey stakingKeyV = new StakingKey();
+					stakingKeyV.setNodeId(editValidatorParam.getNodeId());
+//					stakingKeyV.setStakingBlockNum(stakingBlockNum);
+					staking = stakingMapper.selectByPrimaryKey(stakingKeyV);
+					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
 					resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
 					resp.setNodeId(editValidatorParam.getNodeId());
 					resp.setNodeName(editValidatorParam.getNodeName());
 					resp.setExternalId(editValidatorParam.getExternalId());
-//					resp.setExternalUrl("https://keybase.io" + editValidatorParam.get);
 					resp.setWebsite(editValidatorParam.getWebsite());
 					resp.setDetails(editValidatorParam.getDetails());
 					break;
@@ -390,12 +400,12 @@ public class TransactionServiceImpl implements TransactionService {
 					ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
 					resp.setNodeId(exitValidatorParam.getNodeId());
 					resp.setNodeName(exitValidatorParam.getNodeName());
-					StakingKey stakingKey = new StakingKey();
-					stakingKey.setNodeId(exitValidatorParam.getNodeId());
+					StakingKey stakingKeyE = new StakingKey();
+					stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
 					if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
-						stakingKey.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
+						stakingKeyE.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
 					}
-					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+					staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 					if(staking!=null) {
 						resp.setNodeName(staking.getStakingName());
 						//升级金额等于锁定加犹豫金额

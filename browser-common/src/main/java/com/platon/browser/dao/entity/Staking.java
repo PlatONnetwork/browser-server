@@ -67,6 +67,8 @@ public class Staking extends StakingKey {
 
     private Date updateTime;
 
+    private String externalName;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -317,6 +319,14 @@ public class Staking extends StakingKey {
         this.updateTime = updateTime;
     }
 
+    public String getExternalName() {
+        return externalName;
+    }
+
+    public void setExternalName(String externalName) {
+        this.externalName = externalName == null ? null : externalName.trim();
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -366,6 +376,7 @@ public class Staking extends StakingKey {
         isInit("is_init", "isInit", "INTEGER", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        externalName("external_name", "externalName", "VARCHAR", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

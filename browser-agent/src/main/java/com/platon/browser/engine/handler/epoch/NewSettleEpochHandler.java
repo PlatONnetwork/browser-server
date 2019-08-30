@@ -1,26 +1,35 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.utils.HexTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static java.lang.String.format;
 
 /**
  * @Auther: Chendongming
@@ -30,28 +39,105 @@ import java.util.List;
 @Component
 public class NewSettleEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewSettleEpochHandler.class);
-    private CustomTransaction tx;
-    private NodeCache nodeCache;
-    private StakingStage stakingStage;
+    @Autowired
     private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
+    @Autowired
+    private PlatonClient client;
+    private StakingStage stakingStage;
 
     @Override
-    public void handle(EventContext context) throws SettleEpochChangeException {
-        tx = context.getTransaction();
-        nodeCache = context.getNodeCache();
+    public void handle(EventContext context) throws Exception {
         stakingStage = context.getStakingStage();
-        bc = context.getBlockChain();
-        stakingSettle();
-        modifyDelegationInfoOnNewSettingEpoch();
-        modifyUnDelegationInfoOnNewSettingEpoch();
+        updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
+        settle(); // 结算
+        updateDelegation(); // 更新委托信息
+        updateUnDelegation(); // 更新解委托信息
+    }
+
+
+    /**
+     * 更新结算周期验证人
+     * // 假设当前链上最高区块号为750
+     * 1         250        500        750
+     * |----------|----------|----------|
+     * A B C      A C D       B C D
+     * 结算周期的临界块号分别是：1,250,500,750
+     * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
+     * 如果当前区块号为753，由于未达到
+     */
+    private void updateVerifier () throws CandidateException {
+        CustomBlock curBlock = bc.getCurBlock();
+        Long blockNumber = curBlock.getNumber();
+        BaseResponse<List <Node>> result;
+
+        // ==================================更新前一周期验证人列表=======================================
+        bc.getPreVerifier().clear();
+        bc.getPreVerifier().putAll(bc.getCurVerifier());
+        if(bc.getCurValidator().size()>0){
+            logger.debug("前一轮结算周期(最后块号{})验证人(倒换):{}",blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+        }
+        if(bc.getPreVerifier().size()==0){
+            // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+            try {
+                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
+            }
+            if (!result.isStatusOk()) {
+                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
+            }else{
+                bc.getPreVerifier().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("前一轮结算周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+            }
+        }
+
+        // ==================================更新当前周期验证人列表=======================================
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
+        try {
+            result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+        }
+        if(result.isStatusOk()){
+            bc.getCurVerifier().clear();
+            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            logger.debug("当前轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+        }
+        if (!result.isStatusOk()) {
+            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+            try {
+                result = client.getNodeContract().getVerifierList().send();
+                bc.getCurVerifier().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("当前轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
+            } catch (Exception e) {
+                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
+            }
+            if(!result.isStatusOk()){
+                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
+            }
+        }
+
+        if(bc.getCurVerifier().size()==0){
+            throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
+        }
+
+
+        logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
 
     //结算周期变更导致的委托数据的变更
-    private void modifyDelegationInfoOnNewSettingEpoch () {
+    private void updateDelegation () {
         //由于结算周期的变更，对所有的节点下的质押的委托更新
         //只需变更不为历史节点的委托数据(isHistory=NO(2))
-        List<CustomDelegation> delegations = nodeCache.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
+        List<CustomDelegation> delegations = NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
         delegations.forEach(delegation->{
             //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
             delegation.setDelegateLocked(new BigInteger(delegation.getDelegateLocked()).add(new BigInteger(delegation.getDelegateHas())).toString());
@@ -70,10 +156,10 @@ public class NewSettleEpochHandler implements EventHandler {
     }
 
     //结算周期变更导致的委托赎回的变更
-    private void modifyUnDelegationInfoOnNewSettingEpoch () {
+    private void updateUnDelegation() {
         //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
         //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
+        List<CustomUnDelegation> unDelegations = NODE_CACHE.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
         unDelegations.forEach(unDelegation -> {
             //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
             unDelegation.setRedeemLocked("0");
@@ -88,7 +174,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void stakingSettle() throws SettleEpochChangeException {
+    private void settle() throws SettleEpochChangeException, CandidateException {
 
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
 
@@ -100,23 +186,14 @@ public class NewSettleEpochHandler implements EventHandler {
         BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
         logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
 
-        List<CustomStaking> stakings = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
+        List<CustomStaking> stakings = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
         for(CustomStaking curStaking:stakings){
             // 调整金额状态
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
             curStaking.setStakingLocked(stakingLocked.toString());
             curStaking.setStakingHas(BigInteger.ZERO.toString());
-            if(bc.getCurSettingEpoch().longValue() > curStaking.getStakingReductionEpoch()){
-                // 因为减持质押需要隔一个结算周期才会释放，所以当前周期必须要大于当前质押中的解质押发生的周期，即：
-                // 假设结算周期是500
-                // |--------|--------|--------|
-                // 1        500     1000     1500
-                // 结算周期(1~500)内的解质押会在结算周期(500~1000)结束的时候(第1000块)释放
-                // 假设周期(1~500)内做了质押A，staking.getStakingReductionEpoch()的值为1，则：
-                // 1、第500块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为1，是不会进入此代码块的
-                // 2、第1000块结算周期事件触发进来此方法时，bc.getCurSettingEpoch().longValue()的值为2，是会进入此代码块的
-                //
-                // 当前结算周期轮数大于质押结算周期标识，则表明前一结算周期的解质押已释放
+            // 当前结算周期轮数-减持质押时的结算轮数>=指定的质押退回所要经过的结算周期轮数
+            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
             BigInteger stakingReduction = curStaking.integerStakingReduction();
@@ -135,7 +212,7 @@ public class NewSettleEpochHandler implements EventHandler {
 
                 CustomNode customNode;
                 try {
-                    customNode = nodeCache.getNode(curStaking.getNodeId());
+                    customNode = NODE_CACHE.getNode(curStaking.getNodeId());
                 } catch (NoSuchBeanException e) {
                     throw new SettleEpochChangeException("获取节点错误:"+e.getMessage());
                 }

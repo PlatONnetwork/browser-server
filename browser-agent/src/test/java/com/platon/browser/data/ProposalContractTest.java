@@ -26,8 +26,8 @@ public class ProposalContractTest {
 	private Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
 
 	String nodeId = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
-//	String blsPubKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
-	private String blsPubKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
+	String blsPubKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
+//	private String blsPubKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
 	String chainId = "100";
 
 	private Credentials superCredentials;
@@ -36,7 +36,6 @@ public class ProposalContractTest {
 
 	private ProposalContract proposalContract;
 
-	private String pIDID = "1";
 
 	@Before
 	public void init() throws Exception {
@@ -66,6 +65,7 @@ public class ProposalContractTest {
 	@Test
 	public void submitTextProposal() {
 		try {
+			String pIDID = "1";
 			PlatonSendTransaction platonSendTransaction = proposalContract
 					.submitProposalReturnTransaction(Proposal.createSubmitTextProposalParam(nodeId, pIDID)).send();
 			BaseResponse<?> baseResponse = proposalContract
@@ -89,7 +89,7 @@ public class ProposalContractTest {
 	@Test
 	public void submitVersionProposal() {
 		try {
-			String num = "4";
+			String num = "6";
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
 					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(20000), BigInteger.valueOf(4)))
 					.send();
@@ -98,10 +98,10 @@ public class ProposalContractTest {
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
 //			voteForProposal(platonSendTransaction.getTransactionHash());
-
-			queryResult(platonSendTransaction.getTransactionHash());
+//
+//			queryResult(platonSendTransaction.getTransactionHash());
 			
-//			this.cancelProposal(platonSendTransaction.getTransactionHash(), num+1);
+			this.cancelProposal(platonSendTransaction.getTransactionHash(), String.valueOf(Integer.parseInt(num)+1));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -267,8 +267,8 @@ public class ProposalContractTest {
     public void submitCancelProposal() {
 
         try {
-			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, "5", BigInteger.valueOf(1),
-					"0xa4468e3b32adeb49da11d3e8fd861b41a0098ec608a73ebc7a16e1ad2d3446d6");
+			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, "7", BigInteger.valueOf(1),
+					"0xb581d0d5fb33da7011a2de232273cb949278273dc99000069bd5ee3f1b14a61b");
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
             BaseResponse<?> baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_CANCEL_FUNC_TYPE).send();
             System.out.println(baseResponse.toString());

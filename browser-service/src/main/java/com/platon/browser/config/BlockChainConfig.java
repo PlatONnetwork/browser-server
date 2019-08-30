@@ -23,14 +23,6 @@ import java.util.Set;
 public class BlockChainConfig {
     public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.addresses);
 
-    @PostConstruct
-    private void init(){
-        INNER_CONTRACT_ADDR.add(developerIncentiveFundAccountAddr);
-        INNER_CONTRACT_ADDR.add(platonFundAccountAddr);
-    }
-
-    // 初始验证人锁定质押金(LAT)
-    private BigDecimal initValidatorStakingLockedAmount;
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
     // 链ID
@@ -91,4 +83,8 @@ public class BlockChainConfig {
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;
+    //文本提案默认结束轮数
+    private String proposalTextEndRound;
+    //keyStore地址
+    private String keyStore;
 }

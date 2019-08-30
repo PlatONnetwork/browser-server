@@ -35,7 +35,7 @@ public final class MarkDownParserUtil {
      * @param fileName
      * @return
      */
-    private static String httpGet(String fileName) throws IOException {
+    public static String httpGet(String fileName) throws IOException {
         HttpGet httpGet = null;
         try {
             HttpClient httpClient = HttpClients.createDefault();

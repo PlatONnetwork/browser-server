@@ -187,6 +187,7 @@ public class TransactionDetailsResp {
 	public void setRPAccount(String rPAccount) {
 		RPAccount = rPAccount;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getRPNum() {
 		return RPNum;
 	}

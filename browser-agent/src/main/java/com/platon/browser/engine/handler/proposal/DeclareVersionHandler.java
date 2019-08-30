@@ -1,13 +1,17 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DeclareVersionParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -16,13 +20,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DeclareVersionHandler implements EventHandler {
+    @Autowired
+    private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
-        NodeCache nodeCache = context.getNodeCache();
         DeclareVersionParam param = tx.getTxParam(DeclareVersionParam.class);
         try {
-            String nodeName = nodeCache.getNode(param.getActiveNode()).getLatestStaking().getStakingName();
+            String nodeName = NODE_CACHE.getNode(param.getActiveNode()).getLatestStaking().getStakingName();
             param.setNodeName(nodeName);
             //交易txinfo回填
             tx.setTxInfo(JSON.toJSONString(param));

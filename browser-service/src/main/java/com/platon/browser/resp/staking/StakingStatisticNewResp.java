@@ -21,12 +21,14 @@ public class StakingStatisticNewResp {
 	public void setStakingDelegationValue(String stakingDelegationValue) {
 		this.stakingDelegationValue = stakingDelegationValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getStakingValue() {
 		return stakingValue;
 	}
 	public void setStakingValue(String stakingValue) {
 		this.stakingValue = stakingValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getIssueValue() {
 		return issueValue;
 	}

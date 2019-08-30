@@ -2,7 +2,7 @@
 
 #Spring应用配置
 spring:
-  profiles.active: aton
+  profiles.active: agent
   application.name: browser-agent
   #Redis集群配置
   redis:

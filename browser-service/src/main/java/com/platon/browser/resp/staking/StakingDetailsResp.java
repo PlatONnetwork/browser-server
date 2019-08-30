@@ -16,7 +16,7 @@ public class StakingDetailsResp {
     private Long blockQty;           //产生的区块数
     private Long expectBlockQty;      //预计的出块数
     private String expectedIncome;      //预计年收化率（从验证人加入时刻开始计算）
-    private String joinTime;            //加入时间
+    private Long joinTime;            //加入时间
     private Integer verifierTime;        //进入共识验证轮次数
     private String rewardValue;         //累计的收益 
     private String nodeId;              //节点id
@@ -25,6 +25,7 @@ public class StakingDetailsResp {
     private String website;             //节点的第三方主页
     private String details;             //节点的描述
     private String externalId;          //身份证id
+    private String externalUrl;          //身份证id连接
     private Long stakingBlockNum;     //最新的质押交易块高
     private String statDelegateReduction;//待提取的委托
     private Long leaveTime;  //退出时间
@@ -104,10 +105,10 @@ public class StakingDetailsResp {
 	public void setExpectedIncome(String expectedIncome) {
 		this.expectedIncome = expectedIncome;
 	}
-	public String getJoinTime() {
+	public Long getJoinTime() {
 		return joinTime;
 	}
-	public void setJoinTime(String joinTime) {
+	public void setJoinTime(Long joinTime) {
 		this.joinTime = joinTime;
 	}
 	public Integer getVerifierTime() {
@@ -182,6 +183,12 @@ public class StakingDetailsResp {
 	}
 	public void setIsInit(Boolean isInit) {
 		this.isInit = isInit;
+	}
+	public String getExternalUrl() {
+		return externalUrl;
+	}
+	public void setExternalUrl(String externalUrl) {
+		this.externalUrl = externalUrl;
 	}
     
 }

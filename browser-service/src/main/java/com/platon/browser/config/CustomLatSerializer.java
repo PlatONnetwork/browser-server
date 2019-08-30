@@ -15,7 +15,7 @@ public class CustomLatSerializer  extends JsonSerializer<String>{
 
 	@Override
 	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		String transEner = EnergonUtil.format(Convert.fromVon(value, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18);
+		String transEner = EnergonUtil.format(Convert.fromVon(value, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 12);
 		gen.writeString(transEner);
 	}
 
