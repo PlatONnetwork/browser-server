@@ -9,6 +9,7 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.util.MarkDownParserUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,9 @@ public class StakingInfoUpdateTask {
         String keyStoreUrl = blockChain.getChainConfig().getKeyStore();
         try {
             Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
+            if(customStakingSet.size() == 0)return;
             customStakingSet.forEach(customStaking -> {
-                if(!customStaking.getExternalId().equals(null)){
+                if(StringUtils.isNotBlank(customStaking.getExternalId())){
                     String seachInfo = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
                     String keyStoreInfo = null;
                     try {

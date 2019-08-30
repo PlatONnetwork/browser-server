@@ -63,7 +63,9 @@ public class TxParamResolver {
                         //被质押的节点的NodeId
                         String stakNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
                         //外部Id externalId
-                        String extrnaId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String extrnaIdHex = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String extrnaId = new String(Numeric.hexStringToByteArray(extrnaIdHex));
+
                         //被质押节点的名称 nodeName
                         String hexStakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
                         String stakNodeName = new String(Numeric.hexStringToByteArray(hexStakNodeName));
@@ -282,8 +284,10 @@ public class TxParamResolver {
         return result;
     }
 
-    public static void main ( String[] args ) {
-       TxParamResolver.analysis("0xf683820fa0959460ceca9c1290ee56b98d4e160ef0453f7c40d2199bdacb6489884563918244f40000cd8281c889880853a0d2313c0000");
+   /* public static void main ( String[] args ) {
+        String extrnaId = new String(Numeric.hexStringToByteArray("0x3078646664666466"));
+        System.out.println(extrnaId);
+            TxParamResolver.analysis("0xf683820fa0959460ceca9c1290ee56b98d4e160ef0453f7c40d2199bdacb6489884563918244f40000cd8281c889880853a0d2313c0000");
 
         RlpList rlp = RlpDecoder.decode(Hex.decode("f683820fa0959460ceca9c1290ee56b98d4e160ef0453f7c40d2199bdacb6489884563918244f40000cd8281c889880853a0d2313c0000"));
 
@@ -300,5 +304,5 @@ public class TxParamResolver {
                     System.out.println(((RlpString)rlpL.getValues().get(0)).asPositiveBigInteger());
                     System.out.println(((RlpString)rlpL.getValues().get(1)).asPositiveBigInteger());
                 });
-    }
+    }*/
 }
