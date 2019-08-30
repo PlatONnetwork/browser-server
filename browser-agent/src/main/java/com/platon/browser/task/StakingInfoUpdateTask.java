@@ -54,8 +54,8 @@ public class StakingInfoUpdateTask {
                     try {
                         keyStoreInfo = MarkDownParserUtil.httpGet(seachInfo);
                         String userName = getUserName(keyStoreInfo);
-                        String income = getIncome(keyStoreInfo);
-                        customStaking.setExpectedIncome(income);
+                        String icon = getIcon(keyStoreInfo);
+                        customStaking.setStakingIcon(icon);
                         customStaking.setExternalName(userName);
                     } catch (IOException e) {
                         logger.error("[StakingInfoUpdateTask] IOException {}",e.getMessage());
@@ -78,7 +78,7 @@ public class StakingInfoUpdateTask {
         return userNameJson.getString("val");
     }
 
-    private String getIncome(String seachInfo)throws Exception{
+    private String getIcon(String seachInfo)throws Exception{
         JSONObject jsonObject = JSONObject.parseObject(seachInfo);
         JSONArray completionsArray = jsonObject.getJSONArray("completions");
         JSONObject fristJson = completionsArray.getJSONObject(0);

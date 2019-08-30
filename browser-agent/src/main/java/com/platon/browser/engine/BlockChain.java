@@ -227,8 +227,8 @@ public class BlockChain {
 
         // (当前块号+选举回退块数)%共识周期区块数==0 && 当前共识周期不是第一个共识周期
         if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0&&curConsensusEpoch.longValue()>1) {
-            logger.debug("选举验证人：Block Number({})", blockNumber);
-            stakingExecute.onElectionDistance(curBlock, this);
+            //logger.debug("选举验证人：Block Number({})", blockNumber);
+            //stakingExecute.onElectionDistance(curBlock, this);
 
         }
 

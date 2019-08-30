@@ -119,6 +119,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 slashInfo.put(staking.getNodeId(),info);
             }
         }
-        logger.info("节点出块率低处罚信息:{}", JSON.toJSONString(slashInfo,true));
+
+        if(slashInfo.size()>0) logger.info("节点出块率低处罚信息:{}", JSON.toJSONString(slashInfo,true));
     }
 }

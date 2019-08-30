@@ -110,21 +110,29 @@ public class NewConsensusEpochHandler implements EventHandler {
         Long blockNumber = curBlock.getNumber();
         BaseResponse<List <Node>> result;
         // ==================================更新前一周期验证人列表=======================================
-        // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
-        BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-        try {
-            result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
+        bc.getPreValidator().clear();
+        bc.getPreValidator().putAll(bc.getCurValidator());
+        if(bc.getPreValidator().size()>0){
+            logger.debug("前一轮共识周期(最后块号{})验证人(倒换):{}",blockNumber,JSON.toJSONString(bc.getPreValidator(),true));
         }
-        if (!result.isStatusOk()) {
-            throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
-        }else{
-            bc.getPreValidator().clear();
-            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("前一轮共识周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getPreValidator(),true));
+        if(bc.getPreValidator().size()==0){
+            // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
+            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+            try {
+                result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
+            }
+            if (!result.isStatusOk()) {
+                throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
+            }else{
+                bc.getPreValidator().clear();
+                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("前一轮共识周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getPreValidator(),true));
+            }
         }
+
 
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());

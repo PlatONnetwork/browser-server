@@ -1,5 +1,6 @@
 package com.platon.browser.data;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -50,7 +51,8 @@ import java.util.concurrent.Callable;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
-    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
+    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
 
     // 特殊合约接口测试
     @Test
@@ -170,8 +172,17 @@ public class SpecialContractApiInvoker {
 
 
         try {
-            BaseResponse<List<Node>>  nodes = getHistoryValidatorList(BigInteger.valueOf(6081));
-            logger.debug("{}",nodes);
+            List<Node>  node0 = getHistoryValidatorList(BigInteger.valueOf(3639)).data;
+            logger.debug("{}", JSON.toJSONString(node0,true));
+
+            List<Node>  node1 = getHistoryValidatorList(BigInteger.valueOf(3640)).data;
+            logger.debug("{}", JSON.toJSONString(node1,true));
+
+            List<Node>  node2 = getHistoryValidatorList(BigInteger.valueOf(3679)).data;
+            logger.debug("{}", JSON.toJSONString(node2,true));
+
+            List<Node>  node3 = getHistoryValidatorList(BigInteger.valueOf(3680)).data;
+            logger.debug("{}", JSON.toJSONString(node2,true));
         } catch (Exception e) {
             e.printStackTrace();
         }
