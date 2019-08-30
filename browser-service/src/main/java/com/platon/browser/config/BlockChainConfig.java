@@ -85,6 +85,6 @@ public class BlockChainConfig {
     private String proposalUrlTemplate;
     //文本提案默认结束轮数
     private String proposalTextEndRound;
-    //keyStore地址
-    private String keyStore;
+    //keyBase地址
+    private String keyBase;
 }
