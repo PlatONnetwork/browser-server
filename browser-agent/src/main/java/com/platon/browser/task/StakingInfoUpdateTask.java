@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -7,6 +8,9 @@ import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.keystore.Completion;
+import com.platon.browser.engine.bean.keystore.Components;
+import com.platon.browser.engine.bean.keystore.KeystoreUser;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +25,7 @@ import org.web3j.utils.Convert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,14 +56,22 @@ public class StakingInfoUpdateTask {
             if(customStakingSet.size() == 0)return;
             customStakingSet.forEach(customStaking -> {
                 if(StringUtils.isNotBlank(customStaking.getExternalId())){
-                    String seachInfo = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
-                    String keyStoreInfo = null;
+                    String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
                     try {
-                        keyStoreInfo = MarkDownParserUtil.httpGet(seachInfo);
-                        String userName = getUserName(keyStoreInfo);
-                        String icon = getIcon(keyStoreInfo);
+                        String queryResult = MarkDownParserUtil.httpGet(queryUrl);
+                        KeystoreUser keystoreUser = JSON.parseObject(queryResult,KeystoreUser.class);
+                        List<Completion> completions = keystoreUser.getCompletions();
+                        if(completions==null||completions.size()==0) return;
+                        // 取最新一条
+                        Completion completion = completions.get(0);
+                        // 取缩略图
+                        String icon = completion.getThumbnail();
                         customStaking.setStakingIcon(icon);
-                        customStaking.setExternalName(userName);
+
+                        Components components = completion.getComponents();
+                        String username = components.getUsername().getVal();
+                        customStaking.setExternalName(username);
+
                     } catch (IOException e) {
                         logger.error("[StakingInfoUpdateTask] IOException {}",e.getMessage());
                     } catch (Exception e){

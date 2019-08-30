@@ -1,5 +1,6 @@
 package com.platon.browser.client;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.job.Web3DetectJob;
@@ -230,7 +231,9 @@ public class PlatonClient {
             if(response==null||response.data==null){
                 throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
             }
-            response.data = JSONUtil.parseArray((String) response.data, Node.class);
+            String data = (String)response.data;
+            data = data.replace("\"Shares\":null","\"Shares\":\"0x0\"");
+            response.data = JSONUtil.parseArray(data, Node.class);
             return response;
         });
     }
