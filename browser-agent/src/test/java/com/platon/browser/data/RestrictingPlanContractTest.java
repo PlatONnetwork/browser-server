@@ -34,7 +34,7 @@ public class RestrictingPlanContractTest {
     @Before
     public void init() {
 
-        credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
+        credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 
         restrictingPlanContract = RestrictingPlanContract.load(web3j, credentials, "100");
     }
@@ -52,7 +52,7 @@ public class RestrictingPlanContractTest {
         restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(200), new BigInteger("600000000000000000")));
         try {
             PlatonSendTransaction platonSendTransaction = restrictingPlanContract.createRestrictingPlanReturnTransaction(benifitAddress, restrictingPlans).send();
-            BaseResponse baseResponse = restrictingPlanContract.getCreateRestrictingPlanResult(platonSendTransaction).send();
+            BaseResponse<?> baseResponse = restrictingPlanContract.getCreateRestrictingPlanResult(platonSendTransaction).send();
             System.out.println(baseResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();

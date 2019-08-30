@@ -23,6 +23,7 @@ public class DelegationListByStakingResp {
 	public void setDelegateValue(String delegateValue) {
 		this.delegateValue = delegateValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getDelegateTotalValue() {
 		return delegateTotalValue;
 	}

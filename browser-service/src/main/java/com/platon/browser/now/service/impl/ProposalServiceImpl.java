@@ -91,6 +91,8 @@ public class ProposalServiceImpl implements ProposalService {
         }
         ProposalDetailsResp proposalDetailsResp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
         proposalDetailsResp.setProposalHash(req.getProposalHash());
+        proposalDetailsResp.setNodeId(proposal.getVerifier());
+        proposalDetailsResp.setNodeName(proposal.getVerifierName());
         List<BlockRedis> items = statisticCacheService.getBlockCache(0, 1);
         if (items != null && items.size() > 0) {
             proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());

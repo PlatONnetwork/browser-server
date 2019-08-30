@@ -33,6 +33,7 @@ public class TransactionDetailsResp {
     private String nodeName;            //节点名称
     private String benefitAddr;         //用于接受出块奖励和质押奖励的收益账户
     private String externalId;          //外部Id(有长度限制，给第三方拉取节点描述的Id)
+    private String externalUrl;          //外部url
     private String website;             //节点的第三方主页(有长度限制，表示该节点的主页)
     private String details;             //节点的描述(有长度限制，表示该节点的描述)
     private String programVersion;      //程序的真实版本，治理rpc获取
@@ -374,6 +375,12 @@ public class TransactionDetailsResp {
 	}
 	public void setVoteStatus(String voteStatus) {
 		this.voteStatus = voteStatus;
+	}
+	public String getExternalUrl() {
+		return externalUrl;
+	}
+	public void setExternalUrl(String externalUrl) {
+		this.externalUrl = externalUrl;
 	}
 
 }

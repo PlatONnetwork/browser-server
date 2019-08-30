@@ -363,6 +363,7 @@ public class TransactionServiceImpl implements TransactionService {
 					resp.setNodeId(editValidatorParam.getNodeId());
 					resp.setNodeName(editValidatorParam.getNodeName());
 					resp.setExternalId(editValidatorParam.getExternalId());
+//					resp.setExternalUrl("https://keybase.io" + editValidatorParam.get);
 					resp.setWebsite(editValidatorParam.getWebsite());
 					resp.setDetails(editValidatorParam.getDetails());
 					break;
