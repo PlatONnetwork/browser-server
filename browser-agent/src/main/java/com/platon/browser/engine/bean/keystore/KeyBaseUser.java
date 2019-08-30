@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class KeystoreUser {
+public class KeyBaseUser {
     private Status status;
     private List<Completion> completions;
 }

@@ -100,5 +100,5 @@ platon.config:
   }
   #提案url参数模板
   proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-{pip_id}.md
-  #keystore网址
-  keyStore: https://keybase.io/
+  #keybase网址
+  keyBase: https://keybase.io/
