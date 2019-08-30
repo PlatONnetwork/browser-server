@@ -41,6 +41,11 @@ public class EditValidatorParam {
      */
     private String details;
 
+    /**
+     * blockNumber
+     */
+    private String blockNumber;
+
     public void init(String benefitAddress,String nodeId,String externalId,
                      String nodeName,String website,String details){
         this.setBenefitAddress(benefitAddress);
