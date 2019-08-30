@@ -191,10 +191,10 @@ public class BlockServiceImpl implements BlockService {
 		long blockNumber = req.getNumber().longValue();
 		switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())) {
 			case PREV:
-				blockNumber = -1;
+				blockNumber -= 1;
 				break;
 			case NEXT:
-				blockNumber = +1;
+				blockNumber += 1;
 				break;
 		}
 		return this.queryBlockByNumber(blockNumber);
