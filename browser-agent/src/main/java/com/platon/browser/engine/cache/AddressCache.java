@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 地址实体进程缓存
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 public class AddressCache {
     // <节点ID - 地址实体>
-    private Map<String, CustomAddress> addressMap = new HashMap<>();
+    private Map<String, CustomAddress> addressMap = new ConcurrentHashMap<>();
     /**
      * 根据地址获取地址实体
      * @param address
