@@ -5,6 +5,7 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
@@ -12,6 +13,7 @@ import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
     private BlockChainConfig chainConfig;
 
     @Override
-    public void handle(EventContext context) {
+    public void handle ( EventContext context ) {
         CustomBlock curBlock = bc.getCurBlock();
         try {
             //TODO:地址数需要地址统计
@@ -47,7 +49,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //当前区块所属节点id
             NETWORK_STAT_CACHE.setNodeId(curBlock.getNodeId());
             //当前区块所属节点name
-            NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName().equals(null)? "Unknow" : NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
+            NETWORK_STAT_CACHE.setNodeName(NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName().equals(null) ? "Unknow" : NODE_CACHE.getNode(curBlock.getNodeId()).getLatestStaking().getStakingName());
             //TODO:可优化
             //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
             NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).longValue());
@@ -83,7 +85,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
                 }
                 if (curBlock.getStatDelegateQty() > 0) {
                     //质押已统计，本次累加上委托
-                    Set<Delegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
+                    Set <Delegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
                     newDelegation.forEach(delegation -> {
                         //先做委托累加
                         BigInteger delegationValue = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()));
@@ -94,19 +96,24 @@ public class NetworkStatStatisticHandler implements EventHandler {
                 }
 
                 if (STAGE_DATA.getProposalStage().getProposalInsertStage().size() > 0 || STAGE_DATA.getProposalStage().getProposalUpdateStage().size() > 0) {
-                    /*PROPOSALS_CACHE.getAll(( hash, proposal ) -> {
-                        if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTEING.code)) {
+                    PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
+                        if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                         }
-                    });*/
+                        if (proposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code) || proposal.getType().equals(CustomProposal.TypeEnum.CANCEL.code)) {
+                            if (proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code) || proposal.getType().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
+                                NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
+                            }
+                        }
+                    });
                 }
             }
             //更新暂存变量
             STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
         } catch (NoSuchBeanException e) {
-           // logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",e.getMessage());
-            logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",curBlock.getBlockNumber());
-            logger.error("{}",e.getMessage());
+            // logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}",e.getMessage());
+            logger.error("-------------------------[NETWORK_STAT_CACHE]-------------------------- {}", curBlock.getBlockNumber());
+            logger.error("{}", e.getMessage());
         }
     }
 }
