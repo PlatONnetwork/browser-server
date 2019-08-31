@@ -2,6 +2,7 @@ package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
@@ -82,7 +83,7 @@ public class NewSettleEpochHandler implements EventHandler {
             // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
             BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
             try {
-                result = client.getHistoryVerifierList(prevEpochLastBlockNumber);
+                result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
@@ -99,7 +100,7 @@ public class NewSettleEpochHandler implements EventHandler {
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
         try {
-            result = client.getHistoryVerifierList(nextEpochFirstBlockNumber);
+            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));

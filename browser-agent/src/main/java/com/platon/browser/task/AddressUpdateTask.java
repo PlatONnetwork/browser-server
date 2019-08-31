@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.BlockChain;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class AddressUpdateTask {
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
-            BaseResponse <List<RestrictingBalance>> response = client.getRestrictingBalance(params);
+            BaseResponse <List<RestrictingBalance>> response = SpecialContractApi.getRestrictingBalance(client.getWeb3j(),params);
             if(response.isStatusOk()&&response.data!=null&&response.data.size()>0){
                 List <RestrictingBalance> data = response.data;
                 Map<String,RestrictingBalance> map = new HashMap<>();

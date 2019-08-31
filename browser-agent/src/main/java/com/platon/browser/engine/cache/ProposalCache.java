@@ -5,7 +5,11 @@ import com.platon.browser.dto.CustomVote;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 提案进程缓存
@@ -15,7 +19,7 @@ import java.util.*;
  */
 public class ProposalCache {
     // <提案交易hash - 提案实体>
-    private Map<String, CustomProposal> proposalMap = new HashMap<>();
+    private Map<String, CustomProposal> proposalMap = new ConcurrentHashMap<>();
 
     public void init(List<CustomProposal> proposalList,List<CustomVote> voteList) throws CacheConstructException {
         proposalList.forEach(this::addProposal);

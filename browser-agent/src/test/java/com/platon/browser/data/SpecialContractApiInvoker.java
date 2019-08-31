@@ -3,6 +3,7 @@ package com.platon.browser.data;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.util.Resolver;
@@ -46,19 +47,18 @@ import java.util.concurrent.Callable;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/15 21:00
- * @Description:
+ * @Description: 特殊节点合约接口调用
  */
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
-//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
-    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
-    private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
+//    private Web3j web3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+//    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+    private static NodeContract nodeContract = NodeContract.load(web3j);
 
     // 特殊合约接口测试
     @Test
     public void getCandidates() throws Exception {
-        NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
-
 /*        // 当前区块号
         BigInteger blockNumber = currentValidWeb3j.platonBlockNumber().send().getBlockNumber();
         logger.error("{}",blockNumber);
@@ -78,68 +78,12 @@ public class SpecialContractApiInvoker {
         // 获取可用和锁仓余额
         List<String> addresses = new ArrayList<>();
         addresses.add("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
-        BaseResponse<List<RestrictingBalance>> balances = getRestrictingBalance("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219;0x60ceca9c1290ee56b98d4e160ef0453f7c40d211");
+        BaseResponse<List<RestrictingBalance>> balances = SpecialContractApi
+                .getRestrictingBalance(
+                        web3j,
+                        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219;0x60ceca9c1290ee56b98d4e160ef0453f7c40d211"
+                );
         logger.error("{}",balances);
-    }
-
-
-    public static BaseResponse<List<Node>> getHistoryVerifierList(BigInteger blockNumber) throws Exception {
-        BaseResponse<List<Node>> nodes = nodeCall(
-                blockNumber,
-                PlatonClient.GET_HISTORY_VERIFIERLIST_FUNC_TYPE
-        ).send();
-        return nodes;
-    }
-
-    public static BaseResponse<List<Node>> getHistoryValidatorList(BigInteger blockNumber) throws Exception {
-        BaseResponse<List<Node>> nodes = nodeCall(
-                blockNumber,
-                PlatonClient.GET_HISTORY_VALIDATORLIST_FUNC_TYPE
-        ).send();
-        return nodes;
-    }
-
-
-    public static RemoteCall<BaseResponse<List<Node>>> nodeCall(BigInteger blockNumber, int funcType) {
-        final Function function = new Function(
-                funcType,
-                Collections.singletonList(new Uint256(blockNumber)),
-                Collections.singletonList(new TypeReference<Utf8String>() {
-                })
-        );
-        return new RemoteCall<>((Callable<BaseResponse<List<Node>>>) () -> {
-            String encodedFunction = PlatOnUtil.invokeEncode(function);
-            PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(InnerContractAddrEnum.NODE_CONTRACT.address, InnerContractAddrEnum.NODE_CONTRACT.address, encodedFunction),
-                    DefaultBlockParameter.valueOf(blockNumber)
-            ).send();
-            String value = ethCall.getValue();
-            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
-            if(response==null||response.data==null){
-                throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
-            }
-            response.data = JSONUtil.parseArray((String) response.data, Node.class);
-            return response;
-        });
-    }
-
-    public BaseResponse<List<RestrictingBalance>> getRestrictingBalance(String addresses) throws Exception {
-        final Function function = new Function(
-                PlatonClient.GET_RESTRICTINGBALANCE_FUNC_TYPE,
-                //Collections.singletonList(new DynamicArray<>(Utils.typeMap(addresses, Utf8String.class))),
-                Arrays.asList(new Utf8String(addresses)),
-                Collections.emptyList());
-        return new RemoteCall<>((Callable<BaseResponse<List<RestrictingBalance>>>) () -> {
-            String encodedFunction = PlatOnUtil.invokeEncode(function);
-            PlatonCall ethCall = currentValidWeb3j.platonCall(
-                    Transaction.createEthCallTransaction(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address, encodedFunction),
-                    DefaultBlockParameterName.LATEST
-            ).send();
-            String value = ethCall.getValue();
-            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
-            response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
-            return response;
-        }).send();
     }
 
 
@@ -172,17 +116,12 @@ public class SpecialContractApiInvoker {
 
 
         try {
-            List<Node>  node0 = getHistoryValidatorList(BigInteger.valueOf(3639)).data;
-            logger.debug("{}", JSON.toJSONString(node0,true));
+            BaseResponse<List<Node>>  validator1 = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(440));
+            logger.debug("{}", JSON.toJSONString(validator1,true));
 
-            List<Node>  node1 = getHistoryValidatorList(BigInteger.valueOf(3640)).data;
+            BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(0));
             logger.debug("{}", JSON.toJSONString(node1,true));
 
-            List<Node>  node2 = getHistoryValidatorList(BigInteger.valueOf(3679)).data;
-            logger.debug("{}", JSON.toJSONString(node2,true));
-
-            List<Node>  node3 = getHistoryValidatorList(BigInteger.valueOf(3680)).data;
-            logger.debug("{}", JSON.toJSONString(node2,true));
         } catch (Exception e) {
             e.printStackTrace();
         }

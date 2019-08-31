@@ -2,6 +2,7 @@ package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
@@ -119,7 +120,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
             BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
             try {
-                result = client.getHistoryValidatorList(prevEpochLastBlockNumber);
+                result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),prevEpochLastBlockNumber);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
@@ -136,7 +137,7 @@ public class NewConsensusEpochHandler implements EventHandler {
 
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
-        result = client.getHistoryValidatorList(nextEpochFirstBlockNumber);
+        result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
         if(result.isStatusOk()){
             bc.getCurValidator().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));

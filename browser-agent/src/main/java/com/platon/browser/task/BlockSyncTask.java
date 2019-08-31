@@ -2,6 +2,7 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
@@ -105,7 +106,7 @@ public class BlockSyncTask {
         // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
         try {
-            result = client.getHistoryValidatorList(BigInteger.valueOf(prevEpochLastBlockNumber));
+            result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
@@ -120,7 +121,7 @@ public class BlockSyncTask {
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
         try {
-            result = client.getHistoryValidatorList(nextEpochLastBlockNumber);
+            result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochLastBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询当前共识周期验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
@@ -152,7 +153,7 @@ public class BlockSyncTask {
         // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getSettlePeriodBlockCount().longValue());
         try {
-            result = client.getHistoryVerifierList(BigInteger.valueOf(prevEpochLastBlockNumber));
+            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
@@ -167,7 +168,7 @@ public class BlockSyncTask {
         // ==================================更新当前周期验证人列表=======================================
         BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
         try {
-            result = client.getHistoryVerifierList(nextEpochLastBlockNumber);
+            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochLastBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
@@ -220,7 +221,7 @@ public class BlockSyncTask {
             // 如果库里区块为空，则：
             try {
                 // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
-                BaseResponse<List<Node>> result = client.getHistoryValidatorList(BigInteger.ZERO);
+                BaseResponse<List<Node>> result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),BigInteger.ZERO);
                 if(!result.isStatusOk()){
                     logger.debug("查询实时共识周期验证人列表...");
                     result = client.getNodeContract().getValidatorList().send();
@@ -242,7 +243,7 @@ public class BlockSyncTask {
 
 
                 // 根据区块号0查询结算周期验证人列表并入库
-                result = client.getHistoryVerifierList(BigInteger.ZERO);
+                result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.ZERO);
                 if(!result.isStatusOk()){
                     logger.debug("查询实时结算周期验证人列表...");
                     result = client.getNodeContract().getVerifierList().send();
