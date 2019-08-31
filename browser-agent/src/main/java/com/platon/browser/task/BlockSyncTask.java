@@ -119,7 +119,7 @@ public class BlockSyncTask {
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
+        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
         try {
             result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochLastBlockNumber);
         } catch (Exception e) {
@@ -166,7 +166,7 @@ public class BlockSyncTask {
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
+        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
         try {
             result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochLastBlockNumber);
         } catch (Exception e) {

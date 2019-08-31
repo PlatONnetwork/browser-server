@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:11
- * @Description:
+ * @Description: 区块链业务数据分析处理转发中心
  */
 @Component
 @Data
@@ -55,6 +55,8 @@ public class BlockChain {
     private ProposalEngine proposalExecute;
     @Autowired
     private AddressEngine addressExecute;
+    @Autowired
+    private RestrictingEngine restrictingEngine;
     @Autowired
     private NodeMapper nodeMapper;
     @Autowired
@@ -185,6 +187,8 @@ public class BlockChain {
                 case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx, this);
                     break;
+                case CREATE_RESTRICTING://创建锁仓计划
+                    restrictingEngine.execute(tx,this);
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
                     break;
@@ -227,8 +231,8 @@ public class BlockChain {
 
         // (当前块号+选举回退块数)%共识周期区块数==0 && 当前共识周期不是第一个共识周期
         if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0&&curConsensusEpoch.longValue()>1) {
-            //logger.debug("选举验证人：Block Number({})", blockNumber);
-            //stakingExecute.onElectionDistance(curBlock, this);
+            logger.debug("选举验证人：Block Number({})", blockNumber);
+            stakingExecute.onElectionDistance(curBlock, this);
 
         }
 

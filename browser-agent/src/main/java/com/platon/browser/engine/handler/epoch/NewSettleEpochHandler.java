@@ -74,31 +74,26 @@ public class NewSettleEpochHandler implements EventHandler {
         BaseResponse<List <Node>> result;
 
         // ==================================更新前一周期验证人列表=======================================
-        bc.getPreVerifier().clear();
-        bc.getPreVerifier().putAll(bc.getCurVerifier());
-        if(bc.getCurValidator().size()>0){
-            logger.debug("前一轮结算周期(最后块号{})验证人(倒换):{}",blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+
+        // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
+        BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
+        try {
+            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
         }
-        if(bc.getPreVerifier().size()==0){
-            // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
-            BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-            try {
-                result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
-            }
-            if (!result.isStatusOk()) {
-                throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
-            }else{
-                bc.getPreVerifier().clear();
-                result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("前一轮结算周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
-            }
+        if (!result.isStatusOk()) {
+            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
+        }else{
+            bc.getPreVerifier().clear();
+            result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            logger.debug("前一轮结算周期(最后块号{})验证人(查{}):{}",blockNumber,blockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
 
+
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         try {
             result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
         } catch (Exception e) {

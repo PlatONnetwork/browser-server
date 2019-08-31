@@ -116,7 +116,7 @@ public class SpecialContractApiInvoker {
 
 
         try {
-            BaseResponse<List<Node>>  validator1 = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(440));
+            BaseResponse<List<Node>>  validator1 = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(1040));
             logger.debug("{}", JSON.toJSONString(validator1,true));
 
             BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(0));

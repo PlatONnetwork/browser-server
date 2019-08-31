@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -63,7 +64,9 @@ public class UnDelegateHandler implements EventHandler {
              * */
 
             BigDecimal delegationSum = new BigDecimal(customDelegation.getDelegateHas()).add(new BigDecimal(customDelegation.getDelegateLocked()));
-            if (delegationSum.compareTo(bc.getChainConfig().getDelegateThreshold()) == -1) {
+            //配置文件中委托门槛单位是LAT
+            BigDecimal DelegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
+            if (delegationSum.compareTo(DelegateThresholdVon) == -1) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
                 customDelegation.setDelegateHas("0");

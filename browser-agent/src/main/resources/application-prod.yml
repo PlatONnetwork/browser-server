@@ -34,7 +34,7 @@ platon.config:
   #PlatON初始总发行量
   initIssueAmount: 10000000000
   #每年固定增发比例
-  addIssueRate: 0.25
+  addIssueRate: 0.025
   #每年增发分配给激励池的比例
   incentiveRateFromIssue: 0.8
   #激励池分配给出块激励的比例
@@ -67,6 +67,8 @@ platon.config:
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 28
+  #文本提案默认投票结束轮数
+  proposalTextEndRound: 4
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=

@@ -23,9 +23,9 @@ import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
- * User: dongqile
- * Date: 2019/8/21
- * Time: 11:04
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 提案信息更新任务
  */
 @Component
 public class ProposalUpdateTask {
@@ -39,7 +39,7 @@ public class ProposalUpdateTask {
      * a.http请求查询github治理提案的相关信息并补充
      * b.根据platon底层rpc接口查询提案结果
      */
-    @Scheduled(cron = "0/1 * * * * ?")
+    @Scheduled(cron = "0/5 * * * * ?")
     protected void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;

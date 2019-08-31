@@ -24,7 +24,6 @@
     <result column="contract_createHash" jdbcType="VARCHAR" property="contractCreatehash" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="rp_plan" jdbcType="VARCHAR" property="rpPlan" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -88,7 +87,7 @@
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
     tx_qty, transfer_qty, staking_qty, proposal_qty, delegate_qty, candidate_count, delegate_hes, 
     delegate_locked, delegate_unlock, delegate_reduction, contract_name, contract_create, 
-    contract_createHash, create_time, update_time, rp_plan
+    contract_createHash, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="BaseResultMap">
     select
@@ -128,7 +127,7 @@
       candidate_count, delegate_hes, delegate_locked, 
       delegate_unlock, delegate_reduction, contract_name, 
       contract_create, contract_createHash, create_time, 
-      update_time, rp_plan)
+      update_time)
     values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=VARCHAR}, 
       #{restrictingBalance,jdbcType=VARCHAR}, #{stakingValue,jdbcType=VARCHAR}, #{delegateValue,jdbcType=VARCHAR}, 
       #{redeemedValue,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
@@ -136,7 +135,7 @@
       #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=VARCHAR}, #{delegateLocked,jdbcType=VARCHAR}, 
       #{delegateUnlock,jdbcType=VARCHAR}, #{delegateReduction,jdbcType=VARCHAR}, #{contractName,jdbcType=VARCHAR}, 
       #{contractCreate,jdbcType=VARCHAR}, #{contractCreatehash,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{rpPlan,jdbcType=VARCHAR})
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -207,9 +206,6 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="rpPlan != null">
-        rp_plan,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="address != null">
@@ -277,9 +273,6 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="rpPlan != null">
-        #{rpPlan,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -358,9 +351,6 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.rpPlan != null">
-        rp_plan = #{record.rpPlan,jdbcType=VARCHAR},
-      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -389,8 +379,7 @@
       contract_create = #{record.contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      rp_plan = #{record.rpPlan,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -461,9 +450,6 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="rpPlan != null">
-        rp_plan = #{rpPlan,jdbcType=VARCHAR},
-      </if>
     </set>
     where address = #{address,jdbcType=VARCHAR}
   </update>
@@ -489,8 +475,7 @@
       contract_create = #{contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      rp_plan = #{rpPlan,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where address = #{address,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -503,7 +488,7 @@
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
       tx_qty, transfer_qty, staking_qty, proposal_qty, delegate_qty, candidate_count, 
       delegate_hes, delegate_locked, delegate_unlock, delegate_reduction, contract_name, 
-      contract_create, contract_createHash, create_time, update_time, rp_plan)
+      contract_create, contract_createHash, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=VARCHAR}, 
@@ -515,7 +500,7 @@
         #{item.delegateUnlock,jdbcType=VARCHAR}, #{item.delegateReduction,jdbcType=VARCHAR}, 
         #{item.contractName,jdbcType=VARCHAR}, #{item.contractCreate,jdbcType=VARCHAR}, 
         #{item.contractCreatehash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rpPlan,jdbcType=VARCHAR})
+        #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -598,9 +583,6 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'rp_plan'.toString() == column.value">
-          #{item.rpPlan,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

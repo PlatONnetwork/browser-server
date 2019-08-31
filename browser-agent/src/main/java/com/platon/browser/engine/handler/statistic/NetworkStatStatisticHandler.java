@@ -100,6 +100,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
                  *  2.升级提案：状态为投票中、预升级、为进行中提案
                  *  3.取消提案：状态为投票中的为进行中的提案
                  */
+                NETWORK_STAT_CACHE.setDoingProposalQty(0);
                 PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
                     if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)) {
                         NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);

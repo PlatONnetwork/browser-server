@@ -21,9 +21,9 @@ import java.util.Set;
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
- * User: dongqile
- * Date: 2019/8/29
- * Time: 15:53
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 质押信息更新任务
  */
 @Component
 public class StakingInfoUpdateTask {

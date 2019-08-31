@@ -31,7 +31,8 @@ public class DbService {
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
-
+    @Autowired
+    private RpPlanMapper rpPlanMapper;
     @Autowired
     private CustomNodeMapper customNodeMapper;
     @Autowired
@@ -120,5 +121,11 @@ public class DbService {
         // 批量入库或更新投票数据
         Set<Address> addresses = aer.exportAddress();
         if(addresses.size()>0) customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
+
+        // ****************新增锁仓计划相关数据*******************
+        RestrictingStage stage = bizData.getRestrictingStage();
+        //批量插入锁仓计划
+        Set<RpPlan> planSet = stage.exportRpPlan();
+        if(planSet.size()>0)rpPlanMapper.batchInsert(new ArrayList <>(planSet));
     }
 }
