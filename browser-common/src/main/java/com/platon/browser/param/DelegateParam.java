@@ -1,7 +1,6 @@
 package com.platon.browser.param;
 
 import lombok.Data;
-import org.web3j.abi.datatypes.Int;
 
 /**
  * User: dongqile

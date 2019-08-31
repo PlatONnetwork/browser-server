@@ -7,7 +7,7 @@ import java.math.BigInteger;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/21 14:05
- * @Description:
+ * @Description: 利润和成本bean
  */
 @Data
 public class PeriodValueElement {

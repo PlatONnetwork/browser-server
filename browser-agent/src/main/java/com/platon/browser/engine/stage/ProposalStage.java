@@ -1,10 +1,10 @@
 package com.platon.browser.engine.stage;
 
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Auther: Chendongming

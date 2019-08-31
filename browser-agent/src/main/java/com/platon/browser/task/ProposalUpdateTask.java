@@ -2,10 +2,8 @@ package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.slf4j.Logger;
@@ -15,9 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.TallyResult;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;

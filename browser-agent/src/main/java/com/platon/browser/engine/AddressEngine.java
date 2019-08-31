@@ -7,7 +7,6 @@ import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.statistic.AddressStatisticHandler;
 import com.platon.browser.engine.stage.AddressStage;
-import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

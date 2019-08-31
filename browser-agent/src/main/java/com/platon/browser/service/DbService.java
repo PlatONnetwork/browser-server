@@ -2,26 +2,24 @@ package com.platon.browser.service;
 
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.*;
-import com.platon.browser.engine.BlockChain;
+import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.stage.*;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.util.*;
-
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * User: dongqile
- * Date: 2019/8/13
- * Time: 21:25
+ *
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 批量入库服务
  */
 @Component
 public class DbService {
