@@ -33,7 +33,7 @@ public class NetworkStatUpdateTask {
     @Autowired
     private PlatonClient platonClient;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/1  * * * * ?")
     protected void start () {
         CustomBlock curBlock = blockChain.getCurBlock();
         if(curBlock==null) return;
@@ -41,16 +41,16 @@ public class NetworkStatUpdateTask {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
             Map <Integer, BigDecimal> foundationSubsidiesMap = blockChain.getChainConfig().getFoundationSubsidies();
             //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
-            BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().toString());
+            BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().intValue());
             //获取初始发行金额
             BigDecimal iniValue = blockChain.getChainConfig().getInitIssueAmount();
             BigDecimal iniValueVon = Convert.toVon(iniValue, Convert.Unit.LAT);
             //获取增发比例
             BigDecimal addIssueRate = blockChain.getChainConfig().getAddIssueRate();
             //获取激励池地址
-            String developerIncentiveFundAccountAddr = blockChain.getChainConfig().getDeveloperIncentiveFundAccountAddr();
+            String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
             //rpc查询实时激励池余额
-            BigInteger incentivePoolAccountBalance = platonClient.getWeb3j().platonGetBalance(developerIncentiveFundAccountAddr,
+            BigInteger incentivePoolAccountBalance = platonClient.getWeb3j().platonGetBalance(incentivePoolAccountAddr,
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(curBlock.getBlockNumber().longValue()))).send().getBalance();
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
