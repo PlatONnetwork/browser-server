@@ -67,8 +67,8 @@ public class NetworkStatUpdateTask {
             BigDecimal turnoverValue = circulation.add(new BigDecimal(lockContractBalance)).add(new BigDecimal(stakingContractBalance));
 
             //数据回填内存中
-            blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.toString());
-            blockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.toString());
+            blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            blockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
             STAGE_DATA.getNetworkStatStage().updateNetworkStat(blockChain.NETWORK_STAT_CACHE);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
