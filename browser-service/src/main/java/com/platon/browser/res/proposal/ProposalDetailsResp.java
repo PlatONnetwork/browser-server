@@ -37,4 +37,5 @@ public class ProposalDetailsResp {
     private String supportRateThreshold;   //通过率
     private String opposeRateThreshold;   //反对率
     private String abstainRateThreshold;   //弃权率
+    private Long inBlock;   //所在块高
 }

@@ -2,8 +2,6 @@ package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.TestData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class DataTool extends TestData {
-    private static final Logger logger = LoggerFactory.getLogger(DataTool.class);
 
     public static <T> List<T> getTestData(String chainId, TestDataFileNameEnum dataFileNameEnum, Class<T> clazz) {
         try {
@@ -26,6 +23,6 @@ public class DataTool extends TestData {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }

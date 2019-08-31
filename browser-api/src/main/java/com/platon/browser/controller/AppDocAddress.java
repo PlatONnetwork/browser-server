@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.platon.browser.req.address.QueryDetailRequest;
+import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
+import com.platon.browser.res.address.QueryRPPlanDetailResp;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,18 +65,49 @@ public interface AppDocAddress {
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
-     *       "RPPlan":[
-     *          {
-     *             "epoch":11,         //锁仓周期
-     *             "amount":111,       //锁定金额
-     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
-     *             "estimateTime":dfsdf   //预计时间
-     *          }
-     *       ]
      *    }
      * }
      */
 	@ApiOperation(value = "address/details", nickname = "address details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
 	@RequestMapping(value = "address/details", produces = { "application/json" }, method = RequestMethod.POST)
 	public BaseResp<QueryDetailResp> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
+	
+	/**
+     * @api {post}  /address/rpplanDetail b.查询地址锁仓详情
+     * @apiVersion 1.0.0
+     * @apiName rpplanDetail
+     * @apiGroup address
+     * @apiDescription
+     * 1. 功能：查询锁仓详情<br/>
+     * 2. 实现逻辑：<br/>
+     * - 查询mysql中rpplan表 
+     * - 查询链上实时余额
+     * @apiParamExample {json} Request-Example:
+     * {
+     *    "address":"0x"               //账户地址(必填)
+     * }
+     * @apiSuccessExample {json} Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *    "errMsg":"",                 //描述信息
+     *    "code":0,                    //成功（0），失败则由相关失败码
+     *    "data":{
+     *       "restrictingBalance":"",             //锁仓余额(单位:LAT)
+     *       "stakingValue":"",  //锁仓质押\委托(单位:LAT)
+     *       "underreleaseValue":"",        //欠释放(单位:LAT)
+     *       "total":"",  //计划总数
+     *       "RPPlan":[
+     *          {
+     *             "epoch":11,         //锁仓周期
+     *             "amount":111,       //锁定金额
+     *             "blockNumber":11    //锁仓周期对应快高  结束周期 * epoch  
+     *             "estimateTime":1000   //预计时间
+     *          }
+     *       ]
+     *    }
+     * }
+     */
+	@ApiOperation(value = "address/rpplanDetail", nickname = "address rpplan details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
+	@RequestMapping(value = "address/rpplanDetail", produces = { "application/json" }, method = RequestMethod.POST)
+	public BaseResp<QueryRPPlanDetailResp> rpplanDetail(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryRPPlanDetailRequest req);
 }

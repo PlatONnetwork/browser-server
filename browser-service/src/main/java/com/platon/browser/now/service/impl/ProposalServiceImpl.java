@@ -6,7 +6,9 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
@@ -51,6 +53,8 @@ public class ProposalServiceImpl implements ProposalService {
     private I18nUtil i18n;
     @Autowired
     private ProposalMapper proposalMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
     @Autowired
     private StatisticCacheService statisticCacheService;
     @Autowired
@@ -117,6 +121,11 @@ public class ProposalServiceImpl implements ProposalService {
         BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
         		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
+        /** 查询hash获取对应的交易区块号 */
+        Transaction transaction = transactionMapper.selectByPrimaryKey(req.getProposalHash());
+        if(transaction != null) {
+        	proposalDetailsResp.setInBlock(transaction.getBlockNumber());
+        }
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), proposalDetailsResp);
     }
 

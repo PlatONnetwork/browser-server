@@ -72,7 +72,7 @@ public class AppDocTransactionControllerTest {
     		.andExpect(status().isOk()).andDo(print());
     }
     
-//    @Test
+    @Test
     public void blockListByNodeIdDownload() throws Exception{
     	mockMvc
     		.perform(MockMvcRequestBuilders.get("/transaction/addressTransactionDownload")

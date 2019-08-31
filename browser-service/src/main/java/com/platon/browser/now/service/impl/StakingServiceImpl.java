@@ -194,7 +194,7 @@ public class StakingServiceImpl implements StakingService {
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
 			case 0:
-				return BaseResp.build(RetEnum.RET_SYS_EXCEPTION.getCode(), i18n.i(I18nEnum.FAILURE), null);
+				break;
 			default: // 只有一条数据
 				StakingNode stakingNode = stakings.get(0);
 				BeanUtils.copyProperties(stakingNode, resp);

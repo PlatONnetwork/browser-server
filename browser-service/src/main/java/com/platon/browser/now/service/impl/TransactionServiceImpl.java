@@ -416,7 +416,6 @@ public class TransactionServiceImpl implements TransactionService {
 				case CREATE_PROPOSAL_TEXT:
 				case CREATE_PROPOSAL_UPGRADE:
 				case CREATE_PROPOSAL_PARAMETER:
-					
 				case CANCEL_PROPOSAL:
 					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
 					Proposal proposal = proposalMapper.selectByPrimaryKey(req.getTxHash());
@@ -434,7 +433,6 @@ public class TransactionServiceImpl implements TransactionService {
 					break;
 				case VOTING_PROPOSAL:
 					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
-//					VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
 					CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
 					if(customVoteProposal != null) {
 						resp.setNodeId(customVoteProposal.getVerifier());
@@ -511,34 +509,34 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req) {
+    	TransactionListResp resp = new TransactionListResp();
     	/** 根据hash查询交易具体指 */
     	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
-    	TransactionExample condition = new TransactionExample();
-    	TransactionExample.Criteria criteria = condition.createCriteria();
-    	/** 区分是上一条数据还是下一条数据 */
-    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-	    	case PREV:
-		    	criteria.andSequenceLessThan(currentDetail.getSequence());
-		    	condition.setOrderByClause("sequence desc");
-		    	break;
-	    	case NEXT:
-		    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
-		    	condition.setOrderByClause("sequence asc");
-		    	break;
+    	if(currentDetail != null) {
+	    	TransactionExample condition = new TransactionExample();
+	    	TransactionExample.Criteria criteria = condition.createCriteria();
+	    	/** 区分是上一条数据还是下一条数据 */
+	    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+		    	case PREV:
+			    	criteria.andSequenceLessThan(currentDetail.getSequence());
+			    	condition.setOrderByClause("sequence desc");
+			    	break;
+		    	case NEXT:
+			    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
+			    	condition.setOrderByClause("sequence asc");
+			    	break;
+	    	}
+	    	PageHelper.startPage(1,1);
+	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+	    	if(transactions.size()>0){
+	    		/** 获取数据第一条进行转换对象 */
+	        	TransactionWithBLOBs transaction = transactions.get(0);
+	        	BeanUtils.copyProperties(transaction, resp);
+	        	resp.setTxHash(transaction.getHash());
+	        	resp.setServerTime(new Date().getTime());
+	        	resp.setTimestamp(transaction.getTimestamp().getTime());
+	    	}
     	}
-    	PageHelper.startPage(1,1);
-    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-    	if(transactions.size()==0){
-    		logger.error("invalid transaction hash {}",req.getTxHash());
-    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
-    	}
-    	/** 获取数据第一条进行转换对象 */
-    	TransactionWithBLOBs transaction = transactions.get(0);
-    	TransactionListResp resp = new TransactionListResp();
-    	BeanUtils.copyProperties(transaction, resp);
-    	resp.setTxHash(transaction.getHash());
-    	resp.setServerTime(new Date().getTime());
-    	resp.setTimestamp(transaction.getTimestamp().getTime());
     	return resp;
     }
 
