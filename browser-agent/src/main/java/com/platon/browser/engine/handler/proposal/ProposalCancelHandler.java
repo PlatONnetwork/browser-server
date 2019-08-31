@@ -1,7 +1,6 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;

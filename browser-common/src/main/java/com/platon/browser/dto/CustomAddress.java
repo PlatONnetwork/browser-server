@@ -1,20 +1,14 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Node;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.CreateValidatorParam;
-import com.platon.browser.param.DelegateParam;
-import com.platon.browser.param.IncreaseStakingParam;
-import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming

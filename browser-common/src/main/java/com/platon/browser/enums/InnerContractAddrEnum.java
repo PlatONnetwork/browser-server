@@ -1,9 +1,10 @@
 package com.platon.browser.enums;
 
 import org.web3j.platon.ContractAddress;
-import org.web3j.tx.PlatOnContract;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * \*

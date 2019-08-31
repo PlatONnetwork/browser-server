@@ -3,7 +3,6 @@ package com.platon.browser.dto;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.param.VotingProposalParam;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Arrays;
 import java.util.Date;

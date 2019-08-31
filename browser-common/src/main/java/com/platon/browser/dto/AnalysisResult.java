@@ -2,9 +2,6 @@ package com.platon.browser.dto;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * User: dongqile
  * Date: 2019/1/9

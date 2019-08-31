@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * User: dongqile
- * Date: 2019/8/31
- * Time: 16:48
+ * @Auther: dongqile
+ * @Date: 2019/8/31 20:09
+ * @Description: 锁仓新增暂存类，入库后各容器需要清空
  */
 public class RestrictingStage {
 

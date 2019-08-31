@@ -2,9 +2,7 @@ package com.platon.browser.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.param.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;

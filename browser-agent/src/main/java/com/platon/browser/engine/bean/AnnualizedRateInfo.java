@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/21 15:09
- * @Description:
+ * @Description: 年化率信息bean
  */
 @Data
 public class AnnualizedRateInfo {

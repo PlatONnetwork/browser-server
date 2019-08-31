@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.contracts.RestrictingPlanContract;
-import org.web3j.platon.contracts.StakingContract;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.utils.Convert;
 

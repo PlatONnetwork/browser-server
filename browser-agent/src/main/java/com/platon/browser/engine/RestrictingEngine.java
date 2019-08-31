@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * User: dongqile
- * Date: 2019/8/14
- * Time: 17:14
+ * @Auther: dongqile
+ * @Date: 2019/8/31 20:09
+ * @Description: 锁仓业务引擎
  */
 @Component
 public class RestrictingEngine {
