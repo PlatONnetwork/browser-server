@@ -21,9 +21,9 @@ import java.util.Map;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
- * User: dongqile
- * Date: 2019/8/20
- * Time: 10:08
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 区块链统计信息更新任务
  */
 @Component
 public class NetworkStatUpdateTask {

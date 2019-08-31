@@ -23,9 +23,9 @@ import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
- * User: dongqile
- * Date: 2019/8/21
- * Time: 11:04
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 提案信息更新任务
  */
 @Component
 public class ProposalUpdateTask {

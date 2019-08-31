@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
- * @Description:
+ * @Description: 提案业务处理引擎
  */
 @Component
 public class ProposalEngine {

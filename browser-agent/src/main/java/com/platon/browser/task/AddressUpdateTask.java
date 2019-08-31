@@ -15,9 +15,9 @@ import org.web3j.platon.BaseResponse;
 import java.util.*;
 
 /**
- * User: dongqile
- * Date: 2019/8/14
- * Time: 20:23
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 地址更新任务
  */
 @Component
 public class AddressUpdateTask {
