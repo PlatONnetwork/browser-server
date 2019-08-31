@@ -4,9 +4,7 @@ import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.exception.NoSuchBeanException;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

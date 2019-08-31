@@ -1,7 +1,5 @@
 package com.platon.browser.engine.cache;
 
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
