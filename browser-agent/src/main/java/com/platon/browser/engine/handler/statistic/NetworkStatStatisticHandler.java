@@ -94,13 +94,18 @@ public class NetworkStatStatisticHandler implements EventHandler {
                     //在累加计算好的质押金
                     NETWORK_STAT_CACHE.setStakingDelegationValue(new BigInteger(NETWORK_STAT_CACHE.getStakingDelegationValue()).add(new BigInteger(NETWORK_STAT_CACHE.getStakingValue())).toString());
                 }
-
+                /**
+                 * 进行中提案统计，根据不同类型区分：
+                 *  1.文本提案：状态为投票中的为进行中的提案
+                 *  2.升级提案：状态为投票中、预升级、为进行中提案
+                 *  3.取消提案：状态为投票中的为进行中的提案
+                 */
                 if (STAGE_DATA.getProposalStage().getProposalInsertStage().size() > 0 || STAGE_DATA.getProposalStage().getProposalUpdateStage().size() > 0) {
                     PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
                         if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                         }
-                        if (proposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code) || proposal.getType().equals(CustomProposal.TypeEnum.CANCEL.code)) {
+                        if (proposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code)) {
                             if (proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code) || proposal.getType().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
                                 NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                             }
