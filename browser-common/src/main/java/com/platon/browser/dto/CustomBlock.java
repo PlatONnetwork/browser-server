@@ -67,7 +67,6 @@ public class CustomBlock extends Block {
 
         String publicKey = NodeTool.calculateNodePublicKey(block);
         if(publicKey!=null) this.setNodeId(HexTool.prefix(publicKey));
-
         try{
             // 抽取交易信息
             block.getTransactions().forEach(tr -> {

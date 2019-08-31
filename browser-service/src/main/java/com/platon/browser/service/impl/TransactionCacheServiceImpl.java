@@ -53,19 +53,19 @@ public class TransactionCacheServiceImpl implements TransactionCacheService {
         class MinMax{Long minOffset=Long.MAX_VALUE,maxOffset=Long.MIN_VALUE;}
         MinMax mm=new MinMax();
         items.forEach(item->{
-            Long score = item.getBlockNumber()*10000+item.getTransactionIndex();
+            Long score = item.getSequence();
             if(score<mm.minOffset) mm.minOffset=score;
             if(score>mm.maxOffset) mm.maxOffset=score;
         });
         // 查询在缓存中是否有值
         Set<String> exist = redisTemplate.opsForZSet().rangeByScore(transactionsCacheKey,mm.minOffset,mm.maxOffset);
         Set<Long> existScore = new HashSet<>();
-        exist.forEach(item->{
+        Objects.requireNonNull(exist).forEach(item->{
             Transaction transaction = JSON.parseObject(item,Transaction.class);
-            existScore.add(transaction.getBlockNumber()*10000+transaction.getTransactionIndex());
+            existScore.add(transaction.getSequence());
         });
         items.forEach(item -> {
-            Long score = item.getBlockNumber()*10000+item.getTransactionIndex();
+            Long score = item.getSequence();
             if(existScore.contains(score)) return;
             // 在缓存中不存在的才放入缓存
             stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));

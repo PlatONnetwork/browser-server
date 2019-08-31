@@ -70,7 +70,7 @@ public class BlockCacheServiceImpl implements BlockCacheService {
         // 查询在缓存中是否有值
         Set<String> exist = redisTemplate.opsForZSet().rangeByScore(blocksCacheKey,mm.minOffset,mm.maxOffset);
         Set<Long> existScore = new HashSet<>();
-        exist.forEach(item->{
+        Objects.requireNonNull(exist).forEach(item->{
             Block block = JSON.parseObject(item,Block.class);
             existScore.add(block.getNumber());
         });

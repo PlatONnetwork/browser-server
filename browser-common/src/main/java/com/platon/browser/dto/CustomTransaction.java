@@ -44,7 +44,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
             this.setGasLimit(transaction.getGas().toString());
             this.setValue(transaction.getValue().toString());
             this.setNonce(transaction.getNonce().toString());
-            Long sequence = Long.valueOf(String.valueOf(this.getBlockNumber()) + this.getTransactionIndex());
+            Long sequence = this.getBlockNumber()*10000 + this.getTransactionIndex();
             this.setSequence(sequence);
         } catch (Exception e) {
             e.printStackTrace();
