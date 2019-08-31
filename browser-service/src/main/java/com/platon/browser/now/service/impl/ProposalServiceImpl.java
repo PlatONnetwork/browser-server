@@ -3,20 +3,21 @@ package com.platon.browser.now.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.ProposalService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
-import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.util.BeanConvertUtil;
@@ -64,14 +65,16 @@ public class ProposalServiceImpl implements ProposalService {
         req = req == null ? new PageReq() : req;
         Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
         List<Proposal> list = proposalMapper.selectByExample(null);
+        /** 分页查询提案数据 */
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
             for (Proposal proposal : list) {
                 ProposalListResp proposalListResp = BeanConvertUtil.beanConvert(proposal, ProposalListResp.class);
                 proposalListResp.setProposalHash(proposal.getHash());
-                List<BlockRedis> items = statisticCacheService.getBlockCache(0, 1);
-                if (items != null && items.size() > 0) {
-                    proposalListResp.setCurBlock(items.get(0).getNumber().toString());
+                /** 获取统计的最新块高 */
+                NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+                if (networkStatRedis != null) {
+                    proposalListResp.setCurBlock(String.valueOf(networkStatRedis.getCurrentNumber()));
                 }
                 listResps.add(proposalListResp);
             }
@@ -84,6 +87,7 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Override
     public BaseResp<ProposalDetailsResp> get(ProposalDetailRequest req) {
+    	/** 根据hash查询提案 */
         Proposal proposal = proposalMapper.selectByPrimaryKey(req.getProposalHash());
         if (Objects.isNull(proposal)) {
             logger.error("## ERROR # get record not exist proposalHash:{}", req.getProposalHash());
@@ -93,21 +97,23 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getVerifier());
         proposalDetailsResp.setNodeName(proposal.getVerifierName());
-        List<BlockRedis> items = statisticCacheService.getBlockCache(0, 1);
+        List<Block> items = statisticCacheService.getBlockCache(0, 1);
         if (items != null && items.size() > 0) {
             proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());
         }
-        //赞成百分比
+        /** 赞成百分比 */
         proposalDetailsResp.setSupportRateThreshold(composeRate(proposal.getYeas(), proposal.getAccuVerifiers()));
-        //弃权百分比
+        /** 弃权百分比 */
         proposalDetailsResp.setAbstainRateThreshold(composeRate(proposal.getAbstentions(), proposal.getAccuVerifiers()));
-        //反对百分比
+        /**反对百分比 */
         proposalDetailsResp.setOpposeRateThreshold(composeRate(proposal.getNays(), proposal.getAccuVerifiers()));
+        /** 不为文本提案则有生效时间 */
         if(!CustomProposal.TypeEnum.TEXT.getCode().equals(proposalDetailsResp.getType())){
 	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
 	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
 	        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
         }
+        /** 结束时间预估：（生效区块-当前区块）*出块间隔 + 现有时间 */
         BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
         		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
@@ -131,7 +137,7 @@ public class ProposalServiceImpl implements ProposalService {
         if (divisor == dividend) {
             return "100.00%";
         }
-        //设置保留位数
+        /** 设置保留位数 */
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         return decimalFormat.format((float) divisor * 100 / dividend) + "%";
 

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.req.staking.DelegationListByAddressReq;
 import com.platon.browser.req.staking.DelegationListByStakingReq;
@@ -15,6 +14,7 @@ import com.platon.browser.req.staking.HistoryStakingListReq;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.DelegationListByAddressResp;
 import com.platon.browser.resp.staking.DelegationListByStakingResp;
@@ -28,6 +28,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * 	 验证人模块接口申明集成swagger
+ *  @file AppDocStaking.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Api(value = "/staking", tags = "Staking")
 public interface AppDocStaking {
 	

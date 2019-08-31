@@ -5,7 +5,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.StakingService;
@@ -16,6 +15,7 @@ import com.platon.browser.req.staking.HistoryStakingListReq;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.DelegationListByAddressResp;
 import com.platon.browser.resp.staking.DelegationListByStakingResp;
@@ -26,11 +26,16 @@ import com.platon.browser.resp.staking.StakingOptRecordListResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;
 import com.platon.browser.util.I18nUtil;
 
+/**
+ *  验证人模块Contract。定义使用方法
+ *  @file AppDocStakingController.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @RestController
 public class AppDocStakingController implements AppDocStaking {
 
-//	private final Logger logger = LoggerFactory.getLogger(AppDocStakingController.class);
-	
 	@Autowired
 	private I18nUtil i18n;
 	

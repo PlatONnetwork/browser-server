@@ -6,6 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 转换对象类
+ *  @file BeanConvertUtil.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class BeanConvertUtil {
     /**
      * bean对象转换

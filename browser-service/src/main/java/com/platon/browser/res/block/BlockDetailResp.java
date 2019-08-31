@@ -3,6 +3,13 @@ package com.platon.browser.res.block;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ *  区块详情返回对象
+ *  @file BlockDetailResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class BlockDetailResp {
     private Long number;
     private Long timestamp;

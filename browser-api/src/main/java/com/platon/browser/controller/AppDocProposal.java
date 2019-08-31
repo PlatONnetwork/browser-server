@@ -2,7 +2,6 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
-import com.platon.browser.dto.RespPage;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,6 +10,7 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.res.proposal.VoteListResp;
@@ -19,6 +19,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * 	提案模块接口申明集成swagger
+ *  @file AppDocProposal.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Api(value = "/proposal", tags = "Proposal")
 public interface AppDocProposal {
 	

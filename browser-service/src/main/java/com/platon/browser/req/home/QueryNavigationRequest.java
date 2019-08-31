@@ -5,6 +5,13 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * 首页搜索请求
+ *  @file QueryNavigationRequest.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QueryNavigationRequest {

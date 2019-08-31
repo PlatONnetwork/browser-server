@@ -2,6 +2,13 @@ package com.platon.browser.res.proposal;
 
 import lombok.Data;
 
+/**
+ *  投票列表返回对象
+ *  @file VoteListResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class VoteListResp {
 	private String voterName;          //投票验证人名称

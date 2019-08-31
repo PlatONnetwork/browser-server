@@ -1,5 +1,6 @@
 package com.platon.browser.controller;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 
@@ -21,6 +22,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * 	交易模块接口申明集成swagger
+ *  @file AppDocTransaction.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Api(value = "/transaction", tags = "Transaction")
 public interface AppDocTransaction {
 	
@@ -149,7 +157,7 @@ public interface AppDocTransaction {
 	@ApiOperation(value = "transaction/addressTransactionDownload", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@RequestMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" }, method = RequestMethod.GET)
     public void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
-    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date);
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, HttpServletResponse response);
 	
     /**
      * @api {post} transaction/transactionDetails e.交易详情 

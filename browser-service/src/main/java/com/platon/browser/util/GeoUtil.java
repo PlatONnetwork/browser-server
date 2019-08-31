@@ -14,6 +14,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 
+/**
+ * 根据ip获取相应信息工具类
+ *  @file GeoUtil.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class GeoUtil {
     private final static Logger logger = LoggerFactory.getLogger(GeoUtil.class);
     private static DatabaseReader reader;
@@ -37,6 +44,12 @@ public class GeoUtil {
         private String latitude;
     }
 
+    /**
+     * 通过ip获取经纬度信息
+     * @method getIpLocation
+     * @param ip
+     * @return
+     */
     public static IpLocation getIpLocation(String ip){
         IpLocation il = new IpLocation();
         il.setIp(ip);

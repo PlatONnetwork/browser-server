@@ -2,15 +2,10 @@ package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockListItem;
-import com.platon.browser.dto.block.BlockPushItem;
 import com.platon.browser.service.BlockCacheService;
-import com.platon.browser.util.I18nUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +15,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Min;
 import java.util.*;
 
 /**
+ * 区块缓存数据处理逻辑
  * @Auther: Chendongming
  * @Date: 2019/8/21 09:47
  * @Description:
@@ -34,8 +29,10 @@ public class BlockCacheServiceImpl implements BlockCacheService {
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+    /** 区块缓存key */
     @Value("${platon.redis.key.blocks}")
     private String blocksCacheKey;
+    /** 最大数据 */
     @Value("${platon.redis.max-item}")
     private long maxItemCount;
     @Autowired
@@ -52,7 +49,8 @@ public class BlockCacheServiceImpl implements BlockCacheService {
     /**
      * 更新区块缓存
      */
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public void update(Set<Block> items){
         long startTime = System.currentTimeMillis();
         logger.debug("开始更新Redis区块缓存:timestamp({})",startTime);

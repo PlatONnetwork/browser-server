@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -13,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 链参数统一配置项
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
  * @Description:

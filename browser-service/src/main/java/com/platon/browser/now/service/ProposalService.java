@@ -1,9 +1,9 @@
 package com.platon.browser.now.service;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * rlp处理数据类
  * User: dongqile
  * Date: 2019/8/13
  * Time: 16:48

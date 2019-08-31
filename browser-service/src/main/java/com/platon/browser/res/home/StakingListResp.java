@@ -3,6 +3,13 @@ package com.platon.browser.res.home;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ * 首页验证人列表返回子结构对象
+ *  @file StakingListResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class StakingListResp {
 	private String nodeId; // 出块节点Id
 	private String nodeName; // 出块节点名称

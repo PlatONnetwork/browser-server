@@ -5,6 +5,13 @@ import com.platon.browser.config.CustomLatSerializer;
 
 import lombok.Data;
 
+/**
+ * 交易列表返回对象
+ *  @file TransactionListResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class TransactionListResp {
 	private String txHash;    //交易hash

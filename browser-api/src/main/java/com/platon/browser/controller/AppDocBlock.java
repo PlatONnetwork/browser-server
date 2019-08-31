@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
 import com.platon.browser.req.newblock.BlockListByNodeIdReq;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
 
@@ -21,6 +21,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * 	区块模块接口申明集成swagger
+ *  @file AppDocBlock.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Api(value = "/block", tags = "Block")
 public interface AppDocBlock {
 	

@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.proposal.VoteListRequest;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;
 
 @RunWith(SpringRunner.class)

@@ -2,6 +2,13 @@ package com.platon.browser.res.home;
 
 import lombok.Data;
 
+/**
+ * 首页区块列表返回对象
+ *  @file BlockListNewResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class BlockListNewResp {
 	private Long number; // 区块高度

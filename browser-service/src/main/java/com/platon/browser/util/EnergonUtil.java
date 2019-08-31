@@ -1,20 +1,28 @@
 package com.platon.browser.util;
 
-import com.alibaba.fastjson.JSON;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.List;
 
+/**
+ * 数额转换工具类
+ *  @file EnergonUtil.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class EnergonUtil {
+	/** 默认精度数 */
     private final static Integer DEFAULT_SHARP_NUM = 8;
     public static String format(Object number){
         return format(number,DEFAULT_SHARP_NUM);
     }
+    /**
+     * 数额转换
+     * @method format
+     * @param number
+     * @param sharpNum
+     * @return
+     */
     public static String format(Object number,Integer sharpNum){
         if(!(number instanceof Number)) throw new RuntimeException("The param is not a Number!");
         DecimalFormat NF = (DecimalFormat) NumberFormat.getInstance();

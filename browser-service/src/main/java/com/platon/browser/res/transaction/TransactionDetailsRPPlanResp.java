@@ -3,6 +3,13 @@ package com.platon.browser.res.transaction;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ *  交易详情锁仓子结构体返回对象
+ *  @file TransactionDetailsRPPlanResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class TransactionDetailsRPPlanResp {
 	private Integer epoch;         //锁仓周期
     private String amount;      //锁定金额

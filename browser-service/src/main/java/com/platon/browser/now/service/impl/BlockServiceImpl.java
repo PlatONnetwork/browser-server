@@ -22,22 +22,23 @@ import org.web3j.utils.Convert;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.BlockExample.Criteria;
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockDownload;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.BlockService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
-import com.platon.browser.redis.dto.BlockRedis;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newblock.BlockDownload;
 import com.platon.browser.req.newblock.BlockListByNodeIdReq;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
 import com.platon.browser.util.EnergonUtil;
@@ -45,6 +46,13 @@ import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+/**
+ *  区块方法逻辑具体实现
+ *  @file BlockServiceImpl.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Service
 public class BlockServiceImpl implements BlockService {
 
@@ -63,10 +71,10 @@ public class BlockServiceImpl implements BlockService {
 	public RespPage<BlockListResp> blockList(PageReq req) {
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
-		// 小于50万条查询redis
-		if (req.getPageNo().intValue() * req.getPageSize().intValue() < 500000) {
-			List<BlockRedis> items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
-			for (BlockRedis blockRedis:items) {
+		/** 小于50万条查询redis */
+		if (req.getPageNo().intValue() * req.getPageSize().intValue() < BrowserConst.MAX_NUM) {
+			List<Block> items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
+			for (Block blockRedis:items) {
 				BlockListResp blockListNewResp = new BlockListResp();
 				BeanUtils.copyProperties(blockRedis, blockListNewResp);
 				blockListNewResp.setServerTime(new Date().getTime());
@@ -74,7 +82,7 @@ public class BlockServiceImpl implements BlockService {
 				lists.add(blockListNewResp);
 			}
 		} else {
-			//查询超过五十万条数据
+			/** 查询超过五十万条数据，根据区块号倒序 */
 			BlockExample blockExample = new BlockExample();
 			blockExample.setOrderByClause(" number desc");
 			PageHelper.startPage(req.getPageNo(), req.getPageSize());
@@ -87,25 +95,24 @@ public class BlockServiceImpl implements BlockService {
 				lists.add(blockListNewResp);
 			}
 		}
-		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(0, 1);
+		/** 查询现阶段最大区块数 */
+		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		if(blockEnd.isEmpty()) {
-			page.setTotal(0);
-		} else {
-			page.setTotal(blockEnd.get(0).getNumber());
-		}
+		page.setTotal(networkStatRedis.getCurrentNumber());
 		respPage.init(page, lists);
 		return respPage;
 	}
 
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
+		/** 更具nodeId 查询区块列表，以区块号倒序  */
 		BlockExample blockExample = new BlockExample();
 		blockExample.setOrderByClause("number desc ");
 		Criteria criteria = blockExample.createCriteria();
 		criteria.andNodeIdEqualTo(req.getNodeId());
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		Page<Block> blockPage = blockMapper.selectByExample(blockExample);
+		/** 初始化返回对象 */
 		List<Block> blocks = blockPage.getResult();
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
@@ -116,13 +123,8 @@ public class BlockServiceImpl implements BlockService {
 			blockListResp.setTimestamp(block.getTimestamp().getTime());
 			lists.add(blockListResp);
 		}
+		/** 设置返回的分页数据 */
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-//		List<BlockRedis> blockEnd = statisticCacheService.getBlockCache(1, 1);
-//		if(blockEnd.isEmpty()) {
-//			page.setTotal(0);
-//		} else {
-//			page.setTotal(blockEnd.get(0).getNumber());
-//		}
 		page.setTotal(blockPage.getTotal());
 		respPage.init(page, lists);
 		return respPage;
@@ -133,8 +135,9 @@ public class BlockServiceImpl implements BlockService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
         logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
-        // 限制最多导出3万条记录
+        /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
+        /** 设置根据时间和nodeId查询数据 */
         BlockExample blockExample = new BlockExample();
         Criteria criteria = blockExample.createCriteria();
         criteria.andNodeIdEqualTo(nodeId);
@@ -144,8 +147,8 @@ public class BlockServiceImpl implements BlockService {
 			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
 		}
-//      criteria.andCreateTimeGreaterThan(value)
         List<Block> blockList = blockMapper.selectByExample(blockExample);
+        /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
         blockList.forEach(block->{
             Object[] row = {
@@ -158,13 +161,16 @@ public class BlockServiceImpl implements BlockService {
             rows.add(row);
         });
 
+        /** 初始化输出流对象 */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer outputWriter = new OutputStreamWriter(baos, Charset.defaultCharset());
         try {
+        	/** 设置返回的头，防止csv乱码 */
 			outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+        /** 厨师书writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         writer.writeHeaders(
                 i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER),
@@ -174,6 +180,7 @@ public class BlockServiceImpl implements BlockService {
                 i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE)
         );
         writer.writeRowsAndClose(rows);
+        /** 设置下载返回对象 */
         BlockDownload blockDownload = new BlockDownload();
         blockDownload.setData(baos.toByteArray());
         blockDownload.setFilename("block-"+nodeId+"-"+date+".csv");
@@ -189,6 +196,7 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public BlockDetailResp blockDetailNavigate(BlockDetailNavigateReq req) {
 		long blockNumber = req.getNumber().longValue();
+		/** 区分是否查询上一个块还是下一个块 */
 		switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())) {
 			case PREV:
 				blockNumber -= 1;
@@ -201,17 +209,11 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	private BlockDetailResp queryBlockByNumber(long blockNumber) {
+		/** 根据区块号查询对应数据 */
 		Block block = blockMapper.selectByPrimaryKey(blockNumber);
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
 		if (block != null) {
 			BeanUtils.copyProperties(block, blockDetailResp);
-			/*
-			private Integer txQty;
-			private Integer transferQty;
-		    private Integer delegateQty;
-		    private Integer stakingQty;
-		    private Integer proposalQty;
-			 */
 			blockDetailResp.setTxQty(block.getStatTxQty());
 			blockDetailResp.setTransferQty(block.getStatTransferQty());
 			blockDetailResp.setDelegateQty(block.getStatDelegateQty());
@@ -221,7 +223,7 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
 			
-			// 取上一个区块
+			/** 取上一个区块,如果存在则设置标识和hash */
 			BlockExample blockExample = new BlockExample();
 	        blockExample.createCriteria().andNumberEqualTo(blockNumber - 1);
 	        List<Block> blocks = blockMapper.selectByExample(blockExample);
@@ -231,7 +233,7 @@ public class BlockServiceImpl implements BlockService {
 	        }
 	        if(blocks.size()==0){
 	        	blockDetailResp.setTimeDiff(0l);
-	            // 当前块没有上一个块证明这是第一个块, 设置first标识
+	            /** 当前块没有上一个块证明这是第一个块, 设置first标识  */
 	            blockDetailResp.setFirst(true);
 	        }else{
 	            Block prevBlock = blocks.get(0);
@@ -243,7 +245,7 @@ public class BlockServiceImpl implements BlockService {
 	        blockExample.createCriteria().andNumberEqualTo(blockNumber+1);
 	        blocks = blockMapper.selectByExample(blockExample);
 	        if(blocks.size()==0){
-	            // 当前区块没有下一个块，则表示这是最后一个块，设置last标识
+	            /** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
 	        	blockDetailResp.setLast(true);
 	        }
 			blockDetailResp.setTimestamp(block.getTimestamp().getTime());

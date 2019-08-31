@@ -5,6 +5,7 @@
 package com.platon.browser.enums;
 
 /**
+ * 错误枚举统计
  * Created by IntelliJ IDEA.
  *
  * @author: CK

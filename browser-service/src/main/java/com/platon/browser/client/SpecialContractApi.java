@@ -81,7 +81,8 @@ public class SpecialContractApi {
      * @throws Exception
      */
 
-    private static final RemoteCall<BaseResponse<List<Node>>> nodeCall(Web3j web3j,BigInteger blockNumber,int funcType) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private static final RemoteCall<BaseResponse<List<Node>>> nodeCall(Web3j web3j,BigInteger blockNumber,int funcType) {
         final Function function = new Function(
                 funcType,
                 Collections.singletonList(new Uint256(blockNumber)),
@@ -115,6 +116,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static final BaseResponse<List<RestrictingBalance>> getRestrictingBalance(Web3j web3j, String addresses) throws Exception {
         final Function function = new Function(
                 GET_RESTRICTINGBALANCE_FUNC_TYPE,

@@ -12,26 +12,32 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	
+	/** actvicemq ip */
 	@Value("${activemq.brokenHost:}")
 	private String brokenHost;
 	
+	/** actvicemq port */
 	@Value("${activemq.brokenPort:}")
 	private String brokenPort;
 	
+	/** actvicemq 系统用户名 */
 	@Value("${activemq.system.username:}")
 	private String systemUserName;
 	
+	/** actvicemq 系统密码 */
 	@Value("${activemq.system.password:}")
 	private String systemPassword;
 	
+	/** actvicemq 客户端用户名 */
 	@Value("${activemq.client.username:}")
 	private String clientUserName;
 	
+	/** actvicemq 客户端密码 */
 	@Value("${activemq.client.password:}")
 	private String clientPassword;
 
 	/**
-     * 配置消息代理
+     * 	配置消息代理
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -64,13 +70,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         
     }
     
-    //设置客户端线程组
+    /**设置客户端线程组*/
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.taskExecutor().corePoolSize(8);
     }
 
-  //设置客户端线程组
+  /**设置客户端线程组*/
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
         registration.taskExecutor().corePoolSize(8);

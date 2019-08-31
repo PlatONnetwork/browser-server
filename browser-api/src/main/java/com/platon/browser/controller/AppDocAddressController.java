@@ -10,6 +10,13 @@ import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 
+/**
+ *          地址具体实现Controller 提供地址详情页面使用
+ *  @file AppDocAddressController.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @RestController
 public class AppDocAddressController implements AppDocAddress {
 

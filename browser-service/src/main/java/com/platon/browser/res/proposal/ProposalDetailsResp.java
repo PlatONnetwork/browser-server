@@ -2,6 +2,13 @@ package com.platon.browser.res.proposal;
 
 import lombok.Data;
 
+/**
+ *提案详情返回对象
+ *  @file ProposalDetailsResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class ProposalDetailsResp {
     private String pipNum;

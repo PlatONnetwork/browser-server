@@ -27,6 +27,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.Staking;
@@ -42,17 +43,15 @@ import com.platon.browser.dao.mapper.SlashMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dao.mapper.UnDelegationMapper;
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVoteProposal;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.enums.StakingStatus;
-import com.platon.browser.enums.TransactionTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
@@ -67,13 +66,12 @@ import com.platon.browser.param.IncreaseStakingParam;
 import com.platon.browser.param.PlanParam;
 import com.platon.browser.param.ReportValidatorParam;
 import com.platon.browser.param.UnDelegateParam;
-import com.platon.browser.redis.dto.NetworkStatRedis;
-import com.platon.browser.redis.dto.TransactionRedis;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
@@ -83,6 +81,13 @@ import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+/**
+ * 交易方法逻辑实现
+ *  @file TransactionServiceImpl.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
@@ -91,8 +96,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionMapper transactionMapper;
     @Autowired
     private I18nUtil i18n;
-//    @Autowired
-//    private BlockMapper blockMapper;
     @Autowired
     private UnDelegationMapper unDelegationMapper;
     @Autowired
@@ -107,58 +110,15 @@ public class TransactionServiceImpl implements TransactionService {
     private StatisticCacheService statisticCacheService;
     @Autowired
     private BlockChainConfig blockChainConfig;
- 
-//    private TransactionDetail loadDetail(TransactionDetailReq req){
-//        TransactionExample condition = new TransactionExample();
-//        condition.createCriteria().andHashEqualTo(req.getTxHash());
-//        List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-//        if (transactions.size()>1){
-//            logger.error("duplicate transaction: transaction hash {}",req.getTxHash());
-//            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_DUPLICATE));
-//        }
-//        if(transactions.size()==0){
-//            logger.error("invalid transaction hash {}",req.getTxHash());
-//            throw new BusinessException(RetEnum.RET_FAIL.getCode(),i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
-//        }
-//        TransactionDetail returnData = new TransactionDetail();
-//        TransactionWithBLOBs initData = transactions.get(0);
-//        returnData.init(initData);
-//
-//        String nodeId=returnData.getNodeId();
-//        if(StringUtils.isBlank(nodeId)){
-//            BlockExample blockExample = new BlockExample();
-//            blockExample.createCriteria().andNumberEqualTo(initData.getBlockNumber());
-//            List<Block> blocks = blockMapper.selectByExample(blockExample);
-//            if(blocks.size()>0){
-//                Block block = blocks.get(0);
-//                if(StringUtils.isNotBlank(block.getNodeId())){
-//                    nodeId=block.getNodeId();
-//                    returnData.setNodeId(nodeId);
-//                }
-//            }
-//        }
-//
-////        if(StringUtils.isNotBlank(nodeId)){
-////            Map<String,String> nameMap = nodeService.getNodeNameMap(req.getCid(),Arrays.asList(returnData.getNodeId()));
-////            returnData.setNodeName(nameMap.get(returnData.getNodeId()));
-////        }
-//
-//        return returnData;
-//    }
-//
-//    @Override
-//    public TransactionDetail getDetail(TransactionDetailReq req) {
-//        TransactionDetail transactionDetail = loadDetail(req);
-//        return transactionDetail;
-//    }
 
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
         RespPage<TransactionListResp> result = new RespPage<>();
         List<TransactionListResp> lists = new LinkedList<>();
+        /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
-        List<TransactionRedis> items = transactionCacheDto.getTransactionRedisList();
-        for (TransactionRedis transactionRedis:items) {
+        List<Transaction> items = transactionCacheDto.getTransactionList();
+        for (Transaction transactionRedis:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transactionRedis, transactionListResp);
         	transactionListResp.setTxHash(transactionRedis.getHash());
@@ -184,6 +144,7 @@ public class TransactionServiceImpl implements TransactionService {
             criteria.andTxTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         }
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
+        /** 根据区块号和类型分页查询交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         for (TransactionWithBLOBs transaction:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
@@ -193,6 +154,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
         }
+        /** 统计交易信息 */
         long count  = transactionMapper.countByExample(transactionExample);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
@@ -205,6 +167,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
         List<TransactionListResp> lists = new LinkedList<>();
         TransactionExample transactionExample = new TransactionExample();
+        /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
                 .andFromEqualTo(req.getAddress());
         TransactionExample.Criteria second = transactionExample.createCriteria()
@@ -214,8 +177,8 @@ public class TransactionServiceImpl implements TransactionService {
         	second.andTxTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         }
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
-//        transactionExample.or(first);
         transactionExample.or(second);
+        /** 根据地址查询分页交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         for (TransactionWithBLOBs transaction:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
@@ -225,6 +188,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
         }
+        /** 查询总数 */
         long count  = transactionMapper.countByExample(transactionExample);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
@@ -237,7 +201,7 @@ public class TransactionServiceImpl implements TransactionService {
         Date currentServerTime = new Date();
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
         TransactionExample transactionExample = new TransactionExample();  
-        
+        /** 根据地址查询交易，则可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria();
         TransactionExample.Criteria second = transactionExample.createCriteria();
         first.andFromEqualTo(address);
@@ -250,42 +214,45 @@ public class TransactionServiceImpl implements TransactionService {
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
 		}
         
-        // 限制最多导出3万条记录
+        /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
         transactionExample.or(second);
-        
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         List<Object[]> rows = new ArrayList<>();
-
         items.forEach(transaction -> {
-
+        	/** 
+        	 * 判断是否为to地址
+        	 * 如果为to地址则导出报表为收入金额
+        	 * 如果为from地址则导出报表为支出金额 
+        	*/
             boolean toIsAddress = address.equals(transaction.getTo());
             String valueIn = toIsAddress? transaction.getValue() : "0";
             String valueOut = !toIsAddress? transaction.getValue() : "0";
-
             Object[] row = {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     transaction.getTimestamp(),
-//                  TypeEnum.getEnum(Integer.valueOf(transaction.getTxType())).getDesc(),
-                    TransactionTypeEnum.getEnum(transaction.getTxType()).desc,
+                    CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
+                    /** 数值von转换成lat，并保留十八位精确度 */
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
                     EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
                     transaction.getGasUsed()
             };
             rows.add(row);
         });
-
+        /** 初始化输出流对象 */
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Writer outputWriter = new OutputStreamWriter(byteArrayOutputStream, Charset.defaultCharset());
         try {
+        	/** 设置导出的csv头，防止乱码 */
             outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
         } catch (IOException e) {
             e.printStackTrace();
         }
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+        /** 设置导出表的表头 */
         writer.writeHeaders(
                 i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
                 i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER),
@@ -298,6 +265,7 @@ public class TransactionServiceImpl implements TransactionService {
                 i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE)
         );
         writer.writeRowsAndClose(rows);
+        /** 设置返回对象  */
         AccountDownload accountDownload = new AccountDownload();
         accountDownload.setData(byteArrayOutputStream.toByteArray());
         accountDownload.setFilename("Transaction-" + address + "-" + date + ".CSV");
@@ -307,6 +275,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetailsResp transactionDetails( TransactionDetailsReq req) {
+    	/** 根据hash查询具体的交易数据 */
     	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(transaction!=null) {
@@ -314,8 +283,8 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTimestamp().getTime());
     		resp.setServerTime(new Date().getTime());
-    		// "confirmNum":444,         //区块确认数
-    		NetworkStatRedis networkStatRedis = statisticCacheService.getNetworkStatCache();
+    		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+    		/** 确认区块数等于当前区块书减去交易区块数  */
     		resp.setConfirmNum(String.valueOf(networkStatRedis.getCurrentNumber()-transaction.getBlockNumber()));
     		/*
     		 * "first":false,            //是否第一条记录
@@ -325,6 +294,7 @@ public class TransactionServiceImpl implements TransactionService {
     		condition.createCriteria().andSequenceLessThan(transaction.getSequence());
     		condition.setOrderByClause("sequence DESC");
     		PageHelper.startPage(1,1);
+    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应父hash */
     		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
     			resp.setFirst(true);
@@ -335,17 +305,19 @@ public class TransactionServiceImpl implements TransactionService {
     		condition.createCriteria().andSequenceGreaterThan(transaction.getSequence());
     		condition.setOrderByClause("sequence ASC");
     		PageHelper.startPage(1,1);
+    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应下一个hash */
     		transactionList = transactionMapper.selectByExample(condition);
     		if(transactionList.size()==0){
     			resp.setLast(true);
     		}else {
     			resp.setNextHash(transactionList.get(0).getHash());
     		}
-    		//暂时只有账户合约
+    		/** 暂时只有账户合约 */
     		resp.setReceiveType("account");
     		String txInfo = transaction.getTxInfo();
+    		/** 根据不同交易类型判断逻辑 */
     		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType())) {
-	    		//创建验证人
+	    		/** 创建验证人 */
 				case CREATE_VALIDATOR:
 					CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
 					StakingKey stakingKey = new StakingKey();
@@ -413,7 +385,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setApplyAmount(sum.toString());
 						resp.setRedeemLocked(staking.getStakingReduction());
 						//只有已退出，则金额才会退回到账户
-						resp.setRedeemStatus(staking.getStatus() == StakingStatus.EXITED.getCode()?2:1);
+						resp.setRedeemStatus(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()?2:1);
 						//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
 						BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnstakeRefundSettlePeriodCount())))
 								.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
@@ -442,15 +414,7 @@ public class TransactionServiceImpl implements TransactionService {
 					}
 					break;
 				case CREATE_PROPOSAL_TEXT:
-//					CreateProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, CreateProposalTextParam.class);
-//					resp.setNodeId(createProposalTextParam);
-//					resp.setProposalHash(createProposalTextParam.getPIDID());
-//					break;
 				case CREATE_PROPOSAL_UPGRADE:
-//					CreateProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, CreateProposalUpgradeParam.class);
-	//				resp.setNodeId(createProposalTextParam);
-//					resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
-//					break;
 				case CREATE_PROPOSAL_PARAMETER:
 					
 				case CANCEL_PROPOSAL:
@@ -547,18 +511,20 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req) {
+    	/** 根据hash查询交易具体指 */
     	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
     	TransactionExample condition = new TransactionExample();
     	TransactionExample.Criteria criteria = condition.createCriteria();
+    	/** 区分是上一条数据还是下一条数据 */
     	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-    	case PREV:
-	    	criteria.andSequenceLessThan(currentDetail.getSequence());
-	    	condition.setOrderByClause("sequence desc");
-	    	break;
-    	case NEXT:
-	    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
-	    	condition.setOrderByClause("sequence asc");
-	    	break;
+	    	case PREV:
+		    	criteria.andSequenceLessThan(currentDetail.getSequence());
+		    	condition.setOrderByClause("sequence desc");
+		    	break;
+	    	case NEXT:
+		    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
+		    	condition.setOrderByClause("sequence asc");
+		    	break;
     	}
     	PageHelper.startPage(1,1);
     	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
@@ -566,7 +532,7 @@ public class TransactionServiceImpl implements TransactionService {
     		logger.error("invalid transaction hash {}",req.getTxHash());
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
     	}
-
+    	/** 获取数据第一条进行转换对象 */
     	TransactionWithBLOBs transaction = transactions.get(0);
     	TransactionListResp resp = new TransactionListResp();
     	BeanUtils.copyProperties(transaction, resp);

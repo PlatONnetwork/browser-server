@@ -10,13 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.dto.block.BlockDownload;
 import com.platon.browser.now.service.BlockService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
 import com.platon.browser.req.newblock.BlockDetailsReq;
+import com.platon.browser.req.newblock.BlockDownload;
 import com.platon.browser.req.newblock.BlockListByNodeIdReq;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
 

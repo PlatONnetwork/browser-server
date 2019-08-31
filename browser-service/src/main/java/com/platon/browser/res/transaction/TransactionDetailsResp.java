@@ -5,6 +5,13 @@ import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ * 交易详情返回对象
+ *  @file TransactionDetailsResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class TransactionDetailsResp {
 	private String txHash;      //交易hash
     private String from;       //发送方地址

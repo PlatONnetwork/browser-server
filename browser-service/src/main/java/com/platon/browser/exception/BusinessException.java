@@ -17,12 +17,12 @@ public class BusinessException extends RuntimeException {
 	private static final long serialVersionUID = -2838902301689578334L;
 	private int errorCode = -1;
 	    private String errorMessage;
+	    /** 国际化 */
 	    private Locale locale;
 
 	    public Integer getErrorCode() {
 	        return errorCode;
 	    }
-
 
 	    public void setErrorCode(Integer errorCode) {
 	        this.errorCode = errorCode;

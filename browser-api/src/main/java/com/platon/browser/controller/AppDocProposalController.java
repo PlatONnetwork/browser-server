@@ -3,7 +3,6 @@ package com.platon.browser.controller;
 import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -20,12 +19,20 @@ import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.req.proposal.VoteListRequest;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.res.proposal.VoteListResp;
 
 import java.util.Objects;
 
+/**
+ *  提案模块Contract。定义使用方法
+ *  @file AppDocProposalController.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @RestController
 public class AppDocProposalController implements AppDocProposal {
 	Logger logger= LoggerFactory.getLogger(AppDocProposalController.class);

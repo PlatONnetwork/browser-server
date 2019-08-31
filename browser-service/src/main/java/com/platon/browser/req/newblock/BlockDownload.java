@@ -1,16 +1,16 @@
-package com.platon.browser.dto.account;
+package com.platon.browser.req.newblock;
 
 import lombok.Data;
 
 /**
- * 地址文件下载对象，用来传递下载参数
- *  @file AccountDownload.java
+ *  
+ *  @file BlockDownload.java
  *  @description 
  *	@author zhangrj
  *  @data 2019年8月31日
  */
 @Data
-public class AccountDownload {
+public class BlockDownload {
     private byte [] data;
     private String filename;
     private long length;

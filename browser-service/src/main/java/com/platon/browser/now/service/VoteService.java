@@ -1,7 +1,7 @@
 package com.platon.browser.now.service;
 
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.req.proposal.VoteListRequest;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;
 
 /**
@@ -14,7 +14,7 @@ import com.platon.browser.res.proposal.VoteListResp;
  */
 public interface VoteService {
     /**
-     *
+     * 根据hash和option查询投票列表
      * @param voteListRequest
      * @return
      */

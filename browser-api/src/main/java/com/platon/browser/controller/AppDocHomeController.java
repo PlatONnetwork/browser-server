@@ -21,6 +21,13 @@ import com.platon.browser.res.home.QueryNavigationResp;
 import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.util.I18nUtil;
 
+/**
+ *  首页模块Contract。定义使用方法
+ *  @file AppDocHomeController.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @RestController
 public class AppDocHomeController implements AppDocHome {
 

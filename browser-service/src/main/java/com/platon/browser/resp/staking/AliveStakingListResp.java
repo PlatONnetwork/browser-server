@@ -3,6 +3,13 @@ package com.platon.browser.resp.staking;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ * 活跃验证人列表返回对象
+ *  @file AliveStakingListResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class AliveStakingListResp {
 
 	private Integer ranking;           //排行

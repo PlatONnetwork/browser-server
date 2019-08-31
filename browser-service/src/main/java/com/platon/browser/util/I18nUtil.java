@@ -8,12 +8,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * 国际化工具类
+ *  @file I18nUtil.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Component
 public class I18nUtil {
     @Autowired
     private MessageSource messageSource;
     public String i( I18nEnum key, Object... param){
+    	/** 获取默认locale */
         Locale locale = LocaleContextHolder.getLocale();
+        /** 加载对应key的中英文 */
         String msg = messageSource.getMessage(key.name().toLowerCase(),param, locale);
         return msg;
     }

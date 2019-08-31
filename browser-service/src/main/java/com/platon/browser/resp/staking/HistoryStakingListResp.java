@@ -2,6 +2,13 @@ package com.platon.browser.resp.staking;
 
 import lombok.Data;
 
+/**
+ * 历史验证人列表返回对象
+ *  @file HistoryStakingListResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class HistoryStakingListResp {
 	private String nodeId;            //出块节点地址

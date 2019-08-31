@@ -5,6 +5,13 @@ import java.util.List;
 
 import com.platon.browser.dto.CustomTransaction.TxTypeEnum;
 
+/**
+ * 交易类型请求枚举
+ *  @file ReqTransactionTypeEnum.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public enum ReqTransactionTypeEnum {
 
 	/** 

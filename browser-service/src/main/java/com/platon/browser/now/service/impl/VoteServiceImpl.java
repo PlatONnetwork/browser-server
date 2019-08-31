@@ -8,9 +8,9 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.dao.entity.Vote;
 import com.platon.browser.dao.entity.VoteExample;
 import com.platon.browser.dao.mapper.VoteMapper;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.proposal.VoteListRequest;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.VoteListResp;
 import com.platon.browser.util.BeanConvertUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +43,7 @@ public class VoteServiceImpl implements VoteService {
         if (StringUtils.isNotBlank(voteListRequest.getOption())) {
             criteria.andOptionEqualTo(voteListRequest.getOption());
         }
+        /** 分页根据提案hash查询投票列表 */
         List<Vote> votes = voteMapper.selectByExample(voteExample);
         if (!CollectionUtils.isEmpty(votes)) {
             List<VoteListResp> voteListResps = new ArrayList<>(votes.size());

@@ -21,6 +21,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+/**
+ * 	首页模块接口申明集成swagger
+ *  @file AppDocHome.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Api(value = "/home", tags = "Home")
 public interface AppDocHome {
 	

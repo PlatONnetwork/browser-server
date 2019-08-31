@@ -11,13 +11,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dto.RespPage;
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.redis.dto.BlockRedis;
-import com.platon.browser.redis.dto.TransactionRedis;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.util.I18nUtil;
 
 /**
+ * 基础封装缓存获取逻辑
  * @Auther: Chendongming
  * @Date: 2019/4/11 15:43
  * @Description:
@@ -46,8 +47,8 @@ public class CacheBase {
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
         data.forEach(item -> {
             Long startOffset=0l,endOffset=0l,score=0l;
-            if(item instanceof BlockRedis) startOffset=endOffset=score = ((BlockRedis)item).getTimestamp().getTime();
-            if(item instanceof TransactionRedis) startOffset=endOffset=score = ((TransactionRedis)item).getTimestamp().getTime();
+            if(item instanceof Block) startOffset=endOffset=score = ((Block)item).getTimestamp().getTime();
+            if(item instanceof Transaction) startOffset=endOffset=score = ((Transaction)item).getTimestamp().getTime();
             // 根据score来判断缓存中的记录是否已经存在
             Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
             if(exist.size()==0){

@@ -2,10 +2,17 @@ package com.platon.browser.now.service.cache;
 
 import java.util.List;
 
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
-import com.platon.browser.redis.dto.BlockRedis;
-import com.platon.browser.redis.dto.NetworkStatRedis;
 
+/**
+ * 缓存封装service
+ *  @file StatisticCacheService.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public interface StatisticCacheService {
 	
 	/**
@@ -14,9 +21,14 @@ public interface StatisticCacheService {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<BlockRedis> getBlockCache(Integer pageNum, Integer pageSize);
+	public List<Block> getBlockCache(Integer pageNum, Integer pageSize);
 	
-	public NetworkStatRedis getNetworkStatCache();
+	/**
+	 * 获取缓存统计信息
+	 * @method getNetworkStatCache
+	 * @return
+	 */
+	public NetworkStat getNetworkStatCache();
 	
 	/**
 	 * 分页获取交易缓存数据

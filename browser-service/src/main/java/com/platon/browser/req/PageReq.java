@@ -7,6 +7,16 @@ package com.platon.browser.req;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
+import lombok.Data;
+
+/**
+ * 	分页对象
+ *  @file PageReq.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
+@Data
 public class PageReq {
     /**
      * 当前页
@@ -18,22 +28,6 @@ public class PageReq {
     private Integer pageSize = 10;
 
     private Page<?> pager;
-
-    public Integer getPageNo() {
-        return pageNo;
-    }
-
-    public void setPageNo(Integer pageNo) {
-        this.pageNo = pageNo;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
 
     /**
      * 上层控制使用分页

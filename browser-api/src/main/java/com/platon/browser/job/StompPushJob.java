@@ -19,7 +19,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * 	推送任务
+ *  @file StompPushJob.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Component
 public class StompPushJob {
 
@@ -33,7 +39,7 @@ public class StompPushJob {
     private StakingService stakingService;
     
     /**
-     * 推送统计相关信息
+     * 	推送统计相关信息
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushChainStatisticNew(){
@@ -43,7 +49,7 @@ public class StompPushJob {
     }
     
     /**
-     * 推送出块趋势相关信息
+     * 	推送出块趋势相关信息
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushBlockStatisticNew(){
@@ -53,7 +59,7 @@ public class StompPushJob {
     }
     
     /**
-     * 推送首页区块相关信息
+     *	 推送首页区块相关信息
      */
     @Scheduled(cron="0/3 * * * * ?")
     public void pushBlockListNew() {
@@ -63,7 +69,7 @@ public class StompPushJob {
     }
     
     /**
-     * 推送首页验证人相关信息
+     * 	推送首页验证人相关信息
      */
     @Scheduled(cron="0/5 * * * * ?")
     public void pushStakingListNew() {

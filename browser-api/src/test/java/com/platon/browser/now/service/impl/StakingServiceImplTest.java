@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.req.staking.AliveStakingListReq;
 import com.platon.browser.req.staking.DelegationListByAddressReq;
@@ -18,6 +17,7 @@ import com.platon.browser.req.staking.HistoryStakingListReq;
 import com.platon.browser.req.staking.StakingDetailsReq;
 import com.platon.browser.req.staking.StakingOptRecordListReq;
 import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.DelegationListByAddressResp;
 import com.platon.browser.resp.staking.DelegationListByStakingResp;

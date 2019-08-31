@@ -2,6 +2,13 @@ package com.platon.browser.resp.staking;
 
 import lombok.Data;
 
+/**
+ * 验证人列表变更参数返回对象
+ *  @file StakingChangeNewResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class StakingChangeNewResp {
 	private Boolean isFlash;

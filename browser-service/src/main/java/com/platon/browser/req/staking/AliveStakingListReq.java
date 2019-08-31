@@ -7,6 +7,13 @@ import javax.validation.constraints.Pattern;
 
 import com.platon.browser.req.PageReq;
 
+/**
+ *  活跃验证人列表请求对象
+ *  @file AliveStakingListReq.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Data
 public class AliveStakingListReq extends PageReq{
     private String key;

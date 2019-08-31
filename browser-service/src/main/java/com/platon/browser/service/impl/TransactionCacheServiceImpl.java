@@ -2,7 +2,6 @@ package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.entity.TransactionExample;
 import com.platon.browser.dao.mapper.TransactionMapper;
@@ -18,12 +17,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-
+/**
+ * 交易缓存数据处理逻辑
+ *  @file TransactionCacheServiceImpl.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Component
 public class TransactionCacheServiceImpl implements TransactionCacheService {
     private final Logger logger = LoggerFactory.getLogger(TransactionCacheServiceImpl.class);
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
+    /** 交易缓存key */
     @Value("${platon.redis.key.transactions}")
     private String transactionsCacheKey;
     @Value("${platon.redis.max-item}")
@@ -43,7 +49,8 @@ public class TransactionCacheServiceImpl implements TransactionCacheService {
     /**
      * 更新交易缓存
      */
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public void update(Set<Transaction> items){
         long startTime = System.currentTimeMillis();
         logger.debug("开始更新Redis交易缓存:timestamp({})",startTime);

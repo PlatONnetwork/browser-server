@@ -3,6 +3,13 @@ package com.platon.browser.res.home;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ *  首页统计返回对象
+ *  @file ChainStatisticNewResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class ChainStatisticNewResp {
 	private Long currentNumber; // 当前区块高度
 	private String nodeId; // 出块节点id

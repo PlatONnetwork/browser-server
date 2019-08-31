@@ -1,5 +1,12 @@
 package com.platon.browser.enums;
 
+/**
+ * 国际化枚举
+ *  @file I18nEnum.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public enum I18nEnum {
 
     // 通用

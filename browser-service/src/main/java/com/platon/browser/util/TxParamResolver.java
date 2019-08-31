@@ -2,7 +2,6 @@ package com.platon.browser.util;
 
 
 import com.alibaba.fastjson.JSONArray;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.param.*;
 import lombok.Data;
@@ -14,9 +13,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +28,8 @@ public class TxParamResolver {
     public static class Result {
         private Object param;
         private CustomTransaction.TxTypeEnum txTypeEnum;
-        public <T> T convert(Class<T> clazz){
+        @SuppressWarnings("unchecked")
+		public <T> T convert(Class<T> clazz){
             return (T)param;
         }
     }
@@ -274,6 +272,8 @@ public class TxParamResolver {
                         createRestrictingParam.setAccount(account);
                         result.param = createRestrictingParam;
                         break;
+				default:
+					break;
                 }
             }
         } catch (Exception e) {

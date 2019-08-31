@@ -3,6 +3,13 @@ package com.platon.browser.resp.staking;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ * 地址锁仓列表返回对象
+ *  @file DelegationListByAddressResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class DelegationListByAddressResp {
 	private String nodeId;            //节点id
     private String nodeName;          //节点名称

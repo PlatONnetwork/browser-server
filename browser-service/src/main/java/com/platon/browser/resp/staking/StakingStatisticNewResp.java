@@ -3,6 +3,13 @@ package com.platon.browser.resp.staking;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
+/**
+ * 验证人统计参数返回对象
+ *  @file StakingStatisticNewResp.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class StakingStatisticNewResp {
 
 	private String stakingDelegationValue; // 质押委托总数

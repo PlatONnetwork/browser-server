@@ -2,25 +2,37 @@ package com.platon.browser.dto.transaction;
 
 import java.util.List;
 
-import com.platon.browser.dto.RespPage;
-import com.platon.browser.redis.dto.TransactionRedis;
+import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.res.RespPage;
 
+/**
+ * 交易缓存dto
+ *  @file TransactionCacheDto.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 public class TransactionCacheDto {
 	
-	public TransactionCacheDto(List<TransactionRedis> transactionRedisList,RespPage<?> page) {
-		this.transactionRedisList = transactionRedisList;
+	/**
+	 * 交易构造初始方法
+	 * @param transactionRedisList
+	 * @param page
+	 */
+	public TransactionCacheDto(List<Transaction> transactionList,RespPage<?> page) {
+		this.transactionList = transactionList;
 		this.page = page;
 	}
-	private List<TransactionRedis> transactionRedisList;
+	private List<Transaction> transactionList;
 	
 	private RespPage<?> page;
 
-	public List<TransactionRedis> getTransactionRedisList() {
-		return transactionRedisList;
+	public List<Transaction> getTransactionList() {
+		return transactionList;
 	}
 
-	public void setTransactionRedisList(List<TransactionRedis> transactionRedisList) {
-		this.transactionRedisList = transactionRedisList;
+	public void setTransactionList(List<Transaction> transactionList) {
+		this.transactionList = transactionList;
 	}
 
 	public RespPage<?> getPage() {

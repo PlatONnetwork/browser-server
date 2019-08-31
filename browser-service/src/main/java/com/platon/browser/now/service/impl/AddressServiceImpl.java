@@ -15,6 +15,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * 地址具体逻辑实现方法
+ *  @file AddressServiceImpl.java
+ *  @description 
+ *	@author zhangrj
+ *  @data 2019年8月31日
+ */
 @Service
 public class AddressServiceImpl implements AddressService {
 
@@ -26,6 +33,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public BaseResp<QueryDetailResp> getDetails(QueryDetailRequest req) {
+    	/** 根据主键查询地址信息 */
         Address item = addressMapper.selectByPrimaryKey(req.getAddress());
         QueryDetailResp resp = new QueryDetailResp();
         if (item != null) {

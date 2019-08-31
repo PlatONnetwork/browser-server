@@ -2,12 +2,12 @@ package com.platon.browser.now.service.impl;
 
 
 import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.dto.RespPage;
 import com.platon.browser.now.service.ProposalService;
 import com.platon.browser.now.service.VoteService;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.req.proposal.VoteListRequest;
+import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalListResp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
