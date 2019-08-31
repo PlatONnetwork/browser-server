@@ -72,22 +72,6 @@ public class AddressStatisticHandler implements EventHandler {
         fromAddress.updateWithCustomTransaction(tx);
         toAddress.updateWithCustomTransaction(tx);
 
-        // 查询地址余额
-        try {
-            BigInteger fromBalance = client.getWeb3j().platonGetBalance(from, DefaultBlockParameterName.LATEST).send().getBalance();
-            fromAddress.setBalance(fromBalance.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("查询from地址({})余额失败:",from,e.getMessage());
-        }
-        try {
-            BigInteger toBalance = client.getWeb3j().platonGetBalance(to, DefaultBlockParameterName.LATEST).send().getBalance();
-            toAddress.setBalance(toBalance.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("查询to地址({})余额失败:",from,e.getMessage());
-        }
-
         addressStage.insertAddress(fromAddress);
         addressStage.insertAddress(toAddress);
         NETWORK_STAT_CACHE.setAddressQty(ADDRESS_CACHE.getAllAddress().size());

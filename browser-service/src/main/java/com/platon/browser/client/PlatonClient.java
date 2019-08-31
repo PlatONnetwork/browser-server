@@ -265,7 +265,9 @@ public class PlatonClient {
             if(response==null||response.data==null){
                 throw new ContractInvokeException("查询锁仓计划合约出错: 入参(addresses="+addresses+"),响应(ethCall.getValue()="+value+")");
             }
-            response.data = JSONUtil.parseArray((String) response.data, RestrictingBalance.class);
+            String data = (String)response.data;
+            data = data.replace("\"lockBalance\":null","\"lockBalance\":\"0x0\"");
+            response.data = JSONUtil.parseArray(data, RestrictingBalance.class);
             return response;
         }).send();
     }
