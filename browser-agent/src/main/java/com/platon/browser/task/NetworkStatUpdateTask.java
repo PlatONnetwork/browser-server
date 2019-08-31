@@ -64,7 +64,7 @@ public class NetworkStatUpdateTask {
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(blockChain.getCurBlock().getBlockNumber().longValue()))).send().getBalance();
 
             //计算流通量
-            BigDecimal turnoverValue = circulation.add(new BigDecimal(lockContractBalance)).add(new BigDecimal(stakingContractBalance));
+            BigDecimal turnoverValue = circulation.subtract(new BigDecimal(lockContractBalance)).subtract(new BigDecimal(stakingContractBalance)).subtract(new BigDecimal(incentivePoolAccountBalance));
 
             //数据回填内存中
             blockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
