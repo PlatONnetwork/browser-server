@@ -1,5 +1,6 @@
 package com.platon.browser.engine.handler.statistic;
 
+import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomTransaction;
@@ -8,10 +9,16 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+
+import java.io.IOException;
+import java.math.BigInteger;
 
 import static com.platon.browser.engine.BlockChain.ADDRESS_CACHE;
 import static com.platon.browser.engine.BlockChain.NETWORK_STAT_CACHE;
@@ -28,12 +35,15 @@ public class AddressStatisticHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private PlatonClient client;
     @Override
     public void handle(EventContext context) {
         AddressStage addressStage = context.getAddressStage();
         CustomTransaction tx = context.getTransaction();
 
         String from = tx.getFrom(),to = tx.getTo();
+
         // 取from地址缓存，不存在则新建
         CustomAddress fromAddress;
         try {
@@ -61,6 +71,22 @@ public class AddressStatisticHandler implements EventHandler {
         // 更新与地址是from还是to无关的通用属性
         fromAddress.updateWithCustomTransaction(tx);
         toAddress.updateWithCustomTransaction(tx);
+
+        // 查询地址余额
+        try {
+            BigInteger fromBalance = client.getWeb3j().platonGetBalance(from, DefaultBlockParameterName.LATEST).send().getBalance();
+            fromAddress.setBalance(fromBalance.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("查询from地址({})余额失败:",from,e.getMessage());
+        }
+        try {
+            BigInteger toBalance = client.getWeb3j().platonGetBalance(to, DefaultBlockParameterName.LATEST).send().getBalance();
+            toAddress.setBalance(toBalance.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("查询to地址({})余额失败:",from,e.getMessage());
+        }
 
         addressStage.insertAddress(fromAddress);
         addressStage.insertAddress(toAddress);

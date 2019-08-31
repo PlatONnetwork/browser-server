@@ -32,15 +32,15 @@ import java.util.List;
  */
 public class TransactionSender {
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
-    //private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 
     private String chainId = "100";
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
+//    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
     private Credentials credentials = Credentials.create("00e6bd52b0015d9767c2308f4e75083aa455dd345a936a1c48abaee5795db51ccb");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
-    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
-    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
+    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
+    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,credentials,chainId);
     public TransactionSender() throws IOException, CipherException {}
 
     // 发送转账交易
@@ -83,19 +83,19 @@ public class TransactionSender {
     // 修改质押信息(编辑验证人)
     @Test
     public void updateStakingInfo() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+        /*StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,"101");
         BaseResponse res = stakingContract.updateStakingInfo(
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
                 "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
                 "PID-002","cdm-004","WWW.CCC.COM","Node of CDM"
         ).send();
-        logger.debug("res:{}",res);
+        logger.debug("res:{}",res);*/
     }
 
     // 增持质押(增加自有质押)
     @Test
     public void addStaking() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,"101");
         BaseResponse res = stakingContract.addStaking(
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000",
                 StakingAmountType.FREE_AMOUNT_TYPE,
@@ -107,7 +107,7 @@ public class TransactionSender {
     // 撤销质押(退出验证人)
     @Test
     public void unStaking() throws Exception {
-        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),"101");
+        StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,"101");
         BaseResponse res = stakingContract.unStaking(
                 "0x00cc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba41000"
         ).send();

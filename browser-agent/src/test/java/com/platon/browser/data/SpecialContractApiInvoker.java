@@ -51,7 +51,8 @@ import java.util.concurrent.Callable;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
-    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
+    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+//    private static Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private static NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
 
     // 特殊合约接口测试
@@ -118,7 +119,9 @@ public class SpecialContractApiInvoker {
             if(response==null||response.data==null){
                 throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType+"),响应(ethCall.getValue()="+value+")");
             }
-            response.data = JSONUtil.parseArray((String) response.data, Node.class);
+            String data = (String)response.data;
+            data = data.replace("\"Shares\":null","\"Shares\":\"0x0\"");
+            response.data = JSONUtil.parseArray(data, Node.class);
             return response;
         });
     }
@@ -172,17 +175,29 @@ public class SpecialContractApiInvoker {
 
 
         try {
-            List<Node>  node0 = getHistoryValidatorList(BigInteger.valueOf(3639)).data;
-            logger.debug("{}", JSON.toJSONString(node0,true));
+            BaseResponse<List<Node>>  validator1 = getHistoryValidatorList(BigInteger.valueOf(440));
+            logger.debug("{}", JSON.toJSONString(validator1,true));
 
-            List<Node>  node1 = getHistoryValidatorList(BigInteger.valueOf(3640)).data;
+            BaseResponse<List<Node>>  validator2 = getHistoryValidatorList(BigInteger.valueOf(0));
+            logger.debug("{}", JSON.toJSONString(validator1,true));
+
+            BaseResponse<List<Node>>  validator3 = getHistoryValidatorList(BigInteger.valueOf(0));
+            logger.debug("{}", JSON.toJSONString(validator3,true));
+
+            BaseResponse<List<Node>>  validator4 = getHistoryValidatorList(BigInteger.valueOf(0));
+            logger.debug("{}", JSON.toJSONString(validator4,true));
+
+            BaseResponse<List<Node>>  node1 = getHistoryVerifierList(BigInteger.valueOf(0));
             logger.debug("{}", JSON.toJSONString(node1,true));
 
-            List<Node>  node2 = getHistoryValidatorList(BigInteger.valueOf(3679)).data;
+            BaseResponse<List<Node>>  node2 = getHistoryVerifierList(BigInteger.valueOf(120));
             logger.debug("{}", JSON.toJSONString(node2,true));
 
-            List<Node>  node3 = getHistoryValidatorList(BigInteger.valueOf(3680)).data;
-            logger.debug("{}", JSON.toJSONString(node2,true));
+            BaseResponse<List<Node>>  node3 = getHistoryVerifierList(BigInteger.valueOf(240));
+            logger.debug("{}", JSON.toJSONString(node3,true));
+
+            BaseResponse<List<Node>>  node4 = getHistoryVerifierList(BigInteger.valueOf(360));
+            logger.debug("{}", JSON.toJSONString(node4,true));
         } catch (Exception e) {
             e.printStackTrace();
         }

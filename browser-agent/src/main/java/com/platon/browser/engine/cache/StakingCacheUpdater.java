@@ -41,7 +41,7 @@ public class StakingCacheUpdater {
         try {
             CustomNode customNode = NODE_CACHE.getNode(curBlock.getNodeId());
             CustomStaking customStaking = customNode.getLatestStaking();
-            if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
+            //if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
                 info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
                 // 当前共识周期出块奖励
                 BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
@@ -51,7 +51,7 @@ public class StakingCacheUpdater {
                 // 把更改后的内容暂存至待更新列表
                 STAGE_DATA.getStakingStage().updateStaking(customStaking);
                 info = info.replace("CUR_COUNT",customStaking.getCurConsBlockQty().toString());
-            }
+            //}
         } catch (NoSuchBeanException e) {
             logger.error("更新出块奖励和共识出块数错误,找不到符合条件的质押信息:{}",e.getMessage());
         }
