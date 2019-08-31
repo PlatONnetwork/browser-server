@@ -136,7 +136,7 @@ public class NewConsensusEpochHandler implements EventHandler {
 
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getConsensusPeriodBlockCount().longValue());
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
         if(result.isStatusOk()){
             bc.getCurValidator().clear();

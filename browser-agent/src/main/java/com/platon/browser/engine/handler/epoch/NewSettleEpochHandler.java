@@ -98,7 +98,7 @@ public class NewSettleEpochHandler implements EventHandler {
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+chainConfig.getSettlePeriodBlockCount().longValue());
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         try {
             result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
         } catch (Exception e) {
