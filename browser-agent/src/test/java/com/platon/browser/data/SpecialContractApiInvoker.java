@@ -32,10 +32,12 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.rlp.*;
 import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.gas.DefaultWasmGasProvider;
+import org.web3j.utils.Convert;
 import org.web3j.utils.JSONUtil;
 import org.web3j.utils.Numeric;
 import org.web3j.utils.PlatOnUtil;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -52,7 +54,8 @@ import java.util.concurrent.Callable;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
 //    private Web3j web3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+//    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:6789"));
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private static NodeContract nodeContract = NodeContract.load(web3j);
 
@@ -114,16 +117,39 @@ public class SpecialContractApiInvoker {
         //System.out.println(a);
 
 
-
         try {
-            BaseResponse<List<Node>>  validator1 = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(1040));
-            logger.debug("{}", JSON.toJSONString(validator1,true));
+//            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.112.172:6789"));
+            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.120.76:6797"));
 
-            BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(0));
+            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9840)).data;
+            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
+            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
+            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
+
+            BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(0));
             logger.debug("{}", JSON.toJSONString(node1,true));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        BigDecimal init = Convert.toVon("10000000000", Convert.Unit.LAT);
+
+        try {
+            BigDecimal jili = new BigDecimal(web3j
+                    .platonGetBalance("0x1000000000000000000000000000000000000003",DefaultBlockParameterName.LATEST)
+                    .send().getBalance());
+
+
+            BigDecimal aa = new BigDecimal("42993086.2369165");
+
+            BigDecimal bd = init.multiply(BigDecimal.valueOf(1.025).pow(4)).subtract(jili).add(aa);
+            BigDecimal lat = Convert.fromVon(bd.toString(), Convert.Unit.LAT);
+            System.out.println(lat);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
