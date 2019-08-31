@@ -10,12 +10,14 @@ public class BlockChainStage {
     private StakingStage stakingStage=new StakingStage();
     private AddressStage addressStage =new AddressStage();
     private NetworkStatStage networkStatStage =new NetworkStatStage();
+    private RestrictingStage restrictingStage = new RestrictingStage();
 
     public void clear(){
         proposalStage.clear();
         stakingStage.clear();
         addressStage.clear();
         networkStatStage.clear();
+        restrictingStage.clear();
     }
 
     public ProposalStage getProposalStage() {
@@ -33,5 +35,7 @@ public class BlockChainStage {
     public NetworkStatStage getNetworkStatStage() {
         return networkStatStage;
     }
+
+    public RestrictingStage getRestrictingStage(){ return restrictingStage;}
 
 }

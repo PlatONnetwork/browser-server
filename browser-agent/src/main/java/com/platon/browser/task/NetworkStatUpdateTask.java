@@ -33,7 +33,7 @@ public class NetworkStatUpdateTask {
     @Autowired
     private PlatonClient platonClient;
 
-    @Scheduled(cron = "0/1  * * * * ?")
+    @Scheduled(cron = "0/5  * * * * ?")
     protected void start () {
         CustomBlock curBlock = blockChain.getCurBlock();
         if(curBlock==null) return;

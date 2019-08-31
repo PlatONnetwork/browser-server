@@ -56,6 +56,8 @@ public class BlockChain {
     @Autowired
     private AddressEngine addressExecute;
     @Autowired
+    private RestrictingEngine restrictingEngine;
+    @Autowired
     private NodeMapper nodeMapper;
     @Autowired
     private StakingMapper stakingMapper;
@@ -185,6 +187,8 @@ public class BlockChain {
                 case DUPLICATE_SIGN: // 双签举报
                     proposalExecute.execute(tx, this);
                     break;
+                case CREATE_RESTRICTING://创建锁仓计划
+                    restrictingEngine.execute(tx,this);
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
                     break;

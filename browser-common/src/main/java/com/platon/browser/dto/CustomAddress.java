@@ -47,7 +47,6 @@ public class CustomAddress extends Address {
         this.setContractName("Unknown");
         this.setContractCreate("Unknown");
         this.setContractCreatehash("Unknown");
-        this.setRpPlan("");
     }
 
     /**

@@ -89,9 +89,6 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'rp_plan'.toString() == column.value">
-          #{item.rpPlan,jdbcType=VARCHAR}
-        </if>
       </foreach>
       )
     </foreach>
