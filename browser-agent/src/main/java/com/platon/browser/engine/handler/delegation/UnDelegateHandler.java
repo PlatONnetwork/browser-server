@@ -63,10 +63,10 @@ public class UnDelegateHandler implements EventHandler {
              *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
              * */
 
-            BigDecimal delegationSum = new BigDecimal(customDelegation.getDelegateHas()).add(new BigDecimal(customDelegation.getDelegateLocked()));
+            BigInteger delegationSum = new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(customDelegation.getDelegateLocked()));
             //配置文件中委托门槛单位是LAT
             BigDecimal DelegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
-            if (delegationSum.compareTo(DelegateThresholdVon) == -1) {
+            if (delegationSum.subtract(new BigInteger(param.getAmount())).compareTo(new BigInteger(DelegateThresholdVon.toString())) == -1) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customDelegation.getDelegateLocked())).toString());
                 customDelegation.setDelegateHas("0");
@@ -74,19 +74,20 @@ public class UnDelegateHandler implements EventHandler {
                 //设置赎回委托结构中的赎回锁定金额
                 customUnDelegation.setRedeemLocked(customDelegation.getDelegateReduction());
             } else {
-
                 if (new BigInteger(customDelegation.getDelegateHas()).compareTo(new BigInteger(param.getAmount())) == 1) {
                     //犹豫期的金额 > 赎回委托金额，直接扣除犹豫期金额
                     //该委托的变更犹豫期金额 = 委托原本的犹豫期金额 - 委托赎回的金额
                     customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).subtract(new BigInteger(param.getAmount())).toString());
                 } else {
                     //犹豫期金额 < 赎回委托金额，优先扣除所剩的犹豫期金额，不足的从锁定期金额中扣除
-                    customDelegation.setDelegateLocked(
-                            new BigInteger(customDelegation.getDelegateLocked()).add
-                                    (new BigInteger(customDelegation.getDelegateHas())).subtract
-                                    (new BigInteger(param.getAmount())).toString());
+                    //差值 = 要赎回的金额 - 犹豫期的金额
+                    BigInteger subHas = new BigInteger(param.getAmount()).subtract(new BigInteger(customDelegation.getDelegateHas()));
+                    //解委托后锁定期金额= 解委托前锁定期 - 差值
+                    customDelegation.setDelegateLocked(new BigInteger(customDelegation.getDelegateLocked()).subtract(subHas).toString());
+                    //犹豫期设置为零
+                    customDelegation.setDelegateHas("0");
                     //优先扣除所剩的犹豫期的金额，剩余委托赎回金额 = 原本需要赎回的金额 - 委托的犹豫期的金额
-                    customUnDelegation.setRedeemLocked(new BigInteger(param.getAmount()).subtract(new BigInteger(customDelegation.getDelegateHas())).toString());
+                    customUnDelegation.setRedeemLocked(subHas.toString());
                     //设置委托中的赎回金额，经过分析后的委托赎回金额 = 委托赎回金额 + 委托锁定期金额
                     customDelegation.setDelegateReduction(new BigInteger(customDelegation.getDelegateReduction()).add(new BigInteger(customUnDelegation.getRedeemLocked())).toString());
                 }
