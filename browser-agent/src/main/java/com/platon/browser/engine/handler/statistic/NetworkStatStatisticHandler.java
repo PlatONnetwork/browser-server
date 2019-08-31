@@ -100,18 +100,16 @@ public class NetworkStatStatisticHandler implements EventHandler {
                  *  2.升级提案：状态为投票中、预升级、为进行中提案
                  *  3.取消提案：状态为投票中的为进行中的提案
                  */
-                if (STAGE_DATA.getProposalStage().getProposalInsertStage().size() > 0 || STAGE_DATA.getProposalStage().getProposalUpdateStage().size() > 0) {
-                    PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
-                        if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)) {
+                PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
+                    if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)) {
+                        NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
+                    }
+                    if (proposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code)) {
+                        if (proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code) || proposal.getType().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
                             NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                         }
-                        if (proposal.getType().equals(CustomProposal.TypeEnum.UPGRADE.code)) {
-                            if (proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code) || proposal.getType().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)) {
-                                NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
-                            }
-                        }
-                    });
-                }
+                    }
+                });
             }
             //更新暂存变量
             STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
