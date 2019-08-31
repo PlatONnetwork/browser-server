@@ -11,6 +11,7 @@ import org.web3j.platon.BaseResponse;
 import org.web3j.platon.StakingAmountType;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.bean.StakingParam;
+import org.web3j.platon.bean.UpdateStakingParam;
 import org.web3j.platon.contracts.DelegateContract;
 import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.StakingContract;
@@ -19,11 +20,9 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.PlatonSendTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
-import org.web3j.tx.gas.DefaultWasmGasProvider;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -43,8 +42,8 @@ public class TransactionSender {
     private Credentials credentials1 = Credentials.create("00a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
     private Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
-    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,new DefaultWasmGasProvider(),chainId);
-    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,new DefaultWasmGasProvider(),chainId);
+    StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
+    DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
     private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
     private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 //    private String stakingBlsKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
@@ -111,11 +110,16 @@ public class TransactionSender {
     // 修改质押信息(编辑验证人)
     @Test
     public void updateStakingInfo() throws Exception {
-        BaseResponse<?> res = stakingContract.updateStakingInfo(
-        		stakingPubKey,
-                "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
-                "5FD68B690010632B","cdm-004","WWW.CCC.COM","Node of CDM"
-        ).send();
+    	UpdateStakingParam.Builder uBuilder = new UpdateStakingParam.Builder();
+    	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+    	uBuilder.setDetails("Node of CDM");
+    	uBuilder.setExternalId("5FD68B690010632B");
+    	uBuilder.setNodeId(stakingPubKey);
+    	uBuilder.setNodeName("cdm-004");
+    	uBuilder.setWebSite("WWW.CCC.COM");
+    	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+    	UpdateStakingParam updateStakingParam = new UpdateStakingParam(uBuilder);
+        BaseResponse<?> res = stakingContract.updateStakingInfo(updateStakingParam).send();
         logger.debug("res:{}",res);
     }
 

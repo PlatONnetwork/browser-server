@@ -350,7 +350,7 @@ public class TransactionServiceImpl implements TransactionService {
 					CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
 					StakingKey stakingKey = new StakingKey();
 					stakingKey.setNodeId(createValidatorParam.getNodeId());
-//					stakingKey.setStakingBlockNum(stakingBlockNum);
+					stakingKey.setStakingBlockNum(Long.valueOf(createValidatorParam.getBlockNumber()));
 					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
 					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
 					resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
@@ -367,7 +367,7 @@ public class TransactionServiceImpl implements TransactionService {
 					EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
 					StakingKey stakingKeyV = new StakingKey();
 					stakingKeyV.setNodeId(editValidatorParam.getNodeId());
-//					stakingKeyV.setStakingBlockNum(stakingBlockNum);
+					stakingKeyV.setStakingBlockNum(Long.valueOf(editValidatorParam.getBlockNumber()));
 					staking = stakingMapper.selectByPrimaryKey(stakingKeyV);
 					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
 					resp.setBenefitAddr(editValidatorParam.getBenefitAddress());

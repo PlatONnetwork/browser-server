@@ -73,7 +73,13 @@ public class HomeServiceImpl implements HomeService {
 		QueryNavigationResp result = new QueryNavigationResp();
 		QueryNavigationStructResp queryNavigationStructResp = new QueryNavigationStructResp();
 		if (isNumber) {
-			Block block = blockMapper.selectByPrimaryKey(Long.valueOf(keyword));
+			Long number;
+			try {
+				number = Long.valueOf(keyword);
+			} catch (Exception e) {
+				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
+			}
+			Block block = blockMapper.selectByPrimaryKey(number);
 			if(block != null) {
 				result.setType("block");
 				queryNavigationStructResp.setNumber(Long.valueOf(keyword));

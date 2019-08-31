@@ -1,7 +1,6 @@
 package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.engine.bean.keystore.KeystoreUser;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -703,8 +702,8 @@ public class AccountTool {
                 "  ]\n" +
                 "}\n";
 
-        KeystoreUser ku = JSON.parseObject(str, KeystoreUser.class);
-        System.out.println(ku);
+//        KeystoreUser ku = JSON.parseObject(str, KeystoreUser.class);
+//        System.out.println(ku);
     }
 
 }

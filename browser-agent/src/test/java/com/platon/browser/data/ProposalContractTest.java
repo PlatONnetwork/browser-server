@@ -89,7 +89,7 @@ public class ProposalContractTest {
 	@Test
 	public void submitVersionProposal() {
 		try {
-			String num = "6";
+			String num = "8";
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
 					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(20000), BigInteger.valueOf(4)))
 					.send();
@@ -97,7 +97,7 @@ public class ProposalContractTest {
 					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
-//			voteForProposal(platonSendTransaction.getTransactionHash());
+			voteForProposal(platonSendTransaction.getTransactionHash());
 //
 //			queryResult(platonSendTransaction.getTransactionHash());
 			
