@@ -63,9 +63,9 @@ platon.config:
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 120
+  settlePeriodBlockCount: 160
   #每个增发周期区块总数(1466个结算周期=15759500个块)
-  addIssuePeriodBlockCount: 1680
+  addIssuePeriodBlockCount: 1600
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 2
   #文本提案默认投票结束轮数
