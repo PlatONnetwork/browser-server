@@ -52,23 +52,21 @@ public class DelegateHandler implements EventHandler {
                 //todo：交易数据回填
                 tx.setTxInfo(JSON.toJSONString(param));
                 CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
-                //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
                 //更新犹豫期金额
+                //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点有做过委托
+
                 if (customDelegation != null) {
                     customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
                     customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
                     //更新分析结果UpdateSet
                     stakingStage.updateDelegation(customDelegation);
-                    //添加委托缓存
-                    NODE_CACHE.addDelegation(customDelegation);
                 }
-
-                //若不存在，则说明该地址有对此节点做过委托
+                //若不存在，则说明该地址有对此节点没有委托过
                 if (customDelegation == null) {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
                     newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
-                    // 添加至委托缓存
+                    // 添加新增至委托缓存
                     NODE_CACHE.addDelegation(newCustomDelegation);
 
                     //新增分析结果AddSet
