@@ -9,7 +9,6 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.EvidencesParam;
 import com.platon.browser.param.ReportValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
