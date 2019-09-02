@@ -18,6 +18,7 @@ public class QueryRPPlanDetailResp {
 	private String underreleaseValue;        //欠释放(单位:LAT)
 	private List<DetailsRPPlanResp> RPPlan;  //锁仓计划
 	private Long total;
+	private String totalValue;//总计锁仓
 	
 	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getRestrictingBalance() {
@@ -51,6 +52,13 @@ public class QueryRPPlanDetailResp {
 	}
 	public void setTotal(Long total) {
 		this.total = total;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getTotalValue() {
+		return totalValue;
+	}
+	public void setTotalValue(String totalValue) {
+		this.totalValue = totalValue;
 	}
 	
 }

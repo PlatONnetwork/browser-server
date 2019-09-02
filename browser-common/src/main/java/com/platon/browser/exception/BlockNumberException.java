@@ -6,7 +6,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class BlockNumberException extends Exception {
-    public BlockNumberException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public BlockNumberException(String msg){
         super(msg);
     }
 }

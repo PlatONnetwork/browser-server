@@ -1,6 +1,5 @@
 package com.platon.browser.dao.mapper;
 
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.UnDelegation;
 import com.platon.browser.dto.CustomUnDelegation;
 import org.apache.ibatis.annotations.Mapper;

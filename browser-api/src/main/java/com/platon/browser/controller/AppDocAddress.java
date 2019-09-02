@@ -84,7 +84,9 @@ public interface AppDocAddress {
      * - 查询链上实时余额
      * @apiParamExample {json} Request-Example:
      * {
-     *    "address":"0x"               //账户地址(必填)
+     *    "address":"0x",               //账户地址(必填)
+     *    "pageNo":"",  //页号
+     *    "pageSize":"" //页码
      * }
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
@@ -95,6 +97,7 @@ public interface AppDocAddress {
      *       "restrictingBalance":"",             //锁仓余额(单位:LAT)
      *       "stakingValue":"",  //锁仓质押\委托(单位:LAT)
      *       "underreleaseValue":"",        //欠释放(单位:LAT)
+     *       "totalValue":"",        //锁仓计划总计锁仓(单位:LAT)
      *       "total":"",  //计划总数
      *       "RPPlan":[
      *          {

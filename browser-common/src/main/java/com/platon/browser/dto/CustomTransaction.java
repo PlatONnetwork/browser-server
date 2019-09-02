@@ -32,7 +32,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
      * 使用原生交易信息初始化交易信息
      * @param tr
      */
-    public void updateWithTransactionResult (PlatonBlock.TransactionResult tr ) {
+    @SuppressWarnings("rawtypes")
+	public void updateWithTransactionResult (PlatonBlock.TransactionResult tr ) {
         try {
             Transaction transaction = (Transaction) tr;
             BeanUtils.copyProperties(transaction, this);
@@ -54,7 +55,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
      * @param receipt
      * @throws BeanCreateOrUpdateException
      */
-    public void updateWithTransactionReceipt (TransactionReceipt receipt,Set<String> innerContractAddr) throws BeanCreateOrUpdateException {
+    @SuppressWarnings("rawtypes")
+	public void updateWithTransactionReceipt (TransactionReceipt receipt,Set<String> innerContractAddr) throws BeanCreateOrUpdateException {
         try{
             this.setGasUsed(receipt.getGasUsed().toString());
             this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());

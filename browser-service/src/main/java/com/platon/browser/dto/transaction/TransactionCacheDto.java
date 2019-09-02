@@ -2,7 +2,7 @@ package com.platon.browser.dto.transaction;
 
 import java.util.List;
 
-import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.res.RespPage;
 
 /**
@@ -19,19 +19,19 @@ public class TransactionCacheDto {
 	 * @param transactionRedisList
 	 * @param page
 	 */
-	public TransactionCacheDto(List<Transaction> transactionList,RespPage<?> page) {
+	public TransactionCacheDto(List<TransactionWithBLOBs> transactionList,RespPage<?> page) {
 		this.transactionList = transactionList;
 		this.page = page;
 	}
-	private List<Transaction> transactionList;
+	private List<TransactionWithBLOBs> transactionList;
 	
 	private RespPage<?> page;
 
-	public List<Transaction> getTransactionList() {
+	public List<TransactionWithBLOBs> getTransactionList() {
 		return transactionList;
 	}
 
-	public void setTransactionList(List<Transaction> transactionList) {
+	public void setTransactionList(List<TransactionWithBLOBs> transactionList) {
 		this.transactionList = transactionList;
 	}
 

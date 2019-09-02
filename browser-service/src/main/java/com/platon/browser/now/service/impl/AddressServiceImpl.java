@@ -20,6 +20,7 @@ import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -100,6 +101,7 @@ public class AddressServiceImpl implements AddressService {
 		List<DetailsRPPlanResp> detailsRPPlanResps = new ArrayList<DetailsRPPlanResp>();
 		PageHelper.startPage(req.getPageNo(),req.getPageSize());
 		List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
+		BigDecimal totalValue = new BigDecimal(0);
 		for(RpPlan rPlan : rpPlans) {
 			DetailsRPPlanResp detailsRPPlanResp = new DetailsRPPlanResp();
 			BeanUtils.copyProperties(rPlan, detailsRPPlanResp);
@@ -111,8 +113,10 @@ public class AddressServiceImpl implements AddressService {
 			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval() * (networkStat.getCurrentNumber() - number) 
 					+ new Date().getTime());
 			detailsRPPlanResps.add(detailsRPPlanResp);
+			totalValue = totalValue.add(new BigDecimal(rPlan.getAmount()));
 		}
 		queryRPPlanDetailResp.setRPPlan(detailsRPPlanResps);
+		queryRPPlanDetailResp.setTotalValue(totalValue.toString());
 		/**
 		 * 获取列表总数
 		 */

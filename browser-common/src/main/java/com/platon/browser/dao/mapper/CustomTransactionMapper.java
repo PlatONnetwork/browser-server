@@ -4,7 +4,6 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 import java.util.Set;
 
 @Mapper

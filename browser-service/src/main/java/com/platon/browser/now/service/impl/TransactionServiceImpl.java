@@ -50,6 +50,7 @@ import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
+import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -114,18 +115,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
         /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
-        List<Transaction> items = transactionCacheDto.getTransactionList();
-        for (Transaction transactionRedis:items) {
-        	TransactionListResp transactionListResp = new TransactionListResp();
-        	BeanUtils.copyProperties(transactionRedis, transactionListResp);
-        	transactionListResp.setTxHash(transactionRedis.getHash());
-            transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(transactionRedis.getTimestamp().getTime());
-            lists.add(transactionListResp);
-        }
+        List<TransactionWithBLOBs> items = transactionCacheDto.getTransactionList();
+        List<TransactionListResp> lists = this.tranferList(items);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
         result.setTotalCount(transactionCacheDto.getPage().getTotalCount());
@@ -136,7 +129,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByBlock(TransactionListByBlockRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
         TransactionExample transactionExample = new TransactionExample();
         TransactionExample.Criteria criteria = transactionExample.createCriteria()
                 .andBlockNumberEqualTo(req.getBlockNumber().longValue());
@@ -146,14 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
         /** 根据区块号和类型分页查询交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        for (TransactionWithBLOBs transaction:items) {
-        	TransactionListResp transactionListResp = new TransactionListResp();
-        	BeanUtils.copyProperties(transaction, transactionListResp);
-            transactionListResp.setTxHash(transaction.getHash());
-            transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
-            lists.add(transactionListResp);
-        }
+        List<TransactionListResp> lists = this.tranferList(items);
         /** 统计交易信息 */
         long count  = transactionMapper.countByExample(transactionExample);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -165,7 +150,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByAddress(TransactionListByAddressRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
+        
         TransactionExample transactionExample = new TransactionExample();
         /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
@@ -180,7 +165,18 @@ public class TransactionServiceImpl implements TransactionService {
         transactionExample.or(second);
         /** 根据地址查询分页交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        for (TransactionWithBLOBs transaction:items) {
+        List<TransactionListResp> lists = this.tranferList(items);
+        /** 查询总数 */
+        long count  = transactionMapper.countByExample(transactionExample);
+        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
+        result.init(page, lists);
+        result.setTotalCount(count);
+        return result;
+    }
+    
+    private List<TransactionListResp> tranferList(List<TransactionWithBLOBs> items) {
+    	List<TransactionListResp> lists = new LinkedList<>();
+    	for (TransactionWithBLOBs transaction:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
@@ -188,12 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
         }
-        /** 查询总数 */
-        long count  = transactionMapper.countByExample(transactionExample);
-        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
-        result.init(page, lists);
-        result.setTotalCount(count);
-        return result;
+    	return lists;
     }
 
     public AccountDownload transactionListByAddressDownload(String address, String date) {
@@ -286,6 +277,12 @@ public class TransactionServiceImpl implements TransactionService {
     		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
     		/** 确认区块数等于当前区块书减去交易区块数  */
     		resp.setConfirmNum(String.valueOf(networkStatRedis.getCurrentNumber()-transaction.getBlockNumber()));
+    		/** 暂时只有账户合约 */
+    		resp.setReceiveType("account");
+    		/** 如果数据值为null 则置为空 */
+    		if("null".equals(transaction.getTxInfo())) {
+    			resp.setTxInfo("");
+    		}
     		/*
     		 * "first":false,            //是否第一条记录
     		 * "last":true,              //是否最后一条记录
@@ -312,8 +309,6 @@ public class TransactionServiceImpl implements TransactionService {
     		}else {
     			resp.setNextHash(transactionList.get(0).getHash());
     		}
-    		/** 暂时只有账户合约 */
-    		resp.setReceiveType("account");
     		String txInfo = transaction.getTxInfo();
     		/** 根据不同交易类型判断逻辑 */
     		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType())) {
@@ -385,7 +380,12 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setApplyAmount(sum.toString());
 						resp.setRedeemLocked(staking.getStakingReduction());
 						//只有已退出，则金额才会退回到账户
-						resp.setRedeemStatus(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()?2:1);
+						if(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode() || sum.intValue() == 0) {
+							resp.setRedeemStatus(RedeemStatusEnum.EXTED.getCode());
+						} else {
+							resp.setRedeemStatus(RedeemStatusEnum.EXTING.getCode());
+						}
+						
 						//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
 						BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnstakeRefundSettlePeriodCount())))
 								.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));

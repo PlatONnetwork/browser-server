@@ -1,7 +1,6 @@
 package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dto.CustomDelegation;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -216,7 +216,18 @@ public class StakingServiceImpl implements StakingService {
 				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 				resp.setBlockQty(stakingNode.getStatBlockQty());
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
-				resp.setWebsite(stakingNode.getWebSite());
+				String webSite = "";
+				if(StringUtils.isNotBlank(stakingNode.getWebSite()) ) {
+					/**
+					 * 如果地址不是http开头就补齐
+					 */
+					if(stakingNode.getWebSite().startsWith(BrowserConst.HTTP) || stakingNode.getWebSite().startsWith(BrowserConst.HTTPS)){
+						webSite = stakingNode.getWebSite();
+					} else {
+						webSite = BrowserConst.HTTP + stakingNode.getWebSite();
+					}
+				}
+				resp.setWebsite(webSite);
 				/** 实际跳转地址是url拼接上名称 */
 				resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());

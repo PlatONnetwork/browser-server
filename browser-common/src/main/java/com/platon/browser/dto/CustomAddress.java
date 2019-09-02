@@ -80,6 +80,8 @@ public class CustomAddress extends Address {
             case VOTING_PROPOSAL:// 提案投票
                 this.setProposalQty(this.getProposalQty()+1); // 累加提案交易总数
                 break;
+		default:
+			break;
         }
     }
 
