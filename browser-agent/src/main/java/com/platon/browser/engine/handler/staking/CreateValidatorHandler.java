@@ -77,7 +77,6 @@ public class CreateValidatorHandler implements EventHandler {
             /** 业务逻辑说明：
              * 2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
              */
-            logger.error("节点(id={})未被质押！");
             CustomStaking staking = new CustomStaking();
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();
