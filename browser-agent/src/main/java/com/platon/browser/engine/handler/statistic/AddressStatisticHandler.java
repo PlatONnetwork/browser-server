@@ -43,12 +43,6 @@ public class AddressStatisticHandler implements EventHandler {
         CustomAddress fromAddress;
         try {
             fromAddress = ADDRESS_CACHE.getAddress(from);
-            ContractDescEnum cde = ContractDescEnum.MAP.get(from);
-            if(cde!=null){
-                fromAddress.setContractName(cde.getContractName());
-                fromAddress.setContractCreate(cde.getCreator());
-                fromAddress.setContractCreatehash(cde.getContractHash());
-            }
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有from地址({})记录，添加一条",from);
             fromAddress = new CustomAddress();
@@ -61,18 +55,25 @@ public class AddressStatisticHandler implements EventHandler {
         CustomAddress toAddress;
         try {
             toAddress = ADDRESS_CACHE.getAddress(to);
-            ContractDescEnum cde = ContractDescEnum.MAP.get(to);
-            if(cde!=null){
-                toAddress.setContractName(cde.getContractName());
-                toAddress.setContractCreate(cde.getCreator());
-                toAddress.setContractCreatehash(cde.getContractHash());
-            }
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有to地址({})记录，添加一条",to);
             toAddress = new CustomAddress();
             toAddress.setAddress(to);
             // 添加至全量缓存
             ADDRESS_CACHE.add(toAddress);
+        }
+
+        ContractDescEnum cde = ContractDescEnum.MAP.get(from);
+        if(cde!=null){
+            fromAddress.setContractName(cde.getContractName());
+            fromAddress.setContractCreate(cde.getCreator());
+            fromAddress.setContractCreatehash(cde.getContractHash());
+        }
+        cde = ContractDescEnum.MAP.get(to);
+        if(cde!=null){
+            toAddress.setContractName(cde.getContractName());
+            toAddress.setContractCreate(cde.getCreator());
+            toAddress.setContractCreatehash(cde.getContractHash());
         }
 
         // 更新与地址是from还是to无关的通用属性
