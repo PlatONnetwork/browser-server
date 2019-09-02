@@ -25,6 +25,11 @@ public class ExitValidatorParam {
      */
     private String stakingBlockNum;
 
+    /**
+     *  撤销金额
+     */
+    private String amount;
+
     public void init(String nodeId,String nodeName,String stakingBlockNum){
         this.setNodeId(nodeId);
         this.setNodeName(nodeName);
