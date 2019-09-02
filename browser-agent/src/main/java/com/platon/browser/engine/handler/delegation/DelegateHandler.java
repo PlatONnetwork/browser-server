@@ -46,25 +46,20 @@ public class DelegateHandler implements EventHandler {
                 CustomStaking latestStaking = node.getLatestStaking();
                 logger.debug("委托信息:{}", JSON.toJSONString(param));
 
-                //交易数据tx_info补全
-                param.setNodeName(latestStaking.getStakingName());
-                param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
-                //todo：交易数据回填
-                tx.setTxInfo(JSON.toJSONString(param));
-                CustomDelegation customDelegation = latestStaking.getDelegations().get(tx.getFrom());
+                CustomDelegation delegation = latestStaking.getDelegations().get(tx.getFrom());
                 //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点没有做过委托
                 //更新犹豫期金额
-                if (customDelegation != null) {
-                    customDelegation.setDelegateHas(new BigInteger(customDelegation.getDelegateHas()).add(new BigInteger(param.getAmount())).toString());
-                    customDelegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
+                if (delegation != null) {
+                    delegation.setDelegateHas(delegation.integerDelegateHas().add(param.integerAmount()).toString());
+                    delegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
                     //更新分析结果UpdateSet
-                    stakingStage.updateDelegation(customDelegation);
+                    stakingStage.updateDelegation(delegation);
                     //添加委托缓存
-                    NODE_CACHE.addDelegation(customDelegation);
+                    NODE_CACHE.addDelegation(delegation);
                 }
 
                 //若不存在，则说明该地址有对此节点做过委托
-                if (customDelegation == null) {
+                if (delegation == null) {
                     CustomDelegation newCustomDelegation = new CustomDelegation();
                     newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
@@ -74,6 +69,12 @@ public class DelegateHandler implements EventHandler {
                     //新增分析结果AddSet
                     stakingStage.insertDelegation(newCustomDelegation);
                 }
+
+                //todo：交易数据回填
+                //交易数据tx_info补全
+                param.setNodeName(latestStaking.getStakingName());
+                param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+                tx.setTxInfo(JSON.toJSONString(param));
             } catch (NoSuchBeanException e) {
                 logger.error("{}", e.getMessage());
             }

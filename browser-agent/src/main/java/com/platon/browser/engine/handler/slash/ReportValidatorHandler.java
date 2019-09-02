@@ -52,13 +52,13 @@ public class ReportValidatorHandler implements EventHandler {
                 evidencesParam.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
 
                 //多签举报，惩罚金额
-                Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashRate().doubleValue();
+                BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(bc.getChainConfig().getDuplicateSignLowSlashRate());
                 //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
-                latestStaking.setStakingLocked(new BigDecimal(latestStaking.getStakingLocked()).add(new BigDecimal(latestStaking.getStakingHas())).subtract(new BigDecimal(slashValue.toString())).toString());
+                latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
                 //设置离开时间
                 latestStaking.setLeaveTime(new Date());
                 //判断现在的锁定期金额是否大于零
-                if (new BigInteger(latestStaking.getStakingLocked()).compareTo(BigInteger.ZERO) == 1) {
+                if (latestStaking.integerStakingLocked().compareTo(BigInteger.ZERO) > 0) {
                     latestStaking.setStakingReduction(latestStaking.getStakingLocked());
                     latestStaking.setStakingLocked("0");
                     Integer reduction = bc.getCurSettingEpoch().intValue();

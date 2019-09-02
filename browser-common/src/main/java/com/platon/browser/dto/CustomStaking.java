@@ -76,11 +76,6 @@ public class CustomStaking extends Staking {
         this.setIsInit(YesNoEnum.NO.code);
     }
 
-    // staking与delegation的关联键
-    public String getStakingMapKey(){
-        return this.getNodeId()+this.getStakingBlockNum();
-    }
-
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalStakingLocked(){return new BigDecimal(this.getStakingLocked());}
     public BigDecimal decimalStakingHas(){return new BigDecimal(this.getStakingHas());}
