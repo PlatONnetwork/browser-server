@@ -59,9 +59,8 @@ public class DbService {
     @Autowired
     private NetworkStatCacheService networkStatCacheService;
 
-
     @Transactional
-    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) throws Exception {
+    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {
@@ -80,9 +79,10 @@ public class DbService {
         }
         // 统计数据入库并更新redis缓存
         NetworkStatStage nsr = bizData.getNetworkStatStage();
-        if (nsr.getNetworkStatUpdateStage().size() > 0) {
-            customNetworkStatMapper.batchInsertOrUpdateSelective(nsr.getNetworkStatUpdateStage(), NetworkStat.Column.values());
-            networkStatCacheService.update(nsr.getNetworkStatUpdateStage());
+        Set<NetworkStat> networkStats = nsr.exportNetworkStat();
+        if (networkStats.size() > 0) {
+            customNetworkStatMapper.batchInsertOrUpdateSelective(networkStats, NetworkStat.Column.values());
+            networkStatCacheService.update(networkStats);
         }
         // ****************批量新增或更新质押相关数据*******************
         StakingStage ser = bizData.getStakingStage();
@@ -121,9 +121,9 @@ public class DbService {
         if(addresses.size()>0) customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
 
         // ****************新增锁仓计划相关数据*******************
-        RestrictingStage stage = bizData.getRestrictingStage();
+        RestrictingStage rs = bizData.getRestrictingStage();
         //批量插入锁仓计划
-        Set<RpPlan> planSet = stage.exportRpPlan();
+        Set<RpPlan> planSet = rs.exportRpPlan();
         if(planSet.size()>0)rpPlanMapper.batchInsert(new ArrayList <>(planSet));
     }
 }

@@ -1,6 +1,7 @@
 package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.RpPlan;
+import com.platon.browser.dto.CustomRpPlan;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,24 +13,22 @@ import java.util.Set;
  */
 public class RestrictingStage {
 
-    private Set <RpPlan> insertRpPlanStage = new HashSet <>();
+    private Set <CustomRpPlan> insertRpPlanStage = new HashSet <>();
 
     public void clear () {
         insertRpPlanStage.clear();
     }
 
-    public void insertRpPlan ( RpPlan rpPlan ) {
+    public void insertRpPlan ( CustomRpPlan rpPlan ) {
         insertRpPlanStage.add(rpPlan);
+    }
+
+    public Set <CustomRpPlan> getRpPlan () {
+        return insertRpPlanStage;
     }
 
     public Set <RpPlan> exportRpPlan () {
         Set <RpPlan> returnData = new HashSet <>(insertRpPlanStage);
         return returnData;
     }
-
-    public Set <RpPlan> getRpPlan () {
-        return insertRpPlanStage;
-    }
-
-
 }

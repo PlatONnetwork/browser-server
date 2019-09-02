@@ -2,6 +2,9 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.NetworkStat;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * User: dongqile
  * Date: 2019/8/20
@@ -30,5 +33,20 @@ public class CustomNetworkStat extends NetworkStat {
         this.setAddIssueEnd(0L);
         this.setNextSetting(0L);
     }
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalBlockReward(){return new BigDecimal(this.getBlockReward());}
+    public BigDecimal decimalIssueValue(){return new BigDecimal(this.getIssueValue());}
+    public BigDecimal decimalStakingDelegationValue(){return new BigDecimal(this.getStakingDelegationValue());}
+    public BigDecimal decimalStakingReward(){return new BigDecimal(this.getStakingReward());}
+    public BigDecimal decimalStakingValue(){return new BigDecimal(this.getStakingValue());}
+    public BigDecimal decimalTurnValue(){return new BigDecimal(this.getTurnValue());}
+    /********把字符串类数值转换为大整数的便捷方法********/
+    public BigInteger integerBlockReward(){return new BigInteger(this.getBlockReward());}
+    public BigInteger integerIssueValue(){return new BigInteger(this.getIssueValue());}
+    public BigInteger integerStakingDelegationValue(){return new BigInteger(this.getStakingDelegationValue());}
+    public BigInteger integerStakingReward(){return new BigInteger(this.getStakingReward());}
+    public BigInteger integerStakingValue(){return new BigInteger(this.getStakingValue());}
+    public BigInteger integerTurnValue(){return new BigInteger(this.getTurnValue());}
 
 }
