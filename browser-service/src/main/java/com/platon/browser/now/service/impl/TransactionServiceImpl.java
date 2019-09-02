@@ -294,15 +294,17 @@ public class TransactionServiceImpl implements TransactionService {
 					stakingKey.setNodeId(createValidatorParam.getNodeId());
 					stakingKey.setStakingBlockNum(Long.valueOf(createValidatorParam.getBlockNumber()));
 					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
-					resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
-					resp.setNodeId(createValidatorParam.getNodeId());
-					resp.setNodeName(createValidatorParam.getNodeName());
-					resp.setExternalId(createValidatorParam.getExternalId());
-					resp.setWebsite(createValidatorParam.getWebsite());
-					resp.setDetails(createValidatorParam.getDetails());
-					resp.setProgramVersion(createValidatorParam.getProgramVersion());
-					resp.setTxAmount(createValidatorParam.getAmount());
+					if(staking != null) {
+						resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
+						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
+						resp.setNodeId(createValidatorParam.getNodeId());
+						resp.setNodeName(createValidatorParam.getNodeName());
+						resp.setExternalId(createValidatorParam.getExternalId());
+						resp.setWebsite(createValidatorParam.getWebsite());
+						resp.setDetails(createValidatorParam.getDetails());
+						resp.setProgramVersion(createValidatorParam.getProgramVersion());
+						resp.setTxAmount(createValidatorParam.getAmount());
+					}
 					break;
 				//编辑验证人
 				case EDIT_VALIDATOR:
@@ -440,19 +442,17 @@ public class TransactionServiceImpl implements TransactionService {
 				case REPORT_VALIDATOR:
 					ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
 					List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
-		/*			for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
-						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
-						transactionDetailsEvidencesResp.setNodeName(evidencesParam.getNodeName());
-						transactionDetailsEvidencesResp.setVerify(evidencesParam.getVerify());
-						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
-					}*/
+					TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
+					transactionDetailsEvidencesResp.setNodeName(reportValidatorParam.getNodeName());
+					transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
+					transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
 					Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 					if(slash != null) {
 						resp.setReportRewards(slash.getReward());
 						resp.setRedeemStatus(slash.getStatus());
 						resp.setEvidence(slash.getData());
 					}
-					resp.setReportType(1);
+					resp.setReportType(reportValidatorParam.getType().intValue());
 					resp.setEvidences(transactionDetailsEvidencesResps);
 					break;
 				case CREATE_RESTRICTING:

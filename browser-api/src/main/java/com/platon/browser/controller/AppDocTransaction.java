@@ -254,7 +254,7 @@ public interface AppDocTransaction {
      *       "declareVersion":"",      //声明的版本 
      *       "txReceiptStatus":"",     //交易状态 1:成功 0：失败
      *       "evidence":"",   //证据
-     *       "reportType":"",//举报类型:1：区块双签
+     *       "reportType":"",//举报类型:1：prepareBlock，2：prepareVote，3：viewChange
      *       "reportRewards":"",//举报奖励
      *       "reportStatus":"",//举报状态 \r\n1：失败\r\n2：成功
      *       "pipNum":"",//提案pip编号

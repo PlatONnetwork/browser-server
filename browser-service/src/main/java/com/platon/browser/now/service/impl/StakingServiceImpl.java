@@ -93,15 +93,18 @@ public class StakingServiceImpl implements StakingService {
 		 */
 		switch (StakingStatusEnum.valueOf(req.getQueryStatus().toUpperCase())) {
 			case ALL:
+				/** 查询候选人 */
+				status = StakingStatusEnum.CANDIDATE.getCode();
 				break;
 			case ACTIVE:
 				/** 活跃中代表即使后续同时也是共识周期验证人 */
-				status = StakingStatusEnum.ACTIVE.getCode();
+				status = StakingStatusEnum.CANDIDATE.getCode();
 				isConsensus = CustomStaking.YesNoEnum.YES.getCode();
 				break;
 			case CANDIDATE:
 				/** 查询候选人 */
 				status = StakingStatusEnum.CANDIDATE.getCode();
+				isConsensus = CustomStaking.YesNoEnum.NO.getCode();
 				break;
 			default:
 				break;
