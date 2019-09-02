@@ -65,13 +65,13 @@ public enum ReqTransactionTypeEnum {
 		List<String> list = new ArrayList<String>();
 		if(ReqTransactionTypeEnum.TRANSACTION_TRANSFER.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.TRANSFER.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CONTRACT_CREATION.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CONTRACT_EXECUTION.getCode()));
-			list.add(String.valueOf(TxTypeEnum.OTHERS.getCode()));
-			list.add(String.valueOf(TxTypeEnum.MPC.getCode()));
-			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
-			list.add(String.valueOf(TxTypeEnum.DUPLICATE_SIGN.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.CONTRACT_CREATION.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.CONTRACT_EXECUTION.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.OTHERS.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.MPC.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.DUPLICATE_SIGN.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_DELEGATE.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.DELEGATE.getCode()));
@@ -82,6 +82,7 @@ public enum ReqTransactionTypeEnum {
 			list.add(String.valueOf(TxTypeEnum.EDIT_VALIDATOR.getCode()));
 			list.add(String.valueOf(TxTypeEnum.INCREASE_STAKING.getCode()));
 			list.add(String.valueOf(TxTypeEnum.EXIT_VALIDATOR.getCode()));
+			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_PROPOSAL.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_TEXT.getCode()));
