@@ -3,7 +3,8 @@ package com.platon.browser.engine.stage;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Auther: Chendongming
@@ -12,18 +13,18 @@ import java.util.*;
  */
 public class StakingStage {
     // 插入或更新数据
-    private Set<Node> nodeInsertStage = new HashSet<>();
-    private Set<Node> nodeUpdateStage = new HashSet<>();
-    private Set<Staking> stakingInsertStage = new HashSet<>();
-    private Set<Staking> stakingUpdateStage = new HashSet<>();
-    private Set<Delegation> delegationInsertStage = new HashSet<>();
-    private Set<Delegation> delegationUpdateStage = new HashSet<>();
-    private Set<UnDelegation> unDelegationInsertStage = new HashSet<>();
-    private Set<UnDelegation> unDelegationUpdateStage = new HashSet<>();
-    private Set<Slash> slashInsertStage = new HashSet<>();
-    private Set<Slash> slashUpdateStage = new HashSet<>();
-    private Set<NodeOpt> nodeOptInsertStage = new HashSet<>();
-    private Set<NodeOpt> nodeOptUpdateStage = new HashSet<>();
+    private Set<CustomNode> nodeInsertStage = new HashSet<>();
+    private Set<CustomNode> nodeUpdateStage = new HashSet<>();
+    private Set<CustomStaking> stakingInsertStage = new HashSet<>();
+    private Set<CustomStaking> stakingUpdateStage = new HashSet<>();
+    private Set<CustomDelegation> delegationInsertStage = new HashSet<>();
+    private Set<CustomDelegation> delegationUpdateStage = new HashSet<>();
+    private Set<CustomUnDelegation> unDelegationInsertStage = new HashSet<>();
+    private Set<CustomUnDelegation> unDelegationUpdateStage = new HashSet<>();
+    private Set<CustomSlash> slashInsertStage = new HashSet<>();
+    private Set<CustomSlash> slashUpdateStage = new HashSet<>();
+    private Set<CustomNodeOpt> nodeOptInsertStage = new HashSet<>();
+    private Set<CustomNodeOpt> nodeOptUpdateStage = new HashSet<>();
 
     /**
      * 清除待入库暂存空间
@@ -44,18 +45,18 @@ public class StakingStage {
     }
 
 
-    public void insertNode(Node node){
+    public void insertNode(CustomNode node){
         nodeInsertStage.add(node);
     }
 
-    public void updateNode(Node node){
+    public void updateNode(CustomNode node){
         nodeUpdateStage.add(node);
     }
 
-    public void insertStaking(Staking staking){
+    public void insertStaking(CustomStaking staking){
         stakingInsertStage.add(staking);
     }
-    public void insertStaking(Staking staking,CustomTransaction tx){
+    public void insertStaking(CustomStaking staking,CustomTransaction tx){
         stakingInsertStage.add(staking);
         // 构建操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.CREATE);
@@ -63,10 +64,10 @@ public class StakingStage {
         // 暂存至待入库节点操作日志列表
         insertNodeOpt(nodeOpt);
     }
-    public void updateStaking(Staking staking){
+    public void updateStaking(CustomStaking staking){
         stakingUpdateStage.add(staking);
     }
-    public void updateStaking(Staking staking,CustomTransaction tx){
+    public void updateStaking(CustomStaking staking,CustomTransaction tx){
         stakingUpdateStage.add(staking);
         // 构建操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.MODIFY);
@@ -74,35 +75,71 @@ public class StakingStage {
         insertNodeOpt(nodeOpt);
     }
 
-    public void insertDelegation(Delegation delegation){
+    public void insertDelegation(CustomDelegation delegation){
         delegationInsertStage.add(delegation);
     }
-    public void updateDelegation(Delegation delegation){
+    public void updateDelegation(CustomDelegation delegation){
         delegationUpdateStage.add(delegation);
     }
 
 
-    public void insertUnDelegation(UnDelegation unDelegation){
+    public void insertUnDelegation(CustomUnDelegation unDelegation){
         unDelegationInsertStage.add(unDelegation);
     }
-    public void updateUnDelegation(UnDelegation unDelegation){
+    public void updateUnDelegation(CustomUnDelegation unDelegation){
         unDelegationUpdateStage.add(unDelegation);
     }
 
-    public void insertSlash(Slash slash){
+    public void insertSlash(CustomSlash slash){
         slashInsertStage.add(slash);
     }
-    public void updateSlash(Slash slash){
+    public void updateSlash(CustomSlash slash){
         slashUpdateStage.add(slash);
     }
 
-    public void insertNodeOpt(NodeOpt nodeOpt){
+    public void insertNodeOpt(CustomNodeOpt nodeOpt){
         nodeOptInsertStage.add(nodeOpt);
     }
-    public void updateNodeOpt(NodeOpt nodeOpt){
+    public void updateNodeOpt(CustomNodeOpt nodeOpt){
         nodeOptUpdateStage.add(nodeOpt);
     }
 
+    public Set<CustomNode> getNodeInsertStage() {
+        return nodeInsertStage;
+    }
+    public Set<CustomNode> getNodeUpdateStage() {
+        return nodeUpdateStage;
+    }
+    public Set<CustomStaking> getStakingInsertStage() {
+        return stakingInsertStage;
+    }
+    public Set<CustomStaking> getStakingUpdateStage() {
+        return stakingUpdateStage;
+    }
+    public Set<CustomDelegation> getDelegationInsertStage() {
+        return delegationInsertStage;
+    }
+    public Set<CustomDelegation> getDelegationUpdateStage() {
+        return delegationUpdateStage;
+    }
+    public Set<CustomUnDelegation> getUnDelegationInsertStage() {
+        return unDelegationInsertStage;
+    }
+    public Set<CustomUnDelegation> getUnDelegationUpdateStage() {
+        return unDelegationUpdateStage;
+    }
+    public Set<CustomSlash> getSlashInsertStage() {
+        return slashInsertStage;
+    }
+    public Set<CustomSlash> getSlashUpdateStage() {
+        return slashUpdateStage;
+    }
+    public Set<CustomNodeOpt> getNodeOptInsertStage() {
+        return nodeOptInsertStage;
+    }
+    public Set<CustomNodeOpt> getNodeOptUpdateStage() {
+        return nodeOptUpdateStage;
+    }
 
     public Set<Node> exportNode(){
         Set<Node> returnData = new HashSet<>(nodeInsertStage);
@@ -133,53 +170,5 @@ public class StakingStage {
         Set<NodeOpt> returnData = new HashSet<>(nodeOptInsertStage);
         returnData.addAll(nodeOptUpdateStage);
         return returnData;
-    }
-
-    public Set<Node> getNodeInsertStage() {
-        return nodeInsertStage;
-    }
-
-    public Set<Node> getNodeUpdateStage() {
-        return nodeUpdateStage;
-    }
-
-    public Set<Staking> getStakingInsertStage() {
-        return stakingInsertStage;
-    }
-
-    public Set<Staking> getStakingUpdateStage() {
-        return stakingUpdateStage;
-    }
-
-    public Set<Delegation> getDelegationInsertStage() {
-        return delegationInsertStage;
-    }
-
-    public Set<Delegation> getDelegationUpdateStage() {
-        return delegationUpdateStage;
-    }
-
-    public Set<UnDelegation> getUnDelegationInsertStage() {
-        return unDelegationInsertStage;
-    }
-
-    public Set<UnDelegation> getUnDelegationUpdateStage() {
-        return unDelegationUpdateStage;
-    }
-
-    public Set<Slash> getSlashInsertStage() {
-        return slashInsertStage;
-    }
-
-    public Set<Slash> getSlashUpdateStage() {
-        return slashUpdateStage;
-    }
-
-    public Set<NodeOpt> getNodeOptInsertStage() {
-        return nodeOptInsertStage;
-    }
-
-    public Set<NodeOpt> getNodeOptUpdateStage() {
-        return nodeOptUpdateStage;
     }
 }

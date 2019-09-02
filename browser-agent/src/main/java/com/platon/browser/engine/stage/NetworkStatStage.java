@@ -1,6 +1,7 @@
 package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dto.CustomNetworkStat;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -13,12 +14,12 @@ import java.util.Set;
  */
 @Data
 public class NetworkStatStage {
-    private Set <NetworkStat> networkStatInsertStage = new HashSet <>();
-    private Set <NetworkStat> networkStatUpdateStage = new HashSet <>();
-    public void insertNetworkStat( NetworkStat networkStat){
+    private Set <CustomNetworkStat> networkStatInsertStage = new HashSet <>();
+    private Set <CustomNetworkStat> networkStatUpdateStage = new HashSet <>();
+    public void insertNetworkStat( CustomNetworkStat networkStat){
         networkStatInsertStage.add(networkStat);
     }
-    public void updateNetworkStat( NetworkStat networkStat){
+    public void updateNetworkStat( CustomNetworkStat networkStat){
         networkStatUpdateStage.add(networkStat);
     }
     public void clear() {
@@ -26,19 +27,16 @@ public class NetworkStatStage {
         networkStatUpdateStage.clear();
     }
 
+    public Set<CustomNetworkStat> getNetworkStatInsertStage() {
+        return networkStatInsertStage;
+    }
+    public Set<CustomNetworkStat> getNetworkStatUpdateStage() {
+        return networkStatUpdateStage;
+    }
 
     public Set<NetworkStat> exportNetworkStat(){
         Set<NetworkStat> returnData = new HashSet<>(networkStatInsertStage);
         returnData.addAll(networkStatUpdateStage);
         return returnData;
     }
-    public Set<NetworkStat> getNetworkStatInsertStage() {
-        return networkStatInsertStage;
-    }
-
-    public Set<NetworkStat> getNetworkStatUpdateStage() {
-        return networkStatUpdateStage;
-    }
-
-
 }

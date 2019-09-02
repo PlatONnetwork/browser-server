@@ -2,7 +2,7 @@ package com.platon.browser.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.param.EvidencesParam;
+import com.platon.browser.param.ReportValidatorParam;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.Map;
 @Data
 public class CustomSlash extends Slash {
 
-    public void updateWithSlash( CustomTransaction tx , EvidencesParam param){
+    public void updateWithSlash( CustomTransaction tx , ReportValidatorParam param){
         this.setNodeId(param.getVerify());
         String date = JSON.toJSONString(param);
         this.setData(date);

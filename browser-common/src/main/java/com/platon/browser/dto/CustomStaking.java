@@ -76,16 +76,11 @@ public class CustomStaking extends Staking {
         this.setIsInit(YesNoEnum.NO.code);
     }
 
-    // staking与delegation的关联键
-    public String getStakingMapKey(){
-        return this.getNodeId()+this.getStakingBlockNum();
-    }
-
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalStakingLocked(){return new BigDecimal(this.getStakingLocked());}
     public BigDecimal decimalStakingHas(){return new BigDecimal(this.getStakingHas());}
-    public BigDecimal decimalBlockReward(){return new BigDecimal(this.getBlockRewardValue());}
-    public BigDecimal decimalStakingReward(){return new BigDecimal(this.getStakingRewardValue());}
+    public BigDecimal decimalBlockRewardValue(){return new BigDecimal(this.getBlockRewardValue());}
+    public BigDecimal decimalStakingRewardValue(){return new BigDecimal(this.getStakingRewardValue());}
     public BigDecimal decimalStakingReduction(){return new BigDecimal(this.getStakingReduction());}
     public BigDecimal decimalStatDelegateHas(){return new BigDecimal(this.getStatDelegateHas());}
     public BigDecimal decimalStatDelegateLocked(){return new BigDecimal(this.getStatDelegateLocked());}
@@ -93,8 +88,8 @@ public class CustomStaking extends Staking {
     /********把字符串类数值转换为大整数的便捷方法********/
     public BigInteger integerStakingLocked(){return new BigInteger(this.getStakingLocked());}
     public BigInteger integerStakingHas(){return new BigInteger(this.getStakingHas());}
-    public BigInteger integerBlockReward(){return new BigInteger(this.getBlockRewardValue());}
-    public BigInteger integerStakingReward(){return new BigInteger(this.getStakingRewardValue());}
+    public BigInteger integerBlockRewardValue(){return new BigInteger(this.getBlockRewardValue());}
+    public BigInteger integerStakingRewardValue(){return new BigInteger(this.getStakingRewardValue());}
     public BigInteger integerStakingReduction(){return new BigInteger(this.getStakingReduction());}
     public BigInteger integerStatDelegateHas(){return new BigInteger(this.getStatDelegateHas());}
     public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}

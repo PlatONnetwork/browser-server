@@ -1,48 +1,12 @@
 package com.platon.browser.now.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.dao.entity.UnDelegation;
-import com.platon.browser.dao.mapper.CustomVoteMapper;
-import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dao.mapper.SlashMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
-import com.platon.browser.dao.mapper.UnDelegationMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVoteProposal;
@@ -56,17 +20,7 @@ import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
-import com.platon.browser.param.CreateRestrictingParam;
-import com.platon.browser.param.CreateValidatorParam;
-import com.platon.browser.param.DeclareVersionParam;
-import com.platon.browser.param.DelegateParam;
-import com.platon.browser.param.EditValidatorParam;
-import com.platon.browser.param.EvidencesParam;
-import com.platon.browser.param.ExitValidatorParam;
-import com.platon.browser.param.IncreaseStakingParam;
-import com.platon.browser.param.PlanParam;
-import com.platon.browser.param.ReportValidatorParam;
-import com.platon.browser.param.UnDelegateParam;
+import com.platon.browser.param.*;
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
@@ -81,6 +35,27 @@ import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 交易方法逻辑实现
@@ -465,12 +440,12 @@ public class TransactionServiceImpl implements TransactionService {
 				case REPORT_VALIDATOR:
 					ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
 					List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
-					for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
+		/*			for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setNodeName(evidencesParam.getNodeName());
 						transactionDetailsEvidencesResp.setVerify(evidencesParam.getVerify());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
-					}
+					}*/
 					Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 					if(slash != null) {
 						resp.setReportRewards(slash.getReward());

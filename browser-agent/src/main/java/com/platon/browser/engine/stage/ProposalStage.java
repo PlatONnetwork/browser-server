@@ -2,6 +2,8 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomVote;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,10 +15,10 @@ import java.util.Set;
  */
 public class ProposalStage {
     // 插入或更新数据
-    private Set<Proposal> proposalInsertStage = new HashSet<>();
-    private Set<Proposal> proposalUpdateStage = new HashSet<>();
-    private Set<Vote> voteInsertStage = new HashSet<>();
-    private Set<Vote> voteUpdateStage = new HashSet<>();
+    private Set<CustomProposal> proposalInsertStage = new HashSet<>();
+    private Set<CustomProposal> proposalUpdateStage = new HashSet<>();
+    private Set<CustomVote> voteInsertStage = new HashSet<>();
+    private Set<CustomVote> voteUpdateStage = new HashSet<>();
     public void clear() {
         proposalInsertStage.clear();
         proposalUpdateStage.clear();
@@ -24,18 +26,31 @@ public class ProposalStage {
         voteUpdateStage.clear();
     }
 
-    public void insertProposal( Proposal proposal){
+    public void insertProposal( CustomProposal proposal){
         proposalInsertStage.add(proposal);
     }
-    public void updateProposal( Proposal proposal){
+    public void updateProposal( CustomProposal proposal){
         proposalUpdateStage.add(proposal);
     }
 
-    public void insertVote( Vote vote){
+    public void insertVote( CustomVote vote){
         voteInsertStage.add(vote);
     }
-    public void updateVote( Vote vote){
+    public void updateVote( CustomVote vote){
         voteUpdateStage.add(vote);
+    }
+
+    public Set<CustomProposal> getProposalInsertStage() {
+        return proposalInsertStage;
+    }
+    public Set<CustomProposal> getProposalUpdateStage() {
+        return proposalUpdateStage;
+    }
+    public Set<CustomVote> getVoteInsertStage() {
+        return voteInsertStage;
+    }
+    public Set<CustomVote> getVoteUpdateStage() {
+        return voteUpdateStage;
     }
 
     public Set<Proposal> exportProposal(){
@@ -43,26 +58,9 @@ public class ProposalStage {
         returnData.addAll(proposalUpdateStage);
         return returnData;
     }
-
     public Set<Vote> exportVote(){
         Set<Vote> returnData = new HashSet<>(voteInsertStage);
         returnData.addAll(voteUpdateStage);
         return returnData;
-    }
-
-    public Set<Proposal> getProposalInsertStage() {
-        return proposalInsertStage;
-    }
-
-    public Set<Proposal> getProposalUpdateStage() {
-        return proposalUpdateStage;
-    }
-
-    public Set<Vote> getVoteInsertStage() {
-        return voteInsertStage;
-    }
-
-    public Set<Vote> getVoteUpdateStage() {
-        return voteUpdateStage;
     }
 }

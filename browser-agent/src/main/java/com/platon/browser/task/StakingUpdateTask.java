@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -26,9 +27,9 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
  * @Description: 质押信息更新任务
  */
 @Component
-public class StakingInfoUpdateTask {
+public class StakingUpdateTask {
 
-    private static Logger logger = LoggerFactory.getLogger(StakingInfoUpdateTask.class);
+    private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
 
     @Autowired
     private BlockChain blockChain;
@@ -48,6 +49,7 @@ public class StakingInfoUpdateTask {
                     try {
                         String queryResult = MarkDownParserUtil.httpGet(queryUrl);
                         KeyBaseUser keyBaseUser = JSON.parseObject(queryResult, KeyBaseUser.class);
+                        if(keyBaseUser==null) return;
                         List <Completion> completions = keyBaseUser.getCompletions();
                         if (completions == null || completions.size() == 0) return;
                         // 取最新一条
@@ -59,11 +61,10 @@ public class StakingInfoUpdateTask {
                         Components components = completion.getComponents();
                         String username = components.getUsername().getVal();
                         customStaking.setExternalName(username);
-
+                        // 把改动后的内容暂存至待更新列表
+                        STAGE_DATA.getStakingStage().updateStaking(customStaking);
                     } catch (IOException e) {
-                        logger.error("[StakingInfoUpdateTask] IOException {}", e.getMessage());
-                    } catch (Exception e) {
-                        logger.error("[StakingInfoUpdateTask] Exception {}", e.getMessage());
+                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                     }
                 }
             });

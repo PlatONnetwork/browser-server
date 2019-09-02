@@ -2,6 +2,9 @@ package com.platon.browser.param;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * User: dongqile
  * Date: 2019/8/6
@@ -75,4 +78,9 @@ public class CreateValidatorParam {
         this.setAmount(amount);
         this.setProgramVersion(programVersion);
     }
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalAmount(){return new BigDecimal(amount);}
+    /********把字符串类数值转换为大整数的便捷方法********/
+    public BigInteger integerAmount(){return new BigInteger(amount);}
 }

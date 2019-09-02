@@ -40,11 +40,6 @@ public class NewElectionEpochHandler implements EventHandler {
     public void handle(EventContext context) throws ElectionEpochChangeException {
         StakingStage stakingStage = context.getStakingStage();
 
-        if(bc.getCurConsensusEpoch().longValue()==1){
-            // 因为第一轮共识没有前一轮，所以不处理
-            return;
-        }
-
         // <节点ID, 前一共识轮出块数({}),前一共识轮出块率({}),处罚率(),被罚金额({})>
         Map<String,String> slashInfo = new HashMap<>();
         String tpl = "当前区块号({CUR_NUMBER}),前一共识轮出块数(PRE_QTY),前一共识轮出块率(PRE_BLOCK_RATE),处罚率(SLASH_RATE),被罚金额(SLASH_AMOUNT)";
@@ -65,8 +60,8 @@ public class NewElectionEpochHandler implements EventHandler {
                 info = info.replace("PRE_QTY",staking.getPreConsBlockQty().toString());
                 info = info.replace("PRE_BLOCK_RATE",blockRate.toString());
 
-                BigDecimal stakingHas = new BigDecimal(staking.getStakingHas());
-                BigDecimal stakingLocked = new BigDecimal(staking.getStakingLocked());
+                BigDecimal stakingHas = staking.decimalStakingHas();
+                BigDecimal stakingLocked = staking.decimalStakingLocked();
                 // 判断当前出块率是否小于等于最高处罚百分比
                 boolean isHighSlash = blockRate.compareTo(bc.getChainConfig().getBlockRate4HighSlash())<=0;
                 // 确定处罚比例

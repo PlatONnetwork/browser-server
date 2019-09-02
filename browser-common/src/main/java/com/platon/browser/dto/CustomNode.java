@@ -27,9 +27,9 @@ public class CustomNode extends Node {
           // 出块率低举报次数
           this.setStatSlashLowQty(0);
           // 节点处块数统计
-          this.setStatBlockQty(0l);
+          this.setStatBlockQty(0L);
           // 节点期望出块数
-          this.setStatExpectBlockQty(0l);
+          this.setStatExpectBlockQty(0L);
           // 节点收益统计(出块奖励 + 质押奖励)
           this.setStatRewardValue("0");
           // 进入共识验证轮次数

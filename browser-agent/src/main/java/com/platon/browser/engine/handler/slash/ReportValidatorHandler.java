@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.slash;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -9,7 +10,6 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.EvidencesParam;
 import com.platon.browser.param.ReportValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
@@ -33,60 +32,58 @@ public class ReportValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ReportValidatorHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
+
     @Override
-    public void handle(EventContext context) {
+    public void handle ( EventContext context ) {
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
-        List <EvidencesParam> evidencesParams = param.getData();
         //通过结果获取，证据中的举报人的nodeId
-        evidencesParams.forEach(evidencesParam -> {
-            try {
-                CustomStaking latestStaking = NODE_CACHE.getNode(evidencesParam.getVerify()).getLatestStaking();
-                logger.debug("多签举报信息:{}", JSON.toJSONString(param));
-
-                //交易数据回填
-                evidencesParam.setNodeName(latestStaking.getStakingName());
-                evidencesParam.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
-
-                //多签举报，惩罚金额
-                Double slashValue = Double.parseDouble(latestStaking.getStakingLocked()) * bc.getChainConfig().getDuplicateSignLowSlashRate().doubleValue();
-                //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
-                latestStaking.setStakingLocked(new BigDecimal(latestStaking.getStakingLocked()).add(new BigDecimal(latestStaking.getStakingHas())).subtract(new BigDecimal(slashValue.toString())).toString());
-                //设置离开时间
-                latestStaking.setLeaveTime(new Date());
-                //判断现在的锁定期金额是否大于零
-                if (new BigInteger(latestStaking.getStakingLocked()).compareTo(BigInteger.ZERO) == 1) {
-                    latestStaking.setStakingReduction(latestStaking.getStakingLocked());
-                    latestStaking.setStakingLocked("0");
-                    Integer reduction = bc.getCurSettingEpoch().intValue();
-                    latestStaking.setStakingReductionEpoch(reduction);
-                    latestStaking.setStatus(CustomStaking.StatusEnum.EXITING.code);
-                }else {
-                    latestStaking.setStakingLocked("0");
-                    latestStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
-                }
-                latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
-                latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
-                //更新分析质押结果
-                stakingStage.updateStaking(latestStaking ,tx);
-
-                //新增举报交易结构
-                CustomSlash newCustomSlash = new CustomSlash();
-                newCustomSlash.updateWithSlash(tx,evidencesParam);
-                newCustomSlash.setReward(slashValue.toString());
-                newCustomSlash.setSlashRate(bc.getChainConfig().getDuplicateSignLowSlashRate().toString());
-
-                //新增分析多重签名结果
-                stakingStage.insertSlash(newCustomSlash);
-            } catch (NoSuchBeanException e) {
-                logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
+        try {
+            CustomStaking latestStaking = NODE_CACHE.getNode(param.getVerify()).getLatestStaking();
+            logger.debug("多签举报信息:{}", JSON.toJSONString(param));
+            //多签举报，惩罚金额
+            BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignLowSlashRate());
+            //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
+            latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
+            //设置离开时间
+            latestStaking.setLeaveTime(new Date());
+            //判断现在的锁定期金额是否大于零
+            if (latestStaking.integerStakingLocked().compareTo(BigInteger.ZERO) > 0) {
+                latestStaking.setStakingReduction(latestStaking.getStakingLocked());
+                latestStaking.setStakingLocked("0");
+                Integer reduction = bc.getCurSettingEpoch().intValue();
+                latestStaking.setStakingReductionEpoch(reduction);
+                latestStaking.setStatus(CustomStaking.StatusEnum.EXITING.code);
+            } else {
+                latestStaking.setStakingLocked("0");
+                latestStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
             }
+            latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
+            latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+            //更新分析质押结果
+            stakingStage.updateStaking(latestStaking, tx);
 
-            tx.setTxInfo(JSON.toJSONString(param));
-        });
+            //新增举报交易结构
+            CustomSlash slash = new CustomSlash();
+            slash.updateWithSlash(tx, param);
+            slash.setReward(slashValue.toString());
+            slash.setSlashRate(chainConfig.getDuplicateSignLowSlashRate().toString());
+
+            //新增分析多重签名结果
+            stakingStage.insertSlash(slash);
+
+            //交易数据回填
+            param.setNodeName(latestStaking.getStakingName());
+            param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+        } catch (NoSuchBeanException e) {
+            logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
+        }
+        tx.setTxInfo(JSON.toJSONString(param));
         logger.debug("举报多签(举报验证人)");
 
     }

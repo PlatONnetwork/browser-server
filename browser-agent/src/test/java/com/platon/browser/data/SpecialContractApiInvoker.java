@@ -119,12 +119,18 @@ public class SpecialContractApiInvoker {
 
         try {
 //            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.112.172:6789"));
-            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.120.76:6797"));
+            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 
-            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9840)).data;
-            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
-            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
-            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
+            BigInteger number = web3j2.platonBlockNumber().send().getBlockNumber();
+
+//            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9840)).data;
+//            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
+//            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
+//            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
+            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(4560));
+//            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
+//            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
+//            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
 
             BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(0));
             logger.debug("{}", JSON.toJSONString(node1,true));

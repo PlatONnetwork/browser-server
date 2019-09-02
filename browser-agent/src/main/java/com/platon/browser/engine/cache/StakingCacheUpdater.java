@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Map;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
@@ -43,7 +42,7 @@ public class StakingCacheUpdater {
             //if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
                 info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
                 // 当前共识周期出块奖励
-                BigDecimal curConsBlockReward = new BigDecimal(customStaking.getBlockRewardValue()).add(bc.getBlockReward());
+                BigDecimal curConsBlockReward = customStaking.decimalBlockRewardValue().add(bc.getBlockReward());
                 customStaking.setBlockRewardValue(curConsBlockReward.toString());
                 // 节点出块数加1
                 customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
@@ -57,6 +56,17 @@ public class StakingCacheUpdater {
         logger.debug("出块统计:{}", info);
     }
 
+
+    class Stat{
+        private BigInteger statDelegateHas,statDelegateLocked,statDelegateReduction,statDelegateQty;
+        public void reset(){
+            this.statDelegateHas = BigInteger.ZERO;
+            this.statDelegateLocked = BigInteger.ZERO;
+            this.statDelegateReduction = BigInteger.ZERO;
+            this.statDelegateQty = BigInteger.ZERO;
+        }
+    }
+    private Stat stat = new Stat();
     /**
      * 更新质押相关的统计信息，在批量采集后批量入库前执行
      *  1.补充统计质押相关数据
@@ -66,26 +76,22 @@ public class StakingCacheUpdater {
      *      d.stat_delegate_qty  关联的委托地址数
      */
     public void updateStakingStatistics () {
-        NODE_CACHE.getAllNode().forEach(node -> {
-            for (Map.Entry <Long, CustomStaking> customStakingMap : node.getStakings().entrySet()) {
-                //只统计不为历史的委托数据
-                BigInteger statDelegateHas = BigInteger.ZERO;
-                BigInteger statDelegateLocked = BigInteger.ZERO;
-                BigInteger statDelegateReduction = BigInteger.ZERO;
-                BigInteger statDelegateQty = BigInteger.ZERO;
-                for (Map.Entry <String, CustomDelegation> customDelegationMap : customStakingMap.getValue().getDelegations().entrySet()) {
-                    if (customDelegationMap.getValue().getIsHistory().equals(CustomDelegation.YesNoEnum.NO.code)) {
-                        statDelegateHas = statDelegateHas.add(new BigInteger(customDelegationMap.getValue().getDelegateHas()));
-                        statDelegateLocked = statDelegateLocked.add(new BigInteger(customDelegationMap.getValue().getDelegateLocked()));
-                        statDelegateReduction = statDelegateReduction.add(new BigInteger(customDelegationMap.getValue().getDelegateReduction()));
-                        statDelegateQty = statDelegateQty.add(BigInteger.ONE);
-                    }
+        NODE_CACHE.getAllStaking().forEach(staking -> {
+            stat.reset(); // 重置统计bean状态, 复用实例，避免大量创建对象
+            staking.getDelegations().forEach((senderAddr,delegation)->{
+                if (delegation.getIsHistory()==CustomDelegation.YesNoEnum.NO.code) {
+                    stat.statDelegateHas = stat.statDelegateHas.add(delegation.integerDelegateHas());
+                    stat.statDelegateLocked = stat.statDelegateLocked.add(delegation.integerDelegateLocked());
+                    stat.statDelegateReduction = stat.statDelegateReduction.add(delegation.integerDelegateReduction());
+                    stat.statDelegateQty = stat.statDelegateQty.add(BigInteger.ONE);
                 }
-                customStakingMap.getValue().setStatDelegateHas(statDelegateHas.toString());
-                customStakingMap.getValue().setStatDelegateLocked(statDelegateLocked.toString());
-                customStakingMap.getValue().setStatDelegateReduction(statDelegateReduction.toString());
-                customStakingMap.getValue().setStatDelegateQty(statDelegateQty.intValue());
-            }
+            });
+            staking.setStatDelegateHas(stat.statDelegateHas.toString());
+            staking.setStatDelegateLocked(stat.statDelegateLocked.toString());
+            staking.setStatDelegateReduction(stat.statDelegateReduction.toString());
+            staking.setStatDelegateQty(stat.statDelegateQty.intValue());
+            // 把质押信息改动暂存至待更新列表
+            STAGE_DATA.getStakingStage().updateStaking(staking);
         });
     }
 }

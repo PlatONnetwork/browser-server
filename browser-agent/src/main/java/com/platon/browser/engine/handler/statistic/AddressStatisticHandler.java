@@ -8,6 +8,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
+import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,19 @@ public class AddressStatisticHandler implements EventHandler {
             toAddress.setAddress(to);
             // 添加至全量缓存
             ADDRESS_CACHE.add(toAddress);
+        }
+
+        ContractDescEnum cde = ContractDescEnum.MAP.get(from);
+        if(cde!=null){
+            fromAddress.setContractName(cde.getContractName());
+            fromAddress.setContractCreate(cde.getCreator());
+            fromAddress.setContractCreatehash(cde.getContractHash());
+        }
+        cde = ContractDescEnum.MAP.get(to);
+        if(cde!=null){
+            toAddress.setContractName(cde.getContractName());
+            toAddress.setContractCreate(cde.getCreator());
+            toAddress.setContractCreatehash(cde.getContractHash());
         }
 
         // 更新与地址是from还是to无关的通用属性

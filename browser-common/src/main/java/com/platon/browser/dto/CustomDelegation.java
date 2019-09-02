@@ -4,6 +4,8 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.param.DelegateParam;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -27,6 +29,15 @@ public class CustomDelegation extends Delegation {
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalDelegateHas(){return new BigDecimal(this.getDelegateHas());}
+    public BigDecimal decimalDelegateLocked(){return new BigDecimal(this.getDelegateLocked());}
+    public BigDecimal decimalDelegateReduction(){return new BigDecimal(this.getDelegateReduction());}
+    /********把字符串类数值转换为大整数的便捷方法********/
+    public BigInteger integerDelegateHas(){return new BigInteger(this.getDelegateHas());}
+    public BigInteger integerDelegateLocked(){return new BigInteger(this.getDelegateLocked());}
+    public BigInteger integerDelegateReduction(){return new BigInteger(this.getDelegateReduction());}
 
     public YesNoEnum getIsHistoryEnum() {
         return YesNoEnum.getEnum(this.getIsHistory());

@@ -136,14 +136,14 @@ public class NewSettleEpochHandler implements EventHandler {
         List<CustomDelegation> delegations = NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
         delegations.forEach(delegation->{
             //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
-            delegation.setDelegateLocked(new BigInteger(delegation.getDelegateLocked()).add(new BigInteger(delegation.getDelegateHas())).toString());
+            delegation.setDelegateLocked(delegation.integerDelegateLocked().add(delegation.integerDelegateHas()).toString());
             //累加后的犹豫期金额至为0
             delegation.setDelegateHas("0");
             delegation.setDelegateReduction("0");
             //并判断经过一个结算周期后该委托的对应赎回是否全部完成，若完成则将委托设置为历史节点
             //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
-            BigInteger sumAoumt = new BigInteger(delegation.getDelegateHas()).add(new BigInteger(delegation.getDelegateLocked())).add(new BigInteger(delegation.getDelegateReduction()));
-            if (sumAoumt.compareTo(BigInteger.ZERO) == 0) {
+            BigInteger sumAmount = delegation.integerDelegateHas().add(delegation.integerDelegateLocked()).add(delegation.integerDelegateReduction());
+            if (sumAmount.compareTo(BigInteger.ZERO) == 0) {
                 delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
             }
             //添加需要更新的委托的信息到委托更新列表
@@ -182,8 +182,8 @@ public class NewSettleEpochHandler implements EventHandler {
         BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
         logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
 
-        List<CustomStaking> stakings = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
-        for(CustomStaking curStaking:stakings){
+        List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
+        for(CustomStaking curStaking:stakingList){
             // 调整金额状态
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
             curStaking.setStakingLocked(stakingLocked.toString());
@@ -203,7 +203,7 @@ public class NewSettleEpochHandler implements EventHandler {
             if(node!=null){
                 // 质押记录所属节点在前一轮结算周期的验证人列表中，则对其执行结算操作
                 // 累加质押奖励
-                BigInteger stakingRewardValue = curStaking.integerStakingReward().add(preVerifierStakingReward);
+                BigInteger stakingRewardValue = curStaking.integerStakingRewardValue().add(preVerifierStakingReward);
                 curStaking.setStakingRewardValue(stakingRewardValue.toString());
 
                 CustomNode customNode;
@@ -242,7 +242,7 @@ public class NewSettleEpochHandler implements EventHandler {
                         ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
                         // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
                         // 1、添加上一周期的收益
-                        BigInteger profit = curStaking.integerStakingReward().add(curStaking.integerBlockReward());
+                        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
                         ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
                         // 2、添加下一周期的质押成本
                         BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());

@@ -5,6 +5,7 @@ import com.platon.browser.param.UnDelegateParam;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,13 @@ public class CustomUnDelegation extends UnDelegation {
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
     }
+
+    /********把字符串类数值转换为大浮点数的便捷方法********/
+    public BigDecimal decimalApplyAmount(){return new BigDecimal(this.getApplyAmount());}
+    public BigDecimal decimalRedeemLocked(){return new BigDecimal(this.getRedeemLocked());}
+    /********把字符串类数值转换为大整数的便捷方法********/
+    public BigInteger integerApplyAmount(){return new BigInteger(this.getApplyAmount());}
+    public BigInteger integerRedeemLocked(){return new BigInteger(this.getRedeemLocked());}
 
     public StatusEnum getStatusEnum(){
         return StatusEnum.getEnum(this.getStatus());

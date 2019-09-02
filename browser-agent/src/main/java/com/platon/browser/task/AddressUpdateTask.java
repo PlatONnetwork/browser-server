@@ -14,6 +14,8 @@ import org.web3j.platon.BaseResponse;
 
 import java.util.*;
 
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:09
@@ -44,6 +46,8 @@ public class AddressUpdateTask {
                     if(rb!=null){
                         address.setRestrictingBalance(rb.getLockBalance()!=null?rb.getLockBalance().toString():"0");
                         address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
+                        // 把改动后的内容暂存至待更新列表
+                        STAGE_DATA.getAddressStage().updateAddress(address);
                     }
                 });
             }

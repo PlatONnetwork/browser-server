@@ -21,7 +21,7 @@ import java.util.Set;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
-    public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.addresses);
+    public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
