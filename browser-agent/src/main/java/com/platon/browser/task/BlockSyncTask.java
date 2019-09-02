@@ -507,7 +507,7 @@ public class BlockSyncTask {
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.addresses.contains(tx.getTo())){
+            if(null != tx.getValue() && ! InnerContractAddrEnum.ADDRESSES.contains(tx.getTo())){
                 tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.code));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }

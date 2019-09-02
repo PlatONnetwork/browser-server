@@ -38,9 +38,9 @@ public class CustomAddress extends Address {
         this.setDelegateLocked(BigInteger.ZERO.toString());
         this.setDelegateUnlock(BigInteger.ZERO.toString());
         this.setDelegateReduction(BigInteger.ZERO.toString());
-        this.setContractName("Unknown");
-        this.setContractCreate("Unknown");
-        this.setContractCreatehash("Unknown");
+        this.setContractName("");
+        this.setContractCreate("");
+        this.setContractCreatehash("");
     }
 
     /**
@@ -49,7 +49,7 @@ public class CustomAddress extends Address {
      */
     public void updateWithCustomTransaction(CustomTransaction tx) {
         // 设置地址类型
-        if(InnerContractAddrEnum.addresses.contains(this.getAddress())){
+        if(InnerContractAddrEnum.ADDRESSES.contains(this.getAddress())){
             // 内置合约地址
             this.setType(TypeEnum.INNER_CONTRACT.code);
         }else{

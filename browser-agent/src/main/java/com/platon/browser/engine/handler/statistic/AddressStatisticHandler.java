@@ -8,6 +8,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
+import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,12 @@ public class AddressStatisticHandler implements EventHandler {
         CustomAddress fromAddress;
         try {
             fromAddress = ADDRESS_CACHE.getAddress(from);
+            ContractDescEnum cde = ContractDescEnum.MAP.get(from);
+            if(cde!=null){
+                fromAddress.setContractName(cde.getContractName());
+                fromAddress.setContractCreate(cde.getCreator());
+                fromAddress.setContractCreatehash(cde.getContractHash());
+            }
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有from地址({})记录，添加一条",from);
             fromAddress = new CustomAddress();
@@ -54,6 +61,12 @@ public class AddressStatisticHandler implements EventHandler {
         CustomAddress toAddress;
         try {
             toAddress = ADDRESS_CACHE.getAddress(to);
+            ContractDescEnum cde = ContractDescEnum.MAP.get(to);
+            if(cde!=null){
+                toAddress.setContractName(cde.getContractName());
+                toAddress.setContractCreate(cde.getCreator());
+                toAddress.setContractCreatehash(cde.getContractHash());
+            }
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有to地址({})记录，添加一条",to);
             toAddress = new CustomAddress();
