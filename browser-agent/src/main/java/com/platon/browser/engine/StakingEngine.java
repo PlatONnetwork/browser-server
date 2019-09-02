@@ -1,5 +1,6 @@
 package com.platon.browser.engine;
 
+import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
@@ -93,6 +94,7 @@ public class StakingEngine {
         // |-加载撤销委托记录
         List<CustomUnDelegation> unDelegationList = customUnDelegationMapper.selectByNodeIdList(nodeIds);
         nodeCache.init(nodeList,stakingList,delegationList,unDelegationList);
+        nodeCache.sweep();
     }
 
     @PostConstruct

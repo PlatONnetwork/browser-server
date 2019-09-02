@@ -43,6 +43,7 @@ public class ExitValidatorHandler implements EventHandler {
             //交易info数据回填补充
             param.setNodeName(latestStaking.getStakingName());
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+            param.setAmount(latestStaking.integerStakingHas().add(latestStaking.integerStakingLocked()).toString());
             String txinfo = JSON.toJSONString(param);
             tx.setTxInfo(txinfo);
             stakingStage.updateStaking(latestStaking,tx);

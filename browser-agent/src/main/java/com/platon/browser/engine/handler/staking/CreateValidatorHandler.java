@@ -51,33 +51,28 @@ public class CreateValidatorHandler implements EventHandler {
              */
             logger.debug("节点(id={})已经被质押！",param.getNodeId());
             // 取当前节点最新质押信息
-            try {
-                CustomStaking latestStaking = node.getLatestStaking();
-                if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
-                    // 如果当前节点最新质押信息无效，则添加一条质押信息
-                    CustomStaking newStaking = new CustomStaking();
-                    // 使用最新的质押交易更新相关信息
-                    newStaking.updateWithCustomTransaction(tx);
-                    // 把最新质押信息添加至缓存
-                    node.getStakings().put(tx.getBlockNumber(),newStaking);
-                    // 把最新质押信息添加至待入库列表
-                    stakingStage.insertStaking(newStaking,tx);
-                    // 更新节点名称映射缓存
-                    NODE_NAME_MAP.put(newStaking.getNodeId(),newStaking.getStakingName());
-                }
-                if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
-                    // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
-                    logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), JSON.toJSONString(param));
-                }
-            } catch (NoSuchBeanException e) {
-                logger.error("{}",e.getMessage());
+            CustomStaking latestStaking = node.getLatestStaking();
+            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
+                // 如果当前节点最新质押信息无效，则添加一条质押信息
+                CustomStaking newStaking = new CustomStaking();
+                // 使用最新的质押交易更新相关信息
+                newStaking.updateWithCustomTransaction(tx);
+                // 把最新质押信息添加至缓存
+                node.getStakings().put(tx.getBlockNumber(),newStaking);
+                // 把最新质押信息添加至待入库列表
+                stakingStage.insertStaking(newStaking,tx);
+                // 更新节点名称映射缓存
+                NODE_NAME_MAP.put(newStaking.getNodeId(),newStaking.getStakingName());
+            }
+            if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
+                // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
+                logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), JSON.toJSONString(param));
             }
         } catch (NoSuchBeanException e) {
             logger.debug("节点(id={})尚未被质押！",param.getNodeId());
             /** 业务逻辑说明：
              * 2、如果当前质押交易质押的是新节点，则在把新节点添加到缓存中，并放入待入库列表；
              */
-            logger.error("节点(id={})未被质押！");
             CustomStaking staking = new CustomStaking();
             staking.updateWithCustomTransaction(tx);
             CustomNode node = new CustomNode();

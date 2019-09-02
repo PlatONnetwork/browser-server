@@ -63,7 +63,7 @@ public class ProposalEngine {
         List<CustomProposal> proposalList = customProposalMapper.selectAll();
         List<CustomVote> voteList = customVoteMapper.selectAll();
         proposalCache.init(proposalList,voteList);
-
+        proposalCache.sweep();
         context.setProposalStage(proposalStage);
     }
 
