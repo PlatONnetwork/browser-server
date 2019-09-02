@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * 统计缓存数据处理逻辑
  *  @file NetworkStatCacheServiceImpl.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -41,6 +41,6 @@ public class NetworkStatCacheServiceImpl implements NetworkStatCacheService {
         // 取出缓存中的交易总数
         items.forEach(item -> redisTemplate.opsForValue().set(networkStatCacheKey,JSON.toJSONString(item)));
         long endTime = System.currentTimeMillis();
-        logger.debug("更新Redis交易缓存结束:timestamp({}),consume({}ms)",endTime,endTime-startTime);
+        logger.debug("更新Redis统计缓存结束:timestamp({}),consume({}ms)",endTime,endTime-startTime);
     }
 }
