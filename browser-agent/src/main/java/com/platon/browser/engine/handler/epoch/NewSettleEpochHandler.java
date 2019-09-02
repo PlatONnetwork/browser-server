@@ -203,7 +203,7 @@ public class NewSettleEpochHandler implements EventHandler {
             if(node!=null){
                 // 质押记录所属节点在前一轮结算周期的验证人列表中，则对其执行结算操作
                 // 累加质押奖励
-                BigInteger stakingRewardValue = curStaking.integerStakingReward().add(preVerifierStakingReward);
+                BigInteger stakingRewardValue = curStaking.integerStakingRewardValue().add(preVerifierStakingReward);
                 curStaking.setStakingRewardValue(stakingRewardValue.toString());
 
                 CustomNode customNode;
@@ -242,7 +242,7 @@ public class NewSettleEpochHandler implements EventHandler {
                         ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
                         // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
                         // 1、添加上一周期的收益
-                        BigInteger profit = curStaking.integerStakingReward().add(curStaking.integerBlockReward());
+                        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
                         ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
                         // 2、添加下一周期的质押成本
                         BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());

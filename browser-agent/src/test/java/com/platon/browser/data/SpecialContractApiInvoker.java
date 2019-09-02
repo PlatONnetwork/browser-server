@@ -127,7 +127,7 @@ public class SpecialContractApiInvoker {
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
-            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(360));
+            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(4560));
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
