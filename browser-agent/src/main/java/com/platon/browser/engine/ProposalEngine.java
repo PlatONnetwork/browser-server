@@ -78,7 +78,7 @@ public class ProposalEngine {
         switch (tx.getTypeEnum()){
             case CREATE_PROPOSAL_TEXT: proposalTextHandler.handle(context);break; //提交文本提案(创建提案)
             case CREATE_PROPOSAL_UPGRADE: proposalUpgradeHandler.handle(context);break; //提交升级提案(创建提案)
-            case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //其他叫取消提案
+            case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //创建取消提案
             case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
             case DECLARE_VERSION: declareVersionHandler.handle(context);break;//版本声明
         }

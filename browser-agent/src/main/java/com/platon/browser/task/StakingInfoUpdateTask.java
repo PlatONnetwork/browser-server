@@ -61,9 +61,9 @@ public class StakingInfoUpdateTask {
                         customStaking.setExternalName(username);
 
                     } catch (IOException e) {
-                        logger.error("[StakingInfoUpdateTask] IOException {}", e.getMessage());
+                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                     } catch (Exception e) {
-                        logger.error("[StakingInfoUpdateTask] Exception {}", e.getMessage());
+                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                     }
                 }
             });

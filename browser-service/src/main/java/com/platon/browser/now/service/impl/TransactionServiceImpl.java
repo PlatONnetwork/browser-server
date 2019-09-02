@@ -467,12 +467,12 @@ public class TransactionServiceImpl implements TransactionService {
 				case REPORT_VALIDATOR:
 					ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
 					List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
-					for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
+		/*			for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setNodeName(evidencesParam.getNodeName());
 						transactionDetailsEvidencesResp.setVerify(evidencesParam.getVerify());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
-					}
+					}*/
 					Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
 					if(slash != null) {
 						resp.setReportRewards(slash.getReward());
