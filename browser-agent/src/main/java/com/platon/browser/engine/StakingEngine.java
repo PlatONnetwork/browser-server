@@ -89,23 +89,12 @@ public class StakingEngine {
         if(nodeIds.size()==0) return;
         // |-加载质押记录
         List<CustomStaking> stakingList = customStakingMapper.selectByNodeIdList(nodeIds);
-        List<CustomStaking> validStakings = new ArrayList<>();
-        stakingList.forEach(staking -> {
-            if(staking.getStatus()!= CustomStaking.StatusEnum.EXITED.code) validStakings.add(staking);
-        });
         // |-加载委托记录
         List<CustomDelegation> delegationList = customDelegationMapper.selectByNodeIdList(nodeIds);
-        List<CustomDelegation> validDelegations = new ArrayList<>();
-        delegationList.forEach(delegation -> {
-            if(delegation.getIsHistory()!= CustomDelegation.YesNoEnum.NO.code) validDelegations.add(delegation);
-        });
         // |-加载撤销委托记录
         List<CustomUnDelegation> unDelegationList = customUnDelegationMapper.selectByNodeIdList(nodeIds);
-        List<CustomUnDelegation> validUnDelegation = new ArrayList<>();
-        unDelegationList.forEach(unDelegation -> {
-            if(unDelegation.getStatus()!= CustomUnDelegation.StatusEnum.EXITING.code) validUnDelegation.add(unDelegation);
-        });
-        nodeCache.init(nodeList,validStakings,validDelegations,validUnDelegation);
+        nodeCache.init(nodeList,stakingList,delegationList,unDelegationList);
+        nodeCache.sweep();
     }
 
     @PostConstruct
