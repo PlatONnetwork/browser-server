@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
+import com.platon.browser.engine.bean.PeriodValueElement;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.util.Resolver;
@@ -40,6 +42,7 @@ import org.web3j.utils.PlatOnUtil;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -123,17 +126,34 @@ public class SpecialContractApiInvoker {
 
             BigInteger number = web3j2.platonBlockNumber().send().getBlockNumber();
 
-//            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9840)).data;
+            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(1040)).data;
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
-            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(4560));
+            //BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(1040));
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
 
+            BigInteger jili = web3j2.platonGetBalance("0x1000000000000000000000000000000000000003",DefaultBlockParameter.valueOf(BigInteger.valueOf(19200))).send().getBalance();
+
+            BigDecimal part = new BigDecimal(jili).multiply(BigDecimal.valueOf(0.5));
+
+            // 每个区块的奖励
+            BigDecimal qukuai = part.divide(BigDecimal.valueOf(1600));
+
+            // 每个结算周期的奖励
+            BigDecimal jiesuan = part.divide(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(6));
+
+//            460967779502166554487241.47375
+//            73754844720346648717958635.8
+            // 12292474120057774786326439.3
+
             BaseResponse<List<Node>>  node1 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(0));
             logger.debug("{}", JSON.toJSONString(node1,true));
+
+            BaseResponse<List<Node>> verifierList = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(320));
+            BigDecimal stakingReward = jiesuan.divide(BigDecimal.valueOf(verifierList.data.size()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,6 +176,55 @@ public class SpecialContractApiInvoker {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        String str = "{\n" +
+                "  \"cost\": [\n" +
+                "    {\n" +
+                "      \"period\": 147,\n" +
+                "      \"value\": 5100000000000000000000000\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 146,\n" +
+                "      \"value\": 5100000000000000000000000\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 145,\n" +
+                "      \"value\": 5100000000000000000000000\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 144,\n" +
+                "      \"value\": 5100000000000000000000000\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"profit\": [\n" +
+                "    {\n" +
+                "      \"period\": 147,\n" +
+                "      \"value\": 2611933329584907631867019685\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 146,\n" +
+                "      \"value\": 2583893470298945701430536350\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 145,\n" +
+                "      \"value\": 2555853611012983770994053015\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"period\": 144,\n" +
+                "      \"value\": 2523291193777673142100072370\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        AnnualizedRateInfo ari = JSON.parseObject(str,AnnualizedRateInfo.class);
+        BigDecimal cost = BigDecimal.ZERO,profit=BigDecimal.ZERO;
+        for(PeriodValueElement e:ari.getCost()) cost=cost.add(new BigDecimal(e.getValue()));
+        for(PeriodValueElement e:ari.getProfit()) profit=profit.add(new BigDecimal(e.getValue()));
+
+        BigDecimal rate = profit.divide(cost,20, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(10)).multiply(BigDecimal.valueOf(100));
+
+        System.out.println(rate);
+
 
     }
 }

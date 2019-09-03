@@ -211,7 +211,8 @@ public class NodeCache {
         });
         invalidCache.forEach(staking -> {
             // 清除质押
-            nodeMap.values().forEach(node->node.getStakings().remove(staking.getStakingBlockNum()));
+            CustomNode node = nodeMap.get(staking.getNodeId());
+            node.getStakings().remove(staking.getStakingBlockNum());
             // 在所有委托缓存中清除指定实体
             delegationSet.removeAll(staking.getDelegations().values());
         });

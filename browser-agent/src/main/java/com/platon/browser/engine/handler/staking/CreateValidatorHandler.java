@@ -30,7 +30,7 @@ public class CreateValidatorHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Override
-    public void handle(EventContext context) throws BlockChainException {
+    public void handle(EventContext context) throws BlockChainException, NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
 
         StakingStage stakingStage = context.getStakingStage();
@@ -63,6 +63,8 @@ public class CreateValidatorHandler implements EventHandler {
                 stakingStage.insertStaking(newStaking,tx);
                 // 更新节点名称映射缓存
                 NODE_NAME_MAP.put(newStaking.getNodeId(),newStaking.getStakingName());
+                // 把质押信息放入缓存
+                NODE_CACHE.addStaking(newStaking);
             }
             if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
                 // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
@@ -80,12 +82,14 @@ public class CreateValidatorHandler implements EventHandler {
             node.updateWithCustomStaking(staking);
             // 把质押记录添加到节点质押记录列表中
             node.getStakings().put(staking.getStakingBlockNum(),staking);
-            // 节点添加到缓存中
-            NODE_CACHE.addNode(node);
             // 新节点和新质押记录暂存到待入库列表中
             stakingStage.insertNode(node);
             stakingStage.insertStaking(staking,tx);
 
+            // 节点添加到缓存中
+            NODE_CACHE.addNode(node);
+            // 把质押信息放入缓存
+            NODE_CACHE.addStaking(staking);
             // 更新节点名称映射缓存
             NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName());
         }

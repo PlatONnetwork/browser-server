@@ -100,6 +100,9 @@ public class NewElectionEpochHandler implements EventHandler {
                         staking.setStakingHas(BigInteger.ZERO.toString());
                     }
                 }
+
+                staking.setDetails(staking.getDetails()+"[slash: blockNumber="+bc.getCurBlock().getNumber()+",blockRate="+blockRate+",slashRate="+slashRate+"]");
+
                 // 把更新暂存到待入库列表
                 stakingStage.updateStaking(staking);
 
