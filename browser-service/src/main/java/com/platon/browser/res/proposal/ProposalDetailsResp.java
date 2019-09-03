@@ -1,6 +1,7 @@
 package com.platon.browser.res.proposal;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomRateSerializer;
 
 /**
  *提案详情返回对象
@@ -9,7 +10,6 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class ProposalDetailsResp {
     private String pipNum;
     private String proposalHash;        //提案内部标识
@@ -38,4 +38,169 @@ public class ProposalDetailsResp {
     private String opposeRateThreshold;   //反对率
     private String abstainRateThreshold;   //弃权率
     private Long inBlock;   //所在块高
+	public String getPipNum() {
+		return pipNum;
+	}
+	public void setPipNum(String pipNum) {
+		this.pipNum = pipNum;
+	}
+	public String getProposalHash() {
+		return proposalHash;
+	}
+	public void setProposalHash(String proposalHash) {
+		this.proposalHash = proposalHash;
+	}
+	public String getTopic() {
+		return topic;
+	}
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	public String getCurBlock() {
+		return curBlock;
+	}
+	public void setCurBlock(String curBlock) {
+		this.curBlock = curBlock;
+	}
+	public String getEndVotingBlock() {
+		return endVotingBlock;
+	}
+	public void setEndVotingBlock(String endVotingBlock) {
+		this.endVotingBlock = endVotingBlock;
+	}
+	public Long getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
+	}
+	public String getActiveBlock() {
+		return activeBlock;
+	}
+	public void setActiveBlock(String activeBlock) {
+		this.activeBlock = activeBlock;
+	}
+	public String getNewVersion() {
+		return newVersion;
+	}
+	public void setNewVersion(String newVersion) {
+		this.newVersion = newVersion;
+	}
+	public String getParamName() {
+		return paramName;
+	}
+	public void setParamName(String paramName) {
+		this.paramName = paramName;
+	}
+	public String getCurrentValue() {
+		return currentValue;
+	}
+	public void setCurrentValue(String currentValue) {
+		this.currentValue = currentValue;
+	}
+	public String getNewValue() {
+		return newValue;
+	}
+	public void setNewValue(String newValue) {
+		this.newValue = newValue;
+	}
+	public String getNodeName() {
+		return nodeName;
+	}
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public Integer getYeas() {
+		return yeas;
+	}
+	public void setYeas(Integer yeas) {
+		this.yeas = yeas;
+	}
+	public Integer getNays() {
+		return nays;
+	}
+	public void setNays(Integer nays) {
+		this.nays = nays;
+	}
+	public Integer getAbstentions() {
+		return abstentions;
+	}
+	public void setAbstentions(Integer abstentions) {
+		this.abstentions = abstentions;
+	}
+	public String getAccuVerifiers() {
+		return accuVerifiers;
+	}
+	public void setAccuVerifiers(String accuVerifiers) {
+		this.accuVerifiers = accuVerifiers;
+	}
+	public Long getActiveBlockTime() {
+		return activeBlockTime;
+	}
+	public void setActiveBlockTime(Long activeBlockTime) {
+		this.activeBlockTime = activeBlockTime;
+	}
+	public Long getEndVotingBlockTime() {
+		return endVotingBlockTime;
+	}
+	public void setEndVotingBlockTime(Long endVotingBlockTime) {
+		this.endVotingBlockTime = endVotingBlockTime;
+	}
+	@JsonSerialize(using = CustomRateSerializer.class)
+	public String getSupportRateThreshold() {
+		return supportRateThreshold;
+	}
+	public void setSupportRateThreshold(String supportRateThreshold) {
+		this.supportRateThreshold = supportRateThreshold;
+	}
+	public String getOpposeRateThreshold() {
+		return opposeRateThreshold;
+	}
+	public void setOpposeRateThreshold(String opposeRateThreshold) {
+		this.opposeRateThreshold = opposeRateThreshold;
+	}
+	public String getAbstainRateThreshold() {
+		return abstainRateThreshold;
+	}
+	public void setAbstainRateThreshold(String abstainRateThreshold) {
+		this.abstainRateThreshold = abstainRateThreshold;
+	}
+	public Long getInBlock() {
+		return inBlock;
+	}
+	public void setInBlock(Long inBlock) {
+		this.inBlock = inBlock;
+	}
+    
+    
 }

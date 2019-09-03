@@ -113,7 +113,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<AliveStakingListResp> respPage = new RespPage<>();
 		List<AliveStakingListResp> lists = new LinkedList<AliveStakingListResp>();
 		/** 根据条件和状态进行查询列表 */
-		Page<StakingNode> stakingPage = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus,null);
+		Page<StakingNode> stakingPage = customStakingMapper.selectStakingAndNodeByExample(null, name, status, isConsensus);
 		List<StakingNode> stakings = stakingPage.getResult();
 		/** 查询出块节点 */
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
@@ -164,7 +164,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<HistoryStakingListResp>();
 		/** 根据条件和状态进行查询列表 */
-		Page<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(null, req.getKey(), null, null, status);
+		Page<StakingNode> stakings = customStakingMapper.selectHistoryNode(status);
 		for (StakingNode stakingNode:stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
@@ -175,6 +175,11 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setNodeName(stakingNode.getStakingName());
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
+			/**
+			 * 带提取的委托等于has+lock
+			 */
+			String totalValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
+			historyStakingListResp.setStatDelegateReduction(totalValue);
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
 			lists.add(historyStakingListResp);
 		}
@@ -192,7 +197,7 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null, null);
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
 		Integer size = stakings.size();
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
@@ -232,7 +237,9 @@ public class StakingServiceImpl implements StakingService {
 				}
 				resp.setWebsite(webSite);
 				/** 实际跳转地址是url拼接上名称 */
-				resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
+				if(StringUtils.isNotBlank(stakingNode.getExternalName())) {
+					resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
+				}
 				resp.setVerifierTime(stakingNode.getStatVerifierTime());
 				resp.setJoinTime(stakingNode.getJoinTime().getTime());
 				if(StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {

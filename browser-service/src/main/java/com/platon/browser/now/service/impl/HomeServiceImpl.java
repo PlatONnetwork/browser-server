@@ -216,7 +216,7 @@ public class HomeServiceImpl implements HomeService {
 		Criteria criteria = stakingExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
 		stakingExample.setOrderByClause("cast(staking_has as Decimal(30)) + cast(staking_locked  as Decimal(30))"
-				+ " + cast(stat_delegate_has  as Decimal(30)) + cast(stat_delegate_locked  as Decimal(30)),program_version,staking_addr,node_id,staking_block_num desc");
+				+ " + cast(stat_delegate_has  as Decimal(30)) + cast(stat_delegate_locked  as Decimal(30)) desc,program_version desc,staking_addr desc,node_id desc,staking_block_num desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 		 
 		List<StakingListResp> lists = new LinkedList<>();
