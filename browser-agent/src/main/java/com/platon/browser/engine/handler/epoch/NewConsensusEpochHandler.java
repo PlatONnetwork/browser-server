@@ -57,7 +57,7 @@ public class NewConsensusEpochHandler implements EventHandler {
     /**
      * 更新与质押相关的信息
      */
-    private void updateStaking(){
+    private void updateStaking() throws NoSuchBeanException {
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         //if(stakingList.size()!=4) throw new RuntimeException("质押信息少于4条！");
         Long blockNumber = bc.getCurBlock().getNumber();
@@ -69,6 +69,9 @@ public class NewConsensusEpochHandler implements EventHandler {
             if(node!=null){
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                 staking.setStatVerifierTime(staking.getStatVerifierTime()+1);
+                // 累加共识周期期望区块数
+                CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
+                customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
