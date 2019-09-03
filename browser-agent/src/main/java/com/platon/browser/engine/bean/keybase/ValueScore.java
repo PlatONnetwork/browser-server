@@ -1,5 +1,5 @@
 
-package com.platon.browser.engine.bean.keystore;
+package com.platon.browser.engine.bean.keybase;
 
 import lombok.Data;
 
