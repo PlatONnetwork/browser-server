@@ -69,7 +69,7 @@ public class StakingUpdateTask {
                 }
             });
         } catch (Exception e) {
-            logger.error("{}", e.getMessage());
+            logger.error("[StakingUpdateTask] Exception {}", e.getMessage());
         }
     }
 }
