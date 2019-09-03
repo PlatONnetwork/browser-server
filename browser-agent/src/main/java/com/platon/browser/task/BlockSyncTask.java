@@ -265,6 +265,7 @@ public class BlockSyncTask {
                     node.updateWithNode(verifier);
                     node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
                     node.setStatVerifierTime(BigInteger.ONE.intValue());
+                    node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
                     BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
 
                     CustomStaking staking = new CustomStaking();
