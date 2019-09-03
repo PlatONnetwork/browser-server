@@ -125,7 +125,7 @@ public class NewSettleEpochHandler implements EventHandler {
         }
 
 
-        logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
+        //logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
 
