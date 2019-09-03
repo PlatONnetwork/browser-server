@@ -192,6 +192,7 @@ public class NewSettleEpochHandler implements EventHandler {
             if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
+            // 犹豫期+锁定期+退回中==0
             BigInteger stakingReduction = curStaking.integerStakingReduction();
             if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
                 curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
