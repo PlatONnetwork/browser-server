@@ -39,7 +39,7 @@ public class StakingUpdateTask {
 
     @Scheduled(cron = "0/3  * * * * ?")
     protected void start () {
-        String keyStoreUrl = blockChain.getChainConfig().getKeyStore();
+        String keyStoreUrl = blockChain.getChainConfig().getKeyBase();
         try {
             Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
             if (customStakingSet.size() == 0) return;
