@@ -2,7 +2,8 @@ package com.platon.browser.engine.bean;
 
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Auther: Chendongming
