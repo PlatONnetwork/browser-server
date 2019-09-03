@@ -92,4 +92,6 @@ public class BlockChainConfig {
     private String keyBase;
     // 初始内置节点默认质押金额(VON)
     private String defaultStakingLockedAmount;
+    // 初始内置节点信息
+    private List<CustomStaking> defaultStakings;
 }
