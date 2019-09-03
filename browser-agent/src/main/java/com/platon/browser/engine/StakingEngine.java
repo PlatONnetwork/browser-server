@@ -1,6 +1,5 @@
 package com.platon.browser.engine;
 
-import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;

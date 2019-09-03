@@ -3,9 +3,9 @@ package com.platon.browser.task;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.bean.keystore.Completion;
-import com.platon.browser.engine.bean.keystore.Components;
-import com.platon.browser.engine.bean.keystore.KeyBaseUser;
+import com.platon.browser.engine.bean.keybase.Completion;
+import com.platon.browser.engine.bean.keybase.Components;
+import com.platon.browser.engine.bean.keybase.KeyBaseUser;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class StakingUpdateTask {
                 }
             });
         } catch (Exception e) {
-            logger.error("{}", e.getMessage());
+            logger.error("[StakingUpdateTask] Exception {}", e.getMessage());
         }
     }
 }
