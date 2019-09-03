@@ -251,35 +251,22 @@ public class NewSettleEpochHandler implements EventHandler {
                         // 保留指定数量最新的记录
                         if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
                             // 按结算周期由大到小排序
-                            ari.getProfit().sort((c1, c2) -> {
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                                return 0;
-                            });
+                            ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
                             // 删除多余的元素
-                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--){
-                                ari.getProfit().remove(i);
-                            }
+                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
                         }
 
                         // 保留指定数量最新的记录
                         if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
                             // 按结算周期由大到小排序
-                            ari.getCost().sort((c1, c2) -> {
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                                return 0;
-                            });
+                            ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
                             // 删除多余的元素
-                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--){
-                                ari.getCost().remove(i);
-                            }
+                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
                         }
                     }
                     class AnnualizedSum{
-                        BigInteger profitSum=BigInteger.ZERO;
-                        BigInteger costSum=BigInteger.ZERO;
-                        BigDecimal getAnnualizedRate(){
+                        private BigInteger profitSum=BigInteger.ZERO,costSum=BigInteger.ZERO;
+                        private BigDecimal getAnnualizedRate(){
                             if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
                             BigDecimal rate = new BigDecimal(profitSum)
                                     .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR)
@@ -292,12 +279,8 @@ public class NewSettleEpochHandler implements EventHandler {
                     ari.getProfit().forEach(ele->as.profitSum=as.profitSum.add(ele.getValue()));
 
                     // 按周期从大到小排序
-                    ari.getCost().sort((c1, c2) -> {
-                        if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                        if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                        return 0;
-                    });
-                    // 忽略最大的周期
+                    ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+                    // 从索引1开始，忽略最大的周期
                     for (int i=1;i<ari.getCost().size();i++){
                         PeriodValueElement pve = ari.getCost().get(i);
                         as.costSum=as.costSum.add(pve.getValue());
