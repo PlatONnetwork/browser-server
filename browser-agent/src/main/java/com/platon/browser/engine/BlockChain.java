@@ -168,7 +168,10 @@ public class BlockChain {
     public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
         for (CustomTransaction tx:curBlock.getTransactionList()){
             // 链上执行失败的交易不予处理
-            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
+            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) {
+                addressExecute.execute(tx,this);
+                return;
+            }
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人
