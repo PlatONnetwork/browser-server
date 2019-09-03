@@ -60,7 +60,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //离下个结算周期剩余块高 = (每个结算周期块数 * 当前结算周期轮数) - 当前块高
             NETWORK_STAT_CACHE.setNextSetting(chainConfig.getSettlePeriodBlockCount().multiply(bc.getCurSettingEpoch()).subtract(curBlock.getBlockNumber()).longValue());
             //质押奖励
-            NETWORK_STAT_CACHE.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size())).setScale(0,BigDecimal.ROUND_DOWN).toString());
+            NETWORK_STAT_CACHE.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size()),0,BigDecimal.ROUND_DOWN).toString());
 
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());

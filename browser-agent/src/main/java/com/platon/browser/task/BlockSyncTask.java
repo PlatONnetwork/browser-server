@@ -351,9 +351,7 @@ public class BlockSyncTask {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
-                // 入库前更新统计信息
-                addressCacheUpdater.updateAddressStatistics();
-                stakingCacheUpdater.updateStakingStatistics();
+
             } catch (BusinessException e) {
                 break;
             }
@@ -529,6 +527,9 @@ public class BlockSyncTask {
 
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
+            // 入库前更新统计信息
+            addressCacheUpdater.updateAddressStatistics();
+            stakingCacheUpdater.updateStakingStatistics();
             // 串行批量入库
             dbService.insertOrUpdate(basicData,bizData);
             // 缓存整理

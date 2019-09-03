@@ -1,6 +1,7 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.param.CreateValidatorParam;
 import com.platon.browser.param.EditValidatorParam;
 import com.platon.browser.param.ExitValidatorParam;
@@ -11,10 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -238,5 +236,19 @@ public class CustomStaking extends Staking {
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(YesNoEnum en){return ENUMS.containsValue(en);}
+    }
+
+    @Override
+    public boolean equals ( Object o ) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StakingKey that = (StakingKey) o;
+        return Objects.equals(this.getStakingBlockNum(), that.getStakingBlockNum()) &&
+                Objects.equals(this.getNodeId(), that.getNodeId());
+    }
+
+    @Override
+    public int hashCode () {
+        return Objects.hash(this.getStakingBlockNum(), this.getNodeId());
     }
 }
