@@ -97,7 +97,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             }
         });
 
-        logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
+        //logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }
 
     /**
