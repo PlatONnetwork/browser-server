@@ -57,14 +57,17 @@ public class NewConsensusEpochHandler implements EventHandler {
     /**
      * 更新与质押相关的信息
      */
-    private void updateStaking(){
+    private void updateStaking() throws NoSuchBeanException {
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
-        //if(stakingList.size()!=4) throw new RuntimeException("质押信息少于4条！");
-        Long blockNumber = bc.getCurBlock().getNumber();
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
         Map<String,String> consensusInfo = new HashMap<>();
         String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
         for (CustomStaking staking:stakingList){
+            // 累加共识周期期望区块数
+            CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
+            customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
+
+            // 看当前验证人是否在下一轮共识
             Node node = bc.getCurValidator().get(staking.getNodeId());
             if(node!=null){
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
@@ -72,6 +75,8 @@ public class NewConsensusEpochHandler implements EventHandler {
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
+
+
 
             String info = tpl.replace("PRE_QTY",staking.getPreConsBlockQty().toString())
                     .replace("CUR_QTY",staking.getCurConsBlockQty().toString())
