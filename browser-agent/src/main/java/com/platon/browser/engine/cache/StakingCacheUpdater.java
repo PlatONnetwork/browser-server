@@ -93,6 +93,8 @@ public class StakingCacheUpdater {
             staking.setStatDelegateQty(stat.statDelegateQty.intValue());
             // 把质押信息改动暂存至待更新列表
             STAGE_DATA.getStakingStage().updateStaking(staking);
+            STAGE_DATA.getStakingStage().getSlashUpdateStage();
+
         });
     }
 }
