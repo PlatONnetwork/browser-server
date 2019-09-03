@@ -233,15 +233,6 @@ public class BlockSyncTask {
                 Set<String> validatorSet = new HashSet<>();
                 result.data.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
 
-                // 查询所有候选人
-                Map<String,Node> candidateMap = new HashMap<>();
-                result = client.getNodeContract().getCandidateList().send();
-                if(!result.isStatusOk()){
-                    throw new CandidateException("底层链查询候选验证节点列表出错:"+result.errMsg);
-                }
-                result.data.forEach(node->candidateMap.put(HexTool.prefix(node.getNodeId()),node));
-
-
                 // 根据区块号0查询结算周期验证人列表并入库
                 result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.ZERO);
                 if(!result.isStatusOk()){
@@ -253,10 +244,6 @@ public class BlockSyncTask {
                 }
 
                 result.data.stream().filter(Objects::nonNull).forEach(verifier->{
-                    Node candidate = candidateMap.get(HexTool.prefix(verifier.getNodeId()));
-                    // 补充完整属性
-                    if(candidate!=null) BeanUtils.copyProperties(candidate,verifier);
-
                     CustomNode node = new CustomNode();
                     node.updateWithNode(verifier);
                     node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
@@ -271,7 +258,7 @@ public class BlockSyncTask {
                     // 内置节点默认设置状态为1
                     staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
                     // 设置内置节点默认初始质押锁定金额
-                    if(candidate!=null) staking.setStakingLocked(candidate.getReleased().toString());
+                    staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
                     // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
