@@ -9,10 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 链参数统一配置项
@@ -93,5 +90,5 @@ public class BlockChainConfig {
     // 初始内置节点默认质押金额(VON)
     private String defaultStakingLockedAmount;
     // 初始内置节点信息
-    private List<CustomStaking> defaultStakings;
+    private List<CustomStaking> defaultStakings=new ArrayList<>();
 }
