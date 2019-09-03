@@ -67,6 +67,8 @@ platon.config:
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 28
+  #升级提案预升级轮数
+  versionProposalActiveConsensusRounds: 5
   #文本提案默认投票结束轮数
   proposalTextEndRound: 4
   #文本提案参与率: >

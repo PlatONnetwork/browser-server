@@ -91,4 +91,6 @@ public class BlockChainConfig {
     private String defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakings=new ArrayList<>();
+    //设置预升级开始轮数
+    private String versionProposalActiveConsensusRounds;
 }
