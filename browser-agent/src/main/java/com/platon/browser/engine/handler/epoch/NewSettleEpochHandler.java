@@ -92,18 +92,18 @@ public class NewSettleEpochHandler implements EventHandler {
         }
 
 
-        // ==================================更新当前周期验证人列表=======================================
+        // ==================================更新下一轮结算周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         try {
             result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+            throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
         }
         if(result.isStatusOk()){
             bc.getCurVerifier().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("当前轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+            logger.debug("下一轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
@@ -111,21 +111,19 @@ public class NewSettleEpochHandler implements EventHandler {
                 result = client.getNodeContract().getVerifierList().send();
                 bc.getCurVerifier().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("当前轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
+                logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
+                throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
+                throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
             }
         }
 
         if(bc.getCurVerifier().size()==0){
-            throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
+            throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
-
-
-        logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
+        logger.debug("下一轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
 

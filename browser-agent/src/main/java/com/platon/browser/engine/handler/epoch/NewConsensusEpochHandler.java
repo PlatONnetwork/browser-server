@@ -49,7 +49,6 @@ public class NewConsensusEpochHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws Exception {
         stakingStage = context.getStakingStage();
-
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -63,20 +62,17 @@ public class NewConsensusEpochHandler implements EventHandler {
         Map<String,String> consensusInfo = new HashMap<>();
         String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
         for (CustomStaking staking:stakingList){
-            // 累加共识周期期望区块数
-            CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
-            customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
-
-            // 看当前验证人是否在下一轮共识
             Node node = bc.getCurValidator().get(staking.getNodeId());
+            // 看当前验证人是否在下一轮共识
             if(node!=null){
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                 staking.setStatVerifierTime(staking.getStatVerifierTime()+1);
+                // 累加共识周期期望区块数
+                CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
+                customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
-
-
 
             String info = tpl.replace("PRE_QTY",staking.getPreConsBlockQty().toString())
                     .replace("CUR_QTY",staking.getCurConsBlockQty().toString())
@@ -133,13 +129,13 @@ public class NewConsensusEpochHandler implements EventHandler {
         }
 
 
-        // ==================================更新当前周期验证人列表=======================================
+        // ==================================更新下一共识周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
         if(result.isStatusOk()){
             bc.getCurValidator().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("当前轮共识周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+            logger.debug("下一轮共识周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
@@ -147,19 +143,19 @@ public class NewConsensusEpochHandler implements EventHandler {
                 result = client.getNodeContract().getValidatorList().send();
                 bc.getCurValidator().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("当前轮共识周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
+                logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
+                throw new CandidateException(format("【查询下一轮共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
+                throw new CandidateException(format("【查询下一轮共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
             }
         }
 
-
         if(bc.getCurValidator().size()==0){
-            throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
+            throw new CandidateException("查询不到下一轮共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
         }
+        logger.debug("下一轮共识周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 }
