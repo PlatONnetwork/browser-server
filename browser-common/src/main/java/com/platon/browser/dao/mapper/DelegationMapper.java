@@ -54,4 +54,6 @@ public interface DelegationMapper {
 
 	List<DelegationStaking> selectDelegationAndStakingByExample(@Param("nodeId") String nodeId,@Param("stakingBlockNum") Long stakingBlockNum,@Param("delegateAddr") String delegateAddr);
 
+	List<DelegationStaking> selectSumDelegateByExample(@Param("nodeId") String nodeId,@Param("stakingBlockNum") Long stakingBlockNum);
+
 }

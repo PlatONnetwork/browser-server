@@ -288,8 +288,9 @@ public class StakingServiceImpl implements StakingService {
 		/** 根据节点id和区块查询验证委托信息 */
 		List<DelegationStaking> delegationStakings = 
 				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
-		String allDelegate = "0";
-		String allLockDelegate = "0";
+		List<DelegationStaking> sumDelegationStaking = delegationMapper.selectSumDelegateByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+		String allDelegate = sumDelegationStaking.get(0).getAllDelegate();
+		String allLockDelegate = sumDelegationStaking.get(0).getAllLockDelegate();
 		for (DelegationStaking delegationStaking: delegationStakings) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
@@ -300,10 +301,10 @@ public class StakingServiceImpl implements StakingService {
 			String deleLock = delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0";
 			byStakingResp.setDelegateLocked(deleLock);
 			/** 总质押金额累加 */
-			allDelegate = new BigDecimal(allDelegate).add(new BigDecimal(delValue).add(new BigDecimal(deleLock))).toString();
+//			allDelegate = new BigDecimal(allDelegate).add(new BigDecimal(delValue).add(new BigDecimal(deleLock))).toString();
 			/** 总质押锁定金额累积 */
-			allLockDelegate = new BigDecimal(allLockDelegate).add(new BigDecimal(deleLock)).toString();
-			byStakingResp.setAllDelegateLocked(allDelegate);
+//			allLockDelegate = new BigDecimal(allLockDelegate).add(new BigDecimal(deleLock)).toString();
+			byStakingResp.setAllDelegateLocked(allLockDelegate);
 			byStakingResp.setDelegateTotalValue(allDelegate);
 			lists.add(byStakingResp);
 		}
