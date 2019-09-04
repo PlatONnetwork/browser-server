@@ -119,7 +119,6 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
--->
 
 
         <table tableName="address" domainObjectName="Address">
@@ -127,6 +126,13 @@
                                 replaceString=""/>
         </table>
 
+-->
+
+
+        <table tableName="un_delegation" domainObjectName="UnDelegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
 
     </context>

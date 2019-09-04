@@ -1,0 +1,108 @@
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.7.0
+# 当前激活的配置名称(请不要修改)
+profile: local
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+# MySQL数据库用户名
+dbuser: platon
+# MySQL数据库密码
+dbpass: platon
+web3j:
+  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  collect.batch-size: 1000
+# Redis集群节点
+#redis: 192.168.18.9:21006,192.168.18.9:21007,192.168.18.9:21008,192.168.18.9:21009,192.168.18.9:21010,192.168.18.9:21011
+redis: 192.168.16.171:7001,192.168.16.171:7002,192.168.16.171:7000,192.168.16.172:7000,192.168.16.172:7001,192.168.16.172:7002
+# 日志文件存储文件
+logpath: ./logs/${spring.application.name}-${version}-${profile}.log
+# 日志级别
+loglevel:
+  spring: debug
+  platon.task: debug
+  platon.engine: debug
+  platon.client: debug
+  platon.dao: debug
+  platon.service: debug
+
+#初始化链相关的配置
+platon.config:
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #链ID
+  chainId: 101
+  #PlatON初始总发行量
+  initIssueAmount: 10000000000
+  #每年固定增发比例
+  addIssueRate: 0.025
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
+  #激励池分配给出块激励的比例
+  blockRewardRate: 0.5
+  #激励池分配给质押激励的比例
+  stakeRewardRate: 0.5
+  #触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
+  blockRate4LowSlash: 0.6
+  #普通质押金处罚百分比
+  blockLowSlashRate: 0.1
+  #触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
+  blockRate4HighSlash: 0.2
+  #违规-低出块率: 最高处罚百分比
+  blockHighSlashRate: 0.5
+  #质押门槛: 创建验证人最低的质押Token数
+  stakeThreshold: 5000000
+  #委托门槛
+  delegateThreshold: 10
+  #出块间隔(秒)
+  blockInterval: 1
+  #每个验证人每个共识周期出块数量目标值
+  expectBlockCount: 10
+  #共识轮区块数
+  consensusPeriodBlockCount: 40
+  #每个共识轮中回退多少个块是选举下一轮验证人的时机
+  electionBackwardBlockCount: 20
+  #每个结算周期区块总数(等于43个共识周期出的块数总和)
+  settlePeriodBlockCount: 160
+  #每个增发周期区块总数(1466个结算周期=15759500个块)
+  addIssuePeriodBlockCount: 1600
+  #节点质押退回锁定的结算周期数
+  unstakeRefundSettlePeriodCount: 2
+  #升级提案预升级轮数
+  versionProposalActiveConsensusRounds: 5
+  #文本提案默认投票结束轮数
+  proposalTextEndRound: 4
+  #文本提案参与率: >
+  minProposalTextParticipationRate: 0.5
+  #文本提案支持率：>=
+  minProposalTextSupportRate: 0.667
+  #取消提案参与率: >
+  minProposalCancelParticipationRate: 0.5
+  #取消提案支持率：>=
+  minProposalCancelSupportRate: 0.667
+  #升级提案通过率
+  minProposalUpgradePassRate: 0.667
+  #双签低处罚百分比
+  duplicateSignLowSlashRate: 1
+  #开发者激励基金账户地址
+  developerIncentiveFundAccountAddr: '0xfd9d508df262a1c968e0d6c757ab08b96d741f4b'
+  #PlatOn基金会账户地址
+  platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
+  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  foundationSubsidies: {
+    '1':62215742.4869165,
+    '2':55965742.4869165,
+    '3':49559492.4869165,
+    '4':42993086.2369165,
+    '5':36262519.8306666,
+    '6':29363689.2642633,
+    '7':22292387.9336939,
+    '8':15044304.0698633,
+    '9':7615018.1094369
+  }
+  # 初始内置节点默认质押金额(VON)
+  defaultStakingLockedAmount: 10000000000000000000000000
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  #keybase网址
+  keyBase: https://keybase.io/
