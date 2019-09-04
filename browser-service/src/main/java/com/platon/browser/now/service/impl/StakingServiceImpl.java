@@ -120,7 +120,7 @@ public class StakingServiceImpl implements StakingService {
 		for (int i = 0; i < stakings.size(); i++) {
 			AliveStakingListResp aliveStakingListResp = new AliveStakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), aliveStakingListResp);
-			aliveStakingListResp.setBlockQty(stakings.get(i).getCurConsBlockQty());
+			aliveStakingListResp.setBlockQty(stakings.get(i).getStatBlockQty());
 			aliveStakingListResp.setDelegateQty(stakings.get(i).getStatDelegateQty());
 			/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
 			String sumAmount = new BigDecimal(stakings.get(i).getStatDelegateHas())
@@ -181,6 +181,7 @@ public class StakingServiceImpl implements StakingService {
 			String totalValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
 			historyStakingListResp.setStatDelegateReduction(totalValue);
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus()));
+			historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 			lists.add(historyStakingListResp);
 		}
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
@@ -197,7 +198,12 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(StakingDetailsReq req) {
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(req.getNodeId(),null ,null, null);
+		/** 补充前缀 */
+		String nodeId = req.getNodeId();
+		if(!req.getNodeId().startsWith(BrowserConst.WALLET_PRX)) {
+			nodeId = BrowserConst.WALLET_PRX + nodeId ;
+		}
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByExample(nodeId,null ,null, null);
 		Integer size = stakings.size();
 		StakingDetailsResp resp = new StakingDetailsResp();
 		switch (size) {
@@ -339,10 +345,12 @@ public class StakingServiceImpl implements StakingService {
 			/** 如果状态等于候选中则正常显示，否则为0 */
 			String deletgateHas = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateHas():"0";
 			byAddressResp.setDelegateHas(deletgateHas);
+			/** 如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation） */
 			String deletgateLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateLocked():"0";
 			byAddressResp.setDelegateLocked(deletgateLock);
-			String deletgateUnLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString() :"0";
+			/** 如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation） */
+			String deletgateUnLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?"0":new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString() ;
 			byAddressResp.setDelegateUnlock(deletgateUnLock);
 			lists.add(byAddressResp);
 		}

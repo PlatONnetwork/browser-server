@@ -61,6 +61,12 @@ public enum ReqTransactionTypeEnum {
 		this.description = description;
 	}
 	
+	/**
+	 * 页面不同的类型进行转换，显示出需要显示的数据
+	 * @method getTxType
+	 * @param typeName
+	 * @return
+	 */
 	public static List<String> getTxType(String typeName){
 		List<String> list = new ArrayList<String>();
 		if(ReqTransactionTypeEnum.TRANSACTION_TRANSFER.getName().equals(typeName)) {
@@ -83,7 +89,7 @@ public enum ReqTransactionTypeEnum {
 			list.add(String.valueOf(TxTypeEnum.INCREASE_STAKING.getCode()));
 			list.add(String.valueOf(TxTypeEnum.EXIT_VALIDATOR.getCode()));
 			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
+//			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_PROPOSAL.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_TEXT.getCode()));

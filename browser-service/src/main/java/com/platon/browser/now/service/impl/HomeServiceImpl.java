@@ -230,7 +230,7 @@ public class HomeServiceImpl implements HomeService {
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
 			stakingListResp.setTotalValue(totalValue);
-			stakingListResp.setRanking(i);
+			stakingListResp.setRanking(i+1);
 			lists.add(stakingListResp);
 		}
 		stakingListNewResp.setDataList(lists);

@@ -21,4 +21,7 @@ public class BrowserConst {
 	/** https头*/
 	public final static String HTTPS = "https://";
 	
+	/** pre*/
+	public final static String WALLET_PRX = "0x";
+	
 }
