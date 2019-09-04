@@ -23,6 +23,9 @@ public class DelegationStaking extends DelegationKey {
     private String stakingName;
     private String statDelegateReduction;
     
+    private String allDelegate;
+    private String allLockDelegate;
+    
 	public String getDelegateHas() {
 		return delegateHas;
 	}
@@ -94,6 +97,18 @@ public class DelegationStaking extends DelegationKey {
 	}
 	public void setStatDelegateReduction(String statDelegateReduction) {
 		this.statDelegateReduction = statDelegateReduction;
+	}
+	public String getAllDelegate() {
+		return allDelegate;
+	}
+	public void setAllDelegate(String allDelegate) {
+		this.allDelegate = allDelegate;
+	}
+	public String getAllLockDelegate() {
+		return allLockDelegate;
+	}
+	public void setAllLockDelegate(String allLockDelegate) {
+		this.allLockDelegate = allLockDelegate;
 	}
     
     
