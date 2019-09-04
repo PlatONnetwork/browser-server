@@ -109,7 +109,7 @@ public class AddressCacheUpdater {
             address.setDelegateValue(stat.delegateValue.toString());
             address.setRedeemedValue(stat.redeemedValue.toString());
             address.setCandidateCount(stat.candidateCount.intValue());
-            address.setDelegateValue(stat.delegateHes.toString());
+            address.setDelegateHes(stat.delegateHes.toString());
             address.setDelegateLocked(stat.delegateLocked.toString());
             address.setDelegateUnlock(stat.delegateUnlock.toString());
             address.setDelegateReduction(stat.delegateReduction.toString());

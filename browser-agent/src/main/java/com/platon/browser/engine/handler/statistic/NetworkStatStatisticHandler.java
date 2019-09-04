@@ -63,7 +63,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());
 
-            // 成功的交易才累计
+            // 累计总交易数
             NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+curBlock.getStatTxQty());
 
             //累计成功的交易总数
