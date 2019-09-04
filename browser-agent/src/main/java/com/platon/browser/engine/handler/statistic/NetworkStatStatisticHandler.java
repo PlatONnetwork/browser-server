@@ -62,23 +62,23 @@ public class NetworkStatStatisticHandler implements EventHandler {
 
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());
+
             //累计成功的交易总数
             List<CustomTransaction> transactions = curBlock.getTransactionList();
-            transactions.forEach(transaction -> {
-                if(transaction.getTxReceiptStatus()==CustomTransaction.TxReceiptStatusEnum.SUCCESS.code){
-                    // 成功的交易才累计
-                    NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+1);
-                    // 累计提案相关交易数量
-                    switch (transaction.getTypeEnum()){
-                        case CANCEL_PROPOSAL:// 取消提案
-                        case CREATE_PROPOSAL_TEXT:// 创建文本提案
-                        case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                        case DECLARE_VERSION:// 版本声明
-                        case VOTING_PROPOSAL:// 提案投票
-                            //累计提案总数
-                            NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty()+1);
-                            break;
-                    }
+            transactions.stream().filter(transaction -> transaction.getTxReceiptStatus()==CustomTransaction.TxReceiptStatusEnum.SUCCESS.code)
+                    .forEach(transaction -> {
+                // 成功的交易才累计
+                NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+1);
+                // 累计提案相关交易数量
+                switch (transaction.getTypeEnum()){
+                    case CANCEL_PROPOSAL:// 取消提案
+                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                    case DECLARE_VERSION:// 版本声明
+                    case VOTING_PROPOSAL:// 提案投票
+                        //累计提案总数
+                        NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty()+1);
+                        break;
                 }
             });
 
