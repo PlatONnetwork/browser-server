@@ -1,10 +1,7 @@
 package com.platon.browser.engine.handler.statistic;
 
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import static com.platon.browser.dto.CustomProposal.StatusEnum;
@@ -64,18 +62,32 @@ public class NetworkStatStatisticHandler implements EventHandler {
 
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());
-            //累计交易总数
-            NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty() + curBlock.getStatTxQty());
+            //累计成功的交易总数
+            List<CustomTransaction> transactions = curBlock.getTransactionList();
+            transactions.forEach(transaction -> {
+                if(transaction.getTxReceiptStatus()==CustomTransaction.TxReceiptStatusEnum.SUCCESS.code){
+                    // 成功的交易才累计
+                    NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+1);
+                    // 累计提案相关交易数量
+                    switch (transaction.getTypeEnum()){
+                        case CANCEL_PROPOSAL:// 取消提案
+                        case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                        case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                        case DECLARE_VERSION:// 版本声明
+                        case VOTING_PROPOSAL:// 提案投票
+                            //累计提案总数
+                            NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty()+1);
+                            break;
+                    }
+                }
+            });
+
             //当前区块交易总数
             NETWORK_STAT_CACHE.setCurrentTps(curBlock.getStatTxQty());
             //已统计区块中最高交易个数
             NETWORK_STAT_CACHE.setMaxTps(NETWORK_STAT_CACHE.getMaxTps() > curBlock.getStatTxQty() ? NETWORK_STAT_CACHE.getMaxTps() : curBlock.getStatTxQty());
             //出块奖励
             NETWORK_STAT_CACHE.setBlockReward(bc.getBlockReward().toString());
-            if (curBlock.getStatProposalQty() > 0) {
-                //累计提案总数
-                NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + curBlock.getStatProposalQty());
-            }
             if (curBlock.getStatStakingQty() > 0) {
                 //统计质押金额
                 Set <CustomStaking> newStaking = STAGE_DATA.getStakingStage().getStakingInsertStage();
