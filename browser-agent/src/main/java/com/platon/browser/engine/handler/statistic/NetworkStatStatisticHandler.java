@@ -63,12 +63,13 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());
 
+            // 成功的交易才累计
+            NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+curBlock.getStatTxQty());
+
             //累计成功的交易总数
             List<CustomTransaction> transactions = curBlock.getTransactionList();
             transactions.stream().filter(transaction -> transaction.getTxReceiptStatus()==CustomTransaction.TxReceiptStatusEnum.SUCCESS.code)
                     .forEach(transaction -> {
-                // 成功的交易才累计
-                NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+1);
                 // 累计提案相关交易数量
                 switch (transaction.getTypeEnum()){
                     case CANCEL_PROPOSAL:// 取消提案
