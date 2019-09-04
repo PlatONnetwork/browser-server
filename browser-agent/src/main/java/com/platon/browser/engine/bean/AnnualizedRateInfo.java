@@ -14,4 +14,5 @@ import java.util.List;
 public class AnnualizedRateInfo {
     private List<PeriodValueElement> profit = new ArrayList<>();
     private List<PeriodValueElement> cost = new ArrayList<>();
+    private List<SlashInfo> slash = new ArrayList<>();
 }

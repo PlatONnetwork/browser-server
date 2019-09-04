@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
+import com.platon.browser.engine.bean.SlashInfo;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +104,20 @@ public class NewElectionEpochHandler implements EventHandler {
                     }
                 }
 
-                staking.setDetails(staking.getDetails()+"[slash: blockNumber="+bc.getCurBlock().getNumber()+",blockRate="+blockRate+",slashRate="+slashRate+"]");
+                // 记录处罚信息至年化率信息里面
+                String annualizedRateInfo = staking.getAnnualizedRateInfo();
+                AnnualizedRateInfo ari = new AnnualizedRateInfo();
+                if(StringUtils.isNotBlank(annualizedRateInfo)){
+                    ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
+                }
+                SlashInfo si = new SlashInfo();
+                si.setBlockNumber(bc.getCurBlock().getBlockNumber());
+                si.setBlockRate(blockRate);
+                si.setSlashRate(slashRate);
+                si.setSlashAmount(slashAmount);
+                si.setSlashTime(bc.getCurBlock().getTimestamp());
+                ari.getSlash().add(si);
+                staking.setAnnualizedRateInfo(JSON.toJSONString(annualizedRateInfo));
 
                 // 把更新暂存到待入库列表
                 stakingStage.updateStaking(staking);
