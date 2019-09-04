@@ -117,7 +117,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 si.setSlashAmount(slashAmount);
                 si.setSlashTime(bc.getCurBlock().getTimestamp());
                 ari.getSlash().add(si);
-                staking.setAnnualizedRateInfo(JSON.toJSONString(annualizedRateInfo));
+                staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
 
                 // 把更新暂存到待入库列表
                 stakingStage.updateStaking(staking);

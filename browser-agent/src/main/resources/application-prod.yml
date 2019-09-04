@@ -14,16 +14,18 @@ web3j:
   collect.batch-size: 1000
 # Redis集群节点
 redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-# 日志文件存储文件
-logpath: ./logs/${spring.application.name}-${version}-${profile}.log
-# 日志级别
-loglevel:
-  spring: error
-  platon.task: error
-  platon.engine: error
-  platon.client: error
-  platon.dao: error
-  platon.service: error
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  level:
+    org.springframework: error
+    com.platon.browser: error
+    com.platon.browser.service: error
+    com.platon.browser.task: error
+    com.platon.browser.client: error
+    com.platon.browser.dao: error
+    com.platon.browser.engine: error
+    com.platon.browser.engine.handler.epoch: error
 
 #初始化链相关的配置
 platon.config:

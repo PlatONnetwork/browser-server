@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 节点进程缓存
@@ -21,8 +22,8 @@ public class NodeCache {
     private static Logger logger = LoggerFactory.getLogger(NodeCache.class);
     // <节点ID - 节点实体>
     private Map<String, CustomNode> nodeMap = new TreeMap<>();
-    private Set<CustomStaking> stakingSet = new HashSet<>();
-    private Set<CustomDelegation> delegationSet = new HashSet<>();
+    private Set<CustomStaking> stakingSet = new CopyOnWriteArraySet<>();
+    private Set<CustomDelegation> delegationSet = new CopyOnWriteArraySet<>();
 
     public void init(List<CustomNode> nodeList,
                      List<CustomStaking> stakingList,
