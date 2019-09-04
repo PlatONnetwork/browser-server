@@ -264,12 +264,13 @@ public class BlockSyncTask {
                     CustomNode node = new CustomNode();
                     node.updateWithNode(verifier);
                     node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
-                    node.setStatVerifierTime(BigInteger.ONE.intValue());
+                    node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                     node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
                     BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
 
                     CustomStaking staking = new CustomStaking();
                     staking.updateWithNode(verifier);
+                    staking.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                     staking.setIsInit(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
                     // 内置节点默认设置状态为1

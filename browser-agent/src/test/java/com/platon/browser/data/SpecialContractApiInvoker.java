@@ -1,53 +1,33 @@
 package com.platon.browser.data;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
-import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.ContractInvokeException;
-import com.platon.browser.util.Resolver;
-import jnr.ffi.annotations.In;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.abi.TypeReference;
-import org.web3j.abi.Utils;
-import org.web3j.abi.datatypes.*;
-import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.BytesType;
 import org.web3j.platon.BaseResponse;
-import org.web3j.platon.ContractAddress;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.NodeContract;
-import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.PlatonCall;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.rlp.*;
-import org.web3j.tx.ReadonlyTransactionManager;
-import org.web3j.tx.gas.DefaultWasmGasProvider;
+import org.web3j.rlp.RlpEncoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
 import org.web3j.utils.Convert;
-import org.web3j.utils.JSONUtil;
-import org.web3j.utils.Numeric;
-import org.web3j.utils.PlatOnUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * @Auther: Chendongming
@@ -57,8 +37,8 @@ import java.util.concurrent.Callable;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
 //    private Web3j web3j = Web3j.build(new HttpService("http://192.168.21.138:6789"));
-//    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:6789"));
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
+//    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.172:6789"));
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private static NodeContract nodeContract = NodeContract.load(web3j);
 
@@ -124,9 +104,11 @@ public class SpecialContractApiInvoker {
 //            Web3j web3j2 = Web3j.build(new HttpService("http://192.168.112.172:6789"));
             Web3j web3j2 = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 
+            List<Node> nodes = nodeContract.getVerifierList().send().data;
+
             BigInteger number = web3j2.platonBlockNumber().send().getBlockNumber();
 
-            List<Node>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(1040)).data;
+            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(8040));
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;
