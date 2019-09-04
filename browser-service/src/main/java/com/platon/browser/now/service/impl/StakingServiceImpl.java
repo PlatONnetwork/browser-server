@@ -19,6 +19,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.StakingNode;
+import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.dao.mapper.NodeOptMapper;
@@ -61,6 +62,8 @@ public class StakingServiceImpl implements StakingService {
 
 	@Autowired
 	private CustomStakingMapper customStakingMapper;
+	@Autowired
+	private CustomDelegationMapper customDelegationMapper;
 	
 	@Autowired
 	private NodeOptMapper nodeOptMapper;
@@ -287,8 +290,8 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByStakingResp> lists = new LinkedList<DelegationListByStakingResp>();
 		/** 根据节点id和区块查询验证委托信息 */
 		List<DelegationStaking> delegationStakings = 
-				delegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
-		List<DelegationStaking> sumDelegationStaking = delegationMapper.selectSumDelegateByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+				customDelegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
+		List<DelegationStaking> sumDelegationStaking = customDelegationMapper.selectSumDelegateByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
 		String allDelegate = sumDelegationStaking.get(0).getAllDelegate();
 		String allLockDelegate = sumDelegationStaking.get(0).getAllLockDelegate();
 		for (DelegationStaking delegationStaking: delegationStakings) {
@@ -327,7 +330,7 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByAddressResp> lists = new LinkedList<DelegationListByAddressResp>();
 		/** 根据地址分页查询委托列表 */
 		List<DelegationStaking> delegationStakings = 
-				delegationMapper.selectDelegationAndStakingByExample(null,null,req.getAddress());
+				customDelegationMapper.selectDelegationAndStakingByExample(null,null,req.getAddress());
 		for (DelegationStaking delegationStaking:  delegationStakings) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationStaking, byAddressResp);

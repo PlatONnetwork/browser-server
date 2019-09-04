@@ -13,20 +13,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-    <resultMap id="AndStakingResultMap" type="com.platon.browser.dao.entity.DelegationStaking">
-    <id column="delegate_addr" jdbcType="VARCHAR" property="delegateAddr" />
-    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
-    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="delegate_has" jdbcType="VARCHAR" property="delegateHas" />
-    <result column="delegate_locked" jdbcType="VARCHAR" property="delegateLocked" />
-    <result column="delegate_reduction" jdbcType="VARCHAR" property="delegateReduction" />
-    
-    <result column="stat_delegate_has" jdbcType="VARCHAR" property="statDelegateHas" />
-    <result column="stat_delegate_locked" jdbcType="VARCHAR" property="statDelegateLocked" />
-    <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="staking_name" jdbcType="VARCHAR" property="stakingName" />
-    <result column="stat_delegate_reduction" jdbcType="VARCHAR" property="statDelegateReduction" />
-  </resultMap>
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -369,40 +356,5 @@
       )
     </foreach>
   </insert>
-  
-  <select id="selectDelegationAndStakingByExample" resultMap="AndStakingResultMap">
-  	SELECT 
-		t1.delegate_addr,t1.staking_block_num,t1.node_id,t1.delegate_has,t1.delegate_locked,t1.delegate_reduction,
-		t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name
-	FROM delegation t1
-	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
-	<where>
-		<if test="delegateAddr != null">
-			AND t1.delegate_addr=#{delegateAddr,jdbcType=VARCHAR}
-		</if>
-		<if test="nodeId != null">
-			AND t1.node_id=#{nodeId,jdbcType=VARCHAR}
-		</if>
-		<if test="stakingBlockNum != null">
-			AND t1.staking_block_num=#{stakingBlockNum,jdbcType=BIGINT}
-		</if>
-	</where>
-  </select>
-  
-  <select id="selectSumDelegateByExample" resultMap="AndStakingResultMap">
-	select 
-	  	sum(cast(t1.delegate_has as Decimal(30)) + cast(t1.delegate_locked as Decimal(30))) as 'allDelegate',
-		sum(case when t2.status=2 then t1.delegate_locked end) as 'allLockDelegate'
-	FROM delegation t1
-	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
-	<where>
-		<if test="nodeId != null">
-			AND t1.node_id=#{nodeId,jdbcType=VARCHAR}
-		</if>
-		<if test="stakingBlockNum != null">
-			AND t1.staking_block_num=#{stakingBlockNum,jdbcType=BIGINT}
-		</if>
-	</where>
-  </select>
   
 </mapper>
