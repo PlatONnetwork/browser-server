@@ -455,19 +455,8 @@ public class BlockSyncTask {
             Stat stat = new Stat();
             block.getTransactionList().forEach(transaction->{
                 switch (transaction.getTypeEnum()){
-                    case TRANSFER: // 转账交易数总和
+                    case TRANSFER: // 转账交易，from地址转账交易数加一
                         stat.transferQty++;
-                        break;
-                    case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
-                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
-                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                    case DECLARE_VERSION:// 版本声明
-                    case VOTING_PROPOSAL:// 提案投票
-                        stat.proposalQty++; // 提案交易数总和
-                        break;
-                    case DELEGATE:// 发起委托
-                    case UN_DELEGATE:// 撤销委托
-                        stat.delegateQty++; // 委托交易数总和
                         break;
                     case INCREASE_STAKING:// 增加自有质押
                     case CREATE_VALIDATOR:// 创建验证人
@@ -475,6 +464,17 @@ public class BlockSyncTask {
                     case REPORT_VALIDATOR:// 举报验证人
                     case EDIT_VALIDATOR:// 编辑验证人
                         stat.stakingQty++; // 质押交易数总和
+                        break;
+                    case DELEGATE:// 发起委托
+                    case UN_DELEGATE:// 撤销委托
+                        stat.delegateQty++; // 委托交易数总和
+                        break;
+                    case CANCEL_PROPOSAL:// 取消提案
+                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                    case DECLARE_VERSION:// 版本声明
+                    case VOTING_PROPOSAL:// 提案投票
+                        stat.proposalQty++; // 提案交易数总和
                         break;
                 }
                 // 累加当前区块内所有交易的手续费

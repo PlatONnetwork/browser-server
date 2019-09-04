@@ -8,11 +8,13 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
-import static java.util.Comparator.*;
+import static java.util.Comparator.comparing;
 
 /**
  * @Auther: Chendongming
@@ -81,18 +83,6 @@ public class CustomBlock extends Block {
             ex.printStackTrace();
             throw ex;
         }
-
-        class Stat {
-            private int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
-            private BigDecimal txFee = BigDecimal.ZERO;
-        }
-        Stat stat = new Stat();
-        this.setStatDelegateQty(stat.delegateQty);
-        this.setStatProposalQty(stat.proposalQty);
-        this.setStatStakingQty(stat.stakingQty);
-        this.setStatTransferQty(stat.transferQty);
-        this.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
-        this.setStatTxFee(stat.txFee.toString());
 
         // 确保区块内的交易顺序
         transactionList.sort(comparing(Transaction::getTransactionIndex));

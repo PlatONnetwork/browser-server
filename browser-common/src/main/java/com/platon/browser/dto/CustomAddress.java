@@ -73,7 +73,7 @@ public class CustomAddress extends Address {
             case UN_DELEGATE:// 撤销委托
                 this.setDelegateQty(this.getDelegateQty()+1); // 累加委托交易总数
                 break;
-            case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
+            case CANCEL_PROPOSAL:// 取消提案
             case CREATE_PROPOSAL_TEXT:// 创建文本提案
             case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
             case DECLARE_VERSION:// 版本声明
