@@ -48,9 +48,10 @@ public class NewElectionEpochHandler implements EventHandler {
         String tpl = "当前区块号({CUR_NUMBER}),前一共识轮出块数(PRE_QTY),前一共识轮出块率(PRE_BLOCK_RATE),处罚率(SLASH_RATE),被罚金额(SLASH_AMOUNT)";
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakingList){
+            logger.error("nodeId={}",staking.getNodeId());
             // 需要判断被处罚质押是否在上一轮共识周期验证人
             Node exist = bc.getPreValidator().get(staking.getNodeId());
-            if(exist==null) return;
+            if(exist==null) continue;
             // 根据前一个共识周期的出块数判断是否触发最低处罚
             // 计算出块率
             BigDecimal blockRate = new BigDecimal(staking.getPreConsBlockQty())
