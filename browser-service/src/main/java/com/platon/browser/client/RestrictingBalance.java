@@ -24,4 +24,8 @@ public class RestrictingBalance {
     public void setLockBalance(String lockBalance) {
         this.lockBalance = Numeric.decodeQuantity(lockBalance);
     }
+
+    public void setPledgeBalance(String pledgeBalance) {
+        this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
+    }
 }
