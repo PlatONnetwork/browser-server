@@ -47,7 +47,7 @@ public class AddressUpdateTask {
                 addresses.forEach(address->{
                     RestrictingBalance rb = map.get(address.getAddress());
                     if(rb!=null){
-                        address.setRestrictingBalance(rb.getLockBalance()!=null?rb.getLockBalance().toString():"0");
+                        address.setRestrictingBalance(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0");
                         address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
                         // 把改动后的内容暂存至待更新列表
                         STAGE_DATA.getAddressStage().updateAddress(address);

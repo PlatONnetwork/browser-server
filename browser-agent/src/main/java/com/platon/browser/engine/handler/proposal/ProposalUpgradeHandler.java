@@ -60,6 +60,8 @@ public class ProposalUpgradeHandler implements EventHandler {
         } catch (NoSuchBeanException e) {
             throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
+        //设置本轮参与人数
+        proposal.setAccuVerifiers(Long.valueOf(bc.getCurValidator().size()));
 
         proposal.setVerifierName(staking.getStakingName());
         //交易信息回填

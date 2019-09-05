@@ -140,6 +140,7 @@ public class SpecialContractApi {
             }
             String data = (String)response.data;
             data = data.replace("\"lockBalance\":null","\"lockBalance\":\"0x0\"");
+            data = data.replace("\"pledgeBalance\":null","\"pledgeBalance\":\"0x0\"");
             response.data = JSONUtil.parseArray(data, RestrictingBalance.class);
             return response;
         }).send();
