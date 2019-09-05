@@ -1,5 +1,6 @@
-package com.platon.browser;
+package com.platon.browser.other;
 
+import com.platon.browser.BrowserAgentApplication;
 import com.platon.browser.client.PlatonClient;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;

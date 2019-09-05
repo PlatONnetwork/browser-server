@@ -44,7 +44,7 @@ public class ProposalTextHandler implements EventHandler {
         //根据交易参数解析成对应文本提案结构
         CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx);
+        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
         CustomNode node;
         try {
             node = NODE_CACHE.getNode(param.getVerifier());
@@ -60,8 +60,6 @@ public class ProposalTextHandler implements EventHandler {
         //交易信息回填
         param.setNodeName(staking.getStakingName());
         tx.setTxInfo(JSON.toJSONString(param));
-        //设置本轮参与人数
-        proposal.setAccuVerifiers(Long.valueOf(bc.getCurValidator().size()));
         //获取配置文件提案参数模板
         String temp = bc.getChainConfig().getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key,param.getPIDID());

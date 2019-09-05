@@ -44,7 +44,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx);
+        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
         //设置提案人
         proposal.setVerifier(param.getVerifier());
 
@@ -60,9 +60,6 @@ public class ProposalUpgradeHandler implements EventHandler {
         } catch (NoSuchBeanException e) {
             throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
-        //设置本轮参与人数
-        proposal.setAccuVerifiers(Long.valueOf(bc.getCurValidator().size()));
-
         proposal.setVerifierName(staking.getStakingName());
         //交易信息回填
         param.setNodeName(staking.getStakingName());

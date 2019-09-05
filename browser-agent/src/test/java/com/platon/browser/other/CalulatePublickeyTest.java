@@ -1,5 +1,6 @@
-package com.platon.browser;
+package com.platon.browser.other;
 
+import com.platon.browser.BrowserAgentApplication;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.utils.NodeTool;
 import org.junit.Test;
