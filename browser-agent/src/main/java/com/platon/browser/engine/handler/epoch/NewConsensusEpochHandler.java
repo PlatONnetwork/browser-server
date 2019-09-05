@@ -86,9 +86,13 @@ public class NewConsensusEpochHandler implements EventHandler {
             customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
             // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
             customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
-            CustomStaking latestStaking = customNode.getLatestStaking();
-            // 节点最新质押记录经过的共识轮数+1
-            latestStaking.setStatVerifierTime(latestStaking.getStatVerifierTime()+1);
+            try {
+                CustomStaking latestStaking = customNode.getLatestStaking();
+                // 节点最新质押记录经过的共识轮数+1
+                latestStaking.setStatVerifierTime(latestStaking.getStatVerifierTime()+1);
+            } catch (NoSuchBeanException e) {
+                logger.debug("无质押，不处理");
+            }
         }
         logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }
