@@ -207,6 +207,6 @@ public class SpecialContractApiInvoker {
 
         System.out.println(rate);
 
-
+        //SpecialContractApi.getRestrictingBalance(web3j,"0x1000000000000000000000000000000000000003");
     }
 }

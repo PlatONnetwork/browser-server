@@ -14,9 +14,6 @@ spring:
   #Redis集群配置
   redis:
     database: 0
-    cluster:
-      max-redirects: 3
-      nodes: ${redis}
   #数据源配置
   datasource:
     name: test
