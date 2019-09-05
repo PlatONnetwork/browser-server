@@ -85,7 +85,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             // 节点经过的共识周期轮数+1
             customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
             // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
-            customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
+            customNode.setStatExpectBlockQty(customNode.getStatVerifierTime()*chainConfig.getExpectBlockCount().longValue());
             try {
                 CustomStaking latestStaking = customNode.getLatestStaking();
                 // 节点最新质押记录经过的共识轮数+1
