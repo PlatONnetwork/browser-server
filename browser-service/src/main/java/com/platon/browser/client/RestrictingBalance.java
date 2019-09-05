@@ -15,6 +15,7 @@ public class RestrictingBalance {
     private String account;
     private BigInteger freeBalance;
     private BigInteger lockBalance;
+    private BigInteger pledgeBalance;
 
     public void setFreeBalance(String freeBalance) {
         this.freeBalance = Numeric.decodeQuantity(freeBalance);
