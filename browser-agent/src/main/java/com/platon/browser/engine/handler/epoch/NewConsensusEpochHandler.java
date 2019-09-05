@@ -66,9 +66,6 @@ public class NewConsensusEpochHandler implements EventHandler {
             // 看当前验证人是否在下一轮共识
             if(nextNode!=null){
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
-                // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
-                CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
-                customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
@@ -85,12 +82,14 @@ public class NewConsensusEpochHandler implements EventHandler {
         // 下一轮验证人提前设置验证轮数：验证周期轮数+1
         for (Node node:bc.getCurValidator().values()){
             CustomNode customNode = NODE_CACHE.getNode(HexTool.prefix(node.getNodeId()));
+            // 节点经过的共识周期轮数+1
             customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
+            // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
+            customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
             CustomStaking latestStaking = customNode.getLatestStaking();
-            customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
+            // 节点最新质押记录经过的共识轮数+1
             latestStaking.setStatVerifierTime(latestStaking.getStatVerifierTime()+1);
         }
-
         logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }
 
