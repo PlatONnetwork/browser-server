@@ -352,11 +352,9 @@ public class BlockSyncTask {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
-
             } catch (BusinessException e) {
                 break;
             }
-            blockChain.commitResult();
             // 记录已采入库最高区块号
             commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
             try {
@@ -533,6 +531,7 @@ public class BlockSyncTask {
             stakingCacheUpdater.updateStakingStatistics();
             // 串行批量入库
             dbService.insertOrUpdate(basicData,bizData);
+            blockChain.commitResult();
             // 缓存整理
             BlockChain.NODE_CACHE.sweep();
             BlockChain.PROPOSALS_CACHE.sweep();

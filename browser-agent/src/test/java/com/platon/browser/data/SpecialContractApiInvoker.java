@@ -108,7 +108,7 @@ public class SpecialContractApiInvoker {
 
             BigInteger number = web3j2.platonBlockNumber().send().getBlockNumber();
 
-            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(8040));
+            BaseResponse<List<Node>>  v9840 = SpecialContractApi.getHistoryVerifierList(web3j2,BigInteger.valueOf(50215));
 //            List<Node>  v9841 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9841)).data;
 //            List<Node>  v9880 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9880)).data;
 //            List<Node>  v9881 = SpecialContractApi.getHistoryValidatorList(web3j2,BigInteger.valueOf(9881)).data;

@@ -61,7 +61,6 @@ public class NewConsensusEpochHandler implements EventHandler {
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
         Map<String,String> consensusInfo = new HashMap<>();
         String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
-        // 前一轮共识周期的验证人
         for (CustomStaking staking:stakingList){
             Node nextNode = bc.getCurValidator().get(staking.getNodeId());
             // 看当前验证人是否在下一轮共识
@@ -70,9 +69,6 @@ public class NewConsensusEpochHandler implements EventHandler {
                 // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
                 CustomNode customNode = NODE_CACHE.getNode(staking.getNodeId());
                 customNode.setStatExpectBlockQty(customNode.getStatExpectBlockQty()+chainConfig.getExpectBlockCount().longValue());
-                // // 提前设置验证轮数：验证周期轮数+1
-                customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
-                staking.setStatVerifierTime(staking.getStatVerifierTime()+1);
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
@@ -86,15 +82,14 @@ public class NewConsensusEpochHandler implements EventHandler {
             stakingStage.updateStaking(staking);
         }
 
-        // 更新node表中的共识验证轮数: stat_verifier_time
-        /*bc.getCurValidator().forEach((nodeId,validator)->{
-            try {
-                CustomNode node = NODE_CACHE.getNode(nodeId);
-                node.setStatVerifierTime(node.getStatVerifierTime()+1);
-            } catch (NoSuchBeanException e) {
-                logger.error("更新共识验证人(nodeId={})验证轮数出错:{}",nodeId,e.getMessage());
-            }
-        });*/
+        // 下一轮验证人提前设置验证轮数：验证周期轮数+1
+        for (Node node:bc.getCurValidator().values()){
+            CustomNode customNode = NODE_CACHE.getNode(HexTool.prefix(node.getNodeId()));
+            customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
+            CustomStaking latestStaking = customNode.getLatestStaking();
+            customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
+            latestStaking.setStatVerifierTime(latestStaking.getStatVerifierTime()+1);
+        }
 
         logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }

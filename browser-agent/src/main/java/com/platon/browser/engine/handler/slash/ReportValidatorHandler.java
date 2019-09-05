@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
@@ -52,7 +51,7 @@ public class ReportValidatorHandler implements EventHandler {
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
             latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
             //设置离开时间
-            latestStaking.setLeaveTime(new Date());
+            latestStaking.setLeaveTime(bc.getCurBlock().getTimestamp());
             //判断现在的锁定期金额是否大于零
             if (latestStaking.integerStakingLocked().compareTo(BigInteger.ZERO) > 0) {
                 latestStaking.setStakingReduction(latestStaking.getStakingLocked());
