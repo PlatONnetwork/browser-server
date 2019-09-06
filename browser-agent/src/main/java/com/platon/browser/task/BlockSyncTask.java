@@ -1,28 +1,23 @@
 package com.platon.browser.task;
 
-import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.CollectResult;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.AddressCacheUpdater;
 import com.platon.browser.engine.cache.StakingCacheUpdater;
-import com.platon.browser.engine.handler.epoch.NewConsensusEpochHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
-import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.*;
+import com.platon.browser.service.BlockService;
 import com.platon.browser.service.DbService;
-import com.platon.browser.util.TxParamResolver;
+import com.platon.browser.service.TransactionService;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +27,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
-import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 import static java.lang.String.format;
@@ -55,7 +46,7 @@ import static java.lang.String.format;
 @Component
 public class BlockSyncTask {
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
-    private static ExecutorService THREAD_POOL;
+    public static ExecutorService THREAD_POOL;
 
     @Autowired
     private CustomBlockMapper customBlockMapper;
@@ -71,10 +62,10 @@ public class BlockSyncTask {
     private AddressCacheUpdater addressCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
-
-
     @Autowired
-    private NewConsensusEpochHandler newConsensusEpochHandler;
+    private BlockService blockService;
+    @Autowired
+    private TransactionService transactionService;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -83,26 +74,7 @@ public class BlockSyncTask {
     @Value("${platon.web3j.collect.batch-size}")
     private int collectBatchSize;
 
-    @Data
-    static class Result {
-        // 并发采集的块信息，无序
-        public Map <Long, CustomBlock> concurrentBlockMap = new ConcurrentHashMap <>();
-        // 由于异常而未采集的区块号列表
-        private Set <BigInteger> retryNumbers = new CopyOnWriteArraySet <>();
-        // 已排序的区块信息列表
-        private List <CustomBlock> sortedBlocks = new LinkedList <>();
-
-        private List <CustomBlock> getSortedBlocks () {
-            if (sortedBlocks.size() == 0) {
-                sortedBlocks.addAll(concurrentBlockMap.values());
-                sortedBlocks.sort(Comparator.comparing(Block::getNumber));
-            }
-            return sortedBlocks;
-        }
-    }
-
     private void initValidator(Long blockNumber) throws Exception {
-
         BaseResponse<List <Node>> result;
         // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
@@ -149,7 +121,6 @@ public class BlockSyncTask {
 
     private void initVerifier (Long blockNumber) throws CandidateException, BlockNumberException {
         BaseResponse<List <Node>> result;
-
         // ==================================更新前一周期验证人列表=======================================
         // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getSettlePeriodBlockCount().longValue());
@@ -211,7 +182,6 @@ public class BlockSyncTask {
         }
         initValidator(initBlockNumber);
         initVerifier(initBlockNumber);
-
 
         /*
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -281,7 +251,6 @@ public class BlockSyncTask {
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
 
-
                     CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
                     if(StringUtils.isBlank(staking.getStakingName())&&defaultStaking!=null)
                         staking.setStakingName(defaultStaking.getStakingName());
@@ -307,7 +276,7 @@ public class BlockSyncTask {
     public void start() throws Exception {
         while (true) {
             // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
-            List <BigInteger> blockNumbers = new ArrayList <>();
+            Set<BigInteger> blockNumbers = new HashSet<>();
             // 当前链上最新区块号
             BigInteger curChainBlockNumber;
             try {
@@ -330,9 +299,11 @@ public class BlockSyncTask {
                 continue;
             }
             // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
-            Result collectedResult = new Result();
-            parallelCollect(blockNumbers, collectedResult);
-            List <CustomBlock> blocks = collectedResult.getSortedBlocks();
+            // 采集前先重置结果容器
+            CollectResult.reset();
+            // 开始并行采集
+            blockService.collect(blockNumbers);
+            List <CustomBlock> blocks = CollectResult.getSortedBlocks();
             // 采集不到区块则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
                 try {
@@ -343,14 +314,12 @@ public class BlockSyncTask {
                 continue;
             }
             // 并行分析 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
-            parallelAnalyze(blocks);
-            // 调用BlockChain实例，分析质押、提案相关业务数据
-            for (CustomBlock block:blocks){
-                blockChain.execute(block);
-            }
+            transactionService.analyze(blocks);
+            // 调用BlockChain实例, 串行分析每个区块，获取质押、提案相关业务数据
+            for (CustomBlock block:blocks) blockChain.execute(block);
+            BlockChainStage bizData = blockChain.exportResult();
             try {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
-                BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
             } catch (BusinessException e) {
                 break;
@@ -362,165 +331,6 @@ public class BlockSyncTask {
             } catch (InterruptedException e) {
                 throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
             }
-        }
-    }
-
-    /**
-     * 并行采集区块及交易，并转换为数据库结构
-     *
-     * @param blockNumbers 批量采集的区块号
-     * @return void
-     */
-    private void parallelCollect ( List <BigInteger> blockNumbers, Result result ) throws BlockCollectingException {
-        // 清空重试区块号列表
-        result.retryNumbers.clear();
-        // 并行批量采集区块
-        CountDownLatch latch = new CountDownLatch(blockNumbers.size());
-        blockNumbers.forEach(blockNumber->
-            THREAD_POOL.submit(()->{
-                try {
-                    Web3j web3j = client.getWeb3j();
-                    PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-                    if(initData!=null) {
-                        try{
-                            CustomBlock block = new CustomBlock();
-                            block.updateWithBlock(initData);
-                            result.concurrentBlockMap.put(blockNumber.longValue(),block);
-                        }catch (Exception ex){
-                            logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
-                            throw ex;
-                        }
-                    }
-                } catch (Exception e) {
-                    // 把出现异常的区块号加入重试列表
-                    result.retryNumbers.add(blockNumber);
-                }finally {
-                    latch.countDown();
-                }
-            })
-        );
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            throw new BlockCollectingException("区块采集线程被中断:"+e.getMessage());
-        }
-
-        if (result.concurrentBlockMap.size() > 0) {
-            // 查看已采块是否连续，把缺失的区块号放入重试列表
-            Set <Long> collected = result.concurrentBlockMap.keySet();
-            long start = Collections.min(collected), end = Collections.max(collected);
-            for (long i = start; i < end; i++) {
-                if (!collected.contains(i)) result.retryNumbers.add(BigInteger.valueOf(i));
-            }
-        }
-
-        if (result.retryNumbers.size() > 0) {
-            logger.debug("区块重试列表：{}", result.retryNumbers);
-            parallelCollect(new ArrayList <>(result.retryNumbers), result);
-        }
-    }
-
-    /**
-     * 并行分析区块及交易
-     */
-    private void parallelAnalyze( List <CustomBlock> blocks ) {
-        // 对需要复杂分析的区块或交易信息，开启并行处理
-        blocks.forEach(b -> {
-            List <CustomTransaction> txList = b.getTransactionList();
-            CountDownLatch latch = new CountDownLatch(txList.size());
-            txList.forEach(tx ->THREAD_POOL.submit(() -> {
-                try {
-                    updateTransaction(tx);
-                } catch (Exception e) {
-                    logger.error("更新交易信息错误：{}", e.getMessage());
-                } finally {
-                    latch.countDown();
-                }
-            }));
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        // 汇总区块相关的统计信息
-        class Stat {
-            private int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
-            private BigDecimal txFee = BigDecimal.ZERO;
-        }
-        blocks.forEach(block->{
-            Stat stat = new Stat();
-            block.getTransactionList().forEach(transaction->{
-                switch (transaction.getTypeEnum()){
-                    case TRANSFER: // 转账交易，from地址转账交易数加一
-                        stat.transferQty++;
-                        break;
-                    case INCREASE_STAKING:// 增加自有质押
-                    case CREATE_VALIDATOR:// 创建验证人
-                    case EXIT_VALIDATOR:// 退出验证人
-                    case REPORT_VALIDATOR:// 举报验证人
-                    case EDIT_VALIDATOR:// 编辑验证人
-                        stat.stakingQty++; // 质押交易数总和
-                        break;
-                    case DELEGATE:// 发起委托
-                    case UN_DELEGATE:// 撤销委托
-                        stat.delegateQty++; // 委托交易数总和
-                        break;
-                    case CANCEL_PROPOSAL:// 取消提案
-                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
-                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                    case DECLARE_VERSION:// 版本声明
-                    case VOTING_PROPOSAL:// 提案投票
-                        stat.proposalQty++; // 提案交易数总和
-                        break;
-                }
-                // 累加当前区块内所有交易的手续费
-                stat.txFee = stat.txFee.add(new BigDecimal(transaction.getActualTxCost()));
-                // 累加当前区块内所有交易的GasLimit
-                stat.txGasLimit = stat.txGasLimit+Integer.parseInt(transaction.getGasLimit());
-            });
-            block.setStatDelegateQty(stat.delegateQty);
-            block.setStatProposalQty(stat.proposalQty);
-            block.setStatStakingQty(stat.stakingQty);
-            block.setStatTransferQty(stat.transferQty);
-            block.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
-            block.setStatTxFee(stat.txFee.toString());
-        });
-    }
-
-    /**
-     * 分析区块获取code&交易回执
-     */
-    private void updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
-        try {
-            // 查询交易回执
-            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
-            // 如果交易回执存在，则更新交易中与回执相关的信息
-            if(receipt.isPresent()) tx.updateWithTransactionReceipt(receipt.get(),BlockChainConfig.INNER_CONTRACT_ADDR);
-        }catch (IOException e){
-            logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
-            throw e;
-        }catch (BeanCreateOrUpdateException e){
-            logger.error("更新交易[hash={}]的回执相关信息出错:{}",tx.getHash(),e.getMessage());
-            throw e;
-        }
-
-        // 解析交易参数，补充交易中与交易参数相关的信息
-        try {
-            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
-            tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
-            tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
-            tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.ADDRESSES.contains(tx.getTo())){
-                tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.code));
-                tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
-            }
-        }catch (Exception e){
-            logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
-            throw e;
         }
     }
 

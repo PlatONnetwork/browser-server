@@ -20,15 +20,15 @@ import java.util.List;
 public class SpecialContractApiInvoker {
     private static Logger logger = LoggerFactory.getLogger(SpecialContractApiInvoker.class);
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.76:6797")); // atonDev
-    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.90:6789")); // atonTest
+    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.89:6789")); // atonTest
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789")); // test
     private static NodeContract nodeContract = NodeContract.load(web3j);
 
     public static void main(String args[]) throws Exception {
-        BaseResponse<List<Node>>  verifierList = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(50215));
-        BaseResponse<List<Node>>  validatorList = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(50215));
-
-        BaseResponse<List<Node>> nodes = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.ZERO);
-        System.out.println(nodes);
+        // 查询共识周期验证人历史
+        BaseResponse<List<Node>> validatorList = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.ZERO);
+        // 查询结算周期验证人历史
+        BaseResponse<List<Node>> verifierList = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.ZERO);
+        System.out.println("null");
     }
 }
