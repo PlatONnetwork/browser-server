@@ -1,6 +1,5 @@
 package com.platon.browser.config;
 
-import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import lombok.Data;
@@ -88,7 +87,7 @@ public class BlockChainConfig {
     //keyBase
     private String keyBase;
     // 初始内置节点默认质押金额(VON)
-    private String defaultStakingLockedAmount;
+    private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakings=new ArrayList<>();
     //设置预升级开始轮数

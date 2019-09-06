@@ -37,6 +37,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -276,7 +277,8 @@ public class BlockSyncTask {
                     // 内置节点默认设置状态为1
                     staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
                     // 设置内置节点质押锁定金额
-                    staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
+                    BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
+                    staking.setStakingLocked(initStakingLocked.toString());
                     // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
