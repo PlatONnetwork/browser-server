@@ -1,31 +1,32 @@
-# ***************************预生产配置**************************** #
+# ***************************开发配置**************************** #
 spring:
   redis:
-    host:
+    host: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com
+    port: 6379
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: preprod
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
 # MySQL数据库用户名
-dbuser: platon
+dbuser: admin
 # MySQL数据库密码
-dbpass: platon
+dbpass: Juzhen1234
 web3j:
-  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
-  collect.batch-size: 1000
+  addresses: http://18.140.20.252:6789
+  collect.batch-size: 1
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
   level:
-    org.springframework: error
-    com.platon.browser: error
-    com.platon.browser.service: error
-    com.platon.browser.task: error
-    com.platon.browser.client: error
-    com.platon.browser.dao: error
-    com.platon.browser.engine: error
+    org.springframework: debug
+    com.platon.browser: debug
+    com.platon.browser.service: debug
+    com.platon.browser.task: debug
+    com.platon.browser.client: debug
+    com.platon.browser.dao: debug
+    com.platon.browser.engine: debug
     com.platon.browser.engine.handler.epoch: error
 
 #初始化链相关的配置
@@ -52,24 +53,24 @@ platon.config:
   blockRate4HighSlash: 0.2
   #违规-低出块率: 最高处罚百分比
   blockHighSlashRate: 0.5
-  #质押门槛: 创建验证人最低的质押Token数(LAT)
+  #质押门槛: 创建验证人最低的质押Token数
   stakeThreshold: 5000000
-  #委托门槛(LAT)
+  #委托门槛
   delegateThreshold: 10
   #出块间隔(秒)
-  blockInterval: 2
+  blockInterval: 1
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
-  consensusPeriodBlockCount: 250
+  consensusPeriodBlockCount: 40
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 10750
-  #每个增发周期区块总数(1466个结算周期)
-  addIssuePeriodBlockCount: 15759500
+  settlePeriodBlockCount: 160
+  #每个增发周期区块总数(1466个结算周期=15759500个块)
+  addIssuePeriodBlockCount: 1600
   #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 28
+  unstakeRefundSettlePeriodCount: 2
   #升级提案预升级轮数
   versionProposalActiveConsensusRounds: 5
   #文本提案默认投票结束轮数
@@ -87,7 +88,7 @@ platon.config:
   #双签低处罚百分比
   duplicateSignLowSlashRate: 1
   #开发者激励基金账户地址
-  developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
+  developerIncentiveFundAccountAddr: '0xfd9d508df262a1c968e0d6c757ab08b96d741f4b'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
