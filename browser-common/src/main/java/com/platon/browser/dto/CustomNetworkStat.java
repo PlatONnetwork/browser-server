@@ -15,6 +15,9 @@ public class CustomNetworkStat extends NetworkStat {
 
     public CustomNetworkStat () {
         super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
         this.setId(1); // 只有一条数据，默认ID为1
         this.setCurrentNumber(0L);
         this.setNodeName("");
@@ -34,9 +37,6 @@ public class CustomNetworkStat extends NetworkStat {
         this.setAddIssueBegin(0L);
         this.setAddIssueEnd(0L);
         this.setNextSetting(0L);
-        Date date = new Date();
-        this.setCreateTime(date);
-        this.setUpdateTime(date);
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
