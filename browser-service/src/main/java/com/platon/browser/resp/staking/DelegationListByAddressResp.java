@@ -19,6 +19,7 @@ public class DelegationListByAddressResp {
     private String allDelegateLocked; //当前验证人总接收的锁定委托量（LAT）
     private String delegateUnlock;    //已解除委托（LAT） 
     private String delegateReduction;  //赎回中委托（LAT） 
+    private String delegateTotalValue;// 验证人委托的总金额
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -31,6 +32,7 @@ public class DelegationListByAddressResp {
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getDelegateValue() {
 		return delegateValue;
 	}
@@ -71,6 +73,12 @@ public class DelegationListByAddressResp {
 	}
 	public void setDelegateReduction(String delegateReduction) {
 		this.delegateReduction = delegateReduction;
+	}
+	public String getDelegateTotalValue() {
+		return delegateTotalValue;
+	}
+	public void setDelegateTotalValue(String delegateTotalValue) {
+		this.delegateTotalValue = delegateTotalValue;
 	}
     
     

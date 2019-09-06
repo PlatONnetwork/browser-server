@@ -48,8 +48,8 @@ public class RestrictingPlanContractTest {
     public void createRestrictingPlan() {
 
         List<RestrictingPlan> restrictingPlans = new ArrayList<>();
-        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(100), new BigInteger("5000000000000000000")));
-        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(200), new BigInteger("600000000000000000")));
+        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(1000), new BigInteger("5000000000000000000")));
+        restrictingPlans.add(new RestrictingPlan(BigInteger.valueOf(2000), new BigInteger("600000000000000000")));
         try {
             PlatonSendTransaction platonSendTransaction = restrictingPlanContract.createRestrictingPlanReturnTransaction(benifitAddress, restrictingPlans).send();
             BaseResponse<?> baseResponse = restrictingPlanContract.getCreateRestrictingPlanResult(platonSendTransaction).send();

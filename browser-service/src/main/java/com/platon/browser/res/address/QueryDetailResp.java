@@ -50,18 +50,21 @@ public class QueryDetailResp {
 	public void setRestrictingBalance(String restrictingBalance) {
 		this.restrictingBalance = restrictingBalance;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getStakingValue() {
 		return stakingValue;
 	}
 	public void setStakingValue(String stakingValue) {
 		this.stakingValue = stakingValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getDelegateValue() {
 		return delegateValue;
 	}
 	public void setDelegateValue(String delegateValue) {
 		this.delegateValue = delegateValue;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getRedeemedValue() {
 		return redeemedValue;
 	}
@@ -125,10 +128,10 @@ public class QueryDetailResp {
 	public void setDelegateUnlock(String delegateUnlock) {
 		this.delegateUnlock = delegateUnlock;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getDelegateReduction() {
 		return delegateReduction;
 	}
-	@JsonSerialize(using = CustomLatSerializer.class)
 	public void setDelegateReduction(String delegateReduction) {
 		this.delegateReduction = delegateReduction;
 	}

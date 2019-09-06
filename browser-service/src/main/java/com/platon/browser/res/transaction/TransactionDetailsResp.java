@@ -329,6 +329,7 @@ public class TransactionDetailsResp {
 	public void setReportType(Integer reportType) {
 		this.reportType = reportType;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getReportRewards() {
 		return reportRewards;
 	}

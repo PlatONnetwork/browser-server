@@ -14,6 +14,7 @@ import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
+import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -30,6 +31,7 @@ import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
+import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
@@ -89,18 +91,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionList( PageReq req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
         /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
-        List<Transaction> items = transactionCacheDto.getTransactionList();
-        for (Transaction transactionRedis:items) {
-        	TransactionListResp transactionListResp = new TransactionListResp();
-        	BeanUtils.copyProperties(transactionRedis, transactionListResp);
-        	transactionListResp.setTxHash(transactionRedis.getHash());
-            transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(transactionRedis.getTimestamp().getTime());
-            lists.add(transactionListResp);
-        }
+        List<TransactionWithBLOBs> items = transactionCacheDto.getTransactionList();
+        List<TransactionListResp> lists = this.tranferList(items);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
         result.setTotalCount(transactionCacheDto.getPage().getTotalCount());
@@ -111,7 +105,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByBlock(TransactionListByBlockRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
         TransactionExample transactionExample = new TransactionExample();
         TransactionExample.Criteria criteria = transactionExample.createCriteria()
                 .andBlockNumberEqualTo(req.getBlockNumber().longValue());
@@ -121,14 +114,7 @@ public class TransactionServiceImpl implements TransactionService {
         PageHelper.startPage(req.getPageNo(),req.getPageSize());
         /** 根据区块号和类型分页查询交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        for (TransactionWithBLOBs transaction:items) {
-        	TransactionListResp transactionListResp = new TransactionListResp();
-        	BeanUtils.copyProperties(transaction, transactionListResp);
-            transactionListResp.setTxHash(transaction.getHash());
-            transactionListResp.setServerTime(new Date().getTime());
-            transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
-            lists.add(transactionListResp);
-        }
+        List<TransactionListResp> lists = this.tranferList(items);
         /** 统计交易信息 */
         long count  = transactionMapper.countByExample(transactionExample);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -140,8 +126,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByAddress(TransactionListByAddressRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        List<TransactionListResp> lists = new LinkedList<>();
+        
         TransactionExample transactionExample = new TransactionExample();
+        transactionExample.setOrderByClause(" timestamp desc");
         /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
                 .andFromEqualTo(req.getAddress());
@@ -155,7 +142,18 @@ public class TransactionServiceImpl implements TransactionService {
         transactionExample.or(second);
         /** 根据地址查询分页交易信息 */
         List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        for (TransactionWithBLOBs transaction:items) {
+        List<TransactionListResp> lists = this.tranferList(items);
+        /** 查询总数 */
+        long count  = transactionMapper.countByExample(transactionExample);
+        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
+        result.init(page, lists);
+        result.setTotalCount(count);
+        return result;
+    }
+    
+    private List<TransactionListResp> tranferList(List<TransactionWithBLOBs> items) {
+    	List<TransactionListResp> lists = new LinkedList<>();
+    	for (TransactionWithBLOBs transaction:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
@@ -163,12 +161,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setTimestamp(transaction.getTimestamp().getTime());
             lists.add(transactionListResp);
         }
-        /** 查询总数 */
-        long count  = transactionMapper.countByExample(transactionExample);
-        Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
-        result.init(page, lists);
-        result.setTotalCount(count);
-        return result;
+    	return lists;
     }
 
     public AccountDownload transactionListByAddressDownload(String address, String date) {
@@ -206,14 +199,14 @@ public class TransactionServiceImpl implements TransactionService {
             Object[] row = {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
-                    transaction.getTimestamp(),
+                    DateUtil.getGMT(transaction.getTimestamp()),
                     CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
                     EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
-                    transaction.getGasUsed()
+                    EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)
             };
             rows.add(row);
         });
@@ -261,6 +254,12 @@ public class TransactionServiceImpl implements TransactionService {
     		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
     		/** 确认区块数等于当前区块书减去交易区块数  */
     		resp.setConfirmNum(String.valueOf(networkStatRedis.getCurrentNumber()-transaction.getBlockNumber()));
+    		/** 暂时只有账户合约 */
+    		resp.setReceiveType("account");
+    		/** 如果数据值为null 则置为空 */
+    		if("null".equals(transaction.getTxInfo())) {
+    			resp.setTxInfo("");
+    		}
     		/*
     		 * "first":false,            //是否第一条记录
     		 * "last":true,              //是否最后一条记录
@@ -287,234 +286,306 @@ public class TransactionServiceImpl implements TransactionService {
     		}else {
     			resp.setNextHash(transactionList.get(0).getHash());
     		}
-    		/** 暂时只有账户合约 */
-    		resp.setReceiveType("account");
     		String txInfo = transaction.getTxInfo();
     		/** 根据不同交易类型判断逻辑 */
-    		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType())) {
-	    		/** 创建验证人 */
-				case CREATE_VALIDATOR:
-					CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
-					StakingKey stakingKey = new StakingKey();
-					stakingKey.setNodeId(createValidatorParam.getNodeId());
-					stakingKey.setStakingBlockNum(Long.valueOf(createValidatorParam.getBlockNumber()));
-					Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
-					resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
-					resp.setNodeId(createValidatorParam.getNodeId());
-					resp.setNodeName(createValidatorParam.getNodeName());
-					resp.setExternalId(createValidatorParam.getExternalId());
-					resp.setWebsite(createValidatorParam.getWebsite());
-					resp.setDetails(createValidatorParam.getDetails());
-					resp.setProgramVersion(createValidatorParam.getProgramVersion());
-					resp.setTxAmount(createValidatorParam.getAmount());
-					break;
-				//编辑验证人
-				case EDIT_VALIDATOR:
-					EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
-					StakingKey stakingKeyV = new StakingKey();
-					stakingKeyV.setNodeId(editValidatorParam.getNodeId());
-					stakingKeyV.setStakingBlockNum(Long.valueOf(editValidatorParam.getBlockNumber()));
-					staking = stakingMapper.selectByPrimaryKey(stakingKeyV);
-					resp.setExternalUrl(BrowserConst.EX_URL + staking.getExternalName());
-					resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
-					resp.setNodeId(editValidatorParam.getNodeId());
-					resp.setNodeName(editValidatorParam.getNodeName());
-					resp.setExternalId(editValidatorParam.getExternalId());
-					resp.setWebsite(editValidatorParam.getWebsite());
-					resp.setDetails(editValidatorParam.getDetails());
-					break;
-				//增加质押
-				case INCREASE_STAKING:
-					IncreaseStakingParam increaseStakingParam = JSONObject.parseObject(txInfo, IncreaseStakingParam.class);
-					resp.setNodeId(increaseStakingParam.getNodeId());
-					if(StringUtils.isNotBlank(increaseStakingParam.getNodeName())) {
-						resp.setNodeName(increaseStakingParam.getNodeName());
-					} else {
-						StakingExample stakingExample = new StakingExample();
-						stakingExample.setOrderByClause(" staking_block_num desc");
-						stakingExample.createCriteria().andNodeIdEqualTo(increaseStakingParam.getNodeId());
-						List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-						if(stakings.size()>0) {
-							resp.setNodeName(stakings.get(0).getStakingName());
+    		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
+	    		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType())) {
+		    		/** 创建验证人 */
+					case CREATE_VALIDATOR:
+						CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
+						resp.setTxAmount(createValidatorParam.getAmount());
+						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
+						resp.setNodeId(createValidatorParam.getNodeId());
+						resp.setNodeName(createValidatorParam.getNodeName());
+						resp.setExternalId(createValidatorParam.getExternalId());
+						resp.setWebsite(createValidatorParam.getWebsite());
+						resp.setDetails(createValidatorParam.getDetails());
+						resp.setProgramVersion(createValidatorParam.getProgramVersion());
+						resp.setTxAmount(createValidatorParam.getAmount());
+						
+						StakingKey stakingKey = new StakingKey();
+						stakingKey.setNodeId(createValidatorParam.getNodeId());
+						/**
+						 * 如果块高是空的情况下，应该为失败的交易直接跳出
+						 */
+						if(StringUtils.isBlank(createValidatorParam.getBlockNumber())) {
+							break;
+						} else {
+							stakingKey.setStakingBlockNum(Long.valueOf(createValidatorParam.getBlockNumber()));
 						}
-					}
-					resp.setTxAmount(increaseStakingParam.getAmount());
-					break;
-				//退出验证人
-				case EXIT_VALIDATOR:
-					// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
-					ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
-					resp.setNodeId(exitValidatorParam.getNodeId());
-					resp.setNodeName(exitValidatorParam.getNodeName());
-					StakingKey stakingKeyE = new StakingKey();
-					stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
-					if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
-						stakingKeyE.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
-					}
-					staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
-					if(staking!=null) {
-						resp.setNodeName(staking.getStakingName());
-						//升级金额等于锁定加犹豫金额
-						BigDecimal sum = new BigDecimal(staking.getStakingHas()).add(new BigDecimal(staking.getStakingLocked()));
-						resp.setApplyAmount(sum.toString());
-						resp.setRedeemLocked(staking.getStakingReduction());
-						//只有已退出，则金额才会退回到账户
-						resp.setRedeemStatus(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()?2:1);
-						//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
-						BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnstakeRefundSettlePeriodCount())))
-								.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
-						resp.setRedeemUnLockedBlock(blockNum.toString());
-					}
-					break;
-					//委托
-				case DELEGATE:
-					DelegateParam delegateParam = JSONObject.parseObject(txInfo, DelegateParam.class);
-					resp.setNodeId(delegateParam.getNodeId());
-					resp.setNodeName(delegateParam.getNodeName());
-					resp.setTxAmount(delegateParam.getAmount());
-					break;
-				//委托赎回
-				case UN_DELEGATE:
-					// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
-					// 通过txHash关联un_delegation表
-					UnDelegateParam unDelegateParam = JSONObject.parseObject(txInfo, UnDelegateParam.class);
-					resp.setNodeId(unDelegateParam.getNodeId());
-					resp.setNodeName(unDelegateParam.getNodeName());
-					UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
-					if(unDelegation!=null) {
-						resp.setApplyAmount(unDelegation.getApplyAmount());
-						resp.setRedeemLocked(unDelegation.getRedeemLocked());
-						resp.setRedeemStatus(unDelegation.getStatus());
-					}
-					break;
-				case CREATE_PROPOSAL_TEXT:
-				case CREATE_PROPOSAL_UPGRADE:
-				case CREATE_PROPOSAL_PARAMETER:
-					
-				case CANCEL_PROPOSAL:
-					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion
-					Proposal proposal = proposalMapper.selectByPrimaryKey(req.getTxHash());
-					if(proposal != null) {
-						resp.setNodeId(proposal.getVerifier());
-						resp.setNodeName(proposal.getVerifierName());
+						/**
+						 * 为了获取跳转地址
+						 */
+						Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+						if(staking != null) {
+							String exName = "";
+							if(StringUtils.isNotBlank(staking.getExternalName())) {
+								exName = staking.getExternalName();
+							}
+							resp.setExternalUrl(BrowserConst.EX_URL + exName);
+						}
+						break;
+					//编辑验证人
+					case EDIT_VALIDATOR:
+						EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
+						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
+						resp.setNodeId(editValidatorParam.getNodeId());
+						resp.setNodeName(editValidatorParam.getNodeName());
+						resp.setExternalId(editValidatorParam.getExternalId());
+						resp.setWebsite(editValidatorParam.getWebsite());
+						resp.setDetails(editValidatorParam.getDetails());
+						/**
+						 * 如果块高是空的情况下，应该为失败的交易直接跳出
+						 */
+						StakingKey stakingKeyV = new StakingKey();
+						stakingKeyV.setNodeId(editValidatorParam.getNodeId());
+						if(StringUtils.isBlank(editValidatorParam.getBlockNumber())) {
+							break;
+						} else {
+							stakingKeyV.setStakingBlockNum(Long.valueOf(editValidatorParam.getBlockNumber()));
+						}
+						staking = stakingMapper.selectByPrimaryKey(stakingKeyV);
+						String exName = "";
+						if(StringUtils.isNotBlank(staking.getExternalName())) {
+							exName = staking.getExternalName();
+						}
+						resp.setExternalUrl(BrowserConst.EX_URL + exName);
+						break;
+					//增加质押
+					case INCREASE_STAKING:
+						IncreaseStakingParam increaseStakingParam = JSONObject.parseObject(txInfo, IncreaseStakingParam.class);
+						resp.setNodeId(increaseStakingParam.getNodeId());
+						if(StringUtils.isNotBlank(increaseStakingParam.getNodeName())) {
+							resp.setNodeName(increaseStakingParam.getNodeName());
+						} else {
+							StakingExample stakingExample = new StakingExample();
+							stakingExample.setOrderByClause(" staking_block_num desc");
+							stakingExample.createCriteria().andNodeIdEqualTo(increaseStakingParam.getNodeId());
+							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+							if(stakings.size()>0) {
+								resp.setNodeName(stakings.get(0).getStakingName());
+							}
+						}
+						resp.setTxAmount(increaseStakingParam.getAmount());
+						break;
+					//退出验证人
+					case EXIT_VALIDATOR:
+						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
+						ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
+						resp.setNodeId(exitValidatorParam.getNodeId());
+						resp.setNodeName(exitValidatorParam.getNodeName());
+						resp.setApplyAmount(exitValidatorParam.getAmount());
+						StakingKey stakingKeyE = new StakingKey();
+						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
+						if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
+							stakingKeyE.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
+						}
+						staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
+						if(staking!=null) {
+	//						//升级金额等于锁定加犹豫金额
+	//						BigDecimal sum = new BigDecimal(staking.getStakingHas()).add(new BigDecimal(staking.getStakingLocked()));
+	//						resp.setApplyAmount(sum.toString());
+							resp.setRedeemLocked(staking.getStakingReduction());
+							//只有已退出，则金额才会退回到账户
+							if(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+								resp.setRedeemStatus(RedeemStatusEnum.EXTED.getCode());
+							} else {
+								resp.setRedeemStatus(RedeemStatusEnum.EXTING.getCode());
+							}
+							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
+							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnstakeRefundSettlePeriodCount())))
+									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
+							resp.setRedeemUnLockedBlock(blockNum.toString());
+						}
+						break;
+						//委托
+					case DELEGATE:
+						DelegateParam delegateParam = JSONObject.parseObject(txInfo, DelegateParam.class);
+						resp.setNodeId(delegateParam.getNodeId());
+						resp.setNodeName(delegateParam.getNodeName());
+						resp.setTxAmount(delegateParam.getAmount());
+						break;
+					//委托赎回
+					case UN_DELEGATE:
+						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
+						// 通过txHash关联un_delegation表
+						UnDelegateParam unDelegateParam = JSONObject.parseObject(txInfo, UnDelegateParam.class);
+						resp.setNodeId(unDelegateParam.getNodeId());
+						resp.setNodeName(unDelegateParam.getNodeName());
+						UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
+						if(unDelegation!=null) {
+							resp.setApplyAmount(unDelegation.getApplyAmount());
+							resp.setRedeemLocked(unDelegation.getRedeemLocked());
+							resp.setRedeemStatus(unDelegation.getStatus());
+						}
+						break;
+					case CREATE_PROPOSAL_TEXT:
+						CreateProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, CreateProposalTextParam.class);
+						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
+							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
+						}
+						resp.setNodeId(createProposalTextParam.getVerifier());
+						resp.setNodeName(createProposalTextParam.getNodeName());
 						resp.setProposalHash(req.getTxHash());
-						resp.setPipNum(proposal.getPipNum());
-						resp.setProposalTitle(proposal.getTopic());
-						resp.setProposalStatus(proposal.getStatus());
-						resp.setProposalOption(proposal.getType());
-						resp.setProposalNewVersion(proposal.getNewVersion());
-						resp.setProposalUrl(proposal.getUrl());
-					}
-					break;
-				case VOTING_PROPOSAL:
-					// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
-//					VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
-					CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
-					if(customVoteProposal != null) {
-						resp.setNodeId(customVoteProposal.getVerifier());
-						resp.setNodeName(customVoteProposal.getVerifierName());
-						resp.setProposalOption(customVoteProposal.getType());
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
+					case CREATE_PROPOSAL_UPGRADE:
+						CreateProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, CreateProposalUpgradeParam.class);
+						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
+						if(StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
+							resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
+						}
+						resp.setNodeId(createProposalUpgradeParam.getVerifier());
+						resp.setNodeName(createProposalUpgradeParam.getNodeName());
 						resp.setProposalHash(req.getTxHash());
-						resp.setProposalNewVersion(customVoteProposal.getNewVersion());
-						resp.setPipNum(customVoteProposal.getPipNum());
-						resp.setProposalTitle(customVoteProposal.getTopic());
-						resp.setProposalUrl(customVoteProposal.getUrl());
-						resp.setVoteStatus(customVoteProposal.getOption());
-					}
-					break;
-				case DECLARE_VERSION:
-					DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
-					resp.setNodeId(declareVersionParam.getActiveNode());
-					if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
+					case CREATE_PROPOSAL_PARAMETER:
+					case CANCEL_PROPOSAL:
+						CancelProposalParam cancelProposalParam = JSONObject.parseObject(txInfo, CancelProposalParam.class);
+						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
+							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
+						}
+						resp.setNodeId(cancelProposalParam.getVerifier());
+						resp.setNodeName(cancelProposalParam.getNodeName());
+						resp.setProposalHash(req.getTxHash());
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
+					case VOTING_PROPOSAL:
+						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
+						VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
+						resp.setNodeId(votingProposalParam.getVerifier());
+						resp.setNodeName(votingProposalParam.getNodeName());
+						resp.setProposalOption(votingProposalParam.getProposalType());
+						resp.setProposalHash(req.getTxHash());
+						resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
+						if(StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
+							resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
+						}
+						resp.setVoteStatus(votingProposalParam.getOption());
+						CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
+						if(customVoteProposal != null) {
+							resp.setNodeId(customVoteProposal.getVerifier());
+							resp.setNodeName(customVoteProposal.getVerifierName());
+							resp.setProposalOption(customVoteProposal.getType());
+							resp.setProposalHash(req.getTxHash());
+							resp.setProposalNewVersion(customVoteProposal.getNewVersion());
+							resp.setPipNum(customVoteProposal.getPipNum());
+							resp.setProposalTitle(customVoteProposal.getTopic());
+							resp.setProposalUrl(customVoteProposal.getUrl());
+							resp.setVoteStatus(customVoteProposal.getOption());
+						}
+						break;
+					case DECLARE_VERSION:
+						DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
+						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setNodeName(declareVersionParam.getNodeName());
-					} else {
-						StakingExample stakingExample = new StakingExample();
-						stakingExample.setOrderByClause(" staking_block_num desc");
-						stakingExample.createCriteria().andNodeIdEqualTo(declareVersionParam.getActiveNode());
-						List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-						if(stakings.size()>0) {
-							resp.setNodeName(stakings.get(0).getStakingName());
+						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
+						if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
+							resp.setNodeName(declareVersionParam.getNodeName());
+						} else {
+							StakingExample stakingExample = new StakingExample();
+							stakingExample.setOrderByClause(" staking_block_num desc");
+							stakingExample.createCriteria().andNodeIdEqualTo(declareVersionParam.getActiveNode());
+							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+							if(stakings.size()>0) {
+								resp.setNodeName(stakings.get(0).getStakingName());
+							}
 						}
-					}
-					resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
-					break;
-				case REPORT_VALIDATOR:
-					ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
-					List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
-		/*			for(EvidencesParam evidencesParam: reportValidatorParam.getData()) {
+						break;
+					case REPORT_VALIDATOR:
+						ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
+						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
-						transactionDetailsEvidencesResp.setNodeName(evidencesParam.getNodeName());
-						transactionDetailsEvidencesResp.setVerify(evidencesParam.getVerify());
+						transactionDetailsEvidencesResp.setNodeName(reportValidatorParam.getNodeName());
+						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
+						resp.setEvidence(reportValidatorParam.getData());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
-					}*/
-					Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
-					if(slash != null) {
-						resp.setReportRewards(slash.getReward());
-						resp.setRedeemStatus(slash.getStatus());
-						resp.setEvidence(slash.getData());
-					}
-					resp.setReportType(1);
-					resp.setEvidences(transactionDetailsEvidencesResps);
+						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
+						if(slash != null) {
+							resp.setReportRewards(slash.getReward());
+							resp.setReportStatus(slash.getStatus());
+						}
+						resp.setReportType(reportValidatorParam.getType().intValue());
+						resp.setEvidences(transactionDetailsEvidencesResps);
+						break;
+					case CREATE_RESTRICTING:
+						// RPAccount + value + RPPlan
+						CreateRestrictingParam createRestrictingParam = JSONObject.parseObject(txInfo, CreateRestrictingParam.class);
+						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<TransactionDetailsRPPlanResp>();
+						resp.setRPAccount(createRestrictingParam.getAccount());
+						BigDecimal amountSum = new BigDecimal(0);
+						for(PlanParam p:createRestrictingParam.getPlan()) {
+							TransactionDetailsRPPlanResp transactionDetailsRPPlanResp = new TransactionDetailsRPPlanResp();
+							amountSum = amountSum.add(new BigDecimal(p.getAmount()));
+							transactionDetailsRPPlanResp.setAmount(p.getAmount());
+							transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
+							//锁仓周期对应快高  结算周期 * epoch  
+							transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
+									.multiply(new BigInteger(String.valueOf(p.getEpoch()))).longValue());
+							rpPlanResps.add(transactionDetailsRPPlanResp);
+						}
+						//累加
+						resp.setRPNum(amountSum.toString());
+						resp.setRPPlan(rpPlanResps);
+						break;
+				default:
 					break;
-				case CREATE_RESTRICTING:
-					// RPAccount + value + RPPlan
-					CreateRestrictingParam createRestrictingParam = JSONObject.parseObject(txInfo, CreateRestrictingParam.class);
-					List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<TransactionDetailsRPPlanResp>();
-					resp.setRPAccount(createRestrictingParam.getAccount());
-					BigDecimal amountSum = new BigDecimal(0);
-					for(PlanParam p:createRestrictingParam.getPlan()) {
-						TransactionDetailsRPPlanResp transactionDetailsRPPlanResp = new TransactionDetailsRPPlanResp();
-						amountSum = amountSum.add(new BigDecimal(p.getAmount()));
-						transactionDetailsRPPlanResp.setAmount(p.getAmount());
-						transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
-						//锁仓周期对应快高  结算周期 * epoch  
-						transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
-								.multiply(new BigInteger(String.valueOf(p.getEpoch()))).longValue());
-						rpPlanResps.add(transactionDetailsRPPlanResp);
-					}
-					//累加
-					resp.setRPNum(amountSum.toString());
-					resp.setRPPlan(rpPlanResps);
-					break;
-			default:
-				break;
-			}
+				}
+    		}
     	}
     	return resp;
     }
 
     @Override
     public TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req) {
+    	TransactionListResp resp = new TransactionListResp();
     	/** 根据hash查询交易具体指 */
     	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
-    	TransactionExample condition = new TransactionExample();
-    	TransactionExample.Criteria criteria = condition.createCriteria();
-    	/** 区分是上一条数据还是下一条数据 */
-    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-	    	case PREV:
-		    	criteria.andSequenceLessThan(currentDetail.getSequence());
-		    	condition.setOrderByClause("sequence desc");
-		    	break;
-	    	case NEXT:
-		    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
-		    	condition.setOrderByClause("sequence asc");
-		    	break;
+    	if(currentDetail != null) {
+	    	TransactionExample condition = new TransactionExample();
+	    	TransactionExample.Criteria criteria = condition.createCriteria();
+	    	/** 区分是上一条数据还是下一条数据 */
+	    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
+		    	case PREV:
+			    	criteria.andSequenceLessThan(currentDetail.getSequence());
+			    	condition.setOrderByClause("sequence desc");
+			    	break;
+		    	case NEXT:
+			    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
+			    	condition.setOrderByClause("sequence asc");
+			    	break;
+	    	}
+	    	PageHelper.startPage(1,1);
+	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+	    	if(transactions.size()>0){
+	    		/** 获取数据第一条进行转换对象 */
+	        	TransactionWithBLOBs transaction = transactions.get(0);
+	        	BeanUtils.copyProperties(transaction, resp);
+	        	resp.setTxHash(transaction.getHash());
+	        	resp.setServerTime(new Date().getTime());
+	        	resp.setTimestamp(transaction.getTimestamp().getTime());
+	    	}
     	}
-    	PageHelper.startPage(1,1);
-    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-    	if(transactions.size()==0){
-    		logger.error("invalid transaction hash {}",req.getTxHash());
-    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.TRANSACTION_ERROR_NOT_EXIST));
-    	}
-    	/** 获取数据第一条进行转换对象 */
-    	TransactionWithBLOBs transaction = transactions.get(0);
-    	TransactionListResp resp = new TransactionListResp();
-    	BeanUtils.copyProperties(transaction, resp);
-    	resp.setTxHash(transaction.getHash());
-    	resp.setServerTime(new Date().getTime());
-    	resp.setTimestamp(transaction.getTimestamp().getTime());
     	return resp;
+    }
+    
+    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
+    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
+		if(proposal != null) {
+			resp.setNodeId(proposal.getVerifier());
+			resp.setNodeName(proposal.getVerifierName());
+			resp.setPipNum(proposal.getPipNum());
+			resp.setProposalTitle(proposal.getTopic());
+			resp.setProposalStatus(proposal.getStatus());
+			resp.setProposalOption(proposal.getType());
+			resp.setProposalNewVersion(proposal.getNewVersion());
+			resp.setProposalUrl(proposal.getUrl());
+		}
+		return resp;
     }
 
 }

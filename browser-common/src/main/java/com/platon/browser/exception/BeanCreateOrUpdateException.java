@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class BeanCreateOrUpdateException extends Exception {
-    public BeanCreateOrUpdateException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public BeanCreateOrUpdateException(String msg){
         super(msg);
     }
 }

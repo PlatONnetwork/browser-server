@@ -4,6 +4,8 @@
 
 package com.platon.browser.req;
 
+import javax.validation.constraints.NotNull;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
@@ -21,10 +23,12 @@ public class PageReq {
     /**
      * 当前页
      */
+	@NotNull(message = "{pageNo not null}")
     private Integer pageNo = 1;
     /**
      * 页大小
      */
+	@NotNull(message = "{pageSize not null}")
     private Integer pageSize = 10;
 
     private Page<?> pager;

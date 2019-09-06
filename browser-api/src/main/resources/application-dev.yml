@@ -21,7 +21,7 @@ loglevel:
   spring: debug
   platon: debug
 web3j:
-  addresses: http://192.168.9.221:6789
+  addresses: http://192.168.112.171:6789
 
 #初始化链相关的配置
 platon.config:

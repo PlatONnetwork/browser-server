@@ -1,9 +1,6 @@
 package com.platon.browser.util;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.param.*;
 import lombok.Data;

@@ -41,6 +41,7 @@ import com.platon.browser.req.newblock.BlockListByNodeIdReq;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.res.block.BlockDetailResp;
 import com.platon.browser.res.block.BlockListResp;
+import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
@@ -153,7 +154,7 @@ public class BlockServiceImpl implements BlockService {
         blockList.forEach(block->{
             Object[] row = {
                     block.getNumber(),
-                    dateFormat.format(block.getTimestamp()),
+                    DateUtil.getGMT(block.getTimestamp()),
                     block.getStatTxQty(),
                     EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
                     EnergonUtil.format(Convert.fromVon(block.getGasUsed(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))

@@ -67,7 +67,7 @@ public class AppDocStakingControllerTest {
     
     @Test
     public void delegationListByStaking() throws Exception{
-    	String requestBody = "{\"nodeId\":\"aaa\",\"stakingBlockNum\",\"121\"}";
+    	String requestBody = "{\"nodeId\":\"aaa\",\"stakingBlockNum\":\"121\"}";
     	mockMvc.perform(MockMvcRequestBuilders.post("/staking/delegationListByStaking")
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());

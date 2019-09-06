@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.util.I18nUtil;
@@ -75,10 +76,10 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 		/** 分页根据key来获取交易数据  */
 		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, Transaction.class, i18n,
 				redisTemplate, maxItemNum);
-		List<Transaction> transactionRedisList = new LinkedList<>();
+		List<TransactionWithBLOBs> transactionRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/** 获取数据转换成对象 */
-			Transaction transactionRedis = JSON.parseObject(str, Transaction.class);
+			TransactionWithBLOBs transactionRedis = JSON.parseObject(str, TransactionWithBLOBs.class);
 			transactionRedisList.add(transactionRedis);
 		});
 		TransactionCacheDto transactionCacheDto = new TransactionCacheDto(transactionRedisList, cpi.page);

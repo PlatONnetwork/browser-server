@@ -264,7 +264,7 @@ public interface AppDocStaking {
      *   "data":[
      *      {
      *         "timestamp":"",         //创建时间
-     *         "desc":"",              //操作描述
+     *         "desc":"",              //操作描述（code表示）\r\n1 create 创建 \r\n2 modify 修改\r\n3 quit 退出\r\n4 proposals 提案\r\n5 vote 投票\r\n6 signatures 双签\r\n7 lowBlockRate 出块率低 
      *         "txHash":"",            //所属交易
      *         "blockNumber":11        //所属区块
      *      }
@@ -346,6 +346,7 @@ public interface AppDocStaking {
      *         "delegateLocked":"",    //已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）
      *         "allDelegateLocked":"", //当前验证人总接收的锁定委托量（LAT）  staking
      *         "delegateUnlock":"",    //已解除委托（LAT）  如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation）
+     *         "delegateTotalValue":"",//验证人委托的总金额    staking    delegate_has+delegate_locked
      *         "delegateReduction":""  //赎回中委托（LAT） delegation
      *      }
      *   ]

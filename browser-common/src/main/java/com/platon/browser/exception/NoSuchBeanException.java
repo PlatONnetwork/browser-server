@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class NoSuchBeanException extends Exception {
-    public NoSuchBeanException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public NoSuchBeanException(String msg){
         super(msg);
     }
 }

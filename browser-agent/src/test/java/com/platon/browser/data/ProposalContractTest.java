@@ -89,7 +89,7 @@ public class ProposalContractTest {
 	@Test
 	public void submitVersionProposal() {
 		try {
-			String num = "8";
+			String num = "2";
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
 					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(20000), BigInteger.valueOf(4)))
 					.send();
@@ -97,7 +97,7 @@ public class ProposalContractTest {
 					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
-			voteForProposal(platonSendTransaction.getTransactionHash());
+//			voteForProposal(platonSendTransaction.getTransactionHash());
 //
 //			queryResult(platonSendTransaction.getTransactionHash());
 			
@@ -267,8 +267,8 @@ public class ProposalContractTest {
     public void submitCancelProposal() {
 
         try {
-			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, "7", BigInteger.valueOf(1),
-					"0xb581d0d5fb33da7011a2de232273cb949278273dc99000069bd5ee3f1b14a61b");
+			Proposal proposal = Proposal.createSubmitCancelProposalParam(nodeId, "4", BigInteger.valueOf(1),
+					"0x3b26fd691c633a16d686b1400db5fddae210776141971e74b5df84b7f87876e1");
             PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(proposal).send();
             BaseResponse<?> baseResponse = proposalContract.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_CANCEL_FUNC_TYPE).send();
             System.out.println(baseResponse.toString());

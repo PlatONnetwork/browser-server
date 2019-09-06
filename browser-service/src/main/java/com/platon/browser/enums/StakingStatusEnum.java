@@ -46,10 +46,10 @@ public enum StakingStatusEnum {
 	 * 根据数据状态转换成对应的前端状态
 	 * @method getCodeByStatus
 	 */
-	public static Integer getCodeByStatus(Integer status, Integer isConsensus) {
+	public static Integer getCodeByStatus(Integer status, Integer isConsensus, Integer isSetting) {
 		if(CustomStaking.StatusEnum.CANDIDATE.getCode() == status) {
-			if(CustomStaking.YesNoEnum.YES.getCode() == isConsensus) {
-				/** 当状态既为候选中且在共识周期则认为节点为激活中*/
+			if(CustomStaking.YesNoEnum.YES.getCode() == isSetting) {
+				/** 当状态既为候选中且在结算周期则认为节点为活跃中*/
 				return StakingStatusEnum.ACTIVE.getCode();
 			}
 			return StakingStatusEnum.CANDIDATE.getCode();

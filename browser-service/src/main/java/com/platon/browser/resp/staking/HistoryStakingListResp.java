@@ -1,6 +1,7 @@
 package com.platon.browser.resp.staking;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomLatSerializer;
 
 /**
  * 历史验证人列表返回对象
@@ -9,7 +10,6 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class HistoryStakingListResp {
 	private String nodeId;            //出块节点地址
 	private String nodeName;          //验证人名称
@@ -20,4 +20,61 @@ public class HistoryStakingListResp {
 	private Integer slashMultiQty;     //多签举报次数
 	private Long leaveTime;      //退出时间
 	private Long blockQty;          //产生的区块数
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
+	public String getNodeName() {
+		return nodeName;
+	}
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+	public String getStakingIcon() {
+		return stakingIcon;
+	}
+	public void setStakingIcon(String stakingIcon) {
+		this.stakingIcon = stakingIcon;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	@JsonSerialize(using = CustomLatSerializer.class)
+	public String getStatDelegateReduction() {
+		return statDelegateReduction;
+	}
+	public void setStatDelegateReduction(String statDelegateReduction) {
+		this.statDelegateReduction = statDelegateReduction;
+	}
+	public Integer getSlashLowQty() {
+		return slashLowQty;
+	}
+	public void setSlashLowQty(Integer slashLowQty) {
+		this.slashLowQty = slashLowQty;
+	}
+	public Integer getSlashMultiQty() {
+		return slashMultiQty;
+	}
+	public void setSlashMultiQty(Integer slashMultiQty) {
+		this.slashMultiQty = slashMultiQty;
+	}
+	public Long getLeaveTime() {
+		return leaveTime;
+	}
+	public void setLeaveTime(Long leaveTime) {
+		this.leaveTime = leaveTime;
+	}
+	public Long getBlockQty() {
+		return blockQty;
+	}
+	public void setBlockQty(Long blockQty) {
+		this.blockQty = blockQty;
+	}
+	
+	
 }

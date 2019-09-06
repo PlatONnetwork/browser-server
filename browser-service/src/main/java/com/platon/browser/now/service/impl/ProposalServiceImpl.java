@@ -3,15 +3,16 @@ package com.platon.browser.now.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.ProposalExample;
+import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.enums.ErrorCodeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.ProposalService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
@@ -29,9 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +51,8 @@ public class ProposalServiceImpl implements ProposalService {
     @Autowired
     private ProposalMapper proposalMapper;
     @Autowired
+    private TransactionMapper transactionMapper;
+    @Autowired
     private StatisticCacheService statisticCacheService;
     @Autowired
     private BlockChainConfig blockChainConfig;
@@ -64,7 +65,11 @@ public class ProposalServiceImpl implements ProposalService {
         respPage.setTotalPages(0);
         req = req == null ? new PageReq() : req;
         Page<?> page = PageHelper.startPage(req.getPageNo(), req.getPageSize(), true);
-        List<Proposal> list = proposalMapper.selectByExample(null);
+        /** 暂时不显示总人数为0的数据，不然页面展示投票百分比事会出错   */
+        ProposalExample proposalExample = new ProposalExample();
+        ProposalExample.Criteria criteria = proposalExample.createCriteria();
+        criteria.andAccuVerifiersNotEqualTo(0l);
+        List<Proposal> list = proposalMapper.selectByExample(proposalExample);
         /** 分页查询提案数据 */
         if (!CollectionUtils.isEmpty(list)) {
             List<ProposalListResp> listResps = new ArrayList<>(list.size());
@@ -97,49 +102,38 @@ public class ProposalServiceImpl implements ProposalService {
         proposalDetailsResp.setProposalHash(req.getProposalHash());
         proposalDetailsResp.setNodeId(proposal.getVerifier());
         proposalDetailsResp.setNodeName(proposal.getVerifierName());
-        List<Block> items = statisticCacheService.getBlockCache(0, 1);
-        if (items != null && items.size() > 0) {
-            proposalDetailsResp.setCurBlock(items.get(0).getNumber().toString());
-        }
-        /** 赞成百分比 */
-        proposalDetailsResp.setSupportRateThreshold(composeRate(proposal.getYeas(), proposal.getAccuVerifiers()));
-        /** 弃权百分比 */
-        proposalDetailsResp.setAbstainRateThreshold(composeRate(proposal.getAbstentions(), proposal.getAccuVerifiers()));
-        /**反对百分比 */
-        proposalDetailsResp.setOpposeRateThreshold(composeRate(proposal.getNays(), proposal.getAccuVerifiers()));
+        NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+        proposalDetailsResp.setCurBlock(String.valueOf(networkStat.getCurrentNumber()));
+        /** 不同的类型有不同的通过率 */
+        switch (CustomProposal.TypeEnum.getEnum(proposal.getType())) {
+			case TEXT:
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalTextSupportRate().toString());
+				break;
+			case UPGRADE:
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalUpgradePassRate().toString());
+				break;
+			case CANCEL:
+				proposalDetailsResp.setSupportRateThreshold(blockChainConfig.getMinProposalCancelSupportRate().toString());
+				break;
+			default:
+				break;
+		}
         /** 不为文本提案则有生效时间 */
         if(!CustomProposal.TypeEnum.TEXT.getCode().equals(proposalDetailsResp.getType())){
 	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
-	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
+	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(proposal.getTimestamp().getTime()));
 	        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
         }
         /** 结束时间预估：（生效区块-当前区块）*出块间隔 + 现有时间 */
         BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
-        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(new Date().getTime()));
+        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(proposal.getTimestamp().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
+        /** 查询hash获取对应的交易区块号 */
+        Transaction transaction = transactionMapper.selectByPrimaryKey(req.getProposalHash());
+        if(transaction != null) {
+        	proposalDetailsResp.setInBlock(transaction.getBlockNumber());
+        }
         return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), proposalDetailsResp);
     }
 
-    /**
-     * 计算百分比
-     *
-     * @param divisor  除数
-     * @param dividend 被除数
-     * @return
-     */
-    private String composeRate(Long divisor, Long dividend) {
-        if (dividend == null || dividend == 0L) {
-            throw new BusinessException(i18n.i(I18nEnum.NODE_ERROR_NOT_EXIST));
-        }
-        if (divisor == null || divisor == 0L) {
-            return "0.00%";
-        }
-        if (divisor == dividend) {
-            return "100.00%";
-        }
-        /** 设置保留位数 */
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        return decimalFormat.format((float) divisor * 100 / dividend) + "%";
-
-    }
 }

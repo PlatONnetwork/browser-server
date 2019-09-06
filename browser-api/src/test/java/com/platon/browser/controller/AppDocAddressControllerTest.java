@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.BrowserApiApplication;
+import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
@@ -40,5 +42,17 @@ public class AppDocAddressControllerTest {
     		.contentType(MediaType.APPLICATION_JSON_UTF8)
     		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
     }
+    
+    @Test
+	public void rpplanDetail() throws Exception {
+		QueryRPPlanDetailRequest req = new QueryRPPlanDetailRequest();
+		req.setPageNo(0);
+		req.setPageSize(10);
+		req.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+		String requestBody = JSONObject.toJSONString(req);
+    	mockMvc.perform(MockMvcRequestBuilders.post("/address/rpplanDetail")
+    		.contentType(MediaType.APPLICATION_JSON_UTF8)
+    		.content(requestBody.getBytes())).andExpect(status().isOk()).andDo(print());
+	}
     
 }

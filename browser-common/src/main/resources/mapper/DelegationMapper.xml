@@ -14,6 +14,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="cur_delegation_block_num" jdbcType="BIGINT" property="curDelegationBlockNum" />
   </resultMap>
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -373,4 +374,5 @@
       )
     </foreach>
   </insert>
+  
 </mapper>

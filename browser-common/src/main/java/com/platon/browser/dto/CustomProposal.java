@@ -101,7 +101,8 @@ public class CustomProposal extends Proposal {
         public static boolean contains ( int code ) {
             return ENUMS.containsKey(code);
         }
-        public static boolean contains ( TypeEnum en ) {
+        @SuppressWarnings("unlikely-arg-type")
+		public static boolean contains ( TypeEnum en ) {
             return ENUMS.containsValue(en);
         }
     }

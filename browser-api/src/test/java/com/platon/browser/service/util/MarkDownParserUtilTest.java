@@ -2,7 +2,6 @@ package com.platon.browser.service.util;
 import static org.junit.Assert.*;
 
 import com.platon.browser.util.MarkDownParserUtil;
-import org.junit.Test;
 
 import java.io.IOException;
 

@@ -14,4 +14,14 @@ public class BrowserConst {
 	
 	/** 查询缓存最大数量 */
 	public final static Integer MAX_NUM = 500000;
+	
+	/** http头*/
+	public final static String HTTP = "http://";
+	
+	/** https头*/
+	public final static String HTTPS = "https://";
+	
+	/** pre*/
+	public final static String WALLET_PRX = "0x";
+	
 }

@@ -5,8 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionExample;
 
 @SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {

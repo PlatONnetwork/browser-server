@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class NullStringJsonSerializer extends JsonSerializer<Object> {
 	@Override
     public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
-        if (value == null) {
+        if (value == null || "null".equals(value)) {
         	/**
     		 * 	判断数组为null则填写""。
     		 */

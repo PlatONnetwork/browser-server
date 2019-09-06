@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.platon.browser.BrowserApiApplication;
 import com.platon.browser.now.service.AddressService;
 import com.platon.browser.req.address.QueryDetailRequest;
+import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BrowserApiApplication.class)
@@ -24,6 +25,14 @@ public class AddressServiceImplTest {
 		QueryDetailRequest req = new QueryDetailRequest();
 		req.setAddress("abcdefdsfdsa");
 		assertNotNull(addressService.getDetails(req));
+	}
+	@Test
+	public void rpplanDetail() {
+		QueryRPPlanDetailRequest req = new QueryRPPlanDetailRequest();
+		req.setPageNo(0);
+		req.setPageSize(10);
+		req.setAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
+		assertNotNull(addressService.rpplanDetail(req));
 	}
 	
 }

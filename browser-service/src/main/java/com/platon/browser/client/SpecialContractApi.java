@@ -152,13 +152,14 @@ public class SpecialContractApi {
         }).send();
     }
 
-    public static final BaseResponse getProposalAccuVerifiers ( Web3j web3j, String proposalHash, String blockHash)throws Exception{
+    @SuppressWarnings("rawtypes")
+	public static final BaseResponse<?> getProposalAccuVerifiers ( Web3j web3j, String proposalHash, String blockHash)throws Exception{
         final Function function = new Function(
                 GET_PROPOSALRES_FUNC_TYPE,
                 Arrays.<Type>asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),
                         new BytesType(Numeric.hexStringToByteArray(blockHash))),
                 Collections.emptyList());
-        return new RemoteCall<>((Callable<BaseResponse>) () -> {
+        return new RemoteCall<>((Callable<BaseResponse<?>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = web3j.platonCall(
                     Transaction.createEthCallTransaction(InnerContractAddrEnum.PROPOSAL_CONTRACT.address, InnerContractAddrEnum.PROPOSAL_CONTRACT.address, encodedFunction),
@@ -169,7 +170,7 @@ public class SpecialContractApi {
                 // 证明没数据,返回空响应
                 return new BaseResponse<>();
             }
-            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            BaseResponse<?> response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
             return response;
         }).send();
 

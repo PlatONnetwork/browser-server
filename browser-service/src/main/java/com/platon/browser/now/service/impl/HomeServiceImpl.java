@@ -133,7 +133,7 @@ public class HomeServiceImpl implements HomeService {
 						if (blockList.size() > 0) {
 							/**  如果找到区块信息，则构造结果并返回  */
 							result.setType("block");
-							queryNavigationStructResp.setTxHash(keyword);
+							queryNavigationStructResp.setNumber(blockList.get(0).getNumber());
 						}
 					}
 				}
@@ -162,17 +162,20 @@ public class HomeServiceImpl implements HomeService {
 		Long[] x = new Long[items.size()- 2];
 		Double[] ya = new Double[items.size()- 2];
 		Long[] yb = new Long[items.size()- 2];
-		for (int i=0;i<items.size() - 2;i++){
+		for (int i=0;i<items.size() - 1;i++){
 			Block currentBlock = items.get(i);
-			x[i] = currentBlock.getNumber();
-			/** 区块交易数等于null则认为交易为空 */
-			if(currentBlock.getStatTxQty()==null) {
-				yb[i] = 0l;
-			} else {
-				yb[i] = Long.valueOf(currentBlock.getStatTxQty());
+			if(i < items.size() - 2) {
+				/** 最后一个扣减不需要对应的设置 */
+				x[i] = currentBlock.getNumber();
+				/** 区块交易数等于null则认为交易为空 */
+				if(currentBlock.getStatTxQty()==null) {
+					yb[i] = 0l;
+				} else {
+					yb[i] = Long.valueOf(currentBlock.getStatTxQty());
+				}
 			}
-			/** 第一个区块和最后一个区块才计算出块时间 */
-			if(i==0||i==items.size()-1) continue;
+			/** 第一个区块不需要计算出块时间 */
+			if(i==0) continue;
 			Block previousBlock = items.get(i-1);
 			BigDecimal sec = BigDecimal.valueOf(previousBlock.getTimestamp().getTime()-currentBlock.getTimestamp().getTime())
 					.divide(BigDecimal.valueOf(1000));
@@ -205,7 +208,7 @@ public class HomeServiceImpl implements HomeService {
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		/** 当前区块除以共识区块算出第几轮 */
 		BigDecimal num = new BigDecimal(networkStatRedis.getCurrentNumber()).divide(new BigDecimal(blockChainConfig.getConsensusPeriodBlockCount()))
-				.setScale(0, RoundingMode.DOWN);
+				.setScale(0, RoundingMode.UP);
 		if(num.intValue() > consensusNum) {
 			/** 现有共识轮数大于存储轮则全量刷新  */
 			stakingListNewResp.setIsRefresh(true);
@@ -216,21 +219,26 @@ public class HomeServiceImpl implements HomeService {
 		Criteria criteria = stakingExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
 		stakingExample.setOrderByClause("cast(staking_has as Decimal(30)) + cast(staking_locked  as Decimal(30))"
-				+ " + cast(stat_delegate_has  as Decimal(30)) + cast(stat_delegate_locked  as Decimal(30)),program_version,staking_addr,node_id,staking_block_num desc");
+				+ " + cast(stat_delegate_has  as Decimal(30)) + cast(stat_delegate_locked  as Decimal(30)) desc,program_version desc,staking_addr desc,node_id desc,staking_block_num desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 		 
 		List<StakingListResp> lists = new LinkedList<>();
 		for (int i = 0;i<stakings.size();i++) {
 			StakingListResp stakingListResp = new StakingListResp();
 			BeanUtils.copyProperties(stakings.get(i), stakingListResp);
-			stakingListResp.setExpectedIncome(stakings.get(i).getExpectedIncome() + "%");
+			/** 只有不是内置节点才计算年化率  */
+			if(CustomStaking.YesNoEnum.YES.getCode() != stakings.get(i).getIsInit()) {
+				stakingListResp.setExpectedIncome(stakings.get(i).getExpectedIncome() + "%");
+			} else {
+				stakingListResp.setExpectedIncome("");
+			}
 			stakingListResp.setIsInit(stakings.get(i).getIsInit() == 1?true:false);
 			stakingListResp.setNodeName(stakings.get(i).getStakingName());
 			/** 质押总数=有效的质押+委托 */
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
 			stakingListResp.setTotalValue(totalValue);
-			stakingListResp.setRanking(i);
+			stakingListResp.setRanking(i+1);
 			lists.add(stakingListResp);
 		}
 		stakingListNewResp.setDataList(lists);
