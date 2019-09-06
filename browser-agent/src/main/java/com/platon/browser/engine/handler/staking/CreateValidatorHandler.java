@@ -8,7 +8,6 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
-import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class CreateValidatorHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Override
-    public void handle(EventContext context) throws BlockChainException, NoSuchBeanException {
+    public void handle(EventContext context) throws NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
 
         StakingStage stakingStage = context.getStakingStage();
@@ -77,9 +76,18 @@ public class CreateValidatorHandler implements EventHandler {
              */
             CustomStaking staking = new CustomStaking();
             staking.updateWithCustomTransaction(tx);
-            CustomNode node = new CustomNode();
-            node.setStatExpectBlockQty(bc.getChainConfig().getExpectBlockCount().longValue());
-            node.updateWithCustomStaking(staking);
+
+            CustomNode node;
+            try{
+                // 先看缓存里有没有节点统计记录，有则使用已有的记录，没有则新建
+                node = NODE_CACHE.getNode(staking.getNodeId());
+            }catch (NoSuchBeanException nbe){
+                node = new CustomNode();
+                // 预先设置期望出块数
+                node.setStatExpectBlockQty(bc.getChainConfig().getExpectBlockCount().longValue());
+                node.updateWithCustomStaking(staking);
+            }
+
             // 把质押记录添加到节点质押记录列表中
             node.getStakings().put(staking.getStakingBlockNum(),staking);
             // 新节点和新质押记录暂存到待入库列表中

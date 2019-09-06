@@ -44,7 +44,8 @@ public class CustomNode extends Node {
 
     public void updateWithCustomStaking(CustomStaking staking) {
         this.setNodeId(staking.getNodeId());
-        this.setCreateTime(new Date());
+        // 创建时间与质押节点加入时间一致
+        this.setCreateTime(staking.getJoinTime());
     }
 
     /**
