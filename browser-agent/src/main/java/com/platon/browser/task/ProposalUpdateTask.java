@@ -1,9 +1,12 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.AccuVerifiersCount;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -32,6 +35,8 @@ public class ProposalUpdateTask {
     @Autowired
     private PlatonClient platonClient;
     public static final String QUERY_FLAG = "inquiry";
+    @Autowired
+    private BlockChain blockChain;
 
     /**
      * 同步任务功能说明：
@@ -72,15 +77,20 @@ public class ProposalUpdateTask {
             || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code)) {
                 //发送rpc请求查询提案结果
                 try {
-                    BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
-                    //设置赞成票
-                    proposal.setYeas(result.data.getYeas().longValue());
-                    //设置反对票
-                    proposal.setNays(result.data.getNays().longValue());
-                    //设置弃权票
-                    proposal.setAbstentions(result.data.getAbstentions().longValue());
+                    AccuVerifiersCount accuVerifiersCount = new AccuVerifiersCount();
+                    BaseResponse voteInfo = SpecialContractApi.getProposalAccuVerifiers(platonClient.getWeb3j(),proposal.getHash(),blockChain.getCurBlock().getHash());
+                    if(null!=voteInfo.data){
+                        accuVerifiersCount = subString(voteInfo.data.toString());
+                    }
                     //设置参与人数
-                    proposal.setAccuVerifiers(result.data.getAccuVerifiers().longValue());
+                    proposal.setAccuVerifiers(accuVerifiersCount.getAccuVerifiers().longValue());
+                    //设置赞成票
+                    proposal.setYeas(accuVerifiersCount.getYeas().longValue());
+                    //设置反对票
+                    proposal.setNays(accuVerifiersCount.getNays().longValue());
+                    //设置弃权票
+                    proposal.setAbstentions(accuVerifiersCount.getAbstentions().longValue());
+                    BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
                     //设置状态
                     proposal.setStatus(result.data.getStatus());
                     // 添加至全量缓存
@@ -94,4 +104,12 @@ public class ProposalUpdateTask {
         }
     }
 
+
+    private static AccuVerifiersCount subString(String beforeString){
+        String afterString = beforeString.substring(1,beforeString.length()-1);
+        String[] afterList = afterString.split(",");
+        AccuVerifiersCount accuVerifiersCount = new AccuVerifiersCount();
+        accuVerifiersCount.init(afterList[0],afterList[1],afterList[2],afterList[3]);
+        return accuVerifiersCount;
+    }
 }
