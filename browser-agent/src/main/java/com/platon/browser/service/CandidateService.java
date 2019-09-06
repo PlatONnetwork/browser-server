@@ -34,7 +34,7 @@ import static java.lang.String.format;
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/6 16:21
- * @Description:
+ * @Description: 候选人、共识周期验证人、结算周期验证人服务类
  */
 @Service
 public class CandidateService {

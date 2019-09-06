@@ -27,7 +27,7 @@ import static com.platon.browser.task.BlockSyncTask.THREAD_POOL;
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/6 13:43
- * @Description:
+ * @Description: 交易分析服务类
  */
 @Service
 public class TransactionService {

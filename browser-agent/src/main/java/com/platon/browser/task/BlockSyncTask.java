@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import com.platon.browser.bean.CollectResult;
 import com.platon.browser.client.PlatonClient;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
@@ -44,12 +43,8 @@ public class BlockSyncTask {
     private DbService dbService;
     @Autowired
     private BlockChain blockChain;
-
-    @Autowired
-    private BlockChainConfig chainConfig;
     @Autowired
     private PlatonClient client;
-
     @Autowired
     private BlockService blockService;
     @Autowired

@@ -27,12 +27,11 @@ import static com.platon.browser.task.BlockSyncTask.THREAD_POOL;
 @Service
 public class BlockService {
     private static Logger logger = LoggerFactory.getLogger(BlockService.class);
-
     @Autowired
     private PlatonClient client;
+
     /**
      * 并行采集区块及交易，并转换为数据库结构
-     *
      * @param blockNumbers 批量采集的区块号
      * @return void
      */
@@ -53,8 +52,8 @@ public class BlockService {
                         Web3j web3j = client.getWeb3j();
                         PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
                         if (initData==null) throw new RuntimeException("原生区块["+blockNumber+"]为空！");
+                        CustomBlock block = new CustomBlock();
                         try{
-                            CustomBlock block = new CustomBlock();
                             block.updateWithBlock(initData);
                             CollectResult.CONCURRENT_BLOCK_MAP.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
@@ -69,13 +68,11 @@ public class BlockService {
                     }
                 })
             );
-
             try {
                 latch.await();
             } catch (InterruptedException e) {
                 throw new BlockCollectingException("区块采集线程被中断:"+e.getMessage());
             }
-
             // 清空重试列表
             CollectResult.RETRY_NUMBERS.clear();
             // 把本轮异常区块号加入重试列表
