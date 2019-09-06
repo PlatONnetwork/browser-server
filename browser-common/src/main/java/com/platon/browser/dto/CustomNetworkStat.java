@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * User: dongqile
@@ -32,6 +33,9 @@ public class CustomNetworkStat extends NetworkStat {
         this.setAddIssueBegin(0L);
         this.setAddIssueEnd(0L);
         this.setNextSetting(0L);
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
