@@ -27,7 +27,7 @@ platon.config:
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #链ID
   chainId: 101
-  #PlatON初始总发行量
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.25
@@ -91,8 +91,8 @@ platon.config:
     '7':15044304.0698633,
     '8':7615018.1094369
   }
-  # 初始内置节点默认质押金额(VON)
-  defaultStakingLockedAmount: 10000000000000000000000000
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 10000000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
 

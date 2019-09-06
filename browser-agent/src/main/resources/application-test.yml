@@ -36,7 +36,7 @@ platon.config:
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #链ID
   chainId: 101
-  #PlatON初始总发行量
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -54,7 +54,7 @@ platon.config:
   blockRate4HighSlash: 0.2
   #违规-低出块率: 最高处罚百分比
   blockHighSlashRate: 0.5
-  #质押门槛: 创建验证人最低的质押Token数
+  #质押门槛: 创建验证人最低的质押Token数(LAT)
   stakeThreshold: 5000000
   #委托门槛
   delegateThreshold: 10
@@ -66,9 +66,9 @@ platon.config:
   consensusPeriodBlockCount: 40
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #每个结算周期区块总数(等于43个共识周期出的块数总和)
+  #每个结算周期区块总数
   settlePeriodBlockCount: 160
-  #每个增发周期区块总数(1466个结算周期=15759500个块)
+  #每个增发周期区块总数
   addIssuePeriodBlockCount: 1600
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 2
@@ -104,8 +104,8 @@ platon.config:
     '8':15044304.0698633,
     '9':7615018.1094369
   }
-  # 初始内置节点默认质押金额(VON)
-  defaultStakingLockedAmount: 10000000000000000000000000
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 10000000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keybase网址
