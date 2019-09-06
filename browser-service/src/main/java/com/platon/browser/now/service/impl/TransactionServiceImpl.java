@@ -31,6 +31,7 @@ import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
+import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
@@ -127,6 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
         
         TransactionExample transactionExample = new TransactionExample();
+        transactionExample.setOrderByClause(" timestamp desc");
         /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
                 .andFromEqualTo(req.getAddress());
@@ -197,14 +199,14 @@ public class TransactionServiceImpl implements TransactionService {
             Object[] row = {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
-                    transaction.getTimestamp(),
+                    DateUtil.getGMT(transaction.getTimestamp()),
                     CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).getDesc(),
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
                     EnergonUtil.format(Convert.fromVon(valueIn, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
                     EnergonUtil.format(Convert.fromVon(valueOut, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18),
-                    transaction.getGasUsed()
+                    EnergonUtil.format(Convert.fromVon(transaction.getActualTxCost(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 18)
             };
             rows.add(row);
         });
@@ -326,11 +328,17 @@ public class TransactionServiceImpl implements TransactionService {
 					//编辑验证人
 					case EDIT_VALIDATOR:
 						EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
-						StakingKey stakingKeyV = new StakingKey();
-						stakingKeyV.setNodeId(editValidatorParam.getNodeId());
+						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
+						resp.setNodeId(editValidatorParam.getNodeId());
+						resp.setNodeName(editValidatorParam.getNodeName());
+						resp.setExternalId(editValidatorParam.getExternalId());
+						resp.setWebsite(editValidatorParam.getWebsite());
+						resp.setDetails(editValidatorParam.getDetails());
 						/**
 						 * 如果块高是空的情况下，应该为失败的交易直接跳出
 						 */
+						StakingKey stakingKeyV = new StakingKey();
+						stakingKeyV.setNodeId(editValidatorParam.getNodeId());
 						if(StringUtils.isBlank(editValidatorParam.getBlockNumber())) {
 							break;
 						} else {
@@ -342,12 +350,6 @@ public class TransactionServiceImpl implements TransactionService {
 							exName = staking.getExternalName();
 						}
 						resp.setExternalUrl(BrowserConst.EX_URL + exName);
-						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
-						resp.setNodeId(editValidatorParam.getNodeId());
-						resp.setNodeName(editValidatorParam.getNodeName());
-						resp.setExternalId(editValidatorParam.getExternalId());
-						resp.setWebsite(editValidatorParam.getWebsite());
-						resp.setDetails(editValidatorParam.getDetails());
 						break;
 					//增加质押
 					case INCREASE_STAKING:
@@ -419,38 +421,51 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case CREATE_PROPOSAL_TEXT:
 						CreateProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, CreateProposalTextParam.class);
-						resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
+						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
+							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
+						}
 						resp.setNodeId(createProposalTextParam.getVerifier());
 						resp.setNodeName(createProposalTextParam.getNodeName());
+						resp.setProposalHash(req.getTxHash());
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
 					case CREATE_PROPOSAL_UPGRADE:
 						CreateProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, CreateProposalUpgradeParam.class);
 						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
-						resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
+						if(StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
+							resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
+						}
 						resp.setNodeId(createProposalUpgradeParam.getVerifier());
 						resp.setNodeName(createProposalUpgradeParam.getNodeName());
+						resp.setProposalHash(req.getTxHash());
+						/** 如果数据库有值，以数据库为准 */
+						this.transferTransaction(resp, req.getTxHash());
+						break;
 					case CREATE_PROPOSAL_PARAMETER:
 					case CANCEL_PROPOSAL:
 						CancelProposalParam cancelProposalParam = JSONObject.parseObject(txInfo, CancelProposalParam.class);
-						resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
+						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
+							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
+						}
 						resp.setNodeId(cancelProposalParam.getVerifier());
 						resp.setNodeName(cancelProposalParam.getNodeName());
-						
 						resp.setProposalHash(req.getTxHash());
 						/** 如果数据库有值，以数据库为准 */
-						Proposal proposal = proposalMapper.selectByPrimaryKey(req.getTxHash());
-						if(proposal != null) {
-							resp.setNodeId(proposal.getVerifier());
-							resp.setNodeName(proposal.getVerifierName());
-							resp.setPipNum(proposal.getPipNum());
-							resp.setProposalTitle(proposal.getTopic());
-							resp.setProposalStatus(proposal.getStatus());
-							resp.setProposalOption(proposal.getType());
-							resp.setProposalNewVersion(proposal.getNewVersion());
-							resp.setProposalUrl(proposal.getUrl());
-						}
+						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case VOTING_PROPOSAL:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
+						VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
+						resp.setNodeId(votingProposalParam.getVerifier());
+						resp.setNodeName(votingProposalParam.getNodeName());
+						resp.setProposalOption(votingProposalParam.getProposalType());
+						resp.setProposalHash(req.getTxHash());
+						resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
+						if(StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
+							resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
+						}
+						resp.setVoteStatus(votingProposalParam.getOption());
 						CustomVoteProposal customVoteProposal = customVoteMapper.selectVotePropal(req.getTxHash());
 						if(customVoteProposal != null) {
 							resp.setNodeId(customVoteProposal.getVerifier());
@@ -467,6 +482,8 @@ public class TransactionServiceImpl implements TransactionService {
 					case DECLARE_VERSION:
 						DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
+						resp.setNodeName(declareVersionParam.getNodeName());
+						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
 							resp.setNodeName(declareVersionParam.getNodeName());
 						} else {
@@ -478,7 +495,6 @@ public class TransactionServiceImpl implements TransactionService {
 								resp.setNodeName(stakings.get(0).getStakingName());
 							}
 						}
-						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						break;
 					case REPORT_VALIDATOR:
 						ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
@@ -555,6 +571,21 @@ public class TransactionServiceImpl implements TransactionService {
 	    	}
     	}
     	return resp;
+    }
+    
+    private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
+    	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
+		if(proposal != null) {
+			resp.setNodeId(proposal.getVerifier());
+			resp.setNodeName(proposal.getVerifierName());
+			resp.setPipNum(proposal.getPipNum());
+			resp.setProposalTitle(proposal.getTopic());
+			resp.setProposalStatus(proposal.getStatus());
+			resp.setProposalOption(proposal.getType());
+			resp.setProposalNewVersion(proposal.getNewVersion());
+			resp.setProposalUrl(proposal.getUrl());
+		}
+		return resp;
     }
 
 }

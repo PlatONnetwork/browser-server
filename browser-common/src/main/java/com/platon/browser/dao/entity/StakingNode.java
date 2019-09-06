@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class StakingNode extends StakingKey {
+	
+	private String disnodeid;
+	
     private Integer stakingTxIndex;
 
     private String stakingAddr;
@@ -93,7 +96,15 @@ public class StakingNode extends StakingKey {
 
     private String annualizedRateInfo;
 
-    public Integer getStakingTxIndex() {
+    public String getDisnodeid() {
+		return disnodeid;
+	}
+
+	public void setDisnodeid(String disnodeid) {
+		this.disnodeid = disnodeid;
+	}
+
+	public Integer getStakingTxIndex() {
         return stakingTxIndex;
     }
 

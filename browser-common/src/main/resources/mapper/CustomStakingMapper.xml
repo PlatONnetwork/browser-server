@@ -5,6 +5,7 @@
   <resultMap id="AndNodeResultMap" type="com.platon.browser.dao.entity.StakingNode">
     <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="disnodeid" jdbcType="VARCHAR" property="disnodeid" />
     <result column="staking_tx_index" jdbcType="INTEGER" property="stakingTxIndex" />
     <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
     <result column="staking_has" jdbcType="VARCHAR" property="stakingHas" />
@@ -197,12 +198,26 @@
     	<if test="isConsensus != null">
     		and s.is_consensus = #{isConsensus,jdbcType=INTEGER}
     	</if>
+    	<if test="isSetting != null">
+    		and s.is_setting = #{isSetting,jdbcType=INTEGER}
+    	</if>
     </where>
     order by cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) + 
     cast(stat_delegate_has as Decimal(30)) + cast(stat_delegate_locked as Decimal(30)) desc, s.program_version desc,s.staking_addr desc,s.node_id desc,s.staking_block_num desc
   </select>
-  <select id="selectHistoryNode" resultMap="AndNodeResultMap">
+  <select id="selectStakingAndNodeByNodeId" resultMap="AndNodeResultMap">
     select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
+    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
+    from staking s left join node n on s.node_id = n.node_id
+    <where>
+        <if test="nodeId != null">
+            and s.node_id = #{nodeId,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by s.staking_block_num desc
+  </select>
+  <select id="selectHistoryNode" resultMap="AndNodeResultMap">
+    select distinct(s.node_id) as disnodeid,s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
     from staking s left join node n on s.node_id = n.node_id
     <where>

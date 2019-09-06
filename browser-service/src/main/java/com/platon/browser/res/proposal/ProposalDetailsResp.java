@@ -38,6 +38,8 @@ public class ProposalDetailsResp {
     private String opposeRateThreshold;   //反对率
     private String abstainRateThreshold;   //弃权率
     private Long inBlock;   //所在块高
+    private String canceledPipId;
+    private String canceledTopic;
 	public String getPipNum() {
 		return pipNum;
 	}
@@ -200,6 +202,18 @@ public class ProposalDetailsResp {
 	}
 	public void setInBlock(Long inBlock) {
 		this.inBlock = inBlock;
+	}
+	public String getCanceledPipId() {
+		return canceledPipId;
+	}
+	public void setCanceledPipId(String canceledPipId) {
+		this.canceledPipId = canceledPipId;
+	}
+	public String getCanceledTopic() {
+		return canceledTopic;
+	}
+	public void setCanceledTopic(String canceledTopic) {
+		this.canceledTopic = canceledTopic;
 	}
     
     

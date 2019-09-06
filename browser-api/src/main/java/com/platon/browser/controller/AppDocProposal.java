@@ -116,7 +116,9 @@ public interface AppDocProposal {
 	 *       "opposeRateThreshold":"",   //反对率
 	 *       "abstainRateThreshold:"",   //弃权率
 	 *		 "pipNum":121, //pip num
-	 *       "inBlock":""   //所在块高
+	 *       "inBlock":"",   //所在块高
+	 *       "canceledPipId":"",   //被取消提案id
+	 *       "canceledTopic":""  //被取消提案名称
      *    }
      * }
      */	

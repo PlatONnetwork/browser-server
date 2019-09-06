@@ -68,6 +68,7 @@ public class AppDocHomeController implements AppDocHome {
 	@Override
 	public BaseResp<StakingListNewResp> stakingListNew() {
 		StakingListNewResp stakingListNewResp = homeService.stakingListNew();
+		stakingListNewResp.setIsRefresh(true);
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
 	}
 

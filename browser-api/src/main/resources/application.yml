@@ -7,7 +7,7 @@ server:
     context-path: /browser-server
 #Spring应用配置
 spring:
-  profiles.active: dev
+  profiles.active: test
   application.name: browser-api
   #国际化配置
   messages.basename: messages
