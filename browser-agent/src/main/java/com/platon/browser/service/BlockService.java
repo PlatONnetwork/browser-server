@@ -51,14 +51,14 @@ public class BlockService {
                     try {
                         Web3j web3j = client.getWeb3j();
                         PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-                        if (initData==null) throw new RuntimeException("原生区块["+blockNumber+"]为空！");
+                        if (initData==null) throw new BlockCollectingException("原生区块["+blockNumber+"]为空！");
                         CustomBlock block = new CustomBlock();
                         try{
                             block.updateWithBlock(initData);
                             CollectResult.CONCURRENT_BLOCK_MAP.put(blockNumber.longValue(),block);
                         }catch (Exception ex){
                             logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
-                            throw ex;
+                            throw new BlockCollectingException(ex.getMessage());
                         }
                     } catch (Exception e) {
                         // 把出现异常的区块号加入异常块号列表
