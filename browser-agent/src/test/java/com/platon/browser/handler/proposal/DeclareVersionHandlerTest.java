@@ -1,4 +1,4 @@
-package com.platon.browser.handlerTest.proposal;
+package com.platon.browser.handler.proposal;
 
 /**
  * @Auther: dongqile

@@ -1,4 +1,4 @@
-package com.platon.browser.handlerTest.statistic;
+package com.platon.browser.handler.statistic;
 
 /**
  * @Auther: dongqile

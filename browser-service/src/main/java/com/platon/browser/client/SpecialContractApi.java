@@ -3,7 +3,9 @@ package com.platon.browser.client;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.platon.BaseResponse;
@@ -43,6 +45,10 @@ public class SpecialContractApi {
      * 获取可用和锁仓余额
      */
     public static final int GET_RESTRICTINGBALANCE_FUNC_TYPE = 4101;
+    /**
+     * 获取提案结果
+     */
+    public static final int GET_PROPOSALRES_FUNC_TYPE = 2105;
 
     /**
      * 根据区块号获取结算周期验证人列表
@@ -145,4 +151,28 @@ public class SpecialContractApi {
             return response;
         }).send();
     }
+
+    public static final BaseResponse getProposalAccuVerifiers ( Web3j web3j, String proposalHash, String blockHash)throws Exception{
+        final Function function = new Function(
+                GET_PROPOSALRES_FUNC_TYPE,
+                Arrays.<Type>asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),
+                        new BytesType(Numeric.hexStringToByteArray(blockHash))),
+                Collections.emptyList());
+        return new RemoteCall<>((Callable<BaseResponse>) () -> {
+            String encodedFunction = PlatOnUtil.invokeEncode(function);
+            PlatonCall ethCall = web3j.platonCall(
+                    Transaction.createEthCallTransaction(InnerContractAddrEnum.PROPOSAL_CONTRACT.address, InnerContractAddrEnum.PROPOSAL_CONTRACT.address, encodedFunction),
+                    DefaultBlockParameterName.LATEST
+            ).send();
+            String value = ethCall.getValue();
+            if("0x".equals(value)){
+                // 证明没数据,返回空响应
+                return new BaseResponse<>();
+            }
+            BaseResponse response = JSONUtil.parseObject(new String(Numeric.hexStringToByteArray(value)), BaseResponse.class);
+            return response;
+        }).send();
+
+    }
+
 }

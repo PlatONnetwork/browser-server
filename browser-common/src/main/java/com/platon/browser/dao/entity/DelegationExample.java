@@ -754,6 +754,66 @@ public class DelegationExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andCurDelegationBlockNumIsNull() {
+            addCriterion("cur_delegation_block_num is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumIsNotNull() {
+            addCriterion("cur_delegation_block_num is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumEqualTo(Long value) {
+            addCriterion("cur_delegation_block_num =", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumNotEqualTo(Long value) {
+            addCriterion("cur_delegation_block_num <>", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumGreaterThan(Long value) {
+            addCriterion("cur_delegation_block_num >", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumGreaterThanOrEqualTo(Long value) {
+            addCriterion("cur_delegation_block_num >=", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumLessThan(Long value) {
+            addCriterion("cur_delegation_block_num <", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumLessThanOrEqualTo(Long value) {
+            addCriterion("cur_delegation_block_num <=", value, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumIn(List<Long> values) {
+            addCriterion("cur_delegation_block_num in", values, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumNotIn(List<Long> values) {
+            addCriterion("cur_delegation_block_num not in", values, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumBetween(Long value1, Long value2) {
+            addCriterion("cur_delegation_block_num between", value1, value2, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurDelegationBlockNumNotBetween(Long value1, Long value2) {
+            addCriterion("cur_delegation_block_num not between", value1, value2, "curDelegationBlockNum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -1,4 +1,4 @@
-package com.platon.browser.handlerTest.slash;
+package com.platon.browser.handler.slash;
 
 /**
  * @Auther: dongqile

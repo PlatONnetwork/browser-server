@@ -1,4 +1,4 @@
-package com.platon.browser.handlerTest.delagation;
+package com.platon.browser.handler.delagation;
 
 /**
  * @Auther: dongqile

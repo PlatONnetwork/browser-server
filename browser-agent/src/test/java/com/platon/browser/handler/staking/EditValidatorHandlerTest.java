@@ -1,4 +1,4 @@
-package com.platon.browser.handlerTest.staking;
+package com.platon.browser.handler.staking;
 
 /**
  * @Auther: dongqile

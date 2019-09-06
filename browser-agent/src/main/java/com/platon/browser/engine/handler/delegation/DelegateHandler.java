@@ -50,6 +50,7 @@ public class DelegateHandler implements EventHandler {
                 if (delegation != null) {
                     delegation.setDelegateHas(delegation.integerDelegateHas().add(param.integerAmount()).toString());
                     delegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
+                    delegation.setCurDelegationBlockNum(tx.getBlockNumber());
                     //更新分析结果UpdateSet
                     stakingStage.updateDelegation(delegation);
                 }

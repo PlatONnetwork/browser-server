@@ -28,6 +28,7 @@ public class CustomDelegation extends Delegation {
         this.setSequence(tx.getBlockNumber()*10000+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
+        this.setCurDelegationBlockNum(tx.getBlockNumber());
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
