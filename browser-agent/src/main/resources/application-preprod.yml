@@ -1,4 +1,4 @@
-# ***************************开发配置**************************** #
+# ***************************预生产配置**************************** #
 spring:
   redis:
     host: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com
@@ -55,22 +55,22 @@ platon.config:
   blockHighSlashRate: 0.5
   #质押门槛: 创建验证人最低的质押Token数(LAT)
   stakeThreshold: 5000000
-  #委托门槛
+  #委托门槛(LAT)
   delegateThreshold: 10
   #出块间隔(秒)
-  blockInterval: 1
+  blockInterval: 2
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
-  consensusPeriodBlockCount: 40
+  consensusPeriodBlockCount: 250
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数
-  settlePeriodBlockCount: 160
+  settlePeriodBlockCount: 10750
   #每个增发周期区块总数
-  addIssuePeriodBlockCount: 1600
+  addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 2
+  unstakeRefundSettlePeriodCount: 28
   #升级提案预升级轮数
   versionProposalActiveConsensusRounds: 5
   #文本提案默认投票结束轮数
