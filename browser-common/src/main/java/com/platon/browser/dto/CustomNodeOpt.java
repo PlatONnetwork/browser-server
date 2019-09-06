@@ -15,13 +15,14 @@ import java.util.Map;
 public class CustomNodeOpt extends NodeOpt {
 
     public CustomNodeOpt(){
+        super();
         Date date = new Date();
         this.setUpdateTime(date);
         this.setCreateTime(date);
     }
 
     public CustomNodeOpt(String nodeId, DescEnum desc) {
-        super();
+        this();
         this.setNodeId(nodeId);
         this.setDesc(desc.code);
     }

@@ -11,6 +11,7 @@ import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ReportValidatorParam;
+import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
@@ -36,7 +36,7 @@ public class ReportValidatorHandler implements EventHandler {
     private BlockChainConfig chainConfig;
 
     @Override
-    public void handle ( EventContext context ) {
+    public void handle ( EventContext context )throws NoSuchBeanException {
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
@@ -44,14 +44,14 @@ public class ReportValidatorHandler implements EventHandler {
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
         //通过结果获取，证据中的举报人的nodeId
         try {
-            CustomStaking latestStaking = NODE_CACHE.getNode(param.getVerify()).getLatestStaking();
+            CustomStaking latestStaking = NODE_CACHE.getNode(HexTool.prefix(param.getVerify())).getLatestStaking();
             logger.debug("多签举报信息:{}", JSON.toJSONString(param));
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignLowSlashRate());
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
             latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
             //设置离开时间
-            latestStaking.setLeaveTime(new Date());
+            latestStaking.setLeaveTime(bc.getCurBlock().getTimestamp());
             //判断现在的锁定期金额是否大于零
             if (latestStaking.integerStakingLocked().compareTo(BigInteger.ZERO) > 0) {
                 latestStaking.setStakingReduction(latestStaking.getStakingLocked());
@@ -82,6 +82,7 @@ public class ReportValidatorHandler implements EventHandler {
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
         } catch (NoSuchBeanException e) {
             logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
+            throw new NoSuchBeanException("");
         }
         tx.setTxInfo(JSON.toJSONString(param));
         logger.debug("举报多签(举报验证人)");

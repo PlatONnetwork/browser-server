@@ -25,9 +25,10 @@ public class CustomDelegation extends Delegation {
         this.setNodeId(param.getNodeId());
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
-        this.setSequence(tx.getBlockNumber()+tx.getTransactionIndex());
+        this.setSequence(tx.getBlockNumber()*10000+tx.getTransactionIndex());
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
+        this.setCurDelegationBlockNum(tx.getBlockNumber());
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/

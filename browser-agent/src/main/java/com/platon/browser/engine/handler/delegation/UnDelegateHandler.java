@@ -70,11 +70,13 @@ public class UnDelegateHandler implements EventHandler {
                 delegation.setDelegateLocked("0");
                 //设置赎回委托结构中的赎回锁定金额
                 unDelegation.setRedeemLocked(delegation.getDelegateReduction());
+                unDelegation.setRealAmount(delegationSum.toString());
             } else {
                 if (delegation.integerDelegateHas().compareTo(param.integerAmount()) > 0) {
                     //犹豫期的金额 > 赎回委托金额，直接扣除犹豫期金额
                     //该委托的变更犹豫期金额 = 委托原本的犹豫期金额 - 委托赎回的金额
                     delegation.setDelegateHas(delegation.integerDelegateHas().subtract(param.integerAmount()).toString());
+
                 } else {
                     //犹豫期金额 < 赎回委托金额，优先扣除所剩的犹豫期金额，不足的从锁定期金额中扣除
                     //差值 = 要赎回的金额 - 犹豫期的金额
@@ -88,6 +90,7 @@ public class UnDelegateHandler implements EventHandler {
                     //设置委托中的赎回金额，经过分析后的委托赎回金额 = 委托赎回金额 + 委托锁定期金额
                     delegation.setDelegateReduction(delegation.integerDelegateReduction().add(unDelegation.integerRedeemLocked()).toString());
                 }
+                unDelegation.setRealAmount(param.getAmount());
             }
             //判断此赎回委托的交易对应的委托交易是否完成，若完成则将更新委托交易，设置成委托历史；委托犹豫期金额 + 委托锁定期金额 + 委托赎回金额，是否等于0
             BigInteger sumAmount = delegation.integerDelegateHas() // 委托犹豫期金额

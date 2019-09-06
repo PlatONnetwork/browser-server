@@ -49,7 +49,6 @@ public class NewConsensusEpochHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws Exception {
         stakingStage = context.getStakingStage();
-
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -57,18 +56,16 @@ public class NewConsensusEpochHandler implements EventHandler {
     /**
      * 更新与质押相关的信息
      */
-    private void updateStaking(){
+    private void updateStaking() throws NoSuchBeanException {
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
-        //if(stakingList.size()!=4) throw new RuntimeException("质押信息少于4条！");
-        Long blockNumber = bc.getCurBlock().getNumber();
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
         Map<String,String> consensusInfo = new HashMap<>();
         String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
         for (CustomStaking staking:stakingList){
-            Node node = bc.getCurValidator().get(staking.getNodeId());
-            if(node!=null){
+            Node nextNode = bc.getCurValidator().get(staking.getNodeId());
+            // 看当前验证人是否在下一轮共识
+            if(nextNode!=null){
                 staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
-                staking.setStatVerifierTime(staking.getStatVerifierTime()+1);
             }else {
                 staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             }
@@ -82,16 +79,21 @@ public class NewConsensusEpochHandler implements EventHandler {
             stakingStage.updateStaking(staking);
         }
 
-        // 更新node表中的共识验证轮数: stat_verifier_time
-        bc.getCurValidator().forEach((nodeId,validator)->{
+        // 下一轮验证人提前设置验证轮数：验证周期轮数+1
+        for (Node node:bc.getCurValidator().values()){
+            CustomNode customNode = NODE_CACHE.getNode(HexTool.prefix(node.getNodeId()));
+            // 节点经过的共识周期轮数+1
+            customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
+            // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
+            customNode.setStatExpectBlockQty(customNode.getStatVerifierTime()*chainConfig.getExpectBlockCount().longValue());
             try {
-                CustomNode node = NODE_CACHE.getNode(nodeId);
-                node.setStatVerifierTime(node.getStatVerifierTime()+1);
+                CustomStaking latestStaking = customNode.getLatestStaking();
+                // 节点最新质押记录经过的共识轮数+1
+                latestStaking.setStatVerifierTime(latestStaking.getStatVerifierTime()+1);
             } catch (NoSuchBeanException e) {
-                logger.error("更新共识验证人(nodeId={})验证轮数出错:{}",nodeId,e.getMessage());
+                logger.debug("无质押，不处理");
             }
-        });
-
+        }
         logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
     }
 
@@ -128,13 +130,13 @@ public class NewConsensusEpochHandler implements EventHandler {
         }
 
 
-        // ==================================更新当前周期验证人列表=======================================
+        // ==================================更新下一共识周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
         if(result.isStatusOk()){
             bc.getCurValidator().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("当前轮共识周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+            logger.debug("下一轮共识周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
@@ -142,19 +144,19 @@ public class NewConsensusEpochHandler implements EventHandler {
                 result = client.getNodeContract().getValidatorList().send();
                 bc.getCurValidator().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("当前轮共识周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
+                logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
+                throw new CandidateException(format("【查询下一轮共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
+                throw new CandidateException(format("【查询下一轮共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
             }
         }
 
-
         if(bc.getCurValidator().size()==0){
-            throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
+            throw new CandidateException("查询不到下一轮共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
         }
+        logger.debug("下一轮共识周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 }

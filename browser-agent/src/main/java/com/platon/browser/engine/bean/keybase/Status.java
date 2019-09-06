@@ -1,0 +1,10 @@
+
+package com.platon.browser.engine.bean.keybase;
+
+import lombok.Data;
+
+@Data
+public class Status {
+    private int code;
+    private String name;
+}

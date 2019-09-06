@@ -23,6 +23,7 @@ import com.platon.browser.util.TxParamResolver;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +37,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -241,6 +243,9 @@ public class BlockSyncTask {
                 }
                 result.data.forEach(node->candidateMap.put(HexTool.prefix(node.getNodeId()),node));
 
+                // 配置中的默认内置节点信息
+                Map<String,CustomStaking> defaultStakingMap = new HashMap<>();
+                chainConfig.getDefaultStakings().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
 
                 // 根据区块号0查询结算周期验证人列表并入库
                 result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.ZERO);
@@ -260,21 +265,29 @@ public class BlockSyncTask {
                     CustomNode node = new CustomNode();
                     node.updateWithNode(verifier);
                     node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
-                    node.setStatVerifierTime(BigInteger.ONE.intValue());
+                    node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                     node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
                     BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
 
                     CustomStaking staking = new CustomStaking();
                     staking.updateWithNode(verifier);
+                    staking.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                     staking.setIsInit(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
                     // 内置节点默认设置状态为1
                     staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
-                    // 设置内置节点默认初始质押锁定金额
-                    if(candidate!=null) staking.setStakingLocked(candidate.getReleased().toString());
+                    // 设置内置节点质押锁定金额
+                    BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
+                    staking.setStakingLocked(initStakingLocked.toString());
                     // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+
+
+                    CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
+                    if(StringUtils.isBlank(staking.getStakingName())&&defaultStaking!=null)
+                        staking.setStakingName(defaultStaking.getStakingName());
+
                     // 暂存至新增质押待入库列表
                     BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
 
@@ -341,13 +354,9 @@ public class BlockSyncTask {
                 // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
                 BlockChainStage bizData = blockChain.exportResult();
                 batchSave(blocks, bizData);
-                // 入库前更新统计信息
-                addressCacheUpdater.updateAddressStatistics();
-                stakingCacheUpdater.updateStakingStatistics();
             } catch (BusinessException e) {
                 break;
             }
-            blockChain.commitResult();
             // 记录已采入库最高区块号
             commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
             try {
@@ -447,19 +456,8 @@ public class BlockSyncTask {
             Stat stat = new Stat();
             block.getTransactionList().forEach(transaction->{
                 switch (transaction.getTypeEnum()){
-                    case TRANSFER: // 转账交易数总和
+                    case TRANSFER: // 转账交易，from地址转账交易数加一
                         stat.transferQty++;
-                        break;
-                    case CREATE_PROPOSAL_PARAMETER:// 创建参数提案
-                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
-                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                    case DECLARE_VERSION:// 版本声明
-                    case VOTING_PROPOSAL:// 提案投票
-                        stat.proposalQty++; // 提案交易数总和
-                        break;
-                    case DELEGATE:// 发起委托
-                    case UN_DELEGATE:// 撤销委托
-                        stat.delegateQty++; // 委托交易数总和
                         break;
                     case INCREASE_STAKING:// 增加自有质押
                     case CREATE_VALIDATOR:// 创建验证人
@@ -467,6 +465,17 @@ public class BlockSyncTask {
                     case REPORT_VALIDATOR:// 举报验证人
                     case EDIT_VALIDATOR:// 编辑验证人
                         stat.stakingQty++; // 质押交易数总和
+                        break;
+                    case DELEGATE:// 发起委托
+                    case UN_DELEGATE:// 撤销委托
+                        stat.delegateQty++; // 委托交易数总和
+                        break;
+                    case CANCEL_PROPOSAL:// 取消提案
+                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                    case DECLARE_VERSION:// 版本声明
+                    case VOTING_PROPOSAL:// 提案投票
+                        stat.proposalQty++; // 提案交易数总和
                         break;
                 }
                 // 累加当前区块内所有交易的手续费
@@ -519,8 +528,12 @@ public class BlockSyncTask {
 
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
+            // 入库前更新统计信息
+            addressCacheUpdater.updateAddressStatistics();
+            stakingCacheUpdater.updateStakingStatistics();
             // 串行批量入库
             dbService.insertOrUpdate(basicData,bizData);
+            blockChain.commitResult();
             // 缓存整理
             BlockChain.NODE_CACHE.sweep();
             BlockChain.PROPOSALS_CACHE.sweep();

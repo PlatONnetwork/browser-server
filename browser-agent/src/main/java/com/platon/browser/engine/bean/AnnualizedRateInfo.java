@@ -2,7 +2,8 @@ package com.platon.browser.engine.bean;
 
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Auther: Chendongming
@@ -13,4 +14,5 @@ import java.util.*;
 public class AnnualizedRateInfo {
     private List<PeriodValueElement> profit = new ArrayList<>();
     private List<PeriodValueElement> cost = new ArrayList<>();
+    private List<SlashInfo> slash = new ArrayList<>();
 }

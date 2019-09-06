@@ -4,21 +4,24 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
+import com.platon.browser.engine.bean.SlashInfo;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.Node;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +50,7 @@ public class NewElectionEpochHandler implements EventHandler {
         for (CustomStaking staking:stakingList){
             // 需要判断被处罚质押是否在上一轮共识周期验证人
             Node exist = bc.getPreValidator().get(staking.getNodeId());
-            if(exist==null) return;
+            if(exist==null) continue;
             // 根据前一个共识周期的出块数判断是否触发最低处罚
             // 计算出块率
             BigDecimal blockRate = new BigDecimal(staking.getPreConsBlockQty())
@@ -74,16 +77,25 @@ public class NewElectionEpochHandler implements EventHandler {
                 BigDecimal slashAmount = stakingLocked.multiply(slashRate);
                 info = info.replace("SLASH_AMOUNT",slashAmount.toString());
                 // 判断是否需要踢出验证人列表
-                boolean isDeleteStaking = totalAmount.subtract(slashAmount).compareTo(bc.getChainConfig().getStakeThreshold()) < 0;
+                BigDecimal stakeThresholdInVon = Convert.toVon(bc.getChainConfig().getStakeThreshold(), Convert.Unit.LAT);
+                boolean isDeleteStaking = totalAmount.subtract(slashAmount).compareTo(stakeThresholdInVon) < 0;
+
+                // 扣除罚款后剩余的锁定金额 = 原锁定金额+犹豫期金额-罚款
+                BigDecimal lockedAmount = stakingLocked.add(stakingHas).subtract(slashAmount);
                 if(isHighSlash||isDeleteStaking){
+                    // (出块率超低触发高处罚比例)或(被罚款后剩余质押金额小于质押门槛)，则需要踢掉此节点
                     // 此处处理与多签处罚一致
-                    BigDecimal lockedAmount = stakingLocked.add(stakingHas).subtract(slashAmount);
+                    // 犹豫期金额置0
                     staking.setStakingHas(BigInteger.ZERO.toString());
-                    staking.setLeaveTime(new Date());
+                    // 设置离开时间
+                    staking.setLeaveTime(bc.getCurBlock().getTimestamp());
                     if(lockedAmount.compareTo(BigDecimal.ZERO)>0){
+                        // 锁定金额全部置为退回
                         staking.setStakingReduction(lockedAmount.setScale(0,RoundingMode.FLOOR).toString());
+                        // 锁定金额置0
                         staking.setStakingLocked(BigInteger.ZERO.toString());
                         staking.setStakingReductionEpoch(bc.getCurSettingEpoch().intValue());
+                        // 节点状态设为退出中
                         staking.setStatus(CustomStaking.StatusEnum.EXITING.code);
                     }else{
                         staking.setStakingLocked(BigInteger.ZERO.toString());
@@ -92,14 +104,31 @@ public class NewElectionEpochHandler implements EventHandler {
                     staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
                 } else {
+                    // 普通出块率低，则扣点钱完事
                     if(stakingHas.compareTo(slashAmount)>=0){
-                        // 如果犹豫期金额大于等于处罚金额
+                        // 如果犹豫期金额大于等于处罚金额,则直接从犹豫期中扣除罚款
                         staking.setStakingHas(stakingHas.subtract(slashAmount).setScale(0,RoundingMode.CEILING).toString());
                     }else{
-                        staking.setStakingLocked(stakingLocked.add(stakingHas).subtract(slashAmount).setScale(0,RoundingMode.FLOOR).toString());
+                        staking.setStakingLocked(lockedAmount.setScale(0,RoundingMode.FLOOR).toString());
                         staking.setStakingHas(BigInteger.ZERO.toString());
                     }
                 }
+
+                // 记录处罚信息至年化率信息里面
+                String annualizedRateInfo = staking.getAnnualizedRateInfo();
+                AnnualizedRateInfo ari = new AnnualizedRateInfo();
+                if(StringUtils.isNotBlank(annualizedRateInfo)){
+                    ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
+                }
+                SlashInfo si = new SlashInfo();
+                si.setBlockNumber(bc.getCurBlock().getBlockNumber());
+                si.setBlockRate(blockRate);
+                si.setSlashRate(slashRate);
+                si.setSlashAmount(slashAmount);
+                si.setSlashTime(bc.getCurBlock().getTimestamp());
+                ari.getSlash().add(si);
+                staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
+
                 // 把更新暂存到待入库列表
                 stakingStage.updateStaking(staking);
 
@@ -114,7 +143,6 @@ public class NewElectionEpochHandler implements EventHandler {
                 slashInfo.put(staking.getNodeId(),info);
             }
         }
-
         if(slashInfo.size()>0) logger.info("节点出块率低处罚信息:{}", JSON.toJSONString(slashInfo,true));
     }
 }

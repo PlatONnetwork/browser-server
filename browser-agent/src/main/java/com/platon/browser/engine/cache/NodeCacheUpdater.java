@@ -26,14 +26,10 @@ public class NodeCacheUpdater {
      * 更新node表中的节点出块数信息: stat_block_qty, 由blockChain.execute()调用
      * 添加量
      */
-    public void updateStatBlockQty(){
+    public void updateStatBlockQty() throws NoSuchBeanException {
         CustomBlock curBlock = bc.getCurBlock();
-        try {
-            CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
-            node.setStatBlockQty(node.getStatBlockQty()+1);
-            STAGE_DATA.getStakingStage().updateNode(node);
-        } catch (NoSuchBeanException e) {
-            logger.error("{}",e.getMessage());
-        }
+        CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
+        node.setStatBlockQty(node.getStatBlockQty()+1);
+        STAGE_DATA.getStakingStage().updateNode(node);
     }
 }

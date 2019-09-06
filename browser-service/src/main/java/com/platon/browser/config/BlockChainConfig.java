@@ -1,5 +1,6 @@
 package com.platon.browser.config;
 
+import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -7,9 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 链参数统一配置项
@@ -85,6 +84,12 @@ public class BlockChainConfig {
     private String proposalUrlTemplate;
     //文本提案默认结束轮数
     private String proposalTextEndRound;
-    //keyStore地址
-    private String keyStore;
+    //keyBase
+    private String keyBase;
+    // 初始内置节点默认质押金额(VON)
+    private BigDecimal defaultStakingLockedAmount;
+    // 初始内置节点信息
+    private List<CustomStaking> defaultStakings=new ArrayList<>();
+    //设置预升级开始轮数
+    private String versionProposalActiveConsensusRounds;
 }

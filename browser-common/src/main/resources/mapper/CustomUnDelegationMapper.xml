@@ -54,6 +54,9 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'real_amount'.toString() == column.value">
+          #{item.realAmount,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>

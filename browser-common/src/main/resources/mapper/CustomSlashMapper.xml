@@ -15,7 +15,7 @@
     from slash where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
 
-  <insert id="batchInsertSelective" parameterType="map">
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
     replace into slash (
     <foreach collection="selective" item="column" separator=",">
       ${column.escapedColumnName}

@@ -52,14 +52,14 @@ public class RoundCalculation {
             //交易所在区块高度
             BigDecimal txBlockNumber = new BigDecimal(blockNumber);
             //治理交易生效轮数
-            BigDecimal txActiveRound = new BigDecimal(endRound).add(BigDecimal.valueOf(4L));
+            BigDecimal txActiveRound = new BigDecimal(endRound).add(new BigDecimal(bc.getVersionProposalActiveConsensusRounds()).subtract(BigDecimal.ONE));
             //共识周期块数
             BigDecimal consensusCount = new BigDecimal(bc.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换生效块高
-            BigDecimal activeBlockNum = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.add(new BigDecimal("4")).multiply(consensusCount)).add(BigDecimal.ONE);
+            BigDecimal activeBlockNum = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.multiply(consensusCount)).add(BigDecimal.ONE);
             return activeBlockNum;
         } catch (Exception e) {
             return BigDecimal.ZERO;

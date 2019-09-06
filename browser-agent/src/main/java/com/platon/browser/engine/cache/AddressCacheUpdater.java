@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static com.platon.browser.engine.BlockChain.*;
 
@@ -106,7 +109,7 @@ public class AddressCacheUpdater {
             address.setDelegateValue(stat.delegateValue.toString());
             address.setRedeemedValue(stat.redeemedValue.toString());
             address.setCandidateCount(stat.candidateCount.intValue());
-            address.setDelegateValue(stat.delegateHes.toString());
+            address.setDelegateHes(stat.delegateHes.toString());
             address.setDelegateLocked(stat.delegateLocked.toString());
             address.setDelegateUnlock(stat.delegateUnlock.toString());
             address.setDelegateReduction(stat.delegateReduction.toString());

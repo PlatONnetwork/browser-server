@@ -21,12 +21,12 @@ public class CustomProposal extends Proposal {
 
     public static final String queryFlag = "inquiry";
 
-    public void updateWithCustomTransaction(CustomTransaction tx) {
+    public void updateWithCustomTransaction(CustomTransaction tx,Long accuVerSum) {
         this.setHash(tx.getHash());
         this.setYeas(0L);
         this.setNays(0L);
         this.setAbstentions(0L);
-        this.setAccuVerifiers(0L);
+        this.setAccuVerifiers(accuVerSum);
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
         this.setTimestamp(tx.getTimestamp());

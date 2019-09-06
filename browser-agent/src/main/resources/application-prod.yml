@@ -1,4 +1,7 @@
 # ***************************生产配置**************************** #
+spring:
+  redis:
+    host:
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
@@ -12,18 +15,18 @@ dbpass: platon
 web3j:
   addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
   collect.batch-size: 1000
-# Redis集群节点
-redis: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-# 日志文件存储文件
-logpath: ./logs/${spring.application.name}-${version}-${profile}.log
-# 日志级别
-loglevel:
-  spring: error
-  platon.task: error
-  platon.engine: error
-  platon.client: error
-  platon.dao: error
-  platon.service: error
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  level:
+    org.springframework: error
+    com.platon.browser: error
+    com.platon.browser.service: error
+    com.platon.browser.task: error
+    com.platon.browser.client: error
+    com.platon.browser.dao: error
+    com.platon.browser.engine: error
+    com.platon.browser.engine.handler.epoch: error
 
 #初始化链相关的配置
 platon.config:
@@ -31,7 +34,7 @@ platon.config:
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #链ID
   chainId: 101
-  #PlatON初始总发行量
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -61,12 +64,14 @@ platon.config:
   consensusPeriodBlockCount: 250
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #每个结算周期区块总数(等于43个共识周期出的块数总和)
+  #每个结算周期区块总数
   settlePeriodBlockCount: 10750
-  #每个增发周期区块总数(1466个结算周期)
+  #每个增发周期区块总数
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 28
+  #升级提案预升级轮数
+  versionProposalActiveConsensusRounds: 5
   #文本提案默认投票结束轮数
   proposalTextEndRound: 4
   #文本提案参与率: >
@@ -97,6 +102,8 @@ platon.config:
     '8':15044304.0698633,
     '9':7615018.1094369
   }
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 10000000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keybase网址

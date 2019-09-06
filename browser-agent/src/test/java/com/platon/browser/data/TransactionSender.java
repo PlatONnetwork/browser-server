@@ -95,10 +95,10 @@ public class TransactionSender {
         String webSite = "www.baidu.com";
         String details = "chendai-node1-details";
         BigDecimal stakingAmount = Convert.toVon("5000000", Unit.LAT);
-        
+
         PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
                .setNodeId(stakingPubKey)
-               .setAmount(stakingAmount.toBigInteger())  
+               .setAmount(stakingAmount.toBigInteger())
                .setStakingAmountType(StakingAmountType.FREE_AMOUNT_TYPE)
                .setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219")
                .setExternalId(externalId)
@@ -158,10 +158,10 @@ public class TransactionSender {
                 StakingAmountType.FREE_AMOUNT_TYPE,
                 delegate.toBigInteger()
         ).send();
-        logger.debug("res:{}",res); 
+        logger.debug("res:{}",res);
     }
-    
-    
+
+
     public static void main(String[] args) throws IOException, CipherException {
     	Credentials credentials = WalletUtils.loadCredentials("88888888", "F:\\文件\\矩真文件\\区块链\\PlatScan\\fd9d508df262a1c968e0d6c757ab08b96d741f4b_88888888.json");
 //    	Credentials credentials = WalletUtils.loadCredentials("11111111", "D:\\blockchain\\file\\60ceca9c1290ee56b98d4e160ef0453f7c40d219");
@@ -171,8 +171,8 @@ public class TransactionSender {
 //    	Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 //    	WalletUtils.generateWalletFile("88888888", credentials.getEcKeyPair(), new File("d://"), true);
     }
-    
-    
+
+
 
     // 发送解委托交易
     @Test
@@ -187,8 +187,8 @@ public class TransactionSender {
     }
 
     @Test
-    public void getBlockNumber() throws IOException {
-        Web3j web3j = Web3j.build(new HttpService("http://192.168.120.89:6789"));
+    public void getBlockNumber() throws Exception {
+        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 //        long blockNum = 11777;
         /*while (true){
             try {
@@ -254,6 +254,9 @@ public class TransactionSender {
         System.out.println(bg);
         bg = Convert.fromVon("10000000000000000000000000", Convert.Unit.LAT);
         System.out.println(bg);
+
+        BaseResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();
+        System.out.println(nodes);
     }
     
     @Test

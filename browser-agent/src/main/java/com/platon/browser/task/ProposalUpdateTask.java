@@ -5,6 +5,8 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.TallyResult;
+
+import java.io.IOException;
 
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
@@ -41,7 +45,9 @@ public class ProposalUpdateTask {
         if(proposalCache.getAllProposal().size() == 0)return;
         for (CustomProposal proposal : proposalCache.getAllProposal()) {//如果已经补充则无需补充
             try {
-                String proposalMarkString = MarkDownParserUtil.parserMD(MarkDownParserUtil.acquireMD(proposal.getUrl()));
+                String fileUrl = MarkDownParserUtil.acquireMD(proposal.getUrl());
+                if(fileUrl==null) throw new BusinessException("获取不到"+proposal.getUrl());
+                String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
                 ProposalMarkDownDto proposalMarkDownDto = JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
                 proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                 if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
@@ -56,8 +62,10 @@ public class ProposalUpdateTask {
                 PROPOSALS_CACHE.addProposal(proposal);
                 // 暂存至待入库列表
                 STAGE_DATA.getProposalStage().updateProposal(proposal);
-            } catch (Exception e) {
+            }catch (NoSuchBeanException | BusinessException e){
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
+            } catch (IOException e) {
+                logger.error("更新提案({})的主题和描述出错:获取不到{}", proposal.getPipId(), proposal.getUrl());
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code) || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)

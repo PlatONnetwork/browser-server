@@ -1,6 +1,5 @@
 package com.platon.browser.engine;
 
-import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
@@ -31,6 +30,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 
 /**
  * @Auther: Chendongming
@@ -89,6 +90,10 @@ public class StakingEngine {
         if(nodeIds.size()==0) return;
         // |-加载质押记录
         List<CustomStaking> stakingList = customStakingMapper.selectByNodeIdList(nodeIds);
+
+        // 初始化节点名称缓存
+        stakingList.forEach(staking -> NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName()));
+
         // |-加载委托记录
         List<CustomDelegation> delegationList = customDelegationMapper.selectByNodeIdList(nodeIds);
         // |-加载撤销委托记录

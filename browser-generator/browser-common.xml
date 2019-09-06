@@ -24,9 +24,9 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
-                        userId="platon"
-                        password="platon"/>
+                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.7.0_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        userId="root"
+                        password="Juzhen123!"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -63,10 +63,7 @@
                                 replaceString=""/>
         </table>
 
-        <table tableName="delegation" domainObjectName="Delegation">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
+
 
         <table tableName="node" domainObjectName="Node">
             <columnRenamingRule searchString="^D_"
@@ -119,7 +116,6 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
--->
 
 
         <table tableName="address" domainObjectName="Address">
@@ -127,6 +123,12 @@
                                 replaceString=""/>
         </table>
 
+-->
+
+        <table tableName="delegation" domainObjectName="Delegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
 
     </context>

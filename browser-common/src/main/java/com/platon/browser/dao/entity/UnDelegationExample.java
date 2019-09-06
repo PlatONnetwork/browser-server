@@ -694,6 +694,76 @@ public class UnDelegationExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andRealAmountIsNull() {
+            addCriterion("real_amount is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountIsNotNull() {
+            addCriterion("real_amount is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountEqualTo(String value) {
+            addCriterion("real_amount =", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountNotEqualTo(String value) {
+            addCriterion("real_amount <>", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountGreaterThan(String value) {
+            addCriterion("real_amount >", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountGreaterThanOrEqualTo(String value) {
+            addCriterion("real_amount >=", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountLessThan(String value) {
+            addCriterion("real_amount <", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountLessThanOrEqualTo(String value) {
+            addCriterion("real_amount <=", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountLike(String value) {
+            addCriterion("real_amount like", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountNotLike(String value) {
+            addCriterion("real_amount not like", value, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountIn(List<String> values) {
+            addCriterion("real_amount in", values, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountNotIn(List<String> values) {
+            addCriterion("real_amount not in", values, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountBetween(String value1, String value2) {
+            addCriterion("real_amount between", value1, value2, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealAmountNotBetween(String value1, String value2) {
+            addCriterion("real_amount not between", value1, value2, "realAmount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

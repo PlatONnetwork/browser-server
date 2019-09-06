@@ -71,6 +71,9 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'cur_delegation_block_num'.toString() == column.value">
+          #{item.curDelegationBlockNum,jdbcType=BIGINT}
+        </if>
       </foreach>
       )
     </foreach>

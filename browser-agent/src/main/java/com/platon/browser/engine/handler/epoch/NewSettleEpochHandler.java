@@ -92,18 +92,18 @@ public class NewSettleEpochHandler implements EventHandler {
         }
 
 
-        // ==================================更新当前周期验证人列表=======================================
+        // ==================================更新下一轮结算周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         try {
             result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
+            throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochFirstBlockNumber,nextEpochFirstBlockNumber,e.getMessage()));
         }
         if(result.isStatusOk()){
             bc.getCurVerifier().clear();
             result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("当前轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
+            logger.debug("下一轮结算周期验证人(查{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(bc.getCurValidator(),true));
         }
         if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
@@ -111,21 +111,19 @@ public class NewSettleEpochHandler implements EventHandler {
                 result = client.getNodeContract().getVerifierList().send();
                 bc.getCurVerifier().clear();
                 result.data.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("当前轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
+                logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(bc.getCurValidator(),true));
             } catch (Exception e) {
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
+                throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
             }
             if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
+                throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
             }
         }
 
         if(bc.getCurVerifier().size()==0){
-            throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
+            throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
-
-
-        logger.debug("当前轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
+        logger.debug("下一轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
     }
 
 
@@ -192,6 +190,7 @@ public class NewSettleEpochHandler implements EventHandler {
             if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
+            // 犹豫期+锁定期+退回中==0
             BigInteger stakingReduction = curStaking.integerStakingReduction();
             if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
                 curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
@@ -250,35 +249,22 @@ public class NewSettleEpochHandler implements EventHandler {
                         // 保留指定数量最新的记录
                         if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
                             // 按结算周期由大到小排序
-                            ari.getProfit().sort((c1, c2) -> {
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                                return 0;
-                            });
+                            ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
                             // 删除多余的元素
-                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--){
-                                ari.getProfit().remove(i);
-                            }
+                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
                         }
 
                         // 保留指定数量最新的记录
                         if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
                             // 按结算周期由大到小排序
-                            ari.getCost().sort((c1, c2) -> {
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                                if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                                return 0;
-                            });
+                            ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
                             // 删除多余的元素
-                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--){
-                                ari.getCost().remove(i);
-                            }
+                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
                         }
                     }
                     class AnnualizedSum{
-                        BigInteger profitSum=BigInteger.ZERO;
-                        BigInteger costSum=BigInteger.ZERO;
-                        BigDecimal getAnnualizedRate(){
+                        private BigInteger profitSum=BigInteger.ZERO,costSum=BigInteger.ZERO;
+                        private BigDecimal getAnnualizedRate(){
                             if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
                             BigDecimal rate = new BigDecimal(profitSum)
                                     .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR)
@@ -291,12 +277,8 @@ public class NewSettleEpochHandler implements EventHandler {
                     ari.getProfit().forEach(ele->as.profitSum=as.profitSum.add(ele.getValue()));
 
                     // 按周期从大到小排序
-                    ari.getCost().sort((c1, c2) -> {
-                        if (c1.getPeriod().compareTo(c2.getPeriod()) > 0) return -1;
-                        if (c1.getPeriod().compareTo(c2.getPeriod()) < 0) return 1;
-                        return 0;
-                    });
-                    // 忽略最大的周期
+                    ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+                    // 从索引1开始，忽略最大的周期
                     for (int i=1;i<ari.getCost().size();i++){
                         PeriodValueElement pve = ari.getCost().get(i);
                         as.costSum=as.costSum.add(pve.getValue());

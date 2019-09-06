@@ -11,6 +11,7 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="real_amount" jdbcType="VARCHAR" property="realAmount" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,7 +73,7 @@
   </sql>
   <sql id="Base_Column_List">
     hash, delegate_addr, staking_block_num, node_id, apply_amount, redeem_locked, `status`, 
-    create_time, update_time
+    create_time, update_time, real_amount
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.UnDelegationExample" resultMap="BaseResultMap">
     select
@@ -107,12 +108,12 @@
   <insert id="insert" parameterType="com.platon.browser.dao.entity.UnDelegation">
     insert into un_delegation (hash, delegate_addr, staking_block_num, 
       node_id, apply_amount, redeem_locked, 
-      `status`, create_time, update_time
-      )
+      `status`, create_time, update_time, 
+      real_amount)
     values (#{hash,jdbcType=VARCHAR}, #{delegateAddr,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, 
       #{nodeId,jdbcType=VARCHAR}, #{applyAmount,jdbcType=VARCHAR}, #{redeemLocked,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{realAmount,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.UnDelegation">
     insert into un_delegation
@@ -144,6 +145,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="realAmount != null">
+        real_amount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -172,6 +176,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="realAmount != null">
+        #{realAmount,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -211,6 +218,9 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.realAmount != null">
+        real_amount = #{record.realAmount,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -226,7 +236,8 @@
       redeem_locked = #{record.redeemLocked,jdbcType=VARCHAR},
       `status` = #{record.status,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      real_amount = #{record.realAmount,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -258,6 +269,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="realAmount != null">
+        real_amount = #{realAmount,jdbcType=VARCHAR},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -270,7 +284,8 @@
       redeem_locked = #{redeemLocked,jdbcType=VARCHAR},
       `status` = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      real_amount = #{realAmount,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -281,13 +296,13 @@
     -->
     insert into un_delegation
     (hash, delegate_addr, staking_block_num, node_id, apply_amount, redeem_locked, `status`, 
-      create_time, update_time)
+      create_time, update_time, real_amount)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.delegateAddr,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, 
         #{item.nodeId,jdbcType=VARCHAR}, #{item.applyAmount,jdbcType=VARCHAR}, #{item.redeemLocked,jdbcType=VARCHAR}, 
-        #{item.status,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
-        )
+        #{item.status,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.realAmount,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -331,6 +346,9 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'real_amount'.toString() == column.value">
+          #{item.realAmount,jdbcType=VARCHAR}
         </if>
       </foreach>
       )
