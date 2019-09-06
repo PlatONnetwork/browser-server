@@ -25,6 +25,7 @@ public class CustomStaking extends Staking {
     private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     public CustomStaking() {
+        super();
         Date date = new Date();
         this.setCreateTime(date);
         this.setUpdateTime(date);

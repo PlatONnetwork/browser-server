@@ -19,6 +19,7 @@ import java.util.Map;
 public class CustomAddress extends Address {
 
     public CustomAddress(){
+        super();
         Date date = new Date();
         this.setUpdateTime(date);
         this.setCreateTime(date);

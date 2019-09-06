@@ -17,9 +17,14 @@ import java.util.Map;
 @Data
 public class CustomVote extends Vote {
 
+    public CustomVote(){
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     public void updateWithVote( CustomTransaction tx, VotingProposalParam param ){
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
         this.setHash(tx.getHash());
         this.setProposalHash(param.getProposalId());
         this.setOption(param.getOption());

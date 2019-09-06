@@ -16,54 +16,36 @@ import java.util.Map;
  */
 @Data
 public class CustomVoteProposal extends Vote {
-
 	private String pproposalHash;
-
     private String type;
-
     private String proposalVerifier;
-
     private String proposalVerifierName;
-
     private String url;
-
     private String newVersion;
-
     private String endVotingBlock;
-
     private String activeBlock;
-
     private Date proposalTimestamp;
-
     private Long yeas;
-
     private Long nays;
-
     private Long abstentions;
-
     private Long accuVerifiers;
-
     private Integer status;
-
     private Date proposalUpdateTime;
-
     private Date proposalCreateTime;
-
     private String pipNum;
-
     private Integer pipId;
-
     private String topic;
-
     private String description;
-
     private String canceledPipId;
-
     private String canceledTopic;
-    
+
+    public CustomVoteProposal(){
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     public void updateWithVote( CustomTransaction tx, VotingProposalParam param ){
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
         this.setHash(tx.getHash());
         this.setProposalHash(param.getProposalId());
         this.setOption(param.getOption());

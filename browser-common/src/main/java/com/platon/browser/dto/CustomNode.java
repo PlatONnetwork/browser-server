@@ -18,6 +18,7 @@ public class CustomNode extends Node {
     private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
 
      public CustomNode(){
+         super();
          Date date = new Date();
          this.setUpdateTime(date);
          this.setCreateTime(date);
