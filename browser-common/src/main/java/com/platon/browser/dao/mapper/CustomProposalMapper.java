@@ -1,7 +1,6 @@
 package com.platon.browser.dao.mapper;
 
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
