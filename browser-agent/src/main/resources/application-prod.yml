@@ -34,7 +34,7 @@ platon.config:
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #链ID
   chainId: 101
-  #PlatON初始总发行量
+  #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
@@ -64,9 +64,9 @@ platon.config:
   consensusPeriodBlockCount: 250
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #每个结算周期区块总数(等于43个共识周期出的块数总和)
+  #每个结算周期区块总数
   settlePeriodBlockCount: 10750
-  #每个增发周期区块总数(1466个结算周期)
+  #每个增发周期区块总数
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 28
