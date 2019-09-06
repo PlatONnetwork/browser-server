@@ -27,8 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
+import org.web3j.utils.Convert;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -54,6 +56,7 @@ public class BlockSyncTask {
     private DbService dbService;
     @Autowired
     private BlockChain blockChain;
+
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
@@ -246,7 +249,8 @@ public class BlockSyncTask {
                     // 内置节点默认设置状态为1
                     staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
                     // 设置内置节点质押锁定金额
-                    staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
+                    BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
+                    staking.setStakingLocked(initStakingLocked.toString());
                     // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
                     if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
                     staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
