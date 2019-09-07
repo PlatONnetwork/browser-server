@@ -48,7 +48,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //当前区块所属节点id
             NETWORK_STAT_CACHE.setNodeId(curBlock.getNodeId());
             //当前区块所属节点name
-            NETWORK_STAT_CACHE.setNodeName(curStaking.getStakingName()==null ? "Unknown" : curStaking.getStakingName());
+            NETWORK_STAT_CACHE.setNodeName(curStaking.getStakingName() == null ? "Unknown" : curStaking.getStakingName());
             //TODO:可优化
             //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
             NETWORK_STAT_CACHE.setAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).longValue());
@@ -58,29 +58,29 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //离下个结算周期剩余块高 = (每个结算周期块数 * 当前结算周期轮数) - 当前块高
             NETWORK_STAT_CACHE.setNextSetting(chainConfig.getSettlePeriodBlockCount().multiply(bc.getCurSettingEpoch()).subtract(curBlock.getBlockNumber()).longValue());
             //质押奖励
-            NETWORK_STAT_CACHE.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size()),0,BigDecimal.ROUND_DOWN).toString());
+            NETWORK_STAT_CACHE.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size()), 0, BigDecimal.ROUND_DOWN).toString());
 
             //更新时间
             NETWORK_STAT_CACHE.setUpdateTime(new Date());
 
             // 累计总交易数
-            NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty()+curBlock.getStatTxQty());
+            NETWORK_STAT_CACHE.setTxQty(NETWORK_STAT_CACHE.getTxQty() + curBlock.getStatTxQty());
 
             //累计成功的交易总数
-            List<CustomTransaction> transactions = curBlock.getTransactionList();
-            transactions.stream().filter(transaction -> transaction.getTxReceiptStatus()==CustomTransaction.TxReceiptStatusEnum.SUCCESS.code)
+            List <CustomTransaction> transactions = curBlock.getTransactionList();
+            transactions.stream().filter(transaction -> transaction.getTxReceiptStatus() == CustomTransaction.TxReceiptStatusEnum.SUCCESS.code)
                     .forEach(transaction -> {
-                // 累计提案相关交易数量
-                switch (transaction.getTypeEnum()){
-                    case CANCEL_PROPOSAL:// 取消提案
-                    case CREATE_PROPOSAL_TEXT:// 创建文本提案
-                    case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                    case DECLARE_VERSION:// 版本声明
-                        //累计提案总数
-                        NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty()+1);
-                        break;
-                }
-            });
+                        // 累计提案相关交易数量
+                        switch (transaction.getTypeEnum()) {
+                            case CANCEL_PROPOSAL:// 取消提案
+                            case CREATE_PROPOSAL_TEXT:// 创建文本提案
+                            case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+                            case DECLARE_VERSION:// 版本声明
+                                //累计提案总数
+                                NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + 1);
+                                break;
+                        }
+                    });
 
             //当前区块交易总数
             NETWORK_STAT_CACHE.setCurrentTps(curBlock.getStatTxQty());
@@ -91,19 +91,21 @@ public class NetworkStatStatisticHandler implements EventHandler {
             if (curBlock.getStatStakingQty() > 0) {
                 //统计质押金额
                 Set <CustomStaking> newStaking = STAGE_DATA.getStakingStage().getStakingInsertStage();
-                newStaking.forEach(staking -> {
-                    BigInteger stakingValue = NETWORK_STAT_CACHE.integerStakingValue().add(staking.integerStakingHas()).add(staking.integerStakingLocked());
-                    NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
-                });
+                BigInteger stakingValue = BigInteger.ZERO;
+                for(CustomStaking customStaking : newStaking){
+                    stakingValue = NETWORK_STAT_CACHE.integerStakingValue().add(customStaking.integerStakingHas()).add(customStaking.integerStakingLocked());
+
+                }
+                NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
             }
             if (curBlock.getStatDelegateQty() > 0) {
                 //质押已统计，本次累加上委托
                 Set <CustomDelegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
-                newDelegation.forEach(delegation -> {
-                    //先做委托累加
-                    BigInteger delegationValue = delegation.integerDelegateHas().add(delegation.integerDelegateLocked()).add(NETWORK_STAT_CACHE.integerStakingDelegationValue());
-                    NETWORK_STAT_CACHE.setStakingDelegationValue(delegationValue.toString());
-                });
+                BigInteger delegationValue = BigInteger.ZERO;
+                for(CustomDelegation customDelegation : newDelegation){
+                    delegationValue = customDelegation.integerDelegateHas().add(customDelegation.integerDelegateLocked());
+                }
+                NETWORK_STAT_CACHE.setStakingDelegationValue(delegationValue.toString());
                 //在累加计算好的质押金
                 NETWORK_STAT_CACHE.setStakingDelegationValue(NETWORK_STAT_CACHE.integerStakingDelegationValue().add(NETWORK_STAT_CACHE.integerStakingValue()).toString());
             }
