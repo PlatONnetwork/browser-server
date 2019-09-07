@@ -92,7 +92,7 @@ public class ProposalUpdateTask {
                     //设置弃权票
                     proposal.setAbstentions(accuVerifiersCount.getAbstentions().longValue());
                     //只有在结束快高之后才有返回提案结果
-                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock())){
+                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock()).longValue()){
                         BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
                         //设置状态
                         proposal.setStatus(result.data.getStatus());
