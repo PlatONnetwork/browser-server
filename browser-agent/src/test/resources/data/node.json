@@ -1,0 +1,13 @@
+[ 
+{ 
+"node_id":"0xc88a7b7c6201a531afa1f70c6fd88aec623630c957bb2e13ea4caa7e89f260cd3338b2d712d728929062198d08585973298830875279bb84b201f041f1013714",
+"stat_slash_multi_qty":0,
+"stat_slash_low_qty":0,
+"stat_block_qty":1880,
+"stat_expect_block_qty":1800,
+"stat_reward_value":"432127389921020053227368000",
+"stat_verifier_time":180,
+"is_recommend":2,
+"create_time":"2019-09-07 08:21:05",
+"update_time":"2019-09-07 08:21:07"
+}]

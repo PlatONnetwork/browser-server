@@ -30,6 +30,7 @@ public class NewIssueEpochHandler implements EventHandler {
      * @throws IssueEpochChangeException
      */
     private void updateReward() throws IssueEpochChangeException {
+    	logger.debug("NewIssueEpochHandler updateReward");
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         bc.updateReward(blockNumber);

@@ -38,6 +38,7 @@ public class ProposalCancelHandler implements EventHandler {
 
     @Override
     public void handle ( EventContext context ) throws BusinessException {
+    	logger.debug("ProposalCancelHandler Handler");
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
         CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);

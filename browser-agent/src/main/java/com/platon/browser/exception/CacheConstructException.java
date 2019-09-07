@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class CacheConstructException extends Exception {
-    public CacheConstructException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CacheConstructException(String msg){
         super(msg);
     }
 }

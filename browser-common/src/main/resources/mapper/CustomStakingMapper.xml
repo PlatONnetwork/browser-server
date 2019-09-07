@@ -217,7 +217,7 @@
     order by s.staking_block_num desc
   </select>
   <select id="selectHistoryNode" resultMap="AndNodeResultMap">
-    select distinct(s.node_id) as disnodeid,s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
+    select group_concat(DISTINCT s.node_id) as disnodeid,s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
     from staking s left join node n on s.node_id = n.node_id
     <where>
@@ -229,6 +229,6 @@
     	</if>
     	and s.node_id not in  (select s1.node_id from staking s1 where s1.status = 1 )
     </where>
-    order by s.leave_time desc
+    GROUP BY s.node_id order by s.leave_time desc
   </select>
 </mapper>

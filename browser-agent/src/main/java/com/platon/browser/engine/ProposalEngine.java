@@ -59,6 +59,7 @@ public class ProposalEngine {
 
     @PostConstruct
     private void init() throws CacheConstructException {
+    	logger.debug("init ProposalEngine");
         // 初始化全量数据
         List<CustomProposal> proposalList = customProposalMapper.selectAll();
         List<CustomVote> voteList = customVoteMapper.selectAll();
@@ -81,6 +82,8 @@ public class ProposalEngine {
             case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //创建取消提案
             case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
             case DECLARE_VERSION: declareVersionHandler.handle(context);break;//版本声明
+			default:
+				break;
         }
     }
 }

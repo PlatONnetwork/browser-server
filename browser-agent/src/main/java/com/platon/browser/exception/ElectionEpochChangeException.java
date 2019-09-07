@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class ElectionEpochChangeException extends Exception {
-    public ElectionEpochChangeException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ElectionEpochChangeException(String msg){
         super(msg);
     }
 }

@@ -27,6 +27,7 @@ public class NodeCacheUpdater {
      * 添加量
      */
     public void updateStatBlockQty() throws NoSuchBeanException {
+    	logger.debug("NodeCacheUpdater updateStatBlockQty");
         CustomBlock curBlock = bc.getCurBlock();
         CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
         node.setStatBlockQty(node.getStatBlockQty()+1);

@@ -30,6 +30,7 @@ public class NodeCache {
                      List<CustomDelegation> delegationList,
                      List<CustomUnDelegation> unDelegationList
     ) throws CacheConstructException {
+    	logger.debug("NodeCache init" );
         nodeList.forEach(this::addNode);
         for (CustomStaking staking:stakingList){
             try {

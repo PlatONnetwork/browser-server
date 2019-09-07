@@ -1,0 +1,27 @@
+[ 
+{ 
+"delegate_addr":"0x0bc7a943263c136f940bb2ca2a61a0a8eca84365",
+"staking_block_num":808,
+"node_id":"0xc88a7b7c6201a531afa1f70c6fd88aec623630c957bb2e13ea4caa7e89f260cd3338b2d712d728929062198d08585973298830875279bb84b201f041f1013714",
+"delegate_has":"0",
+"delegate_locked":"0",
+"delegate_reduction":"0",
+"is_history":1,
+"sequence":9130000,
+"create_time":"2019-09-07 08:22:14",
+"update_time":"2019-09-07 08:22:14",
+"cur_delegation_block_num":6435
+},
+{ 
+"delegate_addr":"0xf4b75b8006c93c4cac409c72f20a7b080f9c7b4f",
+"staking_block_num":808,
+"node_id":"0xc88a7b7c6201a531afa1f70c6fd88aec623630c957bb2e13ea4caa7e89f260cd3338b2d712d728929062198d08585973298830875279bb84b201f041f1013714",
+"delegate_has":"0",
+"delegate_locked":"0",
+"delegate_reduction":"0",
+"is_history":1,
+"sequence":8850000,
+"create_time":"2019-09-07 08:21:57",
+"update_time":"2019-09-07 08:21:57",
+"cur_delegation_block_num":6448
+}]

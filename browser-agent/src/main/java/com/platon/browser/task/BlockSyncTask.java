@@ -64,6 +64,8 @@ public class BlockSyncTask {
      */
     public void init () throws Exception {
         THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
+        blockService.init(THREAD_POOL);
+        transactionService.init(THREAD_POOL);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         // 更新当前所在周期的区块奖励和结算周期质押奖励, 初始化共识验证人列表
@@ -117,8 +119,7 @@ public class BlockSyncTask {
             // 采集前先重置结果容器
             CollectResult.reset();
             // 开始并行采集
-            blockService.collect(blockNumbers);
-            List <CustomBlock> blocks = CollectResult.getSortedBlocks();
+            List <CustomBlock> blocks = blockService.collect(blockNumbers);
             // 采集不到区块则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
                 try {
