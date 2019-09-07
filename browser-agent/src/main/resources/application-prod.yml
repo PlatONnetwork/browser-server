@@ -1,20 +1,22 @@
 # ***************************生产配置**************************** #
 spring:
   redis:
-    host:
+    cluster:
+      max-redirects: 3
+      nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
 profile: prod
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.9.191:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
 # MySQL数据库用户名
-dbuser: platon
+dbuser: admin
 # MySQL数据库密码
-dbpass: platon
+dbpass: Juzhen1234
 web3j:
-  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
-  collect.batch-size: 1000
+  addresses: http://18.140.20.252:6789
+  collect.batch-size: 100
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -70,10 +72,10 @@ platon.config:
   addIssuePeriodBlockCount: 15759500
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 28
-  #升级提案预升级轮数
+  #升级提案生效周期
   versionProposalActiveConsensusRounds: 5
-  #文本提案默认投票结束轮数
-  proposalTextEndRound: 4
+  #文本提案投票周期
+  proposalTextEndRound: 2419
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=

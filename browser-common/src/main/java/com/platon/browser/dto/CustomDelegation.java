@@ -18,6 +18,13 @@ public class CustomDelegation extends Delegation {
 
     private List<CustomUnDelegation> unDelegations = new ArrayList<>();
 
+    public CustomDelegation() {
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
         this.setDelegateHas(param.getAmount());
         this.setDelegateLocked("0");
@@ -26,8 +33,6 @@ public class CustomDelegation extends Delegation {
         this.setIsHistory(YesNoEnum.NO.code);
         this.setDelegateAddr(tx.getFrom());
         this.setSequence(tx.getBlockNumber()*10000+tx.getTransactionIndex());
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
         this.setCurDelegationBlockNum(tx.getBlockNumber());
     }
 

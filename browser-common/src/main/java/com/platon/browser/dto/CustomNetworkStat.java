@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.NetworkStat;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * User: dongqile
@@ -13,6 +14,10 @@ import java.math.BigInteger;
 public class CustomNetworkStat extends NetworkStat {
 
     public CustomNetworkStat () {
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
         this.setId(1); // 只有一条数据，默认ID为1
         this.setCurrentNumber(0L);
         this.setNodeName("");

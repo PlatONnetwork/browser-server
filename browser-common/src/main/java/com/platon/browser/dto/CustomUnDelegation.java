@@ -20,6 +20,10 @@ import java.util.Map;
 public class CustomUnDelegation extends UnDelegation {
 
     public CustomUnDelegation(){
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
         this.setRedeemLocked(BigDecimal.ZERO.toString());
     }
 
@@ -29,8 +33,6 @@ public class CustomUnDelegation extends UnDelegation {
         this.setHash(tx.getHash());
         this.setStakingBlockNum(Long.valueOf(param.getStakingBlockNum()));
         this.setNodeId(param.getNodeId());
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/

@@ -44,27 +44,30 @@ public class StakingUpdateTask {
             Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
             if (customStakingSet.size() == 0) return;
             customStakingSet.forEach(customStaking -> {
-                if (StringUtils.isNotBlank(customStaking.getExternalId())) {
-                    String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
-                    try {
-                        String queryResult = MarkDownParserUtil.httpGet(queryUrl);
-                        KeyBaseUser keyBaseUser = JSON.parseObject(queryResult, KeyBaseUser.class);
-                        if(keyBaseUser==null) return;
-                        List <Completion> completions = keyBaseUser.getCompletions();
-                        if (completions == null || completions.size() == 0) return;
-                        // 取最新一条
-                        Completion completion = completions.get(0);
-                        // 取缩略图
-                        String icon = completion.getThumbnail();
-                        customStaking.setStakingIcon(icon);
+                if(StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon())){
+                    if (StringUtils.isNotBlank(customStaking.getExternalId())) {
+                        String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
+                        try {
+                            String queryResult = MarkDownParserUtil.httpGet(queryUrl);
+                            if(null==queryResult)return;
+                            KeyBaseUser keyBaseUser = JSON.parseObject(queryResult, KeyBaseUser.class);
+                            if(keyBaseUser==null) return;
+                            List <Completion> completions = keyBaseUser.getCompletions();
+                            if (completions == null || completions.size() == 0) return;
+                            // 取最新一条
+                            Completion completion = completions.get(0);
+                            // 取缩略图
+                            String icon = completion.getThumbnail();
+                            customStaking.setStakingIcon(icon);
 
-                        Components components = completion.getComponents();
-                        String username = components.getUsername().getVal();
-                        customStaking.setExternalName(username);
-                        // 把改动后的内容暂存至待更新列表
-                        STAGE_DATA.getStakingStage().updateStaking(customStaking);
-                    } catch (IOException e) {
-                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
+                            Components components = completion.getComponents();
+                            String username = components.getUsername().getVal();
+                            customStaking.setExternalName(username);
+                            // 把改动后的内容暂存至待更新列表
+                            STAGE_DATA.getStakingStage().updateStaking(customStaking);
+                        } catch (IOException e) {
+                            logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
+                        }
                     }
                 }
             });

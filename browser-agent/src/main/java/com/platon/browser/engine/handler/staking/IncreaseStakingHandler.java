@@ -35,7 +35,7 @@ public class IncreaseStakingHandler implements EventHandler {
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithIncreaseStakingParam(param);
-            stakingStage.updateStaking(latestStaking,tx);
+            stakingStage.modifyStaking(latestStaking,tx);
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
         }

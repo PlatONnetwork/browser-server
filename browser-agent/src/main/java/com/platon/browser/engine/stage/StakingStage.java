@@ -59,7 +59,7 @@ public class StakingStage {
     public void insertStaking(CustomStaking staking,CustomTransaction tx){
         stakingInsertStage.add(staking);
         // 构建操作日志
-        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.CREATE);
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.TypeEnum.CREATE);
         nodeOpt.updateWithCustomTransaction(tx);
         // 暂存至待入库节点操作日志列表
         insertNodeOpt(nodeOpt);
@@ -67,10 +67,16 @@ public class StakingStage {
     public void updateStaking(CustomStaking staking){
         stakingUpdateStage.add(staking);
     }
-    public void updateStaking(CustomStaking staking,CustomTransaction tx){
+
+    /**
+     * 修改质押信息，并记录操作日志
+     * @param staking
+     * @param tx
+     */
+    public void modifyStaking(CustomStaking staking,CustomTransaction tx){
         stakingUpdateStage.add(staking);
         // 构建操作日志
-        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.MODIFY);
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.TypeEnum.MODIFY);
         nodeOpt.updateWithCustomTransaction(tx);
         insertNodeOpt(nodeOpt);
     }

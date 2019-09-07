@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.platon.browser.dao.mapper.NodeOptMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
-import com.platon.browser.dao.mapper.NodeOptMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;

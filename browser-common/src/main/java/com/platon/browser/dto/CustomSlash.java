@@ -18,14 +18,19 @@ import java.util.Map;
 @Data
 public class CustomSlash extends Slash {
 
+    public CustomSlash(){
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     public void updateWithSlash( CustomTransaction tx , ReportValidatorParam param){
         this.setNodeId(param.getVerify());
         String date = JSON.toJSONString(param);
         this.setData(date);
         this.setDenefitAddr(tx.getFrom());
         this.setHash(tx.getHash());
-        this.setUpdateTime(new Date());
-        this.setCreateTime(new Date());
         this.setStatus(StatusEnum.SUCCESS.code);
         this.setIsQuit(YesNoEnum.YES.code);
     }

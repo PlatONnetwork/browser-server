@@ -2,6 +2,7 @@ package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * @Auther: Chendongming
@@ -129,8 +131,17 @@ public class NewElectionEpochHandler implements EventHandler {
                 ari.getSlash().add(si);
                 staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
 
-                // 把更新暂存到待入库列表
+                // 把更新暂存到待入库列表, 记录出块率低处罚
                 stakingStage.updateStaking(staking);
+                // 记录操作日志
+                CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
+                nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+                String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.tpl
+                        .replace("PERCENT",slashRate.toString())
+                        .replace("BLOCK_RATE",blockRate.toString())
+                        .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString());
+                nodeOpt.setDesc(desc);
+                STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
 
                 // 更新被处罚节点统计信息（如果存在）
                 try {

@@ -2,9 +2,7 @@ package com.platon.browser.engine.handler.slash;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomSlash;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
@@ -19,8 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -44,7 +44,8 @@ public class ReportValidatorHandler implements EventHandler {
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
         //通过结果获取，证据中的举报人的nodeId
         try {
-            CustomStaking latestStaking = NODE_CACHE.getNode(HexTool.prefix(param.getVerify())).getLatestStaking();
+            CustomNode node = NODE_CACHE.getNode(HexTool.prefix(param.getVerify()));
+            CustomStaking latestStaking = node.getLatestStaking();
             logger.debug("多签举报信息:{}", JSON.toJSONString(param));
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignLowSlashRate());
@@ -66,7 +67,7 @@ public class ReportValidatorHandler implements EventHandler {
             latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
             //更新分析质押结果
-            stakingStage.updateStaking(latestStaking, tx);
+            stakingStage.modifyStaking(latestStaking, tx);
 
             //新增举报交易结构
             CustomSlash slash = new CustomSlash();
@@ -77,9 +78,22 @@ public class ReportValidatorHandler implements EventHandler {
             //新增分析多重签名结果
             stakingStage.insertSlash(slash);
 
+            // 设置节点统计数据中的多签举报次数
+            node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
+
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+
+
+            // 记录操作日志
+            CustomNodeOpt nodeOpt = new CustomNodeOpt(latestStaking.getNodeId(), CustomNodeOpt.TypeEnum.MULTI_SIGN);
+            nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+            String desc = CustomNodeOpt.TypeEnum.MULTI_SIGN.tpl
+                    .replace("PERCENT",chainConfig.getDuplicateSignLowSlashRate().toString())
+                    .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
+            nodeOpt.setDesc(desc);
+            STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
         } catch (NoSuchBeanException e) {
             logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             throw new NoSuchBeanException("");

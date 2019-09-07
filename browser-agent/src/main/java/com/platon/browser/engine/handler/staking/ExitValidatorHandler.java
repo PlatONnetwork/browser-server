@@ -46,7 +46,7 @@ public class ExitValidatorHandler implements EventHandler {
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
             String txinfo = JSON.toJSONString(param);
             tx.setTxInfo(txinfo);
-            stakingStage.updateStaking(latestStaking,tx);
+            stakingStage.modifyStaking(latestStaking,tx);
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
         }

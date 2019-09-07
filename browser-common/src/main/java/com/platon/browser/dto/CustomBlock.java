@@ -25,6 +25,10 @@ import static java.util.Comparator.comparing;
 public class CustomBlock extends Block {
 
     public CustomBlock(){
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
         /* 初始化默认值 */
         // 区块内交易数（区块所含交易个数）
         this.setStatTxQty(0);
@@ -60,9 +64,6 @@ public class CustomBlock extends Block {
         this.setSize(block.getSize().intValue());
         this.setGasLimit(block.getGasLimit().toString());
         this.setGasUsed(block.getGasUsed().toString());
-        Date date = new Date();
-        this.setCreateTime(date);
-        this.setUpdateTime(date);
         // 交易总数
         this.setStatTxQty(block.getTransactions().size());
         this.setGasLimit(block.getGasLimit().toString());
@@ -75,8 +76,8 @@ public class CustomBlock extends Block {
                 CustomTransaction transaction = new CustomTransaction();
                 transaction.updateWithTransactionResult(tr);
                 transaction.setTimestamp(this.getTimestamp());
-                transaction.setCreateTime(date);
-                transaction.setUpdateTime(date);
+                transaction.setCreateTime(this.getCreateTime());
+                transaction.setUpdateTime(this.getUpdateTime());
                 transactionList.add(transaction);
             });
         }catch (Exception ex){

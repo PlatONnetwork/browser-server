@@ -31,8 +31,8 @@
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="'desc'.toString() == column.value">
-          #{item.desc,jdbcType=VARCHAR}
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
         </if>
         <if test="'tx_hash'.toString() == column.value">
           #{item.txHash,jdbcType=VARCHAR}
@@ -48,6 +48,9 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'desc'.toString() == column.value">
+          #{item.desc,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

@@ -28,6 +28,12 @@ import java.util.*;
 @Data
 public class CustomTransaction extends TransactionWithBLOBs {
 
+    public CustomTransaction(){
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     /**
      * 使用原生交易信息初始化交易信息
      * @param tr

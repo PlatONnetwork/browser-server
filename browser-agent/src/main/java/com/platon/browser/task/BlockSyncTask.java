@@ -55,7 +55,7 @@ import static java.lang.String.format;
 @Component
 public class BlockSyncTask {
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
-    private static ExecutorService THREAD_POOL;
+    public static ExecutorService THREAD_POOL;
 
     @Autowired
     private CustomBlockMapper customBlockMapper;

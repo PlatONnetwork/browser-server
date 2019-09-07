@@ -21,14 +21,19 @@ public class CustomProposal extends Proposal {
 
     public static final String queryFlag = "inquiry";
 
+    public CustomProposal(){
+        super();
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+    }
+
     public void updateWithCustomTransaction(CustomTransaction tx,Long accuVerSum) {
         this.setHash(tx.getHash());
         this.setYeas(0L);
         this.setNays(0L);
         this.setAbstentions(0L);
         this.setAccuVerifiers(accuVerSum);
-        this.setCreateTime(new Date());
-        this.setUpdateTime(new Date());
         this.setTimestamp(tx.getTimestamp());
         this.setStatus(StatusEnum.VOTING.code);
         //设置成查询中，以便任务过滤并查询分析主题&描述
