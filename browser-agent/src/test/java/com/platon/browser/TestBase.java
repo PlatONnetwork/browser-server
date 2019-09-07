@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Auther: Chendongming
@@ -64,6 +62,21 @@ public class TestBase {
                 e.printStackTrace();
             }
         });
+
+        Map<Long,List<CustomTransaction>> txMap = new HashMap<>();
+        transactions.forEach(tx->{
+            List<CustomTransaction> txes = txMap.get(tx.getBlockNumber());
+            if(txes==null){
+                txes=new ArrayList<>();
+                txMap.put(tx.getBlockNumber(),txes);
+            }
+            txes.add(tx);
+        });
+        blocks.forEach(block -> {
+            List<CustomTransaction> txes = txMap.get(block.getNumber());
+            if(txes!=null) block.setTransactionList(txes);
+        });
+
         try {
             NODE_CACHE.init(nodes,stakings,delegations,unDelegations);
         } catch (CacheConstructException e) {

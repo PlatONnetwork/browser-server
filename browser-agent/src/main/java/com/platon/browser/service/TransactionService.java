@@ -114,13 +114,14 @@ public class TransactionService {
     /**
      * 分析区块获取code&交易回执
      */
-    public void updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
+    public CustomTransaction updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
         try {
-            // 查询交易回执
-            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
+            Optional<TransactionReceipt> receipt = getReceipt(tx);
             // 如果交易回执存在，则更新交易中与回执相关的信息
-            if(receipt.isPresent()) tx.updateWithTransactionReceipt(receipt.get(), BlockChainConfig.INNER_CONTRACT_ADDR);
+            if(receipt.isPresent()) {
+                TransactionReceipt tr = receipt.get();
+                tx.updateWithTransactionReceipt(tr, BlockChainConfig.INNER_CONTRACT_ADDR);
+            }
         }catch (IOException e){
             logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
             throw e;
@@ -143,5 +144,19 @@ public class TransactionService {
             logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
             throw e;
         }
+        return tx;
+    }
+
+    /**
+     * 获取交易回执
+     * @param tx
+     * @return
+     * @throws IOException
+     */
+    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) throws IOException {
+        // 查询交易回执
+        PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
+        Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
+        return receipt;
     }
 }
