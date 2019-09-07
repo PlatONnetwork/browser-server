@@ -65,11 +65,4 @@ public class RoundCalculation {
             return BigDecimal.ZERO;
         }
     }
-
-    public static void main ( String[] args ) {
-        BigDecimal a = new BigDecimal(777);
-        BigDecimal b = new BigDecimal(250);
-        BigDecimal[] c = a.divideAndRemainder(b);
-        System.out.println(c);
-    }
 }
