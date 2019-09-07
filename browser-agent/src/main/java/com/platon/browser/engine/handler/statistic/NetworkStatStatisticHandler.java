@@ -99,14 +99,14 @@ public class NetworkStatStatisticHandler implements EventHandler {
                 NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
             }
             if (curBlock.getStatDelegateQty() > 0) {
-                //质押已统计，本次累加上委托
+                //委托累计
                 Set <CustomDelegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
                 BigInteger delegationValue = BigInteger.ZERO;
                 for(CustomDelegation customDelegation : newDelegation){
                     delegationValue = customDelegation.integerDelegateHas().add(customDelegation.integerDelegateLocked());
                 }
                 NETWORK_STAT_CACHE.setStakingDelegationValue(delegationValue.toString());
-                //在累加计算好的质押金
+                //在累加计算好的质押金（质押+委托）
                 NETWORK_STAT_CACHE.setStakingDelegationValue(NETWORK_STAT_CACHE.integerStakingDelegationValue().add(NETWORK_STAT_CACHE.integerStakingValue()).toString());
             }
             /**
