@@ -1,11 +1,22 @@
 package com.platon.browser.config;
 
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.bean.EconomicConfigParam;
+import com.platon.browser.config.bean.EconomicConfigResult;
+import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import lombok.Data;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -20,6 +31,39 @@ import java.util.*;
 @Configuration
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
+    private static Logger logger = LoggerFactory.getLogger(BlockChainConfig.class);
+
+    @Autowired
+    private PlatonClient client;
+
+    @PostConstruct
+    private void init() throws IOException {
+        EconomicConfigParam param = new EconomicConfigParam();
+        param.setId(1);
+        param.setJsonrpc("2.0");
+//        param.setMethod("debug_economicConfig");
+        param.setMethod("debug_economicConfig");
+        param.setParams(Collections.EMPTY_LIST);
+
+        OkHttpClient httpClient = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
+        String post = JSON.toJSONString(param);
+        RequestBody requestBody = RequestBody.create(mediaType, post);
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(client.getWeb3jAddress())
+                .build();
+
+        Response response = httpClient.newCall(request).execute();
+        if(response.isSuccessful()){
+            String res = Objects.requireNonNull(response.body()).string();
+            Web3Response result = JSON.parseObject(res,Web3Response.class);
+            logger.info("{}",JSON.toJSONString(result,true));
+        }else{
+            logger.error("初始化链配置错误:{}",response.message());
+        }
+    }
+
     public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
     // 质押节点统计年化率最多取多少个连续周期

@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -82,6 +83,12 @@ public class PlatonClient {
             WEB3J_CONFIG_LOCK.readLock().unlock();
         }
         return null;
+    }
+
+    public String getWeb3jAddress(){
+        Random random = new Random();
+        int index = random.nextInt(web3jAddresses.size());
+        return web3jAddresses.get(index);
     }
 
     private void updateContract(){
