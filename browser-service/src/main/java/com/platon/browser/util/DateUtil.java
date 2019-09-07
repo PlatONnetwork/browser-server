@@ -22,7 +22,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class DateUtil {
 
-	public static DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+	public static DateFormat df;
+	
+	public DateUtil() {
+		DateUtil.df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+	}
 	
 	private static String localLANG;
 	

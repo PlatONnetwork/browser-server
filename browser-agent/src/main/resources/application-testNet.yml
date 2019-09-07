@@ -1,9 +1,9 @@
-# ***************************预生产配置**************************** #
+# ***************************开发配置**************************** #
+#redis 配置
 spring:
   redis:
-    cluster:
-      max-redirects: 3
-      nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
+    host: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com
+    port: 6379
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
@@ -14,6 +14,7 @@ dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/plat
 dbuser: admin
 # MySQL数据库密码
 dbpass: Juzhen1234
+#web3j配置
 web3j:
   addresses: http://18.140.20.252:6789
   collect.batch-size: 100
@@ -56,26 +57,26 @@ platon.config:
   blockHighSlashRate: 0.5
   #质押门槛: 创建验证人最低的质押Token数(LAT)
   stakeThreshold: 5000000
-  #委托门槛(LAT)
+  #委托门槛
   delegateThreshold: 10
   #出块间隔(秒)
-  blockInterval: 2
+  blockInterval: 1
   #每个验证人每个共识周期出块数量目标值
   expectBlockCount: 10
   #共识轮区块数
-  consensusPeriodBlockCount: 250
+  consensusPeriodBlockCount: 40
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
   #每个结算周期区块总数
-  settlePeriodBlockCount: 10750
+  settlePeriodBlockCount: 160
   #每个增发周期区块总数
-  addIssuePeriodBlockCount: 15759500
+  addIssuePeriodBlockCount: 1600
   #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 28
-  #升级提案生效周期
+  unstakeRefundSettlePeriodCount: 2
+  #升级提案预升级轮数
   versionProposalActiveConsensusRounds: 5
-  #文本提案投票周期
-  proposalTextEndRound: 2419
+  #文本提案默认投票结束轮数
+  proposalTextEndRound: 4
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=

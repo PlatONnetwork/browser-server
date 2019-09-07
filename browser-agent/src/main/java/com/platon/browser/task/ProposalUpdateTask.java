@@ -20,7 +20,6 @@ import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.TallyResult;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;

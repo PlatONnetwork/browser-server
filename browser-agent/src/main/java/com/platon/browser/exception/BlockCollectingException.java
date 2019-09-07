@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class BlockCollectingException extends Exception {
-    public BlockCollectingException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public BlockCollectingException(String msg){
         super(msg);
     }
 }

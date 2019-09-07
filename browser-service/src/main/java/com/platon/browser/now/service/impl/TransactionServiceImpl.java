@@ -168,7 +168,8 @@ public class TransactionServiceImpl implements TransactionService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
-        TransactionExample transactionExample = new TransactionExample();  
+        TransactionExample transactionExample = new TransactionExample(); 
+        transactionExample.setOrderByClause(" timestamp desc");
         /** 根据地址查询交易，则可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria();
         TransactionExample.Criteria second = transactionExample.createCriteria();
@@ -412,6 +413,8 @@ public class TransactionServiceImpl implements TransactionService {
 						UnDelegateParam unDelegateParam = JSONObject.parseObject(txInfo, UnDelegateParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setNodeName(unDelegateParam.getNodeName());
+						resp.setApplyAmount(unDelegateParam.getAmount());
+						resp.setTxAmount(unDelegateParam.getAmount());
 						UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
 						if(unDelegation!=null) {
 							resp.setApplyAmount(unDelegation.getApplyAmount());

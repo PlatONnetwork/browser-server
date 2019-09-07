@@ -3,10 +3,8 @@ package com.platon.browser.engine.cache;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -24,8 +22,6 @@ import static com.platon.browser.engine.BlockChain.*;
  */
 @Component
 public class AddressCacheUpdater {
-    @Autowired
-    private BlockChain bc;
 
     class Stat{
         BigInteger stakingValue,delegateValue,stakingRedeemed,delegateRedeemed,redeemedValue,candidateCount,delegateHes,delegateLocked,delegateUnlock,delegateReduction;

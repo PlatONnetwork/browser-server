@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class CandidateException extends Exception {
-    public CandidateException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CandidateException(String msg){
         super(msg);
     }
 }

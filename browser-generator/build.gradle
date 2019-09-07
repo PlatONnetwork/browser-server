@@ -48,3 +48,7 @@ compileJava {
 compileTestJava {
     options.encoding = defaultEncoding
 }
+
+sonarqube {
+    skipProject = true
+}

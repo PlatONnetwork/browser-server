@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class ConsensusEpochChangeException extends Exception {
-    public ConsensusEpochChangeException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ConsensusEpochChangeException(String msg){
         super(msg);
     }
 }

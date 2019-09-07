@@ -199,6 +199,8 @@ public class BlockChain {
                     break;
                 case OTHERS: // 其它
                 case MPC:
+				default:
+					break;
             }
         }
     }

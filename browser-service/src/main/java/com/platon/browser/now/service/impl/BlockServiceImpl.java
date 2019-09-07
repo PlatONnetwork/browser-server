@@ -140,6 +140,7 @@ public class BlockServiceImpl implements BlockService {
         PageHelper.startPage(1,30000);
         /** 设置根据时间和nodeId查询数据 */
         BlockExample blockExample = new BlockExample();
+        blockExample.setOrderByClause("number desc ");
         Criteria criteria = blockExample.createCriteria();
         criteria.andNodeIdEqualTo(nodeId);
         try {

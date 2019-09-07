@@ -88,7 +88,7 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
     protected boolean isNumberType(BeanPropertyWriter writer) {
 		Class<?> clazz = writer.getPropertyType();
         return clazz.equals(Integer.class) || clazz.equals(int.class)|| clazz.equals(Long.class)
-        		|| clazz.equals(long.class)|| clazz.equals(Double.class)|| clazz.equals(Double.class);
+        		|| clazz.equals(long.class)|| clazz.equals(Double.class)|| clazz.equals(double.class);
     }
 
     protected JsonSerializer<Object> defaultNullArrayJsonSerializer() {

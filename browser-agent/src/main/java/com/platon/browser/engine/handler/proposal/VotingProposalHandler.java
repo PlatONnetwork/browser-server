@@ -25,8 +25,10 @@ import static com.platon.browser.engine.BlockChain.*;
 public class VotingProposalHandler implements EventHandler {
 
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandler.class);
+    
     @Autowired
     private BlockChain bc;
+    
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         try{

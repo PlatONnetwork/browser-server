@@ -38,6 +38,7 @@ public class VoteServiceImpl implements VoteService {
         respPage.setTotalPages(0);
         Page<?> page = PageHelper.startPage(voteListRequest.getPageNo(), voteListRequest.getPageSize(), true);
         VoteExample voteExample = new VoteExample();
+        voteExample.setOrderByClause(" timestamp desc");
         VoteExample.Criteria criteria = voteExample.createCriteria();
         criteria.andProposalHashEqualTo(voteListRequest.getProposalHash());
         if (StringUtils.isNotBlank(voteListRequest.getOption())) {
