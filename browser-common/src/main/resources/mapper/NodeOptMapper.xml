@@ -4,12 +4,13 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.NodeOpt">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
-    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
     <result column="block_number" jdbcType="BIGINT" property="blockNumber" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="desc" jdbcType="VARCHAR" property="desc" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +71,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, node_id, `desc`, tx_hash, block_number, `timestamp`, create_time, update_time
+    id, node_id, `type`, tx_hash, block_number, `timestamp`, create_time, update_time, 
+    `desc`
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeOptExample" resultMap="BaseResultMap">
     select
@@ -103,12 +105,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.NodeOpt">
-    insert into node_opt (id, node_id, `desc`, 
+    insert into node_opt (id, node_id, `type`, 
       tx_hash, block_number, `timestamp`, 
-      create_time, update_time)
-    values (#{id,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{desc,jdbcType=VARCHAR}, 
+      create_time, update_time, `desc`
+      )
+    values (#{id,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
       #{txHash,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, #{timestamp,jdbcType=TIMESTAMP}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{desc,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NodeOpt">
     insert into node_opt
@@ -119,8 +123,8 @@
       <if test="nodeId != null">
         node_id,
       </if>
-      <if test="desc != null">
-        `desc`,
+      <if test="type != null">
+        `type`,
       </if>
       <if test="txHash != null">
         tx_hash,
@@ -137,6 +141,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="desc != null">
+        `desc`,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -145,8 +152,8 @@
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="desc != null">
-        #{desc,jdbcType=VARCHAR},
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
       </if>
       <if test="txHash != null">
         #{txHash,jdbcType=VARCHAR},
@@ -162,6 +169,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="desc != null">
+        #{desc,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -180,8 +190,8 @@
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="record.desc != null">
-        `desc` = #{record.desc,jdbcType=VARCHAR},
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=VARCHAR},
       </if>
       <if test="record.txHash != null">
         tx_hash = #{record.txHash,jdbcType=VARCHAR},
@@ -198,6 +208,9 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.desc != null">
+        `desc` = #{record.desc,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -207,12 +220,13 @@
     update node_opt
     set id = #{record.id,jdbcType=BIGINT},
       node_id = #{record.nodeId,jdbcType=VARCHAR},
-      `desc` = #{record.desc,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=VARCHAR},
       tx_hash = #{record.txHash,jdbcType=VARCHAR},
       block_number = #{record.blockNumber,jdbcType=BIGINT},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      `desc` = #{record.desc,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -223,8 +237,8 @@
       <if test="nodeId != null">
         node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="desc != null">
-        `desc` = #{desc,jdbcType=VARCHAR},
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
       </if>
       <if test="txHash != null">
         tx_hash = #{txHash,jdbcType=VARCHAR},
@@ -241,18 +255,22 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="desc != null">
+        `desc` = #{desc,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.NodeOpt">
     update node_opt
     set node_id = #{nodeId,jdbcType=VARCHAR},
-      `desc` = #{desc,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=VARCHAR},
       tx_hash = #{txHash,jdbcType=VARCHAR},
       block_number = #{blockNumber,jdbcType=BIGINT},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      `desc` = #{desc,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -262,13 +280,14 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into node_opt
-    (id, node_id, `desc`, tx_hash, block_number, `timestamp`, create_time, update_time
-      )
+    (id, node_id, `type`, tx_hash, block_number, `timestamp`, create_time, update_time, 
+      `desc`)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.desc,jdbcType=VARCHAR}, 
+      (#{item.id,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, 
         #{item.txHash,jdbcType=VARCHAR}, #{item.blockNumber,jdbcType=BIGINT}, #{item.timestamp,jdbcType=TIMESTAMP}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.desc,jdbcType=VARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -292,8 +311,8 @@
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="'desc'.toString() == column.value">
-          #{item.desc,jdbcType=VARCHAR}
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
         </if>
         <if test="'tx_hash'.toString() == column.value">
           #{item.txHash,jdbcType=VARCHAR}
@@ -309,6 +328,9 @@
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'desc'.toString() == column.value">
+          #{item.desc,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

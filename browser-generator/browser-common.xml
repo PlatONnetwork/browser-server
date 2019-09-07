@@ -24,9 +24,9 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.7.0_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
-                        userId="root"
-                        password="Juzhen123!"/>
+                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        userId="platon"
+                        password="platon"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -70,10 +70,7 @@
                                 replaceString=""/>
         </table>
 
-        <table tableName="node_opt" domainObjectName="NodeOpt">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
+
 
         <table tableName="un_delegation" domainObjectName="UnDelegation">
             <columnRenamingRule searchString="^D_"
@@ -91,6 +88,10 @@
         </table>
 
 
+        <table tableName="delegation" domainObjectName="Delegation">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
 
         <table tableName="slash" domainObjectName="Slash">
             <columnRenamingRule searchString="^D_"
@@ -125,11 +126,11 @@
 
 -->
 
-        <table tableName="delegation" domainObjectName="Delegation">
+
+        <table tableName="node_opt" domainObjectName="NodeOpt">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
-
 
     </context>
 </generatorConfiguration>
