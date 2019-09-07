@@ -94,7 +94,8 @@ public class ProposalUpgradeHandler implements EventHandler {
         nodeOpt.updateWithCustomBlock(bc.getCurBlock());
         String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
                 .replace("ID",proposal.getPipId().toString())
-                .replace("TITLE",proposal.getTopic());
+                .replace("TITLE",proposal.getTopic())
+                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
         nodeOpt.setDesc(desc);
         STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
     }

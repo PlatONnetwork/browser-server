@@ -1,10 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
 import com.platon.browser.engine.handler.EventContext;
@@ -21,8 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
+import static com.platon.browser.engine.BlockChain.*;
 
 /**
  * @Auther: dongqile
@@ -85,5 +81,15 @@ public class ProposalTextHandler implements EventHandler {
         proposalStage.insertProposal(proposal);
         //全量数据补充
         PROPOSALS_CACHE.addProposal(proposal);
+
+        // 记录操作日志
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
+        nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+                .replace("ID",proposal.getPipId().toString())
+                .replace("TITLE",proposal.getTopic())
+                .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
+        nodeOpt.setDesc(desc);
+        STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
     }
 }
