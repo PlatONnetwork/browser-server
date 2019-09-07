@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
+import static com.platon.browser.engine.BlockChain.*;
 
 /**
  * @Auther: dongqile
@@ -67,6 +66,16 @@ public class VotingProposalHandler implements EventHandler {
             proposalStage.insertVote(vote);
 
             PROPOSALS_CACHE.addVote(vote);
+
+            // 记录操作日志
+            CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
+            nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+            String desc = CustomNodeOpt.TypeEnum.VOTE.tpl
+                    .replace("ID",proposal.getPipId().toString())
+                    .replace("TITLE",proposal.getTopic())
+                    .replace("OPTION",param.getOption());
+            nodeOpt.setDesc(desc);
+            STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
         }catch (NoSuchBeanException | BusinessException e){
             throw new NoSuchBeanException("缓存中找不到对应的投票提案:"+e.getMessage());
         }

@@ -132,11 +132,14 @@ public class NewElectionEpochHandler implements EventHandler {
                 staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
 
                 // 把更新暂存到待入库列表, 记录出块率低处罚
-                stakingStage.slashStaking(staking,bc.getCurBlock());
-
-                //
-                CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.DescEnum.LOW_BLOCK_RATE);
+                stakingStage.updateStaking(staking);
+                // 记录操作日志
+                CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
                 nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+                String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.tpl
+                        .replace("PERCENT",slashRate.toString())
+                        .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString());
+                nodeOpt.setDesc(desc);
                 STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
 
                 // 更新被处罚节点统计信息（如果存在）

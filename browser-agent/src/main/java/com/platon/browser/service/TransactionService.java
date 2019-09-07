@@ -8,6 +8,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.task.BlockSyncTask;
 import com.platon.browser.util.TxParamResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
-
-import static com.platon.browser.task.BlockSyncTask.THREAD_POOL;
 
 /**
  * @Auther: Chendongming
@@ -44,7 +43,7 @@ public class TransactionService {
         blocks.forEach(b -> {
             List <CustomTransaction> txList = b.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
-            txList.forEach(tx ->THREAD_POOL.submit(() -> {
+            txList.forEach(tx -> BlockSyncTask.THREAD_POOL.submit(() -> {
                 try {
                     updateTransaction(tx);
                 } catch (Exception e) {

@@ -21,10 +21,10 @@ public class CustomNodeOpt extends NodeOpt {
         this.setCreateTime(date);
     }
 
-    public CustomNodeOpt(String nodeId, DescEnum desc) {
+    public CustomNodeOpt(String nodeId, TypeEnum typeEnum) {
         this();
         this.setNodeId(nodeId);
-        this.setDesc(desc.code);
+        this.setType(typeEnum.code);
     }
 
     public void updateWithCustomTransaction(CustomTransaction tx) {
@@ -48,31 +48,33 @@ public class CustomNodeOpt extends NodeOpt {
        6 multisign 双签
        7 lowBlockRate 出块率低
      */
-    public enum DescEnum{
-        CREATE("1", "创建"),
-        MODIFY("2", "修改"),
-        QUIT("3", "退出"),
-        PROPOSALS("4", "提案"),
-        VOTE("5", "投票"),
-        MULTI_SIGN("6", "双签"),
-        LOW_BLOCK_RATE("7", "出块率低")
+    public enum TypeEnum{
+        CREATE("1", "创建",""),
+        MODIFY("2", "修改",""),
+        QUIT("3", "退出",""),
+        PROPOSALS("4", "提案","ID|TITLE"),
+        VOTE("5", "投票","ID|TITLE|OPTION"),
+        MULTI_SIGN("6", "双签","PERCENT|AMOUNT"),
+        LOW_BLOCK_RATE("7", "出块率低","PERCENT|AMOUNT")
         ;
         public String code;
         public String desc;
-        DescEnum(String code, String desc) {
+        public String tpl;
+        TypeEnum(String code, String desc,String tpl) {
             this.code = code;
             this.desc = desc;
+            this.tpl = tpl;
         }
         public String getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<String,DescEnum> ENUMS = new HashMap<>();
+        private static Map<String,TypeEnum> ENUMS = new HashMap<>();
         static {
-            Arrays.asList(DescEnum.values()).forEach(en->ENUMS.put(en.code,en));}
-        public static DescEnum getEnum(String code){
+            Arrays.asList(TypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static TypeEnum getEnum(String code){
             return ENUMS.get(code);
         }
         public static boolean contains(String code){return ENUMS.containsKey(code);}
-        public static boolean contains(DescEnum en){return ENUMS.containsValue(en);}
+        public static boolean contains(TypeEnum en){return ENUMS.containsValue(en);}
     }
 
 }

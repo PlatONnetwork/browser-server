@@ -4,6 +4,7 @@ import com.platon.browser.bean.CollectResult;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.exception.BlockCollectingException;
+import com.platon.browser.task.BlockSyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,6 @@ import java.math.BigInteger;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-
-import static com.platon.browser.task.BlockSyncTask.THREAD_POOL;
-
 
 /**
  * @Auther: Chendongming
@@ -32,7 +29,6 @@ public class BlockService {
     private static Logger logger = LoggerFactory.getLogger(BlockService.class);
     @Autowired
     private PlatonClient client;
-    private static ExecutorService EXECUTOR = THREAD_POOL;
 
     /**
      * 并行采集区块及交易，并转换为数据库结构
@@ -51,7 +47,7 @@ public class BlockService {
             // 并行批量采集区块
             CountDownLatch latch = new CountDownLatch(CollectResult.RETRY_NUMBERS.size());
             CollectResult.RETRY_NUMBERS.forEach(blockNumber->
-                EXECUTOR.submit(()->{
+                BlockSyncTask.THREAD_POOL.submit(()->{
                     try {
                         Web3j web3j = client.getWeb3j();
                         Request<?,PlatonBlock> request = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true);

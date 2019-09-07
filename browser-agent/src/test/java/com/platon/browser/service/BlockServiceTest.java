@@ -17,6 +17,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
+import org.web3j.protocol.http.HttpService;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -42,13 +43,12 @@ public class BlockServiceTest {
 
     @Before
     public void setUp() throws IOException {
-        Web3j web3j = mock(Web3j.class);
+        Web3j web3j = Web3j.build(new HttpService(""));
         when(client.getWeb3j()).thenReturn(web3j);
-        Request<?,PlatonBlock> request = mock(Request.class);
         PlatonBlock platonBlock = mock(PlatonBlock.class);
         DefaultBlockParameter parameter = mock(DefaultBlockParameter.class);
-        //when(web3j.platonGetBlockByNumber(parameter,true)).thenReturn(request);
-        when(request.send()).thenReturn(platonBlock);
+        when(web3j.platonGetBlockByNumber(parameter,true)).thenAnswer((Answer<Request<?,PlatonBlock>>) invocation-> mock(Request.class));
+        when(web3j.platonGetBlockByNumber(parameter,true).send()).thenReturn(platonBlock);
 
         when(platonBlock.getBlock()).thenAnswer((Answer<PlatonBlock.Block>) invocation -> {
             PlatonBlock.Block block = mock(PlatonBlock.Block.class);

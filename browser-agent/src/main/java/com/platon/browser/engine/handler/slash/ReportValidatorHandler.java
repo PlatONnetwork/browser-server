@@ -2,6 +2,7 @@ package com.platon.browser.engine.handler.slash;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomSlash;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -19,8 +20,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -80,6 +83,16 @@ public class ReportValidatorHandler implements EventHandler {
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
             param.setStakingBlockNum(latestStaking.getStakingBlockNum().toString());
+
+
+            // 记录操作日志
+            CustomNodeOpt nodeOpt = new CustomNodeOpt(latestStaking.getNodeId(), CustomNodeOpt.TypeEnum.MULTI_SIGN);
+            nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+            String desc = CustomNodeOpt.TypeEnum.MULTI_SIGN.tpl
+                    .replace("PERCENT",chainConfig.getDuplicateSignLowSlashRate().toString())
+                    .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
+            nodeOpt.setDesc(desc);
+            STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
         } catch (NoSuchBeanException e) {
             logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             throw new NoSuchBeanException("");
