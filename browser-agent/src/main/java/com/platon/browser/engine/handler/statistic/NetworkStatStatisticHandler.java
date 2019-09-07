@@ -41,6 +41,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
 
         try {
             CustomNode curNode = NODE_CACHE.getNode(curBlock.getNodeId());
+
             CustomStaking curStaking = curNode.getLatestStaking();
             //TODO:地址数需要地址统计
             //当前区块高度
@@ -88,27 +89,26 @@ public class NetworkStatStatisticHandler implements EventHandler {
             NETWORK_STAT_CACHE.setMaxTps(NETWORK_STAT_CACHE.getMaxTps() > curBlock.getStatTxQty() ? NETWORK_STAT_CACHE.getMaxTps() : curBlock.getStatTxQty());
             //出块奖励
             NETWORK_STAT_CACHE.setBlockReward(bc.getBlockReward().toString());
-            if (curBlock.getStatStakingQty() > 0) {
-                //统计质押金额
-                Set <CustomStaking> newStaking = STAGE_DATA.getStakingStage().getStakingInsertStage();
+            //统计质押金额
+            Set <CustomStaking> newStaking = NODE_CACHE.getAllStaking();
+            if(newStaking.size()>0){
                 BigInteger stakingValue = BigInteger.ZERO;
-                for(CustomStaking customStaking : newStaking){
-                    stakingValue = NETWORK_STAT_CACHE.integerStakingValue().add(customStaking.integerStakingHas()).add(customStaking.integerStakingLocked());
-
+                for (CustomStaking customStaking : newStaking) {
+                    stakingValue = stakingValue.add(customStaking.integerStakingHas()).add(customStaking.integerStakingLocked());
                 }
                 NETWORK_STAT_CACHE.setStakingValue(stakingValue.toString());
             }
-            if (curBlock.getStatDelegateQty() > 0) {
-                //委托累计
-                Set <CustomDelegation> newDelegation = STAGE_DATA.getStakingStage().getDelegationInsertStage();
+            //委托累计
+            Set <CustomDelegation> newDelegation = NODE_CACHE.getAllDelegation();
+            if(newDelegation.size()>0){
                 BigInteger delegationValue = BigInteger.ZERO;
-                for(CustomDelegation customDelegation : newDelegation){
-                    delegationValue = customDelegation.integerDelegateHas().add(customDelegation.integerDelegateLocked());
+                for (CustomDelegation customDelegation : newDelegation) {
+                    delegationValue = delegationValue.add(customDelegation.integerDelegateHas().add(customDelegation.integerDelegateLocked()));
                 }
-                NETWORK_STAT_CACHE.setStakingDelegationValue(delegationValue.toString());
                 //在累加计算好的质押金（质押+委托）
-                NETWORK_STAT_CACHE.setStakingDelegationValue(NETWORK_STAT_CACHE.integerStakingDelegationValue().add(NETWORK_STAT_CACHE.integerStakingValue()).toString());
+                NETWORK_STAT_CACHE.setStakingDelegationValue(NETWORK_STAT_CACHE.integerStakingValue().add(delegationValue).toString());
             }
+
             /**
              * 进行中提案统计，根据不同类型区分：
              *  1.文本提案：状态为投票中的为进行中的提案

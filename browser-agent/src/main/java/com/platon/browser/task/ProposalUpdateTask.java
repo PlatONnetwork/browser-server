@@ -20,6 +20,7 @@ import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.TallyResult;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
@@ -43,7 +44,7 @@ public class ProposalUpdateTask {
      * a.http请求查询github治理提案的相关信息并补充
      * b.根据platon底层rpc接口查询提案结果
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/1 * * * * ?")
     protected void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;
@@ -90,15 +91,19 @@ public class ProposalUpdateTask {
                     proposal.setNays(accuVerifiersCount.getNays().longValue());
                     //设置弃权票
                     proposal.setAbstentions(accuVerifiersCount.getAbstentions().longValue());
-                    BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
-                    //设置状态
-                    proposal.setStatus(result.data.getStatus());
+                    //只有在结束快高之后才有返回提案结果
+                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock())){
+                        BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
+                        //设置状态
+                        proposal.setStatus(result.data.getStatus());
+                    }
                     // 添加至全量缓存
                     PROPOSALS_CACHE.addProposal(proposal);
                     // 暂存至待入库列表
                     STAGE_DATA.getProposalStage().updateProposal(proposal);
                 } catch (Exception e) {
                     logger.error("更新提案({})的结果出错:{}", proposal.getPipId(), e.getMessage());
+
                 }
             }
         }

@@ -28,12 +28,13 @@ public class SpecialContractApiInvoker {
     private static NodeContract nodeContract = NodeContract.load(web3j);
 
     public static void main(String args[]) throws Exception {
-        BaseResponse verifiersCountBaseResponse = SpecialContractApi.getProposalAccuVerifiers(web3j,"0xf1392a0f709974b15f9571282b657671c35d8f0f340ed6ae68cb484255c00bba","0x49d9a5960b3ac2f0ddb191e4af2d9782a1114946a084cdfe95ff33a573977819");
-        //BaseResponse<List<Node>>  verifierList = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(50215));
-        //BaseResponse<List<Node>>  validatorList = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(50215));
+
+        BaseResponse<List<Node>>  verifierList = SpecialContractApi.getHistoryVerifierList(web3j,BigInteger.valueOf(0));
+        BaseResponse<List<Node>>  validatorList = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.valueOf(0));
 
         //BaseResponse<List<Node>> nodes = SpecialContractApi.getHistoryValidatorList(web3j,BigInteger.ONE);
 
+        BaseResponse verifiersCountBaseResponse = SpecialContractApi.getProposalAccuVerifiers(web3j,"0xf1392a0f709974b15f9571282b657671c35d8f0f340ed6ae68cb484255c00bba","0x49d9a5960b3ac2f0ddb191e4af2d9782a1114946a084cdfe95ff33a573977819");
         String a = verifiersCountBaseResponse.data.toString();
         String str =a.substring(1,a.length()-1);
         String[] ids = str.split(",");
