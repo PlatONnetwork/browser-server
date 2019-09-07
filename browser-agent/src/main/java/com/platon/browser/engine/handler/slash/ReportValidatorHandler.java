@@ -66,7 +66,7 @@ public class ReportValidatorHandler implements EventHandler {
             latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
             latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
             //更新分析质押结果
-            stakingStage.updateStaking(latestStaking, tx);
+            stakingStage.modifyStaking(latestStaking, tx);
 
             //新增举报交易结构
             CustomSlash slash = new CustomSlash();

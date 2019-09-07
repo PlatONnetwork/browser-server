@@ -67,11 +67,30 @@ public class StakingStage {
     public void updateStaking(CustomStaking staking){
         stakingUpdateStage.add(staking);
     }
-    public void updateStaking(CustomStaking staking,CustomTransaction tx){
+
+    /**
+     * 修改质押信息，并记录操作日志
+     * @param staking
+     * @param tx
+     */
+    public void modifyStaking(CustomStaking staking,CustomTransaction tx){
         stakingUpdateStage.add(staking);
         // 构建操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.MODIFY);
         nodeOpt.updateWithCustomTransaction(tx);
+        insertNodeOpt(nodeOpt);
+    }
+
+    /**
+     * 更新质押信息，并设置低出块率处罚日志
+     * @param staking
+     * @param block
+     */
+    public void slashStaking(CustomStaking staking,CustomBlock block){
+        stakingUpdateStage.add(staking);
+        // 构建操作日志
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.DescEnum.LOW_BLOCK_RATE);
+        nodeOpt.updateWithCustomBlock(block);
         insertNodeOpt(nodeOpt);
     }
 
