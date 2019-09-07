@@ -55,7 +55,7 @@ public class CustomNodeOpt extends NodeOpt {
         PROPOSALS("4", "提案","ID|TITLE"),
         VOTE("5", "投票","ID|TITLE|OPTION"),
         MULTI_SIGN("6", "双签","PERCENT|AMOUNT"),
-        LOW_BLOCK_RATE("7", "出块率低","PERCENT|AMOUNT")
+        LOW_BLOCK_RATE("7", "出块率低","PERCENT|AMOUNT|BLOCK_RATE")
         ;
         public String code;
         public String desc;

@@ -138,6 +138,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 nodeOpt.updateWithCustomBlock(bc.getCurBlock());
                 String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.tpl
                         .replace("PERCENT",slashRate.toString())
+                        .replace("BLOCK_RATE",blockRate.toString())
                         .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString());
                 nodeOpt.setDesc(desc);
                 STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
