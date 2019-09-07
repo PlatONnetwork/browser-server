@@ -44,6 +44,7 @@ public class EditValidatorHandler implements EventHandler {
             latestStaking.updateWithEditValidatorParam(param);
             stakingStage.modifyStaking(latestStaking,tx);
             //添加本次修改质押信息对应质押时的快高
+            param.setPerNodeName(latestStaking.getStakingName());
             param.setBlockNumber(latestStaking.getStakingBlockNum().toString());
             tx.setTxInfo(JSON.toJSONString(param));
             // 更新节点名称映射缓存
