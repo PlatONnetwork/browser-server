@@ -108,25 +108,17 @@ public class BlockSyncTask {
             }
             if(blockNumbers.size()==0){
                 logger.info("当前链最高块({}),等待链出下一个块...",curChainBlockNumber);
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
-                }
+                TimeUnit.SECONDS.sleep(1);
                 continue;
             }
             // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
             // 采集前先重置结果容器
             CollectResult.reset();
             // 开始并行采集
-            List <CustomBlock> blocks = blockService.collect(blockNumbers);
+            List<CustomBlock> blocks = blockService.collect(blockNumbers);
             // 采集不到区块则暂停1秒, 结束本次循环
             if(blocks.size()==0) {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
-                }
+                TimeUnit.SECONDS.sleep(1);
                 continue;
             }
             // 并行分析 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
@@ -142,11 +134,7 @@ public class BlockSyncTask {
             }
             // 记录已采入库最高区块号
             commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                throw new BlockCollectingException("区块采集暂停被中断:"+e.getMessage());
-            }
+            TimeUnit.SECONDS.sleep(1);
         }
     }
 }
