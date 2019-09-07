@@ -25,6 +25,8 @@ subprojects {
         compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "commons-io:commons-io:$commonIoVersion"
+        testCompile 'org.mockito:mockito-core:3.0.0'
+
 
     }
 }

@@ -8,7 +8,6 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.task.BlockSyncTask;
 import com.platon.browser.util.TxParamResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @Auther: Chendongming
@@ -35,15 +35,21 @@ public class TransactionService {
     @Autowired
     private PlatonClient client;
 
+    private ExecutorService executor;
+
+    public void init(ExecutorService executor) {
+        this.executor = executor;
+    }
+
     /**
      * 并行分析区块及交易
      */
-    public void analyze(List<CustomBlock> blocks) {
+    public List<CustomBlock> analyze(List<CustomBlock> blocks) {
         // 对需要复杂分析的区块或交易信息，开启并行处理
         blocks.forEach(b -> {
             List <CustomTransaction> txList = b.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
-            txList.forEach(tx -> BlockSyncTask.THREAD_POOL.submit(() -> {
+            txList.forEach(tx -> executor.submit(() -> {
                 try {
                     updateTransaction(tx);
                 } catch (Exception e) {
@@ -102,12 +108,13 @@ public class TransactionService {
             block.setStatTxGasLimit(String.valueOf(stat.txGasLimit));
             block.setStatTxFee(stat.txFee.toString());
         });
+        return blocks;
     }
 
     /**
      * 分析区块获取code&交易回执
      */
-    private void updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
+    public void updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
         try {
             // 查询交易回执
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();

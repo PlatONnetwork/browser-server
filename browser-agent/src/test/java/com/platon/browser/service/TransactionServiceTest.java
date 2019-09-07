@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -29,35 +28,30 @@ import static org.mockito.Mockito.when;
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/7 09:32
- * @Description: 区块服务单元测试
+ * @Description: 交易服务单元测试
  */
 @RunWith(MockitoJUnitRunner.class)
-public class BlockServiceTest extends TestBase {
-    private static Logger logger = LoggerFactory.getLogger(BlockServiceTest.class);
+public class TransactionServiceTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(TransactionServiceTest.class);
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
     @Mock
     private PlatonClient client;
     @Mock
-    private BlockService blockService;
+    private TransactionService transactionService;
 
     @Before
     public void setUp() throws IOException, BlockCollectingException {
-        ReflectionTestUtils.setField(blockService, "executor", THREAD_POOL);
-        ReflectionTestUtils.setField(blockService, "client", client);
-        when(blockService.collect(Mockito.anySet())).thenCallRealMethod();
-        when(blockService.getBlock(Mockito.any(),Mockito.any(BigInteger.class))).thenAnswer((Answer<CustomBlock>)invocation->{
-            BigInteger blockNumber = invocation.getArgument(1,BigInteger.class);
-            CustomBlock block = new CustomBlock();
-            block.setNumber(blockNumber.longValue());
-            return block;
-        });
+        ReflectionTestUtils.setField(transactionService, "executor", THREAD_POOL);
+        ReflectionTestUtils.setField(transactionService, "client", client);
+        when(transactionService.analyze(Mockito.anyList())).thenCallRealMethod();
+
     }
 
     @Test
     public void testCollect() throws BlockCollectingException {
         Set<BigInteger> blockNumbers = new HashSet<>();
         for (int i=0;i<20;i++) blockNumbers.add(BigInteger.valueOf(i));
-        List<CustomBlock> blocks = blockService.collect(blockNumbers);
+        List<CustomBlock> blocks = transactionService.analyze(this.blocks);
         assertEquals(blockNumbers.size(),blocks.size());
     }
 
