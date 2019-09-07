@@ -2,10 +2,7 @@ package com.platon.browser.engine.handler.slash;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomNodeOpt;
-import com.platon.browser.dto.CustomSlash;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
@@ -47,7 +44,8 @@ public class ReportValidatorHandler implements EventHandler {
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
         //通过结果获取，证据中的举报人的nodeId
         try {
-            CustomStaking latestStaking = NODE_CACHE.getNode(HexTool.prefix(param.getVerify())).getLatestStaking();
+            CustomNode node = NODE_CACHE.getNode(HexTool.prefix(param.getVerify()));
+            CustomStaking latestStaking = node.getLatestStaking();
             logger.debug("多签举报信息:{}", JSON.toJSONString(param));
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignLowSlashRate());
@@ -79,6 +77,9 @@ public class ReportValidatorHandler implements EventHandler {
 
             //新增分析多重签名结果
             stakingStage.insertSlash(slash);
+
+            // 设置节点统计数据中的多签举报次数
+            node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
 
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
