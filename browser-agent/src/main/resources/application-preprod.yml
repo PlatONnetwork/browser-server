@@ -1,4 +1,5 @@
 # ***************************开发配置**************************** #
+#redis 配置
 spring:
   redis:
     host: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com
@@ -13,6 +14,7 @@ dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/plat
 dbuser: admin
 # MySQL数据库密码
 dbpass: Juzhen1234
+#web3j配置
 web3j:
   addresses: http://18.140.20.252:6789
   collect.batch-size: 100

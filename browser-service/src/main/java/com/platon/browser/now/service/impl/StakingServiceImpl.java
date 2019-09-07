@@ -235,6 +235,14 @@ public class StakingServiceImpl implements StakingService {
 				resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 				resp.setBlockQty(stakingNode.getStatBlockQty());
 				resp.setExpectBlockQty(stakingNode.getStatExpectBlockQty());
+				resp.setVerifierTime(stakingNode.getNodeStatVerifierTime());
+				resp.setJoinTime(stakingNode.getJoinTime().getTime());
+				/** 只有不是内置节点才计算年化率  */
+				if(CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
+					resp.setExpectedIncome(stakingNode.getExpectedIncome());
+				} else {
+					resp.setExpectedIncome("");
+				}
 				String webSite = "";
 				if(StringUtils.isNotBlank(stakingNode.getWebSite()) ) {
 					/**
@@ -251,8 +259,6 @@ public class StakingServiceImpl implements StakingService {
 				if(StringUtils.isNotBlank(stakingNode.getExternalName())) {
 					resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
 				}
-				resp.setVerifierTime(stakingNode.getStatVerifierTime());
-				resp.setJoinTime(stakingNode.getJoinTime().getTime());
 				if(StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {
 					resp.setRewardValue(stakingNode.getStatRewardValue());
 				}

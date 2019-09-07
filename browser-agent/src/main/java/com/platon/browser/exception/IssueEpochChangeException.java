@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class IssueEpochChangeException extends Exception {
-    public IssueEpochChangeException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public IssueEpochChangeException(String msg){
         super(msg);
     }
 

@@ -194,8 +194,6 @@ public class HomeServiceImpl implements HomeService {
 		if(networkStatRedis != null) {
 			/** 查询redis统计信息并转换对应返回对象 */
 			BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
-			BigDecimal sum = new BigDecimal(networkStatRedis.getStakingDelegationValue()).add(new BigDecimal(networkStatRedis.getStakingValue()));
-			chainStatisticNewResp.setStakingDelegationValue(sum.toString());
 		}
 		return chainStatisticNewResp;
 	}

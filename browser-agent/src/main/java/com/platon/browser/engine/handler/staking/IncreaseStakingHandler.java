@@ -1,11 +1,9 @@
 package com.platon.browser.engine.handler.staking;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -13,7 +11,6 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.IncreaseStakingParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
@@ -26,10 +23,6 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 @Component
 public class IncreaseStakingHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(IncreaseStakingHandler.class);
-    @Autowired
-    private BlockChain bc;
-    @Autowired
-    private BlockChainConfig chainConfig;
     @Override
     public void handle(EventContext context) {
         CustomTransaction tx = context.getTransaction();

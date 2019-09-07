@@ -1,7 +1,6 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomStaking;
@@ -35,10 +34,9 @@ public class ProposalTextHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalTextHandler.class);
     @Autowired
     private BlockChain bc;
-    @Autowired
-    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
+    	logger.debug("ProposalTextHandler");
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
         //根据交易参数解析成对应文本提案结构

@@ -91,7 +91,9 @@ public class CacheBase {
         if(pageSize<=0){
             pageSize=1;
         }
-        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey,(pageNum-1)*pageSize,(pageNum*pageSize)-1);
+        long start = (pageNum-1l)*pageSize;
+        long end = (pageNum*pageSize)-1l;
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
         cpi.data = cache;
         cpi.page = page;
         return cpi;

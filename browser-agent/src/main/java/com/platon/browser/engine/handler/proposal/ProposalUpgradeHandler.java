@@ -39,6 +39,7 @@ public class ProposalUpgradeHandler implements EventHandler {
     private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
+    	logger.debug("ProposalUpgradeHandler");
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
         //根据交易参数解析成对应文本提案结构

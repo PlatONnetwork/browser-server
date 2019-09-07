@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class SettleEpochChangeException extends Exception {
-    public SettleEpochChangeException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public SettleEpochChangeException(String msg){
         super(msg);
     }
 }

@@ -1,5 +1,23 @@
 group = 'com.platon.browser'
 version = "${projectVersion}"
+
+buildscript {
+  repositories {
+    maven {url "https://plugins.gradle.org/m2/"}
+  }
+  dependencies {
+    classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
+  }
+}
+
+apply plugin: "org.sonarqube"
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+    }
+}
+
 subprojects {
     // 设置编译器使用的编码
     tasks.withType(JavaCompile) {
@@ -27,4 +45,11 @@ subprojects {
         compile "commons-io:commons-io:$commonIoVersion"
 
     }
+    
+    sonarqube {
+        properties {
+            property "sonar.sources", "src/main/java"
+        }
+    }
+
 }

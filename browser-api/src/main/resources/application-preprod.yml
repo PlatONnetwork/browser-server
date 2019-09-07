@@ -1,19 +1,26 @@
-# ***************************测试配置**************************** #
+# ***************************开发配置**************************** #
+#redis 配置
 spring:
   redis:
     cluster:
       max-redirects: 3
-      nodes: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.171:7002
+      nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
+# 服务器端口号
+port: 9061
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)
-profile: test
-# 服务器端口号
-port: 9061
+profile: preprod
 # MySQL数据库连接地址
-dburl: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
-dbuser: root
-dbpass: Juzhen123!
+dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+# MySQL数据库用户名
+dbuser: admin
+# MySQL数据库密码
+dbpass: Juzhen1234
+#web3j配置
+web3j:
+  addresses: http://18.140.20.252:6789
+  collect.batch-size: 100
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -26,9 +33,6 @@ logging:
     com.platon.browser.dao: debug
     com.platon.browser.engine: debug
     com.platon.browser.engine.handler.epoch: error
-web3j:
-  addresses: http://192.168.112.171:6789
-  collect.batch-size: 100
 
 #初始化链相关的配置
 platon.config:
@@ -39,7 +43,7 @@ platon.config:
   #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
-  addIssueRate: 0.25
+  addIssueRate: 0.025
   #每年增发分配给激励池的比例
   incentiveRateFromIssue: 0.8
   #激励池分配给出块激励的比例
@@ -66,12 +70,16 @@ platon.config:
   consensusPeriodBlockCount: 40
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #每个结算周期区块总数(等于43个共识周期出的块数总和)
-  settlePeriodBlockCount: 120
-  #每个增发周期区块总数(1466个结算周期=15759500个块)
-  addIssuePeriodBlockCount: 1680
+  #每个结算周期区块总数
+  settlePeriodBlockCount: 160
+  #每个增发周期区块总数
+  addIssuePeriodBlockCount: 1600
   #节点质押退回锁定的结算周期数
   unstakeRefundSettlePeriodCount: 2
+  #升级提案预升级轮数
+  versionProposalActiveConsensusRounds: 5
+  #文本提案默认投票结束轮数
+  proposalTextEndRound: 4
   #文本提案参与率: >
   minProposalTextParticipationRate: 0.5
   #文本提案支持率：>=
@@ -85,26 +93,27 @@ platon.config:
   #双签低处罚百分比
   duplicateSignLowSlashRate: 1
   #开发者激励基金账户地址
-  developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
+  developerIncentiveFundAccountAddr: '0xfd9d508df262a1c968e0d6c757ab08b96d741f4b'
   #PlatOn基金会账户地址
   platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
-    '0':62215742.4869165,
-    '1':55965742.4869165,
-    '2':49559492.4869165,
-    '3':42993086.2369165,
-    '4':36262519.8306666,
-    '5':29363689.2642633,
-    '6':22292387.9336939,
-    '7':15044304.0698633,
-    '8':7615018.1094369
+    '1':62215742.4869165,
+    '2':55965742.4869165,
+    '3':49559492.4869165,
+    '4':42993086.2369165,
+    '5':36262519.8306666,
+    '6':29363689.2642633,
+    '7':22292387.9336939,
+    '8':15044304.0698633,
+    '9':7615018.1094369
   }
   # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 10000000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
-
+  #keybase网址
+  keyBase: https://keybase.io/
 brokenHost: 192.168.16.173
 brokenPort: 61613
 system.username: admin

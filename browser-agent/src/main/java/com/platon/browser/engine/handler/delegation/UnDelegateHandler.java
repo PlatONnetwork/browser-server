@@ -1,7 +1,6 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
@@ -30,8 +29,6 @@ public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
     @Autowired
     private BlockChain bc;
-    @Autowired
-    private BlockChainConfig chainConfig;
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
         CustomTransaction tx = context.getTransaction();

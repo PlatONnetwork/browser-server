@@ -13,7 +13,6 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.AddressCacheUpdater;
 import com.platon.browser.engine.cache.StakingCacheUpdater;
-import com.platon.browser.engine.handler.epoch.NewConsensusEpochHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
@@ -73,9 +72,6 @@ public class BlockSyncTask {
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
 
-
-    @Autowired
-    private NewConsensusEpochHandler newConsensusEpochHandler;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -477,6 +473,8 @@ public class BlockSyncTask {
                     case VOTING_PROPOSAL:// 提案投票
                         stat.proposalQty++; // 提案交易数总和
                         break;
+					default:
+						break;
                 }
                 // 累加当前区块内所有交易的手续费
                 stat.txFee = stat.txFee.add(new BigDecimal(transaction.getActualTxCost()));

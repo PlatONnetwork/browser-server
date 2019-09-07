@@ -7,7 +7,12 @@ package com.platon.browser.exception;
  * @Description:
  */
 public class BlockChainException extends Exception {
-    public BlockChainException(String msg){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public BlockChainException(String msg){
         super(msg);
     }
 }

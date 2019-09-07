@@ -61,6 +61,7 @@ public class DbService {
 
     @Transactional
     public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
+    	logger.debug("DbService insertOrUpdate");
         List <Block> blocks = new ArrayList <>();
         List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {

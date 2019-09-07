@@ -38,6 +38,7 @@ public class AddressEngine {
 
     @PostConstruct
     private void init () {
+    	logger.debug("init AddressEngine");
         // 初始化全量数据
         List<CustomAddress> addresses = customAddressMapper.selectAll();
         addresses.forEach(address -> addressCache.add(address));

@@ -79,6 +79,8 @@ public class NetworkStatStatisticHandler implements EventHandler {
                         //累计提案总数
                         NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty()+1);
                         break;
+					default:
+						break;
                 }
             });
 

@@ -85,6 +85,7 @@ public class StakingEngine {
      */
     public void loadNodes() throws CacheConstructException {
         List<CustomNode> nodeList = customNodeMapper.selectAll();
+        logger.debug("execute loadNodes:{}", nodeList);
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> nodeIds.add(node.getNodeId()));
         if(nodeIds.size()==0) return;
@@ -126,6 +127,8 @@ public class StakingEngine {
             case DELEGATE: delegateHandler.handle(context);break; //发起委托(委托)
             case UN_DELEGATE: unDelegateHandler.handle(context);break; //减持/撤销委托(赎回委托)
             case REPORT_VALIDATOR: reportValidatorHandler.handle(context);break; //举报多签(举报验证人)
+			default:
+				break;
         }
         updateTxInfo(tx,bc);
     }
