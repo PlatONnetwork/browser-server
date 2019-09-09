@@ -2,6 +2,8 @@ package com.platon.browser.param;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * User: dongqile
  * Date: 2019/8/6
@@ -24,7 +26,7 @@ public class CreateProposalUpgradeParam {
     /**
      * 提案投票截止块高（EpochSize*N-20，不超过2周的块高）
      */
-    private Integer endVotingRound;
+    private BigDecimal endVotingRound;
 
     /**
      * 升级版本
@@ -37,7 +39,7 @@ public class CreateProposalUpgradeParam {
     private String nodeName;
 
 
-    public void init( String verifier, String pIDID, Integer endVotingRound,Integer newVersion){
+    public void init( String verifier, String pIDID, BigDecimal endVotingRound,Integer newVersion){
         this.setVerifier(verifier);
         this.setPIDID(pIDID);
         this.setEndVotingRound(endVotingRound);

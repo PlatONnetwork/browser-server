@@ -61,7 +61,7 @@ import java.util.List;
 /**
  * 交易方法逻辑实现
  *  @file TransactionServiceImpl.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -126,7 +126,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByAddress(TransactionListByAddressRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        
+
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.setOrderByClause(" timestamp desc");
         /** 地址信息可能是from也可能是to */
@@ -150,7 +150,7 @@ public class TransactionServiceImpl implements TransactionService {
         result.setTotalCount(count);
         return result;
     }
-    
+
     private List<TransactionListResp> tranferList(List<TransactionWithBLOBs> items) {
     	List<TransactionListResp> lists = new LinkedList<>();
     	for (TransactionWithBLOBs transaction:items) {
@@ -168,7 +168,7 @@ public class TransactionServiceImpl implements TransactionService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
-        TransactionExample transactionExample = new TransactionExample(); 
+        TransactionExample transactionExample = new TransactionExample();
         transactionExample.setOrderByClause(" timestamp desc");
         /** 根据地址查询交易，则可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria();
@@ -182,17 +182,17 @@ public class TransactionServiceImpl implements TransactionService {
 			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
 		}
-        
+
         /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
         transactionExample.or(second);
         List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         List<Object[]> rows = new ArrayList<>();
         items.forEach(transaction -> {
-        	/** 
+        	/**
         	 * 判断是否为to地址
         	 * 如果为to地址则导出报表为收入金额
-        	 * 如果为from地址则导出报表为支出金额 
+        	 * 如果为from地址则导出报表为支出金额
         	*/
             boolean toIsAddress = address.equals(transaction.getTo());
             String valueIn = toIsAddress? transaction.getValue() : "0";
@@ -303,7 +303,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setDetails(createValidatorParam.getDetails());
 						resp.setProgramVersion(createValidatorParam.getProgramVersion());
 						resp.setTxAmount(createValidatorParam.getAmount());
-						
+
 						StakingKey stakingKey = new StakingKey();
 						stakingKey.setNodeId(createValidatorParam.getNodeId());
 						/**
@@ -394,7 +394,7 @@ public class TransactionServiceImpl implements TransactionService {
 								resp.setRedeemStatus(RedeemStatusEnum.EXTING.getCode());
 							}
 							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
-							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnstakeRefundSettlePeriodCount())))
+							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
 									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
 							resp.setRedeemUnLockedBlock(blockNum.toString());
 						}
@@ -526,7 +526,7 @@ public class TransactionServiceImpl implements TransactionService {
 							amountSum = amountSum.add(new BigDecimal(p.getAmount()));
 							transactionDetailsRPPlanResp.setAmount(p.getAmount());
 							transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
-							//锁仓周期对应快高  结算周期 * epoch  
+							//锁仓周期对应快高  结算周期 * epoch
 							transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
 									.multiply(new BigInteger(String.valueOf(p.getEpoch()))).longValue());
 							rpPlanResps.add(transactionDetailsRPPlanResp);
@@ -575,7 +575,7 @@ public class TransactionServiceImpl implements TransactionService {
     	}
     	return resp;
     }
-    
+
     private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
     	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
 		if(proposal != null) {

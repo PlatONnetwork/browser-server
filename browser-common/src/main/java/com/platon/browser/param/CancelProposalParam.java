@@ -2,6 +2,8 @@ package com.platon.browser.param;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * User: dongqile
  * Date: 2019/8/21
@@ -23,7 +25,7 @@ public class CancelProposalParam {
     /**
      * 提案投票截止块高（EpochSize*N-20，不超过2周的块高
      */
-    private Integer endVotingRound;
+    private BigDecimal endVotingRound;
 
     /**
      * 被取消的目标提案
@@ -36,7 +38,7 @@ public class CancelProposalParam {
     private String nodeName;
 
 
-    public void init(String verifier,String pIDID,Integer endVotingRound,String canceledProposalID){
+    public void init(String verifier,String pIDID,BigDecimal endVotingRound,String canceledProposalID){
         this.setVerifier(verifier);
         this.setPIDID(pIDID);
         this.setEndVotingRound(endVotingRound);

@@ -3,11 +3,13 @@ package com.platon.browser.config.bean;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class Slashing {
-    private int PackAmountAbnormal;
-    private int PackAmountHighAbnormal;
-    private int PackAmountLowSlashRate;
-    private int PackAmountHighSlashRate;
-    private int DuplicateSignHighSlashing;
+    private BigDecimal PackAmountAbnormal;
+    private BigDecimal PackAmountHighAbnormal;
+    private BigDecimal PackAmountLowSlashRate;
+    private BigDecimal PackAmountHighSlashRate;
+    private BigDecimal DuplicateSignHighSlashing;
 }

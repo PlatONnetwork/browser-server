@@ -3,14 +3,17 @@ package com.platon.browser.config.bean;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 @Data
 public class Gov {
-    private int VersionProposalVote_ConsensusRounds;
-    private int VersionProposalActive_ConsensusRounds;
-    private double VersionProposal_SupportRate;
-    private int TextProposalVote_ConsensusRounds;
-    private double TextProposal_VoteRate;
-    private double TextProposal_SupportRate;
-    private double CancelProposal_VoteRate;
-    private double CancelProposal_SupportRate;
+    private BigDecimal VersionProposalVote_ConsensusRounds;
+    private BigDecimal VersionProposalActive_ConsensusRounds;
+    private BigDecimal VersionProposal_SupportRate;
+    private BigDecimal TextProposalVote_ConsensusRounds;
+    private BigDecimal TextProposal_VoteRate;
+    private BigDecimal TextProposal_SupportRate;
+    private BigDecimal CancelProposal_VoteRate;
+    private BigDecimal CancelProposal_SupportRate;
 }

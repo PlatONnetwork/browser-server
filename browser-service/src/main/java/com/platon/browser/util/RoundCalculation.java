@@ -23,19 +23,17 @@ public class RoundCalculation {
     private static Logger logger = LoggerFactory.getLogger(RoundCalculation.class);
 
 
-    public static BigDecimal endBlockNumCal ( String blockNumber, String endRound, BlockChainConfig bc ) {
+    public static BigDecimal endBlockNumCal ( String blockNumber, BigDecimal consensusRound, BlockChainConfig chainConfig ) {
         try {
             //交易所在区块高度
             BigDecimal txBlockNumber = new BigDecimal(blockNumber);
-            //治理交易定义投票结束轮数
-            BigDecimal txEndRound = new BigDecimal(endRound);
             //共识周期块数
-            BigDecimal consensusCount = new BigDecimal(bc.getConsensusPeriodBlockCount());
+            BigDecimal consensusCount = new BigDecimal(chainConfig.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换结束快高
-            BigDecimal endBlockNumber = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txEndRound.multiply(consensusCount)).subtract(new BigDecimal(20));
+            BigDecimal endBlockNumber = txBlockNumber.add(consensusCount).subtract(belongToCon).add(consensusRound.multiply(consensusCount)).subtract(new BigDecimal(20));
             return endBlockNumber;
         } catch (Exception e) {
             logger.error("[RoundCalculation] exception");
@@ -47,12 +45,12 @@ public class RoundCalculation {
      * 生效轮数转化区块高度
      * 生效块高 = 提案交易所在块高 + 共识周期块数 - 提案交易所在块高%共识周期块数 + (提案入参轮数+4) * 共识周期块数  + 1
      */
-    public static BigDecimal activeBlockNumCal ( String blockNumber, String endRound, BlockChainConfig bc ) {
+    public static BigDecimal activeBlockNumCal ( String blockNumber, BigDecimal endRound, BlockChainConfig bc ) {
         try {
             //交易所在区块高度
             BigDecimal txBlockNumber = new BigDecimal(blockNumber);
             //治理交易生效轮数
-            BigDecimal txActiveRound = new BigDecimal(endRound).add(new BigDecimal(bc.getVersionProposalActiveConsensusRounds()).subtract(BigDecimal.ONE));
+            BigDecimal txActiveRound = endRound.add(bc.getVersionProposalActiveConsensusRounds().subtract(BigDecimal.ONE));
             //共识周期块数
             BigDecimal consensusCount = new BigDecimal(bc.getConsensusPeriodBlockCount());
             //提案交易所在块高%共识周期块数,交易所在第几个共识轮

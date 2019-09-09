@@ -100,10 +100,6 @@ public class BlockChain {
     // 当前增发周期的每个结算周期的奖励，每个增发周期更新一次
     private BigDecimal settleReward;
 
-    // 每个增发周期内有几个结算周期
-    private BigInteger settleEpochCountPerIssueEpoch;
-
-
     @Autowired
     private NetworkStatStatisticHandler networkStatStatisticHandler;
     @Autowired
@@ -122,8 +118,6 @@ public class BlockChain {
 
     @PostConstruct
     private void init () throws Exception {
-        // 计算每个增发周期内有几个结算周期：每个增发周期总块数/每个结算周期总块数
-        settleEpochCountPerIssueEpoch = chainConfig.getAddIssuePeriodBlockCount().divide(chainConfig.getSettlePeriodBlockCount());
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
@@ -296,7 +290,7 @@ public class BlockChain {
                     .multiply(chainConfig.getStakeRewardRate()); // 取出激励池余额中属于质押奖励的部分
             logger.debug("质押奖励部分:{}",stakingPart.toString());
             // 每个增发周期的总结算周期数
-            BigDecimal settleEpochCountPerIssue = new BigDecimal(settleEpochCountPerIssueEpoch);
+            BigDecimal settleEpochCountPerIssue = new BigDecimal(chainConfig.getSettlePeriodCountPerIssue());
             // 每个结算周期的质押奖励
             BigDecimal settleReward = stakingPart
                     .divide(settleEpochCountPerIssue,0, RoundingMode.FLOOR); // 除以结算周期轮数，向下取整

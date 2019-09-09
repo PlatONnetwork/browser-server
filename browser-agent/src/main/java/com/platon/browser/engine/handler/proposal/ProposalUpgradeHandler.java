@@ -72,13 +72,13 @@ public class ProposalUpgradeHandler implements EventHandler {
         //从交易解析参数获取需要设置pIDID
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
-        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key, param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
-        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound(), bc.getChainConfig());
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置新版本号
         proposal.setNewVersion(String.valueOf(param.getNewVersion()));

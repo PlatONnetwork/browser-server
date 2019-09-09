@@ -7,6 +7,7 @@ import com.platon.browser.config.bean.EconomicConfigResult;
 import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.ConfigLoadingException;
 import lombok.Data;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -14,11 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -38,102 +41,166 @@ public class BlockChainConfig {
 
     @PostConstruct
     private void init() throws IOException {
-        EconomicConfigParam param = new EconomicConfigParam();
-        param.setId(1);
-        param.setJsonrpc("2.0");
-//        param.setMethod("debug_economicConfig");
-        param.setMethod("debug_economicConfig");
-        param.setParams(Collections.EMPTY_LIST);
-
+        EconomicConfigParam param = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
         OkHttpClient httpClient = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
-        String post = JSON.toJSONString(param);
-        RequestBody requestBody = RequestBody.create(mediaType, post);
-        Request request = new Request.Builder()
-                .post(requestBody)
-                .url(client.getWeb3jAddress())
-                .build();
-
+        String data = JSON.toJSONString(param);
+        String web3jAddress = client.getWeb3jAddress();
+        logger.info("Web3j RPC:{}",web3jAddress);
+        Request request = new Request.Builder().post(RequestBody.create(data,mediaType)).url(web3jAddress).build();
         Response response = httpClient.newCall(request).execute();
         if(response.isSuccessful()){
             String res = Objects.requireNonNull(response.body()).string();
+            res = res.replace("\n","");
             Web3Response result = JSON.parseObject(res,Web3Response.class);
-            logger.info("{}",JSON.toJSONString(result,true));
+            if(result.getError()!=null){
+                throw new ConfigLoadingException("初始化链配置错误:web3j="+web3jAddress+",code="+result.getError().getCode()+",error="+result.getError().getMessage());
+            }
+            EconomicConfigResult ecr = JSON.parseObject(result.getResult(),EconomicConfigResult.class);
+            logger.info("链上查询出来的配置:{}",JSON.toJSONString(result,true));
+            //【通用】结算周期规定的分钟数
+            this.expectedMinutes=ecr.getCommon().getExpectedMinutes();
+            //【通用】系统分配的节点出块时间窗口
+            this.nodeBlockTimeWindow=ecr.getCommon().getNodeBlockTimeWindow();
+            //【通用】每个验证人每个共识周期出块数量目标值
+            this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
+            //【通用】每个共识轮验证节点数量
+            this.consensusValidatorCount=ecr.getCommon().getValidatorCount();
+            //【通用】每个增发周期内的结算周期数
+            this.settlePeriodCountPerIssue=ecr.getCommon().getAdditionalCycleTime();
+            //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+            this.blockInterval=this.nodeBlockTimeWindow.divide(this.expectBlockCount);
+            //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
+            this.consensusPeriodBlockCount=this.expectBlockCount.multiply(this.getConsensusValidatorCount());
+            //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
+            this.settlePeriodBlockCount=this.expectedMinutes
+                    .multiply(BigInteger.valueOf(60))
+                    .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
+                    .multiply(this.consensusPeriodBlockCount);
+            //【通用】每个增发周期区块总数=每个增发周期内的结算周期数x结算周期区块数
+            this.addIssuePeriodBlockCount=this.settlePeriodCountPerIssue.multiply(this.settlePeriodBlockCount);
+            //【质押】创建验证人最低的质押Token数(LAT)
+            this.stakeThreshold= Convert.fromVon(ecr.getStaking().getStakeThreshold(), Convert.Unit.LAT);
+            //【质押】委托人每次委托及赎回的最低Token数(LAT)
+            this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
+            //【质押】节点质押退回锁定的结算周期数
+            this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
+            //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
+            this.blockRate4LowSlash=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
+            //【惩罚】普通质押金处罚百分比
+            this.blockLowSlashRate=ecr.getSlashing().getPackAmountLowSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+            //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
+            this.blockRate4HighSlash=ecr.getSlashing().getPackAmountHighAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);;
+            //【惩罚】违规-低出块率: 最高处罚百分比
+            this.blockHighSlashRate=ecr.getSlashing().getPackAmountHighSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+            //【惩罚】双签处罚百分比
+            this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);;
+            //【治理】文本提案参与率: >
+            this.minProposalTextParticipationRate=ecr.getGov().getTextProposal_VoteRate();
+            //【治理】文本提案支持率：>=
+            this.minProposalTextSupportRate=ecr.getGov().getTextProposal_SupportRate();
+            //【治理】取消提案参与率: >
+            this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposal_VoteRate();
+            //【治理】取消提案支持率：>=
+            this.minProposalCancelSupportRate=ecr.getGov().getCancelProposal_SupportRate();
+            //【治理】升级提案通过率
+            this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
+            //【治理】文本提案投票周期
+            this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_ConsensusRounds();
+            //【治理】设置预升级开始轮数
+            this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalActive_ConsensusRounds();
+            //【奖励】激励池分配给出块激励的比例
+            this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+            //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
+            this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
         }else{
-            logger.error("初始化链配置错误:{}",response.message());
+            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+response.message());
         }
     }
 
     public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
+    /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
+    //【通用】结算周期规定的分钟数
+    private BigInteger expectedMinutes;
+    //【通用】系统分配的节点出块时间窗口
+    private BigInteger nodeBlockTimeWindow;
+    //【通用】每个验证人每个共识周期出块数量目标值
+    private BigInteger expectBlockCount;
+    //【通用】每个共识轮验证节点数量
+    private BigInteger consensusValidatorCount;
+    //【通用】每个增发周期内的结算周期数
+    private BigInteger settlePeriodCountPerIssue;
+    //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+    private BigInteger blockInterval;
+    //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
+    private BigInteger consensusPeriodBlockCount;
+    //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
+    private BigInteger settlePeriodBlockCount;
+    //【通用】每个增发周期区块总数=ROUND_DOWN(增发周期的时间x60/(出块间隔x结算周期区块数))x结算周期区块数
+    private BigInteger addIssuePeriodBlockCount;
+
+    //【质押】质押门槛: 创建验证人最低的质押Token数(LAT)
+    private BigDecimal stakeThreshold;
+    //【质押】委托门槛(LAT)
+    private BigDecimal delegateThreshold;
+    //【质押】节点质押退回锁定的结算周期数
+    private BigInteger unStakeRefundSettlePeriodCount;
+
+    //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
+    private BigDecimal blockRate4LowSlash;
+    //【惩罚】普通质押金处罚百分比
+    private BigDecimal blockLowSlashRate;
+    //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
+    private BigDecimal blockRate4HighSlash;
+    //【惩罚】违规-低出块率: 最高处罚百分比
+    private BigDecimal blockHighSlashRate;
+    //【惩罚】双签处罚百分比
+    private BigDecimal duplicateSignSlashRate;
+
+    //【治理】文本提案参与率: >
+    private BigDecimal minProposalTextParticipationRate;
+    //【治理】文本提案支持率：>=
+    private BigDecimal minProposalTextSupportRate;
+    //【治理】取消提案参与率: >
+    private BigDecimal minProposalCancelParticipationRate;
+    //【治理】取消提案支持率：>=
+    private BigDecimal minProposalCancelSupportRate;
+    //【治理】升级提案通过率
+    private BigDecimal minProposalUpgradePassRate;
+    //【治理】文本提案默认结束轮数
+    private BigDecimal proposalTextConsensusRounds;
+    //【治理】设置预升级开始轮数
+    private BigDecimal versionProposalActiveConsensusRounds;
+
+    //【奖励】激励池分配给出块激励的比例
+    private BigDecimal blockRewardRate;
+    //【奖励】激励池分配给质押激励的比例
+    private BigDecimal stakeRewardRate;
+
+    /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
     private BigInteger maxSettlePeriodCount4AnnualizedRateStat;
-    // 链ID
-    private String chainId;
-    // PlatON初始总发行量
+    // PlatON初始总发行量(LAT)
     private BigDecimal initIssueAmount;
     // 每年固定增发比例
     private BigDecimal addIssueRate;
     // 每年增发分配给激励池的比例
     private BigDecimal incentiveRateFromIssue;
-    // 激励池分配给出块激励的比例
-    private BigDecimal blockRewardRate;
-    //激励池分配给质押激励的比例
-    private BigDecimal stakeRewardRate;
-    //触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
-    private BigDecimal blockRate4LowSlash;
-    // 普通质押金处罚百分比
-    private BigDecimal blockLowSlashRate;
-    //触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
-    private BigDecimal blockRate4HighSlash;
-    //违规-低出块率: 最高处罚百分比
-    private BigDecimal blockHighSlashRate;
-    //质押门槛: 创建验证人最低的质押Token数
-    private BigDecimal stakeThreshold;
-    //委托门槛
-    private BigDecimal delegateThreshold;
-    //出块间隔(秒)
-    private int blockInterval;
-    //每个验证人每个共识周期出块数量目标值
-    private BigInteger expectBlockCount;
-    //共识轮区块数
-    private BigInteger consensusPeriodBlockCount;
     //每个共识轮中回退多少个块是选举下一轮验证人的时机
     private BigInteger electionBackwardBlockCount;
-    //每个结算周期区块总数(等于43个共识周期出的块数总和)
-    private BigInteger settlePeriodBlockCount;
-    //每个增发周期区块总数(1466个结算周期=15759500个块)
-    private BigInteger addIssuePeriodBlockCount;
-    //节点质押退回锁定的结算周期数
-    private BigInteger unstakeRefundSettlePeriodCount;
-    //文本提案参与率: >
-    private BigDecimal minProposalTextParticipationRate;
-    //文本提案支持率：>=
-    private BigDecimal minProposalTextSupportRate;
-    //取消提案参与率: >
-    private BigDecimal minProposalCancelParticipationRate;
-    //取消提案支持率：>=
-    private BigDecimal minProposalCancelSupportRate;
-    //升级提案通过率
-    private BigDecimal minProposalUpgradePassRate;
-    //双签低处罚百分比
-    private BigDecimal duplicateSignLowSlashRate;
     //开发者激励基金账户地址
     private String developerIncentiveFundAccountAddr;
     //PlatOn基金会账户地址
     private String platonFundAccountAddr;
-    //10年内基金会向激励池填充额度
+    //10年内基金会向激励池填充额度(LAT)
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;
-    //文本提案默认结束轮数
-    private String proposalTextEndRound;
     //keyBase
     private String keyBase;
-    // 初始内置节点默认质押金额(VON)
+    // 初始内置节点默认质押金额(LAT)
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakings=new ArrayList<>();
-    //设置预升级开始轮数
-    private String versionProposalActiveConsensusRounds;
 }

@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
@@ -30,6 +31,8 @@ public class ProposalTextHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalTextHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
     	logger.debug("ProposalTextHandler");
@@ -63,7 +66,7 @@ public class ProposalTextHandler implements EventHandler {
         //从交易解析参数获取需要设置pIDID
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
-        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),bc.getChainConfig().getProposalTextEndRound(),bc.getChainConfig());
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),chainConfig.getProposalTextConsensusRounds(),chainConfig);
 
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum

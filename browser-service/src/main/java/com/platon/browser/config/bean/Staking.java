@@ -3,12 +3,15 @@ package com.platon.browser.config.bean;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 @Data
 public class Staking {
-    private long StakeThreshold;
-    private long MinimumThreshold;
-    private int EpochValidatorNum;
-    private int HesitateRatio;
-    private int UnStakeFreezeRatio;
-    private int ActiveUnDelegateFreezeRatio;
+    private BigDecimal StakeThreshold;
+    private BigDecimal MinimumThreshold;
+    private BigInteger EpochValidatorNum;
+    private BigInteger HesitateRatio;
+    private BigInteger UnStakeFreezeRatio;
+    private BigInteger ActiveUnDelegateFreezeRatio;
 }
