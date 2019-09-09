@@ -41,77 +41,6 @@ public class BlockChainConfig {
     @Autowired
     private PlatonClient client;
 
-    @PostConstruct
-    private void init() throws ConfigLoadingException {
-        String web3jAddress = client.getWeb3jAddress();
-        logger.info("Web3j RPC:{}",web3jAddress);
-        EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
-        String param = JSON.toJSONString(ecp);
-        try {
-            Web3Response response = HttpUtil.post(web3jAddress,param,Web3Response.class);
-            EconomicConfigResult ecr = JSON.parseObject(response.getResult(),EconomicConfigResult.class);
-            logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
-            //【通用】结算周期规定的分钟数
-            this.expectedMinutes=ecr.getCommon().getExpectedMinutes();
-            //【通用】系统分配的节点出块时间窗口
-            this.nodeBlockTimeWindow=ecr.getCommon().getNodeBlockTimeWindow();
-            //【通用】每个验证人每个共识周期出块数量目标值
-            this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
-            //【通用】每个共识轮验证节点数量
-            this.consensusValidatorCount=ecr.getCommon().getValidatorCount();
-            //【通用】每个增发周期内的结算周期数
-            this.settlePeriodCountPerIssue=ecr.getCommon().getAdditionalCycleTime();
-            //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-            this.blockInterval=this.nodeBlockTimeWindow.divide(this.expectBlockCount);
-            //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
-            this.consensusPeriodBlockCount=this.expectBlockCount.multiply(this.getConsensusValidatorCount());
-            //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-            this.settlePeriodBlockCount=this.expectedMinutes
-                    .multiply(BigInteger.valueOf(60))
-                    .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
-                    .multiply(this.consensusPeriodBlockCount);
-            //【通用】每个增发周期区块总数=每个增发周期内的结算周期数x结算周期区块数
-            this.addIssuePeriodBlockCount=this.settlePeriodCountPerIssue.multiply(this.settlePeriodBlockCount);
-            //【质押】创建验证人最低的质押Token数(LAT)
-            this.stakeThreshold= Convert.fromVon(ecr.getStaking().getStakeThreshold(), Convert.Unit.LAT);
-            //【质押】委托人每次委托及赎回的最低Token数(LAT)
-            this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
-            //【质押】节点质押退回锁定的结算周期数
-            this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
-            //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
-            this.blockRate4LowSlash=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
-            //【惩罚】普通质押金处罚百分比
-            this.blockLowSlashRate=ecr.getSlashing().getPackAmountLowSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
-            //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
-            this.blockRate4HighSlash=ecr.getSlashing().getPackAmountHighAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);;
-            //【惩罚】违规-低出块率: 最高处罚百分比
-            this.blockHighSlashRate=ecr.getSlashing().getPackAmountHighSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
-            //【惩罚】双签处罚百分比
-            this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);;
-            //【治理】文本提案参与率: >
-            this.minProposalTextParticipationRate=ecr.getGov().getTextProposal_VoteRate();
-            //【治理】文本提案支持率：>=
-            this.minProposalTextSupportRate=ecr.getGov().getTextProposal_SupportRate();
-            //【治理】取消提案参与率: >
-            this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposal_VoteRate();
-            //【治理】取消提案支持率：>=
-            this.minProposalCancelSupportRate=ecr.getGov().getCancelProposal_SupportRate();
-            //【治理】升级提案通过率
-            this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
-            //【治理】文本提案投票周期
-            this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_ConsensusRounds();
-            //【治理】设置预升级开始轮数
-            this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalActive_ConsensusRounds();
-            //【奖励】激励池分配给出块激励的比例
-            this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
-            //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
-            this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
-        } catch (HttpRequestException e) {
-            e.printStackTrace();
-            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+e.getMessage());
-        }
-    }
-
     public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
@@ -197,4 +126,79 @@ public class BlockChainConfig {
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakings=new ArrayList<>();
+
+    @PostConstruct
+    private void init() throws ConfigLoadingException {
+        String web3jAddress = client.getWeb3jAddress();
+        logger.info("Web3j RPC:{}",web3jAddress);
+        EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
+        String param = JSON.toJSONString(ecp);
+        try {
+            Web3Response response = HttpUtil.post(web3jAddress,param,Web3Response.class);
+            EconomicConfigResult ecr = JSON.parseObject(response.getResult(),EconomicConfigResult.class);
+            logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
+            updateWithEconomicConfigResult(ecr);
+        } catch (HttpRequestException e) {
+            e.printStackTrace();
+            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+e.getMessage());
+        }
+    }
+
+    private void updateWithEconomicConfigResult(EconomicConfigResult ecr) {
+        //【通用】结算周期规定的分钟数
+        this.expectedMinutes=ecr.getCommon().getExpectedMinutes();
+        //【通用】系统分配的节点出块时间窗口
+        this.nodeBlockTimeWindow=ecr.getCommon().getNodeBlockTimeWindow();
+        //【通用】每个验证人每个共识周期出块数量目标值
+        this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
+        //【通用】每个共识轮验证节点数量
+        this.consensusValidatorCount=ecr.getCommon().getValidatorCount();
+        //【通用】每个增发周期内的结算周期数
+        this.settlePeriodCountPerIssue=ecr.getCommon().getAdditionalCycleTime();
+        //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
+        this.blockInterval=this.nodeBlockTimeWindow.divide(this.expectBlockCount);
+        //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
+        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(this.getConsensusValidatorCount());
+        //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
+        this.settlePeriodBlockCount=this.expectedMinutes
+                .multiply(BigInteger.valueOf(60))
+                .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
+                .multiply(this.consensusPeriodBlockCount);
+        //【通用】每个增发周期区块总数=每个增发周期内的结算周期数x结算周期区块数
+        this.addIssuePeriodBlockCount=this.settlePeriodCountPerIssue.multiply(this.settlePeriodBlockCount);
+        //【质押】创建验证人最低的质押Token数(LAT)
+        this.stakeThreshold= Convert.fromVon(ecr.getStaking().getStakeThreshold(), Convert.Unit.LAT);
+        //【质押】委托人每次委托及赎回的最低Token数(LAT)
+        this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
+        //【质押】节点质押退回锁定的结算周期数
+        this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
+        //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
+        this.blockRate4LowSlash=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
+        //【惩罚】普通质押金处罚百分比
+        this.blockLowSlashRate=ecr.getSlashing().getPackAmountLowSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
+        this.blockRate4HighSlash=ecr.getSlashing().getPackAmountHighAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);;
+        //【惩罚】违规-低出块率: 最高处罚百分比
+        this.blockHighSlashRate=ecr.getSlashing().getPackAmountHighSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        //【惩罚】双签处罚百分比
+        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);;
+        //【治理】文本提案参与率: >
+        this.minProposalTextParticipationRate=ecr.getGov().getTextProposal_VoteRate();
+        //【治理】文本提案支持率：>=
+        this.minProposalTextSupportRate=ecr.getGov().getTextProposal_SupportRate();
+        //【治理】取消提案参与率: >
+        this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposal_VoteRate();
+        //【治理】取消提案支持率：>=
+        this.minProposalCancelSupportRate=ecr.getGov().getCancelProposal_SupportRate();
+        //【治理】升级提案通过率
+        this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
+        //【治理】文本提案投票周期
+        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_ConsensusRounds();
+        //【治理】设置预升级开始轮数
+        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalActive_ConsensusRounds();
+        //【奖励】激励池分配给出块激励的比例
+        this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
+        this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
+    }
 }
