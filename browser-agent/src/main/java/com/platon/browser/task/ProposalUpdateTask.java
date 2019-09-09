@@ -44,7 +44,9 @@ public class ProposalUpdateTask {
      * b.根据platon底层rpc接口查询提案结果
      */
     @Scheduled(cron = "0/1 * * * * ?")
-    protected void start () {
+    private void cron(){start();}
+
+    public void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;
         if(proposalCache.getAllProposal().size() == 0)return;

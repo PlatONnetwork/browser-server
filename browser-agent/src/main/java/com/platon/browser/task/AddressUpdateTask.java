@@ -27,12 +27,12 @@ import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 @Component
 public class AddressUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTask.class);
-
     @Autowired
     private PlatonClient client;
-
     @Scheduled(cron = "0/10 * * * * ?")
-    protected void start () {
+    private void cron () {start();}
+
+    public void start(){
         StringBuilder sb = new StringBuilder();
         Collection<CustomAddress> addresses = BlockChain.ADDRESS_CACHE.getAllAddress();
         if(addresses.size()==0) return;

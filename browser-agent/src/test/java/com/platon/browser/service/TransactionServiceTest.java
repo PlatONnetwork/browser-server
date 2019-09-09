@@ -1,6 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
@@ -47,20 +48,14 @@ public class TransactionServiceTest extends TestBase {
         ReflectionTestUtils.setField(transactionService, "client", client);
         when(transactionService.analyze(Mockito.anyList())).thenCallRealMethod();
         when(transactionService.updateTransaction(Mockito.any(CustomTransaction.class))).thenCallRealMethod();
-        when(transactionService.getReceipt(Mockito.any(CustomTransaction.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
-            CustomTransaction tx = invocation.getArgument(0,CustomTransaction.class);
+        when(transactionService.getReceipt(Mockito.any(TransactionBean.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
+            TransactionBean tx = invocation.getArgument(0, TransactionBean.class);
             TransactionReceipt receipt = new TransactionReceipt();
             BeanUtils.copyProperties(tx,receipt);
             receipt.setBlockNumber(tx.getBlockNumber().toString());
             receipt.setTransactionHash(tx.getHash());
             receipt.setTransactionIndex(tx.getTransactionIndex().toString());
-            receipt.setRoot("0xeda9c0ec817590b0741c4910506ec5605a681d3207f1510151113229e4868553");
-            receipt.setCumulativeGasUsed("0x9f54");
-            receipt.setGasUsed("0x9f54");
-            receipt.setLogsBloom("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100080000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000");
             Optional<TransactionReceipt> optional = Optional.ofNullable(receipt);
-
-            //ReflectionTestUtils.setField(optional, "value", new Object());
             return optional;
         });
 
@@ -68,8 +63,8 @@ public class TransactionServiceTest extends TestBase {
 
     @Test
     public void testAnalyze() {
-        List<CustomBlock> blocks = transactionService.analyze(this.blocks);
-        assertEquals(this.blocks.size(),blocks.size());
+        List<CustomBlock> result = transactionService.analyze(blocks);
+        assertEquals(blocks.size(),result.size());
     }
 
 }

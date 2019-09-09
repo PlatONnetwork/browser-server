@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.CacheConstructException;
@@ -26,7 +27,7 @@ public class TestBase {
     public static NodeCache NODE_CACHE = new NodeCache();
     public static List<CustomNode> nodes= Collections.EMPTY_LIST;
     public static List<CustomBlock> blocks= Collections.EMPTY_LIST;
-    public static List<CustomTransaction> transactions= Collections.EMPTY_LIST;
+    public static List<TransactionBean> transactions= Collections.EMPTY_LIST;
     public static List<CustomStaking> stakings= Collections.EMPTY_LIST;
     public static List<CustomDelegation> delegations= Collections.EMPTY_LIST;
     public static List<CustomUnDelegation> unDelegations= Collections.EMPTY_LIST;
@@ -45,7 +46,7 @@ public class TestBase {
                         blocks = JSON.parseArray(content,CustomBlock.class);
                         break;
                     case "transaction":
-                        transactions = JSON.parseArray(content,CustomTransaction.class);
+                        transactions = JSON.parseArray(content,TransactionBean.class);
                         break;
                     case "staking":
                         stakings = JSON.parseArray(content,CustomStaking.class);
@@ -65,11 +66,7 @@ public class TestBase {
 
         Map<Long,List<CustomTransaction>> txMap = new HashMap<>();
         transactions.forEach(tx->{
-            List<CustomTransaction> txes = txMap.get(tx.getBlockNumber());
-            if(txes==null){
-                txes=new ArrayList<>();
-                txMap.put(tx.getBlockNumber(),txes);
-            }
+            List<CustomTransaction> txes = txMap.computeIfAbsent(tx.getBlockNumber(), k -> new ArrayList<>());
             txes.add(tx);
         });
         blocks.forEach(block -> {
