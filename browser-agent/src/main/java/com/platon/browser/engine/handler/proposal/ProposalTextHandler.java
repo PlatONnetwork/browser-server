@@ -41,7 +41,7 @@ public class ProposalTextHandler implements EventHandler {
         //根据交易参数解析成对应文本提案结构
         CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
+        proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         CustomNode node;
         try {
             node = NODE_CACHE.getNode(param.getVerifier());
