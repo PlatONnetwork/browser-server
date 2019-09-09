@@ -41,7 +41,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
+        proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         //设置提案人
         proposal.setVerifier(param.getVerifier());
 

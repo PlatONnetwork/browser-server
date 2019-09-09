@@ -55,7 +55,7 @@ public class ProposalCancelHandler implements EventHandler {
         param.setNodeName(staking.getStakingName());
         tx.setTxInfo(JSON.toJSONString(param));
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
+        proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         //设置提案人
         proposal.setVerifier(param.getVerifier());
         //设置提案人名称
