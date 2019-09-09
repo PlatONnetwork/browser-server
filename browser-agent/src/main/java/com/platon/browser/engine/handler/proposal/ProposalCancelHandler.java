@@ -97,7 +97,7 @@ public class ProposalCancelHandler implements EventHandler {
 
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
-        nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+        nodeOpt.updateWithCustomTransaction(tx);
         String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())

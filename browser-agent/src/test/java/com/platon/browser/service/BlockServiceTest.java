@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,25 +41,38 @@ public class BlockServiceTest extends TestBase {
     @Mock
     private BlockService blockService;
 
+    /**
+     * 测试开始前，设置相关行为属性
+     * @throws IOException
+     * @throws BlockCollectingException
+     */
     @Before
-    public void setUp() throws IOException, BlockCollectingException {
+    public void setup() throws IOException, BlockCollectingException {
         ReflectionTestUtils.setField(blockService, "executor", THREAD_POOL);
         ReflectionTestUtils.setField(blockService, "client", client);
         when(blockService.collect(Mockito.anySet())).thenCallRealMethod();
         when(blockService.getBlock(Mockito.any(),Mockito.any(BigInteger.class))).thenAnswer((Answer<CustomBlock>)invocation->{
-            BigInteger blockNumber = invocation.getArgument(1,BigInteger.class);
+            BigInteger blockNumber = invocation.getArgument(1);
             CustomBlock block = new CustomBlock();
             block.setNumber(blockNumber.longValue());
             return block;
         });
     }
 
+    /**
+     * 执行区块搜集测试
+     * @throws BlockCollectingException
+     */
     @Test
     public void testCollect() throws BlockCollectingException {
         Set<BigInteger> blockNumbers = new HashSet<>();
         for (int i=0;i<20;i++) blockNumbers.add(BigInteger.valueOf(i));
         List<CustomBlock> blocks = blockService.collect(blockNumbers);
+        // 数量相等
         assertEquals(blockNumbers.size(),blocks.size());
+        Set<BigInteger> resultNumbers = new HashSet<>();
+        blocks.forEach(block -> resultNumbers.add(block.getBlockNumber()));
+        // 区块号相等
+        assertTrue(blockNumbers.containsAll(resultNumbers));
     }
-
 }
