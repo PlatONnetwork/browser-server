@@ -1,10 +1,10 @@
 package com.platon.browser.exception;
 
 /**
- * 共识周期切换异常
+ *
  * @Auther: Chendongming
  * @Date: 2019/8/17 16:27
- * @Description:
+ * @Description: 共识周期切换异常
  */
 public class ConsensusEpochChangeException extends Exception {
     /**

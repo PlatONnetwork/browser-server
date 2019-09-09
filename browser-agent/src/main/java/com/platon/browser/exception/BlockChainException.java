@@ -1,10 +1,10 @@
 package com.platon.browser.exception;
 
 /**
- * 区块链内部异常
+ *
  * @Auther: Chendongming
  * @Date: 2019/8/17 16:27
- * @Description:
+ * @Description: 区块链内部异常
  */
 public class BlockChainException extends Exception {
     /**
