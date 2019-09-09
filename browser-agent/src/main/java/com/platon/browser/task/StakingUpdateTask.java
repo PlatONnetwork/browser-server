@@ -6,6 +6,8 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
+import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -48,10 +50,7 @@ public class StakingUpdateTask {
                     if (StringUtils.isNotBlank(customStaking.getExternalId())) {
                         String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
                         try {
-                            String queryResult = MarkDownParserUtil.httpGet(queryUrl);
-                            if(null==queryResult)return;
-                            KeyBaseUser keyBaseUser = JSON.parseObject(queryResult, KeyBaseUser.class);
-                            if(keyBaseUser==null) return;
+                            KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
                             List <Completion> completions = keyBaseUser.getCompletions();
                             if (completions == null || completions.size() == 0) return;
                             // 取最新一条
@@ -65,7 +64,7 @@ public class StakingUpdateTask {
                             customStaking.setExternalName(username);
                             // 把改动后的内容暂存至待更新列表
                             STAGE_DATA.getStakingStage().updateStaking(customStaking);
-                        } catch (IOException e) {
+                        } catch (HttpRequestException e) {
                             logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                         }
                     }

@@ -8,6 +8,8 @@ import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.util.HttpUtil;
 import lombok.Data;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -40,24 +42,15 @@ public class BlockChainConfig {
     private PlatonClient client;
 
     @PostConstruct
-    private void init() throws IOException {
-        EconomicConfigParam param = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
-        OkHttpClient httpClient = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
-        String data = JSON.toJSONString(param);
+    private void init() throws ConfigLoadingException {
         String web3jAddress = client.getWeb3jAddress();
         logger.info("Web3j RPC:{}",web3jAddress);
-        Request request = new Request.Builder().post(RequestBody.create(data,mediaType)).url(web3jAddress).build();
-        Response response = httpClient.newCall(request).execute();
-        if(response.isSuccessful()){
-            String res = Objects.requireNonNull(response.body()).string();
-            res = res.replace("\n","");
-            Web3Response result = JSON.parseObject(res,Web3Response.class);
-            if(result.getError()!=null){
-                throw new ConfigLoadingException("初始化链配置错误:web3j="+web3jAddress+",code="+result.getError().getCode()+",error="+result.getError().getMessage());
-            }
-            EconomicConfigResult ecr = JSON.parseObject(result.getResult(),EconomicConfigResult.class);
-            logger.info("链上查询出来的配置:{}",JSON.toJSONString(result,true));
+        EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
+        String param = JSON.toJSONString(ecp);
+        try {
+            Web3Response response = HttpUtil.post(web3jAddress,param,Web3Response.class);
+            EconomicConfigResult ecr = JSON.parseObject(response.getResult(),EconomicConfigResult.class);
+            logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
             //【通用】结算周期规定的分钟数
             this.expectedMinutes=ecr.getCommon().getExpectedMinutes();
             //【通用】系统分配的节点出块时间窗口
@@ -113,8 +106,9 @@ public class BlockChainConfig {
             this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
             //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
             this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
-        }else{
-            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+response.message());
+        } catch (HttpRequestException e) {
+            e.printStackTrace();
+            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+e.getMessage());
         }
     }
 

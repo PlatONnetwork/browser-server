@@ -12,9 +12,7 @@ import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -27,8 +25,9 @@ public class PlatonClient {
     private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
-    private List<Web3j> allWeb3jList=new ArrayList<>();
+    private Map<Web3j,String> web3jMap=new HashMap<>();
     private Web3j currentValidWeb3j;
+    private String currentValidAddress;
     // 委托合约接口
     private DelegateContract delegateContract;
     public DelegateContract getDelegateContract(){return delegateContract;}
@@ -58,8 +57,9 @@ public class PlatonClient {
             WEB3J_CONFIG_LOCK.writeLock().lock();
             web3jAddresses.forEach(address->{
                 Web3j web3j = Web3j.build(new HttpService(address));
-                allWeb3jList.add(web3j);
+                web3jMap.put(web3j,address);
                 if(currentValidWeb3j==null) currentValidWeb3j=web3j;
+                if(currentValidAddress==null) currentValidAddress=address;
             });
         }catch (Exception e){
             e.printStackTrace();
@@ -86,9 +86,7 @@ public class PlatonClient {
     }
 
     public String getWeb3jAddress(){
-        Random random = new Random();
-        int index = random.nextInt(web3jAddresses.size());
-        return web3jAddresses.get(index);
+        return currentValidAddress;
     }
 
     private void updateContract(){
@@ -112,14 +110,15 @@ public class PlatonClient {
             } catch (Exception e1) {
                 logger.info("当前Web3j实例({})无效，重新选举Web3j实例！",currentValidWeb3j);
                 // 连不通，则需要更新
-                for(Web3j web3j:allWeb3jList){
+                web3jMap.forEach((web3j,address)->{
                     try {
                         web3j.platonBlockNumber().send();
                         currentValidWeb3j=web3j;
+                        currentValidAddress=address;
                     } catch (IOException e2) {
                         logger.info("候选Web3j实例({})无效！",web3j);
                     }
-                }
+                });
                 if(originWeb3j==currentValidWeb3j){
                     logger.info("当前所有候选Web3j实例均无法连通！");
                 }
