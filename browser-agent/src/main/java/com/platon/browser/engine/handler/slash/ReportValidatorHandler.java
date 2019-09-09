@@ -50,7 +50,7 @@ public class ReportValidatorHandler implements EventHandler {
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignSlashRate());
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
-            latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
+            latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).setScale(0).toString());
             //设置离开时间
             latestStaking.setLeaveTime(bc.getCurBlock().getTimestamp());
             //判断现在的锁定期金额是否大于零
