@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/14 12:02
- * @Description:
+ * @Description: 节点实体扩展类
  */
 @Data
 public class CustomNode extends Node {
@@ -57,7 +57,11 @@ public class CustomNode extends Node {
         if(lastEntry==null) throw new NoSuchBeanException("没有质押记录！");
         return lastEntry.getValue();
     }
-
+    /**
+     * 节点是否官方推荐类型枚举类：
+     *  1.是
+     *  2.否
+     */
     public enum YesNoEnum{
           YES(1, "是"),
           NO(2, "否")

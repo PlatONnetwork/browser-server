@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/16 15:36
- * @Description:
+ * @Description: 投票实体扩展类
  */
 @Data
 public class CustomVote extends Vote {
@@ -36,6 +36,12 @@ public class CustomVote extends Vote {
         return OptionEnum.getEnum(this.getOption());
     }
 
+    /**
+     * 投票类型枚举类：
+     *  1.支持
+     *  2.反对
+     *  3.弃权
+     */
     public enum OptionEnum {
         SUPPORT("1", "支持"),
         OPPOSITION("2", "反对"),

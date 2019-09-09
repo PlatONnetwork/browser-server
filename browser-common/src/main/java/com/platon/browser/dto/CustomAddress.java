@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/14 12:02
- * @Description:
+ * @Description: 地址实体扩展类
  */
 @Data
 public class CustomAddress extends Address {
@@ -86,6 +86,12 @@ public class CustomAddress extends Address {
         }
     }
 
+    /**
+     * 地址类型枚举类：
+     *  1.账户
+     *  2.合约
+     *  3.内置合约
+     */
     public enum TypeEnum{
         ACCOUNT(1, "账户"),
         CONTRACT(2, "合约"),

@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/16 19:36
- * @Description:
+ * @Description: 操作实体扩展类
  */
 public class CustomNodeOpt extends NodeOpt {
 

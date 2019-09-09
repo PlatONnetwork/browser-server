@@ -195,6 +195,13 @@ public class CustomStaking extends Staking {
         return StatusEnum.getEnum(this.getStatus());
     }
 
+
+    /**
+     * 质押状态类型枚举类：
+     *  1.候选中
+     *  2.退出中
+     *  3.已退出
+     */
     public enum StatusEnum{
         CANDIDATE(1, "候选中"),
         EXITING(2, "退出中"),
@@ -217,7 +224,11 @@ public class CustomStaking extends Staking {
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(StatusEnum en){return ENUMS.containsValue(en);}
     }
-
+    /**
+     * 质押节点——是否共识周期验证人类型/是否结算周期验证人类型枚举类：
+     *  1.是
+     *  2.否
+     */
     public enum YesNoEnum{
         YES(1, "是"),
         NO(2, "否")

@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 13:52
- * @Description:
+ * @Description: 交易实体扩张类
  */
 @Data
 public class CustomTransaction extends TransactionWithBLOBs {
@@ -166,7 +166,11 @@ public class CustomTransaction extends TransactionWithBLOBs {
             return desc;
         }
     }
-
+    /**
+     * 交易结果成败枚举类：
+     *  1.成功
+     *  2.失败
+     */
     public enum TxReceiptStatusEnum{
         SUCCESS(1, "成功"),
         FAILURE(0, "失败")

@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/14 12:08
- * @Description:
+ * @Description: 解委托实体扩展类
  */
 @Data
 public class CustomUnDelegation extends UnDelegation {
@@ -45,7 +45,11 @@ public class CustomUnDelegation extends UnDelegation {
     public StatusEnum getStatusEnum(){
         return StatusEnum.getEnum(this.getStatus());
     }
-
+    /**
+     * 解委托结果类型枚举类：
+     *  1.退出中
+     *  2.退出成功
+     */
     public enum StatusEnum{
         EXITING(1, "退出中"),
         EXITED(2, "退回成功");

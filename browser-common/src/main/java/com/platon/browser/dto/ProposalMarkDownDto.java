@@ -3,9 +3,9 @@ package com.platon.browser.dto;
 import lombok.Data;
 
 /**
- * User: dongqile
- * Date: 2019/8/21
- * Time: 15:30
+ * @Auther: dongqile
+ * @Date: 2019/8/21 15:30
+ * @Description: 提案githubMarkdown文件实体类
  */
 @Data
 public class ProposalMarkDownDto {
