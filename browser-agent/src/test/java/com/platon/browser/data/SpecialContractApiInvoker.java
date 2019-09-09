@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
+import org.web3j.platon.bean.RestrictingItem;
 import org.web3j.platon.contracts.NodeContract;
+import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -26,6 +28,7 @@ public class SpecialContractApiInvoker {
 //    private static Web3j web3j = Web3j.build(new HttpService("http://192.168.120.90:6789")); // atonTest
     private static Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789")); // test
     private static NodeContract nodeContract = NodeContract.load(web3j);
+    private static RestrictingPlanContract restrictingPlanContract = RestrictingPlanContract.load(web3j);
 
     public static void main(String args[]) throws Exception {
 
@@ -43,5 +46,8 @@ public class SpecialContractApiInvoker {
         }
         System.out.println(ids);
         System.out.println(verifiersCountBaseResponse.data);
+
+        BaseResponse<RestrictingItem> res = restrictingPlanContract.getRestrictingInfo("0x493301712671ada506ba6ca7891f436d29185821").send();
+        System.out.println(res);
     }
 }

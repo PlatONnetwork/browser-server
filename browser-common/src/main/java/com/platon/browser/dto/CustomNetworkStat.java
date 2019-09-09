@@ -7,9 +7,9 @@ import java.math.BigInteger;
 import java.util.Date;
 
 /**
- * User: dongqile
- * Date: 2019/8/20
- * Time: 11:13
+ * @Auther: dongqile
+ * @Date: 2019/8/14 12:08
+ * @Description: 统计实体扩展类
  */
 public class CustomNetworkStat extends NetworkStat {
 

@@ -4,20 +4,21 @@ import com.platon.browser.bean.CollectResult;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.exception.BlockCollectingException;
-import com.platon.browser.task.BlockSyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @Auther: Chendongming
@@ -29,13 +30,18 @@ public class BlockService {
     private static Logger logger = LoggerFactory.getLogger(BlockService.class);
     @Autowired
     private PlatonClient client;
+    private ExecutorService executor;
+
+    public void init(ExecutorService executor){
+        this.executor = executor;
+    }
 
     /**
      * 并行采集区块及交易，并转换为数据库结构
      * @param blockNumbers 批量采集的区块号
      * @return void
      */
-    public void collect(Set<BigInteger> blockNumbers) throws BlockCollectingException {
+    public List<CustomBlock> collect(Set<BigInteger> blockNumbers) throws BlockCollectingException {
         // 先重置重试列表
         CollectResult.RETRY_NUMBERS.clear();
         // 把待采块放入重试列表，当作重试块号操作
@@ -47,21 +53,10 @@ public class BlockService {
             // 并行批量采集区块
             CountDownLatch latch = new CountDownLatch(CollectResult.RETRY_NUMBERS.size());
             CollectResult.RETRY_NUMBERS.forEach(blockNumber->
-                BlockSyncTask.THREAD_POOL.submit(()->{
+                executor.submit(()->{
                     try {
-                        Web3j web3j = client.getWeb3j();
-                        Request<?,PlatonBlock> request = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true);
-                        PlatonBlock platonBlock = request.send();
-                        PlatonBlock.Block initData = platonBlock.getBlock();
-                        if (initData==null) throw new BlockCollectingException("原生区块["+blockNumber+"]为空！");
-                        CustomBlock block = new CustomBlock();
-                        try{
-                            block.updateWithBlock(initData);
-                            CollectResult.CONCURRENT_BLOCK_MAP.put(blockNumber.longValue(),block);
-                        }catch (Exception ex){
-                            logger.debug("初始化区块信息异常, 原因: {}", ex.getMessage());
-                            throw new BlockCollectingException(ex.getMessage());
-                        }
+                        CustomBlock block = getBlock(client.getWeb3j(),blockNumber);
+                        CollectResult.CONCURRENT_BLOCK_MAP.put(blockNumber.longValue(),block);
                     } catch (Exception e) {
                         e.printStackTrace();
                         // 把出现异常的区块号加入异常块号列表
@@ -81,5 +76,18 @@ public class BlockService {
             // 把本轮异常区块号加入重试列表
             CollectResult.RETRY_NUMBERS.addAll(exceptionNumbers);
         }
+        return CollectResult.getSortedBlocks();
+    }
+
+    public CustomBlock getBlock(Web3j web3j, BigInteger blockNumber) throws IOException, BlockCollectingException {
+        PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
+        if (initData==null) throw new BlockCollectingException("原生区块["+blockNumber+"]为空！");
+        CustomBlock block = new CustomBlock();
+        try{
+            block.updateWithBlock(initData);
+        }catch (Exception ex){
+            throw new BlockCollectingException("初始化区块信息异常, 原因:"+ex.getMessage());
+        }
+        return block;
     }
 }

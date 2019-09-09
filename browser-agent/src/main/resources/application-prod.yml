@@ -34,60 +34,14 @@ logging:
 platon.config:
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
-  #链ID
-  chainId: 101
   #PlatON初始总发行量(LAT)
   initIssueAmount: 10000000000
   #每年固定增发比例
   addIssueRate: 0.025
   #每年增发分配给激励池的比例
   incentiveRateFromIssue: 0.8
-  #激励池分配给出块激励的比例
-  blockRewardRate: 0.5
-  #激励池分配给质押激励的比例
-  stakeRewardRate: 0.5
-  #触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
-  blockRate4LowSlash: 0.6
-  #普通质押金处罚百分比
-  blockLowSlashRate: 0.1
-  #触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
-  blockRate4HighSlash: 0.2
-  #违规-低出块率: 最高处罚百分比
-  blockHighSlashRate: 0.5
-  #质押门槛: 创建验证人最低的质押Token数(LAT)
-  stakeThreshold: 5000000
-  #委托门槛(LAT)
-  delegateThreshold: 10
-  #出块间隔(秒)
-  blockInterval: 2
-  #每个验证人每个共识周期出块数量目标值
-  expectBlockCount: 10
-  #共识轮区块数
-  consensusPeriodBlockCount: 250
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #每个结算周期区块总数
-  settlePeriodBlockCount: 10750
-  #每个增发周期区块总数
-  addIssuePeriodBlockCount: 15759500
-  #节点质押退回锁定的结算周期数
-  unstakeRefundSettlePeriodCount: 28
-  #升级提案生效周期
-  versionProposalActiveConsensusRounds: 5
-  #文本提案投票周期
-  proposalTextEndRound: 2419
-  #文本提案参与率: >
-  minProposalTextParticipationRate: 0.5
-  #文本提案支持率：>=
-  minProposalTextSupportRate: 0.667
-  #取消提案参与率: >
-  minProposalCancelParticipationRate: 0.5
-  #取消提案支持率：>=
-  minProposalCancelSupportRate: 0.667
-  #升级提案通过率
-  minProposalUpgradePassRate: 0.667
-  #双签低处罚百分比
-  duplicateSignLowSlashRate: 1
   #开发者激励基金账户地址
   developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
   #PlatOn基金会账户地址
@@ -108,5 +62,5 @@ platon.config:
   defaultStakingLockedAmount: 10000000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
-  #keybase网址
+  #keysBase网址
   keyBase: https://keybase.io/

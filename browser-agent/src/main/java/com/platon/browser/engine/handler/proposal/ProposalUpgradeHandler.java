@@ -41,7 +41,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
+        proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         //设置提案人
         proposal.setVerifier(param.getVerifier());
 
@@ -72,13 +72,13 @@ public class ProposalUpgradeHandler implements EventHandler {
         //从交易解析参数获取需要设置pIDID
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
-        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key, param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
-        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound().toString(), bc.getChainConfig());
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound(), bc.getChainConfig());
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置新版本号
         proposal.setNewVersion(String.valueOf(param.getNewVersion()));
@@ -91,10 +91,11 @@ public class ProposalUpgradeHandler implements EventHandler {
 
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
-        nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+        nodeOpt.updateWithCustomTransaction(tx);
         String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
                 .replace("ID",proposal.getPipId().toString())
-                .replace("TITLE",proposal.getTopic());
+                .replace("TITLE",proposal.getTopic())
+                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
         nodeOpt.setDesc(desc);
         STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
     }

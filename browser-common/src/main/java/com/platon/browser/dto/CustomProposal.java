@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/16 15:34
- * @Description:
+ * @Description: 提案实体扩展类
  */
 @Data
 public class CustomProposal extends Proposal {
@@ -46,6 +46,12 @@ public class CustomProposal extends Proposal {
        this.setDescription(proposalMarkDownDto.getDescription());
     }
 
+    /**
+     * 委托类型枚举类：
+     *  1.文本提案
+     *  2.升级提案
+     *  4.取消提案
+     */
     public enum TypeEnum {
         TEXT("1", "文本提案"),
         UPGRADE("2", "升级提案"),

@@ -48,9 +48,9 @@ public class ReportValidatorHandler implements EventHandler {
             CustomStaking latestStaking = node.getLatestStaking();
             logger.debug("多签举报信息:{}", JSON.toJSONString(param));
             //多签举报，惩罚金额
-            BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignLowSlashRate());
+            BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignSlashRate());
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
-            latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).toString());
+            latestStaking.setStakingLocked(latestStaking.decimalStakingLocked().add(latestStaking.decimalStakingHas()).subtract(slashValue).setScale(0).toString());
             //设置离开时间
             latestStaking.setLeaveTime(bc.getCurBlock().getTimestamp());
             //判断现在的锁定期金额是否大于零
@@ -73,13 +73,14 @@ public class ReportValidatorHandler implements EventHandler {
             CustomSlash slash = new CustomSlash();
             slash.updateWithSlash(tx, param);
             slash.setReward(slashValue.toString());
-            slash.setSlashRate(chainConfig.getDuplicateSignLowSlashRate().toString());
+            slash.setSlashRate(chainConfig.getDuplicateSignSlashRate().toString());
 
             //新增分析多重签名结果
             stakingStage.insertSlash(slash);
 
             // 设置节点统计数据中的多签举报次数
             node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
+            STAGE_DATA.getStakingStage().updateNode(node);
 
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
@@ -90,7 +91,7 @@ public class ReportValidatorHandler implements EventHandler {
             CustomNodeOpt nodeOpt = new CustomNodeOpt(latestStaking.getNodeId(), CustomNodeOpt.TypeEnum.MULTI_SIGN);
             nodeOpt.updateWithCustomBlock(bc.getCurBlock());
             String desc = CustomNodeOpt.TypeEnum.MULTI_SIGN.tpl
-                    .replace("PERCENT",chainConfig.getDuplicateSignLowSlashRate().toString())
+                    .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
                     .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
             nodeOpt.setDesc(desc);
             STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);

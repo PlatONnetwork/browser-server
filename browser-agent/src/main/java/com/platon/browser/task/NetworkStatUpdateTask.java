@@ -32,6 +32,8 @@ public class NetworkStatUpdateTask {
     private PlatonClient platonClient;
 
     @Scheduled(cron = "0/5  * * * * ?")
+    private void cron(){start();}
+
     protected void start () {
         CustomBlock curBlock = blockChain.getCurBlock();
         if(curBlock==null) return;

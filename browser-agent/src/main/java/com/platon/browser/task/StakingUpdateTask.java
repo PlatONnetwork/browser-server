@@ -1,12 +1,12 @@
 package com.platon.browser.task;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
-import com.platon.browser.util.MarkDownParserUtil;
+import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -28,17 +27,15 @@ import static com.platon.browser.engine.BlockChain.STAGE_DATA;
  */
 @Component
 public class StakingUpdateTask {
-
     private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
-
     @Autowired
     private BlockChain blockChain;
-
     private static final String fingerprintpPer = "_/api/1.0/user/autocomplete.json?q=";
 
-
     @Scheduled(cron = "0/3  * * * * ?")
-    protected void start () {
+    private void cron(){start();}
+
+    public void start () {
         String keyStoreUrl = blockChain.getChainConfig().getKeyBase();
         try {
             Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
@@ -48,10 +45,7 @@ public class StakingUpdateTask {
                     if (StringUtils.isNotBlank(customStaking.getExternalId())) {
                         String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
                         try {
-                            String queryResult = MarkDownParserUtil.httpGet(queryUrl);
-                            if(null==queryResult)return;
-                            KeyBaseUser keyBaseUser = JSON.parseObject(queryResult, KeyBaseUser.class);
-                            if(keyBaseUser==null) return;
+                            KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
                             List <Completion> completions = keyBaseUser.getCompletions();
                             if (completions == null || completions.size() == 0) return;
                             // 取最新一条
@@ -65,7 +59,7 @@ public class StakingUpdateTask {
                             customStaking.setExternalName(username);
                             // 把改动后的内容暂存至待更新列表
                             STAGE_DATA.getStakingStage().updateStaking(customStaking);
-                        } catch (IOException e) {
+                        } catch (HttpRequestException e) {
                             logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                         }
                     }

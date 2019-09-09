@@ -1,10 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
 import com.platon.browser.engine.handler.EventContext;
@@ -21,8 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
+import static com.platon.browser.engine.BlockChain.*;
 
 /**
  * @Auther: dongqile
@@ -59,7 +55,7 @@ public class ProposalCancelHandler implements EventHandler {
         param.setNodeName(staking.getStakingName());
         tx.setTxInfo(JSON.toJSONString(param));
         CustomProposal proposal = new CustomProposal();
-        proposal.updateWithCustomTransaction(tx,Long.valueOf(bc.getCurValidator().size()));
+        proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         //设置提案人
         proposal.setVerifier(param.getVerifier());
         //设置提案人名称
@@ -75,13 +71,13 @@ public class ProposalCancelHandler implements EventHandler {
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
         //结束轮转换结束区块高度
-        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
         proposal.setEndVotingBlock(cancelEndBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
-        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound().toString(),bc.getChainConfig());
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置被取消的提案id
         proposal.setCanceledPipId(param.getCanceledProposalID());
@@ -98,5 +94,15 @@ public class ProposalCancelHandler implements EventHandler {
         proposalStage.insertProposal(proposal);
         //全量数据补充
         PROPOSALS_CACHE.addProposal(proposal);
+
+        // 记录操作日志
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
+        nodeOpt.updateWithCustomTransaction(tx);
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+                .replace("ID",proposal.getPipId().toString())
+                .replace("TITLE",proposal.getTopic())
+                .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
+        nodeOpt.setDesc(desc);
+        STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
     }
 }

@@ -44,7 +44,9 @@ public class ProposalUpdateTask {
      * b.根据platon底层rpc接口查询提案结果
      */
     @Scheduled(cron = "0/1 * * * * ?")
-    protected void start () {
+    private void cron(){start();}
+
+    public void start () {
         //获取全量数据
         ProposalCache proposalCache = PROPOSALS_CACHE;
         if(proposalCache.getAllProposal().size() == 0)return;
@@ -91,7 +93,7 @@ public class ProposalUpdateTask {
                     //设置弃权票
                     proposal.setAbstentions(accuVerifiersCount.getAbstentions().longValue());
                     //只有在结束快高之后才有返回提案结果
-                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock())){
+                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock()).longValue()){
                         BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
                         //设置状态
                         proposal.setStatus(result.data.getStatus());

@@ -35,7 +35,7 @@ import org.web3j.platon.bean.RestrictingItem;
 /**
  * 地址具体逻辑实现方法
  *  @file AddressServiceImpl.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -44,25 +44,25 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressMapper addressMapper;
-    
+
     @Autowired
     private RpPlanMapper rpPlanMapper;
-    
+
     @Autowired
     private CustomRpPlanMapper customRpPlanMapper;
-    
+
     @Autowired
     private PlatonClient platonClient;
 
     @Autowired
     private I18nUtil i18n;
-    
+
     @Autowired
     private BlockChainConfig blockChainConfig;
-    
+
     @Autowired
     private BlockMapper blockMapper;
-    
+
     @Override
     public QueryDetailResp getDetails(QueryDetailRequest req) {
     	/** 根据主键查询地址信息 */
@@ -99,7 +99,7 @@ public class AddressServiceImpl implements AddressService {
 				queryRPPlanDetailResp.setRestrictingBalance(baseResponse.data.getBalance().subtract(baseResponse.data.getPledge()).toString());
 				queryRPPlanDetailResp.setStakingValue(baseResponse.data.getPledge().toString());
 				queryRPPlanDetailResp.setUnderreleaseValue(baseResponse.data.getDebt().toString());
-			} 
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new BusinessException(i18n.i(I18nEnum.SYSTEM_EXCEPTION));
@@ -109,7 +109,7 @@ public class AddressServiceImpl implements AddressService {
 		 */
 		RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();
-		criteria.andAddressEqualTo(req.getAddress()); 
+		criteria.andAddressEqualTo(req.getAddress());
 		List<DetailsRPPlanResp> detailsRPPlanResps = new ArrayList<DetailsRPPlanResp>();
 		PageHelper.startPage(req.getPageNo(),req.getPageSize());
 		List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
@@ -133,8 +133,8 @@ public class AddressServiceImpl implements AddressService {
 			detailsRPPlanResp.setBlockNumber(number);
 			//预计时间：预计块高减去当前块高乘以出块时间再加上区块时间
 			Block block = blockMapper.selectByPrimaryKey(rPlan.getNumber());
-			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval() * (number - rPlan.getNumber()) 
-					+ block.getTimestamp().getTime());
+			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval().multiply(BigInteger.valueOf(number - rPlan.getNumber()))
+					.add(BigInteger.valueOf(block.getTimestamp().getTime())).longValue());
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}
 		queryRPPlanDetailResp.setRPPlan(detailsRPPlanResps);

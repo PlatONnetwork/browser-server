@@ -49,7 +49,11 @@ public class CustomDelegation extends Delegation {
         return YesNoEnum.getEnum(this.getIsHistory());
     }
 
-
+    /**
+     * 委托是否历史类型枚举类：
+     *  1.是
+     *  2.否
+     */
     public enum YesNoEnum{
         YES(1, "是"),
         NO(2, "否")

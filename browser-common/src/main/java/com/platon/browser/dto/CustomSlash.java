@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/16 15:37
- * @Description:
+ * @Description: 惩罚实体扩张类
  */
 @Data
 public class CustomSlash extends Slash {
@@ -35,6 +35,11 @@ public class CustomSlash extends Slash {
         this.setIsQuit(YesNoEnum.YES.code);
     }
 
+    /**
+     * 举报成败类型枚举类：
+     *  1.成功
+     *  2.失败
+     */
     public enum StatusEnum{
         FAILURE(1, "失败"),
         SUCCESS(2, "成功")
@@ -57,6 +62,11 @@ public class CustomSlash extends Slash {
         public static boolean contains(StatusEnum en){return ENUMS.containsValue(en);}
     }
 
+    /**
+     * 是否退出类型枚举类：
+     *  1.是
+     *  2.否
+     */
 
     public enum YesNoEnum{
         YES(1, "是"),

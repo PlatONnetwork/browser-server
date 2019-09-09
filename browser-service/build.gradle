@@ -9,4 +9,6 @@ dependencies {
     compile "javax.servlet:javax.servlet-api:$servletVersion"
     compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
     compile "org.jsoup:jsoup:$jsoupVersion"
+    compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
+
 }

@@ -187,7 +187,7 @@ public class NewSettleEpochHandler implements EventHandler {
             curStaking.setStakingLocked(stakingLocked.toString());
             curStaking.setStakingHas(BigInteger.ZERO.toString());
             // 当前结算周期轮数-减持质押时的结算轮数>=指定的质押退回所要经过的结算周期轮数
-            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnstakeRefundSettlePeriodCount().longValue()){
+            if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnStakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
             // 犹豫期+锁定期+退回中==0
@@ -267,8 +267,8 @@ public class NewSettleEpochHandler implements EventHandler {
                         private BigDecimal getAnnualizedRate(){
                             if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
                             BigDecimal rate = new BigDecimal(profitSum)
-                                    .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR)
-                                    .multiply(new BigDecimal(bc.getSettleEpochCountPerIssueEpoch()))
+                                    .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR) // 除总成本
+                                    .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
                                     .multiply(BigDecimal.valueOf(100));
                             return rate.setScale(2,RoundingMode.FLOOR);
                         }

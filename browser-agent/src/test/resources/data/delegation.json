@@ -1,0 +1,14 @@
+[ 
+{ 
+"delegate_addr":"0xf20c948533b35112d8c8df7f5e907b3b3a275cb3",
+"staking_block_num":21698,
+"node_id":"0xf3ab2eb688347ad77185c993c9a0e78af595867350b7abe6582405411257781768fb873b7c7a63b7dfc9c88c02199f4a20eb60c4b68597b228868ccc63634e69",
+"delegate_has":"0",
+"delegate_locked":"1420000000000000000000",
+"delegate_reduction":"0",
+"is_history":2,
+"sequence":277210000,
+"create_time":"2019-09-09 17:17:59",
+"update_time":"2019-09-09 17:17:59",
+"cur_delegation_block_num":27721
+}]

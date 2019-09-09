@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.staking;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -35,7 +36,9 @@ public class IncreaseStakingHandler implements EventHandler {
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithIncreaseStakingParam(param);
+            param.setNodeName(latestStaking.getStakingName());
             stakingStage.modifyStaking(latestStaking,tx);
+            tx.setTxInfo(JSONObject.toJSONString(param));
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
         }

@@ -12,6 +12,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -193,8 +194,7 @@ public class TxParamResolver {
                         //结束轮转换结束区块高度
 
                         CreateProposalUpgradeParam createProposalUpgradeParam = new CreateProposalUpgradeParam();
-                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpidid,endBlockRound.intValue(),
-                                newVersion.intValue());
+                        createProposalUpgradeParam.init(upgradeVerifier,upgradelpidid,new BigDecimal(endBlockRound),newVersion.intValue());
                         result.param = createProposalUpgradeParam;
                         break;
                     case CANCEL_PROPOSAL: // 2005
@@ -212,7 +212,7 @@ public class TxParamResolver {
 
 
                         CancelProposalParam cancelProposalParam = new CancelProposalParam();
-                        cancelProposalParam.init(cancelVerifier,cancelpidid,cancelEndBlockRound.intValue(),canceledProposalID);
+                        cancelProposalParam.init(cancelVerifier,cancelpidid,new BigDecimal(cancelEndBlockRound),canceledProposalID);
                         result.param = cancelProposalParam;
                         break;
                     case VOTING_PROPOSAL: // 2003

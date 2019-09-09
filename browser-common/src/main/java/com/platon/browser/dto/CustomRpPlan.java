@@ -5,9 +5,9 @@ import com.platon.browser.dao.entity.RpPlan;
 import java.util.Date;
 
 /**
- * User: dongqile
- * Date: 2019/8/31
- * Time: 16:44
+ * @Auther: dongqile
+ * @Date: 2019/8/31 16:44
+ * @Description: 锁仓计划实体扩展类
  */
 public class CustomRpPlan extends RpPlan {
     public CustomRpPlan(){
