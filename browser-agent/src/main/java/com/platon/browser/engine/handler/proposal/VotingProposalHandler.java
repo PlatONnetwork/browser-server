@@ -25,10 +25,10 @@ import static com.platon.browser.engine.BlockChain.*;
 public class VotingProposalHandler implements EventHandler {
 
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandler.class);
-    
+
     @Autowired
     private BlockChain bc;
-    
+
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
         try{
@@ -71,7 +71,7 @@ public class VotingProposalHandler implements EventHandler {
 
             // 记录操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
-            nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+            nodeOpt.updateWithCustomTransaction(tx);
             String desc = CustomNodeOpt.TypeEnum.VOTE.tpl
                     .replace("ID",proposal.getPipId().toString())
                     .replace("TITLE",proposal.getTopic())
