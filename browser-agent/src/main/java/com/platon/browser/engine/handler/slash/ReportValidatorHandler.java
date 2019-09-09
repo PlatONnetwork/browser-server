@@ -80,7 +80,7 @@ public class ReportValidatorHandler implements EventHandler {
 
             // 设置节点统计数据中的多签举报次数
             node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
-            STAGE_DATA.getStakingStage().insertNode(node);
+            STAGE_DATA.getStakingStage().updateNode(node);
 
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
