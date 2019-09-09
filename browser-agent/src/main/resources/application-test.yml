@@ -61,6 +61,6 @@ platon.config:
   # 初始内置节点默认质押金额(LAT)
   defaultStakingLockedAmount: 10000000
   #提案url参数模板
-  proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
+  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-{pip_id}.md
   #keysBase网址
   keyBase: https://keybase.io/
