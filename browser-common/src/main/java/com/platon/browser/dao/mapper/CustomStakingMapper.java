@@ -23,6 +23,6 @@ public interface CustomStakingMapper {
 	
 	List<StakingNode> selectStakingAndNodeByNodeId(@Param("nodeId") String node_id);
 	
-	Page<StakingNode> selectHistoryNode(@Param("statusList") List<Integer> statusList);
+	Page<StakingNode> selectHistoryNode(@Param("key") String key, @Param("statusList") List<Integer> statusList);
 
 }

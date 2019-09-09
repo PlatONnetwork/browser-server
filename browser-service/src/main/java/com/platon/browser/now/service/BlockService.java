@@ -57,5 +57,5 @@ public interface BlockService {
 	 * @param date
 	 * @return
 	 */
-	public BlockDownload blockListByNodeIdDownload(String nodeId, String date);
+	public BlockDownload blockListByNodeIdDownload(String nodeId, String date, String local);
 }

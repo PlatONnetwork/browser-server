@@ -26,4 +26,21 @@ public class I18nUtil {
         String msg = messageSource.getMessage(key.name().toLowerCase(),param, locale);
         return msg;
     }
+    
+    public String i( I18nEnum key, String localStr, Object... param){
+    	/** 获取locale */
+    	Locale locale = Locale.forLanguageTag(localStr);
+        /** 加载对应key的中英文 */
+        String msg = messageSource.getMessage(key.name().toLowerCase(),param, locale);
+        return msg;
+    }
+    
+    public String getMessageForStr( String key, String localStr, Object... param){
+    	I18nEnum keyI18 = I18nEnum.valueOf(key);
+    	/** 获取locale */
+        Locale locale = Locale.forLanguageTag(localStr);
+        /** 加载对应key的中英文 */
+        String msg = messageSource.getMessage(keyI18.name().toLowerCase(),param, locale);
+        return msg;
+    }
 }

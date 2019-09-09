@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+import com.platon.browser.config.CustomVersionSerializer;
 
 /**
  * 交易详情返回对象
@@ -249,6 +250,7 @@ public class TransactionDetailsResp {
 	public void setDetails(String details) {
 		this.details = details;
 	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
 	public String getProgramVersion() {
 		return programVersion;
 	}
@@ -305,6 +307,7 @@ public class TransactionDetailsResp {
 	public void setProposalNewVersion(String proposalNewVersion) {
 		this.proposalNewVersion = proposalNewVersion;
 	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
 	public String getDeclareVersion() {
 		return declareVersion;
 	}

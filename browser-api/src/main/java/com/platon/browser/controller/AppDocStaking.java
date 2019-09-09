@@ -266,7 +266,13 @@ public interface AppDocStaking {
      *         "timestamp":"",         //创建时间
      *         "desc":"",              //操作描述（code表示）\r\n1 create 创建 \r\n2 modify 修改\r\n3 quit 退出\r\n4 proposals 提案\r\n5 vote 投票\r\n6 signatures 双签\r\n7 lowBlockRate 出块率低 
      *         "txHash":"",            //所属交易
-     *         "blockNumber":11        //所属区块
+     *         "blockNumber":11,        //所属区块
+     *         "type":"",    			//操作描述（code表示）\r\n1 create 创建 \r\n2 modify 修改\r\n3 quit 退出\r\n4 proposals 提案\r\n5 vote 投票\r\n6 signatures 双签\r\n7 lowBlockRate 出块率低
+     *         "id":"",    //提案id
+     *         "title":"",    //提案标题
+     *         "option":"",    //提案选项
+     *         "percent":"",    //处罚百分比
+     *         "amount":""  //处罚金额
      *      }
      *   ]
      * }

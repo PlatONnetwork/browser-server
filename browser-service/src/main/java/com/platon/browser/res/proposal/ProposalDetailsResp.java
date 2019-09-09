@@ -2,6 +2,7 @@ package com.platon.browser.res.proposal;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomRateSerializer;
+import com.platon.browser.config.CustomVersionSerializer;
 
 /**
  *提案详情返回对象
@@ -106,6 +107,7 @@ public class ProposalDetailsResp {
 	public void setActiveBlock(String activeBlock) {
 		this.activeBlock = activeBlock;
 	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
 	public String getNewVersion() {
 		return newVersion;
 	}

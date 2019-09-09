@@ -164,7 +164,7 @@ public class TransactionServiceImpl implements TransactionService {
     	return lists;
     }
 
-    public AccountDownload transactionListByAddressDownload(String address, String date) {
+    public AccountDownload transactionListByAddressDownload(String address, String date,String local) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
@@ -201,7 +201,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
                     DateUtil.getGMT(transaction.getTimestamp()),
-                    CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).getDesc(),
+                    i18n.getMessageForStr(CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).toString(), local),
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
@@ -223,15 +223,15 @@ public class TransactionServiceImpl implements TransactionService {
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         /** 设置导出表的表头 */
         writer.writeHeaders(
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT),
-                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE)
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_HASH, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TYPE, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FROM, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TO, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_IN, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_VALUE_OUT, local),
+                i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_FEE, local)
         );
         writer.writeRowsAndClose(rows);
         /** 设置返回对象  */
@@ -259,7 +259,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setReceiveType("account");
     		/** 如果数据值为null 则置为空 */
     		if("null".equals(transaction.getTxInfo())) {
-    			resp.setTxInfo("");
+    			resp.setTxInfo("0x");
     		}
     		/*
     		 * "first":false,            //是否第一条记录
@@ -482,6 +482,7 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setVoteStatus(customVoteProposal.getOption());
 						}
 						break;
+						//版本申明
 					case DECLARE_VERSION:
 						DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());

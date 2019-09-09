@@ -24,4 +24,10 @@ public class BrowserConst {
 	/** pre*/
 	public final static String WALLET_PRX = "0x";
 	
+	/** 操作表分隔符*/
+	public final static String OPT_SPILT = "\\|";
+	
+	/** pip前缀*/
+	public final static String PIP_NAME = "PIP-";
+	
 }

@@ -63,7 +63,7 @@ public class BlockServiceImplTest {
 	public void blockListByNodeIdDownload() {
 		String nodeId = "0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc";
 		String date = "2019-08-22";
-		BlockDownload download = blockService.blockListByNodeIdDownload(nodeId, date);
+		BlockDownload download = blockService.blockListByNodeIdDownload(nodeId, date, "en");
 		assertNotNull(download.getData());
 	}
 	
