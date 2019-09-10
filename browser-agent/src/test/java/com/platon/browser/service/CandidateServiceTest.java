@@ -5,8 +5,11 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.exception.CandidateException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -16,6 +19,7 @@ import org.web3j.platon.contracts.NodeContract;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -44,6 +48,9 @@ public class CandidateServiceTest extends TestBase {
     @Mock
     private SpecialContractApi sca;
 
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
+
     @Before
     public void setup() throws Exception {
         ReflectionTestUtils.setField(candidateService, "blockChain", blockChain);
@@ -67,12 +74,20 @@ public class CandidateServiceTest extends TestBase {
 
     @Test
     public void testGetVerifiers() throws Exception {
+        // 模拟正常流程
         when(blockChain.getCurSettingEpoch()).thenReturn(BigInteger.valueOf(2));
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(1600));
         when(candidateService.getCurVerifiers()).thenReturn(verifiers);
         when(candidateService.getVerifiers(anyLong())).thenCallRealMethod();
         CandidateService.CandidateResult cr = candidateService.getVerifiers(20000L);
         assertEquals(cr.getPre().size(),verifiers.size());
+
+        //模拟获取结算周期历史验证人失败
+        when(sca.getHistoryVerifierList(any(),any(BigInteger.class))).thenCallRealMethod();
+        thrown.expect(CandidateException.class);
+        candidateService.getVerifiers(20000L);
+
+
     }
 
     @Test
