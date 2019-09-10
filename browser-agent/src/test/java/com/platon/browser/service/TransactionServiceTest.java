@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
  * @Date: 2019/9/7 09:32
  * @Description: 交易服务单元测试
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TransactionServiceTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(TransactionServiceTest.class);
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);

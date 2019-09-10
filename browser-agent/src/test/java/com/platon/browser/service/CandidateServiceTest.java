@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
  * @Date: 2019/9/9 20:30
  * @Description:
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CandidateServiceTest extends TestBase {
 
     @Mock
@@ -53,15 +53,13 @@ public class CandidateServiceTest extends TestBase {
         when(sca.getHistoryVerifierList(any(),any(BigInteger.class))).thenReturn(verifiers);
         when(sca.getHistoryValidatorList(any(),any(BigInteger.class))).thenReturn(validators);
         when(candidateService.getCurCandidates()).thenReturn(candidates);
-        when(candidateService.getCurVerifiers()).thenReturn(verifiers);
-        when(candidateService.getCurValidators()).thenReturn(validators);
-
     }
 
     @Test
     public void testInitParam() throws Exception {
         when(candidateService.getInitParam()).thenCallRealMethod();
         when(chainConfig.getExpectBlockCount()).thenReturn(BigInteger.TEN);
+        when(candidateService.getCurVerifiers()).thenReturn(verifiers);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(10000000));
         CandidateService.InitParam initParam = candidateService.getInitParam();
         assertEquals(verifiers.size(),initParam.getNodes().size());
@@ -71,8 +69,19 @@ public class CandidateServiceTest extends TestBase {
     public void testGetVerifiers() throws Exception {
         when(blockChain.getCurSettingEpoch()).thenReturn(BigInteger.valueOf(2));
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(1600));
+        when(candidateService.getCurVerifiers()).thenReturn(verifiers);
         when(candidateService.getVerifiers(anyLong())).thenCallRealMethod();
         CandidateService.CandidateResult cr = candidateService.getVerifiers(20000L);
         assertEquals(cr.getPre().size(),verifiers.size());
+    }
+
+    @Test
+    public void testGetValidators() throws Exception {
+        when(blockChain.getCurConsensusEpoch()).thenReturn(BigInteger.valueOf(2));
+        when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(40));
+        when(candidateService.getCurValidators()).thenReturn(validators);
+        when(candidateService.getValidators(anyLong())).thenCallRealMethod();
+        CandidateService.CandidateResult cr = candidateService.getValidators(20000L);
+        assertEquals(cr.getPre().size(),validators.size());
     }
 }
