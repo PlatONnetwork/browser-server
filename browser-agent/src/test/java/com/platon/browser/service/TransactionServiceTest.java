@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,9 +54,9 @@ public class TransactionServiceTest extends TestBase {
     public void setup() throws IOException, BeanCreateOrUpdateException {
         ReflectionTestUtils.setField(transactionService, "executor", THREAD_POOL);
         ReflectionTestUtils.setField(transactionService, "client", client);
-        when(transactionService.analyze(Mockito.anyList())).thenCallRealMethod();
-        when(transactionService.updateTransaction(Mockito.any(CustomTransaction.class))).thenCallRealMethod();
-        when(transactionService.getReceipt(Mockito.any(TransactionBean.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
+        when(transactionService.analyze(anyList())).thenCallRealMethod();
+        when(transactionService.updateTransaction(any(CustomTransaction.class))).thenCallRealMethod();
+        when(transactionService.getReceipt(any(TransactionBean.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
             TransactionBean tx = invocation.getArgument(0);
             TransactionReceipt receipt = new TransactionReceipt();
             BeanUtils.copyProperties(tx,receipt);

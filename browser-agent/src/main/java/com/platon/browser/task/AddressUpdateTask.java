@@ -29,6 +29,9 @@ public class AddressUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTask.class);
     @Autowired
     private PlatonClient client;
+    @Autowired
+    private SpecialContractApi sca;
+
     @Scheduled(cron = "0/10 * * * * ?")
     private void cron () {start();}
 
@@ -39,21 +42,18 @@ public class AddressUpdateTask {
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
-            BaseResponse <List<RestrictingBalance>> response = SpecialContractApi.getRestrictingBalance(client.getWeb3j(),params);
-            if(response.isStatusOk()&&response.data!=null&&response.data.size()>0){
-                List <RestrictingBalance> data = response.data;
-                Map<String,RestrictingBalance> map = new HashMap<>();
-                data.forEach(rb->map.put(rb.getAccount(),rb));
-                addresses.forEach(address->{
-                    RestrictingBalance rb = map.get(address.getAddress());
-                    if(rb!=null){
-                        address.setRestrictingBalance(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0");
-                        address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
-                        // 把改动后的内容暂存至待更新列表
-                        STAGE_DATA.getAddressStage().updateAddress(address);
-                    }
-                });
-            }
+            List<RestrictingBalance> data = sca.getRestrictingBalance(client.getWeb3j(),params);
+            Map<String,RestrictingBalance> map = new HashMap<>();
+            data.forEach(rb->map.put(rb.getAccount(),rb));
+            addresses.forEach(address->{
+                RestrictingBalance rb = map.get(address.getAddress());
+                if(rb!=null){
+                    address.setRestrictingBalance(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0");
+                    address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
+                    // 把改动后的内容暂存至待更新列表
+                    STAGE_DATA.getAddressStage().updateAddress(address);
+                }
+            });
         } catch (Exception e) {
             logger.error("锁仓合约查询余额出错:{}",e.getMessage());
         }
