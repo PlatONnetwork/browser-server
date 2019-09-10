@@ -50,6 +50,8 @@ public class BlockChainConfig {
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量
     private BigInteger consensusValidatorCount;
+    //【通用】每个增发周期的分钟数
+    private BigInteger additionalCycleMinutes;
     //【通用】每个增发周期内的结算周期数
     private BigInteger settlePeriodCountPerIssue;
     //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
@@ -151,8 +153,10 @@ public class BlockChainConfig {
         this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
         //【通用】每个共识轮验证节点数量
         this.consensusValidatorCount=ecr.getCommon().getValidatorCount();
-        //【通用】每个增发周期内的结算周期数
-        this.settlePeriodCountPerIssue=ecr.getCommon().getAdditionalCycleTime();
+        //【通用】增发周期规定的分钟数
+        this.additionalCycleMinutes=ecr.getCommon().getAdditionalCycleTime();
+        //【通用】每个增发周期内的结算周期数=增发周期规定的分钟数/结算周期规定的分钟数
+        this.settlePeriodCountPerIssue=this.additionalCycleMinutes.divide(this.expectedMinutes);
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
         this.blockInterval=this.nodeBlockTimeWindow.divide(this.expectBlockCount);
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
@@ -162,8 +166,11 @@ public class BlockChainConfig {
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
                 .multiply(this.consensusPeriodBlockCount);
-        //【通用】每个增发周期区块总数=每个增发周期内的结算周期数x结算周期区块数
-        this.addIssuePeriodBlockCount=this.settlePeriodCountPerIssue.multiply(this.settlePeriodBlockCount);
+        //【通用】每个增发周期区块总数=ROUND_DOWN(增发周期的时间x60/(出块间隔x结算周期区块数))x结算周期区块数
+        this.addIssuePeriodBlockCount=this.additionalCycleMinutes
+                .multiply(BigInteger.valueOf(60))
+                .divide(this.blockInterval.multiply(this.settlePeriodBlockCount))
+                .multiply(this.settlePeriodBlockCount);
         //【质押】创建验证人最低的质押Token数(LAT)
         this.stakeThreshold= Convert.fromVon(ecr.getStaking().getStakeThreshold(), Convert.Unit.LAT);
         //【质押】委托人每次委托及赎回的最低Token数(LAT)
