@@ -117,11 +117,12 @@ public class NetworkStatStatisticHandler implements EventHandler {
              */
             NETWORK_STAT_CACHE.setDoingProposalQty(0);
             PROPOSALS_CACHE.getAllProposal().forEach(proposal -> {
-                if (proposal.getStatus().equals(StatusEnum.VOTING.code)) {
-                    NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
-                }
                 if (proposal.getType().equals(TypeEnum.UPGRADE.code)) {
                     if (proposal.getStatus().equals(StatusEnum.PASS.code) || proposal.getStatus().equals(StatusEnum.PRE_UPGRADE.code)) {
+                        NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
+                    }
+                }else {
+                    if (proposal.getStatus().equals(StatusEnum.VOTING.code)) {
                         NETWORK_STAT_CACHE.setDoingProposalQty(NETWORK_STAT_CACHE.getDoingProposalQty() + 1);
                     }
                 }
