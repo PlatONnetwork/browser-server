@@ -4,7 +4,6 @@ package com.platon.browser.config.bean;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @Data
 public class Gov {

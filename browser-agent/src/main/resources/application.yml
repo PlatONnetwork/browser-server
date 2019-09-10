@@ -1,6 +1,7 @@
 # ***************************通用配置**************************** #
 #Spring应用配置
 spring:
+  profiles.active: test
   application.name: browser-agent
   #Redis集群配置
   redis:

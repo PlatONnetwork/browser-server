@@ -52,7 +52,7 @@ public class VoteServiceImpl implements VoteService {
                 VoteListResp resp = BeanConvertUtil.beanConvert(vote, VoteListResp.class);
                 resp.setVoter(vote.getVerifier());
                 resp.setVoterName(vote.getVerifierName());
-                resp.setTxHash(voteListRequest.getProposalHash());
+                resp.setTxHash(vote.getHash());
                 voteListResps.add(resp);
             });
             respPage.setTotalPages(page.getPages());

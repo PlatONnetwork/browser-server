@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.filters.BlockFilter;
 
-@SpringBootTest(classes= BrowserAgentApplication.class, value = "spring.profiles.active=cdm")
+@SpringBootTest(classes= BrowserAgentApplication.class, value = "spring.profiles.active=test")
 public class TestBase {
     @Autowired
     private PlatonClient client;
