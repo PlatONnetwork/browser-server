@@ -75,7 +75,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
                             case CANCEL_PROPOSAL:// 取消提案
                             case CREATE_PROPOSAL_TEXT:// 创建文本提案
                             case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-                            case DECLARE_VERSION:// 版本声明
+                            //case DECLARE_VERSION:// 版本声明
                                 //累计提案总数
                                 NETWORK_STAT_CACHE.setProposalQty(NETWORK_STAT_CACHE.getProposalQty() + 1);
                                 break;
