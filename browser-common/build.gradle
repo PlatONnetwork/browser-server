@@ -1,3 +1,7 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+}
+apply plugin: 'io.spring.dependency-management'
 dependencies {
     implementation ("org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisSpringbootStarterVersion")
     compile ("com.github.pagehelper:pagehelper-spring-boot-starter:$pagehelperSpringbootStarterVersion")
@@ -9,5 +13,7 @@ dependencies {
     }
     compile "com.platon.client:core:$platonClientVersion"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 }
 

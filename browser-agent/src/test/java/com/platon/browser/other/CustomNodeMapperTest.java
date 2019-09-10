@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.CustomNodeMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,14 +37,14 @@ public class CustomNodeMapperTest extends TestBase {
 
     @Test
     public void selectValidators(){
-        //List<CustomNode> nodeBeans = customNodeMapper.selectVerifiers();
+        List<CustomNode> nodeBeans = customNodeMapper.selectAll();
 
         List<String> nodeIds = new ArrayList<>();
-        //nodeBeans.forEach(nodeBean -> nodeIds.add(nodeBean.getNodeId()));
+        nodeBeans.forEach(nodeBean -> nodeIds.add(nodeBean.getNodeId()));
 
         List<CustomStaking> stakingBeans = customStakingMapper.selectByNodeIdList(nodeIds);
 
-        //logger.debug("{}",nodeBeans);
+        logger.debug("{}",nodeBeans);
     }
 
     @Test
