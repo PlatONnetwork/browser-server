@@ -18,6 +18,7 @@ import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,22 +49,30 @@ public class CandidateServiceTest extends TestBase {
         ReflectionTestUtils.setField(candidateService, "blockChain", blockChain);
         ReflectionTestUtils.setField(candidateService, "chainConfig", chainConfig);
         ReflectionTestUtils.setField(candidateService, "client", client);
-        ReflectionTestUtils.setField(candidateService, "dbService", dbService);
         ReflectionTestUtils.setField(candidateService, "sca", sca);
         when(sca.getHistoryVerifierList(any(),any(BigInteger.class))).thenReturn(verifiers);
         when(sca.getHistoryValidatorList(any(),any(BigInteger.class))).thenReturn(validators);
-        when(chainConfig.getExpectBlockCount()).thenReturn(BigInteger.TEN);
-        when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(10000000));
         when(candidateService.getCurCandidates()).thenReturn(candidates);
         when(candidateService.getCurVerifiers()).thenReturn(verifiers);
         when(candidateService.getCurValidators()).thenReturn(validators);
-        when(candidateService.getInitParam()).thenCallRealMethod();
+
     }
 
     @Test
     public void testInitParam() throws Exception {
+        when(candidateService.getInitParam()).thenCallRealMethod();
+        when(chainConfig.getExpectBlockCount()).thenReturn(BigInteger.TEN);
+        when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(10000000));
         CandidateService.InitParam initParam = candidateService.getInitParam();
         assertEquals(verifiers.size(),initParam.getNodes().size());
     }
 
+    @Test
+    public void testGetVerifiers() throws Exception {
+        when(blockChain.getCurSettingEpoch()).thenReturn(BigInteger.valueOf(2));
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(1600));
+        when(candidateService.getVerifiers(anyLong())).thenCallRealMethod();
+        CandidateService.CandidateResult cr = candidateService.getVerifiers(20000L);
+        assertEquals(cr.getPre().size(),verifiers.size());
+    }
 }

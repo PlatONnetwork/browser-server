@@ -46,8 +46,6 @@ public class CandidateService {
     @Autowired
     private PlatonClient client;
     @Autowired
-    private DbService dbService;
-    @Autowired
     private SpecialContractApi sca;
 
     @Data
