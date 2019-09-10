@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.NodeBean;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
@@ -8,6 +9,7 @@ import com.platon.browser.exception.CacheConstructException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.platon.bean.Node;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +24,7 @@ import java.util.*;
 public class TestBase {
     private static Logger logger = LoggerFactory.getLogger(TestBase.class);
     private static String prefix = "data/",suffix=".json",encode="UTF8";
-    private static String[] dataFile = {"node","block","transaction","staking","delegation","unDelegation"};
+    private static String[] dataFile = {"node","block","transaction","staking","delegation","unDelegation","verifier","validator","candidate"};
 
     public static NodeCache NODE_CACHE = new NodeCache();
     public static List<CustomNode> nodes= Collections.EMPTY_LIST;
@@ -31,6 +33,10 @@ public class TestBase {
     public static List<CustomStaking> stakings= Collections.EMPTY_LIST;
     public static List<CustomDelegation> delegations= Collections.EMPTY_LIST;
     public static List<CustomUnDelegation> unDelegations= Collections.EMPTY_LIST;
+    public static List<Node> verifiers= new ArrayList<>();
+    public static List<Node> validators= new ArrayList<>();
+    public static List<Node> candidates= new ArrayList<>();
+
     static {
         Arrays.asList(dataFile).forEach(fileName->{
             try {
@@ -57,7 +63,18 @@ public class TestBase {
                     case "unDelegation":
                         unDelegations = JSON.parseArray(content,CustomUnDelegation.class);
                         break;
-
+                    case "verifier":
+                        List<NodeBean> verList = JSON.parseArray(content,NodeBean.class);
+                        verifiers.addAll(verList);
+                        break;
+                    case "validator":
+                        List<NodeBean> valList = JSON.parseArray(content,NodeBean.class);
+                        validators.addAll(valList);
+                        break;
+                    case "candidate":
+                        List<NodeBean> canList = JSON.parseArray(content,NodeBean.class);
+                        candidates.addAll(canList);
+                        break;
                 }
             } catch (IOException e) {
                 e.printStackTrace();

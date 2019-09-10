@@ -1,18 +1,19 @@
 package com.platon.browser.service;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 import static java.lang.String.format;
 
 /**
@@ -47,56 +47,19 @@ public class CandidateService {
     private PlatonClient client;
     @Autowired
     private DbService dbService;
+    @Autowired
+    private SpecialContractApi sca;
 
-    /**
-     * 从指定区块号初始化BlockChain的共识周期验证人
-     * @param blockNumber
-     * @throws BlockNumberException
-     * @throws CandidateException
-     */
-    public void initValidator(Long blockNumber) throws BlockNumberException, CandidateException {
-        BaseResponse<List <Node>> result;
-        // 取入参区块号的前一共识周期结束块号，因此可以通过它查询前一共识周期验证人历史列表
-        Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
-        try {
-            result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
-        }
-        if (!result.isStatusOk()) {
-            throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
-        }else{
-            blockChain.getPreValidator().clear();
-            result.data.stream().filter(Objects::nonNull).forEach(node -> blockChain.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
-        }
+    @Data
+    public static class CandidateResult{
+        private List<Node> pre;
+        private List<Node> cur;
+    }
 
-        // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
-        try {
-            result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),nextEpochLastBlockNumber);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CandidateException(format("【查询当前共识周期验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
-        }
-        if (!result.isStatusOk()) {
-            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
-            try {
-                result = client.getNodeContract().getValidatorList().send();
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e.getMessage()));
-            }
-            if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",result.errMsg));
-            }
-        }
-        blockChain.getCurValidator().clear();
-        result.data.stream().filter(Objects::nonNull).forEach(node -> blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-
-        if(blockChain.getCurValidator().size()==0){
-            throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+blockChain.getCurConsensusEpoch()+")");
-        }
+    @Data
+    public static class InitParam{
+        private List<CustomNode> nodes=new ArrayList<>();
+        private List<CustomStaking> stakings=new ArrayList<>();
     }
 
     /**
@@ -105,94 +68,115 @@ public class CandidateService {
      * @throws CandidateException
      * @throws BlockNumberException
      */
-    public void initVerifier (Long blockNumber) throws CandidateException, BlockNumberException {
-        BaseResponse<List<Node>> result;
+    public CandidateResult getVerifiers(Long blockNumber) throws CandidateException, BlockNumberException {
+        CandidateResult cr = new CandidateResult();
         // ==================================更新前一周期验证人列表=======================================
         // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getSettlePeriodBlockCount().longValue());
         try {
-            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
+            cr.pre = sca.getHistoryVerifierList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
+            logger.debug("前一轮结算周期(未块:{})验证人:{}",prevEpochLastBlockNumber,JSON.toJSONString(cr.pre,true));
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
-        }
-        if (!result.isStatusOk()) {
-            throw new CandidateException(format("【查询前轮结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",prevEpochLastBlockNumber,result.errMsg));
-        }else{
-            blockChain.getPreVerifier().clear();
-            result.data.stream().filter(Objects::nonNull).forEach(node -> blockChain.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+            throw new CandidateException(format("【查询前轮结算验证人-底层出错】使用块号【%s】查询结算周期验证人出错:%s",prevEpochLastBlockNumber,e.getMessage()));
         }
 
         // ==================================更新当前周期验证人列表=======================================
-        BigInteger nextEpochLastBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
+        blockChain.getCurVerifier().clear();
         try {
-            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),nextEpochLastBlockNumber);
+            cr.cur = sca.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
+            logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(cr.cur,true));
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new CandidateException(format("【查询当前结算验证人-底层出错】查询块号在【%s】的结算周期验证人历史出错:%s]",nextEpochLastBlockNumber,e.getMessage()));
-        }
-        if (!result.isStatusOk()) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             try {
-                result = client.getNodeContract().getVerifierList().send();
-            } catch (Exception e) {
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e.getMessage()));
-            }
-            if(!result.isStatusOk()){
-                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",result.errMsg));
+                cr.cur=getCurVerifiers();
+                logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(cr.cur,true));
+            } catch (Exception e1) {
+                throw new CandidateException(format("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错:%s",e1.getMessage()));
             }
         }
-        blockChain.getCurVerifier().clear();
-        result.data.stream().filter(Objects::nonNull).forEach(node -> blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
-
-        if(blockChain.getCurVerifier().size()==0){
+        if(cr.cur.size()==0){
             throw new CandidateException("查询不到结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+blockChain.getCurSettingEpoch()+")");
         }
+        return cr;
+    }
+
+    /**
+     * 从指定区块号初始化BlockChain的共识周期验证人
+     * @param blockNumber
+     * @throws BlockNumberException
+     * @throws CandidateException
+     */
+    public CandidateResult getValidators(Long blockNumber) throws BlockNumberException, CandidateException {
+        CandidateResult cr = new CandidateResult();
+        Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
+        try {
+            cr.pre = sca.getHistoryValidatorList(client.getWeb3j(),BigInteger.valueOf(prevEpochLastBlockNumber));
+            logger.debug("前一轮共识周期(未块:{})验证人:{}",prevEpochLastBlockNumber,JSON.toJSONString(cr.pre,true));
+        } catch (Exception e) {
+            throw new CandidateException(format("【查询前轮共识验证人-底层出错】查询块号在【%s】的共识周期验证人历史出错:%s]",prevEpochLastBlockNumber,e.getMessage()));
+        }
+
+        // ==================================更新当前周期验证人列表=======================================
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(prevEpochLastBlockNumber+1);
+        try {
+            cr.cur = sca.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
+            logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(cr.cur,true));
+        } catch (Exception e) {
+            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+            try {
+                cr.cur=getCurValidators();
+                logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(cr.cur,true));
+            } catch (Exception e1) {
+                throw new CandidateException(format("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错:%s",e1.getMessage()));
+            }
+        }
+        if(cr.cur.size()==0){
+            throw new CandidateException("查询不到共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+blockChain.getCurConsensusEpoch()+")");
+        }
+        return cr;
     }
 
     /**
      * 从区块号0初始化BlockChain的共识周期验证人和结算周期验证人
      * @throws Exception
      */
-    public void init() throws Exception {
+    public InitParam getInitParam() throws Exception {
+        InitParam initParam = new InitParam();
         // 如果库里区块为空，则：
         try {
-            // 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识
-            BaseResponse<List<Node>> result = SpecialContractApi.getHistoryValidatorList(client.getWeb3j(),BigInteger.ZERO);
-            if(!result.isStatusOk()){
-                logger.debug("查询实时共识周期验证人列表...");
-                result = client.getNodeContract().getValidatorList().send();
-                if(!result.isStatusOk()){
-                    throw new CandidateException("底层链查询实时共识周期验证节点列表出错:"+result.errMsg);
+            /* 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识 */
+            List<Node> result;
+            try{
+                result = sca.getHistoryValidatorList(client.getWeb3j(),BigInteger.ZERO);
+                logger.debug("共识周期(未块:{})验证人:{}",BigInteger.ZERO, JSON.toJSONString(result,true));
+            }catch (Exception e){
+                BaseResponse<List<Node>> br = client.getNodeContract().getValidatorList().send();
+                if(!br.isStatusOk()){
+                    throw new CandidateException("底层链查询实时共识周期验证节点列表出错:"+br.errMsg);
                 }
+                result=br.data;
             }
-            // 查询内置共识周期验证人初始化blockChain的curValidator属性
             Set<String> validatorSet = new HashSet<>();
-            result.data.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
+            result.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
 
             // 查询所有候选人
             Map<String,Node> candidateMap = new HashMap<>();
-            result = client.getNodeContract().getCandidateList().send();
-            if(!result.isStatusOk()){
-                throw new CandidateException("底层链查询候选验证节点列表出错:"+result.errMsg);
-            }
-            result.data.forEach(node->candidateMap.put(HexTool.prefix(node.getNodeId()),node));
+            result = getCurCandidates();
+            result.forEach(node->candidateMap.put(HexTool.prefix(node.getNodeId()),node));
 
             // 配置中的默认内置节点信息
             Map<String,CustomStaking> defaultStakingMap = new HashMap<>();
             chainConfig.getDefaultStakings().forEach(staking -> defaultStakingMap.put(staking.getNodeId(),staking));
 
-            // 根据区块号0查询结算周期验证人列表并入库
-            result = SpecialContractApi.getHistoryVerifierList(client.getWeb3j(),BigInteger.ZERO);
-            if(!result.isStatusOk()){
-                logger.debug("查询实时结算周期验证人列表...");
-                result = client.getNodeContract().getVerifierList().send();
-                if(!result.isStatusOk()){
-                    throw new CandidateException("底层链查询实时结算周期验证节点列表出错:"+result.errMsg);
-                }
+            /* 根据区块号0查询结算周期验证人列表并入库 */
+            try {
+                result = sca.getHistoryVerifierList(client.getWeb3j(),BigInteger.ZERO);
+                logger.debug("结算周期(未块:{})验证人:{}",BigInteger.ZERO, JSON.toJSONString(result,true));
+            }catch (Exception e){
+                result = getCurVerifiers();
             }
-
-            result.data.stream().filter(Objects::nonNull).forEach(verifier->{
+            result.stream().filter(Objects::nonNull).forEach(verifier->{
                 Node candidate = candidateMap.get(HexTool.prefix(verifier.getNodeId()));
                 // 补充完整属性
                 if(candidate!=null) BeanUtils.copyProperties(candidate,verifier);
@@ -202,7 +186,7 @@ public class CandidateService {
                 node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
                 node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                 node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
-                BlockChain.STAGE_DATA.getStakingStage().insertNode(node);
+                initParam.nodes.add(node);
 
                 CustomStaking staking = new CustomStaking();
                 staking.updateWithNode(verifier);
@@ -222,20 +206,50 @@ public class CandidateService {
                 if(StringUtils.isBlank(staking.getStakingName())&&defaultStaking!=null)
                     staking.setStakingName(defaultStaking.getStakingName());
 
-                // 暂存至新增质押待入库列表
-                BlockChain.STAGE_DATA.getStakingStage().insertStaking(staking);
-
-                // 更新节点名称映射缓存
-                NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName());
+                initParam.stakings.add(staking);
             });
-            BlockChainStage bcr = blockChain.exportResult();
-            dbService.batchSave(Collections.emptyList(),bcr);
-            blockChain.commitResult();
-
-            // 通知质押引擎重新初始化节点缓存
-            blockChain.getStakingExecute().loadNodes();
         } catch (IOException | CacheConstructException | BusinessException e) {
-            throw new CandidateException("查询内置初始验证人列表失败："+e.getMessage());
+            throw new CandidateException("查询内置验证人列表失败："+e.getMessage());
         }
+        return initParam;
+    }
+
+    /**
+     * 获取实时候选人列表
+     * @return
+     * @throws Exception
+     */
+    public List<Node> getCurCandidates() throws Exception {
+        BaseResponse<List<Node>> br = client.getNodeContract().getCandidateList().send();
+        if(!br.isStatusOk()){
+            throw new CandidateException("底层链查询候选验证节点列表出错:"+br.errMsg);
+        }
+        return br.data;
+    }
+
+    /**
+     * 获取实时结算周期验证人列表
+     * @return
+     * @throws Exception
+     */
+    public List<Node> getCurVerifiers() throws Exception {
+        BaseResponse<List<Node>> br = client.getNodeContract().getVerifierList().send();
+        if(!br.isStatusOk()){
+            throw new CandidateException("底层链查询实时结算周期验证节点列表出错:"+br.errMsg);
+        }
+        return br.data;
+    }
+
+    /**
+     * 获取实时共识周期验证人列表
+     * @return
+     * @throws Exception
+     */
+    public List<Node> getCurValidators() throws Exception {
+        BaseResponse<List<Node>> br = client.getNodeContract().getValidatorList().send();
+        if(!br.isStatusOk()){
+            throw new CandidateException("底层链查询实时共识周期验证节点列表出错:"+br.errMsg);
+        }
+        return br.data;
     }
 }

@@ -3,6 +3,7 @@ package com.platon.browser.task;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.AccuVerifiersCount;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
@@ -37,6 +38,8 @@ public class ProposalUpdateTask {
     public static final String QUERY_FLAG = "inquiry";
     @Autowired
     private BlockChain blockChain;
+    @Autowired
+    private SpecialContractApi sca;
 
     /**
      * 同步任务功能说明：
@@ -79,21 +82,17 @@ public class ProposalUpdateTask {
             || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code)) {
                 //发送rpc请求查询提案结果
                 try {
-                    AccuVerifiersCount accuVerifiersCount = new AccuVerifiersCount();
-                    BaseResponse voteInfo = SpecialContractApi.getProposalAccuVerifiers(platonClient.getWeb3j(),proposal.getHash(),blockChain.getCurBlock().getHash());
-                    if(null!=voteInfo.data){
-                        accuVerifiersCount = subString(voteInfo.data.toString());
-                    }
+                    ProposalParticiantStat pps = sca.getProposalParticipants(platonClient.getWeb3j(),proposal.getHash(),blockChain.getCurBlock().getHash());
                     //设置参与人数
-                    proposal.setAccuVerifiers(accuVerifiersCount.getAccuVerifiers().longValue());
+                    proposal.setAccuVerifiers(pps.getVoterCount());
                     //设置赞成票
-                    proposal.setYeas(accuVerifiersCount.getYeas().longValue());
+                    proposal.setYeas(pps.getSupportCount());
                     //设置反对票
-                    proposal.setNays(accuVerifiersCount.getNays().longValue());
+                    proposal.setNays(pps.getOpposeCount());
                     //设置弃权票
-                    proposal.setAbstentions(accuVerifiersCount.getAbstentions().longValue());
+                    proposal.setAbstentions(pps.getAbstainCount());
                     //只有在结束快高之后才有返回提案结果
-                    if(blockChain.getCurBlock().getBlockNumber().longValue()>=Long.valueOf(proposal.getEndVotingBlock()).longValue()){
+                    if(blockChain.getCurBlock().getBlockNumber().longValue()>= Long.parseLong(proposal.getEndVotingBlock())){
                         BaseResponse <TallyResult> result = platonClient.getProposalContract().getTallyResult(proposal.getHash()).send();
                         //设置状态
                         proposal.setStatus(result.data.getStatus());

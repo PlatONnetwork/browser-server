@@ -14,6 +14,7 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.protocol.Web3j;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -25,6 +26,8 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,6 +43,8 @@ public class BlockServiceTest extends TestBase {
     private PlatonClient client;
     @Mock
     private BlockService blockService;
+    @Mock
+    private Web3j web3j;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -50,8 +55,9 @@ public class BlockServiceTest extends TestBase {
     public void setup() throws IOException, BlockCollectingException {
         ReflectionTestUtils.setField(blockService, "executor", THREAD_POOL);
         ReflectionTestUtils.setField(blockService, "client", client);
-        when(blockService.collect(Mockito.anySet())).thenCallRealMethod();
-        when(blockService.getBlock(Mockito.any(),Mockito.any(BigInteger.class))).thenAnswer((Answer<CustomBlock>)invocation->{
+        when(client.getWeb3j()).thenReturn(web3j);
+        when(blockService.collect(anySet())).thenCallRealMethod();
+        when(blockService.getBlock(any(Web3j.class),any(BigInteger.class))).thenAnswer((Answer<CustomBlock>) invocation->{
             BigInteger blockNumber = invocation.getArgument(1);
             CustomBlock block = new CustomBlock();
             block.setNumber(blockNumber.longValue());

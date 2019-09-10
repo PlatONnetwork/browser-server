@@ -12,6 +12,7 @@ import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
 import com.platon.browser.service.TransactionService;
+import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static com.platon.browser.engine.BlockChain.*;
 
 /**
  * @Auther: Chendongming
@@ -77,8 +78,18 @@ public class BlockSyncTask {
         }else{
             blockChain.updateReward(0L);
         }
-        candidateService.initValidator(initBlockNumber);
-        candidateService.initVerifier(initBlockNumber);
+        // 设定指定块号时的结算周期验证人
+        CandidateService.CandidateResult cr = candidateService.getVerifiers(initBlockNumber);
+        blockChain.getPreVerifier().clear();
+        cr.getPre().stream().filter(Objects::nonNull).forEach(node -> blockChain.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+        blockChain.getCurVerifier().clear();
+        cr.getCur().stream().filter(Objects::nonNull).forEach(node -> blockChain.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+        // 设定指定块号时的共识周期验证人
+        cr = candidateService.getValidators(initBlockNumber);
+        blockChain.getPreValidator().clear();
+        cr.getPre().stream().filter(Objects::nonNull).forEach(node -> blockChain.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
+        blockChain.getCurValidator().clear();
+        cr.getCur().stream().filter(Objects::nonNull).forEach(node -> blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
 
         /*
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
@@ -86,7 +97,21 @@ public class BlockSyncTask {
          * 查询内置结算周期验证人初始化blockChain的curVerifier属性
           */
         if(maxBlockNumber==null){
-            candidateService.init();
+            CandidateService.InitParam initParam = candidateService.getInitParam();
+            // 更新节点名称映射缓存
+            initParam.getStakings().forEach(staking -> NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName()));
+            // 把节点放入待入库暂存
+            initParam.getNodes().forEach(node->STAGE_DATA.getStakingStage().insertNode(node));
+            // 把质押放入待入库暂存
+            initParam.getStakings().forEach(staking->STAGE_DATA.getStakingStage().insertStaking(staking));
+            // 导出结果
+            BlockChainStage bcr = blockChain.exportResult();
+            // 批量入库结果
+            dbService.batchSave(Collections.emptyList(),bcr);
+            blockChain.commitResult();
+            // 初始化节点缓存
+            NODE_CACHE.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
+            NODE_CACHE.sweep();
         }
     }
 
