@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @Date: 2019/9/7 09:32
  * @Description: 区块服务单元测试
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockServiceTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(BlockServiceTest.class);
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
