@@ -1,4 +1,4 @@
-package com.platon.browser.service.util;
+package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.TestData;

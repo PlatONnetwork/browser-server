@@ -1,4 +1,4 @@
-package com.platon.browser.service.cache;
+package com.platon.browser.now.service.cache;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.entity.Block;

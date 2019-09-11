@@ -1,4 +1,4 @@
-package com.platon.browser.service.util;
+package com.platon.browser.util;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
