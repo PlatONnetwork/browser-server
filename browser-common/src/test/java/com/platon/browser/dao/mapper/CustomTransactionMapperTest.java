@@ -1,8 +1,6 @@
 package com.platon.browser.dao.mapper;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +23,9 @@ public class CustomTransactionMapperTest extends TestBase {
 		criteria.andHashEqualTo("0x17974c832860b52e6ac099503bb781e31d01d8c515e6f520487b848f8b3763f6");
 		criteria.andBlockNumberEqualTo(28150l);
 		List<TransactionWithBLOBs> list = transactionMapper.selectByExampleWithBLOBs(example);
-		Set<TransactionWithBLOBs> set = new HashSet<>(list);
-		int num = customTransactionMapper.batchInsertOrUpdateSelective(set, TransactionWithBLOBs.Column.values());
+		System.out.println(list.size());
+//		Set<TransactionWithBLOBs> set = new HashSet<>(list);
+//		int num = customTransactionMapper.batchInsertOrUpdateSelective(set, TransactionWithBLOBs.Column.values());
 	}
 
 }
