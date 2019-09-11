@@ -13,6 +13,8 @@ dependencies {
     }
     compile "com.platon.client:core:$platonClientVersion"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
+    testCompile "com.alibaba:druid:$druidVersion"
+    testCompile "mysql:mysql-connector-java:$mysqlConnectorVersion"
     testCompile "org.springframework:spring-test:5.1.6.RELEASE"
 	testCompile "org.springframework.boot:spring-boot-test:2.1.4.RELEASE"
 	testCompile "org.springframework.boot:spring-boot-starter-test"

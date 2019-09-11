@@ -5,7 +5,7 @@
 
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select
-    <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
+    <include refid="com.platon.browser.dao.mapper.SlashMapper.Base_Column_List" />
     from slash where node_id = #{nodeId}
   </select>
 
