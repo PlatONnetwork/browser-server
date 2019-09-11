@@ -9,29 +9,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.web3j.platon.bean.Node;
-import org.web3j.protocol.Web3j;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.platon.contracts.NodeContract;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.verify;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/9 20:30
  * @Description:
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest( { CandidateService.class })
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CandidateServiceTest extends TestBase {
 
     @Mock
@@ -43,26 +38,50 @@ public class CandidateServiceTest extends TestBase {
     @Mock
     private PlatonClient client;
     @Mock
+    private NodeContract nodeContract;
+    @Mock
     private DbService dbService;
+    @Mock
+    private SpecialContractApi sca;
 
     @Before
     public void setup() throws Exception {
-        mockStatic(SpecialContractApi.class);
-
-        List<Node> verifiers = new ArrayList<>();
-        Node node = new Node();
-        verifiers.add(node);
-        when(SpecialContractApi
-                .getHistoryValidatorList(Mockito.any(Web3j.class),Mockito.any(BigInteger.class)).data)
-                .thenReturn(verifiers);
-        List<Node> result = SpecialContractApi.getHistoryValidatorList(mock(Web3j.class),mock(BigInteger.class)).data;
-        assertEquals(result,verifiers);
-        verify(SpecialContractApi.class);
+        ReflectionTestUtils.setField(candidateService, "blockChain", blockChain);
+        ReflectionTestUtils.setField(candidateService, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(candidateService, "client", client);
+        ReflectionTestUtils.setField(candidateService, "sca", sca);
+        when(sca.getHistoryVerifierList(any(),any(BigInteger.class))).thenReturn(verifiers);
+        when(sca.getHistoryValidatorList(any(),any(BigInteger.class))).thenReturn(validators);
+        when(candidateService.getCurCandidates()).thenReturn(candidates);
     }
 
-//    @Test
-    public void testInit() throws Exception {
-        candidateService.init();
+    @Test
+    public void testInitParam() throws Exception {
+        when(candidateService.getInitParam()).thenCallRealMethod();
+        when(chainConfig.getExpectBlockCount()).thenReturn(BigInteger.TEN);
+        when(candidateService.getCurVerifiers()).thenReturn(verifiers);
+        when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(10000000));
+        CandidateService.InitParam initParam = candidateService.getInitParam();
+        assertEquals(verifiers.size(),initParam.getNodes().size());
     }
 
+    @Test
+    public void testGetVerifiers() throws Exception {
+        when(blockChain.getCurSettingEpoch()).thenReturn(BigInteger.valueOf(2));
+        when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(1600));
+        when(candidateService.getCurVerifiers()).thenReturn(verifiers);
+        when(candidateService.getVerifiers(anyLong())).thenCallRealMethod();
+        CandidateService.CandidateResult cr = candidateService.getVerifiers(20000L);
+        assertEquals(cr.getPre().size(),verifiers.size());
+    }
+
+    @Test
+    public void testGetValidators() throws Exception {
+        when(blockChain.getCurConsensusEpoch()).thenReturn(BigInteger.valueOf(2));
+        when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(40));
+        when(candidateService.getCurValidators()).thenReturn(validators);
+        when(candidateService.getValidators(anyLong())).thenCallRealMethod();
+        CandidateService.CandidateResult cr = candidateService.getValidators(20000L);
+        assertEquals(cr.getPre().size(),validators.size());
+    }
 }

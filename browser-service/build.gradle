@@ -15,6 +15,7 @@ dependencies {
     compile "org.jsoup:jsoup:$jsoupVersion"
     compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	testCompile "org.springframework:spring-test:5.1.6.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-test:2.1.4.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-starter-test"
 }

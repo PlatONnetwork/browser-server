@@ -13,7 +13,8 @@ dependencies {
     }
     compile "com.platon.client:core:$platonClientVersion"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    testCompile "org.springframework:spring-test:5.1.6.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-test:2.1.4.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-starter-test"
 }
 
