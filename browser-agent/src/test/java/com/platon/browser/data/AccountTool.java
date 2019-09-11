@@ -35,7 +35,7 @@ public class AccountTool {
 
     private String chainId = "100";
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
-    private Credentials credentials = Credentials.create("a56f68ca7aa51c24916b9fff027708f856650f9ff36cc3c8da308040ebcc7867");
+    private Credentials credentials = Credentials.create("a689f0879f53710e9e0c1025af410a530d6381eebb5916773195326e123b822b");
 //    private Credentials credentials = WalletUtils.loadCredentials("88888888","D:\\Workspace\\browser-server\\browser-agent\\src\\test\\resources\\0127de1d120dc61b57ab51afcc0fa59022a1be94.json");
 
     // 充钱
@@ -46,7 +46,7 @@ public class AccountTool {
                 credentials,
                 chainId,
                 "0x0127de1d120dc61b57ab51afcc0fa59022a1be94",
-                BigDecimal.valueOf(500000000),
+                BigDecimal.valueOf(5),
                 Convert.Unit.LAT
         ).send();
         BigInteger balance = currentValidWeb3j.platonGetBalance("0x0127de1d120dc61b57ab51afcc0fa59022a1be94", DefaultBlockParameterName.LATEST).send().getBalance();

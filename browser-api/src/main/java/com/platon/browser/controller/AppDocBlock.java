@@ -98,7 +98,7 @@ public interface AppDocBlock {
     public RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
-     * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date c.导出节点的区块列表
+     * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date&local=:en c.导出节点的区块列表
      * @apiVersion 1.0.0
      * @apiName blockListByNodeIdDownload
      * @apiGroup block
@@ -116,7 +116,8 @@ public interface AppDocBlock {
 	@ApiOperation(value = "block/blockListByNodeIdDownload", nickname = "", notes = "", tags = { "Block" })
 	@RequestMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" }, method = RequestMethod.GET)
     public void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
-    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, HttpServletResponse response);
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date,
+    		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true)String local,HttpServletResponse response);
 	
 	
     /**

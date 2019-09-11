@@ -30,6 +30,7 @@ public class QueryDetailResp {
     private String contractName;        //合约名称
     private String contractCreate;      //合约创建者地址
     private String contractCreateHash; //合约创建哈希
+    private Integer isRestricting; //是否锁仓
 	public Integer getType() {
 		return type;
 	}
@@ -152,6 +153,12 @@ public class QueryDetailResp {
 	}
 	public void setContractCreateHash(String contractCreateHash) {
 		this.contractCreateHash = contractCreateHash;
+	}
+	public Integer getIsRestricting() {
+		return isRestricting;
+	}
+	public void setIsRestricting(Integer isRestricting) {
+		this.isRestricting = isRestricting;
 	}
     
 }

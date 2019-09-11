@@ -65,6 +65,7 @@ public interface AppDocAddress {
      *       "contractName":"",        //合约名称
      *       "contractCreate":"",      //合约创建者地址
      *       "contractCreateHash":"",  //合约创建哈希
+     *       "isRestricting":""  //是否有锁仓交易 0-无  1-有
      *    }
      * }
      */

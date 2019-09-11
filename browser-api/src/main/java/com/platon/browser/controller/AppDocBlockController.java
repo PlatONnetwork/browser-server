@@ -57,8 +57,8 @@ public class AppDocBlockController implements AppDocBlock {
 	}
 
 	@Override
-	public void blockListByNodeIdDownload(String nodeId, String date, HttpServletResponse response) {
-		BlockDownload blockDownload = blockService.blockListByNodeIdDownload(nodeId, date);
+	public void blockListByNodeIdDownload(String nodeId, String date, String local, HttpServletResponse response) {
+		BlockDownload blockDownload = blockService.blockListByNodeIdDownload(nodeId, date, local);
 		try {
 			downFileCommon.download(response, blockDownload.getFilename(), blockDownload.getLength(), blockDownload.getData());
 		} catch (Exception e) {

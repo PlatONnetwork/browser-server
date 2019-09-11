@@ -21,6 +21,7 @@ import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -169,7 +170,7 @@ public class StakingServiceImpl implements StakingService {
 		RespPage<HistoryStakingListResp> respPage = new RespPage<>();
 		List<HistoryStakingListResp> lists = new LinkedList<HistoryStakingListResp>();
 		/** 根据条件和状态进行查询列表 */
-		Page<StakingNode> stakings = customStakingMapper.selectHistoryNode(status);
+		Page<StakingNode> stakings = customStakingMapper.selectHistoryNode(req.getKey(), status);
 		for (StakingNode stakingNode:stakings.getResult()) {
 			HistoryStakingListResp historyStakingListResp = new HistoryStakingListResp();
 			BeanUtils.copyProperties(stakingNode, historyStakingListResp);
@@ -181,10 +182,9 @@ public class StakingServiceImpl implements StakingService {
 			historyStakingListResp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			historyStakingListResp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
 			/**
-			 * 带提取的委托等于has+lock
+			 * 带提取的委托等于hes+lock
 			 */
-			String totalValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
-			historyStakingListResp.setStatDelegateReduction(totalValue);
+			historyStakingListResp.setStatDelegateReduction(stakingNode.getAllDelegate());
 			historyStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSetting()));
 			historyStakingListResp.setBlockQty(stakingNode.getStatBlockQty());
 			lists.add(historyStakingListResp);
@@ -225,8 +225,8 @@ public class StakingServiceImpl implements StakingService {
 						.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
 				resp.setTotalValue(totalValue);
 				/** 委托总金额数=委托交易总金额(犹豫期金额)+委托交易总金额(锁定期金额) */
-				String delValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
-				resp.setDelegateValue(delValue);
+//				String delValue = new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
+				resp.setDelegateValue(stakingNode.getAllDelegate());
 				/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
 				String stakingValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString();
 				resp.setStakingValue(stakingValue);
@@ -284,6 +284,33 @@ public class StakingServiceImpl implements StakingService {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
 			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
 			stakingOptRecordListResp.setTimestamp(nodeOpt.getCreateTime().getTime());
+			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
+				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
+				/** 根据不同类型组合返回 */
+				switch (CustomNodeOpt.TypeEnum.getEnum(nodeOpt.getType())) {
+					/** 提案类型 */
+					case PROPOSALS:
+						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(desces[1]);
+						break;
+					/** 投票类型 */
+					case VOTE:
+						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
+						stakingOptRecordListResp.setTitle(desces[1]);
+						stakingOptRecordListResp.setOption(desces[2]);
+						break;
+					/** 双签 */
+					case MULTI_SIGN:
+					/** 出块率低 */
+					case LOW_BLOCK_RATE:
+						stakingOptRecordListResp.setPercent(desces[0]);
+						stakingOptRecordListResp.setAmount(desces[1]);
+						break;
+					default:
+						break;
+				}
+			}
+			
 			lists.add(stakingOptRecordListResp);
 		}
 		/** 查询分页总数 */

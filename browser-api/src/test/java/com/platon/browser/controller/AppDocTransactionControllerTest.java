@@ -78,6 +78,7 @@ public class AppDocTransactionControllerTest {
     		.perform(MockMvcRequestBuilders.get("/transaction/addressTransactionDownload")
     		.param("address", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
     		.param("date", "2019-08-20")
+    		.param("local", "en")
     		.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
     		.andDo(
 				new ResultHandler() {

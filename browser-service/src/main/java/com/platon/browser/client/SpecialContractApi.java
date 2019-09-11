@@ -1,15 +1,12 @@
 package com.platon.browser.client;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
-import lombok.extern.flogger.Flogger;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.BytesType;
 import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.platon.BaseResponse;
@@ -65,7 +62,8 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-    private BaseResponse<String> rpc(Web3j web3j,Function function,DefaultBlockParameter blockParameter,String from,String to) throws Exception {
+    @SuppressWarnings("unchecked")
+	private BaseResponse<String> rpc(Web3j web3j,Function function,DefaultBlockParameter blockParameter,String from,String to) throws Exception {
         BaseResponse<String> br = new RemoteCall<>((Callable<BaseResponse<String>>) () -> {
             String encodedFunction = PlatOnUtil.invokeEncode(function);
             PlatonCall ethCall = web3j.platonCall(Transaction.createEthCallTransaction(from,to,encodedFunction),blockParameter).send();

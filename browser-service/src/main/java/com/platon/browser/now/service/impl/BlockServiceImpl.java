@@ -132,7 +132,7 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	@Override
-	public BlockDownload blockListByNodeIdDownload(String nodeId, String date) {
+	public BlockDownload blockListByNodeIdDownload(String nodeId, String date, String local) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
         logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
@@ -175,11 +175,11 @@ public class BlockServiceImpl implements BlockService {
         /** 厨师书writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         writer.writeHeaders(
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD),
-                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE)
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_NUMBER, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TIMESTAMP, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TRANSACTION_COUNT, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_REWARD, local),
+                i18n.i(I18nEnum.DOWNLOAD_BLOCK_CSV_TXN_FEE, local)
         );
         writer.writeRowsAndClose(rows);
         /** 设置下载返回对象 */

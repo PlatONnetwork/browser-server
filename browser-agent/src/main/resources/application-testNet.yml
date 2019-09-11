@@ -2,8 +2,9 @@
 #redis 配置
 spring:
   redis:
-    host: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com
-    port: 6379
+    cluster:
+      max-redirects: 3
+      nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)

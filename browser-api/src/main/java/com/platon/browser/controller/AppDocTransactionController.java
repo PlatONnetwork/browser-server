@@ -63,8 +63,8 @@ public class AppDocTransactionController implements AppDocTransaction {
 	}
 
 	@Override
-	public void addressTransactionDownload(String address, String date, HttpServletResponse response) {
-		AccountDownload accountDownload = transactionService.transactionListByAddressDownload(address, date);
+	public void addressTransactionDownload(String address, String date, String local, HttpServletResponse response) {
+		AccountDownload accountDownload = transactionService.transactionListByAddressDownload(address, date, local);
 		try {
 			downFileCommon.download(response, accountDownload.getFilename(), accountDownload.getLength(), accountDownload.getData());
 		} catch (Exception e) {

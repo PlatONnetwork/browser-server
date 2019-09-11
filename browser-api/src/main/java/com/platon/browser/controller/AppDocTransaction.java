@@ -140,7 +140,7 @@ public interface AppDocTransaction {
     public RespPage<TransactionListResp> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
-     * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date d.导出地址交易列表
+     * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en d.导出地址交易列表
      * @apiVersion 1.0.0
      * @apiName addressTransactionDownload
      * @apiGroup transaction
@@ -157,7 +157,8 @@ public interface AppDocTransaction {
 	@ApiOperation(value = "transaction/addressTransactionDownload", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@RequestMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" }, method = RequestMethod.GET)
     public void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
-    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, HttpServletResponse response);
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, 
+    		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true) String local,HttpServletResponse response);
 	
     /**
      * @api {post} transaction/transactionDetails e.交易详情 
