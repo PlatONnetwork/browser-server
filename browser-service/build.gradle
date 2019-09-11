@@ -12,6 +12,6 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
 
 	testCompile "org.springframework:spring-test:5.1.6.RELEASE"
-	testCompile "org.springframework.boot:spring-boot-test:2.1.4.RELEASE"
-	testCompile "org.springframework.boot:spring-boot-starter-test:2.1.4.RELEASE"
+	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
+	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
 }
