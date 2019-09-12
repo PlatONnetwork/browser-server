@@ -57,9 +57,14 @@ public class VotingProposalHandler implements EventHandler {
             } catch (NoSuchBeanException e) {
                 throw new BusinessException("缓存中找不到提案:"+e.getMessage());
             }
+
+            // 交易信息回填
             param.setPIDID(proposal.getPipId().toString());
             param.setProposalType(proposal.getType());
+            param.setNodeName(staking.getStakingName());
+            param.setUrl(proposal.getUrl());
             tx.setTxInfo(JSON.toJSONString(param));
+
             logger.debug("投票信息:{}", JSON.toJSONString(param));
             CustomVote vote = new CustomVote();
             vote.updateWithVote(tx,param);

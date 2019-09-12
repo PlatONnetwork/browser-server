@@ -289,31 +289,25 @@ public class BlockChain {
             BigInteger incentivePoolAccountBalance = client.getWeb3j()
                     .platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)))
                     .send().getBalance();
-            logger.debug("区块号位于({})时激励池账户余额:{}",blockNumber,incentivePoolAccountBalance.toString());
+            logger.debug("区块号位于({})时激励池账户余额:{}",blockNumber,incentivePoolAccountBalance);
             // 激励池中的质押奖励部分
-            BigDecimal stakingPart = new BigDecimal(incentivePoolAccountBalance.toString())
+            BigDecimal stakingPart = new BigDecimal(incentivePoolAccountBalance)
                     .multiply(chainConfig.getStakeRewardRate()); // 取出激励池余额中属于质押奖励的部分
-            logger.debug("质押奖励部分:{}",stakingPart.toString());
+            logger.debug("质押奖励部分:{}",stakingPart);
             // 每个增发周期的总结算周期数
             BigDecimal settleEpochCountPerIssue = new BigDecimal(chainConfig.getSettlePeriodCountPerIssue());
             // 每个结算周期的质押奖励
-            BigDecimal settleReward = stakingPart
-                    .divide(settleEpochCountPerIssue,0, RoundingMode.FLOOR); // 除以结算周期轮数，向下取整
-            this.settleReward=settleReward;
-            logger.debug("当前结算周期奖励:{}",settleReward.toString());
+            this.settleReward = stakingPart.divide(settleEpochCountPerIssue,0, RoundingMode.FLOOR); // 除以结算周期轮数，向下取整
+            logger.debug("当前结算周期奖励:{}",settleReward);
             // 激励池中的出块奖励部分
-            BigDecimal blockingPart = new BigDecimal(incentivePoolAccountBalance)
-                    .multiply(chainConfig.getBlockRewardRate()); // 取出激励池余额中属于区块奖励的部分
-            logger.debug("区块奖励部分:{}",stakingPart.toString());
+            BigDecimal blockingPart = new BigDecimal(incentivePoolAccountBalance).multiply(chainConfig.getBlockRewardRate()); // 取出激励池余额中属于区块奖励的部分
+            logger.debug("区块奖励部分:{}",stakingPart);
             // 每个增发周期的总块数
             BigDecimal issuePeriodBlockCount = new BigDecimal(chainConfig.getAddIssuePeriodBlockCount());
             // 出块奖励
-            BigDecimal blockReward = blockingPart
-                    .divide(issuePeriodBlockCount,0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，向下取整
-            this.blockReward=blockReward;
-            logger.debug("当前区块奖励:{}",blockReward.toString());
+            this.blockReward = blockingPart.divide(issuePeriodBlockCount,0, RoundingMode.FLOOR); // 除以一个增发周期的总区块数，向下取整
+            logger.debug("当前区块奖励:{}",blockReward);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
         }
     }
