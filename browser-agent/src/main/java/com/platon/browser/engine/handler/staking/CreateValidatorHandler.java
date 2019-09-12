@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -58,6 +59,9 @@ public class CreateValidatorHandler implements EventHandler {
                 newStaking.updateWithCustomTransaction(tx);
                 // 把最新质押信息添加至缓存
                 node.getStakings().put(tx.getBlockNumber(),newStaking);
+
+                AnnualizedRateInfo ari = new AnnualizedRateInfo();
+                newStaking.setAnnualizedRateInfo(JSON.toJSONString(ari));
                 // 把最新质押信息添加至待入库列表
                 stakingStage.insertStaking(newStaking,tx);
                 // 更新节点名称映射缓存
@@ -87,6 +91,9 @@ public class CreateValidatorHandler implements EventHandler {
                 node.setStatExpectBlockQty(bc.getCurConsensusExpectBlockCount().toString());
                 node.updateWithCustomStaking(staking);
             }
+
+            AnnualizedRateInfo ari = new AnnualizedRateInfo();
+            staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
 
             // 把质押记录添加到节点质押记录列表中
             node.getStakings().put(staking.getStakingBlockNum(),staking);

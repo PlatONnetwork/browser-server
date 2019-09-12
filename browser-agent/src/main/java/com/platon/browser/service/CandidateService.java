@@ -7,6 +7,8 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.bean.AnnualizedRateInfo;
+import com.platon.browser.engine.bean.PeriodValueElement;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
@@ -204,6 +206,12 @@ public class CandidateService {
                 CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
                 if(StringUtils.isBlank(staking.getStakingName())&&defaultStaking!=null)
                     staking.setStakingName(defaultStaking.getStakingName());
+
+                // 记录年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
+                AnnualizedRateInfo ari = new AnnualizedRateInfo();
+                PeriodValueElement pve = new PeriodValueElement(BigInteger.ONE,new BigInteger(staking.getStakingLocked()));
+                ari.getCost().add(pve);
+                staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
 
                 initParam.stakings.add(staking);
             });
