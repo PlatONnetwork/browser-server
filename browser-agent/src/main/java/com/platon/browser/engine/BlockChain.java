@@ -182,6 +182,7 @@ public class BlockChain {
                 case CANCEL_PROPOSAL: // 创建参数提案
                 case VOTING_PROPOSAL: // 给提案投票
                 case DUPLICATE_SIGN: // 双签举报
+                case DECLARE_VERSION://版本声明
                     proposalExecute.execute(tx, this);
                     break;
                 case CREATE_RESTRICTING://创建锁仓计划

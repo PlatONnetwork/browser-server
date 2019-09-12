@@ -260,7 +260,20 @@ public class NewSettleEpochHandler implements EventHandler {
                         }
                     }
                     AnnualizedSum as = new AnnualizedSum();
-                    ari.getProfit().forEach(ele->as.profitSum=as.profitSum.add(ele.getValue()));
+                    // 利润=四个结算周期最新一个的收益-四个结算周期中最旧的收益
+                    // 按结算周期由大到小排序
+                    ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+                    PeriodValueElement latest=null,oldest=null;
+                    int count = 0;
+                    for (PeriodValueElement pve:ari.getProfit()){
+                        count++;
+                        if(count==1) latest=pve;
+                        if(count==ari.getProfit().size()) oldest=pve;
+                    }
+                    if(latest!=null&&oldest!=null){
+                        if (latest==oldest) as.profitSum=latest.getValue();
+                        if (latest!=oldest) as.profitSum=latest.getValue().subtract(oldest.getValue());
+                    }
 
                     // 按周期从大到小排序
                     ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));

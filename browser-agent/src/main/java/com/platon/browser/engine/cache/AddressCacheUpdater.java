@@ -75,10 +75,12 @@ public class AddressCacheUpdater {
                     stat.stakingValue = stat.stakingValue.add(staking.integerStakingHas().add(staking.integerStakingLocked()));
                     stat.stakingRedeemed = stat.stakingRedeemed.add(staking.integerStakingReduction());
                 });
+
             }
             // 查看当前地址是否有委托信息, 若有, 则统计当前地址委托相关金额
             Set<CustomDelegation> delegationSet = addressDelegationMap.get(address.getAddress());
             if(delegationSet!=null){
+                stat.delegateUnlock = BigInteger.ZERO;
                 for(CustomDelegation delegation:delegationSet){
                     stat.delegateValue = stat.delegateValue.add(delegation.integerDelegateHas().add(delegation.integerDelegateLocked()));
                     stat.delegateRedeemed = stat.delegateRedeemed.add(delegation.integerDelegateReduction());
@@ -87,14 +89,16 @@ public class AddressCacheUpdater {
                     stat.delegateReduction = stat.delegateReduction.add(delegation.integerDelegateReduction());
                     stat.candidateCount = stat.candidateCount.add(BigInteger.ONE);
                     Integer status = 0;
+                    CustomStaking staking = new CustomStaking();
                     try {
-                        CustomStaking staking = NODE_CACHE.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
+                        staking = NODE_CACHE.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
                         status = staking.getStatus();
                     } catch (NoSuchBeanException e) {
                         throw new BusinessException(e.getMessage());
                     }
                     if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
-                        stat.delegateUnlock = stat.delegateUnlock.add(delegation.integerDelegateHas());
+                        stat.delegateUnlock = stat.delegateUnlock.add(staking.integerStatDelegateHas().add(staking.integerStatDelegateLocked()));
+                        stat.delegateLocked = stat.delegateLocked.subtract(stat.delegateUnlock);
                     }
                 }
             }
