@@ -38,7 +38,7 @@ public class AddressUpdateTask {
     public void start(){
         StringBuilder sb = new StringBuilder();
         Collection<CustomAddress> addresses = BlockChain.ADDRESS_CACHE.getAllAddress();
-        if(addresses.size()==0) return;
+        if(addresses.isEmpty()) return;
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
