@@ -365,52 +365,62 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyEqualTo(Long value) {
+        public Criteria andStatExpectBlockQtyEqualTo(String value) {
             addCriterion("stat_expect_block_qty =", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyNotEqualTo(Long value) {
+        public Criteria andStatExpectBlockQtyNotEqualTo(String value) {
             addCriterion("stat_expect_block_qty <>", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyGreaterThan(Long value) {
+        public Criteria andStatExpectBlockQtyGreaterThan(String value) {
             addCriterion("stat_expect_block_qty >", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyGreaterThanOrEqualTo(Long value) {
+        public Criteria andStatExpectBlockQtyGreaterThanOrEqualTo(String value) {
             addCriterion("stat_expect_block_qty >=", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyLessThan(Long value) {
+        public Criteria andStatExpectBlockQtyLessThan(String value) {
             addCriterion("stat_expect_block_qty <", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyLessThanOrEqualTo(Long value) {
+        public Criteria andStatExpectBlockQtyLessThanOrEqualTo(String value) {
             addCriterion("stat_expect_block_qty <=", value, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyIn(List<Long> values) {
+        public Criteria andStatExpectBlockQtyLike(String value) {
+            addCriterion("stat_expect_block_qty like", value, "statExpectBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatExpectBlockQtyNotLike(String value) {
+            addCriterion("stat_expect_block_qty not like", value, "statExpectBlockQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatExpectBlockQtyIn(List<String> values) {
             addCriterion("stat_expect_block_qty in", values, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyNotIn(List<Long> values) {
+        public Criteria andStatExpectBlockQtyNotIn(List<String> values) {
             addCriterion("stat_expect_block_qty not in", values, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyBetween(Long value1, Long value2) {
+        public Criteria andStatExpectBlockQtyBetween(String value1, String value2) {
             addCriterion("stat_expect_block_qty between", value1, value2, "statExpectBlockQty");
             return (Criteria) this;
         }
 
-        public Criteria andStatExpectBlockQtyNotBetween(Long value1, Long value2) {
+        public Criteria andStatExpectBlockQtyNotBetween(String value1, String value2) {
             addCriterion("stat_expect_block_qty not between", value1, value2, "statExpectBlockQty");
             return (Criteria) this;
         }

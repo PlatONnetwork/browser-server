@@ -84,7 +84,7 @@ public class CreateValidatorHandler implements EventHandler {
             }catch (NoSuchBeanException nbe){
                 node = new CustomNode();
                 // 预先设置期望出块数
-                node.setStatExpectBlockQty(bc.getChainConfig().getExpectBlockCount().longValue());
+                node.setStatExpectBlockQty(bc.getCurConsensusExpectBlockCount().toString());
                 node.updateWithCustomStaking(staking);
             }
 

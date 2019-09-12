@@ -1,6 +1,5 @@
 package com.platon.browser.engine;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -95,6 +94,8 @@ public class BlockChain {
     private BigInteger addIssueEpoch;
     // 当前块
     private CustomBlock curBlock;
+    // 当前共识周期期望出块数=共识周期区块数/验证人数，取16位小数
+    private BigDecimal curConsensusExpectBlockCount;
 
     // 区块奖励，每个增发周期更新一次
     private BigDecimal blockReward;
@@ -119,6 +120,8 @@ public class BlockChain {
 
     @PostConstruct
     private void init () throws Exception {
+        // 初始等于配置
+        this.curConsensusExpectBlockCount=new BigDecimal(chainConfig.getExpectBlockCount());
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
@@ -313,5 +316,15 @@ public class BlockChain {
             e.printStackTrace();
             throw new IssueEpochChangeException("查询激励池(addr="+incentivePoolAccountAddr+")在块号("+blockNumber+")的账户余额失败:"+e.getMessage());
         }
+    }
+
+    /**
+     * 更新当前共识周期期望出块数
+     */
+    public void updateCurConsensusExpectBlockCount(Integer validatorCount){
+        // 当前共识周期期望出块数=共识周期区块数/验证人数，取16位小数
+        BigDecimal ccebc = new BigDecimal(chainConfig.getConsensusPeriodBlockCount())
+                .divide(new BigDecimal(validatorCount),16,RoundingMode.FLOOR);
+        curConsensusExpectBlockCount=ccebc;
     }
 }

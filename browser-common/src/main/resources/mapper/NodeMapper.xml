@@ -6,7 +6,7 @@
     <result column="stat_slash_multi_qty" jdbcType="INTEGER" property="statSlashMultiQty" />
     <result column="stat_slash_low_qty" jdbcType="INTEGER" property="statSlashLowQty" />
     <result column="stat_block_qty" jdbcType="BIGINT" property="statBlockQty" />
-    <result column="stat_expect_block_qty" jdbcType="BIGINT" property="statExpectBlockQty" />
+    <result column="stat_expect_block_qty" jdbcType="VARCHAR" property="statExpectBlockQty" />
     <result column="stat_reward_value" jdbcType="VARCHAR" property="statRewardValue" />
     <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
     <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
@@ -111,7 +111,7 @@
       stat_verifier_time, is_recommend, create_time, 
       update_time)
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
-      #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=BIGINT}, #{statRewardValue,jdbcType=VARCHAR}, 
+      #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=VARCHAR}, #{statRewardValue,jdbcType=VARCHAR}, 
       #{statVerifierTime,jdbcType=INTEGER}, #{isRecommend,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -163,7 +163,7 @@
         #{statBlockQty,jdbcType=BIGINT},
       </if>
       <if test="statExpectBlockQty != null">
-        #{statExpectBlockQty,jdbcType=BIGINT},
+        #{statExpectBlockQty,jdbcType=VARCHAR},
       </if>
       <if test="statRewardValue != null">
         #{statRewardValue,jdbcType=VARCHAR},
@@ -204,7 +204,7 @@
         stat_block_qty = #{record.statBlockQty,jdbcType=BIGINT},
       </if>
       <if test="record.statExpectBlockQty != null">
-        stat_expect_block_qty = #{record.statExpectBlockQty,jdbcType=BIGINT},
+        stat_expect_block_qty = #{record.statExpectBlockQty,jdbcType=VARCHAR},
       </if>
       <if test="record.statRewardValue != null">
         stat_reward_value = #{record.statRewardValue,jdbcType=VARCHAR},
@@ -232,7 +232,7 @@
       stat_slash_multi_qty = #{record.statSlashMultiQty,jdbcType=INTEGER},
       stat_slash_low_qty = #{record.statSlashLowQty,jdbcType=INTEGER},
       stat_block_qty = #{record.statBlockQty,jdbcType=BIGINT},
-      stat_expect_block_qty = #{record.statExpectBlockQty,jdbcType=BIGINT},
+      stat_expect_block_qty = #{record.statExpectBlockQty,jdbcType=VARCHAR},
       stat_reward_value = #{record.statRewardValue,jdbcType=VARCHAR},
       stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
       is_recommend = #{record.isRecommend,jdbcType=INTEGER},
@@ -255,7 +255,7 @@
         stat_block_qty = #{statBlockQty,jdbcType=BIGINT},
       </if>
       <if test="statExpectBlockQty != null">
-        stat_expect_block_qty = #{statExpectBlockQty,jdbcType=BIGINT},
+        stat_expect_block_qty = #{statExpectBlockQty,jdbcType=VARCHAR},
       </if>
       <if test="statRewardValue != null">
         stat_reward_value = #{statRewardValue,jdbcType=VARCHAR},
@@ -280,7 +280,7 @@
     set stat_slash_multi_qty = #{statSlashMultiQty,jdbcType=INTEGER},
       stat_slash_low_qty = #{statSlashLowQty,jdbcType=INTEGER},
       stat_block_qty = #{statBlockQty,jdbcType=BIGINT},
-      stat_expect_block_qty = #{statExpectBlockQty,jdbcType=BIGINT},
+      stat_expect_block_qty = #{statExpectBlockQty,jdbcType=VARCHAR},
       stat_reward_value = #{statRewardValue,jdbcType=VARCHAR},
       stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
       is_recommend = #{isRecommend,jdbcType=INTEGER},
@@ -300,7 +300,7 @@
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
-        #{item.statBlockQty,jdbcType=BIGINT}, #{item.statExpectBlockQty,jdbcType=BIGINT}, 
+        #{item.statBlockQty,jdbcType=BIGINT}, #{item.statExpectBlockQty,jdbcType=VARCHAR}, 
         #{item.statRewardValue,jdbcType=VARCHAR}, #{item.statVerifierTime,jdbcType=INTEGER}, 
         #{item.isRecommend,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
         )
@@ -334,7 +334,7 @@
           #{item.statBlockQty,jdbcType=BIGINT}
         </if>
         <if test="'stat_expect_block_qty'.toString() == column.value">
-          #{item.statExpectBlockQty,jdbcType=BIGINT}
+          #{item.statExpectBlockQty,jdbcType=VARCHAR}
         </if>
         <if test="'stat_reward_value'.toString() == column.value">
           #{item.statRewardValue,jdbcType=VARCHAR}
@@ -355,4 +355,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>
