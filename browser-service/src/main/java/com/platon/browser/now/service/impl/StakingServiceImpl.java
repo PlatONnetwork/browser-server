@@ -342,7 +342,7 @@ public class StakingServiceImpl implements StakingService {
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
 			byStakingResp.setDelegateValue(delValue);
 		   /**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
-			String deleLock = delegationStaking.getStatus()==2?delegationStaking.getDelegateLocked():"0";
+			String deleLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateLocked():"0";
 			byStakingResp.setDelegateLocked(deleLock);
 			/** 总质押金额累加 */
 //			allDelegate = new BigDecimal(allDelegate).add(new BigDecimal(delValue).add(new BigDecimal(deleLock))).toString();

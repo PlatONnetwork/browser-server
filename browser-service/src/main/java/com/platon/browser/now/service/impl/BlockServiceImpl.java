@@ -126,7 +126,11 @@ public class BlockServiceImpl implements BlockService {
 		}
 		/** 设置返回的分页数据 */
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(blockPage.getTotal());
+		if(blockPage.getTotal() > 5000) {
+			page.setTotal(5000);
+		} else {
+			page.setTotal(blockPage.getTotal());
+		}
 		respPage.init(page, lists);
 		return respPage;
 	}
