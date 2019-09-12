@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,9 @@ public class NewConsensusEpochHandler implements EventHandler {
             // 节点经过的共识周期轮数+1
             customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
             // 累加共识周期期望区块数（提前设置下一轮期望的出块数）
-            customNode.setStatExpectBlockQty(customNode.getStatVerifierTime()*chainConfig.getExpectBlockCount().longValue());
+            BigDecimal statExpectQty = new BigDecimal(customNode.getStatExpectBlockQty());
+            statExpectQty=statExpectQty.add(bc.getCurConsensusExpectBlockCount());
+            customNode.setStatExpectBlockQty(statExpectQty.toString());
             try {
                 CustomStaking latestStaking = customNode.getLatestStaking();
                 // 节点最新质押记录经过的共识轮数+1
@@ -151,6 +154,10 @@ public class NewConsensusEpochHandler implements EventHandler {
         if(bc.getCurValidator().size()==0){
             throw new CandidateException("查询不到下一轮共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
         }
-        logger.debug("下一轮共识周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
+
+        // 更新当前共识周期期望出块数
+        bc.updateCurConsensusExpectBlockCount(bc.getCurValidator().size());
+
+        logger.debug("下一轮共识周期验证人:{}",JSON.toJSONString(bc.getCurValidator(),true));
     }
 }

@@ -90,7 +90,8 @@ public class BlockSyncTask {
         cr.getPre().stream().filter(Objects::nonNull).forEach(node -> blockChain.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
         blockChain.getCurValidator().clear();
         cr.getCur().stream().filter(Objects::nonNull).forEach(node -> blockChain.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
-
+        //更新当前共识周期期望出块数
+        blockChain.updateCurConsensusExpectBlockCount(blockChain.getCurValidator().size());
         /*
          * 从第一块同步的时候，结算周期验证人和共识周期验证人是链上内置的
          * 查询内置共识周期验证人初始化blockChain的curValidator属性

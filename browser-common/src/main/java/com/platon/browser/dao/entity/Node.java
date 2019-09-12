@@ -13,7 +13,7 @@ public class Node {
 
     private Long statBlockQty;
 
-    private Long statExpectBlockQty;
+    private String statExpectBlockQty;
 
     private String statRewardValue;
 
@@ -57,12 +57,12 @@ public class Node {
         this.statBlockQty = statBlockQty;
     }
 
-    public Long getStatExpectBlockQty() {
+    public String getStatExpectBlockQty() {
         return statExpectBlockQty;
     }
 
-    public void setStatExpectBlockQty(Long statExpectBlockQty) {
-        this.statExpectBlockQty = statExpectBlockQty;
+    public void setStatExpectBlockQty(String statExpectBlockQty) {
+        this.statExpectBlockQty = statExpectBlockQty == null ? null : statExpectBlockQty.trim();
     }
 
     public String getStatRewardValue() {
@@ -117,7 +117,7 @@ public class Node {
         statSlashMultiQty("stat_slash_multi_qty", "statSlashMultiQty", "INTEGER", false),
         statSlashLowQty("stat_slash_low_qty", "statSlashLowQty", "INTEGER", false),
         statBlockQty("stat_block_qty", "statBlockQty", "BIGINT", false),
-        statExpectBlockQty("stat_expect_block_qty", "statExpectBlockQty", "BIGINT", false),
+        statExpectBlockQty("stat_expect_block_qty", "statExpectBlockQty", "VARCHAR", false),
         statRewardValue("stat_reward_value", "statRewardValue", "VARCHAR", false),
         statVerifierTime("stat_verifier_time", "statVerifierTime", "INTEGER", false),
         isRecommend("is_recommend", "isRecommend", "INTEGER", false),

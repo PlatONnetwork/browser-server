@@ -157,6 +157,7 @@ public class CandidateService {
             }
             Set<String> validatorSet = new HashSet<>();
             result.forEach(node->validatorSet.add(HexTool.prefix(node.getNodeId())));
+            blockChain.updateCurConsensusExpectBlockCount(validatorSet.size());
 
             // 查询所有候选人
             Map<String,Node> candidateMap = new HashMap<>();
@@ -183,7 +184,7 @@ public class CandidateService {
                 node.updateWithNode(verifier);
                 node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
                 node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-                node.setStatExpectBlockQty(chainConfig.getExpectBlockCount().longValue());
+                node.setStatExpectBlockQty(blockChain.getCurConsensusExpectBlockCount().toString());
                 initParam.nodes.add(node);
 
                 CustomStaking staking = new CustomStaking();

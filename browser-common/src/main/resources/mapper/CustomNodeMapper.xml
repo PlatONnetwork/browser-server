@@ -38,7 +38,7 @@
           #{item.statBlockQty,jdbcType=BIGINT}
         </if>
         <if test="'stat_expect_block_qty'.toString() == column.value">
-          #{item.statExpectBlockQty,jdbcType=BIGINT}
+          #{item.statExpectBlockQty,jdbcType=VARCHAR}
         </if>
         <if test="'stat_reward_value'.toString() == column.value">
           #{item.statRewardValue,jdbcType=VARCHAR}

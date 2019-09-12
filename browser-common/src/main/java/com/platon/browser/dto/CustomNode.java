@@ -5,6 +5,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -30,9 +31,9 @@ public class CustomNode extends Node {
           // 节点处块数统计
           this.setStatBlockQty(0L);
           // 节点期望出块数
-          this.setStatExpectBlockQty(0L);
+          this.setStatExpectBlockQty(BigDecimal.ZERO.toString());
           // 节点收益统计(出块奖励 + 质押奖励)
-          this.setStatRewardValue("0");
+          this.setStatRewardValue(BigDecimal.ZERO.toString());
           // 进入共识验证轮次数
           this.setStatVerifierTime(0);
           // 官方推荐 1：是 2：否
