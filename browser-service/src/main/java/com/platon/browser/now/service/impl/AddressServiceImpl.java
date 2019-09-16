@@ -92,7 +92,7 @@ public class AddressServiceImpl implements AddressService {
 			 * 链上实时查询对应的锁仓信息
 			 */
 			BaseResponse<RestrictingItem> baseResponse = platonClient.getRestrictingPlanContract().getRestrictingInfo(req.getAddress()).send();
-			if(baseResponse.status) {
+			if(baseResponse.isStatusOk()) {
 				/**
 				 * 可用余额为balance减去质押金额
 				 */
