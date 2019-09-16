@@ -14,9 +14,9 @@ profile: preprod
 # MySQL数据库连接地址
 dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
 # MySQL数据库用户名
-dbuser: admin
+dbuser: ENC(VEOTXuMhF0BWUFcyQTzAHQ==)
 # MySQL数据库密码
-dbpass: Juzhen1234
+dbpass: ENC(uI8I+1It5fztcNZSJsXx//nva5pmP2Wz)
 #web3j配置
 web3j:
   addresses: http://18.140.20.252:6789
