@@ -122,12 +122,13 @@ public class BlockChainConfig {
 
     @PostConstruct
     private void init() throws InterruptedException {
-        String web3jAddress = client.getWeb3jAddress();
-        logger.info("Web3j RPC:{}",web3jAddress);
         EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
         String param = JSON.toJSONString(ecp);
         EconomicConfigResult ecr;
+        String web3jAddress=null;
         while (true) try {
+            web3jAddress = client.getWeb3jAddress();
+            logger.info("Web3j RPC:{}",web3jAddress);
             Web3Response response = HttpUtil.post(web3jAddress, param, Web3Response.class);
             ecr = JSON.parseObject(response.getResult(), EconomicConfigResult.class);
             break;
