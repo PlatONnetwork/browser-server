@@ -31,7 +31,9 @@ logging:
     com.platon.browser.dao: debug
     com.platon.browser.engine: debug
     com.platon.browser.engine.handler.epoch: error
-
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #初始化链相关的配置
 platon.config:
   # 质押节点统计年化率最多取多少个连续周期

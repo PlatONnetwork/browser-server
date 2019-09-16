@@ -13,15 +13,17 @@ profile: prod
 port: 38030
 # MySQL数据库连接地址
 dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
-dbuser: root
-dbpass: Juzhenyuan_123
+dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
+dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
 # 日志文件存储文件
 logpath: /data/logs/${spring.application.name}-${version}-${profile}.log
 # 日志级别
 loglevel:
   spring: error
   platon: error
-
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #初始化链相关的配置
 platon.config:
   # 质押节点统计年化率最多取多少个连续周期
