@@ -47,10 +47,6 @@ public class NewElectionEpochHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws ElectionEpochChangeException {
         StakingStage stakingStage = context.getStakingStage();
-
-        // <节点ID, 前一共识轮出块数({}),前一共识轮出块率({}),处罚率(),被罚金额({})>
-        Map<String,String> slashInfo = new HashMap<>();
-        String tpl = "当前区块号({CUR_NUMBER}),前一共识轮出块数(PRE_QTY),前一共识轮出块率(PRE_BLOCK_RATE),处罚区块奖励数(BLOCK_COUNT),被罚金额(SLASH_AMOUNT)";
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakingList){
             // 需要判断被处罚质押是否在上一轮共识周期验证人
@@ -64,10 +60,6 @@ public class NewElectionEpochHandler implements EventHandler {
             boolean isSlash = blockRate.compareTo(chainConfig.getSlashBlockRate())<=0;
             if(isSlash){
                 // 被罚，需要打印处罚信息
-                String info = tpl.replace("CUR_NUMBER",bc.getCurBlock().getBlockNumber().toString());
-                info = info.replace("PRE_QTY",staking.getPreConsBlockQty().toString());
-                info = info.replace("PRE_BLOCK_RATE",blockRate.toString());
-
                 BigDecimal stakingHas = staking.decimalStakingHas();
                 BigDecimal stakingLocked = staking.decimalStakingLocked();
 
@@ -75,14 +67,12 @@ public class NewElectionEpochHandler implements EventHandler {
                 BigDecimal totalAmount = stakingHas.add(stakingLocked);
                 // 处罚金额: 固定的区块奖励
                 BigDecimal slashAmount = bc.getBlockReward().multiply(chainConfig.getSlashBlockCount());
-                info = info.replace("SLASH_AMOUNT",slashAmount.toString());
-                info = info.replace("BLOCK_COUNT",chainConfig.getSlashBlockCount().toString());
                 // 判断是否需要踢出验证人列表：扣除罚金后，剩余质押金小于最低质押门槛，则剔出候选人列表
                 // 扣除罚款后剩余的锁定金额 = 原锁定金额+犹豫期金额-罚款
                 BigDecimal remainAmount = totalAmount.subtract(slashAmount);
                 BigDecimal stakeThresholdInVon = Convert.toVon(bc.getChainConfig().getStakeThreshold(), Convert.Unit.LAT);
-                boolean isDelete = remainAmount.subtract(slashAmount).compareTo(stakeThresholdInVon) < 0;
-                if(isDelete){
+                boolean isKickOut = remainAmount.subtract(slashAmount).compareTo(stakeThresholdInVon) < 0;
+                if(isKickOut){
                     // (出块率超低触发高处罚比例)或(被罚款后剩余质押金额小于质押门槛)，则需要踢掉此节点
                     // 此处处理与多签处罚一致
                     // 犹豫期金额置0
@@ -123,6 +113,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 SlashInfo si = new SlashInfo();
                 si.setBlockNumber(bc.getCurBlock().getBlockNumber());
                 si.setBlockRate(blockRate);
+                si.setKickOut(isKickOut);
                 si.setBlockCount(BigInteger.valueOf(chainConfig.getSlashBlockCount().longValue()));
                 si.setSlashAmount(slashAmount);
                 si.setSlashTime(bc.getCurBlock().getTimestamp());
@@ -134,10 +125,12 @@ public class NewElectionEpochHandler implements EventHandler {
                 // 记录操作日志
                 CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
                 nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+                // BLOCK_RATE|BLOCK_COUNT|AMOUNT|KICK_OUT
                 String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.tpl
-                        .replace("BLOCK_COUNT",chainConfig.getSlashBlockCount().toString())
                         .replace("BLOCK_RATE",blockRate.toString())
-                        .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString());
+                        .replace("BLOCK_COUNT",chainConfig.getSlashBlockCount().toString())
+                        .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString())
+                        .replace("KICK_OUT",isKickOut?"1":"0");
                 nodeOpt.setDesc(desc);
                 STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
 
@@ -149,9 +142,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 } catch (NoSuchBeanException e) {
                     logger.error("更新被处罚节点统计信息出错：{}",e.getMessage());
                 }
-                slashInfo.put(staking.getNodeId(),info);
             }
         }
-        if(slashInfo.size()>0) logger.info("节点出块率低处罚信息:{}", JSON.toJSONString(slashInfo,true));
     }
 }

@@ -17,5 +17,6 @@ public class SlashInfo {
     private BigInteger blockCount;
     private BigDecimal blockRate;
     private BigDecimal slashAmount;
+    private boolean kickOut;
     private Date slashTime;
 }
