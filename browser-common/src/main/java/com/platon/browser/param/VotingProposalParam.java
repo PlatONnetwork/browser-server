@@ -54,6 +54,11 @@ public class VotingProposalParam {
      */
     private String nodeName;
 
+    /**
+     * 提案URL
+     */
+    private String url;
+
 
 
     public void init(String verifier,String proposalId,String option,String programVersion,String versionSign){

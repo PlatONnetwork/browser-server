@@ -52,8 +52,10 @@ public class ProposalCancelHandler implements EventHandler {
             throw new BusinessException("处理取消提案出错:"+e.getMessage());
         }
 
+        // 交易信息回填
         param.setNodeName(staking.getStakingName());
         tx.setTxInfo(JSON.toJSONString(param));
+
         CustomProposal proposal = new CustomProposal();
         proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         //设置提案人

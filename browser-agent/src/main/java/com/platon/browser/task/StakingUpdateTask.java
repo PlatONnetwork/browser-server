@@ -39,7 +39,7 @@ public class StakingUpdateTask {
         String keyStoreUrl = blockChain.getChainConfig().getKeyBase();
         try {
             Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
-            if (customStakingSet.size() == 0) return;
+            if (customStakingSet.isEmpty()) return;
             customStakingSet.forEach(customStaking -> {
                 if(StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon())){
                     if (StringUtils.isNotBlank(customStaking.getExternalId())) {
@@ -47,7 +47,7 @@ public class StakingUpdateTask {
                         try {
                             KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
                             List <Completion> completions = keyBaseUser.getCompletions();
-                            if (completions == null || completions.size() == 0) return;
+                            if (completions == null || completions.isEmpty()) return;
                             // 取最新一条
                             Completion completion = completions.get(0);
                             // 取缩略图

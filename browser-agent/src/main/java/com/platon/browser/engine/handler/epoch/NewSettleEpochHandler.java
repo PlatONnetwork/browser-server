@@ -14,13 +14,12 @@ import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.service.CandidateService;
 import com.platon.browser.utils.HexTool;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static java.lang.String.format;
 
 /**
  * @Auther: Chendongming
@@ -49,6 +47,9 @@ public class NewSettleEpochHandler implements EventHandler {
     private StakingStage stakingStage;
     @Autowired
     private SpecialContractApi sca;
+
+    @Autowired
+    private CandidateService candidateService;
 
     @Override
     public void handle(EventContext context) throws Exception {
@@ -70,41 +71,38 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws CandidateException {
+    private void updateVerifier () throws CandidateException, InterruptedException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
-        List <Node> result;
+        List <Node> preVerifier;
         // ==================================更新前一周期验证人列表=======================================
         BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-        try {
-            // 使用当前区块号查询前一结算周期验证人
-            result = sca.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
-            bc.getPreVerifier().clear();
-            result.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("前一轮结算周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(result,true));
-        } catch (Exception e) {
-            throw new CandidateException(format("【查询前轮结算验证人-底层出错】使用块号【%s】查询结算周期验证人出错:%s",prevEpochLastBlockNumber,e.getMessage()));
-        }
-        // ==================================更新下一轮结算周期验证人列表=======================================
-        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
-        try {
-            result = sca.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
-            logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(result,true));
-        } catch (Exception e) {
-            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+        while (true){
             try {
-                BaseResponse<List<Node>> br = client.getNodeContract().getVerifierList().send();
-                if(!br.isStatusOk()) {
-                    throw new CandidateException(br.errMsg);
-                }
-                result = br.data;
-                logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(result,true));
-            } catch (Exception e1) {
-                throw new CandidateException(format("【查询下一轮结算验证人-底层出错】查询实时结算周期验证人出错:%s",e1.getMessage()));
+                // 使用当前区块号查询前一结算周期验证人
+                preVerifier = sca.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
+                bc.getPreVerifier().clear();
+                preVerifier.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("前一轮结算周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(preVerifier,true));
+                break;
+            } catch (Exception e) {
+                logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
             }
         }
+
+        // ==================================更新下一轮结算周期验证人列表=======================================
+        BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
+        List<Node> curVerifier;
+        try {
+            curVerifier = sca.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
+            logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(curVerifier,true));
+        } catch (Exception e) {
+            // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
+            curVerifier=candidateService.getCurVerifiers();
+            logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(curVerifier,true));
+        }
         bc.getCurVerifier().clear();
-        result.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
+        curVerifier.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
 
         if(bc.getCurVerifier().size()==0){
             throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
@@ -154,152 +152,161 @@ public class NewSettleEpochHandler implements EventHandler {
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void settle() throws SettleEpochChangeException, CandidateException {
-
-        // 结算周期切换时对所有候选中和退出中状态的节点进行结算
-
-        // 前一结算周期内每个验证人所获得的平均质押奖励
-        // 计算结算周期每个验证人所获得的平均质押奖励：((前一增发周期末激励池账户余额/(每个增发周期内的结算周期数))/上一结算周期验证人数)*质押激励比例
+    private void settle() throws SettleEpochChangeException {
         if(bc.getPreVerifier().size()==0){
             throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
-        BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getCurVerifier().size()),0,RoundingMode.FLOOR).toString());
-        logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward.longValue());
-
+        if(bc.getCurValidator().size()==0){
+            throw new SettleEpochChangeException("下一结算周期取到的验证人列表为空，无法执行质押结算操作！");
+        }
+        BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getPreVerifier().size()),0,RoundingMode.FLOOR).toString());
+        logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward);
+        // 结算周期切换时对所有候选中和退出中状态的节点进行结算
         List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
         for(CustomStaking curStaking:stakingList){
             // 调整金额状态
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
-            curStaking.setStakingLocked(stakingLocked.toString());
-            curStaking.setStakingHas(BigInteger.ZERO.toString());
-            // 当前结算周期轮数-减持质押时的结算轮数>=指定的质押退回所要经过的结算周期轮数
+            curStaking.setStakingLocked(stakingLocked.toString()); // 把犹豫期金额挪到锁定字段
+            curStaking.setStakingHas(BigInteger.ZERO.toString()); // 犹豫期金额置0
+            // 当前结算周期轮数-减持质押时的结算轮数>=指定的质押退回所要经过的结算周期轮数，则质押退回成功，退回金额字段置0
             if((bc.getCurSettingEpoch().longValue() - curStaking.getStakingReductionEpoch()) >= chainConfig.getUnStakeRefundSettlePeriodCount().longValue()){
                 curStaking.setStakingReduction("0");
             }
-            // 犹豫期+锁定期+退回中==0
+            // 犹豫期+锁定期+退回中==0, 则节点退出
             BigInteger stakingReduction = curStaking.integerStakingReduction();
             if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
                 curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
             }
+            // 年化率信息
+            AnnualizedRateInfo ari = JSON.parseObject(curStaking.getAnnualizedRateInfo(),AnnualizedRateInfo.class);
 
 
-            // 计算质押激励和年化率
-            Node node = bc.getPreVerifier().get(curStaking.getNodeId());
-            if(node!=null){
-                // 质押记录所属节点在前一轮结算周期的验证人列表中，则对其执行结算操作
-                // 累加质押奖励
+            Node preNode = bc.getPreVerifier().get(curStaking.getNodeId());
+            if(preNode!=null){
+                // 当前质押节点在前一轮验证人中，则累加质押奖励
                 BigInteger stakingRewardValue = curStaking.integerStakingRewardValue().add(preVerifierStakingReward);
                 curStaking.setStakingRewardValue(stakingRewardValue.toString());
-
-                CustomNode customNode;
                 try {
-                    customNode = NODE_CACHE.getNode(curStaking.getNodeId());
+                    CustomNode customNode = NODE_CACHE.getNode(curStaking.getNodeId());
+                    // 更新节点的质押金累计字段
+                    customNode.setStatRewardValue(curStaking.getStakingRewardValue());
+                    // 将改动的内存暂存至待更新缓存
+                    stakingStage.updateNode(customNode);
                 } catch (NoSuchBeanException e) {
                     throw new SettleEpochChangeException("获取节点错误:"+e.getMessage());
                 }
 
+                // 计算年化率
                 if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.code){
                     // 只有候选中的记录才需要计算年化率：(((前4个结算周期内验证人所获得的平均质押奖励+前4结算周期出块奖励)/前四个结算周期质押成本)/1466)*100%
-
-                    /**
-                     * 业务处理逻辑：
-                     * 每4个结算周期计算一次年化率
-                     * 收益:     W0    W1    W2    W3    W4
-                     *          |-----|-----|-----|-----|
-                     * 结算周期： S0    S1    S2    S3    S4
-                     * 成本:     C1    C2    C3    C4    C5
-                     *
-                     * 年化率计算：
-                     * W1 + W2 + W3 + W4
-                     * ------------------ x 一个增发周期内的结算周期总数 x 100%
-                     * C1 + C2 + C3 + C4
-                     */
-                    // 年化率推算信息
-                    String annualizedRateInfo = curStaking.getAnnualizedRateInfo();
-                    AnnualizedRateInfo ari;
-                    if(StringUtils.isBlank(annualizedRateInfo)){
-                        // 如果年化率推算信息为空，则证明是新质押，只需要把成本记录下来即可
-                        ari = new AnnualizedRateInfo();
-                        // 下一周期的质押成本：锁定+犹豫
-                        BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
-                        ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
-                    }else{
-                        ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
-                        // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
-                        // 1、添加上一周期的收益
-                        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
-                        ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
-                        // 2、添加下一周期的质押成本
-                        BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
-                        ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
-                        // 保留指定数量最新的记录
-                        if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
-                            // 按结算周期由大到小排序
-                            ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-                            // 删除多余的元素
-                            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
-                        }
-
-                        // 保留指定数量最新的记录
-                        if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
-                            // 按结算周期由大到小排序
-                            ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-                            // 删除多余的元素
-                            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
-                        }
-                    }
-                    class AnnualizedSum{
-                        private BigInteger profitSum=BigInteger.ZERO,costSum=BigInteger.ZERO;
-                        private BigDecimal getAnnualizedRate(){
-                            if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
-                            BigDecimal rate = new BigDecimal(profitSum)
-                                    .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR) // 除总成本
-                                    .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
-                                    .multiply(BigDecimal.valueOf(100));
-                            return rate.setScale(2,RoundingMode.FLOOR);
-                        }
-                    }
-                    AnnualizedSum as = new AnnualizedSum();
-                    // 利润=四个结算周期最新一个的收益-四个结算周期中最旧的收益
-                    // 按结算周期由大到小排序
-                    ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-                    PeriodValueElement latest=null,oldest=null;
-                    int count = 0;
-                    for (PeriodValueElement pve:ari.getProfit()){
-                        count++;
-                        if(count==1) latest=pve;
-                        if(count==ari.getProfit().size()) oldest=pve;
-                    }
-                    if(latest!=null&&oldest!=null){
-                        if (latest==oldest) as.profitSum=latest.getValue();
-                        if (latest!=oldest) as.profitSum=latest.getValue().subtract(oldest.getValue());
-                    }
-
-                    // 按周期从大到小排序
-                    ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
-                    // 从索引1开始，忽略最大的周期
-                    for (int i=1;i<ari.getCost().size();i++){
-                        PeriodValueElement pve = ari.getCost().get(i);
-                        as.costSum=as.costSum.add(pve.getValue());
-                    }
-                    curStaking.setExpectedIncome(as.getAnnualizedRate().toString());
-                    curStaking.setAnnualizedRateInfo(JSON.toJSONString(ari));
+                    // 记录前一结算周期利润
+                    rotateProfit(curStaking,ari);
+                    // 计算最新年化率
+                    calculateAnnualizedRate(curStaking,ari);
                 }
+            }
 
-                // 结算状态设置为已结算
+            // 如果在下一轮结算周期验证人中有当前节点，则轮换成本信息
+            Node nextNode = bc.getCurVerifier().get(curStaking.getNodeId());
+            if(nextNode!=null)  {
+                rotateCost(curStaking,ari);
+                // 是否下一轮结算验证人
                 curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
-                // 更新节点的质押金累计字段
-                customNode.setStatRewardValue(curStaking.getStakingRewardValue());
-                // 将改动的内存暂存至待更新缓存
-                stakingStage.updateNode(customNode);
             }else{
-                // 年化率设置为0
-                curStaking.setExpectedIncome(BigInteger.ZERO.toString());
-                // 结算状态设置为未结算
+                // 不是下一轮结算验证人
                 curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
             }
+
+
+
+            // 更新年化率信息
+            curStaking.setAnnualizedRateInfo(JSON.toJSONString(ari));
+
             // 将改动的内存暂存至待更新缓存
             stakingStage.updateStaking(curStaking);
         }
+    }
+
+    /**
+     * 记录成本 轮换
+     * @param curStaking
+     */
+    private void rotateCost(CustomStaking curStaking,AnnualizedRateInfo ari) throws SettleEpochChangeException {
+        if(ari==null){
+            throw new SettleEpochChangeException("年化率信息为空，无法计算!");
+        }
+        // 添加下一周期的质押成本
+        BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
+        ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
+        // 保留指定数量最新的记录
+        if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+            // 按结算周期由大到小排序
+            ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+            // 删除多余的元素
+            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
+        }
+    }
+
+    /**
+     * 记录利润
+     * @param curStaking
+     */
+    private void rotateProfit(CustomStaking curStaking,AnnualizedRateInfo ari) throws SettleEpochChangeException {
+        if(ari==null){
+            throw new SettleEpochChangeException("年化率信息为空，无法计算!");
+        }
+        // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
+        // 添加上一周期的收益
+        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
+        ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
+        if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+            // 按结算周期由大到小排序
+            ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+            // 删除多余的元素
+            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+        }
+    }
+
+    private class AnnualizedSum{
+        private BigInteger profitSum=BigInteger.ZERO,costSum=BigInteger.ZERO;
+        private BigDecimal getAnnualizedRate(){
+            if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
+            BigDecimal rate = new BigDecimal(profitSum)
+                    .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR) // 除总成本
+                    .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数
+                    .multiply(BigDecimal.valueOf(100));
+            return rate.setScale(2,RoundingMode.FLOOR);
+        }
+    }
+    /**
+     * 计算年化率
+     * @param curStaking
+     */
+    private void calculateAnnualizedRate(CustomStaking curStaking,AnnualizedRateInfo ari){
+        // 年化率推算信息
+        AnnualizedSum as = new AnnualizedSum();
+        // 利润=最新的收益累计-最旧的收益收益累计
+        if(ari.getProfit().isEmpty()) {
+            as.profitSum=BigInteger.ZERO;
+        } else {
+            PeriodValueElement latest=ari.getProfit().get(0);
+            PeriodValueElement oldest=latest;
+            for (PeriodValueElement pve:ari.getProfit()){
+                if(latest==null||latest.getPeriod().compareTo(pve.getPeriod())<0) latest=pve;
+                if(oldest==null||latest.getPeriod().compareTo(pve.getPeriod())>0) oldest=pve;
+            }
+            if (latest==oldest) as.profitSum=latest.getValue();
+            if (latest!=oldest) as.profitSum=latest.getValue().subtract(oldest.getValue());
+        }
+
+        // 按周期从小到大排序
+        ari.getCost().sort((c1,c2)-> Integer.compare(c1.getPeriod().compareTo(c2.getPeriod()), 0));
+        int count = 0;
+        for (PeriodValueElement pve:ari.getCost()){
+            if(count==4) break;
+            as.costSum=as.costSum.add(pve.getValue());
+            count++;
+        }
+        curStaking.setExpectedIncome(as.getAnnualizedRate().toString());
     }
 }

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class AddressUpdateTask {
     public void start(){
         StringBuilder sb = new StringBuilder();
         Collection<CustomAddress> addresses = BlockChain.ADDRESS_CACHE.getAllAddress();
-        if(addresses.size()==0) return;
+        if(addresses.isEmpty()) return;
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {

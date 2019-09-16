@@ -43,7 +43,7 @@ public class RoundCalculation {
 
     /**
      * 生效轮数转化区块高度
-     * 生效块高 = 提案交易所在块高 + 共识周期块数 - 提案交易所在块高%共识周期块数 + (提案入参轮数+4) * 共识周期块数  + 1
+     * 生效块高 = 提案交易所在块高 + 共识周期块数 - 提案交易所在块高%共识周期块数 + (提案入参轮数+设置预升级开始轮数) * 共识周期块数  + 1
      */
     public static BigDecimal activeBlockNumCal ( String blockNumber, BigDecimal endRound, BlockChainConfig bc ) {
         try {

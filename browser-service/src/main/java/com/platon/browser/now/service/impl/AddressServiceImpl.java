@@ -75,7 +75,7 @@ public class AddressServiceImpl implements AddressService {
         }
         RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();
-		criteria.andAddressEqualTo(req.getAddress()); 
+		criteria.andAddressEqualTo(req.getAddress());
         List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
         /** 有锁仓数据之后就可以返回1 */
         if(rpPlans.size() > 0) {

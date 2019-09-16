@@ -7,7 +7,6 @@ import com.platon.browser.config.bean.EconomicConfigResult;
 import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import lombok.Data;
@@ -23,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 链参数统一配置项
@@ -42,10 +42,6 @@ public class BlockChainConfig {
     public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
-    //【通用】结算周期规定的分钟数
-    private BigInteger expectedMinutes;
-    //【通用】系统分配的节点出块时间窗口
-    private BigInteger nodeBlockTimeWindow;
     //【通用】每个验证人每个共识周期出块数量目标值
     private BigInteger expectBlockCount;
     //【通用】每个共识轮验证节点数量
@@ -70,14 +66,10 @@ public class BlockChainConfig {
     //【质押】节点质押退回锁定的结算周期数
     private BigInteger unStakeRefundSettlePeriodCount;
 
-    //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
-    private BigDecimal blockRate4LowSlash;
-    //【惩罚】普通质押金处罚百分比
-    private BigDecimal blockLowSlashRate;
-    //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
-    private BigDecimal blockRate4HighSlash;
-    //【惩罚】违规-低出块率: 最高处罚百分比
-    private BigDecimal blockHighSlashRate;
+    //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
+    private BigDecimal slashBlockRate;
+    //【惩罚】低出块率处罚多少个区块奖励
+    private BigDecimal slashBlockCount;
     //【惩罚】双签处罚百分比
     private BigDecimal duplicateSignSlashRate;
 
@@ -128,27 +120,26 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakings=new ArrayList<>();
 
     @PostConstruct
-    private void init() throws ConfigLoadingException {
-        String web3jAddress = client.getWeb3jAddress();
-        logger.info("Web3j RPC:{}",web3jAddress);
+    private void init() throws InterruptedException {
         EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
         String param = JSON.toJSONString(ecp);
-        try {
-            Web3Response response = HttpUtil.post(web3jAddress,param,Web3Response.class);
-            EconomicConfigResult ecr = JSON.parseObject(response.getResult(),EconomicConfigResult.class);
-            logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
-            updateWithEconomicConfigResult(ecr);
+        EconomicConfigResult ecr;
+        String web3jAddress=null;
+        while (true) try {
+            web3jAddress = client.getWeb3jAddress();
+            logger.info("Web3j RPC:{}",web3jAddress);
+            Web3Response response = HttpUtil.post(web3jAddress, param, Web3Response.class);
+            ecr = JSON.parseObject(response.getResult(), EconomicConfigResult.class);
+            break;
         } catch (HttpRequestException e) {
-            e.printStackTrace();
-            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+e.getMessage());
+            logger.error("初始化链配置错误,将重试:we3j={},error={}", web3jAddress, e.getMessage());
+            TimeUnit.SECONDS.sleep(1);
         }
+        logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
+        updateWithEconomicConfigResult(ecr);
     }
 
     private void updateWithEconomicConfigResult(EconomicConfigResult ecr) {
-        //【通用】结算周期规定的分钟数
-        this.expectedMinutes=ecr.getCommon().getExpectedMinutes();
-        //【通用】系统分配的节点出块时间窗口
-        this.nodeBlockTimeWindow=ecr.getCommon().getNodeBlockTimeWindow();
         //【通用】每个验证人每个共识周期出块数量目标值
         this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
         //【通用】每个共识轮验证节点数量
@@ -156,11 +147,11 @@ public class BlockChainConfig {
         //【通用】增发周期规定的分钟数
         this.additionalCycleMinutes=ecr.getCommon().getAdditionalCycleTime();
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-        this.blockInterval=this.nodeBlockTimeWindow.divide(this.expectBlockCount);
+        this.blockInterval=ecr.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount);
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
-        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(this.getConsensusValidatorCount());
+        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(ecr.getCommon().getValidatorCount());
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        this.settlePeriodBlockCount=this.expectedMinutes
+        this.settlePeriodBlockCount=ecr.getCommon().getExpectedMinutes()
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
                 .multiply(this.consensusPeriodBlockCount);
@@ -177,16 +168,15 @@ public class BlockChainConfig {
         this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
-        //【惩罚】触发普通处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.6，则执行普通处罚
-        this.blockRate4LowSlash=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
-        //【惩罚】普通质押金处罚百分比
-        this.blockLowSlashRate=ecr.getSlashing().getPackAmountLowSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
-        //【惩罚】触发最高处罚的出块率，例如以出块数量目标值10为标准，如果实际出块数<=10*0.2，则执行最高处罚
-        this.blockRate4HighSlash=ecr.getSlashing().getPackAmountHighAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);;
-        //【惩罚】违规-低出块率: 最高处罚百分比
-        this.blockHighSlashRate=ecr.getSlashing().getPackAmountHighSlashRate().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+
+        //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
+        this.slashBlockRate=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
+        //【惩罚】低出块率处罚多少个区块奖励
+        this.slashBlockCount=ecr.getSlashing().getNumberOfBlockRewardForSlashing();
         //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);;
+        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing();
+        //【惩罚】双签处罚百分比
+        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
         //【治理】文本提案参与率: >
         this.minProposalTextParticipationRate=ecr.getGov().getTextProposal_VoteRate();
         //【治理】文本提案支持率：>=
@@ -198,12 +188,15 @@ public class BlockChainConfig {
         //【治理】升级提案通过率
         this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
         //【治理】文本提案投票周期
-        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_ConsensusRounds();
+        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_DurationSeconds()
+                .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【治理】设置预升级开始轮数
-        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalActive_ConsensusRounds();
+        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalVote_DurationSeconds()
+                .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【奖励】激励池分配给出块激励的比例
         this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
+
     }
 }

@@ -13,12 +13,12 @@ import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.service.CandidateService;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static java.lang.String.format;
 
 /**
  * @Auther: Chendongming
@@ -48,6 +47,8 @@ public class NewConsensusEpochHandler implements EventHandler {
     private StakingStage stakingStage;
     @Autowired
     private SpecialContractApi sca;
+    @Autowired
+    private CandidateService candidateService;
 
     @Override
     public void handle(EventContext context) throws Exception {
@@ -115,41 +116,38 @@ public class NewConsensusEpochHandler implements EventHandler {
     private void updateValidator() throws Exception {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
-        List <Node> result;
+        List <Node> preValidator;
         // ==================================更新前一周期验证人列表=======================================
 
         BigInteger prevEpochLastBlockNumber = BigInteger.valueOf(blockNumber);
-        try {
-            // 使用当前区块号查询前一共识周期验证人
-            result = sca.getHistoryValidatorList(client.getWeb3j(),prevEpochLastBlockNumber);
-            bc.getPreValidator().clear();
-            result.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
-            logger.debug("前一轮共识周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(result,true));
-        } catch (Exception e) {
-            throw new CandidateException(format("【查询前轮共识验证人-底层出错】使用块号【%s】查询共识周期验证人出错:%s",prevEpochLastBlockNumber,e.getMessage()));
+        while (true){
+            try {
+                // 使用当前区块号查询前一共识周期验证人
+                preValidator = sca.getHistoryValidatorList(client.getWeb3j(),prevEpochLastBlockNumber);
+                bc.getPreValidator().clear();
+                preValidator.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
+                logger.debug("前一轮共识周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(preValidator,true));
+                break;
+            } catch (Exception e) {
+                logger.error("【查询前轮共识验证人-底层出错】使用块号【{}】查询共识周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
+            }
         }
 
         // ==================================更新下一共识周期验证人列表=======================================
+        List <Node> curValidator;
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
         try {
             // 先使用区块号查询
-            result = sca.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
-            logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(result,true));
+            curValidator = sca.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
+            logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(curValidator,true));
         }catch (Exception e){
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
-            try {
-                BaseResponse<List<Node>> br = client.getNodeContract().getValidatorList().send();
-                if(!br.isStatusOk()) {
-                    throw new CandidateException(br.errMsg);
-                }
-                result=br.data;
-                logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(result,true));
-            } catch (Exception e1) {
-                throw new CandidateException(format("【查询下一轮共识验证人-底层出错】查询实时共识周期验证人出错:%s",e1.getMessage()));
-            }
+            curValidator = candidateService.getCurValidators();
+            logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(curValidator,true));
         }
+
         bc.getCurValidator().clear();
-        result.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
+        curValidator.stream().filter(Objects::nonNull).forEach(node -> bc.getCurValidator().put(HexTool.prefix(node.getNodeId()), node));
 
         if(bc.getCurValidator().size()==0){
             throw new CandidateException("查询不到下一轮共识周期验证人(当前块号="+blockNumber+",当前共识轮数="+bc.getCurConsensusEpoch()+")");
