@@ -1,8 +1,11 @@
 package com.platon.browser.client;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.BytesType;
@@ -34,6 +37,7 @@ import java.util.concurrent.Callable;
  */
 @Component
 public class SpecialContractApi {
+    private static Logger logger = LoggerFactory.getLogger(SpecialContractApi.class);
 
     /**
      * 查询结算周期历史验证人队列
@@ -124,6 +128,7 @@ public class SpecialContractApi {
             List<Node> result = JSONUtil.parseArray(data, Node.class);
             return result;
         }else{
+            logger.error("接口返回数据:{}", JSON.toJSONString(br,true));
             throw new ContractInvokeException("调用合约失败:"+br.errMsg);
         }
     }
