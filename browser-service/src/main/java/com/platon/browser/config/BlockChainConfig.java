@@ -95,7 +95,8 @@ public class BlockChainConfig {
     private BigDecimal proposalTextConsensusRounds;
     //【治理】设置预升级开始轮数
     private BigDecimal versionProposalActiveConsensusRounds;
-
+    //【治理】计算提案间隔
+    private BigDecimal interval;
     //【奖励】激励池分配给出块激励的比例
     private BigDecimal blockRewardRate;
     //【奖励】激励池分配给质押激励的比例
@@ -126,6 +127,7 @@ public class BlockChainConfig {
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息
     private List<CustomStaking> defaultStakings=new ArrayList<>();
+
 
     @PostConstruct
     private void init() throws ConfigLoadingException {
@@ -198,12 +200,15 @@ public class BlockChainConfig {
         //【治理】升级提案通过率
         this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
         //【治理】文本提案投票周期
-        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_ConsensusRounds();
+        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_DurationSeconds().divide(this.interval.multiply(new BigDecimal(ecr.getCommon().getPerRoundBlocks())).multiply(new BigDecimal(ecr.getCommon().getValidatorCount())));
         //【治理】设置预升级开始轮数
-        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalActive_ConsensusRounds();
+        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalVote_DurationSeconds().divide(this.interval.multiply(new BigDecimal(ecr.getCommon().getPerRoundBlocks())).multiply(new BigDecimal(ecr.getCommon().getValidatorCount())));
         //【奖励】激励池分配给出块激励的比例
         this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
+        //【治理】计算提案间隔
+        this.interval=new BigDecimal(ecr.getCommon().getNodeBlockTimeWindow().divide(ecr.getCommon().getPerRoundBlocks()));
+
     }
 }

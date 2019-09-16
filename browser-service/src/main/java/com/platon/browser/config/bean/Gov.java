@@ -15,4 +15,6 @@ public class Gov {
     private BigDecimal TextProposal_SupportRate;
     private BigDecimal CancelProposal_VoteRate;
     private BigDecimal CancelProposal_SupportRate;
+    private BigDecimal TextProposalVote_DurationSeconds;
+    private BigDecimal VersionProposalVote_DurationSeconds;
 }
