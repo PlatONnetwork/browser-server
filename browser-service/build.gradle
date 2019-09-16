@@ -14,4 +14,5 @@ dependencies {
 	testCompile "org.springframework:spring-test:5.1.6.RELEASE"
 	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
 	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
+    compile group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
 }

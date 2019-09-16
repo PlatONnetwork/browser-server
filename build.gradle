@@ -27,7 +27,7 @@ subprojects {
 
     apply plugin: 'java'
     apply plugin: 'jacoco'
-    
+
     group 'com.platon.browser'
     version "${projectVersion}"
     sourceCompatibility = '1.8'
@@ -45,19 +45,18 @@ subprojects {
         compile "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "commons-io:commons-io:$commonIoVersion"
-        compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:1.16"
         testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '2.0.2'
 
     }
-	
+
 	//sonar扫描的路径
     sonarqube {
         properties {
             property "sonar.sources", "src/main/java"
         }
     }
-    
+
     //jacoco测试报表的功能
     jacocoTestReport {
 	    reports {
@@ -65,19 +64,19 @@ subprojects {
 	        html.enabled true
 	    }
 	}
-	
+
 	jacocoTestCoverageVerification {
 		violationRules {
 			rule {
 				limit {
-					minimum = 0.7 
-				} 
-			} 
-		} 
-	 } 
+					minimum = 0.7
+				}
+			}
+		}
+	 }
 
 	check.dependsOn jacocoTestReport
-	
+
 	test {
 	 //   include '**/Test*.class'
 	// 忽略指定的测试用例

@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.task.BlockSyncTask;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
+@EnableEncryptableProperties
 public class BrowserAgentApplication implements ApplicationRunner {
 
 	@Autowired

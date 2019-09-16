@@ -9,15 +9,23 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
+import com.platon.browser.util.LocalSettingsEnvironmentPostProcessor;
 import lombok.Data;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -35,6 +43,21 @@ import java.util.concurrent.TimeUnit;
 @ConfigurationProperties(prefix="platon.config")
 public class BlockChainConfig {
     private static Logger logger = LoggerFactory.getLogger(BlockChainConfig.class);
+
+    static {
+        File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
+        Properties properties = new Properties();
+        try(InputStream in = new FileInputStream(saltFile);) {
+            properties.load(in);
+            String salt=properties.getProperty("jasypt.encryptor.password");
+            if(StringUtils.isBlank(salt)) throw new RuntimeException("加密盐不能为空!");
+            salt=salt.trim();
+            System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
+            logger.error("salt:{}",salt);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Autowired
     private PlatonClient client;
