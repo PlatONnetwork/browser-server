@@ -126,40 +126,40 @@ public class BlockSyncTask {
             } catch (IOException e) {
                 logger.error("取链上最新区块号失败,将重试{}:", e.getMessage());
             }
-            for (long blockNumber=commitBlockNumber+1; blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++) {
+            long blockNumber=commitBlockNumber+1;
+            while (blockNumber<=(commitBlockNumber+collectBatchSize)) {
                 // 如果块号>当前链上块号,则不再累加
                 if(blockNumber>curChainBlockNumber.longValue()) break;
                 blockNumbers.add(BigInteger.valueOf(blockNumber));
+                blockNumber++;
             }
-            if(blockNumbers.isEmpty()){
-                logger.info("当前链最高块({}),等待链出下一个块...",curChainBlockNumber);
+            if (!blockNumbers.isEmpty()) {
+                // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
+                // 采集前先重置结果容器
+                CollectResult.reset();
+                // 开始并行采集
+                List<CustomBlock> blocks = blockService.collect(blockNumbers);
+                // 采集不到区块则暂停1秒, 结束本次循环
+                if (blocks.isEmpty()) continue;
+                // 并行分析 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
+                transactionService.analyze(blocks);
+                // 调用BlockChain实例, 串行分析每个区块，获取质押、提案相关业务数据
+                for (CustomBlock block:blocks) blockChain.execute(block);
+                BlockChainStage bizData = blockChain.exportResult();
+                try {
+                    // 入库失败，立即停止，防止采集后续更高的区块号，导致数据错乱
+                    dbService.batchSave(blocks, bizData);
+                } catch (BusinessException e) {
+                    logger.error("数据入库失败:",e);
+                    break;
+                }
+                // 记录已采入库最高区块号
+                commitBlockNumber = blocks.get(blocks.size()-1).getNumber();
                 TimeUnit.SECONDS.sleep(1);
-                continue;
-            }
-            // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
-            // 采集前先重置结果容器
-            CollectResult.reset();
-            // 开始并行采集
-            List<CustomBlock> blocks = blockService.collect(blockNumbers);
-            // 采集不到区块则暂停1秒, 结束本次循环
-            if(blocks.isEmpty()) {
+            } else {
+                logger.info("当前链最高块({}),等待下一批块...",curChainBlockNumber);
                 TimeUnit.SECONDS.sleep(1);
-                continue;
             }
-            // 并行分析 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
-            transactionService.analyze(blocks);
-            // 调用BlockChain实例, 串行分析每个区块，获取质押、提案相关业务数据
-            for (CustomBlock block:blocks) blockChain.execute(block);
-            BlockChainStage bizData = blockChain.exportResult();
-            try {
-                // 入库失败，立即停止，防止采集后续更高的区块号，导致数据错乱
-                dbService.batchSave(blocks, bizData);
-            } catch (BusinessException e) {
-                break;
-            }
-            // 记录已采入库最高区块号
-            commitBlockNumber = blocks.get(blocks.size() - 1).getNumber();
-            TimeUnit.SECONDS.sleep(1);
         }
     }
 }

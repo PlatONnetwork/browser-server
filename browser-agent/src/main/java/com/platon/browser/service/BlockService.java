@@ -41,24 +41,24 @@ public class BlockService {
      * @param blockNumbers 批量采集的区块号
      * @return void
      */
-    public List<CustomBlock> collect(Set<BigInteger> blockNumbers) throws BlockCollectingException {
+    public List<CustomBlock> collect(Set<BigInteger> blockNumbers) throws InterruptedException {
         // 先重置重试列表
         CollectResult.RETRY_NUMBERS.clear();
         // 把待采块放入重试列表，当作重试块号操作
         CollectResult.RETRY_NUMBERS.addAll(blockNumbers);
         // 记录每次重试出异常的块号，方便放入下次重试
         Set<BigInteger> exceptionNumbers = new CopyOnWriteArraySet<>();
-        while (CollectResult.RETRY_NUMBERS.size()>0){
+        while (!CollectResult.RETRY_NUMBERS.isEmpty()){
             exceptionNumbers.clear();
             // 并行批量采集区块
             CountDownLatch latch = new CountDownLatch(CollectResult.RETRY_NUMBERS.size());
             CollectResult.RETRY_NUMBERS.forEach(blockNumber->
                 executor.submit(()->{
                     try {
-                        CustomBlock block = getBlock(client.getWeb3j(),blockNumber);
+                        CustomBlock block = getBlock(blockNumber);
                         CollectResult.CONCURRENT_BLOCK_MAP.put(blockNumber.longValue(),block);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("搜集区块[{}]异常,加入重试列表",blockNumber,e);
                         // 把出现异常的区块号加入异常块号列表
                         exceptionNumbers.add(blockNumber);
                     }finally {
@@ -66,11 +66,7 @@ public class BlockService {
                     }
                 })
             );
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new BlockCollectingException("区块采集线程被中断:"+e.getMessage());
-            }
+            latch.await();
             // 清空重试列表
             CollectResult.RETRY_NUMBERS.clear();
             // 把本轮异常区块号加入重试列表
@@ -79,15 +75,25 @@ public class BlockService {
         return CollectResult.getSortedBlocks();
     }
 
-    public CustomBlock getBlock(Web3j web3j, BigInteger blockNumber) throws IOException, BlockCollectingException {
-        PlatonBlock.Block initData = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber),true).send().getBlock();
-        if (initData==null) throw new BlockCollectingException("原生区块["+blockNumber+"]为空！");
-        CustomBlock block = new CustomBlock();
-        try{
-            block.updateWithBlock(initData);
-        }catch (Exception ex){
-            throw new BlockCollectingException("初始化区块信息异常, 原因:"+ex.getMessage());
+    /**
+     * 调用RPC接口获取区块
+     * @param blockNumber
+     * @return
+     */
+    public CustomBlock getBlock(BigInteger blockNumber) {
+        while (true) try {
+            Web3j web3j = client.getWeb3j();
+            PlatonBlock.Block pbb = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
+            if (pbb == null) throw new BlockCollectingException("原生区块[" + blockNumber + "]为空！");
+            CustomBlock block = new CustomBlock();
+            try {
+                block.updateWithBlock(pbb);
+            } catch (Exception ex) {
+                throw new BlockCollectingException("初始化区块信息异常:" + ex.getMessage());
+            }
+            return block;
+        } catch (Exception e) {
+            logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
         }
-        return block;
     }
 }
