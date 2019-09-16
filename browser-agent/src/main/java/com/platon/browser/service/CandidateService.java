@@ -32,8 +32,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.String.format;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/6 16:21

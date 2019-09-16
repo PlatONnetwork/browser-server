@@ -13,7 +13,6 @@ import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
-import jdk.internal.dynalink.ChainedCallSite;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,7 +6,6 @@ import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.stage.BlockChainStage;
-import com.platon.browser.exception.BlockCollectingException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;

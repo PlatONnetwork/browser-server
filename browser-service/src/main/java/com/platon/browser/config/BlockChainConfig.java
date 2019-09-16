@@ -7,7 +7,6 @@ import com.platon.browser.config.bean.EconomicConfigResult;
 import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import lombok.Data;

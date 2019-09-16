@@ -16,12 +16,10 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.exception.SettleEpochChangeException;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.utils.HexTool;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigDecimal;
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static java.lang.String.format;
 
 /**
  * @Auther: Chendongming
