@@ -58,6 +58,8 @@ task copyConf(type: Copy) {
 	    into('build/package/browser-api')
 	    from('src/main/resources/application-prod.yml')
 	    into('build/package/browser-api')
+	    from('jasypt.properties')
+	    into('build/package/browser-api')
     }
 }
 //task 用来复制bin下的脚本。这里的fileMode并没有生效，原因不详
@@ -81,6 +83,10 @@ task copySql(type: Copy) {
     from 'src/main/resources/sql'
     into 'build/package/sql'
 }
+// task 用来删除lib
+task deleteLib(type: Delete) {
+    delete 'build/lib'
+}
 //把上述的task串联起来
 task prepareFile(dependsOn: [
         'createDirs',
@@ -89,7 +95,8 @@ task prepareFile(dependsOn: [
         'copyBin',
         'copyDep',
         'copyJasypt',
-        'copySql'
+        'copySql',
+        'deleteLib'
 ]){}
 //指定打包的tar包的名字，以及文件来源目录
 distributions {

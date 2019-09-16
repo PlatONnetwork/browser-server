@@ -177,10 +177,32 @@ sql：sql脚本执行目录
 1、使用提供的加密jar包执行命令：
 java -cp jasypt-1.9.2.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI password=my123456 algorithm=PBEWithMD5AndDES input=Juzhen123!
 参数解析：
-password：外部的盐，配置在jar包同级目录下的jasypt.properties中，列如：'jasypt.encryptor.password=my123456' 。jasypt.properties加载方式优先在jar的同级目录，其次在jar包里面resources文件夹下redirectjasypt.properties文件中增加全路径文件。
+password：外部的盐，配置在jar包同级目录下的jasypt.properties中，列如：'jasypt.encryptor.password=my123456' 。加密盐对于用户名、密码都是同一个。jasypt.properties加载方式优先在jar的同级目录，其次在jar包里面resources文件夹下redirectjasypt.properties文件中增加全路径文件。
 algorithm：默认选择'PBEWithMD5AndDES'方式即可
 input：输入需要加密的用户名或者密码
-2、得到结果：
+2、得到结果（注意：数据库用户名、密码都需要加密）：
+数据库用户名如下：
+
+----ENVIRONMENT-----------------
+
+Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 25.112-b15
+
+
+
+----ARGUMENTS-------------------
+
+input: root
+algorithm: PBEWithMD5AndDES
+password: my123456
+
+
+
+----OUTPUT----------------------
+
+WdsbLfMqOVt4fifwvlrP/g==
+
+数据库密码如下：
+
 ----ENVIRONMENT-----------------
 
 Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 25.112-b15
@@ -199,7 +221,8 @@ password: my123456
 
 57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi
 
-3、复制输出结果到对应的数据库信息中，列如
+3、复制输出结果替换对应yml文件中的的数据库信息中，列如：
+dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 dbpass: ENC(57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi)
 
 ```

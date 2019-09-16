@@ -1,7 +1,6 @@
 package com.platon.browser.config.bean;
 
 import lombok.Data;
-import org.bouncycastle.jcajce.provider.symmetric.ChaCha;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

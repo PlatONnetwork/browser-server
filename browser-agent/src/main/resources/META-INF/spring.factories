@@ -1,1 +1,1 @@
-org.springframework.boot.env.EnvironmentPostProcessor=com.platon.browser.util.LocalSettingsEnvironmentPostProcessor
+#org.springframework.boot.env.EnvironmentPostProcessor=com.platon.browser.util.LocalSettingsEnvironmentPostProcessor
