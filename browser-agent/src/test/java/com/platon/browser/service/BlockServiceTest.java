@@ -48,17 +48,15 @@ public class BlockServiceTest extends TestBase {
 
     /**
      * 测试开始前，设置相关行为属性
-     * @throws IOException
-     * @throws BlockCollectingException
      */
     @Before
-    public void setup() throws IOException, BlockCollectingException {
+    public void setup() throws InterruptedException {
         ReflectionTestUtils.setField(blockService, "executor", THREAD_POOL);
         ReflectionTestUtils.setField(blockService, "client", client);
         when(client.getWeb3j()).thenReturn(web3j);
         when(blockService.collect(anySet())).thenCallRealMethod();
-        when(blockService.getBlock(any(Web3j.class),any(BigInteger.class))).thenAnswer((Answer<CustomBlock>) invocation->{
-            BigInteger blockNumber = invocation.getArgument(1);
+        when(blockService.getBlock(any(BigInteger.class))).thenAnswer((Answer<CustomBlock>) invocation->{
+            BigInteger blockNumber = invocation.getArgument(0);
             CustomBlock block = new CustomBlock();
             block.setNumber(blockNumber.longValue());
             return block;
@@ -67,10 +65,9 @@ public class BlockServiceTest extends TestBase {
 
     /**
      * 执行区块搜集测试
-     * @throws BlockCollectingException
      */
     @Test
-    public void testCollect() throws BlockCollectingException {
+    public void testCollect() throws InterruptedException {
         Set<BigInteger> blockNumbers = new HashSet<>();
         for (int i=0;i<20;i++) blockNumbers.add(BigInteger.valueOf(i));
         List<CustomBlock> blocks = blockService.collect(blockNumbers);

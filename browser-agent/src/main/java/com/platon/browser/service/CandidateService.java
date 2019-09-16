@@ -193,7 +193,7 @@ public class CandidateService {
                 node.updateWithNode(verifier);
                 node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
                 node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-                node.setStatExpectBlockQty(blockChain.getCurConsensusExpectBlockCount().toString());
+                node.setStatExpectBlockQty(blockChain.getCurConsensusExpectBlockCount().toString()); // 期望出块数=共识周期块数/实际参与共识节点数
                 initParam.nodes.add(node);
 
                 CustomStaking staking = new CustomStaking();

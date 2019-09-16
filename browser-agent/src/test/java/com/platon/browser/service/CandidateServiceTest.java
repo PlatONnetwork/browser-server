@@ -68,6 +68,7 @@ public class CandidateServiceTest extends TestBase {
         when(chainConfig.getExpectBlockCount()).thenReturn(BigInteger.TEN);
         when(candidateService.getCurVerifiers()).thenReturn(verifiers);
         when(chainConfig.getDefaultStakingLockedAmount()).thenReturn(BigDecimal.valueOf(10000000));
+        when(blockChain.getCurConsensusExpectBlockCount()).thenReturn(BigDecimal.TEN);
         CandidateService.InitParam initParam = candidateService.getInitParam();
         assertEquals(verifiers.size(),initParam.getNodes().size());
     }
@@ -81,13 +82,6 @@ public class CandidateServiceTest extends TestBase {
         when(candidateService.getVerifiers(anyLong())).thenCallRealMethod();
         CandidateService.CandidateResult cr = candidateService.getVerifiers(20000L);
         assertEquals(cr.getPre().size(),verifiers.size());
-
-        //模拟获取结算周期历史验证人失败
-        when(sca.getHistoryVerifierList(any(),any(BigInteger.class))).thenCallRealMethod();
-        thrown.expect(CandidateException.class);
-        candidateService.getVerifiers(20000L);
-
-
     }
 
     @Test
