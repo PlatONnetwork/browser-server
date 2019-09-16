@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 链参数统一配置项
@@ -120,20 +121,22 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakings=new ArrayList<>();
 
     @PostConstruct
-    private void init() throws ConfigLoadingException {
+    private void init() throws InterruptedException {
         String web3jAddress = client.getWeb3jAddress();
         logger.info("Web3j RPC:{}",web3jAddress);
         EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
         String param = JSON.toJSONString(ecp);
-        try {
-            Web3Response response = HttpUtil.post(web3jAddress,param,Web3Response.class);
-            EconomicConfigResult ecr = JSON.parseObject(response.getResult(),EconomicConfigResult.class);
-            logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
-            updateWithEconomicConfigResult(ecr);
+        EconomicConfigResult ecr;
+        while (true) try {
+            Web3Response response = HttpUtil.post(web3jAddress, param, Web3Response.class);
+            ecr = JSON.parseObject(response.getResult(), EconomicConfigResult.class);
+            break;
         } catch (HttpRequestException e) {
-            e.printStackTrace();
-            throw new ConfigLoadingException("初始化链配置错误:we3j="+web3jAddress+",error="+e.getMessage());
+            logger.error("初始化链配置错误,将重试:we3j={},error={}", web3jAddress, e.getMessage());
+            TimeUnit.SECONDS.sleep(1);
         }
+        logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
+        updateWithEconomicConfigResult(ecr);
     }
 
     private void updateWithEconomicConfigResult(EconomicConfigResult ecr) {
