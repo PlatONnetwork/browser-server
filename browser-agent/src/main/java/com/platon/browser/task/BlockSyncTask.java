@@ -35,7 +35,6 @@ import static com.platon.browser.engine.BlockChain.*;
 @Component
 public class BlockSyncTask {
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
-    public static ExecutorService THREAD_POOL;
 
     @Autowired
     private CustomBlockMapper customBlockMapper;
@@ -63,9 +62,9 @@ public class BlockSyncTask {
      * 初始化已有业务数据
      */
     public void init () throws Exception {
-        THREAD_POOL = Executors.newFixedThreadPool(collectBatchSize);
-        blockService.init(THREAD_POOL);
-        transactionService.init(THREAD_POOL);
+        ExecutorService es = Executors.newFixedThreadPool(collectBatchSize);
+        blockService.init(es);
+        transactionService.init(es);
         // 从数据库查询最高块号，赋值给commitBlockNumber
         Long maxBlockNumber = customBlockMapper.selectMaxBlockNumber();
         // 更新当前所在周期的区块奖励和结算周期质押奖励, 初始化共识验证人列表
@@ -132,7 +131,7 @@ public class BlockSyncTask {
                 if(blockNumber>curChainBlockNumber.longValue()) break;
                 blockNumbers.add(BigInteger.valueOf(blockNumber));
             }
-            if(blockNumbers.size()==0){
+            if(blockNumbers.isEmpty()){
                 logger.info("当前链最高块({}),等待链出下一个块...",curChainBlockNumber);
                 TimeUnit.SECONDS.sleep(1);
                 continue;
@@ -143,7 +142,7 @@ public class BlockSyncTask {
             // 开始并行采集
             List<CustomBlock> blocks = blockService.collect(blockNumbers);
             // 采集不到区块则暂停1秒, 结束本次循环
-            if(blocks.size()==0) {
+            if(blocks.isEmpty()) {
                 TimeUnit.SECONDS.sleep(1);
                 continue;
             }
