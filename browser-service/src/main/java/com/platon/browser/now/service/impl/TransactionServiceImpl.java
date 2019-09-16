@@ -393,9 +393,9 @@ public class TransactionServiceImpl implements TransactionService {
 							} else {
 								resp.setRedeemStatus(RedeemStatusEnum.EXTING.getCode());
 							}
-							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C)
+							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C) + 现有区块数
 							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))
-									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount()));
+									.multiply(new BigDecimal(blockChainConfig.getSettlePeriodBlockCount())).add(new BigDecimal(resp.getBlockNumber()));
 							resp.setRedeemUnLockedBlock(blockNum.toString());
 						}
 						break;

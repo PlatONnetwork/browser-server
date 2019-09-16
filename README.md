@@ -140,6 +140,66 @@ curl http://192.168.1.100/api-103/cache/reset/103/node/true
 
 ###### 7、静态代码扫描：
 ```
-执行命令：
+执行命令(-x 为跳过测试，加上则没有测试覆盖率)：
 gradle sonarqube -x test --info
+```
+
+###### 8、tar打包：
+```
+1、执行打包命令：
+gradle buildTar -x test  -Pprofile=test
+参数解析：
+-x：调过测试编译
+-Pprofile：只打指定yml配置，不使用该配置则打全部的配置文件
+2、打出来tar包位置在build\distributions下
+tar目录树如下：
+├─browser-api
+│      application-prod.yml
+│      application-test.yml
+│      application-testNet.yml
+│      browser-api-0.7.2.0.jar
+│      start.sh
+│      stop.sh
+│
+├─lib
+│      jasypt-1.9.2.jar
+│
+└─sql
+        platon_agent.sql
+        
+browser-api：主程序、启动脚本、yml配置文件主要在的目录
+lib：数据库信息加解密包
+sql：sql脚本执行目录
+```
+
+###### 9、数据库信息加密使用：
+```
+1、使用提供的加密jar包执行命令：
+java -cp jasypt-1.9.2.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI password=my123456 algorithm=PBEWithMD5AndDES input=Juzhen123!
+参数解析：
+password：外部的盐，配置在jar包同级目录下的jasypt.properties中，列如：'jasypt.encryptor.password=my123456' 。jasypt.properties加载方式优先在jar的同级目录，其次在jar包里面resources文件夹下redirectjasypt.properties文件中增加全路径文件。
+algorithm：默认选择'PBEWithMD5AndDES'方式即可
+input：输入需要加密的用户名或者密码
+2、得到结果：
+----ENVIRONMENT-----------------
+
+Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 25.112-b15
+
+
+
+----ARGUMENTS-------------------
+
+input: Juzhen123!
+algorithm: PBEWithMD5AndDES
+password: my123456
+
+
+
+----OUTPUT----------------------
+
+57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi
+
+3、复制输出结果到对应的数据库信息中，列如
+dbpass: ENC(57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi)
+
 ```
