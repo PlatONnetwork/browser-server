@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomStakingMapper">
-  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomStaking" extends="com.platon.browser.dao.mapper.StakingMapper.BaseResultMap"/>
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomStaking" extends="com.platon.browser.dao.mapper.StakingMapper.ResultMapWithBLOBs"/>
   <resultMap id="AndNodeResultMap" type="com.platon.browser.dao.entity.StakingNode">
     <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
