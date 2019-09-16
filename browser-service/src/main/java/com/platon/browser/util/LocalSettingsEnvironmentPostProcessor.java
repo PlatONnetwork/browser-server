@@ -5,8 +5,6 @@
 //import java.io.InputStream;
 //import java.util.Properties;
 //
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 //import org.springframework.boot.SpringApplication;
 //import org.springframework.boot.env.EnvironmentPostProcessor;
 //import org.springframework.core.env.ConfigurableEnvironment;
@@ -15,26 +13,26 @@
 //import org.springframework.core.io.FileSystemResource;
 //import org.springframework.core.io.support.PropertiesLoaderUtils;
 //
+//import lombok.extern.slf4j.Slf4j;
 //
 ///**
 // *  数据库用户名密码加密
 // *  @file LocalSettingsEnvironmentPostProcessor.java
-// *  @description 
+// *  @description
 // *	@author zhangrj
 // *  @data 2019年9月12日
 // */
+//@Slf4j
 //public class LocalSettingsEnvironmentPostProcessor implements EnvironmentPostProcessor {
-//	
-//	private Logger log = LoggerFactory.getLogger(LocalSettingsEnvironmentPostProcessor.class);
 //
 //	private static String fileName = "redirectjasypt.properties";
-//	
+//
 //	private static String jasFileName = "jasypt.properties";
-//	
+//
 //	private static String key = "jasypt.path";
-//	
+//
 //	private static String proName = "Config";
-//	
+//
 //	private static String LOCATIONS [] = {};
 //	static {
 //        Properties properties = new Properties();
@@ -77,7 +75,6 @@
 //	 * @return
 //	 */
 //	private Properties loadProperties(File f) {
-//		log.info("加载目录：{}", f.getPath());
 //        FileSystemResource resource = new FileSystemResource(f);
 //        try {
 //            return PropertiesLoaderUtils.loadProperties(resource);
@@ -87,7 +84,7 @@
 //            return null;
 //       }
 //   }
-//	
+//
 //	/**
 //	 * 加载jar同级目录下文件
 //	 * @method loadProperties
@@ -95,23 +92,21 @@
 //	 */
 //	private Properties loadProperties() {
 //		String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-//		log.debug("加载loadProperties目录：{}", path);
-//		int startindex = path.indexOf("file");
-//		if(startindex != -1) {
-//			path = path.substring(5, path.length());
-//		}
-//		int endIndex = path.indexOf("browser");
-//		if(endIndex != -1) {
-//			path = path.substring(0, endIndex);
+//		path = path.substring(1,path.length());
+//		int endIndex = path.lastIndexOf(File.separator);
+//		if(endIndex == -1) {
+//			endIndex = path.lastIndexOf("/");
 //		}
 //		try {
+//			path = path.substring(0, endIndex);
 //			path = java.net.URLDecoder.decode(path, "utf-8");
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //			log.info("加载同级目录失败：{}", path);
 //			return null;
 //		}
+//		System.out.println(path);
 //		return loadProperties(new File(path + File.separator + jasFileName));
 //	}
-//	
+//
 //}
