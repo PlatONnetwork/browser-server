@@ -114,20 +114,12 @@ public class TransactionService {
     /**
      * 分析区块获取code&交易回执
      */
-    public CustomTransaction updateTransaction(CustomTransaction tx) throws IOException, BeanCreateOrUpdateException {
-        try {
-            Optional<TransactionReceipt> receipt = getReceipt(tx);
-            // 如果交易回执存在，则更新交易中与回执相关的信息
-            if(receipt.isPresent()) {
-                TransactionReceipt tr = receipt.get();
-                tx.updateWithTransactionReceipt(tr, BlockChainConfig.INNER_CONTRACT_ADDR);
-            }
-        }catch (IOException e){
-            logger.error("查询交易[hash={}]的回执出错:{}",tx.getHash(),e.getMessage());
-            throw e;
-        }catch (BeanCreateOrUpdateException e){
-            logger.error("更新交易[hash={}]的回执相关信息出错:{}",tx.getHash(),e.getMessage());
-            throw e;
+    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException {
+        Optional<TransactionReceipt> receipt = getReceipt(tx);
+        // 如果交易回执存在，则更新交易中与回执相关的信息
+        if(receipt.isPresent()) {
+            TransactionReceipt tr = receipt.get();
+            tx.updateWithTransactionReceipt(tr, BlockChainConfig.INNER_CONTRACT_ADDR);
         }
 
         // 解析交易参数，补充交易中与交易参数相关的信息
@@ -153,10 +145,14 @@ public class TransactionService {
      * @return
      * @throws IOException
      */
-    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) throws IOException {
+    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) {
         // 查询交易回执
-        PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-        Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
-        return receipt;
+        while (true) try {
+            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
+            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
+            return receipt;
+        } catch (Exception e) {
+            logger.error("查询交易回执失败,将重试:{}", e.getMessage());
+        }
     }
 }

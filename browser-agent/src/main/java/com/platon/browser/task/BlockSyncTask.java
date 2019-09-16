@@ -122,10 +122,11 @@ public class BlockSyncTask {
             Set<BigInteger> blockNumbers = new HashSet<>();
             // 当前链上最新区块号
             BigInteger curChainBlockNumber;
-            try {
+            while (true) try {
                 curChainBlockNumber = client.getWeb3j().platonBlockNumber().send().getBlockNumber();
+                break;
             } catch (IOException e) {
-                throw new BlockCollectingException("取链上最新区块号失败:"+e.getMessage());
+                logger.error("取链上最新区块号失败,将重试{}:", e.getMessage());
             }
             for (long blockNumber=commitBlockNumber+1; blockNumber<=(commitBlockNumber+collectBatchSize);blockNumber++) {
                 // 如果块号>当前链上块号,则不再累加
@@ -153,7 +154,7 @@ public class BlockSyncTask {
             for (CustomBlock block:blocks) blockChain.execute(block);
             BlockChainStage bizData = blockChain.exportResult();
             try {
-                // 入库失败，立即停止，防止采集后续更高的区块号，导致不连续区块号出现
+                // 入库失败，立即停止，防止采集后续更高的区块号，导致数据错乱
                 dbService.batchSave(blocks, bizData);
             } catch (BusinessException e) {
                 break;

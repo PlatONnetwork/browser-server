@@ -75,7 +75,7 @@ public class AddressServiceImpl implements AddressService {
         }
         RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();
-		criteria.andAddressEqualTo(req.getAddress()); 
+		criteria.andAddressEqualTo(req.getAddress());
         List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
         /** 有锁仓数据之后就可以返回1 */
         if(rpPlans.size() > 0) {
@@ -92,7 +92,7 @@ public class AddressServiceImpl implements AddressService {
 			 * 链上实时查询对应的锁仓信息
 			 */
 			BaseResponse<RestrictingItem> baseResponse = platonClient.getRestrictingPlanContract().getRestrictingInfo(req.getAddress()).send();
-			if(baseResponse.status) {
+			if(baseResponse.isStatusOk()) {
 				/**
 				 * 可用余额为balance减去质押金额
 				 */
