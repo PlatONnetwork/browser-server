@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 
@@ -31,6 +35,7 @@ public class NodeCacheUpdater {
         CustomBlock curBlock = bc.getCurBlock();
         CustomNode node = NODE_CACHE.getNode(curBlock.getNodeId());
         node.setStatBlockQty(node.getStatBlockQty()+1);
+        node.setStatRewardValue(new BigDecimal(node.getStatRewardValue()).add(bc.getBlockReward()).setScale(0, RoundingMode.FLOOR).toString());
         STAGE_DATA.getStakingStage().updateNode(node);
     }
 }

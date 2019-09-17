@@ -45,7 +45,7 @@ public class BlockChainConfig {
     static {
         File saltFile = FileUtils.getFile(System.getProperty("user.dir"), "jasypt.properties");
         Properties properties = new Properties();
-        try(InputStream in = new FileInputStream(saltFile);) {
+        try(InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
             String salt=properties.getProperty("jasypt.encryptor.password");
             if(StringUtils.isBlank(salt)) throw new RuntimeException("加密盐不能为空!");

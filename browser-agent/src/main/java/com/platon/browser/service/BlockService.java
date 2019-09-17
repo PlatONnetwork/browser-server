@@ -12,7 +12,6 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;

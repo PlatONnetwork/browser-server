@@ -188,8 +188,8 @@ public class NewSettleEpochHandler implements EventHandler {
                 curStaking.setStakingRewardValue(stakingRewardValue.toString());
                 try {
                     CustomNode customNode = NODE_CACHE.getNode(curStaking.getNodeId());
-                    // 更新节点的质押金累计字段
-                    customNode.setStatRewardValue(curStaking.getStakingRewardValue());
+                    // 更新节点的奖励累计字段
+                    customNode.setStatRewardValue(curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue()).toString());
                     // 将改动的内存暂存至待更新缓存
                     stakingStage.updateNode(customNode);
                 } catch (NoSuchBeanException e) {

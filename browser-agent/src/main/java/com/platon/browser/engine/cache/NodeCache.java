@@ -199,19 +199,38 @@ public class NodeCache {
         // 取所有已退出状态质押记录
         List<CustomStaking> exitedStakingList = getStakingByStatus(CustomStaking.StatusEnum.EXITED);
         // 用于记录无效的质押记录（其所有委托均已变成历史）
-        List<CustomStaking> invalidCache = new ArrayList<>();
+        List<CustomStaking> invalidStaking = new ArrayList<>();
+        List<CustomDelegation> historyDelegations = new ArrayList<>();
+        List<CustomUnDelegation> returnedUnDelegations = new ArrayList<>();
         exitedStakingList.forEach(staking -> {
-            boolean valid = false;
-            for(CustomDelegation delegation:staking.getDelegations().values()){
+            boolean isStakingValid = false;
+            historyDelegations.clear();
+            for(Map.Entry<String,CustomDelegation> delegationEntry:staking.getDelegations().entrySet()){
+                CustomDelegation delegation = delegationEntry.getValue();
                 if(CustomDelegation.YesNoEnum.NO.code==delegation.getIsHistory()){
                     // 只要有一条委托是非历史状态，则它所属的质押记录就不能从缓存中删除，标记其为有效
-                    valid = true;
-                    break;
+                    isStakingValid = true;
+                    // 过滤出退回成功的解委托记录
+                    returnedUnDelegations.clear();
+                    delegation.getUnDelegations().stream()
+                            .filter(unDelegation -> CustomUnDelegation.StatusEnum.EXITED.code==unDelegation.getStatus())
+                            .forEach(returnedUnDelegations::add);
+                    // 解除其下退回成功的解委托关联,释放内存
+                    delegation.getUnDelegations().removeAll(returnedUnDelegations);
+                } else {
+                    // 无效委托记录到历史列表
+                    historyDelegations.add(delegation);
+                    // 解除其下所有解委托的关联,释放内存
+                    delegation.getUnDelegations().removeAll(delegation.getUnDelegations());
                 }
             }
-            if(!valid) invalidCache.add(staking);
+            // 删除当前质押下的历史委托
+            staking.getDelegations().entrySet().removeAll(historyDelegations);
+            // 记录无效质押
+            if(!isStakingValid) invalidStaking.add(staking);
         });
-        invalidCache.forEach(staking -> {
+
+        invalidStaking.forEach(staking -> {
             // 清除质押
             CustomNode node = nodeMap.get(staking.getNodeId());
             node.getStakings().remove(staking.getStakingBlockNum());
@@ -219,8 +238,6 @@ public class NodeCache {
             delegationSet.removeAll(staking.getDelegations().values());
         });
         // 在所有质押缓存中清除指定实体
-        stakingSet.removeAll(invalidCache);
+        stakingSet.removeAll(invalidStaking);
     }
-
-
 }

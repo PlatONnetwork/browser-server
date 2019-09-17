@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.CustomStakingMapper">
-  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomStaking" extends="com.platon.browser.dao.mapper.StakingMapper.BaseResultMap"/>
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomStaking" extends="com.platon.browser.dao.mapper.StakingMapper.ResultMapWithBLOBs"/>
   <resultMap id="AndNodeResultMap" type="com.platon.browser.dao.entity.StakingNode">
     <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
@@ -54,12 +54,15 @@
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select
     <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
+    ,
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Blob_Column_List" />
     from staking where node_id = #{nodeId}
   </select>
-
   <select id="selectByNodeIdList" resultMap="BaseResultMap">
     select
     <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
+    ,
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Blob_Column_List" />
     from staking where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
   <!--批量选择性插入或更新-->
@@ -183,7 +186,7 @@
     </foreach>
   </insert>
   <select id="selectStakingAndNodeByExample" resultMap="AndNodeResultMap">
-    select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
+    select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
     from staking s left join node n on s.node_id = n.node_id
     <where>
@@ -203,25 +206,25 @@
     		and s.is_setting = #{isSetting,jdbcType=INTEGER}
     	</if>
     </where>
-    order by cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) + 
+    order by cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) +
     cast(stat_delegate_has as Decimal(30)) + cast(stat_delegate_locked as Decimal(30)) desc, s.program_version desc,s.staking_addr desc,s.node_id desc,s.staking_block_num desc
   </select>
   <select id="selectStakingAndNodeByNodeId" resultMap="AndNodeResultMap">
-    select allDelegate,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
+    select allDelegate,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
-    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate from (SELECT s.* 
+    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate from (SELECT s.*
 FROM staking s
     <where>
         <if test="nodeId != null">
             and s.node_id = #{nodeId,jdbcType=VARCHAR}
         </if>
     </where>
-    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn left join node n on sn.node_id = n.node_id 
+    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn left join node n on sn.node_id = n.node_id
   </select>
   <select id="selectHistoryNode" resultMap="AndNodeResultMap">
-    select sn.node_id as disnodeid,allDelegate,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty, 
+    select sn.node_id as disnodeid,allDelegate,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
     n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
-    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate from (SELECT s.* 
+    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate from (SELECT s.*
 FROM staking s
     <where>
     	<if test="statusList != null and statusList.size() > 0">
@@ -231,10 +234,10 @@ FROM staking s
 			</foreach>
     	</if>
     	<if test="key != null and key != ''">
-    		and s.staking_name like CONCAT('%',#{key},'%') 
+    		and s.staking_name like CONCAT('%',#{key},'%')
     	</if>
     	and s.node_id not in  (select s1.node_id from staking s1 where s1.status = 1 )
     </where>
-    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn LEFT JOIN node n ON sn.node_id = n.node_id 
+    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn LEFT JOIN node n ON sn.node_id = n.node_id
   </select>
 </mapper>
