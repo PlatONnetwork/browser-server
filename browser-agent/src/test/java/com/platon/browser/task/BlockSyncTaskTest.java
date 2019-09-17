@@ -1,7 +1,6 @@
 package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.service.BlockService;
@@ -18,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -41,8 +42,6 @@ public class BlockSyncTaskTest extends TestBase {
     @Mock
     private BlockChain blockChain;
     @Mock
-    private PlatonClient client;
-    @Mock
     private BlockService blockService;
     @Mock
     private TransactionService transactionService;
@@ -54,7 +53,6 @@ public class BlockSyncTaskTest extends TestBase {
         ReflectionTestUtils.setField(blockSyncTask, "customBlockMapper", customBlockMapper);
         ReflectionTestUtils.setField(blockSyncTask, "dbService", dbService);
         ReflectionTestUtils.setField(blockSyncTask, "blockChain", blockChain);
-        ReflectionTestUtils.setField(blockSyncTask, "client", client);
         ReflectionTestUtils.setField(blockSyncTask, "blockService", blockService);
         ReflectionTestUtils.setField(blockSyncTask, "transactionService", transactionService);
         ReflectionTestUtils.setField(blockSyncTask, "candidateService", candidateService);
@@ -74,13 +72,19 @@ public class BlockSyncTaskTest extends TestBase {
         when(blockChain.getCurValidator()).thenReturn(new HashMap<>());
         blockSyncTask.init();
 
-        verify(blockSyncTask, times(1)).init();
-
         when(customBlockMapper.selectMaxBlockNumber()).thenReturn(null);
         CandidateService.InitParam initParam = new CandidateService.InitParam();
         initParam.setNodes(nodes);
         initParam.setStakings(stakings);
         when(candidateService.getInitParam()).thenReturn(initParam);
         blockSyncTask.init();
+        verify(blockSyncTask, times(2)).init();
+    }
+
+    @Test
+    public void testCollect() throws Exception {
+        when(blockService.getLatestNumber()).thenReturn(BigInteger.TEN);
+        boolean success = blockSyncTask.collect();
+        assertTrue(success);
     }
 }

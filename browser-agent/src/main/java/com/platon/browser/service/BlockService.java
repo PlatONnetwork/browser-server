@@ -12,6 +12,8 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -93,6 +95,18 @@ public class BlockService {
             return block;
         } catch (Exception e) {
             logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
+        }
+    }
+
+    /**
+     * 取链上当前块号
+     * @return
+     */
+    public BigInteger getLatestNumber() {
+        while (true) try {
+            return client.getWeb3j().platonBlockNumber().send().getBlockNumber();
+        } catch (IOException e) {
+            logger.error("取链上最新区块号失败,将重试{}:", e.getMessage());
         }
     }
 }
