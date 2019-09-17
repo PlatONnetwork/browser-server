@@ -8,7 +8,6 @@ import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
 import com.platon.browser.service.TransactionService;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
