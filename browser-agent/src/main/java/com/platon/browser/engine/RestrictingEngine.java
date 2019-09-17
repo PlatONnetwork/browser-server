@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
+
 /**
  * @Auther: dongqile
  * @Date: 2019/8/31 20:09
@@ -20,7 +22,7 @@ import java.util.Date;
 public class RestrictingEngine {
     private static Logger logger = LoggerFactory.getLogger(RestrictingEngine.class);
 
-    private RestrictingStage restrictingStage = BlockChain.STAGE_DATA.getRestrictingStage();
+    private RestrictingStage restrictingStage = STAGE_DATA.getRestrictingStage();
 
 
     public void execute (CustomTransaction tx,BlockChain bc) {

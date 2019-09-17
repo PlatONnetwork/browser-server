@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
 
 /**
  * @Auther: Chendongming

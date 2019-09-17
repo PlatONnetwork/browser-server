@@ -9,9 +9,9 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.cache.*;
+import com.platon.browser.engine.cache.NodeCacheUpdater;
+import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
@@ -37,6 +37,8 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming
@@ -74,18 +76,6 @@ public class BlockChain {
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
 
-    // 节点名称缓存 <节点ID-节点名称>
-    public static final Map<String,String> NODE_NAME_MAP = new HashMap<>();
-    // 业务数据暂存容器
-    public static final BlockChainStage STAGE_DATA = new BlockChainStage();
-    // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
-    public static final NodeCache NODE_CACHE = new NodeCache();
-    // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
-    public static final ProposalCache PROPOSALS_CACHE = new ProposalCache();
-    // 全量统计数据
-    public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
-    // 全量数据，需要根据业务变化，保持与数据库一致
-    public static final AddressCache ADDRESS_CACHE = new AddressCache();
     // 当前结算周期轮数
     private BigInteger curSettingEpoch;
     // 当前共识周期轮数

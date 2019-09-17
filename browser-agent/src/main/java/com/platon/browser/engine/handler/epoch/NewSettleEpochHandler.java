@@ -28,7 +28,8 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
+
 
 /**
  * @Auther: Chendongming

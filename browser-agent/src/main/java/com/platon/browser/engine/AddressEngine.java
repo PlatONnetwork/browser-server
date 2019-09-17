@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static com.platon.browser.engine.util.CacheTool.ADDRESS_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
@@ -29,9 +32,9 @@ public class AddressEngine {
     @Autowired
     private CustomAddressMapper customAddressMapper;
 
-    private AddressStage addressStage = BlockChain.STAGE_DATA.getAddressStage();
+    private AddressStage addressStage = STAGE_DATA.getAddressStage();
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private AddressCache addressCache = BlockChain.ADDRESS_CACHE;
+    private AddressCache addressCache = ADDRESS_CACHE;
 
     @Autowired
     private AddressStatisticHandler addressStatisticHandler;

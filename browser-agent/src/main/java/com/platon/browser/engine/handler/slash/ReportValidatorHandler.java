@@ -19,8 +19,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile

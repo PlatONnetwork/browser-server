@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 import static com.platon.browser.engine.BlockChain.*;
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: dongqile

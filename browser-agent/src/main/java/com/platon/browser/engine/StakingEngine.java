@@ -31,7 +31,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming
@@ -74,9 +74,9 @@ public class StakingEngine {
     private NewElectionEpochHandler newElectionEpochHandler;
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private NodeCache nodeCache = BlockChain.NODE_CACHE;
+    private NodeCache nodeCache = NODE_CACHE;
 
-    private StakingStage stakingStage= BlockChain.STAGE_DATA.getStakingStage();
+    private StakingStage stakingStage= STAGE_DATA.getStakingStage();
 
     private EventContext context = new EventContext();
 

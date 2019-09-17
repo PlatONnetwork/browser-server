@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.ADDRESS_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -63,7 +64,7 @@ public class AddressUpdateTask {
      * @return
      */
     public Collection<CustomAddress> getAllAddress(){
-        return BlockChain.ADDRESS_CACHE.getAllAddress();
+        return ADDRESS_CACHE.getAllAddress();
     }
 
     /**

@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.platon.browser.engine.BlockChain.*;
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming

@@ -2,8 +2,6 @@ package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
-import com.platon.browser.dto.CustomNodeOpt;
-import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.handler.EventContext;
@@ -13,8 +11,7 @@ import com.platon.browser.param.DeclareVersionParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
 
 /**
  * @Auther: dongqile

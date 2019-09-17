@@ -3,7 +3,6 @@ package com.platon.browser.engine.handler.epoch;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
 
 /**
  * @Auther: Chendongming
@@ -40,8 +39,6 @@ public class NewConsensusEpochHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(NewConsensusEpochHandler.class);
     @Autowired
     private BlockChain bc;
-    @Autowired
-    private BlockChainConfig chainConfig;
     @Autowired
     private PlatonClient client;
     private StakingStage stakingStage;

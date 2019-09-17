@@ -2,7 +2,6 @@ package com.platon.browser.task;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
@@ -18,8 +17,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile

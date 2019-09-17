@@ -17,7 +17,8 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
+
 
 /**
  * @Auther: dongqile

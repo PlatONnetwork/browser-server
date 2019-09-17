@@ -20,6 +20,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
@@ -30,7 +33,7 @@ public class ProposalEngine {
     private static Logger logger = LoggerFactory.getLogger(ProposalEngine.class);
 
     // 全量数据，需要根据业务变化，保持与数据库一致
-    private ProposalCache proposalCache = BlockChain.PROPOSALS_CACHE;
+    private ProposalCache proposalCache = PROPOSALS_CACHE;
 
     public static final String pIDIDNum = "PIP-{pip_id}";
 
@@ -40,7 +43,7 @@ public class ProposalEngine {
     @Autowired
     private CustomVoteMapper customVoteMapper;
 
-    private ProposalStage proposalStage = BlockChain.STAGE_DATA.getProposalStage();
+    private ProposalStage proposalStage = STAGE_DATA.getProposalStage();
 
     /*********************业务事件处理器*********************/
 

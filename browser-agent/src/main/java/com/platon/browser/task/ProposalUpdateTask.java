@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.platon.browser.engine.BlockChain.PROPOSALS_CACHE;
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile

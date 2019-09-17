@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.platon.browser.engine.BlockChain.*;
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming

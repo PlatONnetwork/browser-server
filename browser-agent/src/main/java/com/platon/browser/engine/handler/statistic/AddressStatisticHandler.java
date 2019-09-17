@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.ADDRESS_CACHE;
-import static com.platon.browser.engine.BlockChain.NETWORK_STAT_CACHE;
+import static com.platon.browser.engine.util.CacheTool.ADDRESS_CACHE;
+import static com.platon.browser.engine.util.CacheTool.NETWORK_STAT_CACHE;
 
 /**
  * @Auther: Chendongming

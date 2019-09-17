@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
+import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
+
 /**
  *
  * @Auther: dongqile
@@ -148,8 +151,8 @@ public class DbService {
             insertOrUpdate(basicData,bizData);
             blockChain.commitResult();
             // 缓存整理
-            BlockChain.NODE_CACHE.sweep();
-            BlockChain.PROPOSALS_CACHE.sweep();
+            NODE_CACHE.sweep();
+            PROPOSALS_CACHE.sweep();
         }catch (Exception e){
             throw new BusinessException("数据批量入库出错："+e.getMessage());
         }

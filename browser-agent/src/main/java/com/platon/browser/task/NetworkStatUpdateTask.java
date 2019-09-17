@@ -18,7 +18,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.platon.browser.engine.BlockChain.STAGE_DATA;
+import static com.platon.browser.engine.util.CacheTool.NETWORK_STAT_CACHE;
+import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -65,9 +66,9 @@ public class NetworkStatUpdateTask {
             //计算流通量
             BigDecimal turnoverValue = circulation.subtract(new BigDecimal(lockContractBalance)).subtract(new BigDecimal(stakingContractBalance)).subtract(new BigDecimal(incentivePoolAccountBalance));
             //数据回填内存中
-            BlockChain.NETWORK_STAT_CACHE.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            BlockChain.NETWORK_STAT_CACHE.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            STAGE_DATA.getNetworkStatStage().updateNetworkStat(BlockChain.NETWORK_STAT_CACHE);
+            NETWORK_STAT_CACHE.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            NETWORK_STAT_CACHE.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }

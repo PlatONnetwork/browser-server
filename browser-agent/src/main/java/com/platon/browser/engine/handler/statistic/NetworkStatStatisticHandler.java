@@ -19,7 +19,7 @@ import java.util.Set;
 
 import static com.platon.browser.dto.CustomProposal.StatusEnum;
 import static com.platon.browser.dto.CustomProposal.TypeEnum;
-import static com.platon.browser.engine.BlockChain.*;
+import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: dongqile
@@ -92,7 +92,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             NETWORK_STAT_CACHE.setBlockReward(bc.getBlockReward().toString());
             //统计质押金额
             Set <CustomStaking> newStaking = NODE_CACHE.getAllStaking();
-            if (newStaking.size() > 0) {
+            if (!newStaking.isEmpty()) {
                 BigInteger stakingValue = BigInteger.ZERO;
                 for (CustomStaking customStaking : newStaking) {
                     stakingValue = stakingValue.add(customStaking.integerStakingHas()).add(customStaking.integerStakingLocked());
@@ -102,7 +102,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //委托累计
             Set <CustomDelegation> newDelegation = NODE_CACHE.getAllDelegation();
             BigInteger delegationValue = BigInteger.ZERO;
-            if (newDelegation.size() > 0) {
+            if (!newDelegation.isEmpty()) {
                 for (CustomDelegation customDelegation : newDelegation) {
                     delegationValue = delegationValue.add(customDelegation.integerDelegateHas().add(customDelegation.integerDelegateLocked()));
                 }
