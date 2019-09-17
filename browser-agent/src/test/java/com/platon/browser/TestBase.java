@@ -6,9 +6,11 @@ import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.web3j.platon.bean.Node;
 
 import java.io.File;
@@ -121,4 +123,6 @@ public class TestBase {
         }
         logger.info("测试数据加载完成！");
     }
+
+
 }

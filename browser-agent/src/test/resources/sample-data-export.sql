@@ -96,7 +96,7 @@ FROM
              ON ud.`staking_block_num` = st.`staking_block_num`;
 
 SELECT DISTINCT
-    pro.*
+    p.*
 FROM
     block bl
         JOIN `transaction` tx
