@@ -21,6 +21,7 @@ public class StakingOptRecordListResp {
     private String option;  //提案选项
     private String percent;  //处罚百分比
     private String amount;  //处罚金额
+    private Integer isFire;  //是否踢出列表  0-否，1-是
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -81,6 +82,12 @@ public class StakingOptRecordListResp {
 	}
 	public void setAmount(String amount) {
 		this.amount = amount;
+	}
+	public Integer getIsFire() {
+		return isFire;
+	}
+	public void setIsFire(Integer isFire) {
+		this.isFire = isFire;
 	}
     
 }

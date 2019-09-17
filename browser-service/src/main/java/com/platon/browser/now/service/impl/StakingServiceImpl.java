@@ -101,7 +101,7 @@ public class StakingServiceImpl implements StakingService {
 				status = StakingStatusEnum.CANDIDATE.getCode();
 				break;
 			case ACTIVE:
-				/** 活跃中代表即使后续同时也是共识周期验证人 */
+				/** 活跃中代表即使后续同时也是结算周期验证人 */
 				status = StakingStatusEnum.CANDIDATE.getCode();
 //				isConsensus = CustomStaking.YesNoEnum.YES.getCode();
 				isSetting = CustomStaking.YesNoEnum.YES.getCode();
@@ -146,9 +146,9 @@ public class StakingServiceImpl implements StakingService {
 			} else {
 				aliveStakingListResp.setStatus(StakingStatusEnum.getCodeByStatus(stakings.get(i).getStatus(), stakings.get(i).getIsConsensus(), stakings.get(i).getIsSetting()));
 			}
-			
+			/** 设置名称 */
 			aliveStakingListResp.setNodeName(stakings.get(i).getStakingName());
-			/* 质押总数=有效的质押+委托 */
+			/** 质押总数=有效的质押+委托 */
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))
 					.add(new BigDecimal(stakings.get(i).getStatDelegateHas())).add(new BigDecimal(stakings.get(i).getStatDelegateLocked())).toString();
 			aliveStakingListResp.setTotalValue(totalValue);
@@ -305,6 +305,7 @@ public class StakingServiceImpl implements StakingService {
 					case LOW_BLOCK_RATE:
 						stakingOptRecordListResp.setPercent(desces[0]);
 						stakingOptRecordListResp.setAmount(desces[1]);
+						stakingOptRecordListResp.setIsFire(Integer.parseInt(desces[2]));
 						break;
 					default:
 						break;
