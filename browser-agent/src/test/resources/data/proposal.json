@@ -1,0 +1,25 @@
+[ 
+{ 
+"hash":"0xf9fb1d9f64ec2573cad0cec662ec1ffcf7207d8c2ebac56d13b5e1ef0a2555f3",
+"type":"1",
+"verifier":"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
+"verifier_name":"cdm-004",
+"url":"https://github.com/danielgogo/PIPs/blob/master/PIP-1.md",
+"new_version":null,
+"end_voting_block":"1251980",
+"active_block":null,
+"timestamp":"2019-09-16 17:54:54",
+"yeas":1,
+"nays":0,
+"abstentions":0,
+"accu_verifiers":5,
+"status":1,
+"update_time":"2019-09-16 20:02:33",
+"create_time":"2019-09-16 20:02:33",
+"pip_num":"PIP-1",
+"pip_id":1,
+"topic":"Topic of 1",
+"description":"Description of 1",
+"canceled_pip_id":"",
+"canceled_topic":""
+}]

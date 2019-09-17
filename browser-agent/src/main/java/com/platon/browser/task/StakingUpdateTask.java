@@ -1,5 +1,6 @@
 package com.platon.browser.task;
 
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.keybase.Completion;
@@ -29,16 +30,16 @@ import static com.platon.browser.engine.BlockChain.STAGE_DATA;
 public class StakingUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
     @Autowired
-    private BlockChain blockChain;
+    private BlockChainConfig chainConfig;
     private static final String fingerprintpPer = "_/api/1.0/user/autocomplete.json?q=";
 
     @Scheduled(cron = "0/3  * * * * ?")
     private void cron(){start();}
 
     public void start () {
-        String keyStoreUrl = blockChain.getChainConfig().getKeyBase();
+        String keyStoreUrl = chainConfig.getKeyBase();
         try {
-            Set <CustomStaking> customStakingSet = NODE_CACHE.getAllStaking();
+            Set <CustomStaking> customStakingSet = getAllStaking();
             if (customStakingSet.isEmpty()) return;
             customStakingSet.forEach(customStaking -> {
                 if(StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon())){
@@ -68,5 +69,13 @@ public class StakingUpdateTask {
         } catch (Exception e) {
             logger.error("[StakingUpdateTask] Exception {}", e.getMessage());
         }
+    }
+
+    /**
+     * 取所有质押
+     * @return
+     */
+    public Set<CustomStaking> getAllStaking() {
+        return NODE_CACHE.getAllStaking();
     }
 }

@@ -12,7 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.web3j.protocol.Web3j;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
@@ -23,8 +22,8 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 /**
- * @Auther: dongqile
- * @Date: 2019/9/5
+ * @Auther: Chendongming
+ * @Date: 2019/9/9 20:29
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
