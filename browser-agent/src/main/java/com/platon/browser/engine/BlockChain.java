@@ -190,6 +190,7 @@ public class BlockChain {
                     break;
                 case CREATE_RESTRICTING://创建锁仓计划
                     restrictingEngine.execute(tx,this);
+                    break;
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
                     break;
