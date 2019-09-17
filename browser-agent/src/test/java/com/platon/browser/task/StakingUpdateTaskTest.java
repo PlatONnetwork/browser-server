@@ -40,7 +40,7 @@ public class StakingUpdateTaskTest extends TestBase {
         customStakingSet.forEach(cc->{
             cc.setExternalName("");
             cc.setStakingIcon("");
-            cc.setExternalId("df6fbe3ced59e75bced77cfa5fd68b690010632b");
+            cc.setExternalId("2A0CD8DCB4BF2BE0");
         });
         doReturn(customStakingSet).when(stakingUpdateTask).getAllStaking();
         stakingUpdateTask.start();
