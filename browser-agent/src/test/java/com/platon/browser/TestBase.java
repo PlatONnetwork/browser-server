@@ -24,18 +24,30 @@ import java.util.*;
 public class TestBase {
     private static Logger logger = LoggerFactory.getLogger(TestBase.class);
     private static String prefix = "data/",suffix=".json",encode="UTF8";
-    private static String[] dataFile = {"node","block","transaction","staking","delegation","unDelegation","verifier","validator","candidate"};
+    private static String[] dataFile = {
+            "node",
+            "block",
+            "transaction",
+            "staking",
+            "delegation",
+            "unDelegation",
+            "verifier",
+            "validator",
+            "candidate",
+            "address"
+    };
 
     public static NodeCache NODE_CACHE = new NodeCache();
-    public static List<CustomNode> nodes= Collections.EMPTY_LIST;
-    public static List<CustomBlock> blocks= Collections.EMPTY_LIST;
-    public static List<TransactionBean> transactions= Collections.EMPTY_LIST;
-    public static List<CustomStaking> stakings= Collections.EMPTY_LIST;
-    public static List<CustomDelegation> delegations= Collections.EMPTY_LIST;
-    public static List<CustomUnDelegation> unDelegations= Collections.EMPTY_LIST;
+    public static List<CustomNode> nodes= Collections.emptyList();
+    public static List<CustomBlock> blocks= Collections.emptyList();
+    public static List<TransactionBean> transactions= Collections.emptyList();
+    public static List<CustomStaking> stakings= Collections.emptyList();
+    public static List<CustomDelegation> delegations= Collections.emptyList();
+    public static List<CustomUnDelegation> unDelegations= Collections.emptyList();
     public static List<Node> verifiers= new ArrayList<>();
     public static List<Node> validators= new ArrayList<>();
     public static List<Node> candidates= new ArrayList<>();
+    public static List<CustomAddress> addresses= Collections.emptyList();
 
     static {
         Arrays.asList(dataFile).forEach(fileName->{
@@ -74,6 +86,9 @@ public class TestBase {
                     case "candidate":
                         List<NodeBean> canList = JSON.parseArray(content,NodeBean.class);
                         candidates.addAll(canList);
+                        break;
+                    case "address":
+                        addresses = JSON.parseArray(content,CustomAddress.class);
                         break;
                 }
             } catch (IOException e) {

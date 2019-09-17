@@ -36,12 +36,12 @@ public class AddressUpdateTask {
 
     public void start(){
         StringBuilder sb = new StringBuilder();
-        Collection<CustomAddress> addresses = BlockChain.ADDRESS_CACHE.getAllAddress();
+        Collection<CustomAddress> addresses = getAllAddress();
         if(addresses.isEmpty()) return;
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
-            List<RestrictingBalance> data = sca.getRestrictingBalance(client.getWeb3j(),params);
+            List<RestrictingBalance> data = getRestrictingBalance(params);
             Map<String,RestrictingBalance> map = new HashMap<>();
             data.forEach(rb->map.put(rb.getAccount(),rb));
             addresses.forEach(address->{
@@ -56,5 +56,23 @@ public class AddressUpdateTask {
         } catch (Exception e) {
             logger.error("锁仓合约查询余额出错:{}",e.getMessage());
         }
+    }
+
+    /**
+     * 取缓存全量地址
+     * @return
+     */
+    public Collection<CustomAddress> getAllAddress(){
+        return BlockChain.ADDRESS_CACHE.getAllAddress();
+    }
+
+    /**
+     * 取锁仓余额信息
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    public List<RestrictingBalance> getRestrictingBalance(String params) throws Exception {
+        return sca.getRestrictingBalance(client.getWeb3j(),params);
     }
 }
