@@ -34,7 +34,8 @@ public class TestBase {
             "verifier",
             "validator",
             "candidate",
-            "address"
+            "address",
+            "proposal"
     };
 
     public static NodeCache NODE_CACHE = new NodeCache();
@@ -44,6 +45,7 @@ public class TestBase {
     public static List<CustomStaking> stakings= Collections.emptyList();
     public static List<CustomDelegation> delegations= Collections.emptyList();
     public static List<CustomUnDelegation> unDelegations= Collections.emptyList();
+    public static List<CustomProposal> proposals = Collections.emptyList();
     public static List<Node> verifiers= new ArrayList<>();
     public static List<Node> validators= new ArrayList<>();
     public static List<Node> candidates= new ArrayList<>();
@@ -89,6 +91,9 @@ public class TestBase {
                         break;
                     case "address":
                         addresses = JSON.parseArray(content,CustomAddress.class);
+                        break;
+                    case "proposal":
+                        proposals = JSON.parseArray(content,CustomProposal.class);
                         break;
                 }
             } catch (IOException e) {
