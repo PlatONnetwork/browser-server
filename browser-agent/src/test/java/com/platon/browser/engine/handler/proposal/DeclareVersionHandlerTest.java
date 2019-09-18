@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
@@ -51,10 +52,11 @@ public class DeclareVersionHandlerTest extends TestBase {
      */
     @Test
     public void testHandler () throws CacheConstructException, NoSuchBeanException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
+        NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
-
+        CustomNode node = mock(CustomNode.class);
+        when(nodeCache.getNode(any())).thenReturn(node);
+        when(node.getLatestStaking()).thenReturn(stakings.get(0));
         EventContext context = new EventContext();
         context.setTransaction(transactions.get(0));
         handler.handle(context);

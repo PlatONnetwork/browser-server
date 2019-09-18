@@ -67,7 +67,7 @@ public class ProposalTextHandler implements EventHandler {
         param.setNodeName(staking.getStakingName());
         tx.setTxInfo(JSON.toJSONString(param));
         //获取配置文件提案参数模板
-        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String temp = chainConfig.getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key,param.getPIDID());
         //设置本轮参与人数
         //设置url

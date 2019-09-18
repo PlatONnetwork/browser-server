@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
@@ -9,7 +10,6 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
@@ -33,6 +33,8 @@ public class ProposalCancelHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private BlockChainConfig chainConfig;
     @Autowired
     private CacheHolder cacheHolder;
 
@@ -74,7 +76,7 @@ public class ProposalCancelHandler implements EventHandler {
         //设置提案为升级类型
         proposal.setType(CustomProposal.TypeEnum.CANCEL.code);
         //获取配置文件提案参数模板
-        String temp = bc.getChainConfig().getProposalUrlTemplate();
+        String temp = chainConfig.getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key,param.getPIDID());
         //设置url
         proposal.setUrl(url);
@@ -82,13 +84,13 @@ public class ProposalCancelHandler implements EventHandler {
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
         //结束轮转换结束区块高度
-        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
+        BigDecimal cancelEndBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),chainConfig);
         proposal.setEndVotingBlock(cancelEndBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
-        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),chainConfig);
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置被取消的提案id
         proposal.setCanceledPipId(param.getCanceledProposalID());

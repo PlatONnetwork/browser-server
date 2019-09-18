@@ -29,8 +29,6 @@ public class VotingProposalHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandler.class);
 
     @Autowired
-    private BlockChain bc;
-    @Autowired
     private CacheHolder cacheHolder;
 
     @Override
