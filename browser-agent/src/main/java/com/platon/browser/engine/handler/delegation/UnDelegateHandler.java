@@ -120,7 +120,7 @@ public class UnDelegateHandler implements EventHandler {
             stakingStage.insertUnDelegation(unDelegation);
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
-            throw  new NoSuchBeanException("缓存中找不到对应的接触质押信息:");
+            throw  new NoSuchBeanException("缓存中找不到对应的解除质押信息:");
         }
     }
 }

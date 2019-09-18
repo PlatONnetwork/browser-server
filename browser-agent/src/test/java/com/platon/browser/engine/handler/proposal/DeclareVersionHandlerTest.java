@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class DeclareVersionHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(DeclareVersionHandlerTest.class);
     @Spy
-    private DeclareVersionHandler declareVersionHandler;
+    private DeclareVersionHandler handler;
     @Mock
     private CacheHolder cacheHolder;
 
@@ -43,7 +43,7 @@ public class DeclareVersionHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(declareVersionHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
     }
 
     /**
@@ -56,11 +56,14 @@ public class DeclareVersionHandlerTest extends TestBase {
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.DECLARE_VERSION.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        declareVersionHandler.handle(context);
+        handler.handle(context);
 
-        verify(declareVersionHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

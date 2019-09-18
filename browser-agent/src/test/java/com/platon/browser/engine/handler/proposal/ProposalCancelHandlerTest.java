@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.*;
 public class ProposalCancelHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandlerTest.class);
     @Spy
-    private ProposalCancelHandler proposalCancelHandler;
+    private ProposalCancelHandler handler;
     @Mock
     private CacheHolder cacheHolder;
 
@@ -43,7 +44,7 @@ public class ProposalCancelHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(proposalCancelHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
     }
 
     /**
@@ -54,13 +55,18 @@ public class ProposalCancelHandlerTest extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.CANCEL_PROPOSAL.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        proposalCancelHandler.handle(context);
+        handler.handle(context);
 
-        verify(proposalCancelHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

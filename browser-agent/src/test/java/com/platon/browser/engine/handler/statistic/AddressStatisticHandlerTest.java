@@ -1,9 +1,11 @@
 package com.platon.browser.engine.handler.statistic;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import org.junit.Before;
@@ -18,7 +20,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class AddressStatisticHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(AddressStatisticHandlerTest.class);
     @Spy
-    private AddressStatisticHandler addressStatisticHandler;
+    private AddressStatisticHandler handler;
     @Mock
     private CacheHolder cacheHolder;
 
@@ -43,7 +44,7 @@ public class AddressStatisticHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(addressStatisticHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
     }
 
     @Test
@@ -51,11 +52,18 @@ public class AddressStatisticHandlerTest extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        CustomNetworkStat networkStatCache = new CustomNetworkStat();
+        when(cacheHolder.getNetworkStatCache()).thenReturn(networkStatCache);
 
         EventContext context = new EventContext();
-        transactions.forEach(context::setTransaction);
-        addressStatisticHandler.handle(context);
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
 
-        verify(addressStatisticHandler, times(1)).handle(any(EventContext.class));
+        transactions.forEach(context::setTransaction);
+        handler.handle(context);
+
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

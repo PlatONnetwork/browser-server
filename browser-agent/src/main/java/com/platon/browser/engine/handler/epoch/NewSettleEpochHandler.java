@@ -12,7 +12,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -55,7 +54,6 @@ public class NewSettleEpochHandler implements EventHandler {
     private CacheHolder cacheHolder;
 
     private NodeCache nodeCache;
-    private BlockChainStage stageData;
 
     @Override
     public void handle(EventContext context) throws Exception {
@@ -163,7 +161,7 @@ public class NewSettleEpochHandler implements EventHandler {
         if(bc.getPreVerifier().size()==0){
             throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
-        if(bc.getCurValidator().size()==0){
+        if(bc.getCurVerifier().size()==0){
             throw new SettleEpochChangeException("下一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
         BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getPreVerifier().size()),0,RoundingMode.FLOOR).toString());
@@ -246,11 +244,11 @@ public class NewSettleEpochHandler implements EventHandler {
         BigInteger cost = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
         ari.getCost().add(new PeriodValueElement(bc.getCurSettingEpoch().add(BigInteger.ONE),cost));
         // 保留指定数量最新的记录
-        if(ari.getCost().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+        if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
             // 按结算周期由大到小排序
             ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
             // 删除多余的元素
-            for (int i=ari.getCost().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
+            for (int i=ari.getCost().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
         }
     }
 
@@ -266,11 +264,11 @@ public class NewSettleEpochHandler implements EventHandler {
         // 添加上一周期的收益
         BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
         ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
-        if(ari.getProfit().size()>bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+        if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
             // 按结算周期由大到小排序
             ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
             // 删除多余的元素
-            for (int i=ari.getProfit().size()-1;i>=bc.getChainConfig().getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+            for (int i=ari.getProfit().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
         }
     }
 
