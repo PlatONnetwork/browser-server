@@ -32,7 +32,7 @@ public class DelegateHandler implements EventHandler {
     public void handle ( EventContext context ) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {

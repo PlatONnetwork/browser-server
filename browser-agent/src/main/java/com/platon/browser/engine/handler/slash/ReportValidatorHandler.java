@@ -40,10 +40,9 @@ public class ReportValidatorHandler implements EventHandler {
     @Override
     public void handle ( EventContext context )throws NoSuchBeanException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
-
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+
         // 获取交易入参
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
@@ -85,7 +84,7 @@ public class ReportValidatorHandler implements EventHandler {
 
             // 设置节点统计数据中的多签举报次数
             node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
-            stageData.getStakingStage().updateNode(node);
+            stakingStage.updateNode(node);
 
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
@@ -99,7 +98,7 @@ public class ReportValidatorHandler implements EventHandler {
                     .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
                     .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
             nodeOpt.setDesc(desc);
-            stageData.getStakingStage().insertNodeOpt(nodeOpt);
+            stakingStage.insertNodeOpt(nodeOpt);
         } catch (NoSuchBeanException e) {
             logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             throw new NoSuchBeanException("");

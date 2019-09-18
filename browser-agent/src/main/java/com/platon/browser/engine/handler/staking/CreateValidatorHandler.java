@@ -38,11 +38,9 @@ public class CreateValidatorHandler implements EventHandler {
     public void handle(EventContext context) throws NoSuchBeanException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
-        BlockChainStage stageData = cacheHolder.getStageData();
-
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
 
-        StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));

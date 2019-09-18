@@ -28,8 +28,8 @@ public class AddressStatisticHandler implements EventHandler {
     @Override
     public void handle(EventContext context) {
         AddressCache addressCache = cacheHolder.getAddressCache();
+        AddressStage addressStage = cacheHolder.getStageData().getAddressStage();
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
-        AddressStage addressStage = context.getAddressStage();
         CustomTransaction tx = context.getTransaction();
 
         String from = tx.getFrom(),to = tx.getTo();

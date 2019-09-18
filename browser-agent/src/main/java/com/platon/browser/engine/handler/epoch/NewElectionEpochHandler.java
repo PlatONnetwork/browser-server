@@ -47,7 +47,7 @@ public class NewElectionEpochHandler implements EventHandler {
     public void handle(EventContext context) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
-        StakingStage stakingStage = context.getStakingStage();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakingList){
             // 需要判断被处罚质押是否在上一轮共识周期验证人

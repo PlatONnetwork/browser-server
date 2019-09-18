@@ -33,9 +33,9 @@ public class EditValidatorHandler implements EventHandler {
     public void handle(EventContext context) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
-
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
         logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));

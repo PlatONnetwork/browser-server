@@ -10,8 +10,8 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalUpgradeParam;
@@ -42,11 +42,11 @@ public class ProposalUpgradeHandler implements EventHandler {
     public void handle ( EventContext context ) throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
 
     	logger.debug("ProposalUpgradeHandler");
         CustomTransaction tx = context.getTransaction();
-        ProposalStage proposalStage = context.getProposalStage();
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
@@ -106,6 +106,6 @@ public class ProposalUpgradeHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
         nodeOpt.setDesc(desc);
-        stageData.getStakingStage().insertNodeOpt(nodeOpt);
+        stakingStage.insertNodeOpt(nodeOpt);
     }
 }

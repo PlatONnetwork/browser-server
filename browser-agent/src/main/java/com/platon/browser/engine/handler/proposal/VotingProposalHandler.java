@@ -38,10 +38,10 @@ public class VotingProposalHandler implements EventHandler {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         BlockChainStage stageData = cacheHolder.getStageData();
-
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
+        CustomTransaction tx = context.getTransaction();
         try{
-            CustomTransaction tx = context.getTransaction();
-            ProposalStage proposalStage = context.getProposalStage();
+
             VotingProposalParam param = tx.getTxParam(VotingProposalParam.class);
 
             CustomNode node;

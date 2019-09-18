@@ -60,8 +60,7 @@ public class NewSettleEpochHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws Exception {
         nodeCache = cacheHolder.getNodeCache();
-        stageData = cacheHolder.getStageData();
-        stakingStage = context.getStakingStage();
+        stakingStage = cacheHolder.getStageData().getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
         settle(); // 结算
         updateDelegation(); // 更新委托信息

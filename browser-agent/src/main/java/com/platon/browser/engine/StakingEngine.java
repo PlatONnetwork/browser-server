@@ -86,7 +86,7 @@ public class StakingEngine {
         logger.debug("execute loadNodes:{}", nodeList);
         List<String> nodeIds = new ArrayList<>();
         nodeList.forEach(node -> nodeIds.add(node.getNodeId()));
-        if(nodeIds.size()==0) return;
+        if(nodeIds.isEmpty()) return;
         // |-加载质押记录
         List<CustomStaking> stakingList = customStakingMapper.selectByNodeIdList(nodeIds);
         // 初始化节点名称缓存
@@ -103,7 +103,6 @@ public class StakingEngine {
     private void init() throws CacheConstructException {
         // 加载并构造节点缓存结构
         loadNodes();
-        context.setStakingStage(cacheHolder.getStageData().getStakingStage());
     }
 
     /**

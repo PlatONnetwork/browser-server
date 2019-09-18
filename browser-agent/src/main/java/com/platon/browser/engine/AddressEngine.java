@@ -7,7 +7,6 @@ import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.statistic.AddressStatisticHandler;
-import com.platon.browser.engine.stage.AddressStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +35,11 @@ public class AddressEngine {
 
     @PostConstruct
     private void init () {
-        AddressStage addressStage = cacheHolder.getStageData().getAddressStage();
         AddressCache addressCache= cacheHolder.getAddressCache();
     	logger.debug("init AddressEngine");
         // 初始化全量数据
         List<CustomAddress> addresses = customAddressMapper.selectAll();
-        addresses.forEach(address -> addressCache.add(address));
-
-        context.setAddressStage(addressStage);
+        addresses.forEach(addressCache::add);
     }
 
     public void execute (CustomTransaction tx,BlockChain bc) {

@@ -30,8 +30,9 @@ public class IncreaseStakingHandler implements EventHandler {
     @Override
     public void handle(EventContext context) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+
         // 获取交易入参
         IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
         logger.debug("增持质押(增加自有质押):{}", JSON.toJSONString(param));

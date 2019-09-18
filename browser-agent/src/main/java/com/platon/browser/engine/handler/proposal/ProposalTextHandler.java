@@ -12,6 +12,7 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalTextParam;
@@ -41,11 +42,11 @@ public class ProposalTextHandler implements EventHandler {
     public void handle ( EventContext context ) throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
-
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
     	logger.debug("ProposalTextHandler");
         CustomTransaction tx = context.getTransaction();
-        ProposalStage proposalStage = context.getProposalStage();
+
         //根据交易参数解析成对应文本提案结构
         CreateProposalTextParam param = tx.getTxParam(CreateProposalTextParam.class);
         CustomProposal proposal = new CustomProposal();
@@ -101,6 +102,6 @@ public class ProposalTextHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
         nodeOpt.setDesc(desc);
-        stageData.getStakingStage().insertNodeOpt(nodeOpt);
+        stakingStage.insertNodeOpt(nodeOpt);
     }
 }

@@ -11,13 +11,11 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.utils.HexTool;
-import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,6 @@ public class NewConsensusEpochHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private PlatonClient client;
-    private StakingStage stakingStage;
     @Autowired
     private SpecialContractApi sca;
     @Autowired
@@ -53,7 +50,6 @@ public class NewConsensusEpochHandler implements EventHandler {
 
     @Override
     public void handle(EventContext context) throws Exception {
-        stakingStage = context.getStakingStage();
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -63,7 +59,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      */
     private void updateStaking() throws NoSuchBeanException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
 
         List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>

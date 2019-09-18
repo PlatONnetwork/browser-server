@@ -58,14 +58,12 @@ public class ProposalEngine {
     @PostConstruct
     private void init() throws CacheConstructException {
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
     	logger.debug("init ProposalEngine");
         // 初始化全量数据
         List<CustomProposal> proposalList = customProposalMapper.selectAll();
         List<CustomVote> voteList = customVoteMapper.selectAll();
         proposalCache.init(proposalList,voteList);
         proposalCache.sweep();
-        context.setProposalStage(proposalStage);
     }
 
     /**

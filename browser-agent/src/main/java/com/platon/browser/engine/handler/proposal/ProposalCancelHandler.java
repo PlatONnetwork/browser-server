@@ -11,6 +11,7 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CancelProposalParam;
@@ -40,11 +41,11 @@ public class ProposalCancelHandler implements EventHandler {
     public void handle ( EventContext context ) throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+        CustomTransaction tx = context.getTransaction();
 
     	logger.debug("ProposalCancelHandler Handler");
-        CustomTransaction tx = context.getTransaction();
-        ProposalStage proposalStage = context.getProposalStage();
         CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
 
         CustomNode node;
@@ -113,6 +114,6 @@ public class ProposalCancelHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
         nodeOpt.setDesc(desc);
-        stageData.getStakingStage().insertNodeOpt(nodeOpt);
+        stakingStage.insertNodeOpt(nodeOpt);
     }
 }

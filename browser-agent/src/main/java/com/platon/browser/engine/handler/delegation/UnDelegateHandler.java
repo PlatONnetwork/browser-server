@@ -7,7 +7,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.UnDelegateParam;
@@ -36,11 +35,9 @@ public class UnDelegateHandler implements EventHandler {
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
 
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
-
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
             CustomNode node = nodeCache.getNode(param.getNodeId());
@@ -66,8 +63,8 @@ public class UnDelegateHandler implements EventHandler {
 
             BigInteger delegationSum = delegation.integerDelegateHas().add(delegation.integerDelegateLocked());
             //配置文件中委托门槛单位是LAT
-            BigDecimal DelegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
-            if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(DelegateThresholdVon.toString())) < 0) {
+            BigDecimal delegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
+            if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(delegateThresholdVon.toString())) < 0) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 delegation.setDelegateReduction(delegation.integerDelegateReduction().add(delegation.integerDelegateLocked()).toString());
                 delegation.setDelegateHas("0");
