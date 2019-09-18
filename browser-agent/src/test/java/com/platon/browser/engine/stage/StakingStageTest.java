@@ -1,8 +1,12 @@
 package com.platon.browser.engine.stage;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.dto.CustomDelegation;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -10,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @Auther: dongqile
@@ -29,6 +35,21 @@ public class StakingStageTest extends TestBase {
      */
     @Before
     public void setup() {
+
+
+    }
+    @Test
+    public void test(){
+        stakingStage.clear();
+        stakingStage.exportDelegation();
+        stakingStage.exportNode();
+        stakingStage.exportNodeOpt();
+        stakingStage.exportSlash();
+        stakingStage.exportUnDelegation();
+
+        stakingStage.insertDelegation(mock(CustomDelegation.class));
+        stakingStage.insertNode(mock(CustomNode.class));
+        stakingStage.insertNodeOpt(mock(CustomNodeOpt.class));
     }
 
 }
