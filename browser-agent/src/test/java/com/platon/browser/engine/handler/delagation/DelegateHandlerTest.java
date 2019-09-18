@@ -38,8 +38,6 @@ public class DelegateHandlerTest extends TestBase {
     private DelegateHandler handler;
     @Mock
     private CacheHolder cacheHolder;
-    @Mock
-    private NodeCache nodeCache;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -56,6 +54,7 @@ public class DelegateHandlerTest extends TestBase {
     */
     @Test
     public void testHandler () throws CacheConstructException, NoSuchBeanException {
+        NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);

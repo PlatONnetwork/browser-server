@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
@@ -29,7 +30,7 @@ import java.math.BigInteger;
 public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
     @Autowired
-    private BlockChain bc;
+    private BlockChainConfig chainConfig;
     @Autowired
     private CacheHolder cacheHolder;
     @Override
@@ -44,7 +45,7 @@ public class UnDelegateHandler implements EventHandler {
             logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
-            CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+            CustomStaking customStaking = node.getStakings().get(param.getStakingBlockNum());
 
             //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
             CustomDelegation delegation = customStaking.getDelegations().get(tx.getFrom());
@@ -63,7 +64,7 @@ public class UnDelegateHandler implements EventHandler {
 
             BigInteger delegationSum = delegation.integerDelegateHas().add(delegation.integerDelegateLocked());
             //配置文件中委托门槛单位是LAT
-            BigDecimal delegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
+            BigDecimal delegateThresholdVon = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT);
             if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(delegateThresholdVon.toString())) < 0) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 delegation.setDelegateReduction(delegation.integerDelegateReduction().add(delegation.integerDelegateLocked()).toString());

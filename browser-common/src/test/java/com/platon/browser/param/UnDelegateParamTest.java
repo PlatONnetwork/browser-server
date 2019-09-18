@@ -6,15 +6,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class UnDelegateParamTest {
-	
+
 	private UnDelegateParam param;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		param = new UnDelegateParam();
-		param.init("1024","nodeId","1000000000000000000");
+		param.init(1024L,"nodeId","1000000000000000000");
 	}
-	
+
 	@Test
 	public void testInit() {
 		assertTrue(param.getNodeId().equals("nodeId"));
