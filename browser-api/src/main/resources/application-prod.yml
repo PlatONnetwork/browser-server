@@ -15,12 +15,23 @@ port: 38030
 dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
-# 日志文件存储文件
-logpath: /data/logs/${spring.application.name}-${version}-${profile}.log
-# 日志级别
-loglevel:
-  spring: error
-  platon: error
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #当文件超过100M时，归档压缩
+  file.max-size: 100M
+  #日志文件最多保存3天
+  file.max-history: 3
+  #日志级别
+  level:
+    org.springframework: error
+    com.platon.browser: error
+    com.platon.browser.service: error
+    com.platon.browser.task: error
+    com.platon.browser.client: error
+    com.platon.browser.dao: error
+    com.platon.browser.engine: error
+    com.platon.browser.engine.handler.epoch: error
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}

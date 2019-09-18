@@ -18,6 +18,11 @@ dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #当文件超过100M时，归档压缩
+  file.max-size: 100M
+  #日志文件最多保存3天
+  file.max-history: 3
+  #日志级别
   level:
     org.springframework: debug
     com.platon.browser: debug

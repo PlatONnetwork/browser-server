@@ -3,7 +3,6 @@ package com.platon.browser.engine.handler.delegation;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
