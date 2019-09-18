@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -37,13 +38,9 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class VotingProposalHandlerTest extends TestBase {
-
-    @Autowired
-    private VotingProposalHandler votingProposalHandler;
-
     private static Logger logger = LoggerFactory.getLogger(VotingProposalHandlerTest.class);
-    @Mock
-    private TransactionService transactionService;
+    @Spy
+    private VotingProposalHandler votingProposalHandler;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -52,18 +49,7 @@ public class VotingProposalHandlerTest extends TestBase {
      */
     @Before
     public void setup() throws  BeanCreateOrUpdateException {
-        when(transactionService.analyze(anyList())).thenCallRealMethod();
-        when(transactionService.updateTransaction(any(CustomTransaction.class))).thenCallRealMethod();
-        when(transactionService.getReceipt(any(TransactionBean.class))).thenAnswer((Answer <Optional <TransactionReceipt>>) invocation->{
-            TransactionBean tx = invocation.getArgument(0);
-            TransactionReceipt receipt = new TransactionReceipt();
-            BeanUtils.copyProperties(tx,receipt);
-            receipt.setBlockNumber(tx.getBlockNumber().toString());
-            receipt.setTransactionHash(tx.getHash());
-            receipt.setTransactionIndex(tx.getTransactionIndex().toString());
-            Optional<TransactionReceipt> optional = Optional.ofNullable(receipt);
-            return optional;
-        });
+
     }
 
     /**
@@ -72,9 +58,9 @@ public class VotingProposalHandlerTest extends TestBase {
     @Test
     public void testHandler () {
         EventContext eventContext = new EventContext();
-        List <CustomBlock> result = transactionService.analyze(blocks);
-        transactions.forEach(transactionBean -> {
-            if (transactionBean.getTxType().equals(CustomTransaction.TxTypeEnum.VOTING_PROPOSAL.code)) {
+        transactions.stream()
+            .filter(tx->CustomTransaction.TxTypeEnum.VOTING_PROPOSAL.code.equals(tx.getTxType()))
+            .forEach(tx->{
                 try {
                     votingProposalHandler.handle(eventContext);
                     assertTrue(true);
@@ -83,7 +69,6 @@ public class VotingProposalHandlerTest extends TestBase {
                     assertTrue(false);
                     logger.info("[VotingProposalHandlerTest] Test Fail");
                 }
-            }
-        });
+            });
     }
 }

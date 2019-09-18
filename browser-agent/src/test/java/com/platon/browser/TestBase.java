@@ -105,9 +105,6 @@ public class TestBase {
 
         Map<Long,List<CustomTransaction>> txMap = new HashMap<>();
         transactions.forEach(tx->{
-            // 交易类型置空，tx_info置空
-            tx.setTxType(null);
-            tx.setTxInfo(null);
             List<CustomTransaction> txes = txMap.computeIfAbsent(tx.getBlockNumber(), k -> new ArrayList<>());
             txes.add(tx);
         });
