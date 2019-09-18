@@ -89,8 +89,9 @@ public class ProposalUpdateTask {
         for (CustomProposal proposal : proposals) {//如果已经补充则无需补充
             proposalList.add(proposal.getHash());
             try {
-                ProposalMarkDownDto proposalMarkDownDto = getMarkdownInfo(proposal.getUrl());
                 logger.info("------------------------------------B-------------------------------------------{}",System.currentTimeMillis());
+                ProposalMarkDownDto proposalMarkDownDto = getMarkdownInfo(proposal.getUrl());
+                logger.info("------------------------------------C-------------------------------------------{}",System.currentTimeMillis());
                 proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                 if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
@@ -108,6 +109,9 @@ public class ProposalUpdateTask {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (IOException e) {
                 logger.error("更新提案({})的主题和描述出错:获取不到{}", proposal.getPipId(), proposal.getUrl());
+            } catch (Exception e){
+                logger.error("更新提案({})的主题和描述出错:发送http请求异常{}", proposal.getPipId(), proposal.getUrl());
+
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)
@@ -229,7 +233,7 @@ public class ProposalUpdateTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo(String url) throws IOException, BusinessException {
+    public ProposalMarkDownDto getMarkdownInfo(String url) throws Exception,IOException, BusinessException {
         String fileUrl = MarkDownParserUtil.acquireMD(url);
         if (fileUrl == null) throw new BusinessException("获取不到" + url);
         String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
