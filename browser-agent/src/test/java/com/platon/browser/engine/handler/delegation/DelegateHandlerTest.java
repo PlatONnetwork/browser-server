@@ -1,4 +1,4 @@
-package com.platon.browser.engine.handler.delagation;
+package com.platon.browser.engine.handler.delegation;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dto.CustomNode;
@@ -6,7 +6,6 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
-import com.platon.browser.engine.handler.delegation.DelegateHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
