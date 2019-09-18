@@ -96,8 +96,8 @@ public class CustomAddress extends Address {
         ACCOUNT(1, "账户"),
         CONTRACT(2, "合约"),
         INNER_CONTRACT(3, "内置合约");
-        public int code;
-        public String desc;
+    	private int code;
+        private String desc;
         TypeEnum ( int code, String desc) {
             this.code = code;
             this.desc = desc;

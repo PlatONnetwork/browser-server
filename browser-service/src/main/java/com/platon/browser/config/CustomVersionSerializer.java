@@ -23,6 +23,8 @@ public class CustomVersionSerializer  extends JsonSerializer<String>{
 	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 		if(StringUtils.isNotBlank(value)) {
 			gen.writeString(VerUtil.toVersion(new BigInteger(value)));
+		} else {
+			gen.writeString("");
 		}
 	}
 

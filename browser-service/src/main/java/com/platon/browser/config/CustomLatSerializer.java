@@ -3,6 +3,7 @@ package com.platon.browser.config;
 import java.io.IOException;
 import java.math.RoundingMode;
 
+import org.apache.commons.lang3.StringUtils;
 import org.web3j.utils.Convert;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -21,9 +22,13 @@ public class CustomLatSerializer  extends JsonSerializer<String>{
 
 	@Override
 	public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		/**	金额转换 von统一转换成小数点12位向下取整lat */
-		String transEner = EnergonUtil.format(Convert.fromVon(value, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 12);
-		gen.writeString(transEner);
+		if(StringUtils.isNotBlank(value)) {
+			/**	金额转换 von统一转换成小数点12位向下取整lat */
+			String transEner = EnergonUtil.format(Convert.fromVon(value, Convert.Unit.LAT).setScale(18,RoundingMode.DOWN), 12);
+			gen.writeString(transEner);
+		}  else {
+			gen.writeString("");
+		}
 	}
 
 }

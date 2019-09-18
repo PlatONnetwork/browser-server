@@ -62,7 +62,7 @@ public class PlatonClient {
                 if(currentValidAddress==null) currentValidAddress=address;
             });
         }catch (Exception e){
-            e.printStackTrace();
+        	logger.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
@@ -79,6 +79,7 @@ public class PlatonClient {
             return currentValidWeb3j;
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();
         }
@@ -137,8 +138,7 @@ public class PlatonClient {
         try {
             updateCurrentValidWeb3j();
         } catch (Exception e) {
-            logger.error("detect exception:{}", e.getMessage());
-            e.printStackTrace();
+            logger.error("detect exception:{}", e);
         }
         logger.debug("*** End the detect task *** ");
     }

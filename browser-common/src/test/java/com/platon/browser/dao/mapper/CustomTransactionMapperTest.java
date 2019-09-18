@@ -12,8 +12,6 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 public class CustomTransactionMapperTest extends TestBase {
 
 	@Autowired
-	private CustomTransactionMapper customTransactionMapper;
-	@Autowired
 	private TransactionMapper transactionMapper;
 	
 	@Test

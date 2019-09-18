@@ -53,7 +53,7 @@ public class BlockChainConfig {
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
             logger.error("salt:{}",salt);
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.error("web3j error{}", e);
         }
     }
 

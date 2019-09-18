@@ -24,6 +24,8 @@ public class CustomRateSerializer  extends JsonSerializer<String>{
 		if(StringUtils.isNotBlank(value)) {
 			String transEner = new BigDecimal(value).multiply(new BigDecimal("100")).setScale(2) + "%";
 			gen.writeString(transEner);
+		}  else {
+			gen.writeString("");
 		}
 	}
 
