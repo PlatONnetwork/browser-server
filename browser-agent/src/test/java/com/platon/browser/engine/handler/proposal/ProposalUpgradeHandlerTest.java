@@ -2,6 +2,7 @@ package com.platon.browser.engine.handler.proposal;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
@@ -13,6 +14,7 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.utils.HexTool;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.Node;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,27 +69,29 @@ public class ProposalUpgradeHandlerTest extends TestBase {
      */
     @Test
     public void testHandler () throws CacheConstructException, NoSuchBeanException, BusinessException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
+        NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
-        ProposalCache proposalCache = new ProposalCache();
-        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
+        ProposalCache proposalCache = mock(ProposalCache.class);
+        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
+        when(proposalCache.getProposal(any())).thenReturn(proposals.get(0));
+        CustomNode node = mock(CustomNode.class);
+        when(nodeCache.getNode(any())).thenReturn(node);
+        when(node.getLatestStaking()).thenReturn(stakings.get(0));
         Map<String, Node> validatorMap = new HashMap<>();
-        validators.forEach(node -> validatorMap.put(node.getNodeId(),node));
+        validators.forEach(validator->validatorMap.put(HexTool.prefix(validator.getNodeId()),validator));
         when(bc.getCurValidator()).thenReturn(validatorMap);
         when(chainConfig.getProposalUrlTemplate()).thenReturn("https://wwww.platon.network");
+        when(chainConfig.getConsensusPeriodBlockCount()).thenReturn(BigInteger.valueOf(250));
+        when(chainConfig.getVersionProposalActiveConsensusRounds()).thenReturn(BigDecimal.valueOf(20));
 
         EventContext context = new EventContext();
-        context.setTransaction(transactions.get(0));
-        handler.handle(context);
-
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.CREATE_PROPOSAL_UPGRADE.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 
-        verify(handler, times(2)).handle(any(EventContext.class));
+        verify(handler, times(1)).handle(any(EventContext.class));
     }
 }

@@ -21,9 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeclareVersionHandler implements EventHandler {
     @Autowired
-    private BlockChain bc;
-
-    @Autowired
     private CacheHolder cacheHolder;
 
     @Override

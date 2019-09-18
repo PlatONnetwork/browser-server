@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.exception.HttpRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,8 +59,8 @@ public final class MarkDownParserUtil {
 
 
 
-    public static String acquireMD(String fileName) throws IOException {
-        String text = httpGet(fileName);
+    public static String acquireMD(String fileName) throws Exception {
+        String text = HttpUtil.get(fileName,String.class);
         if (text == null) {
             return null;
         }

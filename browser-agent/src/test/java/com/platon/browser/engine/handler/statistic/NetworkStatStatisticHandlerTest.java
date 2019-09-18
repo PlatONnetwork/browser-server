@@ -3,13 +3,17 @@ package com.platon.browser.engine.handler.statistic;
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNetworkStat;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.utils.HexTool;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,10 +24,13 @@ import org.omg.CORBA.PRIVATE_MEMBER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.platon.bean.Node;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,10 +70,12 @@ public class NetworkStatStatisticHandlerTest extends TestBase {
      * 节点统计测试方法
      */
     @Test
-    public void testHandler () throws CacheConstructException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
+    public void testHandler () throws CacheConstructException, NoSuchBeanException {
+        NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        CustomNode node = mock(CustomNode.class);
+        when(nodeCache.getNode(anyString())).thenReturn(node);
+        when(node.getLatestStaking()).thenReturn(stakings.get(0));
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
         CustomNetworkStat networkStatCache = new CustomNetworkStat();
@@ -77,14 +86,19 @@ public class NetworkStatStatisticHandlerTest extends TestBase {
         when(chainConfig.getSettlePeriodBlockCount()).thenReturn(BigInteger.valueOf(160));
         when(bc.getCurSettingEpoch()).thenReturn(BigInteger.valueOf(2));
         when(bc.getSettleReward()).thenReturn(BigDecimal.valueOf(2000000));
+        when(bc.getBlockReward()).thenReturn(BigDecimal.valueOf(300000));
+        Map<String, Node> verifierMap = new HashMap<>();
+        verifiers.forEach(verifier->verifierMap.put(HexTool.prefix(verifier.getNodeId()),verifier));
+        when(bc.getPreVerifier()).thenReturn(verifierMap);
+
+        ProposalCache proposalCache = mock(ProposalCache.class);
+        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
+        when(proposalCache.getAllProposal()).thenReturn(proposals);
 
         EventContext context = new EventContext();
-        context.setTransaction(transactions.get(0));
+
         handler.handle(context);
 
-        transactions.forEach(context::setTransaction);
-        handler.handle(context);
-
-        verify(handler, times(2)).handle(any(EventContext.class));
+        verify(handler, times(1)).handle(any(EventContext.class));
     }
 }
