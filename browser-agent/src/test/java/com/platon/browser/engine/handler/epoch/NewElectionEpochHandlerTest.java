@@ -1,8 +1,6 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
-import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
@@ -10,7 +8,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
-import com.platon.browser.service.CandidateService;
 import com.platon.browser.utils.HexTool;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +28,6 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 /**
  * @Auther: dongqile
