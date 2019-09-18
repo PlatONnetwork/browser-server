@@ -54,14 +54,9 @@ public class NewElectionEpochHandler implements EventHandler {
             Node exist = bc.getPreValidator().get(staking.getNodeId());
             if(exist==null) continue;
             // 根据前一个共识周期的出块数判断是否触发最低处罚
-            /*
-            *   count==0: 罚20块并踢出
-                0<count<6: 罚20块; 剩余质押低于质押门槛则踢出
-            * */
-            // 判断出块数是否小于指定的出块数
             boolean isSlash = staking.getPreConsBlockQty()<chainConfig.getSlashBlockThreshold().longValue();
             if(isSlash){
-                // 统一罚20个出块奖励
+                // 统一罚指定个数的出块奖励
                 BigDecimal stakingHas = staking.decimalStakingHas();
                 BigDecimal stakingLocked = staking.decimalStakingLocked();
                 // 总的质押金：（犹豫+锁定）
