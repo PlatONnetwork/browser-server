@@ -70,9 +70,11 @@ public class ProposalUpdateTask {
      * a.http请求查询github治理提案的相关信息并补充
      * b.根据platon底层rpc接口查询提案结果
      */
-    @Scheduled(cron = "0/3 * * * * ?")
+    @Scheduled(cron = "0/5  * * * * ?")
     private void cron () {
         start();
+        logger.info("------------------------------------A-------------------------------------------{}",System.currentTimeMillis());
+
     }
 
     public void start () {
@@ -88,6 +90,7 @@ public class ProposalUpdateTask {
             proposalList.add(proposal.getHash());
             try {
                 ProposalMarkDownDto proposalMarkDownDto = getMarkdownInfo(proposal.getUrl());
+                logger.info("------------------------------------B-------------------------------------------{}",System.currentTimeMillis());
                 proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                 if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
@@ -101,7 +104,6 @@ public class ProposalUpdateTask {
                 proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
                 proposalStage.updateProposal(proposal);
-
             } catch (NoSuchBeanException | BusinessException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (IOException e) {
