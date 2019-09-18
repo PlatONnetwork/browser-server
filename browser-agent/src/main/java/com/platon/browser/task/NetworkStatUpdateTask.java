@@ -3,7 +3,10 @@ package com.platon.browser.task;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +20,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
-
-import static com.platon.browser.engine.util.CacheTool.NETWORK_STAT_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -35,10 +35,16 @@ public class NetworkStatUpdateTask {
     private BlockChainConfig chainConfig;
     @Autowired
     private PlatonClient client;
+    @Autowired
+    private CacheHolder cacheHolder;
+
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
 
     protected void start () {
+        BlockChainStage stageData = cacheHolder.getStageData();
+        CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
+
         CustomBlock curBlock = blockChain.getCurBlock();
         if(curBlock==null) return;
         try {
@@ -66,9 +72,9 @@ public class NetworkStatUpdateTask {
             //计算流通量
             BigDecimal turnoverValue = circulation.subtract(new BigDecimal(lockContractBalance)).subtract(new BigDecimal(stakingContractBalance)).subtract(new BigDecimal(incentivePoolAccountBalance));
             //数据回填内存中
-            NETWORK_STAT_CACHE.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            NETWORK_STAT_CACHE.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            STAGE_DATA.getNetworkStatStage().updateNetworkStat(NETWORK_STAT_CACHE);
+            networkStatCache.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            networkStatCache.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            stageData.getNetworkStatStage().updateNetworkStat(networkStatCache);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }

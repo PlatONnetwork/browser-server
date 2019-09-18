@@ -4,7 +4,8 @@ import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomAddress;
-import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.stage.BlockChainStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.platon.browser.engine.util.CacheTool.ADDRESS_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -31,11 +29,14 @@ public class AddressUpdateTask {
     private PlatonClient client;
     @Autowired
     private SpecialContractApi sca;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Scheduled(cron = "0/10 * * * * ?")
     private void cron () {start();}
 
     public void start(){
+        BlockChainStage stageData = cacheHolder.getStageData();
         StringBuilder sb = new StringBuilder();
         Collection<CustomAddress> addresses = getAllAddress();
         if(addresses.isEmpty()) return;
@@ -51,7 +52,7 @@ public class AddressUpdateTask {
                     address.setRestrictingBalance(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0");
                     address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
                     // 把改动后的内容暂存至待更新列表
-                    STAGE_DATA.getAddressStage().updateAddress(address);
+                    stageData.getAddressStage().updateAddress(address);
                 }
             });
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class AddressUpdateTask {
      * @return
      */
     public Collection<CustomAddress> getAllAddress(){
-        return ADDRESS_CACHE.getAllAddress();
+        return cacheHolder.getAddressCache().getAllAddress();
     }
 
     /**

@@ -8,11 +8,13 @@ import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.NodeOptMapper;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNodeOpt;
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.ProposalMarkDownDto;
+import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.AddressCache;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -30,9 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
+import java.util.Map;
 
 /**
  * @Auther: dongqile
@@ -51,6 +51,8 @@ public class ProposalUpdateTask {
     private SpecialContractApi sca;
     @Autowired
     private NodeOptMapper nodeOptMapper;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     /**
      * 同步任务功能说明：
@@ -63,6 +65,9 @@ public class ProposalUpdateTask {
     }
 
     public void start () {
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         //获取全量数据
         Collection<CustomProposal> proposals = getAllProposal();
         //记录全量缓存中所有的proposalhash，用于后期补充操作记录的查询条件
@@ -83,9 +88,9 @@ public class ProposalUpdateTask {
                     proposal.setCanceledTopic(cp.getTopic());
                 }
                 // 添加至全量缓存
-                PROPOSALS_CACHE.addProposal(proposal);
+                proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
-                STAGE_DATA.getProposalStage().updateProposal(proposal);
+                stageData.getProposalStage().updateProposal(proposal);
             } catch (NoSuchBeanException | BusinessException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (IOException e) {
@@ -112,9 +117,9 @@ public class ProposalUpdateTask {
                         proposal.setStatus(getTallyResult(proposal.getHash()).getStatus());
                     }
                     // 添加至全量缓存
-                    PROPOSALS_CACHE.addProposal(proposal);
+                    proposalCache.addProposal(proposal);
                     // 暂存至待入库列表
-                    STAGE_DATA.getProposalStage().updateProposal(proposal);
+                    stageData.getProposalStage().updateProposal(proposal);
                 } catch (Exception e) {
                     logger.error("更新提案({})的结果出错:{}", proposal.getPipId(), e.getMessage());
 
@@ -125,6 +130,13 @@ public class ProposalUpdateTask {
     }
 
     private void updateNodeOptInfo ( List <String> proposalList ) {
+        AddressCache addressCache = cacheHolder.getAddressCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+        Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
+        CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
+
         //补充操作记录中具体提案描述
         if (!proposalList.isEmpty()) {
             NodeOptExample nodeOptExample = new NodeOptExample();
@@ -133,7 +145,7 @@ public class ProposalUpdateTask {
             nodeOpts.forEach(nodeOpt -> {
                 Proposal proposal = new Proposal();
                 try {
-                    proposal = PROPOSALS_CACHE.getProposal(nodeOpt.getTxHash());
+                    proposal = proposalCache.getProposal(nodeOpt.getTxHash());
                 } catch (NoSuchBeanException e) {
                     logger.error("更新操作({})的结果出错:{}", proposal.getHash(), e.getMessage());
                 }
@@ -146,7 +158,7 @@ public class ProposalUpdateTask {
                 }
                 CustomNodeOpt customNodeOpt = new CustomNodeOpt();
                 BeanUtils.copyProperties(nodeOpt, customNodeOpt);
-                STAGE_DATA.getStakingStage().updateNodeOpt(customNodeOpt);
+                stageData.getStakingStage().updateNodeOpt(customNodeOpt);
             });
         }
     }
@@ -156,7 +168,7 @@ public class ProposalUpdateTask {
      * @return
      */
     public Collection<CustomProposal> getAllProposal(){
-        return PROPOSALS_CACHE.getAllProposal();
+        return cacheHolder.getProposalCache().getAllProposal();
     }
 
     /**
@@ -166,7 +178,7 @@ public class ProposalUpdateTask {
      * @throws NoSuchBeanException
      */
     public CustomProposal getProposal(String hash) throws NoSuchBeanException {
-        return PROPOSALS_CACHE.getProposal(hash);
+        return cacheHolder.getProposalCache().getProposal(hash);
     }
 
     /**

@@ -3,8 +3,12 @@ package com.platon.browser.engine.handler.proposal;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -13,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: dongqile
@@ -28,9 +30,15 @@ public class VotingProposalHandler implements EventHandler {
 
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle ( EventContext context ) throws NoSuchBeanException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         try{
             CustomTransaction tx = context.getTransaction();
             ProposalStage proposalStage = context.getProposalStage();
@@ -38,7 +46,7 @@ public class VotingProposalHandler implements EventHandler {
 
             CustomNode node;
             try {
-                node = NODE_CACHE.getNode(param.getVerifier());
+                node = nodeCache.getNode(param.getVerifier());
             } catch (NoSuchBeanException e) {
                 throw new BusinessException("处理文本提案出错:"+e.getMessage());
             }
@@ -53,7 +61,7 @@ public class VotingProposalHandler implements EventHandler {
 
             CustomProposal proposal;
             try {
-                proposal = PROPOSALS_CACHE.getProposal(param.getProposalId());
+                proposal = proposalCache.getProposal(param.getProposalId());
             } catch (NoSuchBeanException e) {
                 throw new BusinessException("缓存中找不到提案:"+e.getMessage());
             }
@@ -72,7 +80,7 @@ public class VotingProposalHandler implements EventHandler {
             //全量数据回填
             proposalStage.insertVote(vote);
 
-            PROPOSALS_CACHE.addVote(vote);
+            proposalCache.addVote(vote);
 
             // 记录操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
@@ -82,11 +90,9 @@ public class VotingProposalHandler implements EventHandler {
                     .replace("TITLE",proposal.getTopic())
                     .replace("OPTION",param.getOption());
             nodeOpt.setDesc(desc);
-            STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+            stageData.getStakingStage().insertNodeOpt(nodeOpt);
         }catch (NoSuchBeanException | BusinessException e){
             throw new NoSuchBeanException("缓存中找不到对应的投票提案:"+e.getMessage());
         }
-
-
     }
 }

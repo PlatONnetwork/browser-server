@@ -3,8 +3,10 @@ package com.platon.browser.engine.cache;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -13,7 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming
@@ -23,9 +24,12 @@ import static com.platon.browser.engine.util.CacheTool.*;
 @Component
 public class AddressCacheUpdater {
 
-    class Stat{
+    @Autowired
+    private CacheHolder cacheHolder;
+
+    static class Stat{
         BigInteger stakingValue,delegateValue,stakingRedeemed,delegateRedeemed,redeemedValue,candidateCount,delegateHes,delegateLocked,delegateUnlock,delegateReduction;
-        public void reset(){
+        void reset(){
             this.stakingValue = BigInteger.ZERO;
             this.delegateValue = BigInteger.ZERO;
             this.stakingRedeemed = BigInteger.ZERO;
@@ -53,20 +57,24 @@ public class AddressCacheUpdater {
      *
      */
     public void updateAddressStatistics () throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        AddressCache addressCache = cacheHolder.getAddressCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         // 所有质押 <发起质押地址-质押实体列表> 映射
         Map<String, Set<CustomStaking>> addressStakingMap = new HashMap<>();
-        NODE_CACHE.getAllStaking().forEach(staking -> {
+        nodeCache.getAllStaking().forEach(staking -> {
             Set<CustomStaking> stakingSet = addressStakingMap.computeIfAbsent(staking.getStakingAddr(), k -> new HashSet<>());
             stakingSet.add(staking);
         });
         // 非历史状态的委托 <发起委托地址-委托实体列表> 映射
         Map<String,Set<CustomDelegation>> addressDelegationMap = new HashMap<>();
-        NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO).forEach(delegation -> {
+        nodeCache.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO).forEach(delegation -> {
             Set<CustomDelegation> delegationSet = addressDelegationMap.computeIfAbsent(delegation.getDelegateAddr(), k -> new HashSet<>());
             delegationSet.add(delegation);
         });
         // 统计每个地址的质押信息和委托信息
-        for (CustomAddress address:ADDRESS_CACHE.getAllAddress()) {
+        for (CustomAddress address: addressCache.getAllAddress()) {
             stat.reset(); // 重置统计bean状态, 复用实例，避免大量创建对象
             // 查看当前地址是否有质押信息, 若有, 则统计当前地址质押相关金额
             Set<CustomStaking> stakingSet = addressStakingMap.get(address.getAddress());
@@ -91,7 +99,7 @@ public class AddressCacheUpdater {
                     Integer status = 0;
                     CustomStaking staking = new CustomStaking();
                     try {
-                        staking = NODE_CACHE.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
+                        staking = nodeCache.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
                         status = staking.getStatus();
                     } catch (NoSuchBeanException e) {
                         throw new BusinessException(e.getMessage());
@@ -114,7 +122,7 @@ public class AddressCacheUpdater {
             address.setDelegateUnlock(stat.delegateUnlock.toString());
             address.setDelegateReduction(stat.delegateReduction.toString());
             // 把地址信息改动暂存至待更新列表
-            STAGE_DATA.getAddressStage().updateAddress(address);
+            stageData.getAddressStage().updateAddress(address);
         }
     }
 }

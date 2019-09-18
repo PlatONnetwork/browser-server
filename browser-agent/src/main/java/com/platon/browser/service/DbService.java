@@ -4,8 +4,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.AddressCacheUpdater;
-import com.platon.browser.engine.cache.StakingCacheUpdater;
+import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.*;
 import com.platon.browser.exception.BusinessException;
 import org.slf4j.Logger;
@@ -18,9 +17,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
 
 /**
  *
@@ -38,6 +34,8 @@ public class DbService {
     private AddressCacheUpdater addressCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Autowired
     private BlockMapper blockMapper;
@@ -143,6 +141,8 @@ public class DbService {
     }
 
     public void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{
             // 入库前更新统计信息
             addressCacheUpdater.updateAddressStatistics();
@@ -151,8 +151,8 @@ public class DbService {
             insertOrUpdate(basicData,bizData);
             blockChain.commitResult();
             // 缓存整理
-            NODE_CACHE.sweep();
-            PROPOSALS_CACHE.sweep();
+            nodeCache.sweep();
+            proposalCache.sweep();
         }catch (Exception e){
             throw new BusinessException("数据批量入库出错："+e.getMessage());
         }

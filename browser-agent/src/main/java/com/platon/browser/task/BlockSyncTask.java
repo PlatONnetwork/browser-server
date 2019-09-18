@@ -3,7 +3,12 @@ package com.platon.browser.task;
 import com.platon.browser.bean.CollectResult;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.AddressCache;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.BlockService;
@@ -22,8 +27,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: Chendongming
@@ -46,6 +49,8 @@ public class BlockSyncTask {
     private TransactionService transactionService;
     @Autowired
     private CandidateService candidateService;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -58,6 +63,10 @@ public class BlockSyncTask {
      * 初始化已有业务数据
      */
     public void init () throws Exception {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+        Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
+
         ExecutorService es = Executors.newFixedThreadPool(collectBatchSize);
         blockService.init(es);
         transactionService.init(es);
@@ -94,19 +103,19 @@ public class BlockSyncTask {
         if(maxBlockNumber==null){
             CandidateService.InitParam initParam = candidateService.getInitParam();
             // 更新节点名称映射缓存
-            initParam.getStakings().forEach(staking -> NODE_NAME_MAP.put(staking.getNodeId(),staking.getStakingName()));
+            initParam.getStakings().forEach(staking -> nodeNameMap.put(staking.getNodeId(),staking.getStakingName()));
             // 把节点放入待入库暂存
-            initParam.getNodes().forEach(node->STAGE_DATA.getStakingStage().insertNode(node));
+            initParam.getNodes().forEach(node->stageData.getStakingStage().insertNode(node));
             // 把质押放入待入库暂存
-            initParam.getStakings().forEach(staking->STAGE_DATA.getStakingStage().insertStaking(staking));
+            initParam.getStakings().forEach(staking->stageData.getStakingStage().insertStaking(staking));
             // 导出结果
             BlockChainStage bcr = blockChain.exportResult();
             // 批量入库结果
             dbService.batchSave(Collections.emptyList(),bcr);
             blockChain.commitResult();
             // 初始化节点缓存
-            NODE_CACHE.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
-            NODE_CACHE.sweep();
+            nodeCache.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
+            nodeCache.sweep();
         }
     }
 

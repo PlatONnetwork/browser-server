@@ -8,8 +8,11 @@ import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.CandidateException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -27,9 +30,6 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
-
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-
 
 /**
  * @Auther: Chendongming
@@ -51,9 +51,16 @@ public class NewSettleEpochHandler implements EventHandler {
 
     @Autowired
     private CandidateService candidateService;
+    @Autowired
+    private CacheHolder cacheHolder;
+
+    private NodeCache nodeCache;
+    private BlockChainStage stageData;
 
     @Override
     public void handle(EventContext context) throws Exception {
+        nodeCache = cacheHolder.getNodeCache();
+        stageData = cacheHolder.getStageData();
         stakingStage = context.getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
         settle(); // 结算
@@ -116,7 +123,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private void updateDelegation () {
         //由于结算周期的变更，对所有的节点下的质押的委托更新
         //只需变更不为历史节点的委托数据(isHistory=NO(2))
-        List<CustomDelegation> delegations = NODE_CACHE.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
+        List<CustomDelegation> delegations = nodeCache.getDelegationByIsHistory(CustomDelegation.YesNoEnum.NO);
         delegations.forEach(delegation->{
             //经过结算周期的变更，上个周期的犹豫期金额累加到锁定期的金额
             delegation.setDelegateLocked(delegation.integerDelegateLocked().add(delegation.integerDelegateHas()).toString());
@@ -138,7 +145,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private void updateUnDelegation() {
         //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
         //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-        List<CustomUnDelegation> unDelegations = NODE_CACHE.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
+        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
         unDelegations.forEach(unDelegation -> {
             //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
             unDelegation.setRedeemLocked("0");
@@ -163,7 +170,7 @@ public class NewSettleEpochHandler implements EventHandler {
         BigInteger preVerifierStakingReward = new BigInteger(bc.getSettleReward().divide(BigDecimal.valueOf(bc.getPreVerifier().size()),0,RoundingMode.FLOOR).toString());
         logger.debug("上一结算周期验证人平均质押奖励:{}",preVerifierStakingReward);
         // 结算周期切换时对所有候选中和退出中状态的节点进行结算
-        List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
+        List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE,CustomStaking.StatusEnum.EXITING);
         for(CustomStaking curStaking:stakingList){
             // 调整金额状态
             BigInteger stakingLocked = curStaking.integerStakingLocked().add(curStaking.integerStakingHas());
@@ -188,7 +195,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 BigInteger stakingRewardValue = curStaking.integerStakingRewardValue().add(preVerifierStakingReward);
                 curStaking.setStakingRewardValue(stakingRewardValue.toString());
                 try {
-                    CustomNode customNode = NODE_CACHE.getNode(curStaking.getNodeId());
+                    CustomNode customNode = nodeCache.getNode(curStaking.getNodeId());
                     // 更新节点的奖励累计字段
                     customNode.setStatRewardValue(curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue()).toString());
                     // 将改动的内存暂存至待更新缓存

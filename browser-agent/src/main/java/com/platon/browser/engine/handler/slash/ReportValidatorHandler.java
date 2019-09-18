@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ReportValidatorParam;
@@ -19,9 +22,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
-
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:47
@@ -34,9 +34,14 @@ public class ReportValidatorHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle ( EventContext context )throws NoSuchBeanException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
         // 获取交易入参
@@ -44,7 +49,7 @@ public class ReportValidatorHandler implements EventHandler {
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
         //通过结果获取，证据中的举报人的nodeId
         try {
-            CustomNode node = NODE_CACHE.getNode(HexTool.prefix(param.getVerify()));
+            CustomNode node = nodeCache.getNode(HexTool.prefix(param.getVerify()));
             CustomStaking latestStaking = node.getLatestStaking();
             logger.debug("多签举报信息:{}", JSON.toJSONString(param));
             //多签举报，惩罚金额
@@ -80,7 +85,7 @@ public class ReportValidatorHandler implements EventHandler {
 
             // 设置节点统计数据中的多签举报次数
             node.setStatSlashMultiQty(node.getStatSlashMultiQty()+1);
-            STAGE_DATA.getStakingStage().updateNode(node);
+            stageData.getStakingStage().updateNode(node);
 
             //交易数据回填
             param.setNodeName(latestStaking.getStakingName());
@@ -94,7 +99,7 @@ public class ReportValidatorHandler implements EventHandler {
                     .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
                     .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
             nodeOpt.setDesc(desc);
-            STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+            stageData.getStakingStage().insertNodeOpt(nodeOpt);
         } catch (NoSuchBeanException e) {
             logger.error("[ReportValidatorHandler] exception {}", e.getMessage());
             throw new NoSuchBeanException("");

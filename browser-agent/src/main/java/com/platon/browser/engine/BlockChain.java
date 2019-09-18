@@ -10,6 +10,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCacheUpdater;
 import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.handler.EventContext;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.platon.browser.engine.util.CacheTool.*;
+import static com.platon.browser.engine.cache.CacheHolder.*;
 
 /**
  * @Auther: Chendongming
@@ -75,6 +76,8 @@ public class BlockChain {
     private NodeCacheUpdater nodeCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     // 当前结算周期轮数
     private BigInteger curSettingEpoch;
@@ -116,8 +119,8 @@ public class BlockChain {
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
         List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
-        if (networkStats.size() != 0) {
-            BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
+        if (!networkStats.isEmpty()) {
+            BeanUtils.copyProperties(networkStats.get(0), cacheHolder.getNetworkStatCache());
         }
     }
 
@@ -146,7 +149,7 @@ public class BlockChain {
         networkStatStatisticHandler.handle(context);
 
         // 更新当前区块的节点名称
-        String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
+        String nodeName = cacheHolder.getNodeNameMap().get(curBlock.getNodeId());
         curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
     }
 
@@ -202,14 +205,14 @@ public class BlockChain {
      * @return
      */
     public BlockChainStage exportResult () {
-        return STAGE_DATA;
+        return cacheHolder.getStageData();
     }
 
     /**
      * 清除分析后的业务数据
      */
     public void commitResult () {
-        STAGE_DATA.clear();
+        cacheHolder.getStageData().clear();
     }
 
 

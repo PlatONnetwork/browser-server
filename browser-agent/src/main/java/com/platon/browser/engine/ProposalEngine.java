@@ -5,6 +5,7 @@ import com.platon.browser.dao.mapper.CustomVoteMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomVote;
+import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.proposal.*;
@@ -20,9 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static com.platon.browser.engine.util.CacheTool.PROPOSALS_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:12
@@ -32,9 +30,6 @@ import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 public class ProposalEngine {
     private static Logger logger = LoggerFactory.getLogger(ProposalEngine.class);
 
-    // 全量数据，需要根据业务变化，保持与数据库一致
-    private ProposalCache proposalCache = PROPOSALS_CACHE;
-
     public static final String pIDIDNum = "PIP-{pip_id}";
 
     public static final String key = "{pip_id}";
@@ -42,8 +37,8 @@ public class ProposalEngine {
     private CustomProposalMapper customProposalMapper;
     @Autowired
     private CustomVoteMapper customVoteMapper;
-
-    private ProposalStage proposalStage = STAGE_DATA.getProposalStage();
+    @Autowired
+    private CacheHolder cacheHolder;
 
     /*********************业务事件处理器*********************/
 
@@ -62,6 +57,8 @@ public class ProposalEngine {
 
     @PostConstruct
     private void init() throws CacheConstructException {
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
     	logger.debug("init ProposalEngine");
         // 初始化全量数据
         List<CustomProposal> proposalList = customProposalMapper.selectAll();

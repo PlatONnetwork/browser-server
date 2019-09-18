@@ -5,8 +5,12 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -18,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-
-import static com.platon.browser.engine.util.CacheTool.*;
 
 /**
  * @Auther: dongqile
@@ -33,8 +35,14 @@ public class ProposalTextHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private CacheHolder cacheHolder;
     @Override
     public void handle ( EventContext context ) throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
     	logger.debug("ProposalTextHandler");
         CustomTransaction tx = context.getTransaction();
         ProposalStage proposalStage = context.getProposalStage();
@@ -44,7 +52,7 @@ public class ProposalTextHandler implements EventHandler {
         proposal.updateWithCustomTransaction(tx, (long) bc.getCurValidator().size());
         CustomNode node;
         try {
-            node = NODE_CACHE.getNode(param.getVerifier());
+            node = nodeCache.getNode(param.getVerifier());
         } catch (NoSuchBeanException e) {
             throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
@@ -83,7 +91,7 @@ public class ProposalTextHandler implements EventHandler {
         proposal.setCanceledTopic("");
         proposalStage.insertProposal(proposal);
         //全量数据补充
-        PROPOSALS_CACHE.addProposal(proposal);
+        proposalCache.addProposal(proposal);
 
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
@@ -93,6 +101,6 @@ public class ProposalTextHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
         nodeOpt.setDesc(desc);
-        STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+        stageData.getStakingStage().insertNodeOpt(nodeOpt);
     }
 }

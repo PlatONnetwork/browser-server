@@ -5,6 +5,8 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -17,9 +19,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
-
 /**
  * @Auther: dongqile
  * @Date: 2019/8/17 20:09
@@ -31,11 +30,15 @@ public class StakingUpdateTask {
     @Autowired
     private BlockChainConfig chainConfig;
     private static final String fingerprintpPer = "_/api/1.0/user/autocomplete.json?q=";
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Scheduled(cron = "0/3  * * * * ?")
     private void cron(){start();}
 
     public void start () {
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         String keyStoreUrl = chainConfig.getKeyBase();
         try {
             Set <CustomStaking> customStakingSet = getAllStaking();
@@ -58,7 +61,7 @@ public class StakingUpdateTask {
                             String username = components.getUsername().getVal();
                             customStaking.setExternalName(username);
                             // 把改动后的内容暂存至待更新列表
-                            STAGE_DATA.getStakingStage().updateStaking(customStaking);
+                            stageData.getStakingStage().updateStaking(customStaking);
                         } catch (HttpRequestException e) {
                             logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                         }
@@ -75,6 +78,6 @@ public class StakingUpdateTask {
      * @return
      */
     public Set<CustomStaking> getAllStaking() {
-        return NODE_CACHE.getAllStaking();
+        return cacheHolder.getNodeCache().getAllStaking();
     }
 }

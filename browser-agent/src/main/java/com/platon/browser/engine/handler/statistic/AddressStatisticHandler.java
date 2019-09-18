@@ -1,7 +1,10 @@
 package com.platon.browser.engine.handler.statistic;
 
 import com.platon.browser.dto.CustomAddress;
+import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.AddressCache;
+import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.AddressStage;
@@ -9,10 +12,8 @@ import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static com.platon.browser.engine.util.CacheTool.ADDRESS_CACHE;
-import static com.platon.browser.engine.util.CacheTool.NETWORK_STAT_CACHE;
 
 /**
  * @Auther: Chendongming
@@ -22,8 +23,12 @@ import static com.platon.browser.engine.util.CacheTool.NETWORK_STAT_CACHE;
 @Component
 public class AddressStatisticHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(AddressStatisticHandler.class);
+    @Autowired
+    private CacheHolder cacheHolder;
     @Override
     public void handle(EventContext context) {
+        AddressCache addressCache = cacheHolder.getAddressCache();
+        CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
         AddressStage addressStage = context.getAddressStage();
         CustomTransaction tx = context.getTransaction();
 
@@ -32,25 +37,25 @@ public class AddressStatisticHandler implements EventHandler {
         // 取from地址缓存，不存在则新建
         CustomAddress fromAddress;
         try {
-            fromAddress = ADDRESS_CACHE.getAddress(from);
+            fromAddress = addressCache.getAddress(from);
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有from地址({})记录，添加一条",from);
             fromAddress = new CustomAddress();
             fromAddress.setAddress(from);
             // 添加至全量缓存
-            ADDRESS_CACHE.add(fromAddress);
+            addressCache.add(fromAddress);
         }
 
         // 取to地址缓存，不存在则新建
         CustomAddress toAddress;
         try {
-            toAddress = ADDRESS_CACHE.getAddress(to);
+            toAddress = addressCache.getAddress(to);
         } catch (NoSuchBeanException e) {
             logger.debug("缓存中没有to地址({})记录，添加一条",to);
             toAddress = new CustomAddress();
             toAddress.setAddress(to);
             // 添加至全量缓存
-            ADDRESS_CACHE.add(toAddress);
+            addressCache.add(toAddress);
         }
 
         ContractDescEnum cde = ContractDescEnum.MAP.get(from);
@@ -72,6 +77,6 @@ public class AddressStatisticHandler implements EventHandler {
 
         addressStage.insertAddress(fromAddress);
         addressStage.insertAddress(toAddress);
-        NETWORK_STAT_CACHE.setAddressQty(ADDRESS_CACHE.getAllAddress().size());
+        networkStatCache.setAddressQty(addressCache.getAllAddress().size());
     }
 }

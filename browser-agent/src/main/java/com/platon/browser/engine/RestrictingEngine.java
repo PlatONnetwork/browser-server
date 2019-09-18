@@ -3,15 +3,15 @@ package com.platon.browser.engine;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomRpPlan;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.RestrictingStage;
 import com.platon.browser.param.CreateRestrictingParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 
 /**
  * @Auther: dongqile
@@ -21,11 +21,11 @@ import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
 @Component
 public class RestrictingEngine {
     private static Logger logger = LoggerFactory.getLogger(RestrictingEngine.class);
-
-    private RestrictingStage restrictingStage = STAGE_DATA.getRestrictingStage();
-
+    @Autowired
+    private CacheHolder cacheHolder;
 
     public void execute (CustomTransaction tx,BlockChain bc) {
+        RestrictingStage restrictingStage = cacheHolder.getStageData().getRestrictingStage();
     	logger.debug("execute RestrictingEngine,{}", tx.getTxInfo());
         CreateRestrictingParam param = JSON.parseObject(tx.getTxInfo(),CreateRestrictingParam.class);
         param.getPlan().forEach(planParam -> {

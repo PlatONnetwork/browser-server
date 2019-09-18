@@ -8,8 +8,11 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.SlashInfo;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.ElectionEpochChangeException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -26,9 +29,6 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-import static com.platon.browser.engine.util.CacheTool.STAGE_DATA;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
@@ -41,11 +41,15 @@ public class NewElectionEpochHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle(EventContext context) throws ElectionEpochChangeException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
         StakingStage stakingStage = context.getStakingStage();
-        List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
+        List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakingList){
             // 需要判断被处罚质押是否在上一轮共识周期验证人
             Node exist = bc.getPreValidator().get(staking.getNodeId());
@@ -130,11 +134,11 @@ public class NewElectionEpochHandler implements EventHandler {
                         .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString())
                         .replace("KICK_OUT",isKickOut?"1":"0");
                 nodeOpt.setDesc(desc);
-                STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+                stageData.getStakingStage().insertNodeOpt(nodeOpt);
 
                 // 更新被处罚节点统计信息（如果存在）
                 try {
-                    CustomNode node = NODE_CACHE.getNode(staking.getNodeId());
+                    CustomNode node = nodeCache.getNode(staking.getNodeId());
                     node.setStatSlashLowQty(node.getStatSlashLowQty()+1);
                     stakingStage.updateNode(node);
                 } catch (NoSuchBeanException e) {

@@ -3,8 +3,11 @@ package com.platon.browser.engine.handler.delegation;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.UnDelegateParam;
@@ -17,8 +20,6 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static com.platon.browser.engine.util.CacheTool.NODE_CACHE;
-
 
 /**
  * @Auther: dongqile
@@ -30,14 +31,19 @@ public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private CacheHolder cacheHolder;
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        BlockChainStage stageData = cacheHolder.getStageData();
+
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
 
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
-            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
@@ -110,7 +116,7 @@ public class UnDelegateHandler implements EventHandler {
             tx.setTxInfo(JSON.toJSONString(param));
 
             // 添加至解委托缓存
-            NODE_CACHE.addUnDelegation(unDelegation);
+            nodeCache.addUnDelegation(unDelegation);
             //更新分析委托结果
             stakingStage.updateDelegation(delegation);
             //新增分析委托赎回结果
