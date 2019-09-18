@@ -2,11 +2,14 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.CustomNetworkStatMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.NetworkStatStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,10 @@ public class NetworkStatUpdateTask {
     private PlatonClient client;
     @Autowired
     private CacheHolder cacheHolder;
+    @Autowired
+    private CustomNetworkStatMapper customNetworkStatMapper;
+
+    private NetworkStatStage networkStatStage = new NetworkStatStage();
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
@@ -74,7 +81,9 @@ public class NetworkStatUpdateTask {
             //数据回填内存中
             networkStatCache.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
             networkStatCache.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            stageData.getNetworkStatStage().updateNetworkStat(networkStatCache);
+            networkStatStage.updateNetworkStat(networkStatCache);
+            customNetworkStatMapper.batchInsertOrUpdateSelective(networkStatStage.exportNetworkStat(), NetworkStat.Column.values());
+            networkStatStage.clear();
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }

@@ -52,12 +52,10 @@ public class ProposalTextHandlerTest extends TestBase {
      */
     @Test
     public void testHandler () throws CacheConstructException, BusinessException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
+        NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
-
         EventContext context = new EventContext();
         context.setTransaction(transactions.get(0));
         handler.handle(context);

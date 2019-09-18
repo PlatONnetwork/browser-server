@@ -7,6 +7,8 @@ import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.mapper.CustomNodeOptMapper;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.NodeOptMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNodeOpt;
@@ -15,7 +17,8 @@ import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.ProposalCache;
-import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -44,7 +47,6 @@ public class ProposalUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpdateTask.class);
     @Autowired
     private PlatonClient client;
-    public static final String QUERY_FLAG = "inquiry";
     @Autowired
     private BlockChain bc;
     @Autowired
@@ -53,6 +55,15 @@ public class ProposalUpdateTask {
     private NodeOptMapper nodeOptMapper;
     @Autowired
     private CacheHolder cacheHolder;
+    @Autowired
+    private CustomProposalMapper customProposalMapper;
+    @Autowired
+    private CustomNodeOptMapper customNodeOptMapper;
+
+    private ProposalStage proposalStage = new ProposalStage();
+
+    private StakingStage stakingStage = new StakingStage();
+
 
     /**
      * 同步任务功能说明：
@@ -66,7 +77,6 @@ public class ProposalUpdateTask {
 
     public void start () {
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
 
         //获取全量数据
         Collection<CustomProposal> proposals = getAllProposal();
@@ -90,7 +100,8 @@ public class ProposalUpdateTask {
                 // 添加至全量缓存
                 proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
-                stageData.getProposalStage().updateProposal(proposal);
+                proposalStage.updateProposal(proposal);
+
             } catch (NoSuchBeanException | BusinessException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (IOException e) {
@@ -119,20 +130,23 @@ public class ProposalUpdateTask {
                     // 添加至全量缓存
                     proposalCache.addProposal(proposal);
                     // 暂存至待入库列表
-                    stageData.getProposalStage().updateProposal(proposal);
+                    proposalStage.updateProposal(proposal);
                 } catch (Exception e) {
                     logger.error("更新提案({})的结果出错:{}", proposal.getPipId(), e.getMessage());
 
                 }
             }
         }
+        //入库
+        if(proposalStage.exportProposal().size()>0){
+            customProposalMapper.batchInsertOrUpdateSelective(proposalStage.exportProposal(),Proposal.Column.values());
+            proposalStage.clear();
+        }
         updateNodeOptInfo(proposalList);
     }
 
     private void updateNodeOptInfo ( List <String> proposalList ) {
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
-
         //补充操作记录中具体提案描述
         if (!proposalList.isEmpty()) {
             NodeOptExample nodeOptExample = new NodeOptExample();
@@ -154,7 +168,11 @@ public class ProposalUpdateTask {
                 }
                 CustomNodeOpt customNodeOpt = new CustomNodeOpt();
                 BeanUtils.copyProperties(nodeOpt, customNodeOpt);
-                stageData.getStakingStage().updateNodeOpt(customNodeOpt);
+                stakingStage.updateNodeOpt(customNodeOpt);
+                if(stakingStage.exportNodeOpt().size()>0){
+                    customNodeOptMapper.batchInsertOrUpdateSelective(stakingStage.exportNodeOpt(),NodeOpt.Column.values());
+                    stakingStage.clear();
+                }
             });
         }
     }
