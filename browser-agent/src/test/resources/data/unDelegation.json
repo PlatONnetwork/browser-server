@@ -1,13 +1,13 @@
-[
-  {
-    "hash":"0x368a196f519933ebc31ba0f15fcee04cd0997cee872901179f7e770ab5fa9573",
-    "delegate_addr":"0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
-    "staking_block_num":21924,
-    "node_id":"0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
-    "apply_amount":"10000000000000000000000",
-    "redeem_locked":"10000000000000000000000",
-    "status":1,
-    "create_time":"2019-09-18 10:19:50",
-    "update_time":"2019-09-18 10:19:50",
-    "real_amount":"10000000000000000000000"
-  }]
+[ 
+{ 
+"hash":"0x0772fd8e5126c01b98d3a93c64546306149202ed",
+"delegate_addr":"0x0772fd8e5126c01b98d3a93c64546306149202ed",
+"staking_block_num":2552,
+"node_id":"0x75143a7d588c5db985711c7dd5cd322d5b8177a4a4fd4f112873b014a2e660c1b45ce5bbaec5448b5c6654c565d9377a4950922a864c1b6feb0126be968f4b28",
+"apply_amount":"555",
+"redeem_locked":"0",
+"status":1,
+"create_time":"2019-09-18 15:50:19",
+"update_time":"2019-09-18 15:51:06",
+"real_amount":"555"
+}]

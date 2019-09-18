@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.delagation;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
@@ -9,6 +10,7 @@ import com.platon.browser.engine.handler.delegation.DelegateHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +38,8 @@ public class DelegateHandlerTest extends TestBase {
     private DelegateHandler handler;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private NodeCache nodeCache;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -51,12 +55,13 @@ public class DelegateHandlerTest extends TestBase {
     *    委托测试方法
     */
     @Test
-    public void testHandler () throws CacheConstructException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
+    public void testHandler () throws CacheConstructException, NoSuchBeanException {
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
+        CustomNode node = mock(CustomNode.class);
+        when(nodeCache.getNode(any())).thenReturn(node);
+        when(node.getLatestStaking()).thenReturn(stakings.get(0));
 
         EventContext context = new EventContext();
         context.setTransaction(transactions.get(0));
