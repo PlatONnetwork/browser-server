@@ -9,7 +9,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateParam;
@@ -32,7 +31,6 @@ public class DelegateHandler implements EventHandler {
     @Override
     public void handle ( EventContext context ) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
         CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = context.getStakingStage();
         logger.debug("发起委托(委托)");

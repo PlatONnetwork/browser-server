@@ -3,7 +3,6 @@ package com.platon.browser.engine.handler.statistic;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
@@ -43,7 +42,6 @@ public class NetworkStatStatisticHandler implements EventHandler {
 
     @Override
     public void handle ( EventContext context ) {
-        AddressCache addressCache = cacheHolder.getAddressCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
