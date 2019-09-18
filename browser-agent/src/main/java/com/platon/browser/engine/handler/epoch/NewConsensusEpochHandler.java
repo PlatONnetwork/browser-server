@@ -3,11 +3,12 @@ package com.platon.browser.engine.handler.epoch;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -28,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/17 20:09
@@ -41,18 +40,16 @@ public class NewConsensusEpochHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Autowired
-    private BlockChainConfig chainConfig;
-    @Autowired
     private PlatonClient client;
-    private StakingStage stakingStage;
     @Autowired
     private SpecialContractApi sca;
     @Autowired
     private CandidateService candidateService;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle(EventContext context) throws Exception {
-        stakingStage = context.getStakingStage();
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -61,7 +58,10 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 更新与质押相关的信息
      */
     private void updateStaking() throws NoSuchBeanException {
-        List<CustomStaking> stakingList = NODE_CACHE.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+
+        List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
         Map<String,String> consensusInfo = new HashMap<>();
         String tpl = "前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)";
@@ -85,7 +85,7 @@ public class NewConsensusEpochHandler implements EventHandler {
 
         // 下一轮验证人提前设置验证轮数：验证周期轮数+1
         for (Node node:bc.getCurValidator().values()){
-            CustomNode customNode = NODE_CACHE.getNode(HexTool.prefix(node.getNodeId()));
+            CustomNode customNode = nodeCache.getNode(HexTool.prefix(node.getNodeId()));
             // 节点经过的共识周期轮数+1
             customNode.setStatVerifierTime(customNode.getStatVerifierTime()+1);
             // 累加共识周期期望区块数（提前设置下一轮期望的出块数）

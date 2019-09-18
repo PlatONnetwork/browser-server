@@ -4,9 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CancelProposalParam;
@@ -18,8 +23,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.platon.browser.engine.BlockChain.*;
-
 /**
  * @Auther: dongqile
  * @Date: 2019/8/19 20:09
@@ -30,18 +33,24 @@ public class ProposalCancelHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ProposalCancelHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private CacheHolder cacheHolder;
 
 
     @Override
     public void handle ( EventContext context ) throws BusinessException {
-    	logger.debug("ProposalCancelHandler Handler");
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        ProposalStage proposalStage = context.getProposalStage();
+
+    	logger.debug("ProposalCancelHandler Handler");
         CancelProposalParam param = tx.getTxParam(CancelProposalParam.class);
 
         CustomNode node;
         try {
-            node = NODE_CACHE.getNode(param.getVerifier());
+            node = nodeCache.getNode(param.getVerifier());
         } catch (NoSuchBeanException e) {
             throw new BusinessException("处理取消提案出错:"+e.getMessage());
         }
@@ -86,7 +95,7 @@ public class ProposalCancelHandler implements EventHandler {
         //全局内存变量中查询对应需要取消的提案主题
         CustomProposal targetProposal;
         try {
-            targetProposal = PROPOSALS_CACHE.getProposal(param.getCanceledProposalID());
+            targetProposal = proposalCache.getProposal(param.getCanceledProposalID());
         } catch (NoSuchBeanException e) {
             throw new BusinessException("缓存中不存在被取消的目标提案:"+e.getMessage());
         }
@@ -95,7 +104,7 @@ public class ProposalCancelHandler implements EventHandler {
         //更新新增提案列表
         proposalStage.insertProposal(proposal);
         //全量数据补充
-        PROPOSALS_CACHE.addProposal(proposal);
+        proposalCache.addProposal(proposal);
 
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
@@ -105,6 +114,6 @@ public class ProposalCancelHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
         nodeOpt.setDesc(desc);
-        STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+        stakingStage.insertNodeOpt(nodeOpt);
     }
 }

@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -74,6 +73,11 @@ public class TransactionServiceTest extends TestBase {
      */
     @Test
     public void testAnalyze() {
+        // 交易信息置空
+        blocks.forEach(block->block.getTransactionList().forEach(tx->{
+            tx.setTxType(null);
+            tx.setTxInfo(null);
+        }));
         List<CustomBlock> result = transactionService.analyze(blocks);
         // 数量相等
         assertEquals(blocks.size(),result.size());
@@ -89,5 +93,4 @@ public class TransactionServiceTest extends TestBase {
         }
         assertTrue(flag);
     }
-
 }

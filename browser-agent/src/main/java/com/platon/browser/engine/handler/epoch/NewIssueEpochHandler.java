@@ -21,7 +21,7 @@ public class NewIssueEpochHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Override
-    public void handle(EventContext context) throws IssueEpochChangeException {
+    public void handle(EventContext context) {
         updateReward(); // 更新区块奖励和质押奖励
     }
 
@@ -29,7 +29,7 @@ public class NewIssueEpochHandler implements EventHandler {
      * 在增发周期切换时更新区块奖励和质押奖励
      * @throws IssueEpochChangeException
      */
-    private void updateReward() throws IssueEpochChangeException {
+    private void updateReward() {
     	logger.debug("NewIssueEpochHandler updateReward");
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();

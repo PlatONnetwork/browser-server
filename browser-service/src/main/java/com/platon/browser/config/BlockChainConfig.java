@@ -53,7 +53,7 @@ public class BlockChainConfig {
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
             logger.error("salt:{}",salt);
         } catch (IOException e) {
-        	logger.error("web3j error{}", e);
+            logger.error("加载解密文件出错",e);
         }
     }
 
@@ -87,8 +87,8 @@ public class BlockChainConfig {
     //【质押】节点质押退回锁定的结算周期数
     private BigInteger unStakeRefundSettlePeriodCount;
 
-    //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
-    private BigDecimal slashBlockRate;
+    //【惩罚】违规-低出块率-触发处罚的出块阈值(块数)
+    private BigDecimal slashBlockThreshold;
     //【惩罚】低出块率处罚多少个区块奖励
     private BigDecimal slashBlockCount;
     //【惩罚】双签处罚百分比
@@ -191,7 +191,7 @@ public class BlockChainConfig {
         this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
 
         //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
-        this.slashBlockRate=ecr.getSlashing().getPackAmountAbnormal().divide(BigDecimal.valueOf(10),2, RoundingMode.FLOOR);
+        this.slashBlockThreshold=ecr.getSlashing().getPackAmountAbnormal();
         //【惩罚】低出块率处罚多少个区块奖励
         this.slashBlockCount=ecr.getSlashing().getNumberOfBlockRewardForSlashing();
         //【惩罚】双签处罚百分比

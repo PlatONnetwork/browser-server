@@ -17,7 +17,7 @@ public class UnDelegateParam {
     /**
      * 代表着某个node的某次质押的唯一标示
      */
-    private String stakingBlockNum;
+    private Long stakingBlockNum;
 
     /**
      * 被质押的节点Id(也叫候选人的节点Id)
@@ -34,7 +34,7 @@ public class UnDelegateParam {
      */
     private String nodeName;
 
-    public void init(String stakingBlockNum ,String nodeId,String amount){
+    public void init(Long stakingBlockNum ,String nodeId,String amount){
         this.setStakingBlockNum(stakingBlockNum);
         this.setNodeId(nodeId);
         this.setAmount(amount);

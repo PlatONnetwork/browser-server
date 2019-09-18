@@ -5,6 +5,8 @@ import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -12,9 +14,8 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -24,14 +25,18 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 @Component
 public class DelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(DelegateHandler.class);
+    @Autowired
+    private CacheHolder cacheHolder;
+
     @Override
     public void handle ( EventContext context ) {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {
-            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             try {
                 //获取treemap中最新一条质押数据数据
                 CustomStaking latestStaking = node.getLatestStaking();
@@ -53,7 +58,7 @@ public class DelegateHandler implements EventHandler {
                     newCustomDelegation.updateWithDelegateParam(param, tx);
                     newCustomDelegation.setStakingBlockNum(latestStaking.getStakingBlockNum());
                     // 添加至委托缓存
-                    NODE_CACHE.addDelegation(newCustomDelegation);
+                    nodeCache.addDelegation(newCustomDelegation);
 
                     //新增分析结果AddSet
                     stakingStage.insertDelegation(newCustomDelegation);

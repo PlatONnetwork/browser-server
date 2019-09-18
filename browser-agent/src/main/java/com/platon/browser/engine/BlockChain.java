@@ -9,9 +9,10 @@ import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.cache.*;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCacheUpdater;
+import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
@@ -37,6 +38,8 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.platon.browser.engine.cache.CacheHolder.*;
 
 /**
  * @Auther: Chendongming
@@ -73,19 +76,9 @@ public class BlockChain {
     private NodeCacheUpdater nodeCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
+    @Autowired
+    private CacheHolder cacheHolder;
 
-    // 节点名称缓存 <节点ID-节点名称>
-    public static final Map<String,String> NODE_NAME_MAP = new HashMap<>();
-    // 业务数据暂存容器
-    public static final BlockChainStage STAGE_DATA = new BlockChainStage();
-    // 全量数据(质押相关)，需要根据业务变化，保持与数据库一致
-    public static final NodeCache NODE_CACHE = new NodeCache();
-    // 全量数据(提案相关)，需要根据业务变化，保持与数据库一致
-    public static final ProposalCache PROPOSALS_CACHE = new ProposalCache();
-    // 全量统计数据
-    public static final CustomNetworkStat NETWORK_STAT_CACHE = new CustomNetworkStat();
-    // 全量数据，需要根据业务变化，保持与数据库一致
-    public static final AddressCache ADDRESS_CACHE = new AddressCache();
     // 当前结算周期轮数
     private BigInteger curSettingEpoch;
     // 当前共识周期轮数
@@ -126,8 +119,8 @@ public class BlockChain {
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");
         List <NetworkStat> networkStats = networkStatMapper.selectByExample(example);
-        if (networkStats.size() != 0) {
-            BeanUtils.copyProperties(networkStats.get(0), NETWORK_STAT_CACHE);
+        if (!networkStats.isEmpty()) {
+            BeanUtils.copyProperties(networkStats.get(0), cacheHolder.getNetworkStatCache());
         }
     }
 
@@ -156,7 +149,7 @@ public class BlockChain {
         networkStatStatisticHandler.handle(context);
 
         // 更新当前区块的节点名称
-        String nodeName = NODE_NAME_MAP.get(curBlock.getNodeId());
+        String nodeName = cacheHolder.getNodeNameMap().get(curBlock.getNodeId());
         curBlock.setNodeName(nodeName==null?"Unknown":nodeName);
     }
 
@@ -190,6 +183,7 @@ public class BlockChain {
                     break;
                 case CREATE_RESTRICTING://创建锁仓计划
                     restrictingEngine.execute(tx,this);
+                    break;
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
                     break;
@@ -211,14 +205,14 @@ public class BlockChain {
      * @return
      */
     public BlockChainStage exportResult () {
-        return STAGE_DATA;
+        return cacheHolder.getStageData();
     }
 
     /**
      * 清除分析后的业务数据
      */
     public void commitResult () {
-        STAGE_DATA.clear();
+        cacheHolder.getStageData().clear();
     }
 
 

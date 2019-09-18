@@ -5,6 +5,8 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -15,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: Chendongming
@@ -27,16 +28,20 @@ public class ExitValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(ExitValidatorHandler.class);
     @Autowired
     private BlockChain bc;
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle(EventContext context) {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+
         // 获取交易入参
         ExitValidatorParam param = tx.getTxParam(ExitValidatorParam.class);
         logger.debug("撤销质押(退出验证人):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             param.setAmount(latestStaking.integerStakingHas().add(latestStaking.integerStakingLocked()).toString());

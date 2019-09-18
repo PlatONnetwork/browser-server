@@ -14,8 +14,8 @@ import java.util.Date;
 @Data
 public class SlashInfo {
     private BigInteger blockNumber;
+    private BigInteger slashBlockCount;
     private BigInteger blockCount;
-    private BigDecimal blockRate;
     private BigDecimal slashAmount;
     private boolean kickOut;
     private Date slashTime;

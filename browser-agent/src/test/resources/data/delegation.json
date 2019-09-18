@@ -1,14 +1,14 @@
 [ 
 { 
-"delegate_addr":"0xf20c948533b35112d8c8df7f5e907b3b3a275cb3",
-"staking_block_num":21698,
-"node_id":"0xf3ab2eb688347ad77185c993c9a0e78af595867350b7abe6582405411257781768fb873b7c7a63b7dfc9c88c02199f4a20eb60c4b68597b228868ccc63634e69",
+"delegate_addr":"0x0772fd8e5126c01b98d3a93c64546306149202ed",
+"staking_block_num":2552,
+"node_id":"0x75143a7d588c5db985711c7dd5cd322d5b8177a4a4fd4f112873b014a2e660c1b45ce5bbaec5448b5c6654c565d9377a4950922a864c1b6feb0126be968f4b28",
 "delegate_has":"0",
-"delegate_locked":"1420000000000000000000",
+"delegate_locked":"13000000000000000000",
 "delegate_reduction":"0",
 "is_history":2,
-"sequence":277210000,
-"create_time":"2019-09-09 17:17:59",
-"update_time":"2019-09-09 17:17:59",
-"cur_delegation_block_num":27721
+"sequence":193510000,
+"create_time":"2019-09-18 06:06:43",
+"update_time":"2019-09-18 06:06:43",
+"cur_delegation_block_num":19351
 }]

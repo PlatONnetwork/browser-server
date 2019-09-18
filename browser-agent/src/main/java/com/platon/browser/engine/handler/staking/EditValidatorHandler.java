@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -11,10 +13,10 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.EditValidatorParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
-import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -24,16 +26,21 @@ import static com.platon.browser.engine.BlockChain.NODE_NAME_MAP;
 @Component
 public class EditValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(EditValidatorHandler.class);
+    @Autowired
+    private CacheHolder cacheHolder;
 
     @Override
     public void handle(EventContext context) {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
         logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));
         try{
-            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改
             CustomStaking latestStaking = node.getLatestStaking();
             latestStaking.updateWithEditValidatorParam(param);
@@ -43,7 +50,7 @@ public class EditValidatorHandler implements EventHandler {
             param.setBlockNumber(latestStaking.getStakingBlockNum().toString());
             tx.setTxInfo(JSON.toJSONString(param));
             // 更新节点名称映射缓存
-            NODE_NAME_MAP.put(latestStaking.getNodeId(),latestStaking.getStakingName());
+            nodeNameMap.put(latestStaking.getNodeId(),latestStaking.getStakingName());
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
         }

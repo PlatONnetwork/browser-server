@@ -3,12 +3,10 @@ package com.platon.browser.service;
 import com.platon.browser.TestBase;
 import com.platon.browser.client.PlatonClient;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.exception.BlockCollectingException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.protocol.Web3j;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;

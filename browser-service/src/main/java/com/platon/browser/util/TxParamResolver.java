@@ -162,7 +162,7 @@ public class TxParamResolver {
                         BigInteger unDelegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
                         UnDelegateParam unDelegateParam = new UnDelegateParam();
-                        unDelegateParam.init(new BigInteger(stakingBlockNum.replace("0x",""),16).toString(),unDelegateNodeId,unDelegateAmount.toString());
+                        unDelegateParam.init(new BigInteger(stakingBlockNum.replace("0x",""),16).longValue(),unDelegateNodeId,unDelegateAmount.toString());
                         result.param = unDelegateParam;
                         break;
 

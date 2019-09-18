@@ -5,9 +5,13 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.ProposalEngine;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.ProposalStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateProposalUpgradeParam;
@@ -18,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-
-import static com.platon.browser.engine.BlockChain.*;
 
 /**
  * @Auther: dongqile
@@ -33,11 +35,18 @@ public class ProposalUpgradeHandler implements EventHandler {
     private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private CacheHolder cacheHolder;
+
     @Override
     public void handle ( EventContext context ) throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+        ProposalStage proposalStage = cacheHolder.getStageData().getProposalStage();
+
     	logger.debug("ProposalUpgradeHandler");
         CustomTransaction tx = context.getTransaction();
-        ProposalStage proposalStage = context.getProposalStage();
         //根据交易参数解析成对应文本提案结构
         CreateProposalUpgradeParam param = tx.getTxParam(CreateProposalUpgradeParam.class);
         CustomProposal proposal = new CustomProposal();
@@ -47,7 +56,7 @@ public class ProposalUpgradeHandler implements EventHandler {
 
         CustomNode node;
         try {
-            node = NODE_CACHE.getNode(param.getVerifier());
+            node = nodeCache.getNode(param.getVerifier());
         } catch (NoSuchBeanException e) {
             throw new BusinessException("处理文本提案出错:"+e.getMessage());
         }
@@ -72,13 +81,13 @@ public class ProposalUpgradeHandler implements EventHandler {
         //从交易解析参数获取需要设置pIDID
         proposal.setPipId(new Integer(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
-        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),bc.getChainConfig());
+        BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),chainConfig);
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key, param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
-        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound(), bc.getChainConfig());
+        BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound(), chainConfig);
         proposal.setActiveBlock(decActiveNumber.toString());
         //设置新版本号
         proposal.setNewVersion(String.valueOf(param.getNewVersion()));
@@ -87,7 +96,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         //新增文本提案交易结构
         proposalStage.insertProposal(proposal);
         //全量数据补充
-        PROPOSALS_CACHE.addProposal(proposal);
+        proposalCache.addProposal(proposal);
 
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
@@ -97,6 +106,6 @@ public class ProposalUpgradeHandler implements EventHandler {
                 .replace("TITLE",proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
         nodeOpt.setDesc(desc);
-        STAGE_DATA.getStakingStage().insertNodeOpt(nodeOpt);
+        stakingStage.insertNodeOpt(nodeOpt);
     }
 }

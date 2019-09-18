@@ -1,13 +1,25 @@
 [ 
 { 
-"node_id":"0xf3ab2eb688347ad77185c993c9a0e78af595867350b7abe6582405411257781768fb873b7c7a63b7dfc9c88c02199f4a20eb60c4b68597b228868ccc63634e69",
+"node_id":"0x75143a7d588c5db985711c7dd5cd322d5b8177a4a4fd4f112873b014a2e660c1b45ce5bbaec5448b5c6654c565d9377a4950922a864c1b6feb0126be968f4b28",
 "stat_slash_multi_qty":0,
 "stat_slash_low_qty":0,
-"stat_block_qty":3617,
-"stat_expect_block_qty":3580,
-"stat_reward_value":"266896375069071090901096769",
-"stat_verifier_time":358,
+"stat_block_qty":5440,
+"stat_expect_block_qty":"5286.6666666666666660",
+"stat_reward_value":"3210648250148004907138984606",
+"stat_verifier_time":521,
 "is_recommend":2,
-"create_time":"2019-09-09 13:55:45",
-"update_time":"2019-09-09 17:17:17"
+"create_time":"2019-09-18 03:16:41",
+"update_time":"2019-09-18 03:16:46"
+},
+{ 
+"node_id":"0xf515e5a5e2b00d39530c15e50718129f50930c91068e2cf206e390728d009a61a7e58976ab569d97486622cd6491a242efe2a2a65424b2ef7751a65d12762c50",
+"stat_slash_multi_qty":0,
+"stat_slash_low_qty":1,
+"stat_block_qty":4090,
+"stat_expect_block_qty":"4040.0000000000000000",
+"stat_reward_value":"2347286945918813852297194625",
+"stat_verifier_time":404,
+"is_recommend":1,
+"create_time":"2019-09-18 02:55:37",
+"update_time":"2019-09-18 02:55:37"
 }]

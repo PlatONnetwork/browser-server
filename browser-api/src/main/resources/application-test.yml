@@ -18,6 +18,7 @@ dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #日志级别
   level:
     org.springframework: debug
     com.platon.browser: debug

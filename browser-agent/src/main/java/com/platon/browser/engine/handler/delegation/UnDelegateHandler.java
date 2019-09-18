@@ -1,8 +1,10 @@
 package com.platon.browser.engine.handler.delegation;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
-import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
@@ -17,7 +19,6 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 
 /**
  * @Auther: dongqile
@@ -28,19 +29,22 @@ import static com.platon.browser.engine.BlockChain.NODE_CACHE;
 public class UnDelegateHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(UnDelegateHandler.class);
     @Autowired
-    private BlockChain bc;
+    private BlockChainConfig chainConfig;
+    @Autowired
+    private CacheHolder cacheHolder;
     @Override
     public void handle(EventContext context) throws NoSuchBeanException{
-        CustomTransaction tx = context.getTransaction();
-        StakingStage stakingStage = context.getStakingStage();
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
 
+        CustomTransaction tx = context.getTransaction();
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
-            CustomNode node = NODE_CACHE.getNode(param.getNodeId());
+            CustomNode node = nodeCache.getNode(param.getNodeId());
             logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
-            CustomStaking customStaking = node.getStakings().get(Long.valueOf(param.getStakingBlockNum()));
+            CustomStaking customStaking = node.getStakings().get(param.getStakingBlockNum());
 
             //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
             CustomDelegation delegation = customStaking.getDelegations().get(tx.getFrom());
@@ -59,8 +63,8 @@ public class UnDelegateHandler implements EventHandler {
 
             BigInteger delegationSum = delegation.integerDelegateHas().add(delegation.integerDelegateLocked());
             //配置文件中委托门槛单位是LAT
-            BigDecimal DelegateThresholdVon = Convert.toVon(bc.getChainConfig().getDelegateThreshold(), Convert.Unit.LAT);
-            if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(DelegateThresholdVon.toString())) < 0) {
+            BigDecimal delegateThresholdVon = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT);
+            if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(delegateThresholdVon.toString())) < 0) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
                 delegation.setDelegateReduction(delegation.integerDelegateReduction().add(delegation.integerDelegateLocked()).toString());
                 delegation.setDelegateHas("0");
@@ -109,14 +113,14 @@ public class UnDelegateHandler implements EventHandler {
             tx.setTxInfo(JSON.toJSONString(param));
 
             // 添加至解委托缓存
-            NODE_CACHE.addUnDelegation(unDelegation);
+            nodeCache.addUnDelegation(unDelegation);
             //更新分析委托结果
             stakingStage.updateDelegation(delegation);
             //新增分析委托赎回结果
             stakingStage.insertUnDelegation(unDelegation);
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
-            throw  new NoSuchBeanException("缓存中找不到对应的接触质押信息:");
+            throw  new NoSuchBeanException("缓存中找不到对应的解除质押信息:");
         }
     }
 }

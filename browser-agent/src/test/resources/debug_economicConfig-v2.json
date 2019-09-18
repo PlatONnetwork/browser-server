@@ -15,7 +15,7 @@
     "ActiveUnDelegateFreezeRatio": 0 // 解除委托锁定的结算周期
   },
   "Slashing": {
-    "PackAmountAbnormal": 6, // 违规-低出块率-触发处罚的出块率阈值 60%
+    "PackAmountAbnormal": 6, // 违规-低出块率-触发处罚的出块率阈值
     "DuplicateSignHighSlashing": 100, // 区块双签扣除验证人自有质押金比例 100%
     "NumberOfBlockRewardForSlashing": 20 // 低出块率处罚多少个区块奖励
   },
