@@ -12,5 +12,19 @@
     "StakingTxIndex": 0,
     "ValidatorTerm": 0,
     "Website": ""
+  },
+  {
+    "BenefitAddress": "0x0000000000000000000000000000000000000000",
+    "Details": "",
+    "ExternalId": "",
+    "NodeId": "f515e5a5e2b00d39530c15e50718129f50930c91068e2cf206e390728d009a61a7e58976ab569d97486622cd6491a242efe2a2a65424b2ef7751a65d12762c50",
+    "NodeName": "",
+    "ProgramVersion": 0,
+    "Shares": 0,
+    "StakingAddress": "0x0000000000000000000000000000000000000000",
+    "StakingBlockNum": 0,
+    "StakingTxIndex": 0,
+    "ValidatorTerm": 0,
+    "Website": ""
   }
 ]
