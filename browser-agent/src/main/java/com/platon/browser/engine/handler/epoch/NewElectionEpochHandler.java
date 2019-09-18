@@ -68,7 +68,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 // 2、扣除罚金后，剩余质押金小于最低质押门槛
                 // 扣除罚款后剩余的锁定金额 = 原锁定金额+犹豫期金额-罚款
                 BigDecimal remainAmount = totalAmount.subtract(slashAmount);
-                BigDecimal stakeThresholdInVon = Convert.toVon(bc.getChainConfig().getStakeThreshold(), Convert.Unit.LAT);
+                BigDecimal stakeThresholdInVon = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT);
                 boolean isKickOut = remainAmount.subtract(slashAmount).compareTo(stakeThresholdInVon)<0||staking.getPreConsBlockQty()==0;
                 if(isKickOut){
                     // 犹豫期金额置零

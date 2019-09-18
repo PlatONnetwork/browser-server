@@ -1,10 +1,13 @@
 package com.platon.browser.engine.handler.slash;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -19,8 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,9 +37,13 @@ import static org.mockito.Mockito.*;
 public class ReportValidatorHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(ReportValidatorHandlerTest.class);
     @Spy
-    private ReportValidatorHandler reportValidatorHandler;
+    private ReportValidatorHandler handler;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private BlockChainConfig chainConfig;
+    @Mock
+    private BlockChain bc;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -44,7 +52,9 @@ public class ReportValidatorHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(reportValidatorHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(handler, "bc", bc);
     }
 
     /**
@@ -55,13 +65,21 @@ public class ReportValidatorHandlerTest extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        when(chainConfig.getDuplicateSignSlashRate()).thenReturn(BigDecimal.valueOf(100));
+        when(bc.getCurBlock()).thenReturn(blocks.get(0));
+        when(bc.getCurSettingEpoch()).thenReturn(BigInteger.ONE);
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.REPORT_VALIDATOR.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        reportValidatorHandler.handle(context);
+        handler.handle(context);
 
-        verify(reportValidatorHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

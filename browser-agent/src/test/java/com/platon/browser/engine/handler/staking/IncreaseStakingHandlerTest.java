@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import org.junit.Before;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.*;
 public class IncreaseStakingHandlerTest  extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(IncreaseStakingHandlerTest.class);
     @Spy
-    private IncreaseStakingHandler increaseStakingHandler;
+    private IncreaseStakingHandler handler;
     @Mock
     private CacheHolder cacheHolder;
 
@@ -43,7 +44,7 @@ public class IncreaseStakingHandlerTest  extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(increaseStakingHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
     }
 
     /**
@@ -54,13 +55,18 @@ public class IncreaseStakingHandlerTest  extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.INCREASE_STAKING.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        increaseStakingHandler.handle(context);
+        handler.handle(context);
 
-        verify(increaseStakingHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

@@ -31,8 +31,8 @@ public class DelegateHandler implements EventHandler {
     @Override
     public void handle ( EventContext context ) {
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        CustomTransaction tx = context.getTransaction();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+        CustomTransaction tx = context.getTransaction();
         logger.debug("发起委托(委托)");
         DelegateParam param = tx.getTxParam(DelegateParam.class);
         try {

@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import org.junit.Before;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class EditValidatorHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(EditValidatorHandlerTest.class);
     @Spy
-    private EditValidatorHandler editValidatorHandler;
+    private EditValidatorHandler handler;
     @Mock
     private CacheHolder cacheHolder;
 
@@ -42,7 +43,7 @@ public class EditValidatorHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(editValidatorHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
     }
 
     /**
@@ -53,13 +54,18 @@ public class EditValidatorHandlerTest extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.EDIT_VALIDATOR.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        editValidatorHandler.handle(context);
+        handler.handle(context);
 
-        verify(editValidatorHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }

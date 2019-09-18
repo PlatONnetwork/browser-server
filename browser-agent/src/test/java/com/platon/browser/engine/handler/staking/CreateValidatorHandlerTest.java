@@ -2,9 +2,11 @@ package com.platon.browser.engine.handler.staking;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -32,9 +35,11 @@ import static org.mockito.Mockito.*;
 public class CreateValidatorHandlerTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(CreateValidatorHandlerTest.class);
     @Spy
-    private CreateValidatorHandler createValidatorHandler;
+    private CreateValidatorHandler handler;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private BlockChain bc;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -43,7 +48,8 @@ public class CreateValidatorHandlerTest extends TestBase {
      */
     @Before
     public void setup() {
-        ReflectionTestUtils.setField(createValidatorHandler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "bc", bc);
     }
 
     /**
@@ -54,13 +60,19 @@ public class CreateValidatorHandlerTest extends TestBase {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init(nodes,stakings,delegations,unDelegations);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        when(bc.getCurConsensusExpectBlockCount()).thenReturn(BigDecimal.valueOf(30));
 
         EventContext context = new EventContext();
+        context.setTransaction(transactions.get(0));
+        handler.handle(context);
+
         transactions.stream()
                 .filter(tx->CustomTransaction.TxTypeEnum.CREATE_VALIDATOR.code.equals(tx.getTxType()))
                 .forEach(context::setTransaction);
-        createValidatorHandler.handle(context);
+        handler.handle(context);
 
-        verify(createValidatorHandler, times(1)).handle(any(EventContext.class));
+        verify(handler, times(2)).handle(any(EventContext.class));
     }
 }
