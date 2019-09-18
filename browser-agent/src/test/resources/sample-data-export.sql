@@ -45,8 +45,7 @@ from
              ON nd.`node_id` = bl.`node_id`
         JOIN un_delegation ud
              ON ud.`staking_block_num` = st.`staking_block_num`;
-        JOIN proposal pro
-             ON pro.`hash` = tx.`hash`
+
 
 select DISTINCT
     st.*
