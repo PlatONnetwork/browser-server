@@ -67,6 +67,7 @@ public class HttpUtil {
             try {
                 String res = Objects.requireNonNull(response.body()).string();
                 res = res.replace("\n","");
+                if(clazz==String.class) return (T)res;
                 T result = JSON.parseObject(res,clazz);
                 return result;
             } catch (IOException e) {
@@ -76,5 +77,10 @@ public class HttpUtil {
         }else{
             throw new HttpRequestException("请求地址["+url+"]失败:"+response.message());
         }
+    }
+
+    public static void main(String[] args) throws HttpRequestException {
+        String s = get("https://www.baidu.com",String.class);
+        System.out.println(s);
     }
 }
