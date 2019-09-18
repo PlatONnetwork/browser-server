@@ -9,6 +9,7 @@ import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.NetworkStatStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +45,8 @@ public class NetworkStatStatisticHandler implements EventHandler {
     public void handle ( EventContext context ) {
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
-
+        NetworkStatStage networkStatStage = cacheHolder.getStageData().getNetworkStatStage();
         CustomBlock curBlock = bc.getCurBlock();
         try {
             CustomNode curNode = nodeCache.getNode(curBlock.getNodeId());
@@ -138,7 +138,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
             });
 
             //更新暂存变量
-            stageData.getNetworkStatStage().updateNetworkStat(networkStatCache);
+            networkStatStage.updateNetworkStat(networkStatCache);
         } catch (NoSuchBeanException e) {
             logger.error("-------------------------[networkStatCache]-------------------------- {}", curBlock.getBlockNumber());
             logger.error("{}", e.getMessage());

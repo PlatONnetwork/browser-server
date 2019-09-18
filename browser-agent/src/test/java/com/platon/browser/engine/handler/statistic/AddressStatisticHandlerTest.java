@@ -2,12 +2,13 @@ package com.platon.browser.engine.handler.statistic;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dto.CustomNetworkStat;
+import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,22 +49,19 @@ public class AddressStatisticHandlerTest extends TestBase {
     }
 
     @Test
-    public void testHandler () throws CacheConstructException {
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.init(nodes,stakings,delegations,unDelegations);
-        when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+    public void testHandler () throws CacheConstructException, NoSuchBeanException {
+        AddressCache addressCache = mock(AddressCache.class);
+        when(cacheHolder.getAddressCache()).thenReturn(addressCache);
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
         CustomNetworkStat networkStatCache = new CustomNetworkStat();
         when(cacheHolder.getNetworkStatCache()).thenReturn(networkStatCache);
+        when(addressCache.getAddress(anyString())).thenReturn(addresses.get(0));
 
         EventContext context = new EventContext();
-        context.setTransaction(transactions.get(0));
-        handler.handle(context);
-
         transactions.forEach(context::setTransaction);
         handler.handle(context);
 
-        verify(handler, times(2)).handle(any(EventContext.class));
+        verify(handler, times(1)).handle(any(EventContext.class));
     }
 }
