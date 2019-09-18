@@ -3,6 +3,9 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.stage.BlockChainStage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +14,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.utils.Numeric;
 
@@ -34,20 +38,20 @@ public class AddressUpdateTaskTest extends TestBase {
     private AddressUpdateTask addressUpdateTask;
     @Mock
     private SpecialContractApi sca;
+    @Mock
+    private CacheHolder cacheHolder;
 
     @Before
     public void setup(){
+        ReflectionTestUtils.setField(addressUpdateTask, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(addressUpdateTask, "sca", sca);
     }
 
     @Test
     public void testStart() throws Exception {
-        when(addressUpdateTask.getAllAddress()).thenReturn(Collections.emptyList());
-        addressUpdateTask.start();
-
-        when(addressUpdateTask.getAllAddress()).thenReturn(addresses);
-        addressUpdateTask.start();
-
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        doReturn(addresses).when(addressUpdateTask).getAllAddress();
         List<RestrictingBalance> data = new ArrayList<>();
         addresses.forEach(ca->{
             RestrictingBalance rb = new RestrictingBalance();
@@ -61,6 +65,6 @@ public class AddressUpdateTaskTest extends TestBase {
         doReturn(data).when(addressUpdateTask).getRestrictingBalance(anyString());
         addressUpdateTask.start();
 
-        verify(addressUpdateTask, times(3)).start();
+        verify(addressUpdateTask, times(1)).start();
     }
 }

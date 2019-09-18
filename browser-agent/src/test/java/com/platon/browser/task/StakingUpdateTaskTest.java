@@ -3,6 +3,9 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.stage.BlockChainStage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,14 +30,19 @@ public class StakingUpdateTaskTest extends TestBase {
     private StakingUpdateTask stakingUpdateTask;
     @Mock
     private BlockChainConfig chainConfig;
+    @Mock
+    private CacheHolder cacheHolder;
 
     @Before
     public void setup(){
         ReflectionTestUtils.setField(stakingUpdateTask, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(stakingUpdateTask, "cacheHolder", cacheHolder);
     }
 
     @Test
     public void testStart() {
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
         when(chainConfig.getKeyBase()).thenReturn("https://keybase.io/");
         Set<CustomStaking> customStakingSet = new HashSet<>(stakings);
         customStakingSet.forEach(cc->{

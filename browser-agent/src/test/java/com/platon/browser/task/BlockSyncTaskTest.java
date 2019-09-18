@@ -3,6 +3,9 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
@@ -47,9 +50,12 @@ public class BlockSyncTaskTest extends TestBase {
     private TransactionService transactionService;
     @Mock
     private CandidateService candidateService;
+    @Mock
+    private CacheHolder cacheHolder;
 
     @Before
     public void setup(){
+        ReflectionTestUtils.setField(blockSyncTask, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(blockSyncTask, "customBlockMapper", customBlockMapper);
         ReflectionTestUtils.setField(blockSyncTask, "dbService", dbService);
         ReflectionTestUtils.setField(blockSyncTask, "blockChain", blockChain);
@@ -61,6 +67,14 @@ public class BlockSyncTaskTest extends TestBase {
 
     @Test
     public void testInit() throws Exception {
+
+        NodeCache nodeCache = new NodeCache();
+        nodeCache.init(nodes,stakings,delegations,unDelegations);
+        when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+
         CandidateService.CandidateResult cr = new CandidateService.CandidateResult();
         cr.setPre(verifiers);
         cr.setCur(verifiers);

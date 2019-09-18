@@ -8,11 +8,12 @@ import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.NodeOptMapper;
-import com.platon.browser.dto.*;
+import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNodeOpt;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BlockChainException;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Auther: dongqile
@@ -130,12 +130,8 @@ public class ProposalUpdateTask {
     }
 
     private void updateNodeOptInfo ( List <String> proposalList ) {
-        AddressCache addressCache = cacheHolder.getAddressCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
-        NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
-        Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
-        CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
 
         //补充操作记录中具体提案描述
         if (!proposalList.isEmpty()) {

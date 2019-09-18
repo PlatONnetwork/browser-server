@@ -5,9 +5,13 @@ import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.mapper.NodeOptMapper;
 import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.engine.BlockChain;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.stage.BlockChainStage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,16 +41,24 @@ public class ProposalUpdateTaskTest extends TestBase {
     private SpecialContractApi sca;
     @Mock
     private NodeOptMapper nodeOptMapper;
+    @Mock
+    private CacheHolder cacheHolder;
 
     @Before
     public void setup(){
         ReflectionTestUtils.setField(proposalUpdateTask, "bc", blockChain);
         ReflectionTestUtils.setField(proposalUpdateTask, "sca", sca);
         ReflectionTestUtils.setField(proposalUpdateTask, "nodeOptMapper", nodeOptMapper);
+        ReflectionTestUtils.setField(proposalUpdateTask, "cacheHolder", cacheHolder);
     }
 
     @Test
     public void testStart() throws Exception {
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        ProposalCache proposalCache = new ProposalCache();
+        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
+
         CustomBlock customBlock = blocks.get(0);
         when(blockChain.getCurBlock()).thenReturn(customBlock);
         doReturn(proposals).when(proposalUpdateTask).getAllProposal();
