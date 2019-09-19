@@ -11,6 +11,7 @@ import java.math.RoundingMode;
  * @Description: 周期计算工具
  */
 public class EpochUtil {
+    private EpochUtil(){}
     /**
      * 取周期，向上取整
      * @param blockNumber 当前区块号

@@ -68,7 +68,7 @@ public class CustomNodeOpt extends NodeOpt {
         public String getCode(){return code;}
         public String getDesc(){return desc;}
         public String getTpl(){return tpl;}
-        private static Map<String,TypeEnum> ENUMS = new HashMap<>();
+        private static final Map<String,TypeEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(TypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static TypeEnum getEnum(String code){

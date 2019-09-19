@@ -40,7 +40,7 @@ public class ReportValidatorParam {
      */
     private String stakingBlockNum;
 
-    public void init(BigInteger type, String data)throws Exception{
+    public void init(BigInteger type, String data){
         this.type = type;
         this.data = data;
         this.verify = format(type,data);
@@ -60,9 +60,9 @@ public class ReportValidatorParam {
             case 3:
                 base =  jsonObject.getJSONObject("view_a");
                 break;
+            default:
         }
         JSONObject validateNode = base.getJSONObject("validate_node");
-        String nodeId = validateNode.getString("NodeID");
-        return nodeId;
+        return validateNode.getString("NodeID");
     }
 }

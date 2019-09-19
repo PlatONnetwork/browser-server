@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -81,5 +82,6 @@ public class ParamTest extends TestBase {
                 method.invoke(instance);
             }
         }
+        assertTrue(true);
     }
 }

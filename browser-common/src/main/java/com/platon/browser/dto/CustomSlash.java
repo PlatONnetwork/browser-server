@@ -52,7 +52,7 @@ public class CustomSlash extends Slash {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map <Integer, StatusEnum> ENUMS = new HashMap <>();
+        private static final Map <Integer, StatusEnum> ENUMS = new HashMap <>();
         static {
             Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static StatusEnum getEnum( Integer code){
@@ -80,7 +80,7 @@ public class CustomSlash extends Slash {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, CustomSlash.YesNoEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, CustomSlash.YesNoEnum> ENUMS = new HashMap<>();
         static {Arrays.asList(CustomSlash.YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static CustomSlash.YesNoEnum getEnum( Integer code){
             return ENUMS.get(code);
