@@ -6,7 +6,6 @@ import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.NodeOptMapper;
 import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
 import com.platon.browser.engine.BlockChain;
@@ -21,7 +20,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.TallyResult;
 
@@ -74,7 +72,7 @@ public class ProposalUpdateTaskTest extends TestBase {
         pps.setAbstainCount(2L);
         pps.setOpposeCount(3L);
         pps.setSupportCount(6L);
-        doReturn(pps).when(task).getProposalParticiantStat(anyString(),anyString());
+        doReturn(pps).when(task).getProposalParticipantStat(anyString(),anyString());
         TallyResult tr = new TallyResult();
         tr.setStatus(1);
         doReturn(tr).when(task).getTallyResult(anyString());
