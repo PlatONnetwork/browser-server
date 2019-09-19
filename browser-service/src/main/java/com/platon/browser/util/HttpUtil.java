@@ -2,7 +2,10 @@ package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.service.impl.BlockCacheServiceImpl;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -13,6 +16,7 @@ import java.util.Objects;
  * @Description:
  */
 public class HttpUtil {
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
     /**
      * 发送POST请求
      * @param url
@@ -26,8 +30,7 @@ public class HttpUtil {
         OkHttpClient httpClient = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
         Request request = new Request.Builder().post(RequestBody.create(param,mediaType)).url(url).build();
-        T result = resolve(httpClient,request,url,clazz);
-        return result;
+        return resolve(httpClient,request,url,clazz);
     }
 
     /**
@@ -41,8 +44,7 @@ public class HttpUtil {
     public static <T> T get(String url,Class<T> clazz) throws HttpRequestException {
         OkHttpClient httpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
-        T result = resolve(httpClient,request,url,clazz);
-        return result;
+        return resolve(httpClient,request,url,clazz);
     }
 
     /**
@@ -60,7 +62,7 @@ public class HttpUtil {
         try {
             response = httpClient.newCall(request).execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("请求地址出错:",e);
             throw new HttpRequestException("请求地址["+url+"]出错:"+e.getMessage());
         }
         if(response.isSuccessful()){
@@ -68,19 +70,13 @@ public class HttpUtil {
                 String res = Objects.requireNonNull(response.body()).string();
                 res = res.replace("\n","");
                 if(clazz==String.class) return (T)res;
-                T result = JSON.parseObject(res,clazz);
-                return result;
+                return JSON.parseObject(res,clazz);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("返回内容出错:",e);
                 throw new HttpRequestException("获取返回内容出错:"+e.getMessage());
             }
         }else{
             throw new HttpRequestException("请求地址["+url+"]失败:"+response.message());
         }
-    }
-
-    public static void main(String[] args) throws HttpRequestException {
-        String s = get("https://www.baidu.com",String.class);
-        System.out.println(s);
     }
 }

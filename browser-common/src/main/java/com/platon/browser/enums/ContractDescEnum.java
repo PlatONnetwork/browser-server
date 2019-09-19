@@ -16,10 +16,10 @@ public enum  ContractDescEnum {
     PROPOSAL_CONTRACT(ContractAddress.PROPOSAL_CONTRACT_ADDRESS,"proposal","system",""),
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"incentive","system","");
 
-    public String address;
-    public String contractName;
-    public String creator;
-    public String contractHash;
+    private String address;
+    private String contractName;
+    private String creator;
+    private String contractHash;
 
     ContractDescEnum(String address, String contractName, String creator,String contractHash) {
         this.address = address;

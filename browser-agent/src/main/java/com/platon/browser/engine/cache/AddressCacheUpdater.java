@@ -4,7 +4,6 @@ import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.stage.AddressStage;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,16 @@ public class AddressCacheUpdater {
     private CacheHolder cacheHolder;
 
     static class Stat{
-        BigInteger stakingValue,delegateValue,stakingRedeemed,delegateRedeemed,redeemedValue,candidateCount,delegateHes,delegateLocked,delegateUnlock,delegateReduction;
+        BigInteger stakingValue;
+        BigInteger delegateValue;
+        BigInteger stakingRedeemed;
+        BigInteger delegateRedeemed;
+        BigInteger redeemedValue;
+        BigInteger candidateCount;
+        BigInteger delegateHes;
+        BigInteger delegateLocked;
+        BigInteger delegateUnlock;
+        BigInteger delegateReduction;
         void reset(){
             this.stakingValue = BigInteger.ZERO;
             this.delegateValue = BigInteger.ZERO;

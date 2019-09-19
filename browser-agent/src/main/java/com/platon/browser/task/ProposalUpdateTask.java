@@ -1,7 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.entity.NodeOpt;
@@ -21,6 +21,7 @@ import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ import java.util.List;
 public class ProposalUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpdateTask.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private BlockChain bc;
     @Autowired
@@ -96,8 +97,6 @@ public class ProposalUpdateTask {
                 if (CustomProposal.TypeEnum.CANCEL.getCode().equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                     //若是取消提案，则需要补充被取消提案相关信息
-/*                    String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
-                    ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString, ProposalMarkDownDto.class);*/
                     CustomProposal cp = getProposal(proposal.getCanceledPipId());
                     proposal.setCanceledTopic(cp.getTopic());
                 }
@@ -107,8 +106,6 @@ public class ProposalUpdateTask {
                 proposalStage.updateProposal(proposal);
             } catch (NoSuchBeanException | BusinessException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
-            } catch (IOException e) {
-                logger.error("更新提案({})的主题和描述出错:获取不到{}", proposal.getPipId(), proposal.getUrl());
             } catch (Exception e){
                 logger.error("更新提案({})的主题和描述出错:发送http请求异常{}", proposal.getPipId(), proposal.getUrl());
 
@@ -144,7 +141,7 @@ public class ProposalUpdateTask {
             }
         }
         //入库
-        if(proposalStage.exportProposal().size()>0){
+        if(!proposalStage.exportProposal().isEmpty()){
             customProposalMapper.batchInsertOrUpdateSelective(proposalStage.exportProposal(),Proposal.Column.values());
             proposalStage.clear();
         }
@@ -175,7 +172,7 @@ public class ProposalUpdateTask {
                 CustomNodeOpt customNodeOpt = new CustomNodeOpt();
                 BeanUtils.copyProperties(nodeOpt, customNodeOpt);
                 stakingStage.updateNodeOpt(customNodeOpt);
-                if(stakingStage.exportNodeOpt().size()>0){
+                if(!stakingStage.exportNodeOpt().isEmpty()){
                     customNodeOptMapper.batchInsertOrUpdateSelective(stakingStage.exportNodeOpt(),NodeOpt.Column.values());
                     stakingStage.clear();
                 }
@@ -233,7 +230,7 @@ public class ProposalUpdateTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo(String url) throws Exception,IOException, BusinessException {
+    public ProposalMarkDownDto getMarkdownInfo(String url) throws BusinessException, HttpRequestException {
         String fileUrl = MarkDownParserUtil.acquireMD(url);
         if (fileUrl == null) throw new BusinessException("获取不到" + url);
         String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);

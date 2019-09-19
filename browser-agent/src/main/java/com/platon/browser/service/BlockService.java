@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.exception.BlockCollectingException;
@@ -14,7 +14,6 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,17 +30,18 @@ import java.util.concurrent.ExecutorService;
 public class BlockService {
     private static Logger logger = LoggerFactory.getLogger(BlockService.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     private ExecutorService executor;
 
     @Data
     static class CollectResult {
+        private CollectResult(){}
         // 并发采集的块信息，无序
-        final static Map<Long, CustomBlock> CONCURRENT_BLOCK_MAP = new ConcurrentHashMap<>();
+        static final Map<Long, CustomBlock> CONCURRENT_BLOCK_MAP = new ConcurrentHashMap<>();
         // 由于异常而未采集的区块号列表
-        final static Set<BigInteger> RETRY_NUMBERS = new CopyOnWriteArraySet<>();
+        static final Set<BigInteger> RETRY_NUMBERS = new CopyOnWriteArraySet<>();
         // 已排序的区块信息列表
-        private final static List<CustomBlock> SORTED_BLOCKS = new LinkedList<>();
+        private static final List<CustomBlock> SORTED_BLOCKS = new LinkedList<>();
         static List <CustomBlock> getSortedBlocks() {
             SORTED_BLOCKS.clear();
             SORTED_BLOCKS.addAll(CONCURRENT_BLOCK_MAP.values());
@@ -110,11 +110,7 @@ public class BlockService {
             PlatonBlock.Block pbb = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
             if (pbb == null) throw new BlockCollectingException("原生区块[" + blockNumber + "]为空！");
             CustomBlock block = new CustomBlock();
-            try {
-                block.updateWithBlock(pbb);
-            } catch (Exception ex) {
-                throw new BlockCollectingException("初始化区块信息异常:" + ex.getMessage());
-            }
+            block.updateWithBlock(pbb);
             return block;
         } catch (Exception e) {
             logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);

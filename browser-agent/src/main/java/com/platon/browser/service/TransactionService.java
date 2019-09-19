@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
@@ -33,7 +33,7 @@ public class TransactionService {
     private static Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private BlockChainConfig chainConfig;
 
@@ -65,7 +65,11 @@ public class TransactionService {
 
         // 汇总区块相关的统计信息
         class Stat {
-            private int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
+            private int transferQty=0;
+            private int stakingQty=0;
+            private int proposalQty=0;
+            private int delegateQty=0;
+            private int txGasLimit=0;
             private BigDecimal txFee = BigDecimal.ZERO;
         }
         blocks.forEach(block->{
@@ -93,6 +97,7 @@ public class TransactionService {
                     case VOTING_PROPOSAL:// 提案投票
                         stat.proposalQty++; // 提案交易数总和
                         break;
+                    default:
                 }
                 // 累加当前区块内所有交易的手续费
                 stat.txFee = stat.txFee.add(new BigDecimal(transaction.getActualTxCost()));
@@ -131,8 +136,7 @@ public class TransactionService {
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
         }catch (Exception e){
-            logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
-            throw e;
+            throw new BeanCreateOrUpdateException("交易[hash="+tx.getHash()+"]的参数解析出错:"+e.getMessage());
         }
         return tx;
     }
@@ -147,8 +151,7 @@ public class TransactionService {
         // 查询交易回执
         while (true) try {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
-            return receipt;
+            return result.getTransactionReceipt();
         } catch (Exception e) {
             logger.error("查询交易回执失败,将重试:{}", e.getMessage());
         }

@@ -3,8 +3,7 @@ package com.platon.browser.task;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.service.BlockService;
@@ -47,6 +46,11 @@ public class BlockSyncTask {
     private CandidateService candidateService;
     @Autowired
     private CacheHolder cacheHolder;
+
+    @Autowired
+    private AddressCacheUpdater addressCacheUpdater;
+    @Autowired
+    private StakingCacheUpdater stakingCacheUpdater;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -107,8 +111,7 @@ public class BlockSyncTask {
             // 导出结果
             BlockChainStage bcr = blockChain.exportResult();
             // 批量入库结果
-            dbService.batchSave(Collections.emptyList(),bcr);
-            blockChain.commitResult();
+            batchSave(Collections.emptyList(),bcr);
             // 初始化节点缓存
             nodeCache.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
             nodeCache.sweep();
@@ -153,7 +156,7 @@ public class BlockSyncTask {
                 BlockChainStage bizData = blockChain.exportResult();
                 try {
                     // 入库失败，立即停止，防止采集后续更高的区块号，导致数据错乱
-                    dbService.batchSave(blocks, bizData);
+                    batchSave(blocks, bizData);
                 } catch (BusinessException e) {
                     logger.error("数据入库失败:",e);
                     return false;
@@ -167,5 +170,23 @@ public class BlockSyncTask {
             TimeUnit.SECONDS.sleep(1);
         }
         return true;
+    }
+
+    public void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        try{
+            // 入库前更新统计信息
+            addressCacheUpdater.updateAddressStatistics();
+            stakingCacheUpdater.updateStakingStatistics();
+            // 串行批量入库
+            dbService.insertOrUpdate(basicData,bizData);
+            blockChain.commitResult();
+            // 缓存整理
+            nodeCache.sweep();
+            proposalCache.sweep();
+        }catch (Exception e){
+            throw new BusinessException("数据批量入库出错："+e.getMessage());
+        }
     }
 }

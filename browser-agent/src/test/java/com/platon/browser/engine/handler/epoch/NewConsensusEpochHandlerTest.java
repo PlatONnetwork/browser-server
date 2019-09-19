@@ -1,7 +1,7 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
@@ -43,7 +43,7 @@ public class NewConsensusEpochHandlerTest extends TestBase {
     @Mock
     private BlockChain bc;
     @Mock
-    private PlatonClient client;
+    private PlatOnClient client;
     @Mock
     private SpecialContractApi sca;
     @Mock

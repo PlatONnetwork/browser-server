@@ -12,18 +12,12 @@ import org.springframework.context.annotation.Bean;
  * @Date: 2019/4/28 11:53
  * @Description:
  */
-//@Configuration
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DruidConfig {
 
     
 	@Bean
     public ServletRegistrationBean viewServlet(){
         ServletRegistrationBean servletRegistrationBean=new ServletRegistrationBean(new StatViewServlet(),"/druid/*");
-        /** IP白名单 */
-        //servletRegistrationBean.addInitParameter("allow","192.168.1.12,127.0.0.1");
-        /**IP黑名单    */
-        //servletRegistrationBean.addInitParameter("deny","192.168.4.23");
         /**控制台用户 */
         servletRegistrationBean.addInitParameter("loginUsername","admin");
         servletRegistrationBean.addInitParameter("loginPassword","admin");

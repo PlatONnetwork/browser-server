@@ -73,19 +73,23 @@ public class ProposalCache {
         proposalMap.values().forEach(proposal -> {
             CustomProposal.TypeEnum typeEnum = CustomProposal.TypeEnum.getEnum(proposal.getType());
             CustomProposal.StatusEnum statusEnum = CustomProposal.StatusEnum.getEnum(proposal.getStatus());
-            if(typeEnum== CustomProposal.TypeEnum.TEXT||typeEnum== CustomProposal.TypeEnum.CANCEL){
+            if (
                 // 如果是文本提案或取消提案
-                if(statusEnum== CustomProposal.StatusEnum.PASS||statusEnum== CustomProposal.StatusEnum.FAIL){
-                    // 提案通过(2)或失败(3)
-                    invalidCache.add(proposal);
-                }
+                (typeEnum == CustomProposal.TypeEnum.TEXT || typeEnum == CustomProposal.TypeEnum.CANCEL)
+                &&
+                // 且通过(2)或失败(3)
+                (statusEnum == CustomProposal.StatusEnum.PASS || statusEnum == CustomProposal.StatusEnum.FAIL)
+            ) {
+                invalidCache.add(proposal);
             }
-            if(typeEnum== CustomProposal.TypeEnum.UPGRADE){
+            if(
                 // 如果是升级提案
-                if(statusEnum== CustomProposal.StatusEnum.FAIL||statusEnum== CustomProposal.StatusEnum.FINISH|| statusEnum==CustomProposal.StatusEnum.CANCEL){
-                    // 提案失败(3)或生效(5)或被取消(6)
-                    invalidCache.add(proposal);
-                }
+                typeEnum== CustomProposal.TypeEnum.UPGRADE
+                &&
+                // 且失败(3)或生效(5)或被取消(6)
+                (statusEnum== CustomProposal.StatusEnum.FAIL||statusEnum== CustomProposal.StatusEnum.FINISH|| statusEnum==CustomProposal.StatusEnum.CANCEL)
+            ){
+                invalidCache.add(proposal);
             }
         });
         // 删除无效提案

@@ -22,8 +22,8 @@ public enum InnerContractAddrEnum {
     INCENTIVE_POOL_CONTRACT(ContractAddress.INCENTIVE_POOL_CONTRACT_ADDRESS,"激励池合约"),
     NODE_CONTRACT(ContractAddress.NODE_CONTRACT_ADDRESS,"节点相关合约");
 
-    public String address;
-    public String desc;
+    private String address;
+    private String desc;
 
     InnerContractAddrEnum(String address, String desc) {
         this.address = address;

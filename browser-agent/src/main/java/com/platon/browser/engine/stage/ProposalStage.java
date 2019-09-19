@@ -7,7 +7,6 @@ import com.platon.browser.dto.CustomVote;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @Auther: Chendongming
@@ -15,8 +14,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @Description: 提案新增或修改暂存类，入库后各容器需要清空
  */
 public class ProposalStage {
-    private final ReentrantReadWriteLock PROPOSAL_RRW = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock VOTE_RRW = new ReentrantReadWriteLock();
     // 插入或更新数据
     private Set<CustomProposal> proposalInsertStage = new HashSet<>();
     private Set<CustomProposal> proposalUpdateStage = new HashSet<>();

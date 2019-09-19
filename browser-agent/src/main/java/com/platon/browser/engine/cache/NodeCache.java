@@ -32,25 +32,32 @@ public class NodeCache {
     ) throws CacheConstructException {
     	logger.debug("NodeCache init" );
         nodeList.forEach(this::addNode);
+        String msgTpl = "构造缓存错误:ERR, 无法向其关联BUS_TYPE(stakingBlockNumber=SBN)";
         for (CustomStaking staking:stakingList){
             try {
                 addStaking(staking);
             } catch (NoSuchBeanException e) {
-                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联质押(stakingBlockNumber="+staking.getStakingBlockNum()+")");
+                throw new CacheConstructException(msgTpl.replace("ERR",e.getMessage())
+                        .replace("BUS_TYPE","质押")
+                        .replace("SBN",staking.getStakingBlockNum().toString()));
             }
         }
         for (CustomDelegation delegation:delegationList){
             try {
                 addDelegation(delegation);
             } catch (NoSuchBeanException e) {
-                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联委托(stakingBlockNumber="+delegation.getStakingBlockNum()+")");
+                throw new CacheConstructException(msgTpl.replace("ERR",e.getMessage())
+                        .replace("BUS_TYPE","委托")
+                        .replace("SBN",delegation.getStakingBlockNum().toString()));
             }
         }
         for (CustomUnDelegation unDelegation:unDelegationList){
             try {
                 addUnDelegation(unDelegation);
             } catch (NoSuchBeanException e) {
-                throw new CacheConstructException("构造缓存错误:"+e.getMessage()+", 无法向其关联解委托(stakingBlockNumber="+unDelegation.getStakingBlockNum()+")");
+                throw new CacheConstructException(msgTpl.replace("ERR",e.getMessage())
+                        .replace("BUS_TYPE","解委托")
+                        .replace("SBN",unDelegation.getStakingBlockNum().toString()));
             }
         }
     }
@@ -213,7 +220,7 @@ public class NodeCache {
                     // 过滤出退回成功的解委托记录
                     returnedUnDelegations.clear();
                     delegation.getUnDelegations().stream()
-                            .filter(unDelegation -> CustomUnDelegation.StatusEnum.EXITED.code==unDelegation.getStatus())
+                            .filter(unDelegation -> CustomUnDelegation.StatusEnum.EXITED.getCode()==unDelegation.getStatus())
                             .forEach(returnedUnDelegations::add);
                     // 解除其下退回成功的解委托关联,释放内存
                     delegation.getUnDelegations().removeAll(returnedUnDelegations);

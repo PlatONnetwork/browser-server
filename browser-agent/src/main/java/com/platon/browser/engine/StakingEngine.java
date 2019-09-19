@@ -18,10 +18,7 @@ import com.platon.browser.engine.handler.staking.CreateValidatorHandler;
 import com.platon.browser.engine.handler.staking.EditValidatorHandler;
 import com.platon.browser.engine.handler.staking.ExitValidatorHandler;
 import com.platon.browser.engine.handler.staking.IncreaseStakingHandler;
-import com.platon.browser.exception.BlockChainException;
-import com.platon.browser.exception.CacheConstructException;
-import com.platon.browser.exception.ElectionEpochChangeException;
-import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,9 +105,8 @@ public class StakingEngine {
     /**
      * 执行交易
      * @param tx 交易
-     * @param bc BlockChain
      */
-    void execute(CustomTransaction tx, BlockChain bc) throws NoSuchBeanException, BlockChainException {
+    void execute(CustomTransaction tx) throws NoSuchBeanException {
         // 事件上下文
         context.setTransaction(tx);
         switch (tx.getTypeEnum()){
@@ -124,13 +120,13 @@ public class StakingEngine {
 			default:
 				break;
         }
-        updateTxInfo(tx,bc);
+        updateTxInfo(tx);
     }
 
     /**
      * 进行验证人选举时触发
      */
-    void onElectionDistance(CustomBlock block, BlockChain bc) throws ElectionEpochChangeException {
+    void onElectionDistance() {
         // 事件上下文
         newElectionEpochHandler.handle(context);
     }
@@ -138,7 +134,7 @@ public class StakingEngine {
     /**
      * 进入新的共识周期变更
      */
-    void onNewConsEpoch(CustomBlock block, BlockChain bc) throws Exception {
+    void onNewConsEpoch() throws CandidateException, NoSuchBeanException {
         // 事件上下文
         newConsensusEpochHandler.handle(context);
     }
@@ -146,7 +142,7 @@ public class StakingEngine {
     /**
      * 进入新的结算周期
      */
-    void  onNewSettingEpoch(CustomBlock block, BlockChain bc) throws Exception {
+    void  onNewSettingEpoch() throws CandidateException, SettleEpochChangeException {
         /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息
@@ -156,7 +152,7 @@ public class StakingEngine {
         newSettleEpochHandler.handle(context);
     }
 
-    private void updateTxInfo(CustomTransaction tx, BlockChain bc){
+    private void updateTxInfo(CustomTransaction tx){
 
     }
 }

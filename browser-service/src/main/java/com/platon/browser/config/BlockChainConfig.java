@@ -1,12 +1,13 @@
 package com.platon.browser.config;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.bean.EconomicConfigParam;
 import com.platon.browser.config.bean.EconomicConfigResult;
 import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.ConfigLoadingException;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.util.HttpUtil;
 import lombok.Data;
@@ -48,17 +49,18 @@ public class BlockChainConfig {
         try(InputStream in = new FileInputStream(saltFile)) {
             properties.load(in);
             String salt=properties.getProperty("jasypt.encryptor.password");
-            if(StringUtils.isBlank(salt)) throw new RuntimeException("加密盐不能为空!");
+            if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt=salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
             logger.error("salt:{}",salt);
-        } catch (IOException e) {
+        } catch (IOException | ConfigLoadingException e) {
             logger.error("加载解密文件出错",e);
+            System.exit(1);
         }
     }
 
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
 
     private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
 
@@ -158,7 +160,8 @@ public class BlockChainConfig {
             logger.error("初始化链配置错误,将重试:we3j={},error={}", web3jAddress, e.getMessage());
             TimeUnit.SECONDS.sleep(1);
         }
-        logger.info("链上配置:{}",JSON.toJSONString(ecr,true));
+        String msg = JSON.toJSONString(ecr,true);
+        logger.info("链上配置:{}",msg);
         updateWithEconomicConfigResult(ecr);
     }
 
@@ -201,20 +204,20 @@ public class BlockChainConfig {
         //【惩罚】双签处罚百分比
         this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
         //【治理】文本提案参与率: >
-        this.minProposalTextParticipationRate=ecr.getGov().getTextProposal_VoteRate();
+        this.minProposalTextParticipationRate=ecr.getGov().getTextProposalVoteRate();
         //【治理】文本提案支持率：>=
-        this.minProposalTextSupportRate=ecr.getGov().getTextProposal_SupportRate();
+        this.minProposalTextSupportRate=ecr.getGov().getTextProposalSupportRate();
         //【治理】取消提案参与率: >
-        this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposal_VoteRate();
+        this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposalVoteRate();
         //【治理】取消提案支持率：>=
-        this.minProposalCancelSupportRate=ecr.getGov().getCancelProposal_SupportRate();
+        this.minProposalCancelSupportRate=ecr.getGov().getCancelProposalSupportRate();
         //【治理】升级提案通过率
-        this.minProposalUpgradePassRate=ecr.getGov().getVersionProposal_SupportRate();
+        this.minProposalUpgradePassRate=ecr.getGov().getVersionProposalSupportRate();
         //【治理】文本提案投票周期
-        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVote_DurationSeconds()
+        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVoteDurationSeconds()
                 .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【治理】设置预升级开始轮数
-        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalVote_DurationSeconds()
+        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalVoteDurationSeconds()
                 .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【奖励】激励池分配给出块激励的比例
         this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);

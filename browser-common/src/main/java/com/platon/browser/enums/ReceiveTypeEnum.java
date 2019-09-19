@@ -9,8 +9,8 @@ public enum ReceiveTypeEnum {
     CONTRACT(0, "合约"),
     ACCOUNT(1, "账户");
 
-    public int code;
-    public String desc;
+    private int code;
+    private String desc;
 
     ReceiveTypeEnum ( int code, String desc) {
         this.code = code;

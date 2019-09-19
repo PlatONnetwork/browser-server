@@ -4,6 +4,7 @@ import com.platon.browser.TestBase;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BusinessException;
@@ -69,6 +70,7 @@ public class AddressCacheUpdaterTest extends TestBase {
         when(nodeCache.getStaking(anyString(),anyLong())).thenReturn(staking);
         when(addressCache.getAllAddress()).thenReturn(addresses);
         target.updateAddressStatistics();
+        verify(target, times(1)).updateAddressStatistics();
     }
 
 }

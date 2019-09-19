@@ -167,7 +167,8 @@ public class TransactionServiceImpl implements TransactionService {
     public AccountDownload transactionListByAddressDownload(String address, String date,String local) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
-        logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, dateFormat.format(currentServerTime));
+        String msg = dateFormat.format(currentServerTime);
+        logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
         TransactionExample transactionExample = new TransactionExample();
         transactionExample.setOrderByClause(" timestamp desc");
         /** 根据地址查询交易，则可能是from也可能是to */
@@ -179,7 +180,7 @@ public class TransactionServiceImpl implements TransactionService {
         	first.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
         	second.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
 		} catch (Exception e) {
-			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
+			logger.error("导出数据起始日期有误：{},{}",date,e.getMessage());
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
 		}
 
@@ -218,7 +219,7 @@ public class TransactionServiceImpl implements TransactionService {
         	/** 设置导出的csv头，防止乱码 */
             outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.error("输出数据错误:",e);
         }
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
         /** 设置导出表的表头 */
@@ -271,7 +272,7 @@ public class TransactionServiceImpl implements TransactionService {
     		PageHelper.startPage(1,1);
     		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应父hash */
     		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
-    		if(transactionList.size()==0){
+    		if(transactionList.isEmpty()){
     			resp.setFirst(true);
     		}else {
     			resp.setPreHash(transactionList.get(0).getHash());
@@ -282,7 +283,7 @@ public class TransactionServiceImpl implements TransactionService {
     		PageHelper.startPage(1,1);
     		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应下一个hash */
     		transactionList = transactionMapper.selectByExample(condition);
-    		if(transactionList.size()==0){
+    		if(transactionList.isEmpty()){
     			resp.setLast(true);
     		}else {
     			resp.setNextHash(transactionList.get(0).getHash());
@@ -363,7 +364,7 @@ public class TransactionServiceImpl implements TransactionService {
 							stakingExample.setOrderByClause(" staking_block_num desc");
 							stakingExample.createCriteria().andNodeIdEqualTo(increaseStakingParam.getNodeId());
 							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-							if(stakings.size()>0) {
+							if(!stakings.isEmpty()) {
 								resp.setNodeName(stakings.get(0).getStakingName());
 							}
 						}
@@ -383,9 +384,6 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 						if(staking!=null) {
-	//						//升级金额等于锁定加犹豫金额
-	//						BigDecimal sum = new BigDecimal(staking.getStakingHas()).add(new BigDecimal(staking.getStakingLocked()));
-	//						resp.setApplyAmount(sum.toString());
 							resp.setRedeemLocked(staking.getStakingReduction());
 							//只有已退出，则金额才会退回到账户
 							if(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
@@ -495,14 +493,14 @@ public class TransactionServiceImpl implements TransactionService {
 							stakingExample.setOrderByClause(" staking_block_num desc");
 							stakingExample.createCriteria().andNodeIdEqualTo(declareVersionParam.getActiveNode());
 							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-							if(stakings.size()>0) {
+							if(!stakings.isEmpty()) {
 								resp.setNodeName(stakings.get(0).getStakingName());
 							}
 						}
 						break;
 					case REPORT_VALIDATOR:
 						ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
-						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
+						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setNodeName(reportValidatorParam.getNodeName());
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
@@ -519,7 +517,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case CREATE_RESTRICTING:
 						// RPAccount + value + RPPlan
 						CreateRestrictingParam createRestrictingParam = JSONObject.parseObject(txInfo, CreateRestrictingParam.class);
-						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<TransactionDetailsRPPlanResp>();
+						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
 						resp.setRPAccount(createRestrictingParam.getAccount());
 						BigDecimal amountSum = new BigDecimal(0);
 						for(PlanParam p:createRestrictingParam.getPlan()) {
@@ -553,19 +551,17 @@ public class TransactionServiceImpl implements TransactionService {
 	    	TransactionExample condition = new TransactionExample();
 	    	TransactionExample.Criteria criteria = condition.createCriteria();
 	    	/** 区分是上一条数据还是下一条数据 */
-	    	switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())){
-		    	case PREV:
-			    	criteria.andSequenceLessThan(currentDetail.getSequence());
-			    	condition.setOrderByClause("sequence desc");
-			    	break;
-		    	case NEXT:
-			    	criteria.andSequenceGreaterThan(currentDetail.getSequence());
-			    	condition.setOrderByClause("sequence asc");
-			    	break;
-	    	}
+			NavigateEnum navigateEnum = NavigateEnum.valueOf(req.getDirection().toUpperCase());
+			if (navigateEnum == NavigateEnum.PREV) {
+				criteria.andSequenceLessThan(currentDetail.getSequence());
+				condition.setOrderByClause("sequence desc");
+			} else if (navigateEnum == NavigateEnum.NEXT) {
+				criteria.andSequenceGreaterThan(currentDetail.getSequence());
+				condition.setOrderByClause("sequence asc");
+			}
 	    	PageHelper.startPage(1,1);
 	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-	    	if(transactions.size()>0){
+	    	if(!transactions.isEmpty()){
 	    		/** 获取数据第一条进行转换对象 */
 	        	TransactionWithBLOBs transaction = transactions.get(0);
 	        	BeanUtils.copyProperties(transaction, resp);

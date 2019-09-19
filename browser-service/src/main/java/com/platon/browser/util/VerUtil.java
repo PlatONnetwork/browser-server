@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  *  @data 2019年9月9日
  */
 public class VerUtil {
+  private VerUtil(){}
 
   private static Pattern pattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
   /**

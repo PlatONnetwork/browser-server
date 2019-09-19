@@ -18,21 +18,20 @@ import java.util.List;
  * Time: 16:48
  */
 public  class Resolver {
+    private Resolver(){}
 
     public static BigInteger bigIntegerResolver ( RlpString rlpString ) {
         RlpString integers = rlpString;
         RlpList integersList = RlpDecoder.decode(integers.getBytes());
         RlpString integersString = (RlpString) integersList.getValues().get(0);
-        BigInteger integer = new BigInteger(1, integersString.getBytes());
-        return integer;
+        return new BigInteger(1, integersString.getBytes());
     }
 
     public static String StringResolver ( RlpString rlpString ) {
         RlpString Strings = rlpString;
         RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
         RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
-        String stringValue = Numeric.toHexString(StringsListString.getBytes());
-        return stringValue;
+        return Numeric.toHexString(StringsListString.getBytes());
     }
 
     public static List<PlanParam> ObjectResolver ( RlpString rlpString ) {

@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @Service
 public class NetworkStatCacheServiceImpl implements NetworkStatCacheService {
-    private final Logger logger = LoggerFactory.getLogger(BlockCacheServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(NetworkStatCacheServiceImpl.class);
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;

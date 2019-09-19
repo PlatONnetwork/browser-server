@@ -8,7 +8,6 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.NetworkStatStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -51,23 +51,20 @@ public class NetworkStatStatisticHandler implements EventHandler {
         try {
             CustomNode curNode = nodeCache.getNode(curBlock.getNodeId());
             CustomStaking curStaking = curNode.getLatestStaking();
-            //TODO:地址数需要地址统计
             //当前区块高度
             networkStatCache.setCurrentNumber(curBlock.getNumber());
             //当前区块所属节点id
             networkStatCache.setNodeId(curBlock.getNodeId());
             //当前区块所属节点name
             networkStatCache.setNodeName(curStaking.getStakingName() == null ? "Unknown" : curStaking.getStakingName());
-            //TODO:可优化
             //当前增发周期结束块高 =  每个增发周期块数 *  当前增发周期轮数
             networkStatCache.setAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).longValue());
-            //TODO:可优化
             //当前增发周期开始块高 = (每个增发周期块数 * 当前增发周期轮数) - 每个增发周期块数
             networkStatCache.setAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount().multiply(bc.getAddIssueEpoch()).subtract(chainConfig.getAddIssuePeriodBlockCount()).longValue());
             //离下个结算周期剩余块高 = (每个结算周期块数 * 当前结算周期轮数) - 当前块高
             networkStatCache.setNextSetting(chainConfig.getSettlePeriodBlockCount().multiply(bc.getCurSettingEpoch()).subtract(curBlock.getBlockNumber()).longValue());
             //质押奖励
-            networkStatCache.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size()), 0, BigDecimal.ROUND_DOWN).toString());
+            networkStatCache.setStakingReward(bc.getSettleReward().divide(new BigDecimal(bc.getPreVerifier().size()), 0, RoundingMode.FLOOR).toString());
 
             //更新时间
             networkStatCache.setUpdateTime(new Date());

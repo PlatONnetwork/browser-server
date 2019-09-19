@@ -2,9 +2,6 @@ package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.AddressCacheUpdater;
-import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.stage.BlockChainStage;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,12 +28,6 @@ public class DbServiceTest extends TestBase {
     @Spy
     private DbService dbService;
 
-    @Mock
-    private BlockChain blockChain;
-    @Mock
-    private AddressCacheUpdater addressCacheUpdater;
-    @Mock
-    private StakingCacheUpdater stakingCacheUpdater;
     @Mock
     private BlockMapper blockMapper;
     @Mock
@@ -76,9 +67,6 @@ public class DbServiceTest extends TestBase {
      */
     @Before
     public void setup() throws InterruptedException {
-        ReflectionTestUtils.setField(dbService, "blockChain", blockChain);
-        ReflectionTestUtils.setField(dbService, "addressCacheUpdater", addressCacheUpdater);
-        ReflectionTestUtils.setField(dbService, "stakingCacheUpdater", stakingCacheUpdater);
         ReflectionTestUtils.setField(dbService, "blockMapper", blockMapper);
         ReflectionTestUtils.setField(dbService, "transactionMapper", transactionMapper);
         ReflectionTestUtils.setField(dbService, "rpPlanMapper", rpPlanMapper);
@@ -101,7 +89,7 @@ public class DbServiceTest extends TestBase {
      * 执行区块搜集测试
      */
     @Test
-    public void testInsertOrUpdate() throws InterruptedException {
+    public void testInsertOrUpdate() {
         BlockChainStage bcs = new BlockChainStage();
         bcs.getStakingStage().insertNode(nodes.get(0));
         bcs.getStakingStage().insertStaking(stakings.get(0));

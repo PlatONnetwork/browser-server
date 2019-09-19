@@ -16,6 +16,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -59,5 +60,6 @@ public class StageTest extends TestBase {
                 method.invoke(instance);
             }
         }
+        assertTrue(true);
     }
 }

@@ -14,6 +14,7 @@ import java.util.Map;
  *  @data 2019年8月31日
  */
 public class BeanConvertUtil {
+    private BeanConvertUtil(){}
     /**
      * bean对象转换
      *
@@ -43,7 +44,7 @@ public class BeanConvertUtil {
         return returnList;
     }
 
-    public static Map<?, ?> objectToMap(Object object) {
+    public static Map objectToMap(Object object) {
         return beanConvert(object, Map.class);
     }
 

@@ -3,17 +3,10 @@ package com.platon.browser.util;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.exception.HttpRequestException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +23,7 @@ public final class MarkDownParserUtil {
     private static final String MARKDOWN_BEFORE_INDEX = "<article class=\"markdown-body";
     private static final String MARKDOWN_LAST_INDEX = "</article>";
 
-    public static String acquireMD(String fileName) throws Exception {
+    public static String acquireMD(String fileName) throws HttpRequestException {
         String text = HttpUtil.get(fileName,String.class);
         if (text == null) {
             return null;

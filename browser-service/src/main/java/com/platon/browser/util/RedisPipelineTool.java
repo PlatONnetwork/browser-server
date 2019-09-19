@@ -16,6 +16,7 @@ import java.util.Map;
  * @Description:
  */
 public class RedisPipelineTool {
+    private RedisPipelineTool(){}
     /**
      * 通过多个键值批量查询值
      * @param keys
@@ -26,17 +27,17 @@ public class RedisPipelineTool {
      * @return
      */
     public static  <T> Map<String,T> batchQueryByKeys(List<String> keys, Boolean useParallel, Class<T> clazz, RedisTemplate<String,String> redisTemplate){
-        if(null == keys || keys.size() == 0 ) return null;
+        if(null == keys || keys.isEmpty() ) return null;
         if(null == useParallel) useParallel = true;
 
         List<Object> results = redisTemplate.executePipelined( (RedisCallback<Object>) connection -> {
             StringRedisConnection stringRedisConn = (StringRedisConnection)connection;
-            keys.forEach(key->stringRedisConn.get(key));
+            keys.forEach(stringRedisConn::get);
             return null;
         });
-        if(null == results || results.size() == 0 ) return null;
+        if(null == results || results.isEmpty() ) return null;
 
-        Map<String,T> resultMap  =  null;
+        Map<String,T> resultMap;
         if(useParallel){
             Map<String,T> resultMapOne  = Collections.synchronizedMap(new HashMap<>());
             keys.parallelStream().forEach(key -> {
@@ -59,11 +60,10 @@ public class RedisPipelineTool {
      * 通过多个键值批量删除值
      */
     public static Integer batchDeleteByKeys(List<String> keys, Boolean useParallel, RedisTemplate<String,String> redisTemplate){
-        if(null == keys || keys.size() == 0 ) return null;
-        if(null == useParallel) useParallel = true;
+        if(null == keys || keys.isEmpty() ) return null;
         List<Object> results = redisTemplate.executePipelined( (RedisCallback<Object>) connection -> {
             StringRedisConnection stringRedisConn = (StringRedisConnection)connection;
-            keys.forEach(key->stringRedisConn.del(key));
+            keys.forEach(stringRedisConn::del);
             return null;
         });
         return results.size();

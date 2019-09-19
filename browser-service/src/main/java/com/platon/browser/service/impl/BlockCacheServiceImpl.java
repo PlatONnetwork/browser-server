@@ -58,7 +58,10 @@ public class BlockCacheServiceImpl implements BlockCacheService {
         long cacheItemCount = redisTemplate.opsForZSet().size(blocksCacheKey);
         // 待入库列表
         Set<ZSetOperations.TypedTuple<String>> stageSet = new HashSet<>();
-        class MinMax{Long minOffset=Long.MAX_VALUE,maxOffset=Long.MIN_VALUE;}
+        class MinMax{
+            private Long minOffset=Long.MAX_VALUE;
+            private Long maxOffset=Long.MIN_VALUE;
+        }
         MinMax mm=new MinMax();
         items.forEach(item->{
             Long score = item.getNumber();
@@ -77,7 +80,7 @@ public class BlockCacheServiceImpl implements BlockCacheService {
             // 在缓存中不存在的才放入缓存
             stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),item.getNumber().doubleValue()));
         });
-        if(stageSet.size()>0){
+        if(!stageSet.isEmpty()){
             redisTemplate.opsForZSet().add(blocksCacheKey, stageSet);
         }
         if(cacheItemCount>maxItemCount){
@@ -99,7 +102,7 @@ public class BlockCacheServiceImpl implements BlockCacheService {
         for(int i=0;i<1000;i++){
             PageHelper.startPage(i+1,500);
             List<Block> data = blockMapper.selectByExample(condition);
-            if(data.size()==0) break;
+            if(data.isEmpty()) break;
             update(new HashSet<>(data));
         }
     }

@@ -11,8 +11,9 @@ import java.text.NumberFormat;
  *  @data 2019年8月31日
  */
 public class EnergonUtil {
+    private EnergonUtil(){}
 	/** 默认精度数 */
-    private final static Integer DEFAULT_SHARP_NUM = 8;
+    private static final int DEFAULT_SHARP_NUM = 8;
     public static String format(Object number){
         return format(number,DEFAULT_SHARP_NUM);
     }
@@ -24,12 +25,12 @@ public class EnergonUtil {
      * @return
      */
     public static String format(Object number,Integer sharpNum){
-        if(!(number instanceof Number)) throw new RuntimeException("The param is not a Number!");
-        DecimalFormat NF = (DecimalFormat) NumberFormat.getInstance();
-        StringBuffer pattern = new StringBuffer(".");
+        if(!(number instanceof Number)) throw new NumberFormatException("The param is not a Number!");
+        DecimalFormat nf = (DecimalFormat) NumberFormat.getInstance();
+        StringBuilder pattern = new StringBuilder(".");
         for(int i=0;i<sharpNum;i++) pattern.append("#");
-        NF.applyPattern(pattern.toString());
-        String result = NF.format(number);
+        nf.applyPattern(pattern.toString());
+        String result = nf.format(number);
         if(".0".equals(result)) {
             return "0";
         }else

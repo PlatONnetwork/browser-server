@@ -35,7 +35,8 @@ public class IncreaseStakingHandler implements EventHandler {
 
         // 获取交易入参
         IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
-        logger.debug("增持质押(增加自有质押):{}", JSON.toJSONString(param));
+        String msg = JSON.toJSONString(param);
+        logger.debug("增持质押(增加自有质押):{}", msg);
         try{
             CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改

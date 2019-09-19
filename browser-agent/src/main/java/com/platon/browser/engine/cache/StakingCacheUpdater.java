@@ -42,18 +42,17 @@ public class StakingCacheUpdater {
         try {
             CustomNode customNode = nodeCache.getNode(curBlock.getNodeId());
             CustomStaking customStaking = customNode.getLatestStaking();
-            //if(customStaking.getIsConsensus()== CustomStaking.YesNoEnum.YES.code){
-                info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
-                // 当前共识周期出块奖励
-                BigDecimal curConsBlockReward = customStaking.decimalBlockRewardValue().add(bc.getBlockReward());
-                customStaking.setBlockRewardValue(curConsBlockReward.toString());
 
-                // 节点出块数加1
-                customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
-                // 把更改后的内容暂存至待更新列表
-                stageData.getStakingStage().updateStaking(customStaking);
-                info = info.replace("CUR_COUNT",customStaking.getCurConsBlockQty().toString());
-            //}
+            info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
+            // 当前共识周期出块奖励
+            BigDecimal curConsBlockReward = customStaking.decimalBlockRewardValue().add(bc.getBlockReward());
+            customStaking.setBlockRewardValue(curConsBlockReward.toString());
+
+            // 节点出块数加1
+            customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
+            // 把更改后的内容暂存至待更新列表
+            stageData.getStakingStage().updateStaking(customStaking);
+            info = info.replace("CUR_COUNT",customStaking.getCurConsBlockQty().toString());
         } catch (NoSuchBeanException e) {
             logger.error("更新出块奖励和共识出块数错误,找不到符合条件的质押信息:{}",e.getMessage());
         }
@@ -62,7 +61,10 @@ public class StakingCacheUpdater {
 
 
     static class Stat{
-        private BigInteger statDelegateHas,statDelegateLocked,statDelegateReduction,statDelegateQty;
+        private BigInteger statDelegateHas;
+        private BigInteger statDelegateLocked;
+        private BigInteger statDelegateReduction;
+        private BigInteger statDelegateQty;
         void reset(){
             this.statDelegateHas = BigInteger.ZERO;
             this.statDelegateLocked = BigInteger.ZERO;
@@ -81,7 +83,6 @@ public class StakingCacheUpdater {
      */
     public void updateStakingStatistics () {
         NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         nodeCache.getAllStaking().forEach(staking -> {
             stat.reset(); // 重置统计bean状态, 复用实例，避免大量创建对象

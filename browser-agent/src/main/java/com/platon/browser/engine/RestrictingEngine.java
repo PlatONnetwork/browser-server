@@ -24,7 +24,7 @@ public class RestrictingEngine {
     @Autowired
     private CacheHolder cacheHolder;
 
-    public void execute (CustomTransaction tx,BlockChain bc) {
+    public void execute (CustomTransaction tx) {
         RestrictingStage restrictingStage = cacheHolder.getStageData().getRestrictingStage();
     	logger.debug("execute RestrictingEngine,{}", tx.getTxInfo());
         CreateRestrictingParam param = JSON.parseObject(tx.getTxInfo(),CreateRestrictingParam.class);

@@ -1,6 +1,6 @@
 package com.platon.browser.engine;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
@@ -39,8 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.platon.browser.engine.cache.CacheHolder.*;
-
 /**
  * @Auther: Chendongming
  * @Date: 2019/8/10 16:11
@@ -69,7 +67,7 @@ public class BlockChain {
     @Autowired
     private DbService dbService;
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private NetworkStatMapper networkStatMapper;
     @Autowired
@@ -112,7 +110,7 @@ public class BlockChain {
     private Map <String, org.web3j.platon.bean.Node> curValidator = new HashMap <>();// 当前共识周期验证人
 
     @PostConstruct
-    private void init () throws Exception {
+    private void init () {
         // 初始等于配置
         this.curConsensusExpectBlockCount=new BigDecimal(chainConfig.getExpectBlockCount());
         // 数据库统计数据全量初始化
@@ -159,7 +157,7 @@ public class BlockChain {
     public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
         for (CustomTransaction tx:curBlock.getTransactionList()){
             // 统计地址相关信息
-            addressExecute.execute(tx,this);
+            addressExecute.execute(tx);
             // 链上执行失败的交易不予处理
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.getCode() == tx.getTxReceiptStatus()) return;
             // 调用交易分析引擎分析交易，以补充相关数据
@@ -171,7 +169,7 @@ public class BlockChain {
                 case DELEGATE: // 发起委托
                 case UN_DELEGATE: // 撤销委托
                 case REPORT_VALIDATOR: // 举报多签验证人
-                    stakingExecute.execute(tx, this);
+                    stakingExecute.execute(tx);
                     break;
                 case CREATE_PROPOSAL_TEXT: // 创建文本提案
                 case CREATE_PROPOSAL_UPGRADE: // 创建升级提案
@@ -179,10 +177,10 @@ public class BlockChain {
                 case VOTING_PROPOSAL: // 给提案投票
                 case DUPLICATE_SIGN: // 双签举报
                 case DECLARE_VERSION://版本声明
-                    proposalExecute.execute(tx, this);
+                    proposalExecute.execute(tx);
                     break;
                 case CREATE_RESTRICTING://创建锁仓计划
-                    restrictingEngine.execute(tx,this);
+                    restrictingEngine.execute(tx);
                     break;
                 case CONTRACT_CREATION: // 合约发布(合约创建)
                     logger.debug("合约发布(合约创建): txHash({}),contract({})", tx.getHash(), tx.getTo());
@@ -227,19 +225,19 @@ public class BlockChain {
         // (当前块号+选举回退块数)%共识周期区块数==0 && 当前共识周期不是第一个共识周期
         if ((blockNumber+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0&&curConsensusEpoch.longValue()>1) {
             logger.debug("选举验证人：Block Number({})", blockNumber);
-            stakingExecute.onElectionDistance(curBlock, this);
+            stakingExecute.onElectionDistance();
 
         }
 
         if (blockNumber % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             logger.debug("共识周期切换：Block Number({})", blockNumber);
-            stakingExecute.onNewConsEpoch(curBlock, this);
+            stakingExecute.onNewConsEpoch();
 
         }
 
         if (blockNumber % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             logger.debug("结算周期切换：Block Number({})", blockNumber);
-            stakingExecute.onNewSettingEpoch(curBlock, this);
+            stakingExecute.onNewSettingEpoch();
 
         }
 
@@ -257,17 +255,14 @@ public class BlockChain {
      * @param blockNumber
      */
     public void updateEpoch(Long blockNumber){
-        BigInteger curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
+        this.curConsensusEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getConsensusPeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
-        this.curConsensusEpoch=curConsensusEpoch;
         // 计算结算周期轮数
-        BigInteger curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
+        this.curSettingEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getSettlePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
-        this.curSettingEpoch=curSettingEpoch;
         //计算增发周期轮数
-        BigInteger addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
+        this.addIssueEpoch = BigInteger.valueOf(BigDecimal.valueOf(blockNumber)
                 .divide(BigDecimal.valueOf(chainConfig.getAddIssuePeriodBlockCount().longValue()), 0, RoundingMode.CEILING).longValue());
-        this.addIssueEpoch = addIssueEpoch;
     }
 
     /**
@@ -277,7 +272,7 @@ public class BlockChain {
      */
     public void updateReward(Long blockNumber) {
         // 激励池账户地址
-        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
+        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
         BigInteger incentivePoolAccountBalance;
         while (true){
             try {

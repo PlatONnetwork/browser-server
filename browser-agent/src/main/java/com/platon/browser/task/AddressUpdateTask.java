@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.entity.Address;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class AddressUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTask.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private SpecialContractApi sca;
     @Autowired
@@ -60,7 +60,7 @@ public class AddressUpdateTask {
                     addressStage.updateAddress(address);
                 }
             });
-            if(addressStage.exportAddress().size()>0){
+            if(!addressStage.exportAddress().isEmpty()){
                 customAddressMapper.batchInsertOrUpdateSelective(addressStage.exportAddress(), Address.Column.values());
                 addressStage.clear();
             }

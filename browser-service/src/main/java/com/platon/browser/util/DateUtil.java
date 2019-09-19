@@ -21,11 +21,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DateUtil {
+	
+	private static final String DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
 	public static DateFormat df;
 	
 	public DateUtil() {
-		DateUtil.df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+		DateUtil.df = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
 	}
 	
 	private static String localLANG;
@@ -59,7 +61,7 @@ public class DateUtil {
 	 * @throws ParseException
 	 */
 	public static Date getCST(String strGMT) throws ParseException { 
-		DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+		DateFormat df = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
 		return df.parse(strGMT); 
 	}
 
@@ -71,7 +73,7 @@ public class DateUtil {
 	 */
 	public static String getGMT(Date dateCST) {
 		Locale locale = Locale.forLanguageTag(localLANG);
-		DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", locale);
+		DateFormat df = new SimpleDateFormat(DATE_PATTERN, locale);
 		df.setTimeZone(TimeZone.getTimeZone("GMT")); // modify Time Zone.
 		return (df.format(dateCST));
 	}

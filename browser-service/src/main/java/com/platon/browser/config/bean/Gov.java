@@ -1,6 +1,7 @@
 
 package com.platon.browser.config.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -8,17 +9,24 @@ import java.math.BigDecimal;
 @Data
 public class Gov {
     //
-    private BigDecimal VersionProposalVote_DurationSeconds;
+    @JSONField(name = "VersionProposalVote_DurationSeconds")
+    private BigDecimal versionProposalVoteDurationSeconds;
     // 升级提案通过率
-    private BigDecimal VersionProposal_SupportRate;
+    @JSONField(name = "VersionProposal_SupportRate")
+    private BigDecimal versionProposalSupportRate;
     //
-    private BigDecimal TextProposalVote_DurationSeconds;
+    @JSONField(name = "TextProposalVote_DurationSeconds")
+    private BigDecimal textProposalVoteDurationSeconds;
     // 文本提案参与率
-    private BigDecimal TextProposal_VoteRate;
+    @JSONField(name = "TextProposal_VoteRate")
+    private BigDecimal textProposalVoteRate;
     // 文本提案支持率
-    private BigDecimal TextProposal_SupportRate;
+    @JSONField(name = "TextProposal_SupportRate")
+    private BigDecimal textProposalSupportRate;
     // 取消提案参与率
-    private BigDecimal CancelProposal_VoteRate;
+    @JSONField(name = "CancelProposal_VoteRate")
+    private BigDecimal cancelProposalVoteRate;
     // 取消提案支持率
-    private BigDecimal CancelProposal_SupportRate;
+    @JSONField(name = "CancelProposal_SupportRate")
+    private BigDecimal cancelProposalSupportRate;
 }

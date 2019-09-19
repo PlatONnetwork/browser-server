@@ -9,7 +9,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.proposal.*;
-import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -30,9 +29,9 @@ import java.util.List;
 public class ProposalEngine {
     private static Logger logger = LoggerFactory.getLogger(ProposalEngine.class);
 
-    public static final String pIDIDNum = "PIP-{pip_id}";
+    public static final String PID_ID_NUM = "PIP-{pip_id}";
 
-    public static final String key = "{pip_id}";
+    public static final String KEY = "{pip_id}";
     @Autowired
     private CustomProposalMapper customProposalMapper;
     @Autowired
@@ -69,9 +68,8 @@ public class ProposalEngine {
     /**
      * 执行交易
      * @param tx 交易
-     * @param bc BlockChain
      */
-    void execute(CustomTransaction tx, BlockChain bc) throws BusinessException, NoSuchBeanException {
+    void execute(CustomTransaction tx) throws BusinessException, NoSuchBeanException {
         // 事件上下文
         context.setTransaction(tx);
         switch (tx.getTypeEnum()){

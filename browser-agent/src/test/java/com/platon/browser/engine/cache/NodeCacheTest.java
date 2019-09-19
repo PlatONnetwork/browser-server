@@ -57,6 +57,7 @@ public class NodeCacheTest extends TestBase {
         }
 
         CustomStaking errStaking = new CustomStaking();
+        errStaking.setStakingBlockNum(88888888888888L);
         errStaking.setNodeId("unknown");
         stakings.add(errStaking);
         try {
@@ -69,6 +70,7 @@ public class NodeCacheTest extends TestBase {
         stakings.remove(errStaking);
         CustomDelegation errDelegation = new CustomDelegation();
         errDelegation.setNodeId("unknown");
+        errDelegation.setStakingBlockNum(8888888888888L);
         delegations.add(errDelegation);
         try {
             target.init(nodes,stakings,delegations,unDelegations);

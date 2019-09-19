@@ -39,7 +39,8 @@ public class ExitValidatorHandler implements EventHandler {
 
         // 获取交易入参
         ExitValidatorParam param = tx.getTxParam(ExitValidatorParam.class);
-        logger.debug("撤销质押(退出验证人):{}", JSON.toJSONString(param));
+        String msg = JSON.toJSONString(param);
+        logger.debug("撤销质押(退出验证人):{}", msg);
         try{
             CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改

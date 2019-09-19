@@ -49,7 +49,7 @@ public class BusinessExceptionTest {
 	@Test
 	public void testBusinessExceptionErrorCodeEnum() {
 		try {
-			throw new BusinessException(ErrorCodeEnum.Default);
+			throw new BusinessException(ErrorCodeEnum.DEFAULT);
 		} catch (Exception e) {
 			assertTrue(e instanceof BusinessException);
 		}
@@ -58,7 +58,7 @@ public class BusinessExceptionTest {
 	@Test
 	public void testBusinessExceptionErrorCodeEnumLocale() {
 		try {
-			throw new BusinessException(ErrorCodeEnum.Default,Locale.getDefault());
+			throw new BusinessException(ErrorCodeEnum.DEFAULT,Locale.getDefault());
 		} catch (Exception e) {
 			assertTrue(e instanceof BusinessException);
 		}

@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dto.CustomBlock;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class BlockServiceTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(BlockServiceTest.class);
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
     @Mock
-    private PlatonClient client;
+    private PlatOnClient client;
     @Mock
     private BlockService blockService;
     @Mock

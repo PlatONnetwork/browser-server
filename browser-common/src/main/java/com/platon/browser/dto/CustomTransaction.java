@@ -6,6 +6,8 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.web3j.platon.BaseResponse;
 import org.web3j.protocol.core.methods.response.Log;
@@ -27,6 +29,7 @@ import java.util.*;
  */
 @Data
 public class CustomTransaction extends TransactionWithBLOBs {
+    private static Logger logger = LoggerFactory.getLogger(CustomTransaction.class);
 
     public CustomTransaction(){
         Date date = new Date();
@@ -52,7 +55,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
             Long sequence = this.getBlockNumber()*10000 + this.getTransactionIndex();
             this.setSequence(sequence);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("更新交易出错",e);
         }
     }
 
@@ -71,7 +74,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
                 // 成功：logs.get(0).getData()来解析出Status字段，并且为true
                 // 失败：非成功
                 List<Log> logs =  receipt.getLogs();
-                if(logs==null||logs.size()==0){
+                if(logs==null||logs.isEmpty()){
                     this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
                 }else {
                     Log log = logs.get(0);

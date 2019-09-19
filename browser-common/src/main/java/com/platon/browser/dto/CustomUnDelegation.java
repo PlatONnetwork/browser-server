@@ -54,8 +54,8 @@ public class CustomUnDelegation extends UnDelegation {
         EXITING(1, "退出中"),
         EXITED(2, "退回成功");
 
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         StatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;

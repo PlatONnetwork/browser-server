@@ -1,11 +1,10 @@
 package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.exception.CandidateException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +18,6 @@ import org.web3j.platon.contracts.NodeContract;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -40,7 +38,7 @@ public class CandidateServiceTest extends TestBase {
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
-    private PlatonClient client;
+    private PlatOnClient client;
     @Mock
     private NodeContract nodeContract;
     @Mock

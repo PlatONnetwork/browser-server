@@ -32,7 +32,8 @@ public class AddressStatisticHandler implements EventHandler {
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
         CustomTransaction tx = context.getTransaction();
 
-        String from = tx.getFrom(),to = tx.getTo();
+        String from = tx.getFrom();
+        String to = tx.getTo();
 
         // 取from地址缓存，不存在则新建
         CustomAddress fromAddress;

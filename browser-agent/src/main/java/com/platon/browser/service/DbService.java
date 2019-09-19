@@ -29,15 +29,6 @@ public class DbService {
     private static Logger logger = LoggerFactory.getLogger(DbService.class);
 
     @Autowired
-    private BlockChain blockChain;
-    @Autowired
-    private AddressCacheUpdater addressCacheUpdater;
-    @Autowired
-    private StakingCacheUpdater stakingCacheUpdater;
-    @Autowired
-    private CacheHolder cacheHolder;
-
-    @Autowired
     private BlockMapper blockMapper;
     @Autowired
     private TransactionMapper transactionMapper;
@@ -138,23 +129,5 @@ public class DbService {
         //批量插入锁仓计划
         Set<RpPlan> planSet = rs.exportRpPlan();
         if(!planSet.isEmpty())rpPlanMapper.batchInsert(new ArrayList <>(planSet));
-    }
-
-    public void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
-        NodeCache nodeCache = cacheHolder.getNodeCache();
-        ProposalCache proposalCache = cacheHolder.getProposalCache();
-        try{
-            // 入库前更新统计信息
-            addressCacheUpdater.updateAddressStatistics();
-            stakingCacheUpdater.updateStakingStatistics();
-            // 串行批量入库
-            insertOrUpdate(basicData,bizData);
-            blockChain.commitResult();
-            // 缓存整理
-            nodeCache.sweep();
-            proposalCache.sweep();
-        }catch (Exception e){
-            throw new BusinessException("数据批量入库出错："+e.getMessage());
-        }
     }
 }

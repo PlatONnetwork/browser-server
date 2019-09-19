@@ -57,7 +57,10 @@ public class TransactionCacheServiceImpl implements TransactionCacheService {
         // 取出缓存中的交易总数
         long cacheItemCount = redisTemplate.opsForZSet().size(transactionsCacheKey);
         Set<ZSetOperations.TypedTuple<String>> stageSet = new HashSet<>();
-        class MinMax{Long minOffset=Long.MAX_VALUE,maxOffset=Long.MIN_VALUE;}
+        class MinMax{
+            private Long minOffset=Long.MAX_VALUE;
+            private Long maxOffset=Long.MIN_VALUE;
+        }
         MinMax mm=new MinMax();
         items.forEach(item->{
             Long score = item.getSequence();
@@ -77,7 +80,7 @@ public class TransactionCacheServiceImpl implements TransactionCacheService {
             // 在缓存中不存在的才放入缓存
             stageSet.add(new DefaultTypedTuple(JSON.toJSONString(item),score.doubleValue()));
         });
-        if(stageSet.size()>0){
+        if(!stageSet.isEmpty()){
             redisTemplate.opsForZSet().add(transactionsCacheKey, stageSet);
         }
         if(cacheItemCount>maxItemCount){
@@ -100,10 +103,8 @@ public class TransactionCacheServiceImpl implements TransactionCacheService {
         for(int i=0;i<500;i++){
             PageHelper.startPage(i+1,1000);
             List<Transaction> data = transactionMapper.selectByExample(condition);
-            if(data.size()==0) break;
+            if(data.isEmpty()) break;
             update(new HashSet<>(data));
         }
     }
-
-
 }

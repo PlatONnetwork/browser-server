@@ -25,7 +25,6 @@ public class BaseResp<T> {
     }
 
     public String getErrMsg() {
-        //return I18NUtils.getInstance().getResource(2000);
         if(code > 0 && StringUtils.isEmpty(errMsg)){
             errMsg = I18NUtils.getInstance().getResource(code);
         }
@@ -34,6 +33,6 @@ public class BaseResp<T> {
 
     /** 静态构造返回对象 */
     public static <T> BaseResp<T> build(Integer code, String errMsg, T data){
-        return new BaseResp<T>(code,errMsg,data);
+        return new BaseResp<>(code,errMsg,data);
     }
 }

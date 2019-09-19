@@ -67,8 +67,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	public NetworkStat getNetworkStatCache() {
 		String value = redisTemplate.opsForValue().get(networkStatCacheKey);
 		/** 获取对象转换成统计对象 */
-		NetworkStat networkStatRedis = JSON.parseObject(value, NetworkStat.class);
-		return networkStatRedis;
+		return JSON.parseObject(value, NetworkStat.class);
 	}
 
 	@Override
@@ -82,8 +81,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 			TransactionWithBLOBs transactionRedis = JSON.parseObject(str, TransactionWithBLOBs.class);
 			transactionRedisList.add(transactionRedis);
 		});
-		TransactionCacheDto transactionCacheDto = new TransactionCacheDto(transactionRedisList, cpi.page);
-		return transactionCacheDto;
+		return new TransactionCacheDto(transactionRedisList, cpi.page);
 	}
 
 }

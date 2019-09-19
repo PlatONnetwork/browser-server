@@ -2,7 +2,7 @@ package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.bean.TransactionBean;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
@@ -41,7 +41,7 @@ public class TransactionServiceTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(TransactionServiceTest.class);
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
     @Mock
-    private PlatonClient client;
+    private PlatOnClient client;
     @Mock
     private TransactionService target;
     @Mock

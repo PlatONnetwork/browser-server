@@ -49,7 +49,8 @@ public class ReportValidatorHandler implements EventHandler {
         try {
             CustomNode node = nodeCache.getNode(HexTool.prefix(param.getVerify()));
             CustomStaking latestStaking = node.getLatestStaking();
-            logger.debug("多签举报信息:{}", JSON.toJSONString(param));
+            String msg = JSON.toJSONString(param);
+            logger.debug("多签举报信息:{}", msg);
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignSlashRate());
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额

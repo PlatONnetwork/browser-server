@@ -38,7 +38,8 @@ public class EditValidatorHandler implements EventHandler {
 
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
-        logger.debug("修改质押信息(编辑验证人):{}", JSON.toJSONString(param));
+        String msg  = JSON.toJSONString(param);
+        logger.debug("修改质押信息(编辑验证人):{}", msg);
         try{
             CustomNode node = nodeCache.getNode(param.getNodeId());
             // 取当前节点最新质押信息来修改

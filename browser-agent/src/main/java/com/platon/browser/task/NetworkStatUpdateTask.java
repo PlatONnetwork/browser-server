@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.CustomNetworkStatMapper;
@@ -8,7 +8,6 @@ import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.NetworkStatStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
@@ -22,6 +21,7 @@ import org.web3j.utils.Convert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ public class NetworkStatUpdateTask {
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private CacheHolder cacheHolder;
     @Autowired
@@ -49,7 +49,6 @@ public class NetworkStatUpdateTask {
     private void cron(){start();}
 
     protected void start () {
-        BlockChainStage stageData = cacheHolder.getStageData();
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
 
         CustomBlock curBlock = blockChain.getCurBlock();
@@ -65,7 +64,7 @@ public class NetworkStatUpdateTask {
             //获取增发比例
             BigDecimal addIssueRate = blockChain.getChainConfig().getAddIssueRate();
             //获取激励池地址
-            String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
+            String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
             //rpc查询实时激励池余额
             BigInteger incentivePoolAccountBalance = getBalance(incentivePoolAccountAddr,curBlock.getBlockNumber());
             //年份增发量 = (1+增发比例)的增发年份次方
@@ -73,14 +72,14 @@ public class NetworkStatUpdateTask {
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
             BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
-            BigInteger lockContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.address,curBlock.getBlockNumber());
+            BigInteger lockContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),curBlock.getBlockNumber());
             //rpc获取质押余额
-            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.address,curBlock.getBlockNumber());
+            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(),curBlock.getBlockNumber());
             //计算流通量
             BigDecimal turnoverValue = circulation.subtract(new BigDecimal(lockContractBalance)).subtract(new BigDecimal(stakingContractBalance)).subtract(new BigDecimal(incentivePoolAccountBalance));
             //数据回填内存中
-            networkStatCache.setIssueValue(circulation.setScale(0,BigDecimal.ROUND_DOWN).toString());
-            networkStatCache.setTurnValue(turnoverValue.setScale(0,BigDecimal.ROUND_DOWN).toString());
+            networkStatCache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
+            networkStatCache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
             networkStatStage.updateNetworkStat(networkStatCache);
             customNetworkStatMapper.batchInsertOrUpdateSelective(networkStatStage.exportNetworkStat(), NetworkStat.Column.values());
             networkStatStage.clear();
