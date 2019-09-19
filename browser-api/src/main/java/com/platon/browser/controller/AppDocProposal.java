@@ -1,11 +1,5 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.proposal.ProposalDetailRequest;
 import com.platon.browser.req.proposal.VoteListRequest;
@@ -14,10 +8,13 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
 import com.platon.browser.res.proposal.ProposalListResp;
 import com.platon.browser.res.proposal.VoteListResp;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 /**
  * 	提案模块接口申明集成swagger
@@ -68,7 +65,7 @@ public interface AppDocProposal {
      * }
      */	
 	@ApiOperation(value = "proposal/proposalList", nickname = "", notes = "", response = ProposalListResp.class, tags = { "Proposal" })
-	@RequestMapping(value = "proposal/proposalList", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "proposal/proposalList", produces = { "application/json" })
 	public RespPage<ProposalListResp> proposalList(@ApiParam(value = "PageReq")@Valid @RequestBody(required = false) PageReq req);
 
 	
@@ -123,7 +120,7 @@ public interface AppDocProposal {
      * }
      */	
 	@ApiOperation(value = "proposal/proposalDetails", nickname = "", notes = "", response = ProposalDetailsResp.class, tags = { "Proposal" })
-	@RequestMapping(value = "proposal/proposalDetails", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "proposal/proposalDetails", produces = { "application/json" })
 	public BaseResp<ProposalDetailsResp> proposalDetails(
 			@ApiParam(value = "ProposalDetailRequest ")@Valid @RequestBody ProposalDetailRequest req);
 	
@@ -161,6 +158,6 @@ public interface AppDocProposal {
      * }
      */	
 	@ApiOperation(value = "proposal/voteList", nickname = "", notes = "", response = VoteListResp.class, tags = { "Proposal" })
-	@RequestMapping(value = "proposal/voteList", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "proposal/voteList", produces = { "application/json" })
 	public RespPage<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ")@Valid @RequestBody VoteListRequest req);
 }

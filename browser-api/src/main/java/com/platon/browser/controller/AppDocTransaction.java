@@ -3,10 +3,7 @@ package com.platon.browser.controller;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
@@ -79,8 +76,8 @@ public interface AppDocTransaction {
      * }
      */
 	@ApiOperation(value = "transaction/transactionList", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/transactionList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<TransactionListResp> transactionList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
+	@PostMapping(value = "transaction/transactionList", produces = { "application/json" })
+    RespPage<TransactionListResp> transactionList(@ApiParam(value = "PageReq ", required = true)@Valid @RequestBody PageReq req);
 		
 	
     /**
@@ -108,8 +105,8 @@ public interface AppDocTransaction {
      * > 返回值同《交易列表接口》返回值
      */
 	@ApiOperation(value = "transaction/transactionListByBlock", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/transactionListByBlock", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<TransactionListResp> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest ", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
+	@PostMapping(value = "transaction/transactionListByBlock", produces = { "application/json" })
+    RespPage<TransactionListResp> transactionListByBlock(@ApiParam(value = "TransactionListByBlockRequest ", required = true)@Valid @RequestBody TransactionListByBlockRequest req);
 	
     /**
      * @api {post} /transaction/transactionListByAddress c.地址的交易列表
@@ -136,7 +133,7 @@ public interface AppDocTransaction {
      * > 返回值同《交易列表接口》返回值
      */
 	@ApiOperation(value = "transaction/transactionListByAddress", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/transactionListByAddress", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "transaction/transactionListByAddress", produces = { "application/json" })
     public RespPage<TransactionListResp> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
@@ -155,8 +152,8 @@ public interface AppDocTransaction {
      * >响应为 二进制文件流
      */
 	@ApiOperation(value = "transaction/addressTransactionDownload", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" }, method = RequestMethod.GET)
-    public void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
+	@PostMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" })
+    void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
     		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, 
     		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true) String local,HttpServletResponse response);
 	
@@ -267,8 +264,8 @@ public interface AppDocTransaction {
      * }
      */	
 	@ApiOperation(value = "transaction/transactionDetails", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/transactionDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<TransactionDetailsResp> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
+	@PostMapping(value = "transaction/transactionDetails", produces = { "application/json" })
+    BaseResp<TransactionDetailsResp> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
 	
     /**
      * @api {post} transaction/transactionDetailNavigate f.交易详情前后跳转浏览
@@ -286,7 +283,7 @@ public interface AppDocTransaction {
      * > 返回值同《交易详情接口》返回值
      */
 	@ApiOperation(value = "transaction/transactionDetailNavigate", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@RequestMapping(value = "transaction/transactionDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<TransactionListResp> transactionDetailNavigate(@ApiParam(value = "TransactionDetailNavigateReq req ", required = true)@Valid @RequestBody TransactionDetailNavigateReq req);
+	@PostMapping(value = "transaction/transactionDetailNavigate", produces = { "application/json" })
+    BaseResp<TransactionListResp> transactionDetailNavigate(@ApiParam(value = "TransactionDetailNavigateReq req ", required = true)@Valid @RequestBody TransactionDetailNavigateReq req);
 	
 }

@@ -21,15 +21,15 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
 	/**
 	 * 	申明全局空数组序列化对象
 	 */
-	private JsonSerializer<Object> _nullArrayJsonSerializer = new NullArrayJsonSerializer();
+	private JsonSerializer<Object> nullArrayJsonSerializer = new NullArrayJsonSerializer();
 	/**
 	 * 	申明全局空String序列化对象
 	 */
-    private JsonSerializer<Object> _nullStringJsonSerializer = new NullStringJsonSerializer();
+    private JsonSerializer<Object> nullStringJsonSerializer = new NullStringJsonSerializer();
     /**
 	 * 	申明全局空数字序列化对象
 	 */
-    private JsonSerializer<Object> _nullIntegerJsonSerializer = new NullIntegerJsonSerializer();
+    private JsonSerializer<Object> nullIntegerJsonSerializer = new NullIntegerJsonSerializer();
 
     @Override
     public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
@@ -68,7 +68,7 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
      * 	 判断是数组类型
      */
     protected boolean isArrayType(BeanPropertyWriter writer) {
-        Class<?> clazz = writer.getPropertyType();
+        Class<?> clazz = writer.getType().getRawClass();
         return clazz.isArray() || clazz.equals(List.class) || clazz.equals(Set.class);
     }
 
@@ -77,7 +77,7 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
      * @method isStringType
      */
     protected boolean isStringType(BeanPropertyWriter writer) {
-        Class<?> clazz = writer.getPropertyType();
+        Class<?> clazz = writer.getType().getRawClass();
         return clazz.equals(String.class);
     }
 
@@ -86,21 +86,21 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
      * @method isNumberType
      */
     protected boolean isNumberType(BeanPropertyWriter writer) {
-		Class<?> clazz = writer.getPropertyType();
+		Class<?> clazz = writer.getType().getRawClass();
         return clazz.equals(Integer.class) || clazz.equals(int.class)|| clazz.equals(Long.class)
         		|| clazz.equals(long.class)|| clazz.equals(Double.class)|| clazz.equals(double.class);
     }
 
     protected JsonSerializer<Object> defaultNullArrayJsonSerializer() {
-        return _nullArrayJsonSerializer;
+        return nullArrayJsonSerializer;
     }
 
     protected JsonSerializer<Object> defaultNullStringJsonSerializer() {
-        return _nullStringJsonSerializer;
+        return nullStringJsonSerializer;
     }
 
     protected JsonSerializer<Object> defaultNullIntegerJsonSerializer() {
-        return _nullIntegerJsonSerializer;
+        return nullIntegerJsonSerializer;
     }
 
 }

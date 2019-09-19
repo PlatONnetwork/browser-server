@@ -1,25 +1,17 @@
 package com.platon.browser.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.home.BlockListNewResp;
-import com.platon.browser.res.home.BlockStatisticNewResp;
-import com.platon.browser.res.home.ChainStatisticNewResp;
-import com.platon.browser.res.home.QueryNavigationResp;
-import com.platon.browser.res.home.StakingListNewResp;
-
+import com.platon.browser.res.home.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 	首页模块接口申明集成swagger
@@ -71,7 +63,7 @@ public interface AppDocHome {
      * }
      */
 	@ApiOperation(value = "home/queryNavigation", nickname = "", notes = "", response = QueryNavigationResp.class, tags = { "Home" })
-	@RequestMapping(value = "home/queryNavigation", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "home/queryNavigation", produces = { "application/json" })
 	public BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
 	
     /**

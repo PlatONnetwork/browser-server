@@ -1,32 +1,17 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.platon.browser.req.staking.AliveStakingListReq;
-import com.platon.browser.req.staking.DelegationListByAddressReq;
-import com.platon.browser.req.staking.DelegationListByStakingReq;
-import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.DelegationListByAddressResp;
-import com.platon.browser.resp.staking.DelegationListByStakingResp;
-import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingChangeNewResp;
-import com.platon.browser.resp.staking.StakingDetailsResp;
-import com.platon.browser.resp.staking.StakingOptRecordListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
-
+import com.platon.browser.resp.staking.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 /**
  * 	 验证人模块接口申明集成swagger
@@ -118,7 +103,7 @@ public interface AppDocStaking {
      * }
      */	
 	@ApiOperation(value = "staking/aliveStakingList", nickname = "", notes = "", response = AliveStakingListResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/aliveStakingList", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "staking/aliveStakingList", produces = { "application/json" })
     public RespPage<AliveStakingListResp> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
 	
 	
@@ -160,7 +145,7 @@ public interface AppDocStaking {
      * }
      */	
 	@ApiOperation(value = "staking/historyStakingList", nickname = "", notes = "", response = HistoryStakingListResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/historyStakingList", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "staking/historyStakingList", produces = { "application/json" })
     public RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
 	
 	
@@ -172,7 +157,6 @@ public interface AppDocStaking {
      * @apiDescription
      * 1. 功能：.实时验证人变更<br/>
      * 2. 实现逻辑：<br/>
-     * - TODO 实现方式？
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -236,7 +220,7 @@ public interface AppDocStaking {
      * }
      */	
 	@ApiOperation(value = "staking/stakingDetails", nickname = "", notes = "", response = StakingDetailsResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/stakingDetails", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "staking/stakingDetails", produces = { "application/json" })
     public BaseResp<StakingDetailsResp> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
 	
     /**
@@ -279,7 +263,7 @@ public interface AppDocStaking {
      * }
      */	
 	@ApiOperation(value = "staking/stakingOptRecordList", nickname = "", notes = "", response = StakingOptRecordListResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/stakingOptRecordList", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "staking/stakingOptRecordList", produces = { "application/json" })
     public RespPage<StakingOptRecordListResp> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
 	
     /**
@@ -318,8 +302,8 @@ public interface AppDocStaking {
      * }
      */
 	@ApiOperation(value = "staking/delegationListByStaking", nickname = "", notes = "", response = DelegationListByStakingResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/delegationListByStaking", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<DelegationListByStakingResp> delegationListByStaking(@ApiParam(value = "DelegationListByStakingReq ", required = true)@Valid @RequestBody DelegationListByStakingReq req);
+	@PostMapping(value = "staking/delegationListByStaking", produces = { "application/json" })
+    RespPage<DelegationListByStakingResp> delegationListByStaking(@ApiParam(value = "DelegationListByStakingReq ", required = true)@Valid @RequestBody DelegationListByStakingReq req);
 	
 	
     /**
@@ -360,7 +344,7 @@ public interface AppDocStaking {
      * }
      */
 	@ApiOperation(value = "staking/delegationListByAddress", nickname = "", notes = "", response = DelegationListByAddressResp.class, tags = { "Staking" })
-	@RequestMapping(value = "staking/delegationListByAddress", produces = { "application/json" }, method = RequestMethod.POST)
+	@PostMapping(value = "staking/delegationListByAddress", produces = { "application/json" })
     public RespPage<DelegationListByAddressResp> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
 	
 	

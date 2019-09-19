@@ -56,7 +56,8 @@ public class AppDocProposalController implements AppDocProposal {
     @Override
     public RespPage<VoteListResp> voteList(@Valid VoteListRequest req) {
     	if(Objects.isNull(req)|| StringUtils.isBlank(req.getProposalHash())){
-    		logger.error("## ERROR # proposal param error req:{}", JSONObject.toJSONString(req));
+    	    String msg = JSONObject.toJSONString(req);
+    		logger.error("## ERROR # proposal param error req:{}", msg);
     		throw new BusinessException(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.PROPOSAL_PARAM_ERROR));
 		}
         return voteService.queryByProposal(req);

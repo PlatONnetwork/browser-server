@@ -11,13 +11,12 @@ import com.platon.browser.res.home.ChainStatisticNewResp;
 import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;
 import com.platon.browser.util.I18nUtil;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 	推送任务
