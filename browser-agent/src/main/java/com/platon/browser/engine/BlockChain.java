@@ -161,7 +161,7 @@ public class BlockChain {
             // 统计地址相关信息
             addressExecute.execute(tx,this);
             // 链上执行失败的交易不予处理
-            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.code == tx.getTxReceiptStatus()) return;
+            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.getCode() == tx.getTxReceiptStatus()) return;
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人

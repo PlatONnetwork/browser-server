@@ -44,8 +44,8 @@ public class CustomSlash extends Slash {
         FAILURE(1, "失败"),
         SUCCESS(2, "成功")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         StatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;
@@ -72,8 +72,8 @@ public class CustomSlash extends Slash {
         YES(1, "是"),
         NO(2, "否")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         YesNoEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;

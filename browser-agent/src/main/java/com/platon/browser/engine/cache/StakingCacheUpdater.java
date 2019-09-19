@@ -6,6 +6,7 @@ import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,10 +82,11 @@ public class StakingCacheUpdater {
     public void updateStakingStatistics () {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         nodeCache.getAllStaking().forEach(staking -> {
             stat.reset(); // 重置统计bean状态, 复用实例，避免大量创建对象
             staking.getDelegations().forEach((senderAddr,delegation)->{
-                if (delegation.getIsHistory()==CustomDelegation.YesNoEnum.NO.code) {
+                if (delegation.getIsHistory()==CustomDelegation.YesNoEnum.NO.getCode()) {
                     stat.statDelegateHas = stat.statDelegateHas.add(delegation.integerDelegateHas());
                     stat.statDelegateLocked = stat.statDelegateLocked.add(delegation.integerDelegateLocked());
                     stat.statDelegateReduction = stat.statDelegateReduction.add(delegation.integerDelegateReduction());
@@ -96,8 +98,7 @@ public class StakingCacheUpdater {
             staking.setStatDelegateReduction(stat.statDelegateReduction.toString());
             staking.setStatDelegateQty(stat.statDelegateQty.intValue());
             // 把质押信息改动暂存至待更新列表
-            stageData.getStakingStage().updateStaking(staking);
-            stageData.getStakingStage().getSlashUpdateStage();
+            stakingStage.updateStaking(staking);
         });
     }
 }

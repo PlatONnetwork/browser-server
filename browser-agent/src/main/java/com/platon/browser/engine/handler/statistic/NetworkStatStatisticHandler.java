@@ -77,7 +77,7 @@ public class NetworkStatStatisticHandler implements EventHandler {
 
             //累计成功的交易总数
             List <CustomTransaction> transactions = curBlock.getTransactionList();
-            transactions.stream().filter(transaction -> transaction.getTxReceiptStatus() == CustomTransaction.TxReceiptStatusEnum.SUCCESS.code)
+            transactions.stream().filter(transaction -> transaction.getTxReceiptStatus() == CustomTransaction.TxReceiptStatusEnum.SUCCESS.getCode())
                     .forEach(transaction -> {
                         // 累计提案相关交易数量
                         switch (transaction.getTypeEnum()) {
@@ -126,12 +126,12 @@ public class NetworkStatStatisticHandler implements EventHandler {
              */
             networkStatCache.setDoingProposalQty(0);
             proposalCache.getAllProposal().forEach(proposal -> {
-                if (proposal.getType().equals(TypeEnum.UPGRADE.code)) {
-                    if (proposal.getStatus().equals(StatusEnum.PASS.code) || proposal.getStatus().equals(StatusEnum.PRE_UPGRADE.code) || proposal.getStatus().equals(StatusEnum.VOTING.code)) {
+                if (proposal.getType().equals(TypeEnum.UPGRADE.getCode())) {
+                    if (proposal.getStatus().equals(StatusEnum.PASS.getCode()) || proposal.getStatus().equals(StatusEnum.PRE_UPGRADE.getCode()) || proposal.getStatus().equals(StatusEnum.VOTING.getCode())) {
                         networkStatCache.setDoingProposalQty(networkStatCache.getDoingProposalQty() + 1);
                     }
                 }else {
-                    if (proposal.getStatus().equals(StatusEnum.VOTING.code)) {
+                    if (proposal.getStatus().equals(StatusEnum.VOTING.getCode())) {
                         networkStatCache.setDoingProposalQty(networkStatCache.getDoingProposalQty() + 1);
                     }
                 }

@@ -5,6 +5,8 @@ import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
@@ -23,6 +25,7 @@ import static java.util.Comparator.comparing;
  */
 @Data
 public class CustomBlock extends Block {
+    private static Logger logger = LoggerFactory.getLogger(CustomBlock.class);
 
     public CustomBlock(){
         super();
@@ -81,7 +84,7 @@ public class CustomBlock extends Block {
                 transactionList.add(transaction);
             });
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("更新区块出错",ex);
             throw ex;
         }
 

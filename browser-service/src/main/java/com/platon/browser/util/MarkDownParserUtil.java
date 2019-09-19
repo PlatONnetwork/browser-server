@@ -30,35 +30,6 @@ public final class MarkDownParserUtil {
     private static final String MARKDOWN_BEFORE_INDEX = "<article class=\"markdown-body";
     private static final String MARKDOWN_LAST_INDEX = "</article>";
 
-    /**
-     * 获取md文件
-     *
-     * @param fileName
-     * @return
-     */
-    public static String httpGet(String fileName) throws IOException {
-        HttpGet httpGet = null;
-        try {
-            HttpClient httpClient = HttpClients.createDefault();
-            httpGet = new HttpGet(fileName);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            //拿到实体
-            HttpEntity httpEntity = httpResponse.getEntity();
-            //获取结果，这里可以正对相应的数据精细字符集的转码
-            if (httpEntity != null) {
-                return EntityUtils.toString(httpEntity, "utf-8");
-            }
-        } finally {
-            if (httpGet != null) {
-                //释放连接
-                httpGet.releaseConnection();
-            }
-        }
-        return null;
-    }
-
-
-
     public static String acquireMD(String fileName) throws Exception {
         String text = HttpUtil.get(fileName,String.class);
         if (text == null) {

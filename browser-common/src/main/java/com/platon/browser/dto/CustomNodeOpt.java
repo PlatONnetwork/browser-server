@@ -57,9 +57,9 @@ public class CustomNodeOpt extends NodeOpt {
         MULTI_SIGN("6", "双签","PERCENT|AMOUNT"),
         LOW_BLOCK_RATE("7", "出块率低","BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT")
         ;
-        public String code;
-        public String desc;
-        public String tpl;
+        private String code;
+        private String desc;
+        private String tpl;
         TypeEnum(String code, String desc,String tpl) {
             this.code = code;
             this.desc = desc;
@@ -67,6 +67,7 @@ public class CustomNodeOpt extends NodeOpt {
         }
         public String getCode(){return code;}
         public String getDesc(){return desc;}
+        public String getTpl(){return tpl;}
         private static Map<String,TypeEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(TypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}

@@ -72,7 +72,7 @@ public class ProposalUpgradeHandler implements EventHandler {
         tx.setTxInfo(JSON.toJSONString(param));
 
         //设置提案为升级类型
-        proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()));
         //获取配置文件提案参数模板
         String temp = chainConfig.getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key, param.getPIDID());
@@ -101,10 +101,10 @@ public class ProposalUpgradeHandler implements EventHandler {
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
-        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
+                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

@@ -10,7 +10,6 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
@@ -82,7 +81,7 @@ public class ProposalTextHandler implements EventHandler {
         String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置提案类型
-        proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()));
         //设置提案人
         proposal.setVerifier(param.getVerifier());
         //设置提案人名称
@@ -97,10 +96,10 @@ public class ProposalTextHandler implements EventHandler {
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
-        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
+                .replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

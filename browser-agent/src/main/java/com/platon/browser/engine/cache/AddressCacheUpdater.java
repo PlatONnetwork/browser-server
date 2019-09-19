@@ -105,7 +105,7 @@ public class AddressCacheUpdater {
                     } catch (NoSuchBeanException e) {
                         throw new BusinessException(e.getMessage());
                     }
-                    if (status.equals(CustomStaking.StatusEnum.EXITING.code) || status.equals(CustomStaking.StatusEnum.EXITED.code)) {
+                    if (status.equals(CustomStaking.StatusEnum.EXITING.getCode()) || status.equals(CustomStaking.StatusEnum.EXITED.getCode())) {
                         stat.delegateUnlock = stat.delegateUnlock.add(staking.integerStatDelegateHas().add(staking.integerStatDelegateLocked()));
                         stat.delegateLocked = stat.delegateLocked.subtract(stat.delegateUnlock);
                     }

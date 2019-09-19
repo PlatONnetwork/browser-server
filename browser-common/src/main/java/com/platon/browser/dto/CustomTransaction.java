@@ -153,8 +153,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
         public static TxTypeEnum getEnum(String code){
             return map.get(code);
         }
-        public String code;
-        public String desc;
+        private String code;
+        private String desc;
         TxTypeEnum ( String code, String desc) {
             this.code = code;
             this.desc = desc;
@@ -175,8 +175,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
         SUCCESS(1, "成功"),
         FAILURE(0, "失败")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         TxReceiptStatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;

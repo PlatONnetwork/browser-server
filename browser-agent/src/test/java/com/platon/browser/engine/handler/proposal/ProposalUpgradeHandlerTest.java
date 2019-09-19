@@ -68,7 +68,7 @@ public class ProposalUpgradeHandlerTest extends TestBase {
      *  文本提案测试方法
      */
     @Test
-    public void testHandler () throws CacheConstructException, NoSuchBeanException, BusinessException {
+    public void testHandler () throws NoSuchBeanException, BusinessException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
@@ -88,7 +88,7 @@ public class ProposalUpgradeHandlerTest extends TestBase {
 
         EventContext context = new EventContext();
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_PROPOSAL_UPGRADE.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_PROPOSAL_UPGRADE.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

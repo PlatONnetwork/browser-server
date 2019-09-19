@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import com.platon.browser.bean.CollectResult;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
@@ -144,7 +143,6 @@ public class BlockSyncTask {
         if (!blockNumbers.isEmpty()) {
             // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
             // 采集前先重置结果容器
-            CollectResult.reset();
             // 开始并行采集
             List<CustomBlock> blocks = blockService.collect(blockNumbers);
             if (!blocks.isEmpty()){

@@ -78,7 +78,6 @@ public class PlatonClient {
         try{
             return currentValidWeb3j;
         }catch (Exception e){
-            e.printStackTrace();
             logger.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();

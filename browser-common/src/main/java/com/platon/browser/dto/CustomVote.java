@@ -46,8 +46,8 @@ public class CustomVote extends Vote {
         SUPPORT("1", "支持"),
         OPPOSITION("2", "反对"),
         ABSTENTION("3", "弃权");
-        public String code;
-        public String desc;
+        private String code;
+        private String desc;
         OptionEnum ( String code, String desc ) {
             this.code = code;
             this.desc = desc;

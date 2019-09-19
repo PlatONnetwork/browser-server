@@ -51,7 +51,7 @@ public class DeclareVersionHandlerTest extends TestBase {
      *  版本声明测试方法
      */
     @Test
-    public void testHandler () throws CacheConstructException, NoSuchBeanException {
+    public void testHandler () throws NoSuchBeanException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         CustomNode node = mock(CustomNode.class);
@@ -62,7 +62,7 @@ public class DeclareVersionHandlerTest extends TestBase {
         handler.handle(context);
 
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.DECLARE_VERSION.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.DECLARE_VERSION.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

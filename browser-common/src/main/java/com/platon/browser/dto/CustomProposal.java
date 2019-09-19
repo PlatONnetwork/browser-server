@@ -56,8 +56,8 @@ public class CustomProposal extends Proposal {
         TEXT("1", "文本提案"),
         UPGRADE("2", "升级提案"),
         CANCEL("4", "取消提案");
-        public String code;
-        public String desc;
+        private String code;
+        private String desc;
         TypeEnum ( String code, String desc ) {
             this.code = code;
             this.desc = desc;
@@ -90,8 +90,8 @@ public class CustomProposal extends Proposal {
         PRE_UPGRADE(4, "预升级"),
         FINISH(5, "生效"),
         CANCEL(6, "被取消");
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         StatusEnum ( int code, String desc ) {
             this.code = code;
             this.desc = desc;

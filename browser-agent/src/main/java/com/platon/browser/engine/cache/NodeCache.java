@@ -207,7 +207,7 @@ public class NodeCache {
             historyDelegations.clear();
             for(Map.Entry<String,CustomDelegation> delegationEntry:staking.getDelegations().entrySet()){
                 CustomDelegation delegation = delegationEntry.getValue();
-                if(CustomDelegation.YesNoEnum.NO.code==delegation.getIsHistory()){
+                if(CustomDelegation.YesNoEnum.NO.getCode()==delegation.getIsHistory()){
                     // 只要有一条委托是非历史状态，则它所属的质押记录就不能从缓存中删除，标记其为有效
                     isStakingValid = true;
                     // 过滤出退回成功的解委托记录

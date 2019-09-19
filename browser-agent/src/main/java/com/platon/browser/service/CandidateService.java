@@ -191,7 +191,7 @@ public class CandidateService {
 
                 CustomNode node = new CustomNode();
                 node.updateWithNode(verifier);
-                node.setIsRecommend(CustomNode.YesNoEnum.YES.code);
+                node.setIsRecommend(CustomNode.YesNoEnum.YES.getCode());
                 node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
                 node.setStatExpectBlockQty(blockChain.getCurConsensusExpectBlockCount().toString()); // 期望出块数=共识周期块数/实际参与共识节点数
                 initParam.nodes.add(node);
@@ -199,16 +199,16 @@ public class CandidateService {
                 CustomStaking staking = new CustomStaking();
                 staking.updateWithNode(verifier);
                 staking.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-                staking.setIsInit(CustomStaking.YesNoEnum.YES.code);
-                staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
+                staking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
                 // 内置节点默认设置状态为1
-                staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.code);
+                staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
                 // 设置内置节点质押锁定金额
                 BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
                 staking.setStakingLocked(initStakingLocked.toString());
                 // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-                if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
-                staking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+                staking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
 
                 CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
                 if(StringUtils.isBlank(staking.getStakingName())&&defaultStaking!=null)

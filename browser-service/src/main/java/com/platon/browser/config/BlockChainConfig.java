@@ -60,7 +60,9 @@ public class BlockChainConfig {
     @Autowired
     private PlatonClient client;
 
-    public static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
+    private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
+
+    public Set<String> getInnerContractAddr(){return INNER_CONTRACT_ADDR;}
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
     //【通用】每个验证人每个共识周期出块数量目标值

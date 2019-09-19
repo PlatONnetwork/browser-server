@@ -131,7 +131,7 @@ public class NewSettleEpochHandler implements EventHandler {
             //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
             BigInteger sumAmount = delegation.integerDelegateHas().add(delegation.integerDelegateLocked()).add(delegation.integerDelegateReduction());
             if (sumAmount.compareTo(BigInteger.ZERO) == 0) {
-                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
             //添加需要更新的委托的信息到委托更新列表
             stakingStage.updateDelegation(delegation);
@@ -180,7 +180,7 @@ public class NewSettleEpochHandler implements EventHandler {
             // 犹豫期+锁定期+退回中==0, 则节点退出
             BigInteger stakingReduction = curStaking.integerStakingReduction();
             if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
-                curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+                curStaking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
             }
             // 年化率信息
             AnnualizedRateInfo ari = JSON.parseObject(curStaking.getAnnualizedRateInfo(),AnnualizedRateInfo.class);
@@ -202,7 +202,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 }
 
                 // 计算年化率
-                if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.code){
+                if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()){
                     // 只有候选中的记录才需要计算年化率：(((前4个结算周期内验证人所获得的平均质押奖励+前4结算周期出块奖励)/前四个结算周期质押成本)/1466)*100%
                     // 记录前一结算周期利润
                     rotateProfit(curStaking,ari);
@@ -216,10 +216,10 @@ public class NewSettleEpochHandler implements EventHandler {
             if(nextNode!=null)  {
                 rotateCost(curStaking,ari);
                 // 是否下一轮结算验证人
-                curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
             }else{
                 // 不是下一轮结算验证人
-                curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
             }
 
 

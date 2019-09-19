@@ -78,7 +78,7 @@ public class ExitValidatorHandlerTest extends TestBase {
         EventContext context = new EventContext();
 
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.EXIT_VALIDATOR.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.EXIT_VALIDATOR.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

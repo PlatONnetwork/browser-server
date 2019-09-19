@@ -98,7 +98,7 @@ public class UnDelegateHandler implements EventHandler {
                     .add(delegation.integerDelegateLocked()) // +委托锁定期金额
                     .add(delegation.integerDelegateReduction());
             if (sumAmount.compareTo(BigInteger.ZERO)==0) {
-                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
             //判断此委托赎回是否已经完成
             if (unDelegation.integerRedeemLocked().compareTo(BigInteger.ZERO)==0) {

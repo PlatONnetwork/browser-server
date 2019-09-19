@@ -59,7 +59,7 @@ public class CreateValidatorHandler implements EventHandler {
             logger.debug("节点(id={})已经被质押！",param.getNodeId());
             // 取当前节点最新质押信息
             CustomStaking latestStaking = node.getLatestStaking();
-            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
+            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.getCode()){
                 // 如果当前节点最新质押信息无效，则添加一条质押信息
                 CustomStaking newStaking = new CustomStaking();
                 // 使用最新的质押交易更新相关信息
@@ -76,7 +76,7 @@ public class CreateValidatorHandler implements EventHandler {
                 // 把质押信息放入缓存
                 nodeCache.addStaking(newStaking);
             }
-            if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
+            if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.getCode()){
                 // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
                 logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), JSON.toJSONString(param));
             }

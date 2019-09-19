@@ -50,7 +50,7 @@ public class TransactionServiceTest extends TestBase {
      * @throws BeanCreateOrUpdateException
      */
     @Before
-    public void setup() throws IOException, BeanCreateOrUpdateException {
+    public void setup() throws IOException, BeanCreateOrUpdateException, InterruptedException {
         ReflectionTestUtils.setField(transactionService, "executor", THREAD_POOL);
         ReflectionTestUtils.setField(transactionService, "client", client);
         when(transactionService.analyze(anyList())).thenCallRealMethod();
@@ -72,7 +72,7 @@ public class TransactionServiceTest extends TestBase {
      * 执行交易分析测试
      */
     @Test
-    public void testAnalyze() {
+    public void testAnalyze() throws InterruptedException {
         // 交易信息置空
         blocks.forEach(block->block.getTransactionList().forEach(tx->{
             tx.setTxType(null);

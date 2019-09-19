@@ -83,15 +83,15 @@ public class NewElectionEpochHandler implements EventHandler {
                         // 设定退回时所在结算周期
                         staking.setStakingReductionEpoch(bc.getCurSettingEpoch().intValue());
                         // 节点状态设为退出中
-                        staking.setStatus(CustomStaking.StatusEnum.EXITING.code);
+                        staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
                     }else{// 剩余金额等于零
                         // 锁定金额置零
                         staking.setStakingLocked(BigInteger.ZERO.toString());
                         // 节点状态设为已退出
-                        staking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+                        staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
                     }
-                    staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
-                    staking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+                    staking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
+                    staking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
                 } else {
                     // 普通出块率低，则扣点钱完事
                     if(stakingHas.compareTo(slashAmount)>=0){
@@ -125,7 +125,7 @@ public class NewElectionEpochHandler implements EventHandler {
                 CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
                 nodeOpt.updateWithCustomBlock(bc.getCurBlock());
                 // BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT
-                String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.tpl
+                String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getTpl()
                         .replace("BLOCK_COUNT",staking.getPreConsBlockQty().toString())
                         .replace("SLASH_BLOCK_COUNT",chainConfig.getSlashBlockCount().toString())
                         .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString())

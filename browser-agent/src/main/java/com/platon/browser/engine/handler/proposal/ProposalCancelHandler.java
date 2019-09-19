@@ -74,7 +74,7 @@ public class ProposalCancelHandler implements EventHandler {
         //设置提案人名称
         proposal.setVerifierName(staking.getStakingName());
         //设置提案为升级类型
-        proposal.setType(CustomProposal.TypeEnum.CANCEL.code);
+        proposal.setType(CustomProposal.TypeEnum.CANCEL.getCode());
         //获取配置文件提案参数模板
         String temp = chainConfig.getProposalUrlTemplate();
         String url = temp.replace(ProposalEngine.key,param.getPIDID());
@@ -111,10 +111,10 @@ public class ProposalCancelHandler implements EventHandler {
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
-        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
+                .replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

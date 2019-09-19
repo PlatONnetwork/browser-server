@@ -69,9 +69,9 @@ public class NewConsensusEpochHandler implements EventHandler {
             Node nextNode = bc.getCurValidator().get(staking.getNodeId());
             // 看当前验证人是否在下一轮共识
             if(nextNode!=null){
-                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
             }else {
-                staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
+                staking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
             }
 
             String info = tpl.replace("PRE_QTY",staking.getPreConsBlockQty().toString())

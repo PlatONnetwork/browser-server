@@ -75,7 +75,7 @@ public class IncreaseStakingHandlerTest  extends TestBase {
         EventContext context = new EventContext();
 
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.INCREASE_STAKING.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.INCREASE_STAKING.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

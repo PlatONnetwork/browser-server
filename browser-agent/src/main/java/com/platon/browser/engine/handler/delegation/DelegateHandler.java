@@ -47,7 +47,7 @@ public class DelegateHandler implements EventHandler {
                 //若已存在同地址，同节点，同块高的目标委托对象，则说明该地址对此节点有做过委托
                 if (delegation != null) {
                     delegation.setDelegateHas(delegation.integerDelegateHas().add(param.integerAmount()).toString());
-                    delegation.setIsHistory(CustomDelegation.YesNoEnum.NO.code);
+                    delegation.setIsHistory(CustomDelegation.YesNoEnum.NO.getCode());
                     delegation.setCurDelegationBlockNum(tx.getBlockNumber());
                     //更新分析结果UpdateSet
                     stakingStage.updateDelegation(delegation);

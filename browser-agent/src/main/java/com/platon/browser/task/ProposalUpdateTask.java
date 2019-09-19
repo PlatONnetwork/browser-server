@@ -93,7 +93,7 @@ public class ProposalUpdateTask {
                 ProposalMarkDownDto proposalMarkDownDto = getMarkdownInfo(proposal.getUrl());
                 logger.info("------------------------------------C-------------------------------------------{}",System.currentTimeMillis());
                 proposal.updateWithProposalMarkDown(proposalMarkDownDto);
-                if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
+                if (CustomProposal.TypeEnum.CANCEL.getCode().equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                     //若是取消提案，则需要补充被取消提案相关信息
 /*                    String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
@@ -114,9 +114,9 @@ public class ProposalUpdateTask {
 
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
-            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)
-                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)
-                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code)) {
+            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.getCode())
+                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.getCode())
+                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.getCode())) {
                 //发送rpc请求查询提案结果
                 try {
                     ProposalParticiantStat pps = getProposalParticiantStat(proposal.getHash(),curBlock.getHash());
@@ -166,10 +166,10 @@ public class ProposalUpdateTask {
                     logger.error("更新操作({})的结果出错:{}", proposal.getHash(), e.getMessage());
                 }
                 if (proposal != null) {
-                    String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+                    String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                             .replace("ID", proposal.getPipId().toString())
                             .replace("TITLE", proposal.getTopic())
-                            .replace("TYPE", CustomProposal.TypeEnum.TEXT.code);
+                            .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
                     nodeOpt.setDesc(desc);
                 }
                 CustomNodeOpt customNodeOpt = new CustomNodeOpt();

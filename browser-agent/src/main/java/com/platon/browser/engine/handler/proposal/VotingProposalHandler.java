@@ -83,7 +83,7 @@ public class VotingProposalHandler implements EventHandler {
             // 记录操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
             nodeOpt.updateWithCustomTransaction(tx);
-            String desc = CustomNodeOpt.TypeEnum.VOTE.tpl
+            String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
                     .replace("ID",proposal.getPipId().toString())
                     .replace("TITLE",proposal.getTopic())
                     .replace("OPTION",param.getOption());
