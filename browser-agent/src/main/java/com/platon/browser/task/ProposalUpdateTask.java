@@ -117,7 +117,7 @@ public class ProposalUpdateTask {
                     || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.getCode())) {
                 //发送rpc请求查询提案结果
                 try {
-                    ProposalParticiantStat pps = getProposalParticiantStat(proposal.getHash(),curBlock.getHash());
+                    ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(),curBlock.getHash());
                     //设置参与人数
                     proposal.setAccuVerifiers(pps.getVoterCount());
                     //设置赞成票
@@ -203,13 +203,13 @@ public class ProposalUpdateTask {
     }
 
     /**
-     * 取提案参与统计信息
+     * 取提案参与者统计信息
      * @param proposalHash
      * @param blockHash
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticiantStat(String proposalHash,String blockHash) throws Exception {
+    public ProposalParticiantStat getProposalParticipantStat(String proposalHash,String blockHash) throws Exception {
         return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
     }
 
