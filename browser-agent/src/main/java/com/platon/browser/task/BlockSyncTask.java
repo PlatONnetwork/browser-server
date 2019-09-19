@@ -213,7 +213,7 @@ public class BlockSyncTask {
         return true;
     }
 
-    public void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
+    private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{
