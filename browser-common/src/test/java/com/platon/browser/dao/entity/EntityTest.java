@@ -42,7 +42,7 @@ public class EntityTest extends TestBase {
         classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")
                 &&!clazz.getName().endsWith("Column")
                 &&!clazz.getName().endsWith("Criterion")
-                &&!clazz.getName().endsWith("Criteria")
+                &&!clazz.getName().endsWith("GeneratedCriteria")
         ).forEach(target::add);
     }
     @Test
@@ -50,8 +50,8 @@ public class EntityTest extends TestBase {
         for (Class<?> clazz:target){
             Method[] methods = clazz.getDeclaredMethods();
             for(Method method:methods){
-                if(Modifier.isStatic(method.getModifiers())) continue;
-                if(Modifier.isProtected(method.getModifiers())) continue;
+//                if(Modifier.isStatic(method.getModifiers())) continue;
+//                if(Modifier.isProtected(method.getModifiers())) continue;
                 if(Modifier.isPrivate(method.getModifiers())) continue;
                 if(method.getName().equals("init")) continue;
                 Class<?>[] types = method.getParameterTypes();
