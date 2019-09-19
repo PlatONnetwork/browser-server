@@ -44,6 +44,8 @@ public class BlockSyncTask {
     @Autowired
     private BlockChain blockChain;
     @Autowired
+    private BlockChainConfig chainConfig;
+    @Autowired
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
@@ -132,17 +134,15 @@ public class BlockSyncTask {
          */
         Map <String, Address> dbAddressMap = new HashMap <>();
         //其他内置合约地址列表
-        Set <String> innerContractAddrs = blockChain.getChainConfig().getInnerContractAddr();
+        Set <String> innerContractAddrs = chainConfig.getInnerContractAddr();
         //PlatOn基金会账户地址
-        innerContractAddrs.add(blockChain.getChainConfig().getPlatonFundAccountAddr());
+        innerContractAddrs.add(chainConfig.getPlatonFundAccountAddr());
         //开发者激励基金账户地址
-        innerContractAddrs.add(blockChain.getChainConfig().getDeveloperIncentiveFundAccountAddr());
+        innerContractAddrs.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
         AddressExample addressExample = new AddressExample();
         addressExample.createCriteria().andAddressIn(new ArrayList <>(innerContractAddrs));
         List <Address> dbAddressList = addressMapper.selectByExample(addressExample);
-        dbAddressList.forEach(address -> {
-            dbAddressMap.put(address.getAddress(), address);
-        });
+        dbAddressList.forEach(address -> dbAddressMap.put(address.getAddress(), address));
         if (dbAddressList.size() != innerContractAddCount) {
             innerContractAddrs.forEach(address -> {
                 if (null == dbAddressMap.get(address)) {
