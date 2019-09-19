@@ -9,8 +9,8 @@ package com.platon.browser.enums;
  */
 public enum RedeemStatusEnum {
 
-	EXTING("exting", 1),//退出中
-	EXTED("exted" ,2);//已退出
+	EXITING("exiting", 1),//退出中
+	EXITED("exited" ,2);//已退出
 
 	private String name;
 	private Integer code;

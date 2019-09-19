@@ -387,9 +387,9 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setRedeemLocked(staking.getStakingReduction());
 							//只有已退出，则金额才会退回到账户
 							if(staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
-								resp.setRedeemStatus(RedeemStatusEnum.EXTED.getCode());
+								resp.setRedeemStatus(RedeemStatusEnum.EXITED.getCode());
 							} else {
-								resp.setRedeemStatus(RedeemStatusEnum.EXTING.getCode());
+								resp.setRedeemStatus(RedeemStatusEnum.EXITING.getCode());
 							}
 							//（staking_reduction_epoch  + 节点质押退回锁定周期） * 结算周期区块数(C) + 现有区块数
 							BigDecimal blockNum = (new BigDecimal(staking.getStakingReductionEpoch()).add(new BigDecimal(blockChainConfig.getUnStakeRefundSettlePeriodCount())))

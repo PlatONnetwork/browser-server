@@ -8,7 +8,7 @@ public class ErrorCodeEnumTest {
 
 	@Test
 	public void test() {
-		ErrorCodeEnum codeEnum = ErrorCodeEnum.valueOf("Default");
+		ErrorCodeEnum codeEnum = ErrorCodeEnum.valueOf("DEFAULT");
 		assertTrue(codeEnum.getCode()==-1);
 	}
 
