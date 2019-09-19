@@ -26,11 +26,11 @@ public class VerUtil {
     if (matcher.find()) {
       int ver = Byte.parseByte(matcher.group(1)) << 16 & 0x7fffffff;
       int lite = Byte.parseByte(matcher.group(2)) << 8 & 0x7fffffff;
-      int patch = Byte.parseByte(matcher.group(3)) << 0 & 0x7fffffff;
+      int patch = Byte.parseByte(matcher.group(3)) & 0x7fffffff;
       int id = ver | lite | patch;
       return BigInteger.valueOf(id);
     } else {
-      throw new RuntimeException("version is invalid");
+      throw new NumberFormatException("version is invalid");
     }
   }
 
@@ -44,7 +44,7 @@ public class VerUtil {
     int v = version.intValue();
     int ver = v >> 16 & 0x0000ffff;
     int lite = v >> 8 & 0x000000ff;
-    int patch = v >> 0 & 0x000000ff;
+    int patch = v & 0x000000ff;
     return String.format("%s.%s.%s", ver, lite, patch);
   }
 }
