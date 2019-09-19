@@ -109,7 +109,7 @@ public class ProposalUpdateTask {
             } catch (NoSuchBeanException | BusinessException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (Exception e){
-                logger.error("更新提案({})的主题和描述出错:发送http请求异常({},{})", proposal.getPipId(), proposal.getUrl(),e.getMessage());
+                logger.error("更新提案({})的主题和描述出错:发送http请求异常({})", proposal.getPipId(), e.getMessage());
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.getCode())
