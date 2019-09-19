@@ -1,4 +1,4 @@
-package com.platon.browser.engine.bean;
+package com.platon.browser.param;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.mock;
 
@@ -26,8 +24,8 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BeanTest extends TestBase {
-    private static Logger logger = LoggerFactory.getLogger(BeanTest.class);
+public class ParamTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(ParamTest.class);
 
     private List<Class<?>> target = new ArrayList<>();
     /**
@@ -37,7 +35,7 @@ public class BeanTest extends TestBase {
      */
     @Before
     public void setup() {
-        String packageName= BeanTest.class.getPackage().getName();
+        String packageName= ParamTest.class.getPackage().getName();
         Set<Class<?>> classSet = ClassUtil.getClasses(packageName);
         classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")).forEach(target::add);
     }
@@ -48,6 +46,8 @@ public class BeanTest extends TestBase {
             for(Method method:methods){
                 if(Modifier.isStatic(method.getModifiers())) continue;
                 if(Modifier.isProtected(method.getModifiers())) continue;
+                if(Modifier.isPrivate(method.getModifiers())) continue;
+                if(method.getName().equals("init")) continue;
                 Class<?>[] types = method.getParameterTypes();
                 Object instance = clazz.newInstance();
                 if(types.length!=0){
@@ -67,6 +67,10 @@ public class BeanTest extends TestBase {
                         }
                         if(Integer.class==types[i]){
                             args[i]=333;
+                            continue;
+                        }
+                        if(Long.class==types[i]){
+                            args[i]=333L;
                             continue;
                         }
                         args[i]=mock(types[i]);

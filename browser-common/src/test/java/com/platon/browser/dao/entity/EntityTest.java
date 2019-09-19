@@ -1,4 +1,4 @@
-package com.platon.browser.engine.bean;
+package com.platon.browser.dao.entity;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -26,8 +26,8 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class BeanTest extends TestBase {
-    private static Logger logger = LoggerFactory.getLogger(BeanTest.class);
+public class EntityTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(EntityTest.class);
 
     private List<Class<?>> target = new ArrayList<>();
     /**
@@ -37,9 +37,13 @@ public class BeanTest extends TestBase {
      */
     @Before
     public void setup() {
-        String packageName= BeanTest.class.getPackage().getName();
+        String packageName= EntityTest.class.getPackage().getName();
         Set<Class<?>> classSet = ClassUtil.getClasses(packageName);
-        classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")).forEach(target::add);
+        classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")
+                &&!clazz.getName().endsWith("Column")
+                &&!clazz.getName().endsWith("Criterion")
+                &&!clazz.getName().endsWith("Criteria")
+        ).forEach(target::add);
     }
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
@@ -48,16 +52,18 @@ public class BeanTest extends TestBase {
             for(Method method:methods){
                 if(Modifier.isStatic(method.getModifiers())) continue;
                 if(Modifier.isProtected(method.getModifiers())) continue;
+                if(Modifier.isPrivate(method.getModifiers())) continue;
+                if(method.getName().equals("init")) continue;
                 Class<?>[] types = method.getParameterTypes();
                 Object instance = clazz.newInstance();
                 if(types.length!=0){
                     Object[] args = new Object[types.length];
                     for (int i=0;i<types.length;i++){
-                        if(Boolean.class==types[i]){
+                        if(Boolean.class==types[i]||boolean.class==types[i]){
                             args[i]=Boolean.TRUE;
                             continue;
                         }
-                        if(Double.class==types[i]){
+                        if(Double.class==types[i]||double.class==types[i]){
                             args[i]=11.3;
                             continue;
                         }
@@ -65,8 +71,12 @@ public class BeanTest extends TestBase {
                             args[i]="333";
                             continue;
                         }
-                        if(Integer.class==types[i]){
+                        if(Integer.class==types[i]||int.class==types[i]){
                             args[i]=333;
+                            continue;
+                        }
+                        if(Long.class==types[i]||long.class==types[i]){
+                            args[i]=333L;
                             continue;
                         }
                         args[i]=mock(types[i]);
