@@ -134,7 +134,7 @@ public interface AppDocTransaction {
      */
 	@ApiOperation(value = "transaction/transactionListByAddress", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionListByAddress", produces = { "application/json" })
-    public RespPage<TransactionListResp> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
+    RespPage<TransactionListResp> transactionListByAddress(@ApiParam(value = "TransactionListByAddressRequest ", required = true)@Valid @RequestBody TransactionListByAddressRequest req);
 	
     /**
      * @api {get} /transaction/addressTransactionDownload?address=:address&date=:date&local=:en d.导出地址交易列表
@@ -152,7 +152,7 @@ public interface AppDocTransaction {
      * >响应为 二进制文件流
      */
 	@ApiOperation(value = "transaction/addressTransactionDownload", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@PostMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" })
+	@GetMapping(value = "transaction/addressTransactionDownload", produces = { "application/json" })
     void addressTransactionDownload(@ApiParam(value = "address ", required = false)@RequestParam(value = "address", required = false)String address,
     		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date, 
     		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true) String local,HttpServletResponse response);

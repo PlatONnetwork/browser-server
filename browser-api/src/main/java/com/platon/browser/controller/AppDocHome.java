@@ -64,7 +64,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "home/queryNavigation", nickname = "", notes = "", response = QueryNavigationResp.class, tags = { "Home" })
 	@PostMapping(value = "home/queryNavigation", produces = { "application/json" })
-	public BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
+	BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
 	
     /**
      * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
@@ -90,7 +90,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/statistic/new", nickname = "", notes = "", response = BlockStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/statistic/new")
-	public BaseResp<BlockStatisticNewResp> blockStatisticNew();
+	BaseResp<BlockStatisticNewResp> blockStatisticNew();
 	
     /**
      * @api {subscribe} /topic/chain/statistic/new c.基础数据（websocket）
@@ -125,7 +125,7 @@ public interface AppDocHome {
      */	
 	@ApiOperation(value = "/topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "/topic/chain/statistic/new")
-	public BaseResp<ChainStatisticNewResp> chainStatisticNew();
+	BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
 	
     /**
@@ -157,7 +157,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/list/new", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/list/new")
-	public BaseResp<List<BlockListNewResp>> blockListNew();
+	BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
      * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
@@ -193,5 +193,5 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
-	public BaseResp<StakingListNewResp> stakingListNew();
+	BaseResp<StakingListNewResp> stakingListNew();
 }

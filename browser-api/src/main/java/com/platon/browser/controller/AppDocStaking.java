@@ -54,7 +54,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "topic/staking/statistic/new", nickname = "", notes = "", tags = { "Staking" })
 	@SubscribeMapping(value = "topic/staking/statistic/new")
-	public BaseResp<StakingStatisticNewResp> stakingStatisticNew();
+	BaseResp<StakingStatisticNewResp> stakingStatisticNew();
 	
     /**
      * @api {post} /staking/aliveStakingList b.实时验证人列表
@@ -104,7 +104,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/aliveStakingList", nickname = "", notes = "", response = AliveStakingListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/aliveStakingList", produces = { "application/json" })
-    public RespPage<AliveStakingListResp> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
+    RespPage<AliveStakingListResp> aliveStakingList(@ApiParam(value = "AliveStakingListReq ", required = true)@Valid @RequestBody AliveStakingListReq req);
 	
 	
     /**
@@ -146,7 +146,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/historyStakingList", nickname = "", notes = "", response = HistoryStakingListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/historyStakingList", produces = { "application/json" })
-    public RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
+    RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
 	
 	
     /**
@@ -170,7 +170,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "topic/staking/change/new", nickname = "", notes = "", response = StakingChangeNewResp.class, tags = { "Staking" })
 	@SubscribeMapping(value = "topic/staking/change/new")
-	public BaseResp<StakingChangeNewResp> stakingChangeNew();
+	BaseResp<StakingChangeNewResp> stakingChangeNew();
 	
     /**
      * @api {post} /staking/stakingDetails e.验证人详情
@@ -221,7 +221,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/stakingDetails", nickname = "", notes = "", response = StakingDetailsResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/stakingDetails", produces = { "application/json" })
-    public BaseResp<StakingDetailsResp> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
+    BaseResp<StakingDetailsResp> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
 	
     /**
      * @api {post} /staking/stakingOptRecordList f.节点操作记录
@@ -264,7 +264,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "staking/stakingOptRecordList", nickname = "", notes = "", response = StakingOptRecordListResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/stakingOptRecordList", produces = { "application/json" })
-    public RespPage<StakingOptRecordListResp> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
+    RespPage<StakingOptRecordListResp> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
 	
     /**
      * @api {post} /staking/delegationListByStaking g.验证人相关的委托列表
@@ -345,7 +345,7 @@ public interface AppDocStaking {
      */
 	@ApiOperation(value = "staking/delegationListByAddress", nickname = "", notes = "", response = DelegationListByAddressResp.class, tags = { "Staking" })
 	@PostMapping(value = "staking/delegationListByAddress", produces = { "application/json" })
-    public RespPage<DelegationListByAddressResp> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
+    RespPage<DelegationListByAddressResp> delegationListByAddress(@ApiParam(value = "DelegationListByAddressReq ", required = true)@Valid @RequestBody DelegationListByAddressReq req);
 	
 	
     /**

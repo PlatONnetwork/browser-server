@@ -66,7 +66,7 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/proposalList", nickname = "", notes = "", response = ProposalListResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/proposalList", produces = { "application/json" })
-	public RespPage<ProposalListResp> proposalList(@ApiParam(value = "PageReq")@Valid @RequestBody(required = false) PageReq req);
+	RespPage<ProposalListResp> proposalList(@ApiParam(value = "PageReq")@Valid @RequestBody(required = false) PageReq req);
 
 	
     /**
@@ -121,7 +121,7 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/proposalDetails", nickname = "", notes = "", response = ProposalDetailsResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/proposalDetails", produces = { "application/json" })
-	public BaseResp<ProposalDetailsResp> proposalDetails(
+	BaseResp<ProposalDetailsResp> proposalDetails(
 			@ApiParam(value = "ProposalDetailRequest ")@Valid @RequestBody ProposalDetailRequest req);
 	
     /**
@@ -159,5 +159,5 @@ public interface AppDocProposal {
      */	
 	@ApiOperation(value = "proposal/voteList", nickname = "", notes = "", response = VoteListResp.class, tags = { "Proposal" })
 	@PostMapping(value = "proposal/voteList", produces = { "application/json" })
-	public RespPage<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ")@Valid @RequestBody VoteListRequest req);
+	RespPage<VoteListResp> voteList(@ApiParam(value = "VoteListRequest ")@Valid @RequestBody VoteListRequest req);
 }
