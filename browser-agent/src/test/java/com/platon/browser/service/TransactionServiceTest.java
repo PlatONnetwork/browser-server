@@ -3,6 +3,7 @@ package com.platon.browser.service;
 import com.platon.browser.TestBase;
 import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.client.PlatonClient;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -42,7 +43,9 @@ public class TransactionServiceTest extends TestBase {
     @Mock
     private PlatonClient client;
     @Mock
-    private TransactionService transactionService;
+    private TransactionService target;
+    @Mock
+    private BlockChainConfig chainConfig;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -51,11 +54,12 @@ public class TransactionServiceTest extends TestBase {
      */
     @Before
     public void setup() throws IOException, BeanCreateOrUpdateException, InterruptedException {
-        ReflectionTestUtils.setField(transactionService, "executor", THREAD_POOL);
-        ReflectionTestUtils.setField(transactionService, "client", client);
-        when(transactionService.analyze(anyList())).thenCallRealMethod();
-        when(transactionService.updateTransaction(any(CustomTransaction.class))).thenCallRealMethod();
-        when(transactionService.getReceipt(any(TransactionBean.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
+        ReflectionTestUtils.setField(target, "executor", THREAD_POOL);
+        ReflectionTestUtils.setField(target, "client", client);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        when(target.analyze(anyList())).thenCallRealMethod();
+        when(target.updateTransaction(any(CustomTransaction.class))).thenCallRealMethod();
+        when(target.getReceipt(any(TransactionBean.class))).thenAnswer((Answer<Optional<TransactionReceipt>>) invocation->{
             TransactionBean tx = invocation.getArgument(0);
             TransactionReceipt receipt = new TransactionReceipt();
             BeanUtils.copyProperties(tx,receipt);
@@ -78,7 +82,7 @@ public class TransactionServiceTest extends TestBase {
             tx.setTxType(null);
             tx.setTxInfo(null);
         }));
-        List<CustomBlock> result = transactionService.analyze(blocks);
+        List<CustomBlock> result = target.analyze(blocks);
         // 数量相等
         assertEquals(blocks.size(),result.size());
         // 验证交易信息被解析出来
