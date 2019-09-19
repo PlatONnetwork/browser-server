@@ -6,11 +6,10 @@ import com.platon.browser.bean.TransactionBean;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.CacheConstructException;
-import com.platon.browser.exception.NoSuchBeanException;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.web3j.platon.bean.Node;
 
 import java.io.File;
@@ -40,20 +39,21 @@ public class TestBase {
             "proposal"
     };
 
-    public static NodeCache NODE_CACHE = new NodeCache();
-    public static List<CustomNode> nodes= Collections.emptyList();
-    public static List<CustomBlock> blocks= Collections.emptyList();
-    public static List<TransactionBean> transactions= Collections.emptyList();
-    public static List<CustomStaking> stakings= Collections.emptyList();
-    public static List<CustomDelegation> delegations= Collections.emptyList();
-    public static List<CustomUnDelegation> unDelegations= Collections.emptyList();
-    public static List<CustomProposal> proposals = Collections.emptyList();
-    public static List<Node> verifiers= new ArrayList<>();
-    public static List<Node> validators= new ArrayList<>();
-    public static List<Node> candidates= new ArrayList<>();
-    public static List<CustomAddress> addresses= Collections.emptyList();
+    public NodeCache nodeCache = new NodeCache();
+    public List<CustomNode> nodes= Collections.emptyList();
+    public List<CustomBlock> blocks= Collections.emptyList();
+    public List<TransactionBean> transactions= Collections.emptyList();
+    public List<CustomStaking> stakings= Collections.emptyList();
+    public List<CustomDelegation> delegations= Collections.emptyList();
+    public List<CustomUnDelegation> unDelegations= Collections.emptyList();
+    public List<CustomProposal> proposals = Collections.emptyList();
+    public List<Node> verifiers= new ArrayList<>();
+    public List<Node> validators= new ArrayList<>();
+    public List<Node> candidates= new ArrayList<>();
+    public List<CustomAddress> addresses= Collections.emptyList();
 
-    static {
+    @Before
+    public void init(){
         Arrays.asList(dataFile).forEach(fileName->{
             try {
                 URL url = TestBase.class.getClassLoader().getResource(prefix+fileName+suffix);
@@ -114,7 +114,7 @@ public class TestBase {
         });
 
         try {
-            NODE_CACHE.init(nodes,stakings,delegations,unDelegations);
+            nodeCache.init(nodes,stakings,delegations,unDelegations);
         } catch (CacheConstructException e) {
             e.printStackTrace();
         }

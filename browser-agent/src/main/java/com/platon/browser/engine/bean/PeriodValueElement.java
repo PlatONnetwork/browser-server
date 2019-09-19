@@ -11,7 +11,9 @@ import java.math.BigInteger;
  */
 @Data
 public class PeriodValueElement {
+    public PeriodValueElement(){}
     public PeriodValueElement(BigInteger period, BigInteger value) {
+        super();
         this.period = period;
         this.value = value;
     }

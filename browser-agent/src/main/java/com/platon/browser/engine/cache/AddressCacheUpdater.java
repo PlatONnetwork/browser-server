@@ -3,6 +3,7 @@ package com.platon.browser.engine.cache;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.engine.stage.AddressStage;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -59,7 +60,7 @@ public class AddressCacheUpdater {
     public void updateAddressStatistics () throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         AddressCache addressCache = cacheHolder.getAddressCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        AddressStage addressStage = cacheHolder.getStageData().getAddressStage();
 
         // 所有质押 <发起质押地址-质押实体列表> 映射
         Map<String, Set<CustomStaking>> addressStakingMap = new HashMap<>();
@@ -122,7 +123,7 @@ public class AddressCacheUpdater {
             address.setDelegateUnlock(stat.delegateUnlock.toString());
             address.setDelegateReduction(stat.delegateReduction.toString());
             // 把地址信息改动暂存至待更新列表
-            stageData.getAddressStage().updateAddress(address);
+            addressStage.updateAddress(address);
         }
     }
 }

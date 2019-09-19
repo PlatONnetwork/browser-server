@@ -1,6 +1,9 @@
-package com.platon.browser.engine.stage;
+package com.platon.browser.engine.bean;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.bean.CollectResult;
+import com.platon.browser.engine.bean.keybase.*;
+import com.platon.browser.engine.stage.*;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +27,8 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StageTest extends TestBase {
-    private static Logger logger = LoggerFactory.getLogger(StageTest.class);
+public class BeanTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(BeanTest.class);
 
     private List<Class<?>> classes = new ArrayList<>();
     /**
@@ -35,12 +38,16 @@ public class StageTest extends TestBase {
      */
     @Before
     public void setup() {
-        classes.add(AddressStage.class);
-        classes.add(BlockChainStage.class);
-        classes.add(NetworkStatStage.class);
-        classes.add(ProposalStage.class);
-        classes.add(RestrictingStage.class);
-        classes.add(StakingStage.class);
+        classes.add(AnnualizedRateInfo.class);
+        classes.add(PeriodValueElement.class);
+        classes.add(SlashInfo.class);
+        classes.add(Completion.class);
+        classes.add(Components.class);
+        classes.add(KeyBaseUser.class);
+        classes.add(KeyFingerprint.class);
+        classes.add(Status.class);
+        classes.add(ValueScore.class);
+        classes.add(Websites.class);
     }
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
@@ -48,11 +55,30 @@ public class StageTest extends TestBase {
             Method[] methods = clazz.getDeclaredMethods();
             for(Method method:methods){
                 if(Modifier.isStatic(method.getModifiers())) continue;
+                if(Modifier.isProtected(method.getModifiers())) continue;
                 Class<?>[] types = method.getParameterTypes();
                 Object instance = clazz.newInstance();
                 if(types.length!=0){
                     Object[] args = new Object[types.length];
-                    for (int i=0;i<types.length;i++) args[i]=mock(types[i]);
+                    for (int i=0;i<types.length;i++){
+                        if(Boolean.class==types[i]){
+                            args[i]=Boolean.TRUE;
+                            continue;
+                        }
+                        if(Double.class==types[i]){
+                            args[i]=11.3;
+                            continue;
+                        }
+                        if(String.class==types[i]){
+                            args[i]="333";
+                            continue;
+                        }
+                        if(Integer.class==types[i]){
+                            args[i]=333;
+                            continue;
+                        }
+                        args[i]=mock(types[i]);
+                    }
                     method.invoke(instance,args);
                     continue;
                 }

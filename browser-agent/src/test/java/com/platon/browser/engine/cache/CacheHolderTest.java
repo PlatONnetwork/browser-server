@@ -1,6 +1,7 @@
-package com.platon.browser.engine.stage;
+package com.platon.browser.engine.cache;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.engine.stage.*;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +25,8 @@ import static org.mockito.Mockito.mock;
  * @Description:
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class StageTest extends TestBase {
-    private static Logger logger = LoggerFactory.getLogger(StageTest.class);
+public class CacheHolderTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(CacheHolderTest.class);
 
     private List<Class<?>> classes = new ArrayList<>();
     /**
@@ -35,12 +36,7 @@ public class StageTest extends TestBase {
      */
     @Before
     public void setup() {
-        classes.add(AddressStage.class);
-        classes.add(BlockChainStage.class);
-        classes.add(NetworkStatStage.class);
-        classes.add(ProposalStage.class);
-        classes.add(RestrictingStage.class);
-        classes.add(StakingStage.class);
+        classes.add(CacheHolder.class);
     }
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
