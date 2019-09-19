@@ -50,7 +50,7 @@ public class CustomAddress extends Address {
      */
     public void updateWithCustomTransaction(CustomTransaction tx) {
         // 设置地址类型
-        if(InnerContractAddrEnum.ADDRESSES.contains(this.getAddress())){
+        if(InnerContractAddrEnum.getAddresses().contains(this.getAddress())){
             // 内置合约地址
             this.setType(TypeEnum.INNER_CONTRACT.code);
         }else{

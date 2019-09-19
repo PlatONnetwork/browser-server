@@ -131,7 +131,7 @@ public class TransactionService {
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
             tx.setTxType(String.valueOf(txParams.getTxTypeEnum().getCode()));
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.ADDRESSES.contains(tx.getTo())){
+            if(null != tx.getValue() && ! InnerContractAddrEnum.getAddresses().contains(tx.getTo())){
                 tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.getCode()));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }

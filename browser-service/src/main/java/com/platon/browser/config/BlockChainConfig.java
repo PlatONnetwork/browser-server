@@ -62,7 +62,7 @@ public class BlockChainConfig {
     @Autowired
     private PlatOnClient client;
 
-    private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.ADDRESSES);
+    private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
 
     public Set<String> getInnerContractAddr(){return INNER_CONTRACT_ADDR;}
 

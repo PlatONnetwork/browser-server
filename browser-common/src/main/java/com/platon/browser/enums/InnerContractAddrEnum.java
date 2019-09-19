@@ -38,7 +38,8 @@ public enum InnerContractAddrEnum {
         return desc;
     }
 
-    public static final Set<String> ADDRESSES = new HashSet<>();
+    private static final Set<String> ADDRESSES = new HashSet<>();
+    public static Set<String> getAddresses(){return ADDRESSES;}
 
     static {
         Arrays.asList(InnerContractAddrEnum.values()).forEach(innerContractAddEnum-> ADDRESSES.add(innerContractAddEnum.address));
