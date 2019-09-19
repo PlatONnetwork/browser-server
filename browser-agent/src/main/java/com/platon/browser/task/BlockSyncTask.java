@@ -10,7 +10,10 @@ import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.CandidateException;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
@@ -61,7 +64,7 @@ public class BlockSyncTask {
     private StakingCacheUpdater stakingCacheUpdater;
 
     //内置合约总数
-    private static final long innerContractAddCount = 7;
+    private static final long INNER_CONTRACT_ADDRESS_COUNT = 7;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -73,7 +76,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws Exception {
+    public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
@@ -143,7 +146,7 @@ public class BlockSyncTask {
         addressExample.createCriteria().andAddressIn(new ArrayList <>(innerContractAddrs));
         List <Address> dbAddressList = addressMapper.selectByExample(addressExample);
         dbAddressList.forEach(address -> dbAddressMap.put(address.getAddress(), address));
-        if (dbAddressList.size() != innerContractAddCount) {
+        if (dbAddressList.size() != INNER_CONTRACT_ADDRESS_COUNT) {
             innerContractAddrs.forEach(address -> {
                 if (null == dbAddressMap.get(address)) {
                     CustomAddress customAddress = new CustomAddress();
