@@ -106,7 +106,7 @@ public class ProposalUpdateTask {
                 proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
                 proposalStage.updateProposal(proposal);
-            } catch (NoSuchBeanException | BusinessException e) {
+            } catch (NoSuchBeanException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (Exception e){
                 logger.error("更新提案({})的主题和描述出错:发送http请求异常({})", proposal.getPipId(), e.getMessage());
@@ -234,7 +234,7 @@ public class ProposalUpdateTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo(String url) throws BusinessException, HttpRequestException {
+    public ProposalMarkDownDto getMarkdownInfo(String url) throws HttpRequestException {
         try {
             String fileUrl = MarkDownParserUtil.acquireMD(url);
             if (fileUrl == null) throw new BusinessException("获取不到" + url);
