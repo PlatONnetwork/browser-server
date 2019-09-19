@@ -44,9 +44,10 @@ public enum  ContractDescEnum {
         return contractHash;
     }
 
-    public static final Set<String> ADDRESSES = new HashSet<>();
-    public static final Map<String,ContractDescEnum> MAP = new HashMap<>();
-
+    private static final Set<String> ADDRESSES = new HashSet<>();
+    public static Set<String> getAddresses(){return ADDRESSES;}
+    private static final Map<String,ContractDescEnum> MAP = new HashMap<>();
+    public static Map<String,ContractDescEnum> getMap(){return MAP;}
     static {
         Arrays.asList(ContractDescEnum.values()).forEach(innerContractAddEnum-> {
             ADDRESSES.add(innerContractAddEnum.address);

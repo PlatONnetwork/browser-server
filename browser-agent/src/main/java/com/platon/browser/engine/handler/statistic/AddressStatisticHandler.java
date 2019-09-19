@@ -59,13 +59,13 @@ public class AddressStatisticHandler implements EventHandler {
             addressCache.add(toAddress);
         }
 
-        ContractDescEnum cde = ContractDescEnum.MAP.get(from);
+        ContractDescEnum cde = ContractDescEnum.getMap().get(from);
         if(cde!=null){
             fromAddress.setContractName(cde.getContractName());
             fromAddress.setContractCreate(cde.getCreator());
             fromAddress.setContractCreatehash(cde.getContractHash());
         }
-        cde = ContractDescEnum.MAP.get(to);
+        cde = ContractDescEnum.getMap().get(to);
         if(cde!=null){
             toAddress.setContractName(cde.getContractName());
             toAddress.setContractCreate(cde.getCreator());
