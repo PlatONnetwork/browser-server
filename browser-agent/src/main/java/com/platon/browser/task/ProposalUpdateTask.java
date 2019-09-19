@@ -1,6 +1,7 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -108,7 +110,6 @@ public class ProposalUpdateTask {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (Exception e){
                 logger.error("更新提案({})的主题和描述出错:发送http请求异常{}", proposal.getPipId(), proposal.getUrl());
-
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.getCode())
@@ -142,6 +143,9 @@ public class ProposalUpdateTask {
         }
         //入库
         if(!proposalStage.exportProposal().isEmpty()){
+            Set <Proposal> list = proposalStage.exportProposal();
+            String s = JSONArray.toJSONString(list);
+            logger.info("replace into info {}",s);
             customProposalMapper.batchInsertOrUpdateSelective(proposalStage.exportProposal(),Proposal.Column.values());
             proposalStage.clear();
         }
