@@ -1,13 +1,8 @@
 package com.platon.browser.controller;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
+import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.BrowserApiApplication;
+import com.platon.browser.req.PageReq;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,15 +14,17 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.BrowserApiApplication;
-import com.platon.browser.req.PageReq;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
@@ -39,7 +36,7 @@ public class AppDocTransactionControllerTest {
     private MockMvc mockMvc;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
     }
     
@@ -80,20 +77,16 @@ public class AppDocTransactionControllerTest {
     		.param("date", "2019-08-20")
     		.param("local", "en")
     		.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-    		.andDo(
-				new ResultHandler() {
-					@Override
-					public void handle(MvcResult result) throws Exception {
-						result.getResponse().setCharacterEncoding("UTF-8");
-						MockHttpServletResponse contentRespon = result.getResponse();
-						InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-						FileOutputStream fos = new FileOutputStream(new File("bbb.csv"));
-						byte[] byteBuf = new byte[1024];
-						while(in.read(byteBuf)!=-1) {
-							fos.write(byteBuf);
-						}
-						fos.close();
-					}
+    		.andDo(result -> {
+				result.getResponse().setCharacterEncoding("UTF-8");
+				MockHttpServletResponse contentRespon = result.getResponse();
+				InputStream in = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
+				FileOutputStream fos = new FileOutputStream(new File("bbb.csv"));
+				byte[] byteBuf = new byte[1024];
+				while(in.read(byteBuf)!=-1) {
+					fos.write(byteBuf);
+				}
+				fos.close();
 			});
     }
     
