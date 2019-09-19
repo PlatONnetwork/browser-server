@@ -235,10 +235,13 @@ public class ProposalUpdateTask {
      * @throws BusinessException
      */
     public ProposalMarkDownDto getMarkdownInfo(String url) throws BusinessException, HttpRequestException {
-        String fileUrl = MarkDownParserUtil.acquireMD(url);
-        if (fileUrl == null) throw new BusinessException("获取不到" + url);
-        String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
-        return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+        try {
+            String fileUrl = MarkDownParserUtil.acquireMD(url);
+            if (fileUrl == null) throw new BusinessException("获取不到" + url);
+            String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
+            return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+        }catch (Exception e){
+            throw new HttpRequestException(e.getMessage());
+        }
     }
-
 }
