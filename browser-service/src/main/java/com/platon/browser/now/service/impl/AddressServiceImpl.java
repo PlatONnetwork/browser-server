@@ -26,6 +26,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ import org.web3j.platon.bean.RestrictingItem;
  */
 @Service
 public class AddressServiceImpl implements AddressService {
+	
+	private final Logger logger = LoggerFactory.getLogger(AddressServiceImpl.class);
 
     @Autowired
     private AddressMapper addressMapper;
@@ -78,7 +82,7 @@ public class AddressServiceImpl implements AddressService {
 		criteria.andAddressEqualTo(req.getAddress());
         List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
         /** 有锁仓数据之后就可以返回1 */
-        if(rpPlans.size() > 0) {
+        if(rpPlans != null && rpPlans.size() > 0) {
         	resp.setIsRestricting(1);
         }
        return resp;
@@ -101,7 +105,7 @@ public class AddressServiceImpl implements AddressService {
 				queryRPPlanDetailResp.setUnderreleaseValue(baseResponse.data.getDebt().toString());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("rpplanDetail error", e);
 			throw new BusinessException(i18n.i(I18nEnum.SYSTEM_EXCEPTION));
 		}
 		/**
@@ -110,7 +114,7 @@ public class AddressServiceImpl implements AddressService {
 		RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();
 		criteria.andAddressEqualTo(req.getAddress());
-		List<DetailsRPPlanResp> detailsRPPlanResps = new ArrayList<DetailsRPPlanResp>();
+		List<DetailsRPPlanResp> detailsRPPlanResps = new ArrayList<>();
 		PageHelper.startPage(req.getPageNo(),req.getPageSize());
 		List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
 		for(RpPlan rPlan : rpPlans) {
@@ -131,7 +135,7 @@ public class AddressServiceImpl implements AddressService {
 			}
 
 			detailsRPPlanResp.setBlockNumber(number);
-			//预计时间：预计块高减去当前块高乘以出块时间再加上区块时间
+			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
 			Block block = blockMapper.selectByPrimaryKey(rPlan.getNumber());
 			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval().multiply(BigInteger.valueOf(number - rPlan.getNumber()))
 					.add(BigInteger.valueOf(block.getTimestamp().getTime())).longValue());

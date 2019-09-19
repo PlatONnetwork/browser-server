@@ -17,7 +17,7 @@ public class MarkDownParserUtilTest {
 	}
 
 	@Test
-	public void testAcquireMD() throws IOException {
+	public void testAcquireMD() throws Exception {
 		String url = "https://github.com/danielgogo/PIPs/blob/master/PIP-3.md";
 		String str = MarkDownParserUtil.acquireMD(url);
 		assertNotNull(str);
