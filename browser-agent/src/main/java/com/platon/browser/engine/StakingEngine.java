@@ -106,7 +106,7 @@ public class StakingEngine {
      * 执行交易
      * @param tx 交易
      */
-    void execute(CustomTransaction tx) throws NoSuchBeanException {
+    void execute(CustomTransaction tx) throws NoSuchBeanException, BlockChainException {
         // 事件上下文
         context.setTransaction(tx);
         switch (tx.getTypeEnum()){

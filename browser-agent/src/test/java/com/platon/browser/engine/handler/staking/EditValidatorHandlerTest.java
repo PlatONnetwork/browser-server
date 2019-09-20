@@ -9,6 +9,7 @@ import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
@@ -58,7 +59,7 @@ public class EditValidatorHandlerTest extends TestBase {
      *  修改质押信息测试方法
      */
     @Test
-    public void testHandler () throws CacheConstructException, NoSuchBeanException {
+    public void testHandler () throws NoSuchBeanException, BlockChainException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();

@@ -4,13 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.EditValidatorParam;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +31,11 @@ public class EditValidatorHandler implements EventHandler {
     private static Logger logger = LoggerFactory.getLogger(EditValidatorHandler.class);
     @Autowired
     private CacheHolder cacheHolder;
+    @Autowired
+    private BlockChain bc;
 
     @Override
-    public void handle(EventContext context) {
+    public void handle(EventContext context) throws BlockChainException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
@@ -38,6 +43,9 @@ public class EditValidatorHandler implements EventHandler {
 
         // 获取交易入参
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
+
+        //记录参数中的地址
+        bc.updateParamAddress(param.getBenefitAddress());
         String msg  = JSON.toJSONString(param);
         logger.debug("修改质押信息(编辑验证人):{}", msg);
         try{

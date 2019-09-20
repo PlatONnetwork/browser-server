@@ -1,9 +1,6 @@
 package com.platon.browser.engine.handler;
 
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.CandidateException;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.exception.SettleEpochChangeException;
+import com.platon.browser.exception.*;
 
 /**
  * @Auther: Chendongming
@@ -11,5 +8,5 @@ import com.platon.browser.exception.SettleEpochChangeException;
  * @Description: 事件处理器接口
  */
 public interface EventHandler {
-    void handle(EventContext context) throws NoSuchBeanException, CandidateException, SettleEpochChangeException, BusinessException;
+    void handle(EventContext context) throws NoSuchBeanException, CandidateException, SettleEpochChangeException, BusinessException, BlockChainException;
 }

@@ -11,6 +11,7 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
@@ -34,16 +35,18 @@ public class CreateValidatorHandler implements EventHandler {
     private CacheHolder cacheHolder;
 
     @Override
-    public void handle(EventContext context) throws NoSuchBeanException {
+    public void handle(EventContext context) throws NoSuchBeanException, BlockChainException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         String msg = JSON.toJSONString(param);
         logger.debug("发起质押(创建验证人):{}", msg);
+
+        //记录参数中的地址
+        bc.updateParamAddress(param.getBenefitAddress());
 
         //添加质押快高到txinfo，数据回填
         param.setBlockNumber(tx.getBlockNumber().toString());

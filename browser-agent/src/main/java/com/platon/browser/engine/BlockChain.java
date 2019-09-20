@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
@@ -21,6 +22,7 @@ import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -151,7 +153,7 @@ public class BlockChain {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () throws NoSuchBeanException, BusinessException {
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
         for (CustomTransaction tx:curBlock.getTransactionList()){
             // 统计地址相关信息
             addressExecute.execute(tx);
@@ -210,7 +212,19 @@ public class BlockChain {
         cacheHolder.getStageData().clear();
     }
 
-
+    public void updateParamAddress(String address) throws BlockChainException {
+        if(StringUtils.isBlank(address)) {
+            throw new BlockChainException("参数地址不能为空!");
+        }
+        address=address.toLowerCase().startsWith("0x")?address:"0x"+address;
+        try {
+            cacheHolder.getAddressCache().getAddress(address);
+        }catch (NoSuchBeanException e){
+            CustomAddress customAddress = new CustomAddress();
+            customAddress.setAddress(address);
+            cacheHolder.getStageData().getAddressStage().insertAddress(customAddress);
+        }
+    }
     /**
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
