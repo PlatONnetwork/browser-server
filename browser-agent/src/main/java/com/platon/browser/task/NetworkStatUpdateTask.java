@@ -52,23 +52,25 @@ public class NetworkStatUpdateTask {
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
 
         CustomBlock curBlock = blockChain.getCurBlock();
+        BlockChainConfig blockChainConfig = blockChain.getChainConfig();
+        BigInteger addIssueEpoch = blockChain.getAddIssueEpoch();
         if(curBlock==null) return;
         try {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
-            Map <Integer, BigDecimal> foundationSubsidiesMap = chainConfig.getFoundationSubsidies();
+            Map <Integer, BigDecimal> foundationSubsidiesMap = blockChainConfig.getFoundationSubsidies();
             //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
-            BigDecimal foundationValue = foundationSubsidiesMap.get(blockChain.getAddIssueEpoch().intValue());
+            BigDecimal foundationValue = foundationSubsidiesMap.get(addIssueEpoch.intValue());
             //获取初始发行金额
-            BigDecimal iniValue = blockChain.getChainConfig().getInitIssueAmount();
+            BigDecimal iniValue = blockChainConfig.getInitIssueAmount();
             BigDecimal iniValueVon = Convert.toVon(iniValue, Convert.Unit.LAT);
             //获取增发比例
-            BigDecimal addIssueRate = blockChain.getChainConfig().getAddIssueRate();
+            BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
             //获取激励池地址
             String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
             //rpc查询实时激励池余额
             BigInteger incentivePoolAccountBalance = getBalance(incentivePoolAccountAddr,curBlock.getBlockNumber());
             //年份增发量 = (1+增发比例)的增发年份次方
-            BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(blockChain.getAddIssueEpoch().intValue());
+            BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(addIssueEpoch.intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
             BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
             //rpc获取锁仓余额
