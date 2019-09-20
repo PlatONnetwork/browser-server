@@ -60,7 +60,6 @@ public class AppDocStakingController implements AppDocStaking {
 
 	@Override
 	public BaseResp<StakingChangeNewResp> stakingChangeNew() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

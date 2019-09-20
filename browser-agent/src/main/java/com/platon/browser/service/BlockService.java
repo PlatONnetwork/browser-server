@@ -113,7 +113,7 @@ public class BlockService {
             block.updateWithBlock(pbb);
             return block;
         } catch (Exception e) {
-            logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
+            logger.error("搜集区块[{}]异常,将重试:{}", blockNumber, e.getMessage());
         }
     }
 

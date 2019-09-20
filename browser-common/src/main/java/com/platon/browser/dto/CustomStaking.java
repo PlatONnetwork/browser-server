@@ -215,7 +215,7 @@ public class CustomStaking extends Staking {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, StatusEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, StatusEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static StatusEnum getEnum(Integer code){
@@ -241,7 +241,7 @@ public class CustomStaking extends Staking {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
         static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static YesNoEnum getEnum(Integer code){
             return ENUMS.get(code);

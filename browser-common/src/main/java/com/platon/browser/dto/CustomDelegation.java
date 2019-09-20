@@ -66,7 +66,7 @@ public class CustomDelegation extends Delegation {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map <Integer, YesNoEnum> ENUMS = new HashMap <>();
+        private static final Map <Integer, YesNoEnum> ENUMS = new HashMap <>();
         static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static YesNoEnum getEnum( Integer code){
             return ENUMS.get(code);

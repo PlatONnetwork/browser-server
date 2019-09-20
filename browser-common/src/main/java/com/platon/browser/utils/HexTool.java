@@ -6,6 +6,7 @@ package com.platon.browser.utils;
  * @Description:
  */
 public class HexTool {
+    private HexTool(){}
     /**
      * 为十六进制字符串添加"0x"前缀
      * @param hexVal

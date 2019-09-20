@@ -1,5 +1,6 @@
 package com.platon.browser.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -12,41 +13,49 @@ public class ProposalMarkDownDto {
     /**
      * 提案状态
      */
-    private String Status;
+    @JSONField(name = "Status")
+    private String status;
 
     /**
      * 提案类型
      */
-    private String Type;
+    @JSONField(name = "Type")
+    private String type;
 
     /**
      * 提案类别
      */
-    private String Category;
+    @JSONField(name = "Category")
+    private String category;
 
     /**
      * 提案描述
      */
-    private String Description;
+    @JSONField(name = "Description")
+    private String description;
 
     /**
      * 提案状pIDID
      */
-    private String PIP;
+    @JSONField(name = "PIP")
+    private String pIP;
 
     /**
      * 提案发起人
      */
-    private String Author;
+    @JSONField(name = "Author")
+    private String author;
 
     /**
      * 提案主题
      */
-    private String Topic;
+    @JSONField(name = "Topic")
+    private String topic;
 
     /**
      * 提案创建时间
      */
-    private String Created;
+    @JSONField(name = "Created")
+    private String created;
 
 }

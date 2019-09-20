@@ -10,7 +10,10 @@ import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.CandidateException;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
@@ -44,6 +47,8 @@ public class BlockSyncTask {
     @Autowired
     private BlockChain blockChain;
     @Autowired
+    private BlockChainConfig chainConfig;
+    @Autowired
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
@@ -59,7 +64,7 @@ public class BlockSyncTask {
     private StakingCacheUpdater stakingCacheUpdater;
 
     //内置合约总数
-    private static final long innerContractAddCount = 7;
+    private static final long INNER_CONTRACT_ADDRESS_COUNT = 7;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -71,7 +76,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws Exception {
+    public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
@@ -132,18 +137,16 @@ public class BlockSyncTask {
          */
         Map <String, Address> dbAddressMap = new HashMap <>();
         //其他内置合约地址列表
-        Set <String> innerContractAddrs = blockChain.getChainConfig().getInnerContractAddr();
+        Set <String> innerContractAddrs = chainConfig.getInnerContractAddr();
         //PlatOn基金会账户地址
-        innerContractAddrs.add(blockChain.getChainConfig().getPlatonFundAccountAddr());
+        innerContractAddrs.add(chainConfig.getPlatonFundAccountAddr());
         //开发者激励基金账户地址
-        innerContractAddrs.add(blockChain.getChainConfig().getDeveloperIncentiveFundAccountAddr());
+        innerContractAddrs.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
         AddressExample addressExample = new AddressExample();
         addressExample.createCriteria().andAddressIn(new ArrayList <>(innerContractAddrs));
         List <Address> dbAddressList = addressMapper.selectByExample(addressExample);
-        dbAddressList.forEach(address -> {
-            dbAddressMap.put(address.getAddress(), address);
-        });
-        if (dbAddressList.size() != innerContractAddCount) {
+        dbAddressList.forEach(address -> dbAddressMap.put(address.getAddress(), address));
+        if (dbAddressList.size() != INNER_CONTRACT_ADDRESS_COUNT) {
             innerContractAddrs.forEach(address -> {
                 if (null == dbAddressMap.get(address)) {
                     CustomAddress customAddress = new CustomAddress();
@@ -210,7 +213,7 @@ public class BlockSyncTask {
         return true;
     }
 
-    public void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
+    private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{

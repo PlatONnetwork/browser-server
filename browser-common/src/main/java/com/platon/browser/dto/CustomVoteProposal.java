@@ -78,7 +78,7 @@ public class CustomVoteProposal extends Vote {
         public String getDesc () {
             return desc;
         }
-        private static Map<String, OptionEnum> ENUMS = new HashMap<>();
+        private static final Map<String, OptionEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(OptionEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }

@@ -18,10 +18,7 @@ import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.exception.BlockChainException;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.IssueEpochChangeException;
-import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.DbService;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -154,7 +151,7 @@ public class BlockChain {
     /**
      * 根据交易信息新增或更新相关记录：
      */
-    public void analyzeTransaction () throws NoSuchBeanException, BusinessException, BlockChainException {
+    public void analyzeTransaction () throws NoSuchBeanException, BusinessException {
         for (CustomTransaction tx:curBlock.getTransactionList()){
             // 统计地址相关信息
             addressExecute.execute(tx);
@@ -218,7 +215,7 @@ public class BlockChain {
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    public void epochChangeEvent() throws Exception {
+    public void epochChangeEvent() throws CandidateException, NoSuchBeanException, SettleEpochChangeException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
 

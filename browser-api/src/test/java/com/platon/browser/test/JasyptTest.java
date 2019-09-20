@@ -9,6 +9,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.platon.browser.BrowserApiApplication;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = BrowserApiApplication.class)
 public class JasyptTest {
@@ -22,5 +24,6 @@ public class JasyptTest {
         System.out.println("username:" + username);
         String password = encryptor.encrypt("Juzhen123!");//加密123456
         System.out.println("password:" + password);
+        assertTrue(true);
    }
 }

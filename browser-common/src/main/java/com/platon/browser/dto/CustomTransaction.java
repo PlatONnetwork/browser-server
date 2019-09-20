@@ -186,7 +186,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, TxReceiptStatusEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, TxReceiptStatusEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(TxReceiptStatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static TxReceiptStatusEnum getEnum(Integer code){

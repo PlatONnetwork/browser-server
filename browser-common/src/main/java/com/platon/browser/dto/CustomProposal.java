@@ -19,7 +19,7 @@ public class CustomProposal extends Proposal {
     //弃权票
     private List <CustomVote> abstentionList = new ArrayList <>();
 
-    public static final String queryFlag = "inquiry";
+    public static final String QUERY_FLAG = "inquiry";
 
     public CustomProposal(){
         super();
@@ -37,8 +37,8 @@ public class CustomProposal extends Proposal {
         this.setTimestamp(tx.getTimestamp());
         this.setStatus(StatusEnum.VOTING.code);
         //设置成查询中，以便任务过滤并查询分析主题&描述
-        this.setTopic(queryFlag);
-        this.setDescription(queryFlag);
+        this.setTopic(QUERY_FLAG);
+        this.setDescription(QUERY_FLAG);
     }
 
     public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto) {
@@ -68,7 +68,7 @@ public class CustomProposal extends Proposal {
         public String getDesc () {
             return desc;
         }
-        private static Map <String, TypeEnum> ENUMS = new HashMap <>();
+        private static final Map <String, TypeEnum> ENUMS = new HashMap <>();
         static {
             Arrays.asList(TypeEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
@@ -102,7 +102,7 @@ public class CustomProposal extends Proposal {
         public String getDesc () {
             return desc;
         }
-        private static Map <Integer, StatusEnum> ENUMS = new HashMap <>();
+        private static final Map <Integer, StatusEnum> ENUMS = new HashMap <>();
         static {
             Arrays.asList(StatusEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }

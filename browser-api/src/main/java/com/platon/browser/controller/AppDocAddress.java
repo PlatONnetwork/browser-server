@@ -1,20 +1,17 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 /**
  * 	地址接口方法统一申明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
@@ -70,8 +67,8 @@ public interface AppDocAddress {
      * }
      */
 	@ApiOperation(value = "address/details", nickname = "address details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
-	@RequestMapping(value = "address/details", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryDetailResp> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
+	@PostMapping(value = "address/details", produces = { "application/json" })
+	BaseResp<QueryDetailResp> details(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryDetailRequest req);
 	
 	/**
      * @api {post}  /address/rpplanDetail b.查询地址锁仓详情
@@ -112,6 +109,6 @@ public interface AppDocAddress {
      * }
      */
 	@ApiOperation(value = "address/rpplanDetail", nickname = "address rpplan details", notes = "", response = QueryDetailResp.class, tags = { "Address" })
-	@RequestMapping(value = "address/rpplanDetail", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryRPPlanDetailResp> rpplanDetail(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryRPPlanDetailRequest req);
+	@PostMapping(value = "address/rpplanDetail", produces = { "application/json" })
+	BaseResp<QueryRPPlanDetailResp> rpplanDetail(@ApiParam(value = "QueryDetailRequest ", required = true)@Valid @RequestBody QueryRPPlanDetailRequest req);
 }

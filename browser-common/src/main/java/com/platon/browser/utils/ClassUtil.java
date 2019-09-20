@@ -28,8 +28,7 @@ public class ClassUtil {
         // 定义一个枚举的集合 并进行循环来处理这个目录下的things
         Enumeration<URL> dirs;
         try {
-            dirs = Thread.currentThread().getContextClassLoader().getResources(
-                    packageDirName);
+            dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             // 循环迭代下去
             while (dirs.hasMoreElements()) {
                 // 获取下一个元素
@@ -42,8 +41,7 @@ public class ClassUtil {
                     // 获取包的物理路径
                     String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
                     // 以文件的方式扫描整个包下的文件 并添加到集合中
-                    findAndAddClassesInPackageByFile(packageName, filePath,
-                            recursive, classes);
+                    findAndAddClassesInPackageByFile(packageName, filePath, recursive, classes);
                 } else if ("jar".equals(protocol)) {
                     // 如果是jar包文件
                     // 定义一个JarFile
@@ -91,7 +89,7 @@ public class ClassUtil {
                                         } catch (ClassNotFoundException e) {
                                             // log
                                             // .error("添加用户自定义视图类错误 找不到此类的.class文件");
-                                            e.printStackTrace();
+                                            logger.error("添加用户自定义视图类错误:",e);
                                         }
                                     }
                                 }
@@ -99,12 +97,12 @@ public class ClassUtil {
                         }
                     } catch (IOException e) {
                         // log.error("在扫描用户定义视图时从jar包获取文件出错");
-                        e.printStackTrace();
+                        logger.error("在扫描用户定义视图时从jar包获取文件出错:",e);
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("出错:",e);
         }
 
         return classes;
@@ -147,7 +145,7 @@ public class ClassUtil {
                             .loadClass(packageName + '.' + className));
                 } catch (ClassNotFoundException e) {
                     // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
-                    e.printStackTrace();
+                    logger.error("添加用户自定义视图类错误 找不到此类的.class文件:",e);
                 }
             }
         }

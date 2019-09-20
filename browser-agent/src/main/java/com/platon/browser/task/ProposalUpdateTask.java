@@ -106,10 +106,10 @@ public class ProposalUpdateTask {
                 proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
                 proposalStage.updateProposal(proposal);
-            } catch (NoSuchBeanException | BusinessException e) {
+            } catch (NoSuchBeanException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (Exception e){
-                logger.error("更新提案({})的主题和描述出错:发送http请求异常{}", proposal.getPipId(), proposal.getUrl());
+                logger.error("更新提案({})的主题和描述出错:发送http请求异常({})", proposal.getPipId(), e.getMessage());
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
             if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.getCode())
@@ -117,7 +117,7 @@ public class ProposalUpdateTask {
                     || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.getCode())) {
                 //发送rpc请求查询提案结果
                 try {
-                    ProposalParticiantStat pps = getProposalParticiantStat(proposal.getHash(),curBlock.getHash());
+                    ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(),curBlock.getHash());
                     //设置参与人数
                     proposal.setAccuVerifiers(pps.getVoterCount());
                     //设置赞成票
@@ -203,13 +203,13 @@ public class ProposalUpdateTask {
     }
 
     /**
-     * 取提案参与统计信息
+     * 取提案参与者统计信息
      * @param proposalHash
      * @param blockHash
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticiantStat(String proposalHash,String blockHash) throws Exception {
+    public ProposalParticiantStat getProposalParticipantStat(String proposalHash,String blockHash) throws Exception {
         return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
     }
 
@@ -234,11 +234,14 @@ public class ProposalUpdateTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo(String url) throws BusinessException, HttpRequestException {
-        String fileUrl = MarkDownParserUtil.acquireMD(url);
-        if (fileUrl == null) throw new BusinessException("获取不到" + url);
-        String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
-        return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+    public ProposalMarkDownDto getMarkdownInfo(String url) throws HttpRequestException {
+        try {
+            String fileUrl = MarkDownParserUtil.acquireMD(url);
+            if (fileUrl == null) throw new BusinessException("获取不到" + url);
+            String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
+            return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+        }catch (Exception e){
+            throw new HttpRequestException(e.getMessage());
+        }
     }
-
 }

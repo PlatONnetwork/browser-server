@@ -2,7 +2,6 @@ package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.service.impl.BlockCacheServiceImpl;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,6 @@ public class HttpUtil {
         try {
             response = httpClient.newCall(request).execute();
         } catch (IOException e) {
-            logger.error("请求地址出错:",e);
             throw new HttpRequestException("请求地址["+url+"]出错:"+e.getMessage());
         }
         if(response.isSuccessful()){
@@ -72,7 +70,6 @@ public class HttpUtil {
                 if(clazz==String.class) return (T)res;
                 return JSON.parseObject(res,clazz);
             } catch (IOException e) {
-                logger.error("返回内容出错:",e);
                 throw new HttpRequestException("获取返回内容出错:"+e.getMessage());
             }
         }else{

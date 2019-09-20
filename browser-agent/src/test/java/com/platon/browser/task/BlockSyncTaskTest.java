@@ -1,6 +1,10 @@
 package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
@@ -20,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -55,6 +61,10 @@ public class BlockSyncTaskTest extends TestBase {
     private AddressCacheUpdater addressCacheUpdater;
     @Mock
     private StakingCacheUpdater stakingCacheUpdater;
+    @Mock
+    private BlockChainConfig chainConfig;
+    @Mock
+    private AddressMapper addressMapper;
 
     @Before
     public void setup(){
@@ -68,6 +78,8 @@ public class BlockSyncTaskTest extends TestBase {
         ReflectionTestUtils.setField(target, "collectBatchSize", 10);
         ReflectionTestUtils.setField(target, "stakingCacheUpdater", stakingCacheUpdater);
         ReflectionTestUtils.setField(target, "addressCacheUpdater", addressCacheUpdater);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
     }
 
     @Test
@@ -98,6 +110,11 @@ public class BlockSyncTaskTest extends TestBase {
         bcs.getStakingStage().insertDelegation(delegations.get(0));
         bcs.getStakingStage().insertUnDelegation(unDelegations.get(0));
         when(blockChain.exportResult()).thenReturn(bcs);
+
+        when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0x0000000000000000000000000222");
+        when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0x00000002300000000000000000222");
+        List<Address> addrList = new ArrayList<>(addresses);
+        when(addressMapper.selectByExample(any(AddressExample.class))).thenReturn(addrList);
 
         target.init();
 

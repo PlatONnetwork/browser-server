@@ -45,6 +45,8 @@ public class CandidateService {
     @Autowired
     private SpecialContractApi sca;
 
+    private static final String ERR_MSG="睡眠被中断";
+
     @Data
     public static class CandidateResult{
         private List<Node> pre;
@@ -70,7 +72,8 @@ public class CandidateService {
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getSettlePeriodBlockCount().longValue());
         while (true) try {
             cr.pre = sca.getHistoryVerifierList(client.getWeb3j(), BigInteger.valueOf(prevEpochLastBlockNumber));
-            logger.debug("前一轮结算周期(未块:{})验证人:{}", prevEpochLastBlockNumber, JSON.toJSONString(cr.pre, true));
+            String msg = JSON.toJSONString(cr.pre, true);
+            logger.debug("前一轮结算周期(未块:{})验证人:{}", prevEpochLastBlockNumber, msg);
             break;
         } catch (Exception e) {
             logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}", prevEpochLastBlockNumber, e.getMessage());
@@ -244,7 +247,7 @@ public class CandidateService {
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (Exception ex) {
-                logger.error("睡眠被中断",ex);
+                logger.error(ERR_MSG,ex);
             }
         }
     }
@@ -266,7 +269,7 @@ public class CandidateService {
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (Exception ex) {
-                logger.error("睡眠被中断",ex);
+                logger.error(ERR_MSG,ex);
             }
         }
     }
@@ -288,7 +291,7 @@ public class CandidateService {
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (Exception ex) {
-                logger.error("睡眠被中断",ex);
+                logger.error(ERR_MSG,ex);
             }
         }
     }

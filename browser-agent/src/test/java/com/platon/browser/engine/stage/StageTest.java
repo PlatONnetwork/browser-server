@@ -2,6 +2,7 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.utils.ClassUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -28,7 +30,7 @@ import static org.mockito.Mockito.mock;
 public class StageTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(StageTest.class);
 
-    private List<Class<?>> classes = new ArrayList<>();
+    private List<Class<?>> target = new ArrayList<>();
     /**
      * 测试开始前，设置相关行为属性
      * @throws IOException
@@ -36,16 +38,13 @@ public class StageTest extends TestBase {
      */
     @Before
     public void setup() {
-        classes.add(AddressStage.class);
-        classes.add(BlockChainStage.class);
-        classes.add(NetworkStatStage.class);
-        classes.add(ProposalStage.class);
-        classes.add(RestrictingStage.class);
-        classes.add(StakingStage.class);
+        String packageName= StageTest.class.getPackage().getName();
+        Set<Class<?>> classSet = ClassUtil.getClasses(packageName);
+        classSet.stream().filter(clazz->!clazz.getName().endsWith("Test")).forEach(target::add);
     }
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        for (Class<?> clazz:classes){
+        for (Class<?> clazz:target){
             Method[] methods = clazz.getDeclaredMethods();
             for(Method method:methods){
                 if(Modifier.isStatic(method.getModifiers())) continue;

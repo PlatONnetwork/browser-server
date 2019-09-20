@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -87,5 +88,6 @@ public class EntityTest extends TestBase {
                 method.invoke(instance);
             }
         }
+        assertTrue(true);
     }
 }

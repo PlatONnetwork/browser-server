@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.AddressStage;
+import com.platon.browser.exception.ContractInvokeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,7 @@ public class AddressUpdateTask {
      * @return
      * @throws Exception
      */
-    public List<RestrictingBalance> getRestrictingBalance(String params) throws Exception {
+    public List<RestrictingBalance> getRestrictingBalance(String params) throws ContractInvokeException {
         return sca.getRestrictingBalance(client.getWeb3j(),params);
     }
 }
