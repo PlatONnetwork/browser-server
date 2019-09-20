@@ -3,6 +3,7 @@ package com.platon.browser.engine.handler.staking;
 import com.platon.browser.TestBase;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
@@ -10,7 +11,6 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.BlockChainException;
-import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import org.junit.Before;
@@ -25,7 +25,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.Node;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +43,8 @@ public class EditValidatorHandlerTest extends TestBase {
     private EditValidatorHandler handler;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private BlockChain bc;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -53,6 +54,7 @@ public class EditValidatorHandlerTest extends TestBase {
     @Before
     public void setup() {
         ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "bc", bc);
     }
 
     /**
