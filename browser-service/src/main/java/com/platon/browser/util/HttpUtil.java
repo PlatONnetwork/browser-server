@@ -55,7 +55,8 @@ public class HttpUtil {
      * @return
      * @throws HttpRequestException
      */
-    private static <T> T resolve(OkHttpClient httpClient,Request request,String url,Class<T> clazz) throws HttpRequestException {
+    @SuppressWarnings("unchecked")
+	private static <T> T resolve(OkHttpClient httpClient,Request request,String url,Class<T> clazz) throws HttpRequestException {
         Response response;
         try {
             response = httpClient.newCall(request).execute();

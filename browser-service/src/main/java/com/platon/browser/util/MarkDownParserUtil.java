@@ -1,12 +1,11 @@
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.exception.HttpRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -38,8 +37,9 @@ public final class MarkDownParserUtil {
      */
     public static String httpGet(String fileName) throws IOException {
         HttpGet httpGet = null;
+        CloseableHttpClient httpClient = null;
         try {
-            HttpClient httpClient = HttpClients.createDefault();
+            httpClient = HttpClients.createDefault();
             httpGet = new HttpGet(fileName);
             HttpResponse httpResponse = httpClient.execute(httpGet);
             //拿到实体
@@ -52,6 +52,9 @@ public final class MarkDownParserUtil {
             if (httpGet != null) {
                 //释放连接
                 httpGet.releaseConnection();
+            }
+            if(httpClient != null) {
+            	httpClient.close();
             }
         }
         return null;

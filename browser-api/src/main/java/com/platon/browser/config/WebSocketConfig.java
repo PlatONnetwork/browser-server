@@ -44,7 +44,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     	// 订阅Broker名称 /topic 代表发布广播，即群发 /queue 代表点对点，即发指定用户  基于内存的单机stomp
         config.enableSimpleBroker("/topic");
         // 全局使用的消息前缀（客户端订阅路径上会体现出来）
-//        config.setApplicationDestinationPrefixes("/app");
+        config.setApplicationDestinationPrefixes("/app");
         
     	/**
          * 设置单独发送到某个user需要添加的前缀，用户订阅地址/user/topic/td1地址后会去掉/user，并加上用户名（需要springsecurity支持）等唯一标识组成新的目的地发送回去，

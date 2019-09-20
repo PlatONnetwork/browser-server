@@ -25,6 +25,9 @@ public class BrowserConst {
 	public final static String WALLET_PRX = "0x";
 	
 	/** 操作表分隔符*/
+	public final static String PEAD_SPILT = "|";
+	
+	/** 操作表分隔符*/
 	public final static String OPT_SPILT = "\\|";
 	
 	/** pip前缀*/

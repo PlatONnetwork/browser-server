@@ -2,7 +2,9 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -185,8 +187,8 @@ public interface AppDocStaking {
      * }
      */	
 	@ApiOperation(value = "topic/staking/change/new", nickname = "", notes = "", response = StakingChangeNewResp.class, tags = { "Staking" })
-	@SubscribeMapping(value = "topic/staking/change/new")
-	public BaseResp<StakingChangeNewResp> stakingChangeNew();
+	@MessageMapping(value = "/staking/change/new")
+	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor);
 	
     /**
      * @api {post} /staking/stakingDetails e.验证人详情

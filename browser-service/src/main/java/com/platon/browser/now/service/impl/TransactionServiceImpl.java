@@ -331,10 +331,10 @@ public class TransactionServiceImpl implements TransactionService {
 						EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
 						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
 						resp.setNodeId(editValidatorParam.getNodeId());
-						resp.setNodeName(editValidatorParam.getNodeName());
 						resp.setExternalId(editValidatorParam.getExternalId());
 						resp.setWebsite(editValidatorParam.getWebsite());
 						resp.setDetails(editValidatorParam.getDetails());
+						resp.setNodeName(this.setStakingName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
 						/**
 						 * 如果块高是空的情况下，应该为失败的交易直接跳出
 						 */
@@ -356,25 +356,15 @@ public class TransactionServiceImpl implements TransactionService {
 					case INCREASE_STAKING:
 						IncreaseStakingParam increaseStakingParam = JSONObject.parseObject(txInfo, IncreaseStakingParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
-						if(StringUtils.isNotBlank(increaseStakingParam.getNodeName())) {
-							resp.setNodeName(increaseStakingParam.getNodeName());
-						} else {
-							StakingExample stakingExample = new StakingExample();
-							stakingExample.setOrderByClause(" staking_block_num desc");
-							stakingExample.createCriteria().andNodeIdEqualTo(increaseStakingParam.getNodeId());
-							List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-							if(stakings.size()>0) {
-								resp.setNodeName(stakings.get(0).getStakingName());
-							}
-						}
 						resp.setTxAmount(increaseStakingParam.getAmount());
+						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
 					//退出验证人
 					case EXIT_VALIDATOR:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 						ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
-						resp.setNodeName(exitValidatorParam.getNodeName());
+						this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName());
 						resp.setApplyAmount(exitValidatorParam.getAmount());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
@@ -403,8 +393,8 @@ public class TransactionServiceImpl implements TransactionService {
 					case DELEGATE:
 						DelegateParam delegateParam = JSONObject.parseObject(txInfo, DelegateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
-						resp.setNodeName(delegateParam.getNodeName());
 						resp.setTxAmount(delegateParam.getAmount());
+						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
 					//委托赎回
 					case UN_DELEGATE:
@@ -412,9 +402,9 @@ public class TransactionServiceImpl implements TransactionService {
 						// 通过txHash关联un_delegation表
 						UnDelegateParam unDelegateParam = JSONObject.parseObject(txInfo, UnDelegateParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
-						resp.setNodeName(unDelegateParam.getNodeName());
 						resp.setApplyAmount(unDelegateParam.getAmount());
 						resp.setTxAmount(unDelegateParam.getAmount());
+						resp.setNodeName(this.setStakingName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 						UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
 						if(unDelegation!=null) {
 							resp.setApplyAmount(unDelegation.getApplyAmount());
@@ -428,8 +418,8 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
 						}
 						resp.setNodeId(createProposalTextParam.getVerifier());
-						resp.setNodeName(createProposalTextParam.getNodeName());
 						resp.setProposalHash(req.getTxHash());
+						resp.setNodeName(this.setStakingName(createProposalTextParam.getVerifier(), createProposalTextParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
@@ -440,8 +430,8 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
 						}
 						resp.setNodeId(createProposalUpgradeParam.getVerifier());
-						resp.setNodeName(createProposalUpgradeParam.getNodeName());
 						resp.setProposalHash(req.getTxHash());
+						resp.setNodeName(this.setStakingName(createProposalUpgradeParam.getVerifier(), createProposalUpgradeParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
@@ -452,8 +442,8 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
 						}
 						resp.setNodeId(cancelProposalParam.getVerifier());
-						resp.setNodeName(cancelProposalParam.getNodeName());
 						resp.setProposalHash(req.getTxHash());
+						resp.setNodeName(this.setStakingName(cancelProposalParam.getVerifier(), cancelProposalParam.getNodeName()));
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
@@ -461,10 +451,10 @@ public class TransactionServiceImpl implements TransactionService {
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
 						VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
 						resp.setNodeId(votingProposalParam.getVerifier());
-						resp.setNodeName(votingProposalParam.getNodeName());
 						resp.setProposalOption(votingProposalParam.getProposalType());
 						resp.setProposalHash(req.getTxHash());
 						resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
+						resp.setNodeName(this.setStakingName(votingProposalParam.getVerifier(), votingProposalParam.getNodeName()));
 						if(StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
 							resp.setPipNum("PIP-" + votingProposalParam.getPIDID());
 						}
@@ -486,8 +476,8 @@ public class TransactionServiceImpl implements TransactionService {
 					case DECLARE_VERSION:
 						DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
-						resp.setNodeName(declareVersionParam.getNodeName());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
+						resp.setNodeName(this.setStakingName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
 						if(StringUtils.isNotBlank(declareVersionParam.getNodeName())) {
 							resp.setNodeName(declareVersionParam.getNodeName());
 						} else {
@@ -504,8 +494,8 @@ public class TransactionServiceImpl implements TransactionService {
 						ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<TransactionDetailsEvidencesResp>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
-						transactionDetailsEvidencesResp.setNodeName(reportValidatorParam.getNodeName());
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
+						resp.setNodeName(this.setStakingName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
 						resp.setEvidence(reportValidatorParam.getData());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());
@@ -577,6 +567,13 @@ public class TransactionServiceImpl implements TransactionService {
     	return resp;
     }
 
+    /**
+     * 提案信息统一转换
+     * @method transferTransaction
+     * @param resp
+     * @param hash
+     * @return
+     */
     private TransactionDetailsResp transferTransaction(TransactionDetailsResp resp, String hash) {
     	Proposal proposal = proposalMapper.selectByPrimaryKey(hash);
 		if(proposal != null) {
@@ -590,6 +587,31 @@ public class TransactionServiceImpl implements TransactionService {
 			resp.setProposalUrl(proposal.getUrl());
 		}
 		return resp;
+    }
+    
+    /**
+     * 统一设置验证人名称
+     * @method setStakingName
+     * @param nodeId
+     * @param nodeName
+     * @return
+     */
+    private String setStakingName(String nodeId,String nodeName) {
+    	/**
+    	 * 当nodeId为空或者nodeName不为空则直接返回name
+    	 */
+    	if(StringUtils.isNotBlank(nodeName) || StringUtils.isBlank(nodeId)) {
+    		return nodeName;
+    	}
+    	StakingExample stakingExample = new StakingExample();
+    	stakingExample.setOrderByClause(" staking_block_num desc");
+    	StakingExample.Criteria criteria = stakingExample.createCriteria();
+    	criteria.andNodeIdEqualTo(nodeId);
+    	List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+    	if(stakings != null && stakings.size()>0) {
+    		return stakings.get(0).getStakingName();
+    	}
+    	return nodeName;
     }
 
 }

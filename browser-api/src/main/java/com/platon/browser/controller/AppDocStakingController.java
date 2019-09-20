@@ -3,8 +3,11 @@ package com.platon.browser.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.StakingService;
@@ -20,7 +23,6 @@ import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.DelegationListByAddressResp;
 import com.platon.browser.resp.staking.DelegationListByStakingResp;
 import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingChangeNewResp;
 import com.platon.browser.resp.staking.StakingDetailsResp;
 import com.platon.browser.resp.staking.StakingOptRecordListResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;
@@ -42,6 +44,9 @@ public class AppDocStakingController implements AppDocStaking {
 	@Autowired
 	private StakingService stakingService;
 	
+	@Autowired
+	private SimpMessageSendingOperations simpMessageSendingOperations;
+	
 	@Override
 	public BaseResp<StakingStatisticNewResp> stakingStatisticNew() {
 		StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
@@ -59,9 +64,11 @@ public class AppDocStakingController implements AppDocStaking {
 	}
 
 	@Override
-	public BaseResp<StakingChangeNewResp> stakingChangeNew() {
-		// TODO Auto-generated method stub
-		return null;
+	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor) {
+		AliveStakingListReq req = new AliveStakingListReq();
+		RespPage<AliveStakingListResp> aliveStakingListResp = stakingService.aliveStakingList(req);
+		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSONObject.toJSONString(aliveStakingListResp));
+		return stakingService.aliveStakingList(req);
 	}
 
 	@Override

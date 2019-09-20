@@ -31,7 +31,7 @@ public class CustomUnDelegation extends UnDelegation {
         this.setApplyAmount(param.getAmount());
         this.setDelegateAddr(tx.getFrom());
         this.setHash(tx.getHash());
-        this.setStakingBlockNum(Long.valueOf(param.getStakingBlockNum()));
+        this.setStakingBlockNum(param.getStakingBlockNum());
         this.setNodeId(param.getNodeId());
     }
 
