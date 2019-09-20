@@ -13,8 +13,8 @@ package com.platon.browser.enums;
  */
 public enum ErrorCodeEnum {
 
-    Default(-1, "系统错误"),
-    PARAM_VALIT_ERROR(1, "请求参数错误"),
+    DEFAULT(-1, "系统错误"),
+    PARAM_VALID_ERROR(1, "请求参数错误"),
     SYSTEM_CONFIG_ERROR(2, "系统配置错误"),
     REPEAT_SUBMIT (3,"重复提交"),
     RECORD_NOT_EXIST(4,"记录不存在"),
@@ -28,8 +28,8 @@ public enum ErrorCodeEnum {
 
 
 	
-    public int code;
-    public String desc;
+    private int code;
+    private String desc;
 
     ErrorCodeEnum(int code, String desc) {
         this.code = code;

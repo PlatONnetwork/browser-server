@@ -10,6 +10,7 @@ import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
@@ -63,7 +64,7 @@ public class CreateValidatorHandlerTest extends TestBase {
      *  质押测试方法
      */
     @Test
-    public void testHandler () throws NoSuchBeanException, CacheConstructException {
+    public void testHandler () throws NoSuchBeanException, CacheConstructException, BlockChainException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
@@ -82,7 +83,7 @@ public class CreateValidatorHandlerTest extends TestBase {
         EventContext context = new EventContext();
 
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_VALIDATOR.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_VALIDATOR.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

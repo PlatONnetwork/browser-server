@@ -10,7 +10,6 @@ import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BusinessException;
@@ -68,21 +67,21 @@ public class ProposalTextHandler implements EventHandler {
         tx.setTxInfo(JSON.toJSONString(param));
         //获取配置文件提案参数模板
         String temp = chainConfig.getProposalUrlTemplate();
-        String url = temp.replace(ProposalEngine.key,param.getPIDID());
+        String url = temp.replace(ProposalEngine.KEY,param.getPIDID());
         //设置本轮参与人数
         //设置url
         proposal.setUrl(url);
         //从交易解析参数获取需要设置pIDID
-        proposal.setPipId(new Integer(param.getPIDID()));
+        proposal.setPipId(Integer.parseInt(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
         BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),chainConfig.getProposalTextConsensusRounds(),chainConfig);
 
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
-        String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key,param.getPIDID());
+        String pIDIDNum = ProposalEngine.PID_ID_NUM.replace(ProposalEngine.KEY,param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置提案类型
-        proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.code));
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()));
         //设置提案人
         proposal.setVerifier(param.getVerifier());
         //设置提案人名称
@@ -97,10 +96,10 @@ public class ProposalTextHandler implements EventHandler {
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
-        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.TEXT.code);
+                .replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

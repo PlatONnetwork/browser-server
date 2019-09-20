@@ -1,7 +1,8 @@
 package com.platon.browser.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.alibaba.fastjson.JSONArray;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.entity.NodeOpt;
@@ -21,6 +22,7 @@ import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -46,7 +49,7 @@ import java.util.List;
 public class ProposalUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpdateTask.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private BlockChain bc;
     @Autowired
@@ -93,11 +96,9 @@ public class ProposalUpdateTask {
                 ProposalMarkDownDto proposalMarkDownDto = getMarkdownInfo(proposal.getUrl());
                 logger.info("------------------------------------C-------------------------------------------{}",System.currentTimeMillis());
                 proposal.updateWithProposalMarkDown(proposalMarkDownDto);
-                if (CustomProposal.TypeEnum.CANCEL.code.equals(proposal.getType())) {
+                if (CustomProposal.TypeEnum.CANCEL.getCode().equals(proposal.getType())) {
                     proposal.updateWithProposalMarkDown(proposalMarkDownDto);
                     //若是取消提案，则需要补充被取消提案相关信息
-/*                    String cancelProposalString = MarkDownParserUtil.parserMD(proposalCache.getProposal(proposal.getHash()).getUrl());
-                    ProposalMarkDownDto cancelProp = JSON.parseObject(cancelProposalString, ProposalMarkDownDto.class);*/
                     CustomProposal cp = getProposal(proposal.getCanceledPipId());
                     proposal.setCanceledTopic(cp.getTopic());
                 }
@@ -105,21 +106,18 @@ public class ProposalUpdateTask {
                 proposalCache.addProposal(proposal);
                 // 暂存至待入库列表
                 proposalStage.updateProposal(proposal);
-            } catch (NoSuchBeanException | BusinessException e) {
+            } catch (NoSuchBeanException e) {
                 logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
-            } catch (IOException e) {
-                logger.error("更新提案({})的主题和描述出错:获取不到{}", proposal.getPipId(), proposal.getUrl());
             } catch (Exception e){
-                logger.error("更新提案({})的主题和描述出错:发送http请求异常{}", proposal.getPipId(), proposal.getUrl());
-
+                logger.error("更新提案({})的主题和描述出错:发送http请求异常({})", proposal.getPipId(), e.getMessage());
             }
             //需要更新的提案结果，查询类型1.投票中 2.预升级
-            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.code)
-                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.code)
-                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.code)) {
+            if (proposal.getStatus().equals(CustomProposal.StatusEnum.VOTING.getCode())
+                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PRE_UPGRADE.getCode())
+                    || proposal.getStatus().equals(CustomProposal.StatusEnum.PASS.getCode())) {
                 //发送rpc请求查询提案结果
                 try {
-                    ProposalParticiantStat pps = getProposalParticiantStat(proposal.getHash(),curBlock.getHash());
+                    ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(),curBlock.getHash());
                     //设置参与人数
                     proposal.setAccuVerifiers(pps.getVoterCount());
                     //设置赞成票
@@ -144,7 +142,10 @@ public class ProposalUpdateTask {
             }
         }
         //入库
-        if(proposalStage.exportProposal().size()>0){
+        if(!proposalStage.exportProposal().isEmpty()){
+            Set <Proposal> list = proposalStage.exportProposal();
+            String s = JSONArray.toJSONString(list);
+            logger.info("replace into info {}",s);
             customProposalMapper.batchInsertOrUpdateSelective(proposalStage.exportProposal(),Proposal.Column.values());
             proposalStage.clear();
         }
@@ -166,16 +167,16 @@ public class ProposalUpdateTask {
                     logger.error("更新操作({})的结果出错:{}", proposal.getHash(), e.getMessage());
                 }
                 if (proposal != null) {
-                    String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+                    String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                             .replace("ID", proposal.getPipId().toString())
                             .replace("TITLE", proposal.getTopic())
-                            .replace("TYPE", CustomProposal.TypeEnum.TEXT.code);
+                            .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
                     nodeOpt.setDesc(desc);
                 }
                 CustomNodeOpt customNodeOpt = new CustomNodeOpt();
                 BeanUtils.copyProperties(nodeOpt, customNodeOpt);
                 stakingStage.updateNodeOpt(customNodeOpt);
-                if(stakingStage.exportNodeOpt().size()>0){
+                if(!stakingStage.exportNodeOpt().isEmpty()){
                     customNodeOptMapper.batchInsertOrUpdateSelective(stakingStage.exportNodeOpt(),NodeOpt.Column.values());
                     stakingStage.clear();
                 }
@@ -202,13 +203,13 @@ public class ProposalUpdateTask {
     }
 
     /**
-     * 取提案参与统计信息
+     * 取提案参与者统计信息
      * @param proposalHash
      * @param blockHash
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticiantStat(String proposalHash,String blockHash) throws Exception {
+    public ProposalParticiantStat getProposalParticipantStat(String proposalHash,String blockHash) throws Exception {
         return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
     }
 
@@ -233,11 +234,14 @@ public class ProposalUpdateTask {
      * @throws IOException
      * @throws BusinessException
      */
-    public ProposalMarkDownDto getMarkdownInfo(String url) throws Exception,IOException, BusinessException {
-        String fileUrl = MarkDownParserUtil.acquireMD(url);
-        if (fileUrl == null) throw new BusinessException("获取不到" + url);
-        String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
-        return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+    public ProposalMarkDownDto getMarkdownInfo(String url) throws HttpRequestException {
+        try {
+            String fileUrl = MarkDownParserUtil.acquireMD(url);
+            if (fileUrl == null) throw new BusinessException("获取不到" + url);
+            String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
+            return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+        }catch (Exception e){
+            throw new HttpRequestException(e.getMessage());
+        }
     }
-
 }

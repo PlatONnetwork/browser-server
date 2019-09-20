@@ -41,7 +41,8 @@ public class UnDelegateHandler implements EventHandler {
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
             CustomNode node = nodeCache.getNode(param.getNodeId());
-            logger.debug("减持/撤销委托(赎回委托):{}", JSON.toJSONString(param));
+            String msg = JSON.toJSONString(param);
+            logger.debug("减持/撤销委托(赎回委托):{}", msg);
 
             //根据委托赎回参数blockNumber找到对应当时委托的质押信息
             CustomStaking customStaking = node.getStakings().get(param.getStakingBlockNum());
@@ -98,14 +99,14 @@ public class UnDelegateHandler implements EventHandler {
                     .add(delegation.integerDelegateLocked()) // +委托锁定期金额
                     .add(delegation.integerDelegateReduction());
             if (sumAmount.compareTo(BigInteger.ZERO)==0) {
-                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
             //判断此委托赎回是否已经完成
             if (unDelegation.integerRedeemLocked().compareTo(BigInteger.ZERO)==0) {
                 //锁定期赎回金额为0则表示：本次赎回的金额在犹豫期金额足够，全部扣除，本次委托赎回已经完成
-                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
+                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
             } else {
-                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.code);
+                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.getCode());
             }
 
             //交易数据回填

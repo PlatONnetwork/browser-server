@@ -1,9 +1,9 @@
 package com.platon.browser.enums;
 
+import com.platon.browser.dto.CustomTransaction.TxTypeEnum;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.platon.browser.dto.CustomTransaction.TxTypeEnum;
 
 /**
  * 交易类型请求枚举
@@ -41,26 +41,14 @@ public enum ReqTransactionTypeEnum {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getCode() {
 		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
 	/**
 	 * 页面不同的类型进行转换，显示出需要显示的数据
 	 * @method getTxType
@@ -71,13 +59,6 @@ public enum ReqTransactionTypeEnum {
 		List<String> list = new ArrayList<String>();
 		if(ReqTransactionTypeEnum.TRANSACTION_TRANSFER.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.TRANSFER.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.CONTRACT_CREATION.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.CONTRACT_EXECUTION.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.OTHERS.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.MPC.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.DUPLICATE_SIGN.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_DELEGATE.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.DELEGATE.getCode()));
@@ -89,7 +70,6 @@ public enum ReqTransactionTypeEnum {
 			list.add(String.valueOf(TxTypeEnum.INCREASE_STAKING.getCode()));
 			list.add(String.valueOf(TxTypeEnum.EXIT_VALIDATOR.getCode()));
 			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
-//			list.add(String.valueOf(TxTypeEnum.CREATE_RESTRICTING.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_PROPOSAL.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_TEXT.getCode()));
@@ -100,6 +80,5 @@ public enum ReqTransactionTypeEnum {
 			list.add(String.valueOf(TxTypeEnum.DECLARE_VERSION.getCode()));
 		}
 		return list;
-		
 	}
 }

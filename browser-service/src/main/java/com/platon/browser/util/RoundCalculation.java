@@ -33,8 +33,7 @@ public class RoundCalculation {
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换结束快高
-            BigDecimal endBlockNumber = txBlockNumber.add(consensusCount).subtract(belongToCon).add(consensusRound.multiply(consensusCount)).subtract(new BigDecimal(20));
-            return endBlockNumber;
+            return txBlockNumber.add(consensusCount).subtract(belongToCon).add(consensusRound.multiply(consensusCount)).subtract(new BigDecimal(20));
         } catch (Exception e) {
             logger.error("[RoundCalculation] exception");
             return BigDecimal.ZERO;
@@ -57,8 +56,7 @@ public class RoundCalculation {
             BigDecimal[] belongToConList = txBlockNumber.divideAndRemainder(consensusCount);
             BigDecimal belongToCon = belongToConList[1];
             //转换生效块高
-            BigDecimal activeBlockNum = txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.multiply(consensusCount)).add(BigDecimal.ONE);
-            return activeBlockNum;
+            return txBlockNumber.add(consensusCount).subtract(belongToCon).add(txActiveRound.multiply(consensusCount)).add(BigDecimal.ONE);
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }

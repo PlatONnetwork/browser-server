@@ -42,7 +42,7 @@ public class AddressEngine {
         addresses.forEach(addressCache::add);
     }
 
-    public void execute (CustomTransaction tx,BlockChain bc) {
+    public void execute (CustomTransaction tx) {
         context.setTransaction(tx);
         addressStatisticHandler.handle(context);
     }

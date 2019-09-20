@@ -5,13 +5,13 @@ import java.util.ResourceBundle;
 
 public class I18NUtils {
 
-    private ResourceBundle RES_BUNDLE;
+    private ResourceBundle resourceBundle;
 
     private static String b;
     private static String l;
 
     private I18NUtils() {
-        RES_BUNDLE = ResourceBundle.getBundle(b, new Locale(l));
+        resourceBundle = ResourceBundle.getBundle(b, new Locale(l));
     }
 
 
@@ -34,17 +34,16 @@ public class I18NUtils {
     }
 
     public String getResource(String key) {
-        if (RES_BUNDLE.containsKey(key)) {
-            System.out.println("I18NUtils::+++++++++++::::::" + RES_BUNDLE.getLocale());
-            return RES_BUNDLE.getString(key);
+        if (resourceBundle.containsKey(key)) {
+            return resourceBundle.getString(key);
         } else {
             return null;
         }
     }
 
     public String getResource(Integer code) {
-        if (RES_BUNDLE.containsKey(String.valueOf(code))) {
-            return RES_BUNDLE.getString(String.valueOf(code));
+        if (resourceBundle.containsKey(String.valueOf(code))) {
+            return resourceBundle.getString(String.valueOf(code));
         } else {
             return null;
         }

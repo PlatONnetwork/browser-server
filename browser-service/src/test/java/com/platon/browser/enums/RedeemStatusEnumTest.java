@@ -8,7 +8,7 @@ public class RedeemStatusEnumTest {
 
 	@Test
 	public void test() {
-		RedeemStatusEnum redeemStatusEnum = RedeemStatusEnum.valueOf("EXTING");
+		RedeemStatusEnum redeemStatusEnum = RedeemStatusEnum.valueOf("EXITING");
 		assertTrue(redeemStatusEnum.getCode()==1);
 	}
 

@@ -2,7 +2,6 @@ package com.platon.browser.engine.handler.proposal;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.*;
-import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
@@ -71,7 +70,8 @@ public class VotingProposalHandler implements EventHandler {
             param.setUrl(proposal.getUrl());
             tx.setTxInfo(JSON.toJSONString(param));
 
-            logger.debug("投票信息:{}", JSON.toJSONString(param));
+            String msg = JSON.toJSONString(param);
+            logger.debug("投票信息:{}", msg);
             CustomVote vote = new CustomVote();
             vote.updateWithVote(tx,param);
             vote.setVerifierName(staking.getStakingName());
@@ -83,7 +83,7 @@ public class VotingProposalHandler implements EventHandler {
             // 记录操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
             nodeOpt.updateWithCustomTransaction(tx);
-            String desc = CustomNodeOpt.TypeEnum.VOTE.tpl
+            String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
                     .replace("ID",proposal.getPipId().toString())
                     .replace("TITLE",proposal.getTopic())
                     .replace("OPTION",param.getOption());

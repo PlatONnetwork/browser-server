@@ -1,14 +1,16 @@
 package com.platon.browser.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 
 /**
@@ -21,13 +23,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DateUtil {
+	private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
+	
+	private static final String DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
-	public static DateFormat df;
-	
-	public DateUtil() {
-		DateUtil.df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-	}
-	
 	private static String localLANG;
 	
 	/**
@@ -46,7 +45,7 @@ public class DateUtil {
 		try {
 			firstDate = ymd.parse(firstStr);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error("日期错误:",e);
 		}
 		return firstDate;
 	}
@@ -59,7 +58,7 @@ public class DateUtil {
 	 * @throws ParseException
 	 */
 	public static Date getCST(String strGMT) throws ParseException { 
-		DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+		DateFormat df = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
 		return df.parse(strGMT); 
 	}
 
@@ -71,7 +70,7 @@ public class DateUtil {
 	 */
 	public static String getGMT(Date dateCST) {
 		Locale locale = Locale.forLanguageTag(localLANG);
-		DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", locale);
+		DateFormat df = new SimpleDateFormat(DATE_PATTERN, locale);
 		df.setTimeZone(TimeZone.getTimeZone("GMT")); // modify Time Zone.
 		return (df.format(dateCST));
 	}

@@ -22,6 +22,7 @@ import java.util.List;
  * Time: 10:52
  */
 public class NodeTool {
+    private NodeTool(){}
 
     /**
      * 通过区块计算节点公钥
@@ -33,27 +34,26 @@ public class NodeTool {
     public static String calculateNodePublicKey(PlatonBlock.Block block){
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
-        if (publicKey.length() < 128) for (int i = 0; i < (128 - publicKey.length()); i++) publicKey = "0" + publicKey;
+        if (publicKey.length() < 128) {
+            for (int i = 0; i < (128 - publicKey.length()); i++) {
+                publicKey = "0" + publicKey;
+            }
+        }
         return publicKey;
     }
 
     public static BigInteger testBlock(PlatonBlock.Block block){
-
         String extraData = block.getExtraData();
 
         String signature = extraData.substring(66, extraData.length());
 
         byte[] msgHash = getMsgHash(block);
 
-
         byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
         byte v = signatureBytes[64];
         byte[] r = Arrays.copyOfRange(signatureBytes, 0, 32);
         byte[] s = Arrays.copyOfRange(signatureBytes, 32, 64);
-
-
-        BigInteger publicKey = Sign.recoverFromSignature( v, new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s)), msgHash);
-        return publicKey;
+        return Sign.recoverFromSignature( v, new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s)), msgHash);
     }
 
     private static byte[] getMsgHash(PlatonBlock.Block block) {
@@ -71,8 +71,6 @@ public class NodeTool {
         List<RlpType> result = new ArrayList<>();
         //ParentHash  common.Hash    `json:"parentHash"       gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getParentHash())));
-        //UncleHash   common.Hash    `json:"sha3Uncles"       gencodec:"required"`
-        //result.add(RlpString.create(decodeHash(block.getSha3Uncles())));
         //Coinbase    common.Address `json:"miner"            gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getMiner())));
         //Root        common.Hash    `json:"stateRoot"        gencodec:"required"`
@@ -83,9 +81,6 @@ public class NodeTool {
         result.add(RlpString.create(decodeHash(block.getReceiptsRoot())));
         //Bloom       Bloom          `json:"logsBloom"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getLogsBloom())));
-        //Difficulty  *big.Int       `json:"difficulty"       gencodec:"required"`
-        //TODO:0.4.0链去除难度值得解析
-        //result.add(RlpString.create(block.getDifficulty()));
         //Number      *big.Int       `json:"number"           gencodec:"required"`
         result.add(RlpString.create(block.getNumber()));
         //GasLimit    uint64         `json:"gasLimit"         gencodec:"required"`
@@ -96,8 +91,6 @@ public class NodeTool {
         result.add(RlpString.create(block.getTimestamp()));
         //Extra       []byte         `json:"extraData"        gencodec:"required"`
         result.add(RlpString.create(decodeHash(block.getExtraData().substring(0, 66))));
-        //MixDigest   common.Hash    `json:"mixHash"`
-        //result.add(RlpString.create(decodeHash(block.getMixHash())));
         //Nonce       BlockNonce     `json:"nonce"`
         result.add(RlpString.create(decodeHash(block.getNonceRaw())));
 
@@ -105,8 +98,7 @@ public class NodeTool {
     }
 
     static byte[] decodeHash(String hex) {
-        byte[] result = Hex.decode(Numeric.cleanHexPrefix(hex));
-        return result;
+        return Hex.decode(Numeric.cleanHexPrefix(hex));
     }
 
 }

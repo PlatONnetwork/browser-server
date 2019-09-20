@@ -111,7 +111,7 @@ public class HomeServiceImpl implements HomeService {
 					StakingExample.Criteria criteria = stakingExample.createCriteria();
 					criteria.andNodeIdEqualTo(keyword);
 					List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-					if(stakings.size() > 0) {
+					if(!stakings.isEmpty()) {
 						result.setType("staking");
 						queryNavigationStructResp.setNodeId(stakings.get(0).getNodeId());
 					}
@@ -130,7 +130,7 @@ public class HomeServiceImpl implements HomeService {
 						BlockExample blockExample = new BlockExample();
 						blockExample.createCriteria().andHashEqualTo(keyword);
 						List<Block> blockList = blockMapper.selectByExample(blockExample);
-						if (blockList.size() > 0) {
+						if (!blockList.isEmpty()) {
 							/**  如果找到区块信息，则构造结果并返回  */
 							result.setType("block");
 							queryNavigationStructResp.setNumber(blockList.get(0).getNumber());
@@ -143,7 +143,7 @@ public class HomeServiceImpl implements HomeService {
 				StakingExample.Criteria criteria = stakingExample.createCriteria();
 				criteria.andStakingNameEqualTo(keyword);
 				List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-				if(stakings.size() > 0) {
+				if(!stakings.isEmpty()) {
 					result.setType("staking");
 					queryNavigationStructResp.setNodeId(stakings.get(0).getNodeId());
 				}
@@ -230,7 +230,7 @@ public class HomeServiceImpl implements HomeService {
 			} else {
 				stakingListResp.setExpectedIncome("");
 			}
-			stakingListResp.setIsInit(stakings.get(i).getIsInit() == 1?true:false);
+			stakingListResp.setIsInit(stakings.get(i).getIsInit() == 1);
 			stakingListResp.setNodeName(stakings.get(i).getStakingName());
 			/** 质押总数=有效的质押+委托 */
 			String totalValue = new BigDecimal(stakings.get(i).getStakingHas()).add(new BigDecimal(stakings.get(i).getStakingLocked()))

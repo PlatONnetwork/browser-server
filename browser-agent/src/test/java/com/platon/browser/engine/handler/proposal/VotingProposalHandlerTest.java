@@ -59,7 +59,7 @@ public class VotingProposalHandlerTest extends TestBase {
      *  文本提案测试方法
      */
     @Test
-    public void testHandler () throws CacheConstructException, NoSuchBeanException {
+    public void testHandler () throws NoSuchBeanException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
@@ -75,7 +75,7 @@ public class VotingProposalHandlerTest extends TestBase {
 
         EventContext context = new EventContext();
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.VOTING_PROPOSAL.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.VOTING_PROPOSAL.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

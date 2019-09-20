@@ -31,7 +31,7 @@ public class StakingUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
     @Autowired
     private BlockChainConfig chainConfig;
-    private static final String fingerprintpPer = "_/api/1.0/user/autocomplete.json?q=";
+    private static final String URI_PATH = "_/api/1.0/user/autocomplete.json?q=";
     @Autowired
     private CacheHolder cacheHolder;
     @Autowired
@@ -48,31 +48,33 @@ public class StakingUpdateTask {
             Set <CustomStaking> customStakingSet = getAllStaking();
             if (customStakingSet.isEmpty()) return;
             customStakingSet.forEach(customStaking -> {
-                if(StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon())){
-                    if (StringUtils.isNotBlank(customStaking.getExternalId())) {
-                        String queryUrl = keyStoreUrl.concat(fingerprintpPer.concat(customStaking.getExternalId()));
-                        try {
-                            KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
-                            List <Completion> completions = keyBaseUser.getCompletions();
-                            if (completions == null || completions.isEmpty()) return;
-                            // 取最新一条
-                            Completion completion = completions.get(0);
-                            // 取缩略图
-                            String icon = completion.getThumbnail();
-                            customStaking.setStakingIcon(icon);
+                if(
+                    (StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon()))
+                    &&
+                    StringUtils.isNotBlank(customStaking.getExternalId())
+                ){
+                    String queryUrl = keyStoreUrl.concat(URI_PATH.concat(customStaking.getExternalId()));
+                    try {
+                        KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
+                        List <Completion> completions = keyBaseUser.getCompletions();
+                        if (completions == null || completions.isEmpty()) return;
+                        // 取最新一条
+                        Completion completion = completions.get(0);
+                        // 取缩略图
+                        String icon = completion.getThumbnail();
+                        customStaking.setStakingIcon(icon);
 
-                            Components components = completion.getComponents();
-                            String username = components.getUsername().getVal();
-                            customStaking.setExternalName(username);
-                            // 把改动后的内容暂存至待更新列表
-                            stakingStage.updateStaking(customStaking);
-                        } catch (HttpRequestException e) {
-                            logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
-                        }
+                        Components components = completion.getComponents();
+                        String username = components.getUsername().getVal();
+                        customStaking.setExternalName(username);
+                        // 把改动后的内容暂存至待更新列表
+                        stakingStage.updateStaking(customStaking);
+                    } catch (HttpRequestException e) {
+                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
                     }
                 }
             });
-            if(stakingStage.exportStaking().size()>0){
+            if(!stakingStage.exportStaking().isEmpty()){
                 customStakingMapper.batchInsertOrUpdateSelective(stakingStage.exportStaking(), Staking.Column.values());
                 stakingStage.clear();
             }

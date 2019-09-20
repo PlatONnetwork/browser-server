@@ -66,7 +66,7 @@ public class DelegateHandlerTest extends TestBase {
         handler.handle(context);
 
         transactions.stream()
-            .filter(tx->CustomTransaction.TxTypeEnum.DELEGATE.code.equals(tx.getTxType()))
+            .filter(tx->CustomTransaction.TxTypeEnum.DELEGATE.getCode().equals(tx.getTxType()))
             .forEach(context::setTransaction);
         handler.handle(context);
 

@@ -1,9 +1,10 @@
 package com.platon.browser.service;
 
-import com.platon.browser.bean.CollectResult;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.exception.BlockCollectingException;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,9 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -30,8 +30,30 @@ import java.util.concurrent.ExecutorService;
 public class BlockService {
     private static Logger logger = LoggerFactory.getLogger(BlockService.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     private ExecutorService executor;
+
+    @Data
+    static class CollectResult {
+        private CollectResult(){}
+        // 并发采集的块信息，无序
+        static final Map<Long, CustomBlock> CONCURRENT_BLOCK_MAP = new ConcurrentHashMap<>();
+        // 由于异常而未采集的区块号列表
+        static final Set<BigInteger> RETRY_NUMBERS = new CopyOnWriteArraySet<>();
+        // 已排序的区块信息列表
+        private static final List<CustomBlock> SORTED_BLOCKS = new LinkedList<>();
+        static List <CustomBlock> getSortedBlocks() {
+            SORTED_BLOCKS.clear();
+            SORTED_BLOCKS.addAll(CONCURRENT_BLOCK_MAP.values());
+            SORTED_BLOCKS.sort(Comparator.comparing(Block::getNumber));
+            return SORTED_BLOCKS;
+        }
+        static void reset() {
+            CONCURRENT_BLOCK_MAP.clear();
+            RETRY_NUMBERS.clear();
+            SORTED_BLOCKS.clear();
+        }
+    }
 
     public void init(ExecutorService executor){
         this.executor = executor;
@@ -43,6 +65,7 @@ public class BlockService {
      * @return void
      */
     public List<CustomBlock> collect(Set<BigInteger> blockNumbers) throws InterruptedException {
+        CollectResult.reset();
         // 先重置重试列表
         CollectResult.RETRY_NUMBERS.clear();
         // 把待采块放入重试列表，当作重试块号操作
@@ -87,14 +110,10 @@ public class BlockService {
             PlatonBlock.Block pbb = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
             if (pbb == null) throw new BlockCollectingException("原生区块[" + blockNumber + "]为空！");
             CustomBlock block = new CustomBlock();
-            try {
-                block.updateWithBlock(pbb);
-            } catch (Exception ex) {
-                throw new BlockCollectingException("初始化区块信息异常:" + ex.getMessage());
-            }
+            block.updateWithBlock(pbb);
             return block;
         } catch (Exception e) {
-            logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
+            logger.error("搜集区块[{}]异常,将重试:{}", blockNumber, e.getMessage());
         }
     }
 

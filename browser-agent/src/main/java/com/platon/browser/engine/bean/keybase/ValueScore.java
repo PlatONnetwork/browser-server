@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class ValueScore {
     private String val;
-    private double score;
+    private Double score;
 }

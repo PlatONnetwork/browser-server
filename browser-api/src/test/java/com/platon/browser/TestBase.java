@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 
 @SpringBootTest(classes= BrowserApiApplication.class, value = "spring.profiles.active=dev")
 public class TestBase extends TestData {
@@ -21,7 +21,7 @@ public class TestBase extends TestData {
     protected TicketService ticketService;*/
 
     @Autowired
-    protected PlatonClient platon;
+    protected PlatOnClient platon;
 
    /* protected NodeListItem getOneNode(String chainId){
         NodePageReq req = new NodePageReq();

@@ -3,10 +3,7 @@ package com.platon.browser.controller;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.platon.browser.req.PageReq;
 import com.platon.browser.req.newblock.BlockDetailNavigateReq;
@@ -70,8 +67,8 @@ public interface AppDocBlock {
      * }
      */
 	@ApiOperation(value = "block/blockList", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
-	@RequestMapping(value = "block/blockList", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
+	@PostMapping(value = "block/blockList", produces = { "application/json" })
+    RespPage<BlockListResp> blockList(@ApiParam(value = "PageReq", required = true)@Valid @RequestBody PageReq req);
 	
      /**
      *
@@ -94,8 +91,8 @@ public interface AppDocBlock {
      * > 返回值同《区块列表接口》返回值
      */
 	@ApiOperation(value = "block/blockListByNodeId", nickname = "", notes = "", response = BlockListResp.class, tags = { "Block" })
-	@RequestMapping(value = "block/blockListByNodeId", produces = { "application/json" }, method = RequestMethod.POST)
-    public RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
+	@PostMapping(value = "block/blockListByNodeId", produces = { "application/json" })
+    RespPage<BlockListResp> blockListByNodeId(@ApiParam(value = "BlockListByNodeIdReq", required = true)@Valid @RequestBody BlockListByNodeIdReq req);
 	
     /**
      * @api {get} /block/blockListByNodeIdDownload?nodeId=:nodeId&date=:date&local=:en c.导出节点的区块列表
@@ -111,11 +108,10 @@ public interface AppDocBlock {
      * @apiSuccessExample {json} Success-Response:
      * HTTP/1.1 200 OK
      * >响应为 二进制文件流
-     * TODO 模版
-     */	
+     */
 	@ApiOperation(value = "block/blockListByNodeIdDownload", nickname = "", notes = "", tags = { "Block" })
-	@RequestMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" }, method = RequestMethod.GET)
-    public void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
+	@GetMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" })
+    void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
     		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date,
     		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true)String local,HttpServletResponse response);
 	
@@ -164,8 +160,8 @@ public interface AppDocBlock {
      * }
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
-	@RequestMapping(value = "block/blockDetails", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq", required = true)@Valid @RequestBody BlockDetailsReq req);
+	@PostMapping(value = "block/blockDetails", produces = { "application/json" })
+    BaseResp<BlockDetailResp> blockDetails(@ApiParam(value = "BlockDetailsReq", required = true)@Valid @RequestBody BlockDetailsReq req);
 	
 	
     /**
@@ -184,6 +180,6 @@ public interface AppDocBlock {
      * > 返回值同《区块详情接口》返回值
      */
 	@ApiOperation(value = "block/blockDetails", nickname = "", notes = "", response = BlockDetailResp.class, tags = { "Block" })
-	@RequestMapping(value = "block/blockDetailNavigate", produces = { "application/json" }, method = RequestMethod.POST)
-    public BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
+	@PostMapping(value = "block/blockDetailNavigate", produces = { "application/json" })
+    BaseResp<BlockDetailResp> blockDetailNavigate(@ApiParam(value = "BlockDetailNavigateReq", required = true)@Valid @RequestBody BlockDetailNavigateReq req);
 }

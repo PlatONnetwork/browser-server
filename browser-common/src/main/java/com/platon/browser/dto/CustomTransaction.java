@@ -6,6 +6,8 @@ import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.web3j.platon.BaseResponse;
 import org.web3j.protocol.core.methods.response.Log;
@@ -27,6 +29,7 @@ import java.util.*;
  */
 @Data
 public class CustomTransaction extends TransactionWithBLOBs {
+    private static Logger logger = LoggerFactory.getLogger(CustomTransaction.class);
 
     public CustomTransaction(){
         Date date = new Date();
@@ -52,7 +55,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
             Long sequence = this.getBlockNumber()*10000 + this.getTransactionIndex();
             this.setSequence(sequence);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("更新交易出错",e);
         }
     }
 
@@ -71,7 +74,7 @@ public class CustomTransaction extends TransactionWithBLOBs {
                 // 成功：logs.get(0).getData()来解析出Status字段，并且为true
                 // 失败：非成功
                 List<Log> logs =  receipt.getLogs();
-                if(logs==null||logs.size()==0){
+                if(logs==null||logs.isEmpty()){
                     this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
                 }else {
                     Log log = logs.get(0);
@@ -153,8 +156,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
         public static TxTypeEnum getEnum(String code){
             return map.get(code);
         }
-        public String code;
-        public String desc;
+        private String code;
+        private String desc;
         TxTypeEnum ( String code, String desc) {
             this.code = code;
             this.desc = desc;
@@ -175,15 +178,15 @@ public class CustomTransaction extends TransactionWithBLOBs {
         SUCCESS(1, "成功"),
         FAILURE(0, "失败")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         TxReceiptStatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, TxReceiptStatusEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, TxReceiptStatusEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(TxReceiptStatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static TxReceiptStatusEnum getEnum(Integer code){

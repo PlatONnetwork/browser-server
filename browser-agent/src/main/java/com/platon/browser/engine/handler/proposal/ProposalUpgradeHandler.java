@@ -72,19 +72,19 @@ public class ProposalUpgradeHandler implements EventHandler {
         tx.setTxInfo(JSON.toJSONString(param));
 
         //设置提案为升级类型
-        proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.code));
+        proposal.setType(String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()));
         //获取配置文件提案参数模板
         String temp = chainConfig.getProposalUrlTemplate();
-        String url = temp.replace(ProposalEngine.key, param.getPIDID());
+        String url = temp.replace(ProposalEngine.KEY, param.getPIDID());
         //设置url
         proposal.setUrl(url);
         //从交易解析参数获取需要设置pIDID
-        proposal.setPipId(new Integer(param.getPIDID()));
+        proposal.setPipId(Integer.parseInt(param.getPIDID()));
         //解析器将轮数换成结束块高直接使用
         BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),param.getEndVotingRound(),chainConfig);
         proposal.setEndVotingBlock(endBlockNumber.toString());
         //设置pIDIDNum
-        String pIDIDNum = ProposalEngine.pIDIDNum.replace(ProposalEngine.key, param.getPIDID());
+        String pIDIDNum = ProposalEngine.PID_ID_NUM.replace(ProposalEngine.KEY, param.getPIDID());
         proposal.setPipNum(pIDIDNum);
         //设置生效时间
         BigDecimal decActiveNumber = RoundCalculation.activeBlockNumCal(tx.getBlockNumber().toString(), param.getEndVotingRound(), chainConfig);
@@ -101,10 +101,10 @@ public class ProposalUpgradeHandler implements EventHandler {
         // 记录操作日志
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
-        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.tpl
+        String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                 .replace("ID",proposal.getPipId().toString())
                 .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.code);
+                .replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

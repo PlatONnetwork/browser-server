@@ -69,7 +69,7 @@ public class ProposalTextHandlerTest extends TestBase {
      *  文本提案测试方法
      */
     @Test
-    public void testHandle () throws CacheConstructException, BusinessException, NoSuchBeanException {
+    public void testHandle () throws BusinessException, NoSuchBeanException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
         BlockChainStage stageData = new BlockChainStage();
@@ -91,7 +91,7 @@ public class ProposalTextHandlerTest extends TestBase {
         EventContext context = new EventContext();
 
         transactions.stream()
-                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_PROPOSAL_TEXT.code.equals(tx.getTxType()))
+                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_PROPOSAL_TEXT.getCode().equals(tx.getTxType()))
                 .forEach(context::setTransaction);
         handler.handle(context);
 

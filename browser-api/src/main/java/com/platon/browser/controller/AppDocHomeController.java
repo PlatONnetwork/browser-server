@@ -1,12 +1,5 @@
 package com.platon.browser.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.exception.BusinessException;
@@ -14,12 +7,13 @@ import com.platon.browser.exception.ResponseException;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.home.BlockListNewResp;
-import com.platon.browser.res.home.BlockStatisticNewResp;
-import com.platon.browser.res.home.ChainStatisticNewResp;
-import com.platon.browser.res.home.QueryNavigationResp;
-import com.platon.browser.res.home.StakingListNewResp;
+import com.platon.browser.res.home.*;
 import com.platon.browser.util.I18nUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  *  首页模块Contract。定义使用方法

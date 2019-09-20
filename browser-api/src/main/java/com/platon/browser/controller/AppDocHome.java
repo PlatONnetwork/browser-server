@@ -1,25 +1,17 @@
 package com.platon.browser.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.platon.browser.req.home.QueryNavigationRequest;
 import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.home.BlockListNewResp;
-import com.platon.browser.res.home.BlockStatisticNewResp;
-import com.platon.browser.res.home.ChainStatisticNewResp;
-import com.platon.browser.res.home.QueryNavigationResp;
-import com.platon.browser.res.home.StakingListNewResp;
-
+import com.platon.browser.res.home.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 	首页模块接口申明集成swagger
@@ -71,8 +63,8 @@ public interface AppDocHome {
      * }
      */
 	@ApiOperation(value = "home/queryNavigation", nickname = "", notes = "", response = QueryNavigationResp.class, tags = { "Home" })
-	@RequestMapping(value = "home/queryNavigation", produces = { "application/json" }, method = RequestMethod.POST)
-	public BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
+	@PostMapping(value = "home/queryNavigation", produces = { "application/json" })
+	BaseResp<QueryNavigationResp> queryNavigation(@ApiParam(value = "QueryNavigationRequest ", required = true)@Valid @RequestBody QueryNavigationRequest req);
 	
     /**
      * @api {subscribe} /topic/block/statistic/new b.出块趋势（websocket）
@@ -98,7 +90,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/statistic/new", nickname = "", notes = "", response = BlockStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/statistic/new")
-	public BaseResp<BlockStatisticNewResp> blockStatisticNew();
+	BaseResp<BlockStatisticNewResp> blockStatisticNew();
 	
     /**
      * @api {subscribe} /topic/chain/statistic/new c.基础数据（websocket）
@@ -133,7 +125,7 @@ public interface AppDocHome {
      */	
 	@ApiOperation(value = "/topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "/topic/chain/statistic/new")
-	public BaseResp<ChainStatisticNewResp> chainStatisticNew();
+	BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
 	
     /**
@@ -165,7 +157,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/list/new", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/list/new")
-	public BaseResp<List<BlockListNewResp>> blockListNew();
+	BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
      * @api {subscribe} /topic/staking/list/new e.验证人列表（websocket）
@@ -201,5 +193,5 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
-	public BaseResp<StakingListNewResp> stakingListNew();
+	BaseResp<StakingListNewResp> stakingListNew();
 }

@@ -207,15 +207,15 @@ public class CustomStaking extends Staking {
         EXITING(2, "退出中"),
         EXITED(3, "已退出")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         StatusEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, StatusEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, StatusEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(StatusEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static StatusEnum getEnum(Integer code){
@@ -233,15 +233,15 @@ public class CustomStaking extends Staking {
         YES(1, "是"),
         NO(2, "否")
         ;
-        public int code;
-        public String desc;
+        private int code;
+        private String desc;
         YesNoEnum(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
         public int getCode(){return code;}
         public String getDesc(){return desc;}
-        private static Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
+        private static final Map<Integer, YesNoEnum> ENUMS = new HashMap<>();
         static {Arrays.asList(YesNoEnum.values()).forEach(en->ENUMS.put(en.code,en));}
         public static YesNoEnum getEnum(Integer code){
             return ENUMS.get(code);

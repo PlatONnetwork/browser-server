@@ -1,7 +1,7 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.*;
@@ -43,7 +43,7 @@ public class NewSettleEpochHandler implements EventHandler {
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     private StakingStage stakingStage;
     @Autowired
     private SpecialContractApi sca;
@@ -56,7 +56,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private NodeCache nodeCache;
 
     @Override
-    public void handle(EventContext context) throws Exception {
+    public void handle(EventContext context) throws CandidateException, SettleEpochChangeException {
         nodeCache = cacheHolder.getNodeCache();
         stakingStage = cacheHolder.getStageData().getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
@@ -76,7 +76,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws CandidateException, InterruptedException {
+    private void updateVerifier () throws CandidateException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         List <Node> preVerifier;
@@ -88,7 +88,8 @@ public class NewSettleEpochHandler implements EventHandler {
                 preVerifier = sca.getHistoryVerifierList(client.getWeb3j(),prevEpochLastBlockNumber);
                 bc.getPreVerifier().clear();
                 preVerifier.stream().filter(Objects::nonNull).forEach(node -> bc.getPreVerifier().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("前一轮结算周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(preVerifier,true));
+                String msg = JSON.toJSONString(preVerifier,true);
+                logger.debug("前一轮结算周期(未块:{})验证人:{}",blockNumber,msg);
                 break;
             } catch (Exception e) {
                 logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
@@ -100,7 +101,8 @@ public class NewSettleEpochHandler implements EventHandler {
         List<Node> curVerifier;
         try {
             curVerifier = sca.getHistoryVerifierList(client.getWeb3j(),nextEpochFirstBlockNumber);
-            logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(curVerifier,true));
+            String msg = JSON.toJSONString(curVerifier,true);
+            logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,msg);
         } catch (Exception e) {
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             curVerifier=candidateService.getCurVerifiers();
@@ -109,10 +111,11 @@ public class NewSettleEpochHandler implements EventHandler {
         bc.getCurVerifier().clear();
         curVerifier.stream().filter(Objects::nonNull).forEach(node -> bc.getCurVerifier().put(HexTool.prefix(node.getNodeId()), node));
 
-        if(bc.getCurVerifier().size()==0){
+        if(bc.getCurVerifier().isEmpty()){
             throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
-        logger.debug("下一轮结算周期验证人:{}",JSON.toJSONString(bc.getCurVerifier(),true));
+        String msg = JSON.toJSONString(bc.getCurVerifier(),true);
+        logger.debug("下一轮结算周期验证人:{}",msg);
     }
 
 
@@ -131,7 +134,7 @@ public class NewSettleEpochHandler implements EventHandler {
             //判断条件委托的犹豫期金额 + 委托的锁定期金额 + 委托的赎回金额是否等于0
             BigInteger sumAmount = delegation.integerDelegateHas().add(delegation.integerDelegateLocked()).add(delegation.integerDelegateReduction());
             if (sumAmount.compareTo(BigInteger.ZERO) == 0) {
-                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.code);
+                delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
             //添加需要更新的委托的信息到委托更新列表
             stakingStage.updateDelegation(delegation);
@@ -147,7 +150,7 @@ public class NewSettleEpochHandler implements EventHandler {
             //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
             unDelegation.setRedeemLocked("0");
             //当锁定期金额为零时，认为此笔赎回委托交易已经完成
-            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.code);
+            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
             //添加需要更新的赎回委托信息到赎回委托更新列表
             stakingStage.updateUnDelegation(unDelegation);
         });
@@ -180,7 +183,7 @@ public class NewSettleEpochHandler implements EventHandler {
             // 犹豫期+锁定期+退回中==0, 则节点退出
             BigInteger stakingReduction = curStaking.integerStakingReduction();
             if(stakingLocked.add(stakingReduction).compareTo(BigInteger.ZERO)==0){
-                curStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+                curStaking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
             }
             // 年化率信息
             AnnualizedRateInfo ari = JSON.parseObject(curStaking.getAnnualizedRateInfo(),AnnualizedRateInfo.class);
@@ -202,7 +205,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 }
 
                 // 计算年化率
-                if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.code){
+                if(curStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()){
                     // 只有候选中的记录才需要计算年化率：(((前4个结算周期内验证人所获得的平均质押奖励+前4结算周期出块奖励)/前四个结算周期质押成本)/1466)*100%
                     // 记录前一结算周期利润
                     rotateProfit(curStaking,ari);
@@ -216,17 +219,13 @@ public class NewSettleEpochHandler implements EventHandler {
             if(nextNode!=null)  {
                 rotateCost(curStaking,ari);
                 // 是否下一轮结算验证人
-                curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.code);
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
             }else{
                 // 不是下一轮结算验证人
-                curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+                curStaking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
             }
-
-
-
             // 更新年化率信息
             curStaking.setAnnualizedRateInfo(JSON.toJSONString(ari));
-
             // 将改动的内存暂存至待更新缓存
             stakingStage.updateStaking(curStaking);
         }
@@ -273,9 +272,12 @@ public class NewSettleEpochHandler implements EventHandler {
     }
 
     private class AnnualizedSum{
-        private BigInteger profitSum=BigInteger.ZERO,costSum=BigInteger.ZERO;
+        private BigInteger profitSum=BigInteger.ZERO;
+        private BigInteger costSum=BigInteger.ZERO;
         private BigDecimal getAnnualizedRate(){
-            if(costSum.compareTo(BigInteger.ZERO)==0) return BigDecimal.ZERO;
+            if(costSum.compareTo(BigInteger.ZERO)==0) {
+                return BigDecimal.ZERO;
+            }
             BigDecimal rate = new BigDecimal(profitSum)
                     .divide(new BigDecimal(costSum),16,RoundingMode.FLOOR) // 除总成本
                     .multiply(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue())) // 乘每个增发周期的结算周期数

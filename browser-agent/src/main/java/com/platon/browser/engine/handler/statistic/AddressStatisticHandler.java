@@ -32,7 +32,8 @@ public class AddressStatisticHandler implements EventHandler {
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
         CustomTransaction tx = context.getTransaction();
 
-        String from = tx.getFrom(),to = tx.getTo();
+        String from = tx.getFrom();
+        String to = tx.getTo();
 
         // 取from地址缓存，不存在则新建
         CustomAddress fromAddress;
@@ -58,13 +59,13 @@ public class AddressStatisticHandler implements EventHandler {
             addressCache.add(toAddress);
         }
 
-        ContractDescEnum cde = ContractDescEnum.MAP.get(from);
+        ContractDescEnum cde = ContractDescEnum.getMap().get(from);
         if(cde!=null){
             fromAddress.setContractName(cde.getContractName());
             fromAddress.setContractCreate(cde.getCreator());
             fromAddress.setContractCreatehash(cde.getContractHash());
         }
-        cde = ContractDescEnum.MAP.get(to);
+        cde = ContractDescEnum.getMap().get(to);
         if(cde!=null){
             toAddress.setContractName(cde.getContractName());
             toAddress.setContractCreate(cde.getCreator());

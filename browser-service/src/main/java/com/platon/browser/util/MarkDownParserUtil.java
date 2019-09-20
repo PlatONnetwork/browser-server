@@ -1,18 +1,13 @@
 package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.exception.HttpRequestException;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,40 +24,7 @@ public final class MarkDownParserUtil {
     private static final String MARKDOWN_BEFORE_INDEX = "<article class=\"markdown-body";
     private static final String MARKDOWN_LAST_INDEX = "</article>";
 
-    /**
-     * 获取md文件
-     *
-     * @param fileName
-     * @return
-     */
-    public static String httpGet(String fileName) throws IOException {
-        HttpGet httpGet = null;
-        CloseableHttpClient httpClient = null;
-        try {
-            httpClient = HttpClients.createDefault();
-            httpGet = new HttpGet(fileName);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            //拿到实体
-            HttpEntity httpEntity = httpResponse.getEntity();
-            //获取结果，这里可以正对相应的数据精细字符集的转码
-            if (httpEntity != null) {
-                return EntityUtils.toString(httpEntity, "utf-8");
-            }
-        } finally {
-            if (httpGet != null) {
-                //释放连接
-                httpGet.releaseConnection();
-            }
-            if(httpClient != null) {
-            	httpClient.close();
-            }
-        }
-        return null;
-    }
-
-
-
-    public static String acquireMD(String fileName) throws Exception {
+    public static String acquireMD(String fileName) throws HttpRequestException {
         String text = HttpUtil.get(fileName,String.class);
         if (text == null) {
             return null;

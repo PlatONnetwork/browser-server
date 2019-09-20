@@ -8,29 +8,30 @@ package com.platon.browser.common;
  *  @data 2019年8月31日
  */
 public class BrowserConst {
+	private BrowserConst(){}
 
 	/** 身份标识外部引用url */
-	public final static String EX_URL = "https://keybase.io/";
+	public static final String EX_URL = "https://keybase.io/";
 	
 	/** 查询缓存最大数量 */
-	public final static Integer MAX_NUM = 500000;
+	public static final Integer MAX_NUM = 500000;
 	
 	/** http头*/
-	public final static String HTTP = "http://";
+	public static final String HTTP = "http://";
 	
 	/** https头*/
-	public final static String HTTPS = "https://";
+	public static final String HTTPS = "https://";
 	
 	/** pre*/
-	public final static String WALLET_PRX = "0x";
+	public static final String WALLET_PRX = "0x";
 	
 	/** 操作表分隔符*/
-	public final static String PEAD_SPILT = "|";
+	public static final String OPT_SPILT = "\\|";
 	
 	/** 操作表分隔符*/
-	public final static String OPT_SPILT = "\\|";
+	public static final  String PEAD_SPILT = "|";
 	
 	/** pip前缀*/
-	public final static String PIP_NAME = "PIP-";
+	public static final String PIP_NAME = "PIP-";
 	
 }

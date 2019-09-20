@@ -1,6 +1,6 @@
 package com.platon.browser.task;
 
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dao.entity.Address;
@@ -8,6 +8,7 @@ import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.AddressStage;
+import com.platon.browser.exception.ContractInvokeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class AddressUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTask.class);
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private SpecialContractApi sca;
     @Autowired
@@ -60,7 +61,7 @@ public class AddressUpdateTask {
                     addressStage.updateAddress(address);
                 }
             });
-            if(addressStage.exportAddress().size()>0){
+            if(!addressStage.exportAddress().isEmpty()){
                 customAddressMapper.batchInsertOrUpdateSelective(addressStage.exportAddress(), Address.Column.values());
                 addressStage.clear();
             }
@@ -83,7 +84,7 @@ public class AddressUpdateTask {
      * @return
      * @throws Exception
      */
-    public List<RestrictingBalance> getRestrictingBalance(String params) throws Exception {
+    public List<RestrictingBalance> getRestrictingBalance(String params) throws ContractInvokeException {
         return sca.getRestrictingBalance(client.getWeb3j(),params);
     }
 }

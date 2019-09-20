@@ -66,8 +66,8 @@ public class CustomVoteProposal extends Vote {
         SUPPORT("1", "支持"),
         OPPOSITION("2", "反对"),
         ABSTENTION("3", "弃权");
-        public String code;
-        public String desc;
+        private String code;
+        private String desc;
         OptionEnum ( String code, String desc ) {
             this.code = code;
             this.desc = desc;
@@ -78,7 +78,7 @@ public class CustomVoteProposal extends Vote {
         public String getDesc () {
             return desc;
         }
-        private static Map<String, OptionEnum> ENUMS = new HashMap<>();
+        private static final Map<String, OptionEnum> ENUMS = new HashMap<>();
         static {
             Arrays.asList(OptionEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }

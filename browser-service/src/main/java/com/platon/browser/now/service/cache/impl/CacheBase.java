@@ -29,7 +29,7 @@ public class CacheBase {
 
 
     protected boolean validateParam(Collection<?> items){
-        if(items.size()==0){
+        if(items.isEmpty()){
             // 无更新内容
             logger.debug("Empty Content");
             return false;
@@ -46,17 +46,19 @@ public class CacheBase {
         long size = redisTemplate.opsForZSet().size(cacheKey);
         Set<ZSetOperations.TypedTuple<String>> tupleSet = new HashSet<>();
         data.forEach(item -> {
-            Long startOffset=0l,endOffset=0l,score=0l;
+            Long startOffset=0l;
+            Long endOffset=0l;
+            Long score=0l;
             if(item instanceof Block) startOffset=endOffset=score = ((Block)item).getTimestamp().getTime();
             if(item instanceof Transaction) startOffset=endOffset=score = ((Transaction)item).getTimestamp().getTime();
             // 根据score来判断缓存中的记录是否已经存在
             Set<String> exist = redisTemplate.opsForZSet().rangeByScore(cacheKey,startOffset,endOffset);
-            if(exist.size()==0){
+            if(exist.isEmpty()){
                 // 在缓存中不存在的才放入缓存
                 tupleSet.add(new DefaultTypedTuple<>(JSON.toJSONString(item),score.doubleValue()));
             }
         });
-        if(tupleSet.size()>0){
+        if(!tupleSet.isEmpty()){
             redisTemplate.opsForZSet().add(cacheKey, tupleSet);
         }
         if(size>maxItemNum){

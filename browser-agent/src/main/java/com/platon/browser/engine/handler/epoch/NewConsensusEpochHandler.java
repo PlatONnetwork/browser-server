@@ -1,7 +1,7 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
@@ -40,7 +40,7 @@ public class NewConsensusEpochHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
     @Autowired
     private SpecialContractApi sca;
     @Autowired
@@ -49,7 +49,7 @@ public class NewConsensusEpochHandler implements EventHandler {
     private CacheHolder cacheHolder;
 
     @Override
-    public void handle(EventContext context) throws Exception {
+    public void handle(EventContext context) throws CandidateException, NoSuchBeanException {
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -69,9 +69,9 @@ public class NewConsensusEpochHandler implements EventHandler {
             Node nextNode = bc.getCurValidator().get(staking.getNodeId());
             // 看当前验证人是否在下一轮共识
             if(nextNode!=null){
-                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.code);
+                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
             }else {
-                staking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
+                staking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
             }
 
             String info = tpl.replace("PRE_QTY",staking.getPreConsBlockQty().toString())
@@ -100,7 +100,8 @@ public class NewConsensusEpochHandler implements EventHandler {
                 logger.debug("无质押，不处理");
             }
         }
-        logger.debug("质押节点共识信息：{}", JSON.toJSONString(consensusInfo,true));
+        String msg = JSON.toJSONString(consensusInfo,true);
+        logger.debug("质押节点共识信息：{}", msg);
     }
 
     /**
@@ -113,7 +114,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateValidator() throws Exception {
+    private void updateValidator() throws CandidateException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         List <Node> preValidator;
@@ -126,7 +127,8 @@ public class NewConsensusEpochHandler implements EventHandler {
                 preValidator = sca.getHistoryValidatorList(client.getWeb3j(),prevEpochLastBlockNumber);
                 bc.getPreValidator().clear();
                 preValidator.stream().filter(Objects::nonNull).forEach(node -> bc.getPreValidator().put(HexTool.prefix(node.getNodeId()), node));
-                logger.debug("前一轮共识周期(未块:{})验证人:{}",blockNumber,JSON.toJSONString(preValidator,true));
+                String msg = JSON.toJSONString(preValidator,true);
+                logger.debug("前一轮共识周期(未块:{})验证人:{}",blockNumber,msg);
                 break;
             } catch (Exception e) {
                 logger.error("【查询前轮共识验证人-底层出错】使用块号【{}】查询共识周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
@@ -139,7 +141,8 @@ public class NewConsensusEpochHandler implements EventHandler {
         try {
             // 先使用区块号查询
             curValidator = sca.getHistoryValidatorList(client.getWeb3j(),nextEpochFirstBlockNumber);
-            logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,JSON.toJSONString(curValidator,true));
+            String msg = JSON.toJSONString(curValidator,true);
+            logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,msg);
         }catch (Exception e){
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             curValidator = candidateService.getCurValidators();
@@ -155,7 +158,7 @@ public class NewConsensusEpochHandler implements EventHandler {
 
         // 更新当前共识周期期望出块数
         bc.updateCurConsensusExpectBlockCount(bc.getCurValidator().size());
-
-        logger.debug("下一轮共识周期验证人:{}",JSON.toJSONString(bc.getCurValidator(),true));
+        String msg = JSON.toJSONString(bc.getCurValidator(),true);
+        logger.debug("下一轮共识周期验证人:{}",msg);
     }
 }

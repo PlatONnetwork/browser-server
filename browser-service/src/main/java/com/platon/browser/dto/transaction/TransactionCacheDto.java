@@ -16,7 +16,6 @@ public class TransactionCacheDto {
 	
 	/**
 	 * 交易构造初始方法
-	 * @param transactionRedisList
 	 * @param page
 	 */
 	public TransactionCacheDto(List<TransactionWithBLOBs> transactionList,RespPage<?> page) {

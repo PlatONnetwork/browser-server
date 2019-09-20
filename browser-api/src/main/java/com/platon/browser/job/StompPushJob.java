@@ -18,10 +18,6 @@ import com.platon.browser.res.home.StakingListNewResp;
 import com.platon.browser.resp.staking.AliveStakingListResp;
 import com.platon.browser.resp.staking.StakingStatisticNewResp;
 import com.platon.browser.util.I18nUtil;
-
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -29,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * 	推送任务

@@ -1,6 +1,6 @@
 package com.platon.browser.client;
 
-import com.platon.browser.job.Web3DetectJob;
+import com.platon.browser.exception.ContractInvokeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +21,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 14:42
  */
 @Component
-public class PlatonClient {
-    private static Logger logger = LoggerFactory.getLogger(Web3DetectJob.class);
+public class PlatOnClient {
+    private static Logger logger = LoggerFactory.getLogger(PlatOnClient.class);
     private static final ReentrantReadWriteLock WEB3J_CONFIG_LOCK = new ReentrantReadWriteLock();
 
     private Map<Web3j,String> web3jMap=new HashMap<>();
@@ -78,7 +78,6 @@ public class PlatonClient {
         try{
             return currentValidWeb3j;
         }catch (Exception e){
-            e.printStackTrace();
             logger.error("web3j error{}", e);
         }finally {
             WEB3J_CONFIG_LOCK.readLock().unlock();
@@ -105,7 +104,7 @@ public class PlatonClient {
         try {
             // 检查currentValidWeb3j连通性
             try {
-                if(currentValidWeb3j==null) throw new RuntimeException("currentValidWeb3j需要初始化！");
+                if(currentValidWeb3j==null) throw new ContractInvokeException("currentValidWeb3j需要初始化！");
                 currentValidWeb3j.platonBlockNumber().send();
                 updateContract();
             } catch (Exception e1) {

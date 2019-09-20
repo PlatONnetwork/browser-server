@@ -10,6 +10,7 @@ import java.math.BigInteger;
  *  @data 2019年8月31日
  */
 public class ConvertUtil {
+    private ConvertUtil(){}
     public static BigInteger hexToBigInteger(String hexStr){
         hexStr = hexStr.replace("0x","");
         return new BigInteger(hexStr,16);

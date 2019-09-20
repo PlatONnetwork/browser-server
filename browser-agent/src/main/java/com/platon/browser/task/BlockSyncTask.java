@@ -1,13 +1,19 @@
 package com.platon.browser.task;
 
-import com.platon.browser.bean.CollectResult;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.exception.CandidateException;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
 import com.platon.browser.service.DbService;
@@ -41,6 +47,8 @@ public class BlockSyncTask {
     @Autowired
     private BlockChain blockChain;
     @Autowired
+    private BlockChainConfig chainConfig;
+    @Autowired
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
@@ -48,6 +56,15 @@ public class BlockSyncTask {
     private CandidateService candidateService;
     @Autowired
     private CacheHolder cacheHolder;
+    @Autowired
+    private AddressMapper addressMapper;
+    @Autowired
+    private AddressCacheUpdater addressCacheUpdater;
+    @Autowired
+    private StakingCacheUpdater stakingCacheUpdater;
+
+    //内置合约总数
+    private static final long INNER_CONTRACT_ADDRESS_COUNT = 7;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -59,7 +76,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws Exception {
+    public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
@@ -108,11 +125,37 @@ public class BlockSyncTask {
             // 导出结果
             BlockChainStage bcr = blockChain.exportResult();
             // 批量入库结果
-            dbService.batchSave(Collections.emptyList(),bcr);
-            blockChain.commitResult();
+            batchSave(Collections.emptyList(),bcr);
             // 初始化节点缓存
             nodeCache.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
             nodeCache.sweep();
+        }
+        /*
+         * 初始化内置合约地址到address表中
+         * 1.若为初次，新增内置合约数据
+         * 2.反之，缺哪个地址就补充，有则忽略
+         */
+        Map <String, Address> dbAddressMap = new HashMap <>();
+        //其他内置合约地址列表
+        Set <String> innerContractAddrs = chainConfig.getInnerContractAddr();
+        //PlatOn基金会账户地址
+        innerContractAddrs.add(chainConfig.getPlatonFundAccountAddr());
+        //开发者激励基金账户地址
+        innerContractAddrs.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
+        AddressExample addressExample = new AddressExample();
+        addressExample.createCriteria().andAddressIn(new ArrayList <>(innerContractAddrs));
+        List <Address> dbAddressList = addressMapper.selectByExample(addressExample);
+        dbAddressList.forEach(address -> dbAddressMap.put(address.getAddress(), address));
+        if (dbAddressList.size() != INNER_CONTRACT_ADDRESS_COUNT) {
+            innerContractAddrs.forEach(address -> {
+                if (null == dbAddressMap.get(address)) {
+                    CustomAddress customAddress = new CustomAddress();
+                    customAddress.setAddress(address);
+                    customAddress.setType(CustomAddress.TypeEnum.INNER_CONTRACT.getCode());
+                    dbAddressList.add(customAddress);
+                }
+            });
+            addressMapper.batchInsertSelective(dbAddressList, Address.Column.values());
         }
     }
 
@@ -144,7 +187,6 @@ public class BlockSyncTask {
         if (!blockNumbers.isEmpty()) {
             // 并行采块 ξξξξξξξξξξξξξξξξξξξξξξξξξξξ
             // 采集前先重置结果容器
-            CollectResult.reset();
             // 开始并行采集
             List<CustomBlock> blocks = blockService.collect(blockNumbers);
             if (!blocks.isEmpty()){
@@ -155,7 +197,7 @@ public class BlockSyncTask {
                 BlockChainStage bizData = blockChain.exportResult();
                 try {
                     // 入库失败，立即停止，防止采集后续更高的区块号，导致数据错乱
-                    dbService.batchSave(blocks, bizData);
+                    batchSave(blocks, bizData);
                 } catch (BusinessException e) {
                     logger.error("数据入库失败:",e);
                     return false;
@@ -169,5 +211,23 @@ public class BlockSyncTask {
             TimeUnit.SECONDS.sleep(1);
         }
         return true;
+    }
+
+    private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        try{
+            // 入库前更新统计信息
+            addressCacheUpdater.updateAddressStatistics();
+            stakingCacheUpdater.updateStakingStatistics();
+            // 串行批量入库
+            dbService.insertOrUpdate(basicData,bizData);
+            blockChain.commitResult();
+            // 缓存整理
+            nodeCache.sweep();
+            proposalCache.sweep();
+        }catch (Exception e){
+            throw new BusinessException("数据批量入库出错："+e.getMessage());
+        }
     }
 }

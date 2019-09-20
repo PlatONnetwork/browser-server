@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
@@ -33,7 +33,9 @@ public class TransactionService {
     private static Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     @Autowired
-    private PlatonClient client;
+    private PlatOnClient client;
+    @Autowired
+    private BlockChainConfig chainConfig;
 
     private ExecutorService executor;
 
@@ -44,10 +46,10 @@ public class TransactionService {
     /**
      * 并行分析区块及交易
      */
-    public List<CustomBlock> analyze(List<CustomBlock> blocks) {
+    public List<CustomBlock> analyze(List<CustomBlock> blocks) throws InterruptedException {
         // 对需要复杂分析的区块或交易信息，开启并行处理
-        blocks.forEach(b -> {
-            List <CustomTransaction> txList = b.getTransactionList();
+        for (CustomBlock block:blocks){
+            List <CustomTransaction> txList = block.getTransactionList();
             CountDownLatch latch = new CountDownLatch(txList.size());
             txList.forEach(tx -> executor.submit(() -> {
                 try {
@@ -58,16 +60,16 @@ public class TransactionService {
                     latch.countDown();
                 }
             }));
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+            latch.await();
+        }
 
         // 汇总区块相关的统计信息
         class Stat {
-            private int transferQty=0,stakingQty=0,proposalQty=0,delegateQty=0,txGasLimit=0;
+            private int transferQty=0;
+            private int stakingQty=0;
+            private int proposalQty=0;
+            private int delegateQty=0;
+            private int txGasLimit=0;
             private BigDecimal txFee = BigDecimal.ZERO;
         }
         blocks.forEach(block->{
@@ -95,6 +97,7 @@ public class TransactionService {
                     case VOTING_PROPOSAL:// 提案投票
                         stat.proposalQty++; // 提案交易数总和
                         break;
+                    default:
                 }
                 // 累加当前区块内所有交易的手续费
                 stat.txFee = stat.txFee.add(new BigDecimal(transaction.getActualTxCost()));
@@ -119,22 +122,21 @@ public class TransactionService {
         // 如果交易回执存在，则更新交易中与回执相关的信息
         if(receipt.isPresent()) {
             TransactionReceipt tr = receipt.get();
-            tx.updateWithTransactionReceipt(tr, BlockChainConfig.INNER_CONTRACT_ADDR);
+            tx.updateWithTransactionReceipt(tr,chainConfig.getInnerContractAddr());
         }
 
         // 解析交易参数，补充交易中与交易参数相关的信息
         try {
             TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
             tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
-            tx.setTxType(String.valueOf(txParams.getTxTypeEnum().code));
+            tx.setTxType(String.valueOf(txParams.getTxTypeEnum().getCode()));
             tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.ADDRESSES.contains(tx.getTo())){
-                tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.code));
+            if(null != tx.getValue() && ! InnerContractAddrEnum.getAddresses().contains(tx.getTo())){
+                tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.getCode()));
                 tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
             }
         }catch (Exception e){
-            logger.error("交易[hash={}]的参数解析出错:{}",tx.getHash(),e.getMessage());
-            throw e;
+            throw new BeanCreateOrUpdateException("交易[hash="+tx.getHash()+"]的参数解析出错:"+e.getMessage());
         }
         return tx;
     }
@@ -149,8 +151,7 @@ public class TransactionService {
         // 查询交易回执
         while (true) try {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            Optional<TransactionReceipt> receipt = result.getTransactionReceipt();
-            return receipt;
+            return result.getTransactionReceipt();
         } catch (Exception e) {
             logger.error("查询交易回执失败,将重试:{}", e.getMessage());
         }

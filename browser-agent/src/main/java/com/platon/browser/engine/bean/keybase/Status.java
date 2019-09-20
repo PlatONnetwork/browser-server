@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class Status {
-    private int code;
+    private Integer code;
     private String name;
 }

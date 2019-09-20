@@ -1,10 +1,13 @@
 package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.AddressExample;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.service.BlockService;
 import com.platon.browser.service.CandidateService;
@@ -21,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -37,7 +42,7 @@ public class BlockSyncTaskTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTaskTest.class);
 
     @Spy
-    private BlockSyncTask blockSyncTask;
+    private BlockSyncTask target;
     @Mock
     private CustomBlockMapper customBlockMapper;
     @Mock
@@ -52,17 +57,29 @@ public class BlockSyncTaskTest extends TestBase {
     private CandidateService candidateService;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private AddressCacheUpdater addressCacheUpdater;
+    @Mock
+    private StakingCacheUpdater stakingCacheUpdater;
+    @Mock
+    private BlockChainConfig chainConfig;
+    @Mock
+    private AddressMapper addressMapper;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(blockSyncTask, "cacheHolder", cacheHolder);
-        ReflectionTestUtils.setField(blockSyncTask, "customBlockMapper", customBlockMapper);
-        ReflectionTestUtils.setField(blockSyncTask, "dbService", dbService);
-        ReflectionTestUtils.setField(blockSyncTask, "blockChain", blockChain);
-        ReflectionTestUtils.setField(blockSyncTask, "blockService", blockService);
-        ReflectionTestUtils.setField(blockSyncTask, "transactionService", transactionService);
-        ReflectionTestUtils.setField(blockSyncTask, "candidateService", candidateService);
-        ReflectionTestUtils.setField(blockSyncTask, "collectBatchSize", 10);
+        ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(target, "customBlockMapper", customBlockMapper);
+        ReflectionTestUtils.setField(target, "dbService", dbService);
+        ReflectionTestUtils.setField(target, "blockChain", blockChain);
+        ReflectionTestUtils.setField(target, "blockService", blockService);
+        ReflectionTestUtils.setField(target, "transactionService", transactionService);
+        ReflectionTestUtils.setField(target, "candidateService", candidateService);
+        ReflectionTestUtils.setField(target, "collectBatchSize", 10);
+        ReflectionTestUtils.setField(target, "stakingCacheUpdater", stakingCacheUpdater);
+        ReflectionTestUtils.setField(target, "addressCacheUpdater", addressCacheUpdater);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
     }
 
     @Test
@@ -74,6 +91,8 @@ public class BlockSyncTaskTest extends TestBase {
 
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
+        ProposalCache proposalCache = mock(ProposalCache.class);
+        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
 
         CandidateService.CandidateResult cr = new CandidateService.CandidateResult();
         cr.setPre(verifiers);
@@ -84,21 +103,34 @@ public class BlockSyncTaskTest extends TestBase {
         when(blockChain.getCurVerifier()).thenReturn(new HashMap<>());
         when(blockChain.getPreValidator()).thenReturn(new HashMap<>());
         when(blockChain.getCurValidator()).thenReturn(new HashMap<>());
-        blockSyncTask.init();
+
+        BlockChainStage bcs = new BlockChainStage();
+        bcs.getStakingStage().insertNode(nodes.get(0));
+        bcs.getStakingStage().insertStaking(stakings.get(0));
+        bcs.getStakingStage().insertDelegation(delegations.get(0));
+        bcs.getStakingStage().insertUnDelegation(unDelegations.get(0));
+        when(blockChain.exportResult()).thenReturn(bcs);
+
+        when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0x0000000000000000000000000222");
+        when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0x00000002300000000000000000222");
+        List<Address> addrList = new ArrayList<>(addresses);
+        when(addressMapper.selectByExample(any(AddressExample.class))).thenReturn(addrList);
+
+        target.init();
 
         when(customBlockMapper.selectMaxBlockNumber()).thenReturn(null);
         CandidateService.InitParam initParam = new CandidateService.InitParam();
         initParam.setNodes(nodes);
         initParam.setStakings(stakings);
         when(candidateService.getInitParam()).thenReturn(initParam);
-        blockSyncTask.init();
-        verify(blockSyncTask, times(2)).init();
+        target.init();
+        verify(target, times(2)).init();
     }
 
     @Test
     public void testCollect() throws Exception {
         when(blockService.getLatestNumber()).thenReturn(BigInteger.TEN);
-        boolean success = blockSyncTask.collect();
+        boolean success = target.collect();
         assertTrue(success);
     }
 }

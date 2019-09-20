@@ -8,7 +8,6 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ReportValidatorParam;
@@ -50,7 +49,8 @@ public class ReportValidatorHandler implements EventHandler {
         try {
             CustomNode node = nodeCache.getNode(HexTool.prefix(param.getVerify()));
             CustomStaking latestStaking = node.getLatestStaking();
-            logger.debug("多签举报信息:{}", JSON.toJSONString(param));
+            String msg = JSON.toJSONString(param);
+            logger.debug("多签举报信息:{}", msg);
             //多签举报，惩罚金额
             BigDecimal slashValue = latestStaking.decimalStakingLocked().multiply(chainConfig.getDuplicateSignSlashRate());
             //质押节点扣除惩罚后的锁定期金额 = 未惩罚前的锁定期金额 + 犹豫期的金额 - 惩罚金额
@@ -63,13 +63,13 @@ public class ReportValidatorHandler implements EventHandler {
                 latestStaking.setStakingLocked("0");
                 Integer reduction = bc.getCurSettingEpoch().intValue();
                 latestStaking.setStakingReductionEpoch(reduction);
-                latestStaking.setStatus(CustomStaking.StatusEnum.EXITING.code);
+                latestStaking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
             } else {
                 latestStaking.setStakingLocked("0");
-                latestStaking.setStatus(CustomStaking.StatusEnum.EXITED.code);
+                latestStaking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
             }
-            latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.code);
-            latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.code);
+            latestStaking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
+            latestStaking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
             //更新分析质押结果
             stakingStage.modifyStaking(latestStaking, tx);
 
@@ -94,7 +94,7 @@ public class ReportValidatorHandler implements EventHandler {
             // 记录操作日志
             CustomNodeOpt nodeOpt = new CustomNodeOpt(latestStaking.getNodeId(), CustomNodeOpt.TypeEnum.MULTI_SIGN);
             nodeOpt.updateWithCustomBlock(bc.getCurBlock());
-            String desc = CustomNodeOpt.TypeEnum.MULTI_SIGN.tpl
+            String desc = CustomNodeOpt.TypeEnum.MULTI_SIGN.getTpl()
                     .replace("PERCENT",chainConfig.getDuplicateSignSlashRate().toString())
                     .replace("AMOUNT",slashValue.setScale(0, RoundingMode.CEILING).toString());
             nodeOpt.setDesc(desc);

@@ -10,8 +10,8 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
-import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.CreateValidatorParam;
 import org.slf4j.Logger;
@@ -35,15 +35,18 @@ public class CreateValidatorHandler implements EventHandler {
     private CacheHolder cacheHolder;
 
     @Override
-    public void handle(EventContext context) throws NoSuchBeanException {
+    public void handle(EventContext context) throws NoSuchBeanException, BlockChainException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         CustomTransaction tx = context.getTransaction();
-
         // 获取交易入参
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
-        logger.debug("发起质押(创建验证人):{}", JSON.toJSONString(param));
+        String msg = JSON.toJSONString(param);
+        logger.debug("发起质押(创建验证人):{}", msg);
+
+        //记录参数中的地址
+        bc.updateParamAddress(param.getBenefitAddress());
 
         //添加质押快高到txinfo，数据回填
         param.setBlockNumber(tx.getBlockNumber().toString());
@@ -59,7 +62,7 @@ public class CreateValidatorHandler implements EventHandler {
             logger.debug("节点(id={})已经被质押！",param.getNodeId());
             // 取当前节点最新质押信息
             CustomStaking latestStaking = node.getLatestStaking();
-            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.code){
+            if(latestStaking.getStatus()!= CustomStaking.StatusEnum.CANDIDATE.getCode()){
                 // 如果当前节点最新质押信息无效，则添加一条质押信息
                 CustomStaking newStaking = new CustomStaking();
                 // 使用最新的质押交易更新相关信息
@@ -76,9 +79,10 @@ public class CreateValidatorHandler implements EventHandler {
                 // 把质押信息放入缓存
                 nodeCache.addStaking(newStaking);
             }
-            if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.code){
+            if(latestStaking.getStatus()== CustomStaking.StatusEnum.CANDIDATE.getCode()){
                 // 如果最新质押状态为选中，且另有新的创建质押请求，则证明链上出错
-                logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), JSON.toJSONString(param));
+                msg = JSON.toJSONString(param);
+                logger.error("[DuplicateStakingError]链上重复质押同一节点(txHash={},param={})",tx.getHash(), msg);
             }
         } catch (NoSuchBeanException e) {
             logger.debug("节点(id={})尚未被质押！",param.getNodeId());

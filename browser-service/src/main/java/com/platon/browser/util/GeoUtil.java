@@ -6,6 +6,7 @@ import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
+import com.platon.browser.exception.ConfigLoadingException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,14 +23,15 @@ import java.net.InetAddress;
  *  @data 2019年8月31日
  */
 public class GeoUtil {
-    private final static Logger logger = LoggerFactory.getLogger(GeoUtil.class);
+    private GeoUtil(){}
+    private static final Logger logger = LoggerFactory.getLogger(GeoUtil.class);
     private static DatabaseReader reader;
 
     static {
         try {
             reader = new DatabaseReader.Builder(GeoUtil.class.getClassLoader().getResource("GeoLite2-City.mmdb").openStream()).build();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("",e);
         }
     }
 
@@ -69,13 +71,11 @@ public class GeoUtil {
                 }
 
                 City city = response.getCity();
-                if(city!=null){
-                    if(StringUtils.isNotBlank(city.getName())){
-                        il.setLocation(il.getLocation()+" "+city.getName());
-                    }
+                if(city!=null&&StringUtils.isNotBlank(city.getName())){
+                    il.setLocation(il.getLocation()+" "+city.getName());
                 }
             }else{
-                throw new RuntimeException("");
+                throw new ConfigLoadingException("");
             }
         }catch (Exception ex){
             // ip不合法，直接返回默认数据
@@ -90,18 +90,17 @@ public class GeoUtil {
 
     public static CityResponse getResponse(String ip){
         CityResponse response=null;
-        if(ipCheck(ip)){
-            try {
-                InetAddress ipAddress = InetAddress.getByName(ip);
-                response = reader.city(ipAddress);
-            } catch (IOException | GeoIp2Exception e) {
-                logger.debug(e.getMessage());
-            }
+        ipCheck(ip);
+        try {
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            response = reader.city(ipAddress);
+        } catch (IOException | GeoIp2Exception e) {
+            logger.debug(e.getMessage());
         }
         return response;
     }
 
-    public static boolean ipCheck(String ip) {
+    public static void ipCheck(String ip) {
         if(StringUtils.isBlank(ip)){
             logger.debug("请指定IP地址！");
             throw new RuntimeException("请指定IP地址！");
@@ -110,11 +109,9 @@ public class GeoUtil {
                 "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."+
                 "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."+
                 "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$";
-        if (ip.matches(regex)) {
-            return true;
+        if (!ip.matches(regex)) {
+            logger.debug("IP地址不合法！");
+            throw new RuntimeException("IP地址不合法！");
         }
-        logger.debug("IP地址不合法！");
-        throw new RuntimeException("IP地址不合法！");
     }
-
 }

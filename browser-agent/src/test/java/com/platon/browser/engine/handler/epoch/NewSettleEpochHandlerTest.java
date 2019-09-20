@@ -1,11 +1,10 @@
 package com.platon.browser.engine.handler.epoch;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomDelegation;
-import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomUnDelegation;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
@@ -22,7 +21,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
@@ -59,7 +57,7 @@ public class NewSettleEpochHandlerTest extends TestBase {
     @Mock
     private SpecialContractApi sca;
     @Mock
-    private PlatonClient client;
+    private PlatOnClient client;
 
     @Before
     public void setup() {

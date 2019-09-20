@@ -5,6 +5,7 @@ import com.platon.browser.dto.CustomRpPlan;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.RestrictingStage;
+import com.platon.browser.exception.BlockChainException;
 import com.platon.browser.param.CreateRestrictingParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +24,16 @@ public class RestrictingEngine {
     private static Logger logger = LoggerFactory.getLogger(RestrictingEngine.class);
     @Autowired
     private CacheHolder cacheHolder;
+    @Autowired
+    private BlockChain bc;
 
-    public void execute (CustomTransaction tx,BlockChain bc) {
+    public void execute (CustomTransaction tx) throws BlockChainException {
         RestrictingStage restrictingStage = cacheHolder.getStageData().getRestrictingStage();
     	logger.debug("execute RestrictingEngine,{}", tx.getTxInfo());
         CreateRestrictingParam param = JSON.parseObject(tx.getTxInfo(),CreateRestrictingParam.class);
+        //记录参数中的地址
+        bc.updateParamAddress(param.getAccount());
+
         param.getPlan().forEach(planParam -> {
             CustomRpPlan customRpPlan = new CustomRpPlan();
             customRpPlan.setAddress(param.getAccount());
@@ -37,6 +43,7 @@ public class RestrictingEngine {
             customRpPlan.setCreateTime(new Date());
             customRpPlan.setUpdateTime(new Date());
             restrictingStage.insertRpPlan(customRpPlan);
+
         });
     }
 }

@@ -139,7 +139,8 @@ public class BlockServiceImpl implements BlockService {
 	public BlockDownload blockListByNodeIdDownload(String nodeId, String date, String local) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
-        logger.info("导出数据起始日期：{},结束日期：{}",date,dateFormat.format(now));
+		String msg = dateFormat.format(now);
+        logger.info("导出数据起始日期：{},结束日期：{}",date,msg);
         /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
         /** 设置根据时间和nodeId查询数据 */
@@ -150,7 +151,7 @@ public class BlockServiceImpl implements BlockService {
         try {
         	criteria.andCreateTimeBetween(dateFormat.parse(date), now);
 		} catch (Exception e) {
-			logger.error("导出数据起始日期有误：{},"+e.getMessage(),date);
+			logger.error("导出数据起始日期有误：{},{}",date,e.getMessage());
     		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
 		}
         List<Block> blockList = blockMapper.selectByExample(blockExample);
@@ -174,7 +175,7 @@ public class BlockServiceImpl implements BlockService {
         	/** 设置返回的头，防止csv乱码 */
 			outputWriter.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
 		} catch (IOException e) {
-			e.printStackTrace();
+        	logger.error("数据输出错误:",e);
 		}
         /** 厨师书writer对象 */
         CsvWriter writer = new CsvWriter(outputWriter, new CsvWriterSettings());
@@ -201,15 +202,13 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public BlockDetailResp blockDetailNavigate(BlockDetailNavigateReq req) {
-		long blockNumber = req.getNumber().longValue();
+		long blockNumber = req.getNumber();
 		/** 区分是否查询上一个块还是下一个块 */
-		switch (NavigateEnum.valueOf(req.getDirection().toUpperCase())) {
-			case PREV:
-				blockNumber -= 1;
-				break;
-			case NEXT:
-				blockNumber += 1;
-				break;
+		NavigateEnum navigateEnum = NavigateEnum.valueOf(req.getDirection().toUpperCase());
+		if (navigateEnum == NavigateEnum.PREV) {
+			blockNumber -= 1;
+		} else if (navigateEnum == NavigateEnum.NEXT) {
+			blockNumber += 1;
 		}
 		return this.queryBlockByNumber(blockNumber);
 	}
@@ -237,7 +236,7 @@ public class BlockServiceImpl implements BlockService {
 	            logger.error("duplicate block: block number {}",blockNumber);
 	            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
 	        }
-	        if(blocks.size()==0){
+	        if(blocks.isEmpty()){
 	        	blockDetailResp.setTimeDiff(0l);
 	            /** 当前块没有上一个块证明这是第一个块, 设置first标识  */
 	            blockDetailResp.setFirst(true);
@@ -250,7 +249,7 @@ public class BlockServiceImpl implements BlockService {
 	        blockExample = new BlockExample();
 	        blockExample.createCriteria().andNumberEqualTo(blockNumber+1);
 	        blocks = blockMapper.selectByExample(blockExample);
-	        if(blocks.size()==0){
+	        if(blocks.isEmpty()){
 	            /** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
 	        	blockDetailResp.setLast(true);
 	        }

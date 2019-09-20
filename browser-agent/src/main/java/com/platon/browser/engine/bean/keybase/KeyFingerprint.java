@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class KeyFingerprint extends ValueScore {
-    private int algo;
-    private int nbits;
+    private Integer algo;
+    private Integer nbits;
 }

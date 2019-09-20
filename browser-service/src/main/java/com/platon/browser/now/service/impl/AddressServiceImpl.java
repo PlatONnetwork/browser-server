@@ -1,7 +1,7 @@
 package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.client.PlatonClient;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Block;
@@ -56,7 +56,7 @@ public class AddressServiceImpl implements AddressService {
     private CustomRpPlanMapper customRpPlanMapper;
 
     @Autowired
-    private PlatonClient platonClient;
+    private PlatOnClient platonClient;
 
     @Autowired
     private I18nUtil i18n;
@@ -82,7 +82,7 @@ public class AddressServiceImpl implements AddressService {
 		criteria.andAddressEqualTo(req.getAddress());
         List<RpPlan> rpPlans = rpPlanMapper.selectByExample(rpPlanExample);
         /** 有锁仓数据之后就可以返回1 */
-        if(rpPlans != null && rpPlans.size() > 0) {
+        if(rpPlans != null && !rpPlans.isEmpty()) {
         	resp.setIsRestricting(1);
         }
        return resp;
@@ -102,7 +102,7 @@ public class AddressServiceImpl implements AddressService {
 				 */
 				queryRPPlanDetailResp.setRestrictingBalance(baseResponse.data.getBalance().subtract(baseResponse.data.getPledge()).toString());
 				queryRPPlanDetailResp.setStakingValue(baseResponse.data.getPledge().toString());
-				queryRPPlanDetailResp.setUnderreleaseValue(baseResponse.data.getDebt().toString());
+				queryRPPlanDetailResp.setUnderReleaseValue(baseResponse.data.getDebt().toString());
 			}
 		} catch (Exception e) {
 			logger.error("rpplanDetail error", e);
@@ -123,7 +123,7 @@ public class AddressServiceImpl implements AddressService {
 			/**
 			 * 锁仓周期对应快高  结算周期数 * epoch  + number,如果不是整数倍则为：结算周期 * （epoch-1）  + 多余的数目
 			 */
-			Long number = 0l;
+			Long number;
 			long remainder = rPlan.getNumber() % blockChainConfig.getSettlePeriodBlockCount().longValue();
 			if(remainder == 0l) {
 				number = blockChainConfig.getSettlePeriodBlockCount()
@@ -141,7 +141,7 @@ public class AddressServiceImpl implements AddressService {
 					.add(BigInteger.valueOf(block.getTimestamp().getTime())).longValue());
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}
-		queryRPPlanDetailResp.setRPPlan(detailsRPPlanResps);
+		queryRPPlanDetailResp.setRpPlans(detailsRPPlanResps);
 		/**
 		 * 获取计算总数
 		 */

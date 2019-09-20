@@ -15,8 +15,8 @@ import com.platon.browser.config.CustomLatSerializer;
 public class QueryRPPlanDetailResp {
 	private String restrictingBalance;           //锁仓余额(单位:LAT)
 	private String stakingValue;  //锁仓质押\委托(单位:LAT)
-	private String underreleaseValue;        //欠释放(单位:LAT)
-	private List<DetailsRPPlanResp> RPPlan;  //锁仓计划
+	private String underReleaseValue;        //欠释放(单位:LAT)
+	private List<DetailsRPPlanResp> rpPlans;  //锁仓计划
 	private Long total;
 	private String totalValue;//总计锁仓
 	
@@ -35,18 +35,21 @@ public class QueryRPPlanDetailResp {
 		this.stakingValue = stakingValue;
 	}
 	@JsonSerialize(using = CustomLatSerializer.class)
-	public String getUnderreleaseValue() {
-		return underreleaseValue;
+	public String getUnderReleaseValue() {
+		return underReleaseValue;
 	}
-	public void setUnderreleaseValue(String underreleaseValue) {
-		this.underreleaseValue = underreleaseValue;
+	public void setUnderReleaseValue(String underReleaseValue) {
+		this.underReleaseValue = underReleaseValue;
 	}
-	public List<DetailsRPPlanResp> getRPPlan() {
-		return RPPlan;
+
+	public List<DetailsRPPlanResp> getRpPlans() {
+		return rpPlans;
 	}
-	public void setRPPlan(List<DetailsRPPlanResp> rPPlan) {
-		RPPlan = rPPlan;
+
+	public void setRpPlans(List<DetailsRPPlanResp> rpPlans) {
+		this.rpPlans = rpPlans;
 	}
+
 	public Long getTotal() {
 		return total;
 	}
