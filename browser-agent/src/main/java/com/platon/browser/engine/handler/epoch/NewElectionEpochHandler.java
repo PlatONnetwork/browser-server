@@ -52,7 +52,7 @@ public class NewElectionEpochHandler implements EventHandler {
             Node exist = bc.getPreValidator().get(staking.getNodeId());
             if(exist==null) continue;
             // 根据前一个共识周期的出块数判断是否触发最低处罚
-            boolean isSlash = staking.getPreConsBlockQty()<chainConfig.getSlashBlockThreshold().longValue();
+            boolean isSlash = staking.getPreConsBlockQty()<=chainConfig.getSlashBlockThreshold().longValue();
             if(isSlash){
                 // 统一罚指定个数的出块奖励
                 BigDecimal stakingHas = staking.decimalStakingHas();
