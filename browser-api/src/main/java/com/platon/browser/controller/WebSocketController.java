@@ -38,10 +38,10 @@ public class WebSocketController {
 	 * * 连接建立成功调用的方法 * * @param session 可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
 	 */
 	@OnOpen
-	public void onOpen(@PathParam(value = "message") String message, Session WebSocketsession, EndpointConfig config) {
+	public void onOpen(@PathParam(value = "message") String message, Session session, EndpointConfig config) {
 		message = "{" + message + "}";
 		MessageDto messageDto = JSONObject.parseObject(message, MessageDto.class);
-		BrowserCache.getWebSocketSet().put(messageDto.getUserNo(), WebSocketsession);// 加入map中
+		BrowserCache.getWebSocketSet().put(messageDto.getUserNo(), session);// 加入map中
 		/**
 		 * 用組合key来存储用户list
 		 * 判断是否已经拥有key
@@ -62,7 +62,7 @@ public class WebSocketController {
 		}
 		userno = messageDto.getUserNo();
 		BrowserCache.addOnlineCount();// 在线数加1
-		logger.debug("有新连接加入！当前在线人数为" + BrowserCache.getOnlineCount());
+		logger.debug("有新连接加入！当前在线人数为:{}",BrowserCache.getOnlineCount());
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class WebSocketController {
 			BrowserCache.getWebSocketSet().remove(userno); // 从set中删除
 		}
 		BrowserCache.subOnlineCount(); // 在线数减1
-		logger.debug("有一连接关闭！当前在线人数为" + BrowserCache.getOnlineCount());
+		logger.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class WebSocketController {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		logger.debug("来自客户端的消息:" + message);
+		logger.debug("来自客户端的消息:{}",message);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class WebSocketController {
 			}
 			BrowserCache.getWebSocketSet().remove(userno); // 从set中删除
 			BrowserCache.subOnlineCount(); // 在线数减1
-			logger.debug("有一连接关闭！当前在线人数为" + BrowserCache.getOnlineCount());
+			logger.debug("有一连接关闭！当前在线人数为:{}",BrowserCache.getOnlineCount());
 		}
 	}
 

@@ -3,7 +3,6 @@ package com.platon.browser.job;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
-import com.platon.browser.controller.WebSocketController;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.HomeService;
@@ -39,7 +38,7 @@ import java.util.Map.Entry;
 @Component
 public class StompPushJob {
 
-	private static Logger logger = LoggerFactory.getLogger(WebSocketController.class);
+	private static Logger logger = LoggerFactory.getLogger(StompPushJob.class);
 	
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -121,7 +120,7 @@ public class StompPushJob {
     				/**
     				 * 只有没有用户列表时候才需要remove整个key
     				 */
-    				if(m.getValue().size() <= 0) {
+    				if(m.getValue().isEmpty()) {
     					BrowserCache.getKeys().remove(m.getKey());
     				}
 					logger.error("连接异常清楚连接",e);

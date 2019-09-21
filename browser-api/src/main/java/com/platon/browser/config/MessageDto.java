@@ -26,24 +26,24 @@ public class MessageDto extends PageReq{
      * @return
      */
 	public String getMessageKey () {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		/**
 		 * 如果为null则填空
 		 */
 		if(this.getPageNo() != null) {
-			sb.append(new StringBuffer(String.valueOf(this.getPageNo())));
+			sb.append(this.getPageNo());
 		}
 		sb.append(BrowserConst.PEAD_SPILT);
 		if(this.getPageSize() != null) {
-			sb.append(new StringBuffer(String.valueOf(this.getPageSize())));
+			sb.append(this.getPageSize());
 		}
 		sb.append(BrowserConst.PEAD_SPILT);
 		if(StringUtils.isNotBlank(this.getKey())) {
-			sb.append(new StringBuffer(String.valueOf(this.getKey())));
+			sb.append(this.getKey());
 		}
 		sb.append(BrowserConst.PEAD_SPILT);
 		if(StringUtils.isNotBlank(this.getQueryStatus())) {
-			sb.append(new StringBuffer(this.getQueryStatus()));
+			sb.append(this.getQueryStatus());
 		}
 		return sb.toString();
 	}
