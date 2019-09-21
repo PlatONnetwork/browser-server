@@ -150,7 +150,7 @@ public class SpecialContractApi {
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException {
         final Function function = new Function(
             GET_RESTRICTING_BALANCE_FUNC_TYPE,
-            Arrays.asList(new Utf8String(addresses)),
+            Collections.singletonList(new Utf8String(addresses)),
             Collections.emptyList()
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
