@@ -55,7 +55,7 @@ public class ProposalEngine {
     private EventContext context = new EventContext();
 
     @PostConstruct
-    private void init() throws CacheConstructException {
+    public void init() throws CacheConstructException {
         ProposalCache proposalCache = cacheHolder.getProposalCache();
     	logger.debug("init ProposalEngine");
         // 初始化全量数据

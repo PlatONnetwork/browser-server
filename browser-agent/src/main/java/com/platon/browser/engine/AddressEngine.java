@@ -34,7 +34,7 @@ public class AddressEngine {
     private AddressStatisticHandler addressStatisticHandler;
 
     @PostConstruct
-    private void init () {
+    public void init () {
         AddressCache addressCache= cacheHolder.getAddressCache();
     	logger.debug("init AddressEngine");
         // 初始化全量数据
