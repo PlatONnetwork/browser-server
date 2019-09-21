@@ -12,7 +12,7 @@ import com.platon.browser.BrowserApiApplication;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class)
+@SpringBootTest(classes = BrowserApiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class JasyptTest {
 
     @Autowired
