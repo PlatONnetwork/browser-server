@@ -212,7 +212,7 @@ public class BlockChain {
         cacheHolder.getStageData().clear();
     }
 
-    public void updateParamAddress(String address) throws BlockChainException {
+    public void updateParamAddress(String address,CustomAddress.TypeEnum typeEnum) throws BlockChainException {
         if(StringUtils.isBlank(address)) {
             throw new BlockChainException("参数地址不能为空!");
         }
@@ -222,6 +222,7 @@ public class BlockChain {
         }catch (NoSuchBeanException e){
             CustomAddress customAddress = new CustomAddress();
             customAddress.setAddress(address);
+            customAddress.setType(typeEnum.getCode());
             cacheHolder.getStageData().getAddressStage().insertAddress(customAddress);
         }
     }
