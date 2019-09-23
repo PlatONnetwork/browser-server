@@ -1,13 +1,20 @@
 package com.platon.browser.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 public class MarkDownParserUtilTest {
 
+	@Test
+	public void testacquireMD() throws Exception {
+		String str = MarkDownParserUtil.acquireMD("http://192.168.16.173");
+		assertNull(str);
+	}
+	
 	@Test
 	public void testParserMD() throws IOException {
 		String str = "<table data-table-type=\"yaml-metadata\">\r\n" +

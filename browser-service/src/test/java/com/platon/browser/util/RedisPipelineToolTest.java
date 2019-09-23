@@ -1,6 +1,7 @@
 package com.platon.browser.util;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -37,15 +38,27 @@ public class RedisPipelineToolTest extends TestBase{
 		@SuppressWarnings("rawtypes")
 		Map<String, Map> map = RedisPipelineTool.batchQueryByKeys(keys, false, Map.class, redisTemplate);
 		assertNotNull(map);
+		
+		map = RedisPipelineTool.batchQueryByKeys(keys, true, Map.class, redisTemplate);
+		assertNotNull(map);
+		
+		map = RedisPipelineTool.batchQueryByKeys(null, null, Map.class, redisTemplate);
+		assertNull(map);
+		
+		keys.clear();
+		map = RedisPipelineTool.batchQueryByKeys(keys, null, Map.class, redisTemplate);
+		assertNull(map);
 	}
 
 	@Test
 	public void testBatchDeleteByKeys() {
 		List<String> keys = new ArrayList<String>();
+		Integer num = RedisPipelineTool.batchDeleteByKeys(keys, false, redisTemplate);
+		assertNull(num);
 		keys.add("key1");
 		keys.add("key2");
 		keys.add("key3");
-		Integer num = RedisPipelineTool.batchDeleteByKeys(keys, false, redisTemplate);
+		num = RedisPipelineTool.batchDeleteByKeys(keys, false, redisTemplate);
 		assertTrue(num==3);
 	}
 	

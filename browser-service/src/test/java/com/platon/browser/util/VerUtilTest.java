@@ -2,6 +2,7 @@ package com.platon.browser.util;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 
@@ -22,6 +23,11 @@ public class VerUtilTest {
     public void shouldEquals() {
         BigInteger version = VerUtil.toInteger("1.1.0");
         assertEquals(BigInteger.valueOf(65792), version);
+        try {
+			version = VerUtil.toInteger("abcdef");
+		} catch (Exception e) {
+			assertTrue(e instanceof NumberFormatException);
+		}
     }
 
 

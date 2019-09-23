@@ -12,8 +12,12 @@ public class BusinessExceptionTest {
 
 	@Test
 	public void testBusinessExceptionString() {
+		BusinessException be = new BusinessException("BusinessException");
+		assertTrue(be.getErrorCode()==-1);
+		assertTrue(be.getErrorMessage().equals("BusinessException"));
+		assertTrue(be.getLocale().getCountry().equals("CN"));
 		try {
-			throw new BusinessException("BusinessException");
+			throw be;
 		} catch (Exception e) {
 			assertTrue(e instanceof BusinessException);;
 		}

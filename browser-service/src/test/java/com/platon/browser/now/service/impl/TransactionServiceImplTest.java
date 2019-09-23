@@ -37,12 +37,12 @@ public class TransactionServiceImplTest extends TestBase{
 		assertNotNull(resp);
 	}
 	
-//	@Test
+	@Test
 	public void getTransactionListByBlock() {
 		TransactionListByBlockRequest req = new TransactionListByBlockRequest();
-		req.setBlockNumber(56779);
-		req.setTxType("0");
-		RespPage<TransactionListResp>  resp = this.transactionService.getTransactionListByBlock(req);
+		req.setBlockNumber(8546);
+		req.setTxType("staking");
+		RespPage<TransactionListResp> resp = this.transactionService.getTransactionListByBlock(req);
 		assertNotNull(resp);
 	}
 	
@@ -54,11 +54,10 @@ public class TransactionServiceImplTest extends TestBase{
 		assertNotNull(resp);
 	}
 	
-//	@Test
+	@Test
 	public void transactionListByAddressDownload() {
 		String address = "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219";
 		String date = "2019-08-21";
-		// TODO
 		AccountDownload accountDownload = this.transactionService.transactionListByAddressDownload(address, date, "en");
 		assertNotNull(accountDownload.getData());
 	}
@@ -71,7 +70,7 @@ public class TransactionServiceImplTest extends TestBase{
 		assertNotNull(resp);
 	}
 	
-//	@Test
+	@Test
 	public void transactionDetailNavigate() {
 		TransactionDetailNavigateReq req = new TransactionDetailNavigateReq();
 		req.setTxHash("0x215eb99a9ee0d0e75e88a99897aa2b71711c09a7296a66591fa88e9c39b13a6f");

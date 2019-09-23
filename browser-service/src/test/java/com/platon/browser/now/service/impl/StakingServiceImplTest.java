@@ -38,16 +38,24 @@ public class StakingServiceImplTest extends TestBase{
 	@Test
 	public void aliveStakingList() {
 		AliveStakingListReq req = new AliveStakingListReq();
-		req.setKey("cdm");
+		req.setKey("cdm-004");
 		req.setQueryStatus("all");
 		RespPage<AliveStakingListResp> resp = stakingService.aliveStakingList(req);
+		assertNotNull(resp);
+		
+		req.setQueryStatus("active");
+		resp = stakingService.aliveStakingList(req);
+		assertNotNull(resp);
+		
+		req.setQueryStatus("candidate");
+		resp = stakingService.aliveStakingList(req);
 		assertNotNull(resp);
 	}
 	
 	@Test
 	public void historyStakingList() {
 		HistoryStakingListReq req = new HistoryStakingListReq();
-		req.setKey("cdm");
+		req.setKey("cdm-004");
 		RespPage<HistoryStakingListResp> resp = stakingService.historyStakingList(req);
 		assertNotNull(resp);
 	}
