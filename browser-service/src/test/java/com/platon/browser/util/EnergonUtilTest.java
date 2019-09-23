@@ -16,8 +16,21 @@ public class EnergonUtilTest {
 
 	@Test
 	public void testFormatObjectInteger() {
-		String str = EnergonUtil.format(12345678901234567890123456789f,8);
+		String str;
+		try {
+			str = EnergonUtil.format("abc",8);
+		} catch (Exception e) {
+			assertTrue(e instanceof NumberFormatException);
+		}
+		
+		str = EnergonUtil.format(12345678901234567890123456789f,8);
 		assertTrue("12345679154391251000000000000".equals(str));
+		
+		str = EnergonUtil.format(0,8);
+		assertTrue("0".equals(str));
+		
+		str = EnergonUtil.format(0.1,8);
+		assertTrue("0.1".equals(str));
 	}
 
 }

@@ -30,7 +30,7 @@ public class ProposalServiceImplTest extends TestBase{
     @Test
     public void get() {
         ProposalDetailRequest request = new ProposalDetailRequest();
-        request.setProposalHash("addvdfbnghm");
+        request.setProposalHash("0xf90e919f3a8d75557a3675b9c832bcd1f6d0531d4eb3730a2996be14fac5cb4f");
         assertNotNull(proposalService.get(request));
     }
     @Test

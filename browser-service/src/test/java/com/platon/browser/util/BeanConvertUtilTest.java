@@ -1,5 +1,6 @@
 package com.platon.browser.util;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class BeanConvertUtilTest {
 		proposal.setPipNum("0xefsdfefa5fse");
 		ProposalDetailsResp resp = BeanConvertUtil.beanConvert(proposal, ProposalDetailsResp.class);
 		assertTrue(proposal.getPipNum().equals(resp.getPipNum()));
+		resp = BeanConvertUtil.beanConvert(null, ProposalDetailsResp.class);
+		assertNull(resp);
 	}
 
 	@Test
