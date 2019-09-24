@@ -64,7 +64,9 @@ public class BlockChainConfig {
 
     private static final Set<String> INNER_CONTRACT_ADDR = new HashSet<>(InnerContractAddrEnum.getAddresses());
 
-    public Set<String> getInnerContractAddr(){return INNER_CONTRACT_ADDR;}
+    public Set<String> getInnerContractAddr(){
+        return Collections.unmodifiableSet(INNER_CONTRACT_ADDR);
+    }
 
     /*******************以下参数通过rpc接口debug_economicConfig获取*******************/
     //【通用】每个验证人每个共识周期出块数量目标值
@@ -194,7 +196,6 @@ public class BlockChainConfig {
         this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
-
         //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
         this.slashBlockThreshold=ecr.getSlashing().getPackAmountAbnormal();
         //【惩罚】低出块率处罚多少个区块奖励
@@ -223,6 +224,5 @@ public class BlockChainConfig {
         this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
-
     }
 }

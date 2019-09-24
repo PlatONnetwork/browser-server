@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,21 +49,20 @@ public class AddressEngine {
         List<CustomAddress> addresses = customAddressMapper.selectAll();
         addresses.forEach(addressCache::add);
 
-        // 检查内置地址是否存在，不存在则添加
-        //其他内置合约地址列表
-        Set<String> innerAddress = chainConfig.getInnerContractAddr();
+        // 检查内置地址是否在数据库中存在，不存在则入库并添加至缓存
+        Set<String> innerAddresses = new HashSet<>(chainConfig.getInnerContractAddr());
         //PlatOn基金会账户地址
-        innerAddress.add(chainConfig.getPlatonFundAccountAddr());
+        innerAddresses.add(chainConfig.getPlatonFundAccountAddr());
         //开发者激励基金账户地址
-        innerAddress.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
-
-        innerAddress.forEach(address->{
+        innerAddresses.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
+        innerAddresses.forEach(address->{
             try {
                 addressCache.getAddress(address);
             } catch (NoSuchBeanException e) {
                 CustomAddress customAddress = new CustomAddress();
                 customAddress.setAddress(address);
                 customAddress.setType(CustomAddress.TypeEnum.INNER_CONTRACT.getCode());
+                // 放入地址缓存
                 addressCache.add(customAddress);
                 // 放入入库暂存
                 addressStage.insertAddress(customAddress);
