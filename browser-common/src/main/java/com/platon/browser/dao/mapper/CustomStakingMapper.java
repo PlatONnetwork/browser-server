@@ -25,4 +25,6 @@ public interface CustomStakingMapper {
 	
 	Page<StakingNode> selectHistoryNode(@Param("key") String key, @Param("statusList") List<Integer> statusList);
 
+	String selectSumExitDelegate();
+
 }
