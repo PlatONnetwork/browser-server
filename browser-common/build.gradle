@@ -16,3 +16,9 @@ dependencies {
 	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
 }
 
+sonarqube {
+    properties {
+        property "sonar.exclusions", "src/main/java/com/platon/browser/dao/entity/*"
+        property "sonar.exclusions", "src/main/java/com/platon/browser/dao/mapper/*"
+    }
+}

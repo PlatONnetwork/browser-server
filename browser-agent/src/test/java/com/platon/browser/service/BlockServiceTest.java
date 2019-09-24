@@ -51,6 +51,7 @@ public class BlockServiceTest extends TestBase {
         ReflectionTestUtils.setField(blockService, "client", client);
         when(client.getWeb3j()).thenReturn(web3j);
         when(blockService.collect(anySet())).thenCallRealMethod();
+        when(blockService.getSortedBlocks()).thenCallRealMethod();
         when(blockService.getBlock(any(BigInteger.class))).thenAnswer((Answer<CustomBlock>) invocation->{
             BigInteger blockNumber = invocation.getArgument(0);
             CustomBlock block = new CustomBlock();

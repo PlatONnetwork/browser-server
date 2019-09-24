@@ -4,7 +4,6 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.exception.BlockCollectingException;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,25 +29,19 @@ public class BlockService {
     private PlatOnClient client;
     private ExecutorService executor;
 
-    @Data
-    static class CollectResult {
-        private CollectResult(){}
-        // 并发采集的块信息，无序
-        private Map<Long, CustomBlock> blockMap = new ConcurrentHashMap<>();
-        // 由于异常而未采集的区块号列表
-        private final Set<BigInteger> retryNumber = new CopyOnWriteArraySet<>();
-        List <CustomBlock> getSortedBlocks() {
-            List<CustomBlock> sortedBlock = new LinkedList<>(blockMap.values());
-            sortedBlock.sort(Comparator.comparing(Block::getNumber));
-            return sortedBlock;
-        }
-        void reset() {
-            blockMap.clear();
-            retryNumber.clear();
-        }
+    // 并发采集的块信息，无序
+    private final static Map<Long, CustomBlock> BLOCK_MAP = new ConcurrentHashMap<>();
+    // 由于异常而未采集的区块号列表
+    private final static Set<BigInteger> RETRY_NUMBER = new CopyOnWriteArraySet<>();
+    List <CustomBlock> getSortedBlocks() {
+        List<CustomBlock> sortedBlock = new LinkedList<>(BLOCK_MAP.values());
+        sortedBlock.sort(Comparator.comparing(Block::getNumber));
+        return sortedBlock;
     }
-
-    private CollectResult cr = new CollectResult();
+    private void reset() {
+        BLOCK_MAP.clear();
+        RETRY_NUMBER.clear();
+    }
 
     public void init(ExecutorService executor){
         this.executor = executor;
@@ -60,20 +53,20 @@ public class BlockService {
      * @return void
      */
     public List<CustomBlock> collect(Set<BigInteger> blockNumbers) throws InterruptedException {
-        cr.reset();
+        reset();
         // 把待采块放入重试列表，当作重试块号操作
-        cr.getRetryNumber().addAll(blockNumbers);
+        RETRY_NUMBER.addAll(blockNumbers);
         // 记录每次重试出异常的块号，方便放入下次重试
         Set<BigInteger> exceptionNumbers = new CopyOnWriteArraySet<>();
-        while (!cr.getRetryNumber().isEmpty()){
+        while (!RETRY_NUMBER.isEmpty()){
             exceptionNumbers.clear();
             // 并行批量采集区块
-            CountDownLatch latch = new CountDownLatch(cr.getRetryNumber().size());
-            cr.getRetryNumber().forEach(blockNumber->
+            CountDownLatch latch = new CountDownLatch(RETRY_NUMBER.size());
+            RETRY_NUMBER.forEach(blockNumber->
                 executor.submit(()->{
                     try {
                         CustomBlock block = getBlock(blockNumber);
-                        cr.getBlockMap().put(blockNumber.longValue(),block);
+                        BLOCK_MAP.put(blockNumber.longValue(),block);
                     } catch (Exception e) {
                         logger.error("搜集区块[{}]异常,加入重试列表",blockNumber,e);
                         // 把出现异常的区块号加入异常块号列表
@@ -85,11 +78,11 @@ public class BlockService {
             );
             latch.await();
             // 清空重试列表
-            cr.getRetryNumber().clear();
+            RETRY_NUMBER.clear();
             // 把本轮异常区块号加入重试列表
-            cr.getRetryNumber().addAll(exceptionNumbers);
+            RETRY_NUMBER.addAll(exceptionNumbers);
         }
-        return cr.getSortedBlocks();
+        return getSortedBlocks();
     }
 
     /**
