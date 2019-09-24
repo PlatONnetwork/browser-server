@@ -18,6 +18,7 @@ import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
@@ -78,6 +79,11 @@ public class StakingServiceImpl implements StakingService {
 		StakingStatisticNewResp stakingStatisticNewResp = new StakingStatisticNewResp();
 		if(networkStatRedis != null) {
 			BeanUtils.copyProperties(networkStatRedis, stakingStatisticNewResp);
+			
+			String sumExitDelegate = customStakingMapper.selectSumExitDelegate();
+			String stakingDelegationValue = new BigDecimal(networkStatRedis.getStakingDelegationValue())
+					.subtract(new BigDecimal(sumExitDelegate==null?"0":sumExitDelegate)).toString();
+			stakingStatisticNewResp.setStakingDelegationValue(stakingDelegationValue);
 		}
 		return stakingStatisticNewResp;
 	}
