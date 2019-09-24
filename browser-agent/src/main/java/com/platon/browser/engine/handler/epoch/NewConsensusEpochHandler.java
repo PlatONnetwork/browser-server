@@ -49,7 +49,7 @@ public class NewConsensusEpochHandler implements EventHandler {
     private CacheHolder cacheHolder;
 
     @Override
-    public void handle(EventContext context) throws CandidateException, NoSuchBeanException {
+    public void handle(EventContext context) throws CandidateException, NoSuchBeanException, InterruptedException {
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -114,7 +114,7 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateValidator() throws CandidateException {
+    private void updateValidator() throws CandidateException, InterruptedException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         List <Node> preValidator;

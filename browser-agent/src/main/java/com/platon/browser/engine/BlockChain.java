@@ -237,7 +237,7 @@ public class BlockChain {
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    public void epochChangeEvent() throws CandidateException, NoSuchBeanException, SettleEpochChangeException {
+    public void epochChangeEvent() throws CandidateException, NoSuchBeanException, SettleEpochChangeException, InterruptedException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
 

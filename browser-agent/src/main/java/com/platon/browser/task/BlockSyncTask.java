@@ -67,7 +67,7 @@ public class BlockSyncTask {
     /**
      * 初始化已有业务数据
      */
-    public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException {
+    public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException, InterruptedException {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
@@ -128,7 +128,7 @@ public class BlockSyncTask {
      * @throws Exception
      */
     public void start() throws Exception {
-        while (true) if (!collect()) break;
+        while (true) if(collect()==null) break;
     }
 
     /**
@@ -136,7 +136,7 @@ public class BlockSyncTask {
      * @return
      * @throws Exception
      */
-    public boolean collect() throws Exception {
+    public Boolean collect() throws Exception {
         // 从(已采最高区块号+1)开始构造连续的指定数量的待采区块号列表
         Set<BigInteger> blockNumbers = new HashSet<>();
         // 当前链上最新区块号
@@ -164,6 +164,8 @@ public class BlockSyncTask {
                     batchSave(blocks, bizData);
                 } catch (BusinessException e) {
                     logger.error("数据入库失败:",e);
+                    // 清除待入库数据，防止下次重试插入重复数据
+                    blockChain.commitResult();
                     return false;
                 }
                 // 记录已采入库最高区块号

@@ -56,7 +56,7 @@ public class NewSettleEpochHandler implements EventHandler {
     private NodeCache nodeCache;
 
     @Override
-    public void handle(EventContext context) throws CandidateException, SettleEpochChangeException {
+    public void handle(EventContext context) throws CandidateException, SettleEpochChangeException, InterruptedException {
         nodeCache = cacheHolder.getNodeCache();
         stakingStage = cacheHolder.getStageData().getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
@@ -76,7 +76,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws CandidateException {
+    private void updateVerifier () throws CandidateException, InterruptedException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         List <Node> preVerifier;

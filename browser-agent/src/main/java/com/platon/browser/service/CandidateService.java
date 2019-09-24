@@ -65,7 +65,7 @@ public class CandidateService {
      * @throws CandidateException
      * @throws BlockNumberException
      */
-    public CandidateResult getVerifiers(Long blockNumber) throws CandidateException, BlockNumberException {
+    public CandidateResult getVerifiers(Long blockNumber) throws CandidateException, BlockNumberException, InterruptedException {
         CandidateResult cr = new CandidateResult();
         // ==================================更新前一周期验证人列表=======================================
         // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
@@ -77,6 +77,7 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}", prevEpochLastBlockNumber, e.getMessage());
+            TimeUnit.SECONDS.sleep(1L);
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -97,6 +98,7 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错,将重试:{}", e1.getMessage());
+                TimeUnit.SECONDS.sleep(1L);
             }
         }
 
@@ -112,7 +114,7 @@ public class CandidateService {
      * @throws BlockNumberException
      * @throws CandidateException
      */
-    public CandidateResult getValidators(Long blockNumber) throws BlockNumberException, CandidateException {
+    public CandidateResult getValidators(Long blockNumber) throws BlockNumberException, CandidateException, InterruptedException {
         CandidateResult cr = new CandidateResult();
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
         while (true) try {
@@ -122,6 +124,7 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:{}]", prevEpochLastBlockNumber, e.getMessage());
+            TimeUnit.SECONDS.sleep(1L);
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -141,6 +144,7 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:{}", e1.getMessage());
+                TimeUnit.SECONDS.sleep(1L);
             }
         }
 
@@ -154,7 +158,7 @@ public class CandidateService {
      * 从区块号0初始化BlockChain的共识周期验证人和结算周期验证人
      * @throws Exception
      */
-    public InitParam getInitParam() {
+    public InitParam getInitParam() throws InterruptedException {
         InitParam initParam = new InitParam();
         // 如果库里区块为空，则：
         /* 根据区块号0查询共识周期验证人，以便对结算周期验证人设置共识标识 */
@@ -235,7 +239,7 @@ public class CandidateService {
      * @return
      * @throws Exception
      */
-    public List<Node> getCurCandidates() {
+    public List<Node> getCurCandidates() throws InterruptedException {
         while (true) try {
             BaseResponse<List<Node>> br = client.getNodeContract().getCandidateList().send();
             if (!br.isStatusOk()) {
@@ -244,11 +248,7 @@ public class CandidateService {
             return br.data;
         } catch (Exception e) {
             logger.error("底层链查询候选验证节点列表出错,将重试:{}", e.getMessage());
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception ex) {
-                logger.error(ERR_MSG,ex);
-            }
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 
@@ -257,7 +257,7 @@ public class CandidateService {
      * @return
      * @throws Exception
      */
-    public List<Node> getCurVerifiers() {
+    public List<Node> getCurVerifiers() throws InterruptedException {
         while (true) try {
             BaseResponse<List<Node>> br = client.getNodeContract().getVerifierList().send();
             if (!br.isStatusOk()) {
@@ -266,11 +266,7 @@ public class CandidateService {
             return br.data;
         } catch (Exception e) {
             logger.error("底层链查询实时结算周期验证节点列表出错,将重试:{}", e.getMessage());
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception ex) {
-                logger.error(ERR_MSG,ex);
-            }
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 
@@ -279,7 +275,7 @@ public class CandidateService {
      * @return
      * @throws Exception
      */
-    public List<Node> getCurValidators() {
+    public List<Node> getCurValidators() throws InterruptedException {
         while (true) try {
             BaseResponse<List<Node>> br = client.getNodeContract().getValidatorList().send();
             if (!br.isStatusOk()) {
@@ -288,11 +284,7 @@ public class CandidateService {
             return br.data;
         } catch (Exception e) {
             logger.error("底层链查询实时共识周期验证节点列表出错,将重试:{}", e.getMessage());
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception ex) {
-                logger.error(ERR_MSG,ex);
-            }
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 }
