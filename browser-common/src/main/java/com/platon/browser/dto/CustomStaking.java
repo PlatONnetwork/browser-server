@@ -115,7 +115,7 @@ public class CustomStaking extends Staking {
         // 节点状态 1：候选中 2：退出中 3：已退出
         if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
         // 节点名称(质押节点名称)
-        this.setStakingName(node.getNodeName());
+        this.setStakingName(StringUtils.isBlank(node.getNodeName())?this.getStakingName():node.getNodeName());
         // 节点的第三方主页
         this.setWebSite(node.getWebsite());
         this.setDetails(node.getDetails());
@@ -135,7 +135,7 @@ public class CustomStaking extends Staking {
         /**********从交易入参中取相关信息***********/
         CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
         this.setNodeId(param.getNodeId());
-        this.setStakingName(param.getNodeName());
+        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
         this.setDenefitAddr(param.getBenefitAddress());
         this.setStakingHas(param.getAmount());
         this.setWebSite(param.getWebsite());
@@ -151,7 +151,7 @@ public class CustomStaking extends Staking {
      */
     public void updateWithEditValidatorParam(EditValidatorParam param) {
         this.setExternalId(param.getExternalId());
-        this.setStakingName(param.getNodeName());
+        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
         this.setDetails(param.getDetails());
         this.setDenefitAddr(param.getBenefitAddress());
         this.setWebSite(param.getWebsite());
