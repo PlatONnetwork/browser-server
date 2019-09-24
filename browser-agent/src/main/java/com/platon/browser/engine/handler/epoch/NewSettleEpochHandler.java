@@ -60,7 +60,7 @@ public class NewSettleEpochHandler implements EventHandler {
         nodeCache = cacheHolder.getNodeCache();
         stakingStage = cacheHolder.getStageData().getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
-        settle(); // 结算
+        settleStaking(); // 结算
         updateDelegation(); // 更新委托信息
         updateUnDelegation(); // 更新解委托信息
     }
@@ -160,7 +160,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void settle() throws SettleEpochChangeException {
+    private void settleStaking() throws SettleEpochChangeException {
         if(bc.getPreVerifier().size()==0){
             throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }
