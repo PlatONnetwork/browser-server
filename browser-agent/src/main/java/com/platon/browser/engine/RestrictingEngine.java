@@ -33,7 +33,7 @@ public class RestrictingEngine {
     	logger.debug("execute RestrictingEngine,{}", tx.getTxInfo());
         CreateRestrictingParam param = JSON.parseObject(tx.getTxInfo(),CreateRestrictingParam.class);
         //记录参数中的地址
-        bc.updateParamAddress(param.getAccount(), CustomAddress.TypeEnum.ACCOUNT);
+        bc.createAddress(param.getAccount(), CustomAddress.TypeEnum.ACCOUNT);
 
         param.getPlan().forEach(planParam -> {
             CustomRpPlan customRpPlan = new CustomRpPlan();

@@ -45,7 +45,7 @@ public class EditValidatorHandler implements EventHandler {
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
 
         //记录参数中的地址
-        bc.updateParamAddress(param.getBenefitAddress(), CustomAddress.TypeEnum.ACCOUNT);
+        bc.createAddress(param.getBenefitAddress(), CustomAddress.TypeEnum.ACCOUNT);
         String msg  = JSON.toJSONString(param);
         logger.debug("修改质押信息(编辑验证人):{}", msg);
         try{

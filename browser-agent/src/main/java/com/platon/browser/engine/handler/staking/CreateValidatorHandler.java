@@ -47,7 +47,7 @@ public class CreateValidatorHandler implements EventHandler {
         logger.debug("发起质押(创建验证人):{}", msg);
 
         //记录参数中的地址
-        bc.updateParamAddress(param.getBenefitAddress(), CustomAddress.TypeEnum.ACCOUNT);
+        bc.createAddress(param.getBenefitAddress(), CustomAddress.TypeEnum.ACCOUNT);
 
         //添加质押快高到txinfo，数据回填
         param.setBlockNumber(tx.getBlockNumber().toString());
