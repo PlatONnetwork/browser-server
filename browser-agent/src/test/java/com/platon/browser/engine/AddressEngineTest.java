@@ -1,11 +1,13 @@
 package com.platon.browser.engine;
 
 import com.platon.browser.TestBase;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.AddressCache;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.handler.statistic.AddressStatisticHandler;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +40,8 @@ public class AddressEngineTest extends TestBase {
     private CustomAddressMapper customAddressMapper;
     @Mock
     private AddressStatisticHandler addressStatisticHandler;
+    @Mock
+    private BlockChainConfig chainConfig;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -49,13 +53,18 @@ public class AddressEngineTest extends TestBase {
         ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(target, "customAddressMapper", customAddressMapper);
         ReflectionTestUtils.setField(target, "addressStatisticHandler", addressStatisticHandler);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
     }
 
     @Test
     public void testInit () {
         AddressCache addressCache = mock(AddressCache.class);
         when(cacheHolder.getAddressCache()).thenReturn(addressCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
         when(customAddressMapper.selectAll()).thenReturn(addresses);
+        when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0xaaaaaaaaaaaaaaaaaa");
+        when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0xbbbbbbbbbbbbbbbbbb");
 
         target.init();
         verify(target, times(1)).init();

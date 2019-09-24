@@ -223,6 +223,7 @@ public class BlockChain {
             CustomAddress customAddress = new CustomAddress();
             customAddress.setAddress(address);
             customAddress.setType(typeEnum.getCode());
+            cacheHolder.getAddressCache().add(customAddress);
             cacheHolder.getStageData().getAddressStage().insertAddress(customAddress);
         }
     }

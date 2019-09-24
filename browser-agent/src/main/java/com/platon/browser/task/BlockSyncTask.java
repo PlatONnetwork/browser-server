@@ -1,11 +1,7 @@
 package com.platon.browser.task;
 
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
-import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
@@ -57,14 +53,9 @@ public class BlockSyncTask {
     @Autowired
     private CacheHolder cacheHolder;
     @Autowired
-    private AddressMapper addressMapper;
-    @Autowired
     private AddressCacheUpdater addressCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
-
-    //内置合约总数
-    private static final long INNER_CONTRACT_ADDRESS_COUNT = 7;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -129,33 +120,6 @@ public class BlockSyncTask {
             // 初始化节点缓存
             nodeCache.init(initParam.getNodes(),initParam.getStakings(),Collections.emptyList(),Collections.emptyList());
             nodeCache.sweep();
-        }
-        /*
-         * 初始化内置合约地址到address表中
-         * 1.若为初次，新增内置合约数据
-         * 2.反之，缺哪个地址就补充，有则忽略
-         */
-        Map <String, Address> dbAddressMap = new HashMap <>();
-        //其他内置合约地址列表
-        Set <String> innerContractAddrs = chainConfig.getInnerContractAddr();
-        //PlatOn基金会账户地址
-        innerContractAddrs.add(chainConfig.getPlatonFundAccountAddr());
-        //开发者激励基金账户地址
-        innerContractAddrs.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
-        AddressExample addressExample = new AddressExample();
-        addressExample.createCriteria().andAddressIn(new ArrayList <>(innerContractAddrs));
-        List <Address> dbAddressList = addressMapper.selectByExample(addressExample);
-        dbAddressList.forEach(address -> dbAddressMap.put(address.getAddress(), address));
-        if (dbAddressList.size() != INNER_CONTRACT_ADDRESS_COUNT) {
-            innerContractAddrs.forEach(address -> {
-                if (null == dbAddressMap.get(address)) {
-                    CustomAddress customAddress = new CustomAddress();
-                    customAddress.setAddress(address);
-                    customAddress.setType(CustomAddress.TypeEnum.INNER_CONTRACT.getCode());
-                    dbAddressList.add(customAddress);
-                }
-            });
-            addressMapper.batchInsertSelective(dbAddressList, Address.Column.values());
         }
     }
 
