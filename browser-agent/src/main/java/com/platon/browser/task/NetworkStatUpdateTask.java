@@ -59,7 +59,8 @@ public class NetworkStatUpdateTask {
             //从配置文件中获取到每个增发周期对应的基金会补充金额
             Map <Integer, BigDecimal> foundationSubsidiesMap = blockChainConfig.getFoundationSubsidies();
             //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
-            BigDecimal foundationValue = foundationSubsidiesMap.get(addIssueEpoch.intValue());
+            BigDecimal foundationValueLAT = foundationSubsidiesMap.get(addIssueEpoch.intValue());
+            BigDecimal foundationValueVon = Convert.toVon(foundationValueLAT,Convert.Unit.LAT);
             //获取初始发行金额
             BigDecimal iniValue = blockChainConfig.getInitIssueAmount();
             BigDecimal iniValueVon = Convert.toVon(iniValue, Convert.Unit.LAT);
@@ -72,7 +73,7 @@ public class NetworkStatUpdateTask {
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(addIssueEpoch.intValue());
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-            BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValue == null ? BigDecimal.ZERO : foundationValue);
+            BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValueVon == null ? BigDecimal.ZERO : foundationValueVon);
             //rpc获取锁仓余额
             BigInteger lockContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),curBlock.getBlockNumber());
             //rpc获取质押余额
