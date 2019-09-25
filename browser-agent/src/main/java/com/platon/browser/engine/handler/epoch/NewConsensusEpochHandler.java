@@ -47,9 +47,13 @@ public class NewConsensusEpochHandler implements EventHandler {
     private CandidateService candidateService;
     @Autowired
     private CacheHolder cacheHolder;
+    NodeCache nodeCache;
+    StakingStage stakingStage;
 
     @Override
     public void handle(EventContext context) throws CandidateException, NoSuchBeanException, InterruptedException {
+        nodeCache = cacheHolder.getNodeCache();
+        stakingStage = cacheHolder.getStageData().getStakingStage();
         updateValidator(); // 更新缓存中的辅助共识周期验证人信息
         updateStaking(); // 更新质押相关信息
     }
@@ -58,9 +62,6 @@ public class NewConsensusEpochHandler implements EventHandler {
      * 更新与质押相关的信息
      */
     private void updateStaking() throws NoSuchBeanException {
-        NodeCache nodeCache = cacheHolder.getNodeCache();
-        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
-
         List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         // <节点ID, 前一共识轮出块数(PRE_QTY),当前共识轮出块数(CUR_QTY),验证轮数(VER_ROUND)>
         Map<String,String> consensusInfo = new HashMap<>();
@@ -134,6 +135,8 @@ public class NewConsensusEpochHandler implements EventHandler {
                 logger.error("【查询前轮共识验证人-底层出错】使用块号【{}】查询共识周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
             }
         }
+        // 把前一结算周期验证人状态置否
+        updateIsConsensus(preValidator, CustomStaking.YesNoEnum.NO);
 
         // ==================================更新下一共识周期验证人列表=======================================
         List <Node> curValidator;
@@ -158,7 +161,25 @@ public class NewConsensusEpochHandler implements EventHandler {
 
         // 更新当前共识周期期望出块数
         bc.updateCurConsensusExpectBlockCount(bc.getCurValidator().size());
+
+        // 把下一共识周期验证人状态置是
+        updateIsConsensus(curValidator, CustomStaking.YesNoEnum.YES);
+
         String msg = JSON.toJSONString(bc.getCurValidator(),true);
         logger.debug("下一轮共识周期验证人:{}",msg);
+    }
+
+    private void updateIsConsensus(List<Node> nodes, CustomStaking.YesNoEnum isConsensus){
+        nodes.forEach(v->{
+            String nodeId = HexTool.prefix(v.getNodeId());
+            try {
+                CustomNode node = nodeCache.getNode(nodeId);
+                CustomStaking staking = node.getLatestStaking();
+                staking.setIsConsensus(isConsensus.getCode());
+                stakingStage.updateStaking(staking);
+            } catch (NoSuchBeanException e) {
+                logger.error("找不到[{}]对应的节点信息!",nodeId);
+            }
+        });
     }
 }

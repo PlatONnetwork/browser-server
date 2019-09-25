@@ -2,13 +2,11 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.CustomNetworkStatMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.NetworkStatStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +41,13 @@ public class NetworkStatUpdateTask {
     @Autowired
     private CustomNetworkStatMapper customNetworkStatMapper;
 
-    private NetworkStatStage networkStatStage = new NetworkStatStage();
+    //private NetworkStatStage networkStatStage = new NetworkStatStage();
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
 
     protected void start () {
         CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
-
         CustomBlock curBlock = blockChain.getCurBlock();
         BlockChainConfig blockChainConfig = blockChain.getChainConfig();
         BigInteger addIssueEpoch = blockChain.getAddIssueEpoch();
@@ -83,9 +80,9 @@ public class NetworkStatUpdateTask {
             //数据回填内存中
             networkStatCache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
             networkStatCache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
-            networkStatStage.updateNetworkStat(networkStatCache);
-            customNetworkStatMapper.batchInsertOrUpdateSelective(networkStatStage.exportNetworkStat(), NetworkStat.Column.values());
-            networkStatStage.clear();
+            //networkStatStage.updateNetworkStat(networkStatCache);
+            //customNetworkStatMapper.batchInsertOrUpdateSelective(networkStatStage.exportNetworkStat(), NetworkStat.Column.values());
+            //networkStatStage.clear();
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }

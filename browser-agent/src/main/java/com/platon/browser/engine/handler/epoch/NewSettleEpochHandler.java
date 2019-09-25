@@ -95,6 +95,8 @@ public class NewSettleEpochHandler implements EventHandler {
                 logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
             }
         }
+        // 把前一结算周期验证人状态置否
+        updateIsSetting(preVerifier, CustomStaking.YesNoEnum.NO);
 
         // ==================================更新下一轮结算周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
@@ -114,10 +116,27 @@ public class NewSettleEpochHandler implements EventHandler {
         if(bc.getCurVerifier().isEmpty()){
             throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
+
+        // 把下一结算周期验证人状态置是
+        updateIsSetting(curVerifier, CustomStaking.YesNoEnum.YES);
+
         String msg = JSON.toJSONString(bc.getCurVerifier(),true);
         logger.debug("下一轮结算周期验证人:{}",msg);
     }
 
+    private void updateIsSetting(List<Node> nodes, CustomStaking.YesNoEnum isSetting){
+        nodes.forEach(v->{
+            String nodeId = HexTool.prefix(v.getNodeId());
+            try {
+                CustomNode node = nodeCache.getNode(nodeId);
+                CustomStaking staking = node.getLatestStaking();
+                staking.setIsSetting(isSetting.getCode());
+                stakingStage.updateStaking(staking);
+            } catch (NoSuchBeanException e) {
+                logger.error("找不到[{}]对应的节点信息!",nodeId);
+            }
+        });
+    }
 
     //结算周期变更导致的委托数据的变更
     private void updateDelegation () {
