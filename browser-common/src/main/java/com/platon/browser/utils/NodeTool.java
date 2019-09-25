@@ -35,13 +35,11 @@ public class NodeTool {
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
         int lack = 128 - publicKey.length();
-        if(lack==0) return publicKey;
-        StringBuilder z = new StringBuilder();
-        for (int i=0;i<lack;i++){
-            z.append("0");
-        }
-        z.append(publicKey);
-        return z.toString();
+        if(lack<=0) return publicKey;
+        StringBuilder prefix = new StringBuilder();
+        for (int i=0;i<lack;i++) prefix.append("0");
+        prefix.append(publicKey);
+        return prefix.toString();
     }
 
     public static BigInteger testBlock(PlatonBlock.Block block){
