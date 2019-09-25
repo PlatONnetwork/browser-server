@@ -32,23 +32,16 @@ public class NodeTool {
      * @throws Exception
      */
     public static String getPublicKey(PlatonBlock.Block block){
-//        byte[] src = testBlock(block).toByteArray();
-//        byte[] dest = new byte[64];
-//        int destPos = 64 - src.length;
-//        System.arraycopy(src, 0, dest, destPos, src.length);
-//        for(int i = 0; i< 64 - src.length; i++){
-//            dest[i] = 0;
-//        }
-//        return Hex.toHexString(dest);
-
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
-        if (publicKey.length() < 128) {
-            for (int i = 0; i < (128 - publicKey.length()); i++) {
-                publicKey = "0" + publicKey;
-            }
+        int lack = 128 - publicKey.length();
+        if(lack==0) return publicKey;
+        StringBuilder z = new StringBuilder();
+        for (int i=0;i<lack;i++){
+            z.append("0");
         }
-        return publicKey;
+        z.append(publicKey);
+        return z.toString();
     }
 
     public static BigInteger testBlock(PlatonBlock.Block block){
