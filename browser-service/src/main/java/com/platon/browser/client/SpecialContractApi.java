@@ -123,7 +123,7 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameter.valueOf(blockNumber),InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询历史节点合约出错: 入参(blockNumber=%s,funcType=%s)",blockNumber.toString(),String.valueOf(funcType)));
+            throw new ContractInvokeException(String.format("查询验证人出错【函数类型:%s,区块号:%s】,返回为空!",String.valueOf(funcType),blockNumber));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -136,7 +136,7 @@ public class SpecialContractApi {
             return result;
         }else{
             String msg = JSON.toJSONString(br,true);
-            logger.error("接口返回数据:{}", msg);
+            logger.error("查询验证人出错【函数类型:{},区块号:{}】,返回数据:{}",funcType,blockNumber,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }
@@ -155,7 +155,7 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询锁仓计划合约出错: 入参(addresses=%s)",addresses));
+            throw new ContractInvokeException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -168,6 +168,8 @@ public class SpecialContractApi {
             result = JSONUtil.parseArray(data, RestrictingBalance.class);
             return result;
         }else{
+            String msg = JSON.toJSONString(br,true);
+            logger.error("查询锁仓余额出错【地址:{}】,返回数据:{}",addresses,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }
@@ -190,7 +192,7 @@ public class SpecialContractApi {
 
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询提案参与人出错: 入参(proposalHash=%s,blockHash=%s)",proposalHash,blockHash));
+            throw new ContractInvokeException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -210,6 +212,8 @@ public class SpecialContractApi {
             pps.setAbstainCount(Long.parseLong(abstainCount));
             return pps;
         }else{
+            String msg = JSON.toJSONString(br,true);
+            logger.error("查询提案参与者出错【提案Hash:{},区块Hash:{}】,返回数据:{}",proposalHash,blockHash,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }
