@@ -97,6 +97,8 @@ public class StakingNode extends StakingKey {
     private String annualizedRateInfo;
     
     private String allDelegate;
+    
+    private Integer allDelegateQty;
 
     public String getDisnodeid() {
 		return disnodeid;
@@ -464,6 +466,15 @@ public class StakingNode extends StakingKey {
 
 	public void setAllDelegate(String allDelegate) {
 		this.allDelegate = allDelegate;
+	}
+
+
+	public Integer getAllDelegateQty() {
+		return allDelegateQty;
+	}
+
+	public void setAllDelegateQty(Integer allDelegateQty) {
+		this.allDelegateQty = allDelegateQty;
 	}
 
 

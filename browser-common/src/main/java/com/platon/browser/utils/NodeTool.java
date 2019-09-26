@@ -58,7 +58,7 @@ public class NodeTool {
         return Hash.sha3(signData);
     }
 
-    private static byte[] encode(PlatonBlock.Block block) {
+    public static byte[] encode(PlatonBlock.Block block) {
         List<RlpType> values = asRlpValues(block);
         RlpList rlpList = new RlpList(values);
         return RlpEncoder.encode(rlpList);

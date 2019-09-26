@@ -65,4 +65,30 @@ public class MessageDto extends PageReq{
 		return this;
 	}
 	
+	/**
+	 * 解析key
+	 * @method analysisKey
+	 * @param data  用户号|页码|页数|查询状态|模糊查询key
+	 * @return
+	 */
+	public MessageDto analysisData (String data) {
+		String[] message = data.split(BrowserConst.HTTP_SPILT);
+		if(message.length > 0) {
+			this.setUserNo(message[0]);
+		}
+		if(message.length > 1) {
+			this.setPageNo(Integer.parseInt(message[1]));
+		}
+		if(message.length > 2) {
+			this.setPageSize(Integer.parseInt(message[2]));
+		}
+		if(message.length > 3) {
+			this.setQueryStatus(message[3]);
+		}
+		if(message.length > 4) {
+			this.setKey(message[4]);
+		}
+		return this;
+	}
+	
 }

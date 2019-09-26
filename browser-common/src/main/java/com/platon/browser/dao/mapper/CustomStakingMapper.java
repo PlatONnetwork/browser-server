@@ -23,6 +23,8 @@ public interface CustomStakingMapper {
 	
 	List<StakingNode> selectStakingAndNodeByNodeId(@Param("nodeId") String node_id);
 	
+	List<StakingNode> selectStakingAndNodeActive(@Param("nodeId") String node_id,@Param("status") Integer status);
+	
 	Page<StakingNode> selectHistoryNode(@Param("key") String key, @Param("statusList") List<Integer> statusList);
 
 	String selectSumExitDelegate();

@@ -163,7 +163,7 @@ public class BlockServiceImpl implements BlockService {
                     DateUtil.getGMT(block.getTimestamp()),
                     block.getStatTxQty(),
                     EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
-                    EnergonUtil.format(Convert.fromVon(block.getGasUsed(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))
+                    EnergonUtil.format(Convert.fromVon(block.getStatTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))
             };
             rows.add(row);
         });

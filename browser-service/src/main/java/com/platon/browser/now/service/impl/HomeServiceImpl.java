@@ -262,7 +262,8 @@ public class HomeServiceImpl implements HomeService {
 			 * 如果块没有增长则置为false
 			 */
 			if(i == 0) {
-				if(items.get(i).getNumber() != newBlockNum) {
+				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
+				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
 					newBlockNum = items.get(i).getNumber();
 				} else {
 					blockListNewResp.setIsRefresh(false);

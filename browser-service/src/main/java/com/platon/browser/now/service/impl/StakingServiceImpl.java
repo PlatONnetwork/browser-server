@@ -209,7 +209,18 @@ public class StakingServiceImpl implements StakingService {
 		if(!req.getNodeId().startsWith(BrowserConst.WALLET_PRX)) {
 			nodeId = BrowserConst.WALLET_PRX + nodeId ;
 		}
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeByNodeId(nodeId);
+		boolean isHistory = false;
+		/**
+		 * 先查询是否活跃节点，查不到再查询是否历史汇总
+		 */
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeActive(nodeId, StatusEnum.CANDIDATE.getCode());
+		if(stakings == null || stakings.isEmpty()) {
+			/**
+			 * 历史详情汇总查询
+			 */
+			stakings = customStakingMapper.selectStakingAndNodeByNodeId(nodeId);
+			isHistory = true;
+		} 
 		StakingDetailsResp resp = new StakingDetailsResp();
 		// 只有一条数据
 		if (!stakings.isEmpty()) {
@@ -218,16 +229,6 @@ public class StakingServiceImpl implements StakingService {
 			resp.setIsInit(stakingNode.getIsInit() == 1);
 			resp.setNodeName(stakingNode.getStakingName());
 			resp.setStatus(StakingStatusEnum.getCodeByStatus(stakingNode.getStatus(), stakingNode.getIsConsensus(), stakingNode.getIsSetting()));
-			/** 质押总数=有效的质押+委托 */
-			String totalValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
-					.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
-			resp.setTotalValue(totalValue);
-			/** 候选中则返回单条委托的总金额，其他返回汇总委托金额 **/
-			resp.setDelegateValue(stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()?
-					new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString():stakingNode.getAllDelegate());
-			/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
-			String stakingValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString();
-			resp.setStakingValue(stakingValue);
 			resp.setDelegateQty(stakingNode.getStatDelegateQty());
 			resp.setSlashLowQty(stakingNode.getStatSlashLowQty());
 			resp.setSlashMultiQty(stakingNode.getStatSlashMultiQty());
@@ -262,6 +263,27 @@ public class StakingServiceImpl implements StakingService {
 			}
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
+			}
+			/**
+			 * 如果判断为true则表示为查历史数据
+			 * 没有值则标识查询活跃账户
+			 */
+			if(isHistory) {
+				resp.setDelegateQty(stakingNode.getAllDelegateQty());
+				resp.setDelegateValue(stakingNode.getAllDelegate());
+				resp.setStakingValue(stakingNode.getStakingReduction());
+				String totalValue = new BigDecimal(resp.getStakingValue()).add(new BigDecimal(resp.getDelegateValue())).toString();
+				resp.setTotalValue(totalValue);
+			} else {
+				String delegateValue= new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
+				/** 候选中则返回单条委托的总金额 **/
+				resp.setDelegateValue(delegateValue);
+				/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
+				String stakingValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString();
+				resp.setStakingValue(stakingValue);
+				/** 质押总数=有效的质押+委托 */
+				String totalValue = new BigDecimal(stakingValue).add(new BigDecimal(delegateValue)).toString();
+				resp.setTotalValue(totalValue);
 			}
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(), i18n.i(I18nEnum.SUCCESS), resp);

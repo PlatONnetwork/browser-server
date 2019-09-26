@@ -31,6 +31,9 @@ public class BrowserConst {
 	/** 操作表分隔符*/
 	public static final  String PEAD_SPILT = "|";
 	
+	/** http分隔符*/
+	public static final String HTTP_SPILT = ",";
+	
 	/** pip前缀*/
 	public static final String PIP_NAME = "PIP-";
 	
