@@ -1,15 +1,15 @@
 package com.platon.browser.task;
 
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
+import com.platon.browser.engine.bean.keybase.ValueScore;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.task.bean.TaskStaking;
+import com.platon.browser.task.cache.StakingTaskCache;
 import com.platon.browser.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,9 +35,7 @@ public class StakingUpdateTask {
     @Autowired
     private CacheHolder cacheHolder;
     @Autowired
-    private CustomStakingMapper customStakingMapper;
-
-    private StakingStage stakingStage = new StakingStage();
+    private StakingTaskCache taskCache;
 
     @Scheduled(cron = "0/3  * * * * ?")
     private void cron(){start();}
@@ -45,42 +43,46 @@ public class StakingUpdateTask {
     public void start () {
         String keyStoreUrl = chainConfig.getKeyBase();
         try {
-            Set <CustomStaking> customStakingSet = getAllStaking();
-            if (customStakingSet.isEmpty()) return;
-            customStakingSet.forEach(customStaking -> {
-                if(
-                    (StringUtils.isBlank(customStaking.getExternalName()) || StringUtils.isBlank(customStaking.getStakingIcon()))
-                    &&
-                    StringUtils.isNotBlank(customStaking.getExternalId())
-                ){
-                    String queryUrl = keyStoreUrl.concat(URI_PATH.concat(customStaking.getExternalId()));
+            Set<CustomStaking> stakingSet = getAllStaking();
+            if (stakingSet.isEmpty()) return;
+            stakingSet.forEach(staking -> {
+                if(StringUtils.isNotBlank(staking.getExternalId())){
+                    TaskStaking cache = new TaskStaking();
+                    // 设置缓存主键
+                    cache.setNodeId(staking.getNodeId());
+                    cache.setStakingBlockNum(staking.getStakingBlockNum());
+                    // 如果外部ID不为空，则发送获取请求
+                    String url = keyStoreUrl.concat(URI_PATH.concat(staking.getExternalId()));
                     try {
-                        KeyBaseUser keyBaseUser = HttpUtil.get(queryUrl,KeyBaseUser.class);
+                        KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
                         List <Completion> completions = keyBaseUser.getCompletions();
                         if (completions == null || completions.isEmpty()) return;
                         // 取最新一条
                         Completion completion = completions.get(0);
                         // 取缩略图
                         String icon = completion.getThumbnail();
-                        customStaking.setStakingIcon(icon);
-
+                        if(StringUtils.isNotBlank(icon)&&!icon.equals(staking.getStakingIcon())){
+                            cache.setStakingIcon(icon);
+                            taskCache.update(cache);
+                        }
                         Components components = completion.getComponents();
-                        String username = components.getUsername().getVal();
-                        customStaking.setExternalName(username);
-                        // 把改动后的内容暂存至待更新列表
-                        stakingStage.updateStaking(customStaking);
+                        ValueScore vs = components.getUsername();
+                        if(vs==null) return;
+                        String username = vs.getVal();
+                        if(StringUtils.isNotBlank(username)&&!username.equals(staking.getExternalName())){
+                            cache.setExternalName(username);
+                            taskCache.update(cache);
+                        }
                     } catch (HttpRequestException e) {
-                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",customStaking.getNodeId(),customStaking.getStakingBlockNum(), e.getMessage());
+                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",staking.getNodeId(),staking.getStakingBlockNum(), e.getMessage());
                     }
                 }
             });
-            if(!stakingStage.exportStaking().isEmpty()){
-                customStakingMapper.batchInsertOrUpdateSelective(stakingStage.exportStaking(), Staking.Column.values());
-                stakingStage.clear();
-            }
         } catch (Exception e) {
             logger.error("[StakingUpdateTask] Exception {}", e.getMessage());
         }
+        // 清除已合并的任务缓存
+        taskCache.sweep();
     }
 
     /**

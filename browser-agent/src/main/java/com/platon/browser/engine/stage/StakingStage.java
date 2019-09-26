@@ -3,7 +3,9 @@ package com.platon.browser.engine.stage;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dto.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -147,32 +149,38 @@ public class StakingStage {
         return nodeOptUpdateStage;
     }
 
-    public Set<Node> exportNode(){
+    public Set<Node> exportNodeSet(){
         Set<Node> returnData = new HashSet<>(nodeInsertStage);
         returnData.addAll(nodeUpdateStage);
         return returnData;
     }
-    public Set<Staking> exportStaking(){
+    public Map<String, CustomStaking> exportStakingMap(){
+        Map<String,CustomStaking> map = new HashMap<>();
+        stakingInsertStage.forEach(e->map.put(e.getNodeId()+e.getStakingBlockNum(),e));
+        stakingUpdateStage.forEach(e->map.put(e.getNodeId()+e.getStakingBlockNum(),e));
+        return map;
+    }
+    public Set<Staking> exportStakingSet(){
         Set<Staking> returnData = new HashSet<>(stakingInsertStage);
         returnData.addAll(stakingUpdateStage);
         return returnData;
     }
-    public Set<Delegation> exportDelegation(){
+    public Set<Delegation> exportDelegationSet(){
         Set<Delegation> returnData = new HashSet<>(delegationInsertStage);
         returnData.addAll(delegationUpdateStage);
         return returnData;
     }
-    public Set<UnDelegation> exportUnDelegation(){
+    public Set<UnDelegation> exportUnDelegationSet(){
         Set<UnDelegation> returnData = new HashSet<>(unDelegationInsertStage);
         returnData.addAll(unDelegationUpdateStage);
         return returnData;
     }
-    public Set<Slash> exportSlash(){
+    public Set<Slash> exportSlashSet(){
         Set<Slash> returnData = new HashSet<>(slashInsertStage);
         returnData.addAll(slashUpdateStage);
         return returnData;
     }
-    public Set<NodeOpt> exportNodeOpt(){
+    public Set<NodeOpt> exportNodeOptSet(){
         Set<NodeOpt> returnData = new HashSet<>(nodeOptInsertStage);
         returnData.addAll(nodeOptUpdateStage);
         return returnData;

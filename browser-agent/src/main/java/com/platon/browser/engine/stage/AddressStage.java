@@ -3,7 +3,9 @@ package com.platon.browser.engine.stage;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dto.CustomAddress;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,7 +34,14 @@ public class AddressStage {
         return addressUpdateStage;
     }
 
-    public Set<Address> exportAddress(){
+    public Map<String,CustomAddress> exportAddressMap(){
+        Map<String,CustomAddress> map = new HashMap<>();
+        addressInsertStage.forEach(e->map.put(e.getAddress(),e));
+        addressUpdateStage.forEach(e->map.put(e.getAddress(),e));
+        return map;
+    }
+
+    public Set<Address> exportAddressSet(){
         Set<Address> returnData = new HashSet<>(addressInsertStage);
         returnData.addAll(addressUpdateStage);
         return returnData;

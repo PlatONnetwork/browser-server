@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.bean.TransactionBean;
+import com.platon.browser.task.bean.TransactionBean;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;

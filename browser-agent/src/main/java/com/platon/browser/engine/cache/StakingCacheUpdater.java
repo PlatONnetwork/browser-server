@@ -94,12 +94,34 @@ public class StakingCacheUpdater {
                     stat.statDelegateQty = stat.statDelegateQty.add(BigInteger.ONE);
                 }
             });
-            staking.setStatDelegateHas(stat.statDelegateHas.toString());
-            staking.setStatDelegateLocked(stat.statDelegateLocked.toString());
-            staking.setStatDelegateReduction(stat.statDelegateReduction.toString());
-            staking.setStatDelegateQty(stat.statDelegateQty.intValue());
-            // 把质押信息改动暂存至待更新列表
-            stakingStage.updateStaking(staking);
+
+            boolean changed = false;
+            String statDelegateHas = stat.statDelegateHas.toString();
+            if(!statDelegateHas.equals(staking.getStatDelegateHas())){
+                // 有变更
+                staking.setStatDelegateHas(statDelegateHas);
+                changed=true;
+            }
+            String statDelegateLocked = stat.statDelegateLocked.toString();
+            if(!statDelegateLocked.equals(staking.getStatDelegateLocked())){
+                // 有变更
+                staking.setStatDelegateLocked(statDelegateLocked);
+                changed=true;
+            }
+            String statDelegateReduction = stat.statDelegateReduction.toString();
+            if(!statDelegateReduction.equals(staking.getStatDelegateReduction())){
+                // 有变更
+                staking.setStatDelegateReduction(statDelegateReduction);
+                changed=true;
+            }
+            Integer statDelegateQty = stat.statDelegateQty.intValue();
+            if(!statDelegateQty.equals(staking.getStatDelegateQty())){
+                // 有变更
+                staking.setStatDelegateQty(statDelegateQty);
+                changed=true;
+            }
+            // 有变更才需要进行数据记录更新，防止频繁数据库更新操作
+            if(changed) stakingStage.updateStaking(staking);
         });
     }
 }

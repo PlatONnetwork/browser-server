@@ -1,19 +1,16 @@
 package com.platon.browser.task;
 
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.CandidateException;
-import com.platon.browser.service.BlockService;
-import com.platon.browser.service.CandidateService;
-import com.platon.browser.service.DbService;
-import com.platon.browser.service.TransactionService;
+import com.platon.browser.service.*;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +40,6 @@ public class BlockSyncTask {
     @Autowired
     private BlockChain blockChain;
     @Autowired
-    private BlockChainConfig chainConfig;
-    @Autowired
     private BlockService blockService;
     @Autowired
     private TransactionService transactionService;
@@ -56,6 +51,11 @@ public class BlockSyncTask {
     private AddressCacheUpdater addressCacheUpdater;
     @Autowired
     private StakingCacheUpdater stakingCacheUpdater;
+    @Autowired
+    private TaskCacheService taskCacheService;
+
+    private StakingStage stakingStage;
+    private NodeCache nodeCache;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -68,8 +68,9 @@ public class BlockSyncTask {
      * 初始化已有业务数据
      */
     public void init () throws BlockNumberException, CandidateException, BusinessException, CacheConstructException, InterruptedException {
-        NodeCache nodeCache = cacheHolder.getNodeCache();
-        BlockChainStage stageData = cacheHolder.getStageData();
+        nodeCache = cacheHolder.getNodeCache();
+        stakingStage = cacheHolder.getStageData().getStakingStage();
+
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
 
         ExecutorService es = Executors.newFixedThreadPool(collectBatchSize);
@@ -110,9 +111,9 @@ public class BlockSyncTask {
             // 更新节点名称映射缓存
             initParam.getStakings().forEach(staking -> nodeNameMap.put(staking.getNodeId(),staking.getStakingName()));
             // 把节点放入待入库暂存
-            initParam.getNodes().forEach(node->stageData.getStakingStage().insertNode(node));
+            initParam.getNodes().forEach(node->stakingStage.insertNode(node));
             // 把质押放入待入库暂存
-            initParam.getStakings().forEach(staking->stageData.getStakingStage().insertStaking(staking));
+            initParam.getStakings().forEach(staking->stakingStage.insertStaking(staking));
             // 导出结果
             BlockChainStage bcr = blockChain.exportResult();
             // 批量入库结果
@@ -180,20 +181,29 @@ public class BlockSyncTask {
     }
 
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
-        NodeCache nodeCache = cacheHolder.getNodeCache();
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{
             // 入库前更新统计信息
             addressCacheUpdater.updateAddressStatistics();
             stakingCacheUpdater.updateStakingStatistics();
+            // 合并地址任务缓存
+            taskCacheService.mergeTaskAddressCache();
+            // 合并质押任务缓存
+            taskCacheService.mergeTaskStakingCache();
+            // 合并提案任务缓存
+            taskCacheService.mergeTaskProposalCache();
+            // 合并网络状态统计任务缓存
+            taskCacheService.mergeTaskNetworkStatCache();
             // 串行批量入库
             dbService.insertOrUpdate(basicData,bizData);
+            // 清除暂存区
             blockChain.commitResult();
             // 缓存整理
             nodeCache.sweep();
             proposalCache.sweep();
         }catch (Exception e){
-            throw new BusinessException("数据批量入库出错："+e.getMessage());
+            logger.error("数据批量入库出错：",e);
+            throw new BusinessException("数据批量入库出错!");
         }
     }
 }

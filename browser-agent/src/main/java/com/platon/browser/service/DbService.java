@@ -88,43 +88,43 @@ public class DbService {
         // ****************批量新增或更新质押相关数据*******************
         StakingStage ser = bizData.getStakingStage();
         // 批量入库或更新节点数据
-        Set<Node> nodes = ser.exportNode();
+        Set<Node> nodes = ser.exportNodeSet();
         if(!nodes.isEmpty()) customNodeMapper.batchInsertOrUpdateSelective(nodes, Node.Column.values());
         // 批量入库或更新质押数据
-        Set<Staking> stakings = ser.exportStaking();
+        Set<Staking> stakings = ser.exportStakingSet();
         if(!stakings.isEmpty()) customStakingMapper.batchInsertOrUpdateSelective(stakings, Staking.Column.values());
         // 批量入库或更新委托数据
-        Set<Delegation> delegations = ser.exportDelegation();
+        Set<Delegation> delegations = ser.exportDelegationSet();
         if(!delegations.isEmpty()) customDelegationMapper.batchInsertOrUpdateSelective(delegations, Delegation.Column.values());
         // 批量入库或更新解委托数据
-        Set<UnDelegation> unDelegations = ser.exportUnDelegation();
+        Set<UnDelegation> unDelegations = ser.exportUnDelegationSet();
         if(!unDelegations.isEmpty()) customUnDelegationMapper.batchInsertOrUpdateSelective(unDelegations, UnDelegation.Column.values());
         // 批量入库或更新惩罚数据
-        Set<Slash> slashes = ser.exportSlash();
+        Set<Slash> slashes = ser.exportSlashSet();
         if(!slashes.isEmpty()) customSlashMapper.batchInsertOrUpdateSelective(slashes, Slash.Column.values());
         // 批量入库或更新节点操作数据
-        Set<NodeOpt> nodeOpts = ser.exportNodeOpt();
+        Set<NodeOpt> nodeOpts = ser.exportNodeOptSet();
         if(!nodeOpts.isEmpty()) customNodeOptMapper.batchInsertOrUpdateSelective(nodeOpts, NodeOpt.Column.values());
 
         // ****************批量新增或更新提案相关数据*******************
         ProposalStage per = bizData.getProposalStage();
         // 批量入库或更新提案数据
-        Set<Proposal> proposals = per.exportProposal();
+        Set<Proposal> proposals = per.exportProposalSet();
         if(!proposals.isEmpty()) customProposalMapper.batchInsertOrUpdateSelective(proposals, Proposal.Column.values());
         // 批量入库或更新投票数据
-        Set<Vote> votes = per.exportVote();
+        Set<Vote> votes = per.exportVoteSet();
         if(!votes.isEmpty()) customVoteMapper.batchInsertOrUpdateSelective(votes, Vote.Column.values());
 
         // ****************批量新增或更新地址相关数据*******************
         AddressStage aer = bizData.getAddressStage();
         // 批量入库或更新投票数据
-        Set<Address> addresses = aer.exportAddress();
+        Set<Address> addresses = aer.exportAddressSet();
         if(!addresses.isEmpty()) customAddressMapper.batchInsertOrUpdateSelective(addresses, Address.Column.values());
 
         // ****************新增锁仓计划相关数据*******************
         RestrictingStage rs = bizData.getRestrictingStage();
         //批量插入锁仓计划
-        Set<RpPlan> planSet = rs.exportRpPlan();
+        Set<RpPlan> planSet = rs.exportRpPlanSet();
         if(!planSet.isEmpty())rpPlanMapper.batchInsert(new ArrayList <>(planSet));
     }
 }

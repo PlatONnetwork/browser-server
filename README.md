@@ -226,3 +226,8 @@ dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 dbpass: ENC(57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi)
 
 ```
+
+###### 代码行数统计
+```
+find . "(" -name "*Test.java" ")" -print | xargs awk '{if($0!="")print}' |wc -l
+```
