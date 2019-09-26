@@ -51,8 +51,8 @@ public class NetworkStatStatisticHandler implements EventHandler {
         try {
             CustomNode curNode = nodeCache.getNode(curBlock.getNodeId());
             CustomStaking curStaking = curNode.getLatestStaking();
-            //当前区块高度
-            networkStatCache.setCurrentNumber(curBlock.getNumber());
+            //当前区块高度,在统计任务中设置，保持跟流通量一致
+            //networkStatCache.setCurrentNumber(curBlock.getNumber());
             //当前区块所属节点id
             networkStatCache.setNodeId(curBlock.getNodeId());
             //当前区块所属节点name

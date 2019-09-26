@@ -87,6 +87,7 @@ public class NetworkStatUpdateTask {
             //数据回填内存中
             cache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
             cache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
+            cache.setCurrentNumber(blockNumber.longValue());
             cache.setMerged(false);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());

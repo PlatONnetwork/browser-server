@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -164,6 +165,10 @@ public class TaskCacheService {
             }
             if(StringUtils.isNotBlank(tns.getTurnValue())&&!tns.getTurnValue().equals(cns.getTurnValue())){
                 cns.setTurnValue(tns.getTurnValue());
+                changed=true;
+            }
+            if(tns.getCurrentNumber()!=null&&!tns.getCurrentNumber().equals(cns.getCurrentNumber())){
+                cns.setCurrentNumber(tns.getCurrentNumber());
                 changed=true;
             }
             if(changed) networkStatStage.updateNetworkStat(cns);
