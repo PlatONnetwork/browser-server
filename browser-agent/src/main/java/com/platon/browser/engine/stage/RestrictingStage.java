@@ -27,7 +27,7 @@ public class RestrictingStage {
         return insertRpPlanStage;
     }
 
-    public Set <RpPlan> exportRpPlan () {
+    public Set <RpPlan> exportRpPlanSet() {
         return new HashSet <>(insertRpPlanStage);
     }
 }

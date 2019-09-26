@@ -3,11 +3,10 @@ package com.platon.browser.task;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.mapper.CustomAddressMapper;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.AddressStage;
+import com.platon.browser.task.bean.TaskAddress;
+import com.platon.browser.task.cache.AddressTaskCache;
 import com.platon.browser.exception.ContractInvokeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +33,9 @@ public class AddressUpdateTask {
     private SpecialContractApi sca;
     @Autowired
     private CacheHolder cacheHolder;
-    @Autowired
-    private CustomAddressMapper customAddressMapper;
 
-    private AddressStage addressStage = new AddressStage();
+    @Autowired
+    private AddressTaskCache taskCache;
 
     @Scheduled(cron = "0/10 * * * * ?")
     private void cron () {start();}
@@ -55,26 +53,26 @@ public class AddressUpdateTask {
             addresses.forEach(address->{
                 RestrictingBalance rb = map.get(address.getAddress());
                 if(rb!=null){
+                    TaskAddress cache = new TaskAddress();
+                    cache.setAddress(address.getAddress());
                     // 查看缓存中地址的属性值是否和查询回来的值有出入，有变动才需要更新, 防止大批量数据更新
                     String restrictingBalance=(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null)?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0";
                     if (!restrictingBalance.equals(address.getRestrictingBalance())){
-                        address.setRestrictingBalance(restrictingBalance);
-                        addressStage.updateAddress(address);
+                        cache.setRestrictingBalance(restrictingBalance);
+                        taskCache.update(cache);
                     }
                     String balance = (rb.getFreeBalance()!=null)?rb.getFreeBalance().toString():"0";
                     if(!balance.equals(address.getBalance())){
-                        address.setBalance(balance);
-                        addressStage.updateAddress(address);
+                        cache.setBalance(balance);
+                        taskCache.update(cache);
                     }
                 }
             });
-            if(!addressStage.exportAddress().isEmpty()){
-                customAddressMapper.batchInsertOrUpdateSelective(addressStage.exportAddress(), Address.Column.values());
-                addressStage.clear();
-            }
         } catch (Exception e) {
             logger.error("锁仓合约查询余额出错:{}",e.getMessage());
         }
+        // 清除已合并的任务缓存
+        taskCache.sweep();
     }
 
     /**

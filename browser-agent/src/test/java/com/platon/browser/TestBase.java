@@ -1,8 +1,8 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.NodeBean;
-import com.platon.browser.bean.TransactionBean;
+import com.platon.browser.task.bean.NodeBean;
+import com.platon.browser.task.bean.TransactionBean;
 import com.platon.browser.dto.*;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.CacheConstructException;

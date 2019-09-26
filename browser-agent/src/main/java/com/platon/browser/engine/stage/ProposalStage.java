@@ -2,10 +2,13 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomVote;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,12 +56,18 @@ public class ProposalStage {
         return voteUpdateStage;
     }
 
-    public Set<Proposal> exportProposal(){
+    public Map<String, CustomProposal> exportProposalMap(){
+        Map<String,CustomProposal> map = new HashMap<>();
+        proposalInsertStage.forEach(e->map.put(e.getHash(),e));
+        proposalUpdateStage.forEach(e->map.put(e.getHash(),e));
+        return map;
+    }
+    public Set<Proposal> exportProposalSet(){
         Set<Proposal> returnData = new HashSet<>(proposalInsertStage);
         returnData.addAll(proposalUpdateStage);
         return returnData;
     }
-    public Set<Vote> exportVote(){
+    public Set<Vote> exportVoteSet(){
         Set<Vote> returnData = new HashSet<>(voteInsertStage);
         returnData.addAll(voteUpdateStage);
         return returnData;

@@ -1,4 +1,4 @@
-package com.platon.browser.bean;
+package com.platon.browser.task.bean;
 
 import org.web3j.platon.bean.Node;
 import org.web3j.utils.Numeric;

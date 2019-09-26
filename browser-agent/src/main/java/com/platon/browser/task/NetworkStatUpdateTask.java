@@ -8,6 +8,8 @@ import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.task.bean.TaskNetworkStat;
+import com.platon.browser.task.cache.NetworkStatTaskCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,60 +33,62 @@ import java.util.Map;
 public class NetworkStatUpdateTask {
     private static Logger logger = LoggerFactory.getLogger(NetworkStatUpdateTask.class);
     @Autowired
-    private BlockChain blockChain;
+    private BlockChain bc;
     @Autowired
     private BlockChainConfig chainConfig;
     @Autowired
     private PlatOnClient client;
     @Autowired
-    private CacheHolder cacheHolder;
-    @Autowired
-    private CustomNetworkStatMapper customNetworkStatMapper;
+    private NetworkStatTaskCache taskCache;
 
-    //private NetworkStatStage networkStatStage = new NetworkStatStage();
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
 
     protected void start () {
-        CustomNetworkStat networkStatCache = cacheHolder.getNetworkStatCache();
-        CustomBlock curBlock = blockChain.getCurBlock();
-        BlockChainConfig blockChainConfig = blockChain.getChainConfig();
-        BigInteger addIssueEpoch = blockChain.getAddIssueEpoch();
-        if(curBlock==null) return;
-        try {
-            //从配置文件中获取到每个增发周期对应的基金会补充金额
-            Map <Integer, BigDecimal> foundationSubsidiesMap = blockChainConfig.getFoundationSubsidies();
-            //判断当前为哪一个增发周期，获取当前增发周期基金会补充的金额
-            BigDecimal foundationValueLAT = foundationSubsidiesMap.get(addIssueEpoch.intValue());
-            BigDecimal foundationValueVon = Convert.toVon(foundationValueLAT,Convert.Unit.LAT);
-            //获取初始发行金额
-            BigDecimal iniValue = blockChainConfig.getInitIssueAmount();
-            BigDecimal iniValueVon = Convert.toVon(iniValue, Convert.Unit.LAT);
-            //获取增发比例
-            BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
-            //获取激励池地址
-            String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
-            //rpc查询实时激励池余额
-            BigInteger incentivePoolAccountBalance = getBalance(incentivePoolAccountAddr,curBlock.getBlockNumber());
-            //年份增发量 = (1+增发比例)的增发年份次方
-            BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(addIssueEpoch.intValue());
-            //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-            BigDecimal circulation = iniValueVon.multiply(circulationByYear).subtract(new BigDecimal(incentivePoolAccountBalance)).add(foundationValueVon == null ? BigDecimal.ZERO : foundationValueVon);
-            //rpc获取锁仓余额
-            BigInteger lockContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),curBlock.getBlockNumber());
-            //rpc获取质押余额
-            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(),curBlock.getBlockNumber());
-            //计算流通量
-            BigDecimal turnoverValue = circulation.subtract(new BigDecimal(lockContractBalance)).subtract(new BigDecimal(stakingContractBalance)).subtract(new BigDecimal(incentivePoolAccountBalance));
-            //数据回填内存中
-            networkStatCache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
-            networkStatCache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
-            //networkStatStage.updateNetworkStat(networkStatCache);
-            //customNetworkStatMapper.batchInsertOrUpdateSelective(networkStatStage.exportNetworkStat(), NetworkStat.Column.values());
-            //networkStatStage.clear();
-        } catch (Exception e) {
-            logger.error("计算发行量和流通量出错:{}", e.getMessage());
+        if(bc.getCurBlock()==null) return;
+        BigDecimal addIssuePeriodBlockCount = new BigDecimal(chainConfig.getAddIssuePeriodBlockCount());
+        BigDecimal round = new BigDecimal(bc.getCurBlock().getBlockNumber().add(BigInteger.ONE)).divide(addIssuePeriodBlockCount,0,RoundingMode.CEILING);
+        //只计算十年内有基金会补充的发行量和增发量
+        if (bc.getAddIssueEpoch().compareTo(BigInteger.TEN) < 0) {
+            TaskNetworkStat cache = taskCache.get();
+            try {
+                BigInteger blockNumber = bc.getCurBlock().getBlockNumber();
+                //从配置文件中获取到每个增发周期对应的基金会补充金额
+                Map<Integer, BigDecimal> foundationSubsidiesMap = chainConfig.getFoundationSubsidies();
+                // 基金会补贴部分
+                BigDecimal foundationAmount = foundationSubsidiesMap.get(round.intValue());
+                foundationAmount = Convert.toVon(foundationAmount, Convert.Unit.LAT);
+                //获取初始发行金额
+                BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
+                initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
+                //获取增发比例
+                BigDecimal addIssueRate = chainConfig.getAddIssueRate();
+                //rpc查询实时激励池余额
+                BigInteger incentivePoolAccountBalance = getBalance(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress(),blockNumber);
+                //年份增发量 = (1+增发比例)的增发年份次方
+                BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(round.intValue());
+                //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
+                BigDecimal circulation = initIssueAmount
+                        .multiply(circulationByYear)
+                        .subtract(new BigDecimal(incentivePoolAccountBalance))
+                        .add(foundationAmount == null ? BigDecimal.ZERO : foundationAmount);
+                //rpc获取锁仓余额
+                BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+                //rpc获取质押余额
+                BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+                //计算流通量
+                BigDecimal turnoverValue = circulation
+                        .subtract(new BigDecimal(restrictingContractBalance))
+                        .subtract(new BigDecimal(stakingContractBalance))
+                        .subtract(new BigDecimal(incentivePoolAccountBalance));
+                //数据回填内存中
+                cache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
+                cache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
+                cache.setMerged(false);
+            } catch (Exception e) {
+                logger.error("计算发行量和流通量出错:{}", e.getMessage());
+            }
         }
     }
 
@@ -95,7 +99,11 @@ public class NetworkStatUpdateTask {
      * @return
      * @throws IOException
      */
-    public BigInteger getBalance(String address,BigInteger blockNumber) throws IOException {
-        return client.getWeb3j().platonGetBalance(address,DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber.longValue()))).send().getBalance();
+    public BigInteger getBalance(String address,BigInteger blockNumber) {
+        while (true)try {
+            return client.getWeb3j().platonGetBalance(address,DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber.longValue()))).send().getBalance();
+        }catch (Exception e){
+            logger.error("查询地址[{}]在区块[{}]的余额失败,将重试:{}",address,blockNumber,e);
+        }
     }
 }

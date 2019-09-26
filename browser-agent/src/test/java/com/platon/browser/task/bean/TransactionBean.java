@@ -1,4 +1,4 @@
-package com.platon.browser.bean;
+package com.platon.browser.task.bean;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomTransaction;

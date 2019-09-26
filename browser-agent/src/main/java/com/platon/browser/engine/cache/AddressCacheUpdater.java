@@ -122,16 +122,57 @@ public class AddressCacheUpdater {
             stat.redeemedValue = stat.stakingRedeemed.add(stat.delegateRedeemed);
 
             //address引用对象更新
-            address.setStakingValue(stat.stakingValue.toString());
-            address.setDelegateValue(stat.delegateValue.toString());
-            address.setRedeemedValue(stat.redeemedValue.toString());
-            address.setCandidateCount(stat.candidateCount.intValue());
-            address.setDelegateHes(stat.delegateHes.toString());
-            address.setDelegateLocked(stat.delegateLocked.toString());
-            address.setDelegateUnlock(stat.delegateUnlock.toString());
-            address.setDelegateReduction(stat.delegateReduction.toString());
-            // 把地址信息改动暂存至待更新列表
-            addressStage.updateAddress(address);
+            boolean changed = false;
+            String stakingValue = stat.stakingValue.toString();
+            if(!stakingValue.equals(address.getStakingValue())){
+                // 有变动
+                address.setStakingValue(stakingValue);
+                changed = true;
+            }
+            String delegateValue = stat.delegateValue.toString();
+            if(!delegateValue.equals(address.getDelegateValue())){
+                // 有变动
+                address.setDelegateValue(delegateValue);
+                changed = true;
+            }
+            String redeemedValue = stat.redeemedValue.toString();
+            if(!redeemedValue.equals(address.getRedeemedValue())){
+                // 有变动
+                address.setRedeemedValue(redeemedValue);
+                changed = true;
+            }
+            Integer candidateCount = stat.candidateCount.intValue();
+            if(!candidateCount.equals(address.getCandidateCount())){
+                // 有变动
+                address.setCandidateCount(candidateCount);
+                changed = true;
+            }
+            String delegateHes = stat.delegateHes.toString();
+            if(!delegateHes.equals(address.getDelegateHes())){
+                // 有变动
+                address.setDelegateHes(delegateHes);
+                changed = true;
+            }
+            String delegateLocked = stat.delegateLocked.toString();
+            if(!delegateLocked.equals(address.getDelegateLocked())){
+                // 有变动
+                address.setDelegateLocked(delegateLocked);
+                changed = true;
+            }
+            String delegateUnlock = stat.delegateUnlock.toString();
+            if(!delegateUnlock.equals(address.getDelegateUnlock())){
+                // 有变动
+                address.setDelegateUnlock(delegateUnlock);
+                changed = true;
+            }
+            String delegateReduction = stat.delegateReduction.toString();
+            if(!delegateReduction.equals(address.getDelegateReduction())){
+                // 有变动
+                address.setDelegateReduction(delegateReduction);
+                changed = true;
+            }
+            // 有变更才需要进行数据记录更新，防止频繁数据库更新操作
+            if(changed) addressStage.updateAddress(address);
         }
     }
 }

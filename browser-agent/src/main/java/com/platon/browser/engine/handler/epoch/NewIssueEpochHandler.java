@@ -21,7 +21,7 @@ public class NewIssueEpochHandler implements EventHandler {
     @Autowired
     private BlockChain bc;
     @Override
-    public void handle(EventContext context) {
+    public void handle ( EventContext context ) {
         updateReward(); // 更新区块奖励和质押奖励
     }
 
