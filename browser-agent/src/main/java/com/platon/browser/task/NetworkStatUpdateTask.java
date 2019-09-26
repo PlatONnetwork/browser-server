@@ -37,9 +37,6 @@ public class NetworkStatUpdateTask {
     @Autowired
     private NetworkStatTaskCache taskCache;
 
-    // 发行量
-    private BigDecimal circulation = BigDecimal.ZERO;
-
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
@@ -72,7 +69,8 @@ public class NetworkStatUpdateTask {
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
             //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
-            circulation = initIssueAmount
+            // 发行量
+            BigDecimal circulation = initIssueAmount
                     .multiply(circulationByYear)
                     .subtract(new BigDecimal(incentivePoolAccountBalance))
                     .add(foundationAmount);
