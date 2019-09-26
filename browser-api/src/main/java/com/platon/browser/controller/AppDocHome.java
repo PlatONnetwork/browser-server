@@ -145,6 +145,7 @@ public interface AppDocHome {
      *    "code":0,                    //成功（0），失败则由相关失败码
      *    "data":[
      *       {
+     *       	"isRefresh":true // 是否更新,false不更新区块，true更新区块
      *          "number":33,           //区块高度
      *          "timestamp":33333,     //出块时间
      *          "serverTime":44444,    //服务器时间
@@ -155,8 +156,9 @@ public interface AppDocHome {
      *    ]
      * }
      */
-	@ApiOperation(value = "topic/block/list/new", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
+	@ApiOperation(value = "home/blockList", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/list/new")
+	@PostMapping(value = "home/blockList", produces = { "application/json" })
 	BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
@@ -193,5 +195,6 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/staking/list/new", nickname = "", notes = "", response = StakingListNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/staking/list/new")
+	@PostMapping(value = "home/stakingList", produces = { "application/json" })
 	BaseResp<StakingListNewResp> stakingListNew();
 }

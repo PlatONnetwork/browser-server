@@ -56,12 +56,21 @@ public class AppDocHomeController implements AppDocHome {
 	@Override
 	public BaseResp<List<BlockListNewResp>> blockListNew() {
 		List<BlockListNewResp> lists = homeService.blockListNew();
+		/**
+		 * 第一次返回都设为true
+		 */
+		if(lists !=null && lists.size() > 0) {
+			lists.get(0).setIsRefresh(true);
+		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);
 	}
 
 	@Override
 	public BaseResp<StakingListNewResp> stakingListNew() {
 		StakingListNewResp stakingListNewResp = homeService.stakingListNew();
+		/**
+		 * 第一次返回都设为true
+		 */
 		stakingListNewResp.setIsRefresh(true);
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),stakingListNewResp);
 	}

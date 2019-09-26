@@ -18,12 +18,12 @@ import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -222,7 +222,9 @@ public class StakingServiceImpl implements StakingService {
 			String totalValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked()))
 					.add(new BigDecimal(stakingNode.getStatDelegateHas())).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
 			resp.setTotalValue(totalValue);
-			resp.setDelegateValue(stakingNode.getAllDelegate());
+			/** 候选中则返回单条委托的总金额，其他返回汇总委托金额 **/
+			resp.setDelegateValue(stakingNode.getStatus().intValue() == StatusEnum.CANDIDATE.getCode()?
+					new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString():stakingNode.getAllDelegate());
 			/** 质押金额=质押（犹豫期）+ 质押（锁定期）  */
 			String stakingValue = new BigDecimal(stakingNode.getStakingHas()).add(new BigDecimal(stakingNode.getStakingLocked())).toString();
 			resp.setStakingValue(stakingValue);

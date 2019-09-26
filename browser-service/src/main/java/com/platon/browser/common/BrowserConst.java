@@ -34,4 +34,7 @@ public class BrowserConst {
 	/** pip前缀*/
 	public static final String PIP_NAME = "PIP-";
 	
+	/**账户*/
+	public static final String ACCOUNT = "0x1000000000000000000000000000000000000001";
+	
 }
