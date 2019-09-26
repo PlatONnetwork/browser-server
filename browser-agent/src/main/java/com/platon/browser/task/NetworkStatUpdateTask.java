@@ -41,54 +41,62 @@ public class NetworkStatUpdateTask {
     @Autowired
     private NetworkStatTaskCache taskCache;
 
+    // 发行量
+    private BigDecimal circulation = BigDecimal.ZERO;
+
 
     @Scheduled(cron = "0/5  * * * * ?")
     private void cron(){start();}
 
     protected void start () {
         if(bc.getCurBlock()==null) return;
-        BigDecimal addIssuePeriodBlockCount = new BigDecimal(chainConfig.getAddIssuePeriodBlockCount());
-        BigDecimal round = new BigDecimal(bc.getCurBlock().getBlockNumber().add(BigInteger.ONE)).divide(addIssuePeriodBlockCount,0,RoundingMode.CEILING);
-        //只计算十年内有基金会补充的发行量和增发量
-        if (bc.getAddIssueEpoch().compareTo(BigInteger.TEN) < 0) {
+        try {
             TaskNetworkStat cache = taskCache.get();
-            try {
-                BigInteger blockNumber = bc.getCurBlock().getBlockNumber();
-                //从配置文件中获取到每个增发周期对应的基金会补充金额
-                Map<Integer, BigDecimal> foundationSubsidiesMap = chainConfig.getFoundationSubsidies();
+            BigInteger blockNumber = bc.getCurBlock().getBlockNumber();
+            //rpc查询实时激励池余额
+            BigInteger incentivePoolAccountBalance = getBalance(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress(),blockNumber);
+
+            //从配置文件中获取到每个增发周期对应的基金会补充金额
+            Map<Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
+            int issueEpoch=bc.getAddIssueEpoch().intValue();
+            int subsidiesSize=subsidiesMap.size();
+            /* ========== 只有发行量等于0(程序重启)，或增发轮数<=补贴轮数时，才需要计算当前的发行量，避免每次进来都计算 ==========*/
+            if(circulation.compareTo(BigDecimal.ZERO)==0||issueEpoch<=subsidiesSize){
+                // 二者取最小值作为索引
+                int index= Math.min(issueEpoch, subsidiesSize);
                 // 基金会补贴部分
-                BigDecimal foundationAmount = foundationSubsidiesMap.get(round.intValue());
+                BigDecimal foundationAmount = subsidiesMap.get(index);
                 foundationAmount = Convert.toVon(foundationAmount, Convert.Unit.LAT);
                 //获取初始发行金额
                 BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
                 initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
                 //获取增发比例
                 BigDecimal addIssueRate = chainConfig.getAddIssueRate();
-                //rpc查询实时激励池余额
-                BigInteger incentivePoolAccountBalance = getBalance(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress(),blockNumber);
                 //年份增发量 = (1+增发比例)的增发年份次方
-                BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(round.intValue());
+                BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(index);
                 //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-                BigDecimal circulation = initIssueAmount
+                circulation = initIssueAmount
                         .multiply(circulationByYear)
                         .subtract(new BigDecimal(incentivePoolAccountBalance))
                         .add(foundationAmount == null ? BigDecimal.ZERO : foundationAmount);
-                //rpc获取锁仓余额
-                BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
-                //rpc获取质押余额
-                BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
-                //计算流通量
-                BigDecimal turnoverValue = circulation
-                        .subtract(new BigDecimal(restrictingContractBalance))
-                        .subtract(new BigDecimal(stakingContractBalance))
-                        .subtract(new BigDecimal(incentivePoolAccountBalance));
-                //数据回填内存中
-                cache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
-                cache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
-                cache.setMerged(false);
-            } catch (Exception e) {
-                logger.error("计算发行量和流通量出错:{}", e.getMessage());
             }
+
+            /* ========== 不论何时, 流通量都需要计算，因为流通量会随着锁仓余额和质押余额的变化而变化 ==========*/
+            //rpc获取锁仓余额
+            BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            //rpc获取质押余额
+            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            //计算流通量
+            BigDecimal turnoverValue = circulation
+                    .subtract(new BigDecimal(restrictingContractBalance))
+                    .subtract(new BigDecimal(stakingContractBalance))
+                    .subtract(new BigDecimal(incentivePoolAccountBalance));
+            //数据回填内存中
+            cache.setIssueValue(circulation.setScale(0, RoundingMode.FLOOR).toString());
+            cache.setTurnValue(turnoverValue.setScale(0,RoundingMode.FLOOR).toString());
+            cache.setMerged(false);
+        } catch (Exception e) {
+            logger.error("计算发行量和流通量出错:{}", e.getMessage());
         }
     }
 
