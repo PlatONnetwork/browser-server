@@ -51,47 +51,33 @@ public class NetworkStatUpdateTask {
             TaskNetworkStat cache = taskCache.get();
             BigInteger blockNumber = bc.getCurBlock().getBlockNumber();
 
-
             //从配置文件中获取到每个增发周期对应的基金会补充金额
             Map<Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
             int curIssueEpoch=bc.getAddIssueEpoch().intValue();
             int subsidiesSize=subsidiesMap.size();
-            /* ========== 只有发行量等于0(程序重启)，或增发轮数<=补贴轮数时，才需要计算当前的发行量，避免每次进来都计算 ==========*/
-            if(circulation.compareTo(BigDecimal.ZERO)==0||curIssueEpoch<=subsidiesSize){
-                // 二者取最小值作为索引
-                int index= Math.min(curIssueEpoch, subsidiesSize);
-                // 基金会补贴部分
-                BigDecimal foundationAmount = subsidiesMap.get(index);
-                foundationAmount = Convert.toVon(foundationAmount, Convert.Unit.LAT);
-                //获取初始发行金额
-                BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
-                initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
-                //获取增发比例
-                BigDecimal addIssueRate = chainConfig.getAddIssueRate();
 
-                Long targetBlockNumber;
-                if(curIssueEpoch<=subsidiesSize){
-                    // 如果当前增发周期轮数在补贴轮数内, 则取当前增发周期的上一增发周期末块号作为查询激励池余额的块号
-                    targetBlockNumber=EpochUtil.getPreEpochLastBlockNumber(blockNumber.longValue(),chainConfig.getAddIssuePeriodBlockCount().longValue());
-                }else{
-                    // 如果当前增发周期轮数在补贴轮数外, 则取补贴轮数最后一轮的上一轮末的块号作为查询激励池余额的块号
-                    targetBlockNumber=(index-1)*chainConfig.getAddIssuePeriodBlockCount().longValue();
-                }
+            // 基金会补贴部分
+            BigDecimal foundationAmount = BigDecimal.ZERO;
+            // 前subsidiesSize年才有补贴，其余时候为0
+            if(curIssueEpoch<=subsidiesSize) foundationAmount = subsidiesMap.get(curIssueEpoch);
 
-                //rpc查询前一增发周期末激励池余额
-                BigInteger preIssueEpochIncentiveBalance = getBalance(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress(),BigInteger.valueOf(targetBlockNumber));
-                //年份增发量 = (1+增发比例)的增发年份次方
-                BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(index);
-                //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补发量
-                circulation = initIssueAmount
-                        .multiply(circulationByYear)
-                        .subtract(new BigDecimal(preIssueEpochIncentiveBalance))
-                        .add(foundationAmount);
-            }
+            //获取初始发行金额
+            BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
+            initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
+            //获取增发比例
+            BigDecimal addIssueRate = chainConfig.getAddIssueRate();
 
-            /* ========== 不论何时, 流通量都需要计算，因为流通量会随着锁仓余额和质押余额的变化而变化 ==========*/
             //rpc查询实时激励池余额
             BigInteger incentivePoolAccountBalance = getBalance(InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress(),blockNumber);
+
+            //年份增发量 = (1+增发比例)的增发年份次方
+            BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+            //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
+            circulation = initIssueAmount
+                    .multiply(circulationByYear)
+                    .subtract(new BigDecimal(incentivePoolAccountBalance))
+                    .add(foundationAmount);
+
             //rpc获取锁仓余额
             BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
             //rpc获取质押余额
