@@ -1,14 +1,12 @@
 package com.platon.browser.task;
 
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.bean.keybase.Completion;
 import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
 import com.platon.browser.engine.bean.keybase.ValueScore;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.task.bean.TaskStaking;
 import com.platon.browser.task.cache.StakingTaskCache;

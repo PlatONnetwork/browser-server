@@ -2,11 +2,7 @@ package com.platon.browser.task;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.mapper.CustomNetworkStatMapper;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.task.bean.TaskNetworkStat;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
