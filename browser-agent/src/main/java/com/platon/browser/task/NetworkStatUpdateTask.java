@@ -6,7 +6,6 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.task.bean.TaskNetworkStat;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
-import com.platon.browser.utils.EpochUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
