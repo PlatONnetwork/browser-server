@@ -31,24 +31,21 @@ public class NodeTool {
      * @return
      * @throws Exception
      */
-    public static String calculateNodePublicKey(PlatonBlock.Block block){
+    public static String getPublicKey(PlatonBlock.Block block){
         String publicKey = testBlock(block).toString(16);
         // 不足128前面补0
-        if (publicKey.length() < 128) {
-            for (int i = 0; i < (128 - publicKey.length()); i++) {
-                publicKey = "0" + publicKey;
-            }
-        }
-        return publicKey;
+        int lack = 128 - publicKey.length();
+        if(lack<=0) return publicKey;
+        StringBuilder prefix = new StringBuilder();
+        for (int i=0;i<lack;i++) prefix.append("0");
+        prefix.append(publicKey);
+        return prefix.toString();
     }
 
     public static BigInteger testBlock(PlatonBlock.Block block){
         String extraData = block.getExtraData();
-
         String signature = extraData.substring(66, extraData.length());
-
         byte[] msgHash = getMsgHash(block);
-
         byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
         byte v = signatureBytes[64];
         byte[] r = Arrays.copyOfRange(signatureBytes, 0, 32);
@@ -93,7 +90,6 @@ public class NodeTool {
         result.add(RlpString.create(decodeHash(block.getExtraData().substring(0, 66))));
         //Nonce       BlockNonce     `json:"nonce"`
         result.add(RlpString.create(decodeHash(block.getNonceRaw())));
-
         return result;
     }
 

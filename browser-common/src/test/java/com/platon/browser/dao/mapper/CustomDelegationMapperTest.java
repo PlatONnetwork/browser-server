@@ -2,16 +2,13 @@ package com.platon.browser.dao.mapper;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dto.CustomDelegation;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -39,10 +36,10 @@ public class CustomDelegationMapperTest extends TestBase {
 
 	@Test
 	public void testBatchInsertOrUpdateSelective() {
-		List<Delegation> list = mapper.selectByExample(null);
-		Set<Delegation> set = new HashSet<>(list);
-		int num = delegationMapper.batchInsertOrUpdateSelective(set, Delegation.Column.values());
-		assertTrue(num>0);
+//		List<Delegation> list = mapper.selectByExample(null);
+//		Set<Delegation> set = new HashSet<>(list);
+//		int num = delegationMapper.batchInsertOrUpdateSelective(set, Delegation.Column.values());
+//		assertTrue(num>0);
 	}
 
 	@Test

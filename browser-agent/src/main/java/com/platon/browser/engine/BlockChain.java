@@ -212,7 +212,13 @@ public class BlockChain {
         cacheHolder.getStageData().clear();
     }
 
-    public void updateParamAddress(String address) throws BlockChainException {
+    /**
+     * 创建地址实体并入库
+     * @param address
+     * @param typeEnum
+     * @throws BlockChainException
+     */
+    public void createAddress(String address,CustomAddress.TypeEnum typeEnum) throws BlockChainException {
         if(StringUtils.isBlank(address)) {
             throw new BlockChainException("参数地址不能为空!");
         }
@@ -222,6 +228,8 @@ public class BlockChain {
         }catch (NoSuchBeanException e){
             CustomAddress customAddress = new CustomAddress();
             customAddress.setAddress(address);
+            customAddress.setType(typeEnum.getCode());
+            cacheHolder.getAddressCache().add(customAddress);
             cacheHolder.getStageData().getAddressStage().insertAddress(customAddress);
         }
     }
@@ -229,7 +237,7 @@ public class BlockChain {
      * 周期变更通知：
      * 通知各钩子方法处理周期临界点事件，以便更新与周期切换相关的信息
      */
-    public void epochChangeEvent() throws CandidateException, NoSuchBeanException, SettleEpochChangeException {
+    public void epochChangeEvent() throws CandidateException, NoSuchBeanException, SettleEpochChangeException, InterruptedException {
         // 根据区块号是否整除周期来触发周期相关处理方法
         Long blockNumber = curBlock.getNumber();
 

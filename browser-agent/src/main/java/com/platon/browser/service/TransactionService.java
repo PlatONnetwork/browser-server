@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Chendongming
@@ -117,7 +118,7 @@ public class TransactionService {
     /**
      * 分析区块获取code&交易回执
      */
-    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException {
+    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException, InterruptedException {
         Optional<TransactionReceipt> receipt = getReceipt(tx);
         // 如果交易回执存在，则更新交易中与回执相关的信息
         if(receipt.isPresent()) {
@@ -147,13 +148,14 @@ public class TransactionService {
      * @return
      * @throws IOException
      */
-    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) {
+    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) throws InterruptedException {
         // 查询交易回执
         while (true) try {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             return result.getTransactionReceipt();
         } catch (Exception e) {
             logger.error("查询交易回执失败,将重试:{}", e.getMessage());
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 }

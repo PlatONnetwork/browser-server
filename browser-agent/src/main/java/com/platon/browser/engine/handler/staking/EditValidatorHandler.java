@@ -1,6 +1,7 @@
 package com.platon.browser.engine.handler.staking;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
@@ -44,7 +45,7 @@ public class EditValidatorHandler implements EventHandler {
         EditValidatorParam param = tx.getTxParam(EditValidatorParam.class);
 
         //记录参数中的地址
-        bc.updateParamAddress(param.getBenefitAddress());
+        bc.createAddress(param.getBenefitAddress(), CustomAddress.TypeEnum.ACCOUNT);
         String msg  = JSON.toJSONString(param);
         logger.debug("修改质押信息(编辑验证人):{}", msg);
         try{

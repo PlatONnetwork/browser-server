@@ -56,11 +56,11 @@ public class NewSettleEpochHandler implements EventHandler {
     private NodeCache nodeCache;
 
     @Override
-    public void handle(EventContext context) throws CandidateException, SettleEpochChangeException {
+    public void handle(EventContext context) throws CandidateException, SettleEpochChangeException, InterruptedException {
         nodeCache = cacheHolder.getNodeCache();
         stakingStage = cacheHolder.getStageData().getStakingStage();
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
-        settle(); // 结算
+        settleStaking(); // 结算
         updateDelegation(); // 更新委托信息
         updateUnDelegation(); // 更新解委托信息
     }
@@ -76,7 +76,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 使用临界块号查到的验证人：1=>"A,B,C",250=>"A,B,C",500=>"A,C,D",750=>"B,C,D"
      * 如果当前区块号为753，由于未达到
      */
-    private void updateVerifier () throws CandidateException {
+    private void updateVerifier () throws CandidateException, InterruptedException {
         CustomBlock curBlock = bc.getCurBlock();
         Long blockNumber = curBlock.getNumber();
         List <Node> preVerifier;
@@ -95,6 +95,8 @@ public class NewSettleEpochHandler implements EventHandler {
                 logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
             }
         }
+        // 把前一结算周期验证人状态置否
+        updateIsSetting(preVerifier, CustomStaking.YesNoEnum.NO);
 
         // ==================================更新下一轮结算周期验证人列表=======================================
         BigInteger nextEpochFirstBlockNumber = BigInteger.valueOf(blockNumber+1);
@@ -114,10 +116,27 @@ public class NewSettleEpochHandler implements EventHandler {
         if(bc.getCurVerifier().isEmpty()){
             throw new CandidateException("查询不到下一轮结算周期验证人(当前块号="+blockNumber+",当前结算轮数="+bc.getCurSettingEpoch()+")");
         }
+
+        // 把下一结算周期验证人状态置是
+        updateIsSetting(curVerifier, CustomStaking.YesNoEnum.YES);
+
         String msg = JSON.toJSONString(bc.getCurVerifier(),true);
         logger.debug("下一轮结算周期验证人:{}",msg);
     }
 
+    private void updateIsSetting(List<Node> nodes, CustomStaking.YesNoEnum isSetting){
+        nodes.forEach(v->{
+            String nodeId = HexTool.prefix(v.getNodeId());
+            try {
+                CustomNode node = nodeCache.getNode(nodeId);
+                CustomStaking staking = node.getLatestStaking();
+                staking.setIsSetting(isSetting.getCode());
+                stakingStage.updateStaking(staking);
+            } catch (NoSuchBeanException e) {
+                logger.error("找不到[{}]对应的节点信息!",nodeId);
+            }
+        });
+    }
 
     //结算周期变更导致的委托数据的变更
     private void updateDelegation () {
@@ -160,7 +179,7 @@ public class NewSettleEpochHandler implements EventHandler {
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算
      */
-    private void settle() throws SettleEpochChangeException {
+    private void settleStaking() throws SettleEpochChangeException {
         if(bc.getPreVerifier().size()==0){
             throw new SettleEpochChangeException("上一结算周期取到的验证人列表为空，无法执行质押结算操作！");
         }

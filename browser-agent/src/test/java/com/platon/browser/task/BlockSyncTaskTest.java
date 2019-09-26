@@ -3,8 +3,6 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.AddressExample;
-import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
@@ -63,8 +61,6 @@ public class BlockSyncTaskTest extends TestBase {
     private StakingCacheUpdater stakingCacheUpdater;
     @Mock
     private BlockChainConfig chainConfig;
-    @Mock
-    private AddressMapper addressMapper;
 
     @Before
     public void setup(){
@@ -79,7 +75,6 @@ public class BlockSyncTaskTest extends TestBase {
         ReflectionTestUtils.setField(target, "stakingCacheUpdater", stakingCacheUpdater);
         ReflectionTestUtils.setField(target, "addressCacheUpdater", addressCacheUpdater);
         ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(target, "addressMapper", addressMapper);
     }
 
     @Test
@@ -114,7 +109,6 @@ public class BlockSyncTaskTest extends TestBase {
         when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0x0000000000000000000000000222");
         when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0x00000002300000000000000000222");
         List<Address> addrList = new ArrayList<>(addresses);
-        when(addressMapper.selectByExample(any(AddressExample.class))).thenReturn(addrList);
 
         target.init();
 

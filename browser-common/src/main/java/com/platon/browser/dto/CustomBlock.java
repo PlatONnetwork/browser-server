@@ -71,7 +71,7 @@ public class CustomBlock extends Block {
         this.setStatTxQty(block.getTransactions().size());
         this.setGasLimit(block.getGasLimit().toString());
 
-        String publicKey = NodeTool.calculateNodePublicKey(block);
+        String publicKey = NodeTool.getPublicKey(block);
         if(publicKey!=null) this.setNodeId(HexTool.prefix(publicKey));
         try{
             // 抽取交易信息

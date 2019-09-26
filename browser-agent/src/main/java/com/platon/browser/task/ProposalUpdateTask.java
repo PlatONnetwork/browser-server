@@ -20,10 +20,7 @@ import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.stage.ProposalStage;
 import com.platon.browser.engine.stage.StakingStage;
-import com.platon.browser.exception.BlockChainException;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.exception.*;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,7 +206,7 @@ public class ProposalUpdateTask {
      * @return
      * @throws Exception
      */
-    public ProposalParticiantStat getProposalParticipantStat(String proposalHash,String blockHash) throws Exception {
+    public ProposalParticiantStat getProposalParticipantStat(String proposalHash,String blockHash) throws ContractInvokeException {
         return sca.getProposalParticipants(client.getWeb3j(), proposalHash, blockHash);
     }
 

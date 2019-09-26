@@ -134,7 +134,7 @@ public class StakingEngine {
     /**
      * 进入新的共识周期变更
      */
-    void onNewConsEpoch() throws CandidateException, NoSuchBeanException {
+    void onNewConsEpoch() throws CandidateException, NoSuchBeanException, InterruptedException {
         // 事件上下文
         newConsensusEpochHandler.handle(context);
     }
@@ -142,7 +142,7 @@ public class StakingEngine {
     /**
      * 进入新的结算周期
      */
-    void  onNewSettingEpoch() throws CandidateException, SettleEpochChangeException {
+    void  onNewSettingEpoch() throws CandidateException, SettleEpochChangeException, InterruptedException {
         /*
          * 进入新的结算周期后需要变更的数据列表
          * 1.质押信息

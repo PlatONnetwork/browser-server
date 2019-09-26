@@ -8,5 +8,5 @@ import com.platon.browser.exception.*;
  * @Description: 事件处理器接口
  */
 public interface EventHandler {
-    void handle(EventContext context) throws NoSuchBeanException, CandidateException, SettleEpochChangeException, BusinessException, BlockChainException;
+    void handle(EventContext context) throws NoSuchBeanException, CandidateException, SettleEpochChangeException, BusinessException, BlockChainException, InterruptedException;
 }

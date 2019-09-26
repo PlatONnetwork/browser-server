@@ -54,15 +54,9 @@ public class NewElectionEpochHandler implements EventHandler {
             // 根据前一个共识周期的出块数判断是否触发最低处罚
             boolean isSlash = staking.getPreConsBlockQty()<=chainConfig.getSlashBlockThreshold().longValue();
             if(isSlash){
-                // 统一罚指定个数的出块奖励
-                BigDecimal stakingHas = staking.decimalStakingHas();
-                BigDecimal stakingLocked = staking.decimalStakingLocked();
-                // 总的质押金：（犹豫+锁定）
-                BigDecimal totalAmount = stakingHas.add(stakingLocked);
-                // 处罚金额: 固定的区块奖励
+                // 处罚金额=当前区块奖励x处罚块数
                 BigDecimal slashAmount = bc.getBlockReward().multiply(chainConfig.getSlashBlockCount());
-                BigDecimal remainAmount = totalAmount.subtract(slashAmount);
-                markSlashInfo(nodeCache,stakingStage,staking,kickOut(staking,remainAmount,slashAmount),slashAmount);
+                markSlashInfo(nodeCache,stakingStage,staking,kickOut(staking,slashAmount),slashAmount);
             }
         }
     }
@@ -70,25 +64,27 @@ public class NewElectionEpochHandler implements EventHandler {
     /**
      * 执行踢出逻辑
      * @param staking
-     * @param remainAmount
      * @param slashAmount
      * @return
      */
-    private boolean kickOut(CustomStaking staking,BigDecimal remainAmount,BigDecimal slashAmount){
-
+    private boolean kickOut(CustomStaking staking,BigDecimal slashAmount){
         // 判断是否需要踢出验证人列表：
         // 1、出块数为零；
         // 2、扣除罚金后，剩余质押金小于最低质押门槛
-        // 扣除罚款后剩余的锁定金额 = 原锁定金额+犹豫期金额-罚款
-        BigDecimal stakeThresholdInVon = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT);
-        boolean isKickOut = remainAmount.subtract(slashAmount).compareTo(stakeThresholdInVon)<0||staking.getPreConsBlockQty()==0;
+        // 总质押金=犹豫金额+锁定金额
+        BigDecimal totalAmount = staking.decimalStakingHas().add(staking.decimalStakingLocked());
+        // 剩余质押金额=总质押金额-处罚金额
+        BigDecimal remainAmount = totalAmount.subtract(slashAmount);
+        BigDecimal stakingThreshold = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT);
+        // 前一共识周期出块数为0||(剩余质押金<质押门槛), 则需要被踢出验证人列表
+        boolean isKickOut = (staking.getPreConsBlockQty()==0)||(remainAmount.compareTo(stakingThreshold)<0);
         if(isKickOut){
             // 犹豫期金额置零
             staking.setStakingHas(BigInteger.ZERO.toString());
             // 设置离开时间
             staking.setLeaveTime(bc.getCurBlock().getTimestamp());
             if(remainAmount.compareTo(BigDecimal.ZERO)>0){ // 剩余金额大于零，则进入退回质押金流程
-                // 锁定金额全部置为退回
+                // 剩余质押金额全部置为退回状态
                 staking.setStakingReduction(remainAmount.setScale(0,RoundingMode.FLOOR).toString());
                 // 锁定金额置0
                 staking.setStakingLocked(BigInteger.ZERO.toString());
@@ -110,8 +106,10 @@ public class NewElectionEpochHandler implements EventHandler {
                 // 如果犹豫期金额>=处罚金额,则直接从犹豫期中扣除罚款
                 staking.setStakingHas(staking.decimalStakingHas().subtract(slashAmount).setScale(0,RoundingMode.CEILING).toString());
             }else{
-                staking.setStakingLocked(remainAmount.setScale(0,RoundingMode.FLOOR).toString());
+                // 犹豫期金额置0
                 staking.setStakingHas(BigInteger.ZERO.toString());
+                // 锁定期金额设置为：犹豫金额+锁定金额-处罚金额
+                staking.setStakingLocked(remainAmount.setScale(0,RoundingMode.FLOOR).toString());
             }
         }
         return isKickOut;
@@ -149,8 +147,8 @@ public class NewElectionEpochHandler implements EventHandler {
         nodeOpt.updateWithCustomBlock(bc.getCurBlock());
         // BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT
         String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getTpl()
-                .replace("BLOCK_COUNT",staking.getPreConsBlockQty().toString())
                 .replace("SLASH_BLOCK_COUNT",chainConfig.getSlashBlockCount().toString())
+                .replace("BLOCK_COUNT",staking.getPreConsBlockQty().toString())
                 .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString())
                 .replace("KICK_OUT",isKickOut?"1":"0");
         nodeOpt.setDesc(desc);

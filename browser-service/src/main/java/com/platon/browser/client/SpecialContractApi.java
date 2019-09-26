@@ -42,19 +42,19 @@ public class SpecialContractApi {
     /**
      * 查询结算周期历史验证人队列
      */
-    public static final int GET_HISTORY_VERIFIERLIST_FUNC_TYPE = 1106;
+    public static final int GET_HISTORY_VERIFIER_LIST_FUNC_TYPE = 1106;
     /**
      * 查询历史共识周期的验证人列
      */
-    public static final int GET_HISTORY_VALIDATORLIST_FUNC_TYPE = 1107;
+    public static final int GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE = 1107;
     /**
      * 获取可用和锁仓余额
      */
-    public static final int GET_RESTRICTINGBALANCE_FUNC_TYPE = 4101;
+    public static final int GET_RESTRICTING_BALANCE_FUNC_TYPE = 4101;
     /**
      * 获取提案结果
      */
-    public static final int GET_PROPOSALRES_FUNC_TYPE = 2105;
+    public static final int GET_PROPOSAL_RES_FUNC_TYPE = 2105;
 
     private static final String BLANK_RES = "结果为空!";
     private static final String INVOKE_FAIL = "调用合约失败:";
@@ -71,7 +71,7 @@ public class SpecialContractApi {
      */
     @SuppressWarnings("unchecked")
 	private BaseResponse<String> rpc(Web3j web3j,Function function,DefaultBlockParameter blockParameter,String from,String to) throws ContractInvokeException {
-        BaseResponse<String> br = null;
+        BaseResponse<String> br;
         try {
             br = new RemoteCall<>((Callable<BaseResponse<String>>) () -> {
                 String encodedFunction = PlatOnUtil.invokeEncode(function);
@@ -97,7 +97,7 @@ public class SpecialContractApi {
      * @throws Exception
      */
     public List<Node> getHistoryVerifierList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException {
-        return nodeCall(web3j,blockNumber,GET_HISTORY_VERIFIERLIST_FUNC_TYPE);
+        return nodeCall(web3j,blockNumber,GET_HISTORY_VERIFIER_LIST_FUNC_TYPE);
     }
 
     /**
@@ -107,7 +107,7 @@ public class SpecialContractApi {
      * @throws Exception
      */
     public List<Node> getHistoryValidatorList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException {
-        return nodeCall(web3j,blockNumber,GET_HISTORY_VALIDATORLIST_FUNC_TYPE);
+        return nodeCall(web3j,blockNumber,GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE);
     }
 
     /**
@@ -123,7 +123,7 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameter.valueOf(blockNumber),InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException("查询历史节点合约出错: 入参(blockNumber="+blockNumber+",funcType="+funcType);
+            throw new ContractInvokeException(String.format("查询验证人出错【函数类型:%s,区块号:%s】,返回为空!",String.valueOf(funcType),blockNumber));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -136,7 +136,7 @@ public class SpecialContractApi {
             return result;
         }else{
             String msg = JSON.toJSONString(br,true);
-            logger.error("接口返回数据:{}", msg);
+            logger.error("查询验证人出错【函数类型:{},区块号:{}】,返回数据:{}",funcType,blockNumber,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }
@@ -149,13 +149,13 @@ public class SpecialContractApi {
      */
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException {
         final Function function = new Function(
-            GET_RESTRICTINGBALANCE_FUNC_TYPE,
-            Arrays.asList(new Utf8String(addresses)),
+            GET_RESTRICTING_BALANCE_FUNC_TYPE,
+            Collections.singletonList(new Utf8String(addresses)),
             Collections.emptyList()
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException("查询锁仓计划合约出错: 入参(addresses="+addresses);
+            throw new ContractInvokeException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -168,6 +168,8 @@ public class SpecialContractApi {
             result = JSONUtil.parseArray(data, RestrictingBalance.class);
             return result;
         }else{
+            String msg = JSON.toJSONString(br,true);
+            logger.error("查询锁仓余额出错【地址:{}】,返回数据:{}",addresses,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }
@@ -182,7 +184,7 @@ public class SpecialContractApi {
      */
 	public ProposalParticiantStat getProposalParticipants ( Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException {
         final Function function = new Function(
-            GET_PROPOSALRES_FUNC_TYPE,
+            GET_PROPOSAL_RES_FUNC_TYPE,
             Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),
             new BytesType(Numeric.hexStringToByteArray(blockHash))),
             Collections.emptyList()
@@ -190,7 +192,7 @@ public class SpecialContractApi {
 
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException("查询提案参与人出错: 入参(proposalHash="+proposalHash+",blockHash="+blockHash);
+            throw new ContractInvokeException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -210,6 +212,8 @@ public class SpecialContractApi {
             pps.setAbstainCount(Long.parseLong(abstainCount));
             return pps;
         }else{
+            String msg = JSON.toJSONString(br,true);
+            logger.error("查询提案参与者出错【提案Hash:{},区块Hash:{}】,返回数据:{}",proposalHash,blockHash,msg);
             throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
         }
     }

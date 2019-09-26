@@ -55,10 +55,17 @@ public class AddressUpdateTask {
             addresses.forEach(address->{
                 RestrictingBalance rb = map.get(address.getAddress());
                 if(rb!=null){
-                    address.setRestrictingBalance(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0");
-                    address.setBalance(rb.getFreeBalance()!=null?rb.getFreeBalance().toString():"0");
-                    // 把改动后的内容暂存至待更新列表
-                    addressStage.updateAddress(address);
+                    // 查看缓存中地址的属性值是否和查询回来的值有出入，有变动才需要更新, 防止大批量数据更新
+                    String restrictingBalance=(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null)?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0";
+                    if (!restrictingBalance.equals(address.getRestrictingBalance())){
+                        address.setRestrictingBalance(restrictingBalance);
+                        addressStage.updateAddress(address);
+                    }
+                    String balance = (rb.getFreeBalance()!=null)?rb.getFreeBalance().toString():"0";
+                    if(!balance.equals(address.getBalance())){
+                        address.setBalance(balance);
+                        addressStage.updateAddress(address);
+                    }
                 }
             });
             if(!addressStage.exportAddress().isEmpty()){

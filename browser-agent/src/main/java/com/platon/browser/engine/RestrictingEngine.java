@@ -1,6 +1,7 @@
 package com.platon.browser.engine;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomRpPlan;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
@@ -32,7 +33,7 @@ public class RestrictingEngine {
     	logger.debug("execute RestrictingEngine,{}", tx.getTxInfo());
         CreateRestrictingParam param = JSON.parseObject(tx.getTxInfo(),CreateRestrictingParam.class);
         //记录参数中的地址
-        bc.updateParamAddress(param.getAccount());
+        bc.createAddress(param.getAccount(), CustomAddress.TypeEnum.ACCOUNT);
 
         param.getPlan().forEach(planParam -> {
             CustomRpPlan customRpPlan = new CustomRpPlan();
