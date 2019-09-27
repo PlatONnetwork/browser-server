@@ -50,10 +50,6 @@ platon.config:
   incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #开发者激励基金账户地址
-  developerIncentiveFundAccountAddr: '0x60ceca9c1290ee56b98d4e160ef0453f7c40d219'
-  #PlatOn基金会账户地址
-  platonFundAccountAddr: '0x493301712671ada506ba6ca7891f436d29185821'
   #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
     '1':62215742.4869165,

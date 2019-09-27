@@ -52,9 +52,9 @@ public class AddressEngine {
         // 检查内置地址是否在数据库中存在，不存在则入库并添加至缓存
         Set<String> innerAddresses = new HashSet<>(chainConfig.getInnerContractAddr());
         //PlatOn基金会账户地址
-        innerAddresses.add(chainConfig.getPlatonFundAccountAddr());
-        //开发者激励基金账户地址
-        innerAddresses.add(chainConfig.getDeveloperIncentiveFundAccountAddr());
+        innerAddresses.add(chainConfig.getPlatOnFundAccount());
+        //社区开发者激励基金账户地址
+        innerAddresses.add(chainConfig.getCommunityFundAccount());
         innerAddresses.forEach(address->{
             try {
                 addressCache.getAddress(address);
