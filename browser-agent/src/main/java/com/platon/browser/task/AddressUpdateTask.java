@@ -45,13 +45,8 @@ public class AddressUpdateTask {
     public void start(){
         Collection<CustomAddress> addresses = getAllAddress();
         if(addresses.isEmpty()) return;
-        StringBuilder sb = new StringBuilder();
-        addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
-        String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
-            balanceMap.clear();
-            List<RestrictingBalance> data = getRestrictingBalance(params);
-            data.forEach(rb->balanceMap.put(rb.getAccount(),rb));
+            batchQueryBalance(addresses);
             addresses.forEach(address->{
                 RestrictingBalance rb = balanceMap.get(address.getAddress());
                 if(rb!=null){
@@ -74,8 +69,36 @@ public class AddressUpdateTask {
         } catch (Exception e) {
             logger.error("锁仓合约查询余额出错:",e);
         }
+        balanceMap.clear();
         // 清除已合并的任务缓存
         taskCache.sweep();
+    }
+
+    /**
+     * 批量查询地址锁仓余额
+     * @param addresses
+     * @throws ContractInvokeException
+     */
+    public void batchQueryBalance(Collection<CustomAddress> addresses) throws ContractInvokeException {
+        balanceMap.clear();
+        // 为防止RPC调用请求体超出限制，需要对地址分批查询: 每200个地址查询一次
+        StringBuilder sb = new StringBuilder();
+        int addressCount=0; // 地址索引
+        int batchEleCount = 0; // 批次内元素个数计数
+        for (CustomAddress address:addresses){
+            sb.append(address.getAddress());
+            batchEleCount++;
+            addressCount++;
+            if(batchEleCount==200||(addressCount==addresses.size())){
+                // 如果达到批次指定的数量或达到地址列表最后一个元素，则执行批量查询
+                List<RestrictingBalance> balanceList = getRestrictingBalance(sb.toString());
+                balanceList.forEach(rb->balanceMap.put(rb.getAccount(),rb));
+                batchEleCount=0; // 重置计数器
+                sb.setLength(0); // 重置参数
+            }else{
+                sb.append(";");
+            }
+        }
     }
 
     /**

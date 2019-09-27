@@ -3,8 +3,10 @@ package com.platon.browser.task;
 import com.platon.browser.TestBase;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.browser.task.cache.AddressTaskCache;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -42,17 +45,11 @@ public class AddressUpdateTaskTest extends TestBase {
     private AddressTaskCache taskCache;
 
     @Before
-    public void setup(){
+    public void setup() throws ContractInvokeException {
         ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(target, "sca", sca);
         ReflectionTestUtils.setField(target, "taskCache", taskCache);
-    }
 
-    @Test
-    public void testStart() throws Exception {
-        BlockChainStage stageData = new BlockChainStage();
-        when(cacheHolder.getStageData()).thenReturn(stageData);
-        doReturn(addresses).when(target).getAllAddress();
         List<RestrictingBalance> data = new ArrayList<>();
         addresses.forEach(ca->{
             RestrictingBalance rb = new RestrictingBalance();
@@ -64,8 +61,32 @@ public class AddressUpdateTaskTest extends TestBase {
         });
 
         doReturn(data).when(target).getRestrictingBalance(anyString());
+    }
+
+    @Test
+    public void testStart() throws Exception {
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        doReturn(addresses).when(target).getAllAddress();
+
         target.start();
 
         verify(target, times(1)).start();
+    }
+
+    @Test
+    public void testBatchQueryBalance() throws Exception {
+
+        Collection<CustomAddress> addresses = new ArrayList<>();
+
+        for (int i=0;i<1000;i++){
+            CustomAddress ca = new CustomAddress();
+            ca.setAddress(String.valueOf(i));
+            addresses.add(ca);
+        }
+
+        target.batchQueryBalance(addresses);
+
+        verify(target, times(1)).batchQueryBalance(anyCollection());
     }
 }
