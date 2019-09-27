@@ -106,10 +106,6 @@ public class NodeCache {
             if(dbStaking==null) throw new NoSuchBeanException("【nodeId="+nodeId+",stakingBlockNumber="+stakingNumber+"】的质押不存在!");
             staking = new CustomStaking();
             BeanUtils.copyProperties(dbStaking,staking);
-            if(CustomStaking.StatusEnum.CANDIDATE.getCode()==staking.getStatus()||CustomStaking.StatusEnum.EXITING.getCode()==staking.getStatus()){
-                // 如果是候选中或退出中状态，则重新加入缓存
-                addStaking(staking);
-            }
         }
         return staking;
     }
