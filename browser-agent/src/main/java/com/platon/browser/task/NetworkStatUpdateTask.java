@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @Description: 区块链统计信息更新任务
  */
 @Component
-public class NetworkStatUpdateTask {
+public class NetworkStatUpdateTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(NetworkStatUpdateTask.class);
     @Autowired
     private BlockChain bc;
@@ -45,6 +45,16 @@ public class NetworkStatUpdateTask {
     private void cron(){start();}
 
     protected void start () {
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if(bc.getCurBlock()==null) return;
         try {
             TaskNetworkStat cache = taskCache.get();
@@ -94,13 +104,6 @@ public class NetworkStatUpdateTask {
             cache.setMerged(false);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
-        }
-        try {
-            GracefullyUtil.monitor();
-        } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

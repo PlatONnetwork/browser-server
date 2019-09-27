@@ -27,7 +27,7 @@ import java.util.Map;
  * @Description: 地址更新任务
  */
 @Component
-public class AddressUpdateTask {
+public class AddressUpdateTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTask.class);
     @Autowired
     private PlatOnClient client;
@@ -45,6 +45,16 @@ public class AddressUpdateTask {
     private Map<String,RestrictingBalance> balanceMap = new HashMap<>();
 
     public void start(){
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Collection<CustomAddress> addresses = getAllAddress();
         if(addresses.isEmpty()) return;
         try {
@@ -100,13 +110,6 @@ public class AddressUpdateTask {
             }else{
                 sb.append(";");
             }
-        }
-        try {
-            GracefullyUtil.monitor();
-        } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

@@ -39,7 +39,7 @@ import java.util.List;
  * @Description: 提案信息更新任务
  */
 @Component
-public class ProposalUpdateTask {
+public class ProposalUpdateTask extends BaseTask {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpdateTask.class);
     @Autowired
     private PlatOnClient client;
@@ -67,6 +67,16 @@ public class ProposalUpdateTask {
     }
 
     public void start () {
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         //获取全量数据
         Collection<CustomProposal> proposals = getAllProposal();
         if (proposals.isEmpty()) return;
@@ -165,14 +175,6 @@ public class ProposalUpdateTask {
         // 整理提案缓存，注意：此操作不能放在采块线程，否则会造成找不到提案的错误
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         proposalCache.sweep();
-
-        try {
-            GracefullyUtil.monitor();
-        } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateNodeOpt(List <String> proposalHashes) {

@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @Description: 区块和交易同步任务
  */
 @Component
-public class BlockSyncTask {
+public class BlockSyncTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
     @Autowired
@@ -54,6 +54,9 @@ public class BlockSyncTask {
 
     private StakingStage stakingStage;
     private NodeCache nodeCache;
+
+    @Autowired
+    private TaskManager taskManager;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -128,8 +131,14 @@ public class BlockSyncTask {
      */
     public void start() throws Exception {
         while (true) {
-            collect();
-            GracefullyUtil.monitor();
+            if(taskManager.isRunning()){
+                if(collect()==null) break;
+            }else {
+                // 其它任务停止后，再执行一遍采集功能，确保所有内存数据都落库
+                collect();
+                // 采集线程停止
+                GracefullyUtil.monitor(this);
+            }
         }
     }
 

@@ -30,7 +30,7 @@ import java.util.Set;
  * @Description: 质押信息更新任务
  */
 @Component
-public class StakingUpdateTask {
+public class StakingUpdateTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
     @Autowired
     private BlockChainConfig chainConfig;
@@ -44,6 +44,16 @@ public class StakingUpdateTask {
     private void cron(){start();}
 
     public void start () {
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Set<CustomStaking> stakingSet = getAllStaking();
         if (stakingSet.isEmpty()) return;
         String keyStoreUrl = chainConfig.getKeyBase();
@@ -85,14 +95,6 @@ public class StakingUpdateTask {
         // 节点缓存整理
         NodeCache nodeCache = cacheHolder.getNodeCache();
         nodeCache.sweep();
-
-        try {
-            GracefullyUtil.monitor();
-        } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
