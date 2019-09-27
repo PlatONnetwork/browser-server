@@ -11,7 +11,19 @@
   <select id="selectByNodeIdList" resultMap="BaseResultMap">
     select
     <include refid="com.platon.browser.dao.mapper.NodeOptMapper.Base_Column_List" />
-    from node_opt where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+    from node_opt where node_id IN (<foreach collection="nodeIdList" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+
+  <select id="selectByTxHash" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.NodeOptMapper.Base_Column_List" />
+    from node_opt where tx_hash = #{txHash}
+  </select>
+
+  <select id="selectByTxHashList" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.NodeOptMapper.Base_Column_List" />
+    from node_opt where tx_hash IN (<foreach collection="txHashList" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
   </select>
 
   <!--批量选择性插入或更新-->

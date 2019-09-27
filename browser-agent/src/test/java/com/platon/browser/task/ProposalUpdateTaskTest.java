@@ -3,6 +3,7 @@ package com.platon.browser.target;
 import com.platon.browser.TestBase;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.dao.mapper.CustomNodeOptMapper;
 import com.platon.browser.dao.mapper.NodeOptMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomProposal;
@@ -21,6 +22,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.platon.bean.TallyResult;
 
@@ -41,7 +43,7 @@ public class ProposalUpdateTaskTest extends TestBase {
     @Mock
     private SpecialContractApi sca;
     @Mock
-    private NodeOptMapper nodeOptMapper;
+    private CustomNodeOptMapper customNodeOptMapper;
     @Mock
     private CacheHolder cacheHolder;
     @Mock
@@ -51,7 +53,7 @@ public class ProposalUpdateTaskTest extends TestBase {
     public void setup(){
         ReflectionTestUtils.setField(target, "bc", blockChain);
         ReflectionTestUtils.setField(target, "sca", sca);
-        ReflectionTestUtils.setField(target, "nodeOptMapper", nodeOptMapper);
+        ReflectionTestUtils.setField(target, "customNodeOptMapper", customNodeOptMapper);
         ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(target, "taskCache", taskCache);
     }

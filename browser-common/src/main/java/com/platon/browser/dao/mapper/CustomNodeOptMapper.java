@@ -12,7 +12,9 @@ import java.util.Set;
 public interface CustomNodeOptMapper {
 
     List<CustomNodeOpt> selectByNodeId(@Param("nodeId")String nodeId);
-    List<CustomNodeOpt> selectByNodeIdList(@Param("nodeIds")List<String> nodeIds);
+    List<CustomNodeOpt> selectByNodeIdList(@Param("nodeIdList")List<String> nodeIdList);
+    List<CustomNodeOpt> selectByTxHash(@Param("txHash")String txHash);
+    List<CustomNodeOpt> selectByTxHashList(@Param("txHashList")List<String> txHashList);
     int batchInsertOrUpdateSelective(@Param("list") Set<NodeOpt> list, @Param("selective") NodeOpt.Column... selective);
 
 }

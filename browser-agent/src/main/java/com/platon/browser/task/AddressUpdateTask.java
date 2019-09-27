@@ -40,18 +40,20 @@ public class AddressUpdateTask {
     @Scheduled(cron = "0/10 * * * * ?")
     private void cron () {start();}
 
+    private Map<String,RestrictingBalance> balanceMap = new HashMap<>();
+
     public void start(){
-        StringBuilder sb = new StringBuilder();
         Collection<CustomAddress> addresses = getAllAddress();
         if(addresses.isEmpty()) return;
+        StringBuilder sb = new StringBuilder();
         addresses.forEach(address -> sb.append(address.getAddress()).append(";"));
         String params = sb.toString().substring(0,sb.lastIndexOf(";"));
         try {
+            balanceMap.clear();
             List<RestrictingBalance> data = getRestrictingBalance(params);
-            Map<String,RestrictingBalance> map = new HashMap<>();
-            data.forEach(rb->map.put(rb.getAccount(),rb));
+            data.forEach(rb->balanceMap.put(rb.getAccount(),rb));
             addresses.forEach(address->{
-                RestrictingBalance rb = map.get(address.getAddress());
+                RestrictingBalance rb = balanceMap.get(address.getAddress());
                 if(rb!=null){
                     TaskAddress cache = new TaskAddress();
                     cache.setAddress(address.getAddress());

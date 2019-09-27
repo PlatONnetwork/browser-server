@@ -41,46 +41,42 @@ public class StakingUpdateTask {
     private void cron(){start();}
 
     public void start () {
+        Set<CustomStaking> stakingSet = getAllStaking();
+        if (stakingSet.isEmpty()) return;
         String keyStoreUrl = chainConfig.getKeyBase();
-        try {
-            Set<CustomStaking> stakingSet = getAllStaking();
-            if (stakingSet.isEmpty()) return;
-            stakingSet.forEach(staking -> {
-                if(StringUtils.isNotBlank(staking.getExternalId())){
-                    TaskStaking cache = new TaskStaking();
-                    // 设置缓存主键
-                    cache.setNodeId(staking.getNodeId());
-                    cache.setStakingBlockNum(staking.getStakingBlockNum());
-                    // 如果外部ID不为空，则发送获取请求
-                    String url = keyStoreUrl.concat(URI_PATH.concat(staking.getExternalId()));
-                    try {
-                        KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
-                        List <Completion> completions = keyBaseUser.getCompletions();
-                        if (completions == null || completions.isEmpty()) return;
-                        // 取最新一条
-                        Completion completion = completions.get(0);
-                        // 取缩略图
-                        String icon = completion.getThumbnail();
-                        if(StringUtils.isNotBlank(icon)&&!icon.equals(staking.getStakingIcon())){
-                            cache.setStakingIcon(icon);
-                            taskCache.update(cache);
-                        }
-                        Components components = completion.getComponents();
-                        ValueScore vs = components.getUsername();
-                        if(vs==null) return;
-                        String username = vs.getVal();
-                        if(StringUtils.isNotBlank(username)&&!username.equals(staking.getExternalName())){
-                            cache.setExternalName(username);
-                            taskCache.update(cache);
-                        }
-                    } catch (HttpRequestException e) {
-                        logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",staking.getNodeId(),staking.getStakingBlockNum(), e.getMessage());
+        stakingSet.forEach(staking -> {
+            if(StringUtils.isNotBlank(staking.getExternalId())){
+                TaskStaking cache = new TaskStaking();
+                // 设置缓存主键
+                cache.setNodeId(staking.getNodeId());
+                cache.setStakingBlockNum(staking.getStakingBlockNum());
+                // 如果外部ID不为空，则发送获取请求
+                String url = keyStoreUrl.concat(URI_PATH.concat(staking.getExternalId()));
+                try {
+                    KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+                    List <Completion> completions = keyBaseUser.getCompletions();
+                    if (completions == null || completions.isEmpty()) return;
+                    // 取最新一条
+                    Completion completion = completions.get(0);
+                    // 取缩略图
+                    String icon = completion.getThumbnail();
+                    if(StringUtils.isNotBlank(icon)&&!icon.equals(staking.getStakingIcon())){
+                        cache.setStakingIcon(icon);
+                        taskCache.update(cache);
                     }
+                    Components components = completion.getComponents();
+                    ValueScore vs = components.getUsername();
+                    if(vs==null) return;
+                    String username = vs.getVal();
+                    if(StringUtils.isNotBlank(username)&&!username.equals(staking.getExternalName())){
+                        cache.setExternalName(username);
+                        taskCache.update(cache);
+                    }
+                } catch (HttpRequestException e) {
+                    logger.error("更新质押(nodeId = {}, blockNumber = {})keybase信息出错:{}",staking.getNodeId(),staking.getStakingBlockNum(), e.getMessage());
                 }
-            });
-        } catch (Exception e) {
-            logger.error("[StakingUpdateTask] Exception {}", e.getMessage());
-        }
+            }
+        });
         // 清除已合并的任务缓存
         taskCache.sweep();
     }
