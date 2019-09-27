@@ -161,6 +161,9 @@ public class ProposalUpdateTask {
         updateNodeOpt(proposalHashes);
         // 清除已合并的任务缓存
         taskCache.sweep();
+        // 整理提案缓存，注意：此操作不能放在采块线程，否则会造成找不到提案的错误
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        proposalCache.sweep();
     }
 
     private void updateNodeOpt(List <String> proposalHashes) {
@@ -180,7 +183,7 @@ public class ProposalUpdateTask {
                 // 放入入库暂存区
                 stakingStage.updateNodeOpt(nodeOpt);
             } catch (NoSuchBeanException e) {
-                logger.error("更新操作记录({})出错:{}", nodeOpt.getTxHash(), e.getMessage());
+                logger.error("更新操作记录(TxHash={})出错:{}", nodeOpt.getTxHash(), e.getMessage());
             }
         });
     }

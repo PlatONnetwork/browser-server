@@ -137,7 +137,6 @@ public class NetworkStatStatisticHandler implements EventHandler {
             //更新暂存变量
             networkStatStage.updateNetworkStat(networkStatCache);
         } catch (NoSuchBeanException e) {
-            logger.error("-------------------------[networkStatCache]-------------------------- {}", curBlock.getBlockNumber());
             logger.error("{}", e.getMessage());
         }
     }

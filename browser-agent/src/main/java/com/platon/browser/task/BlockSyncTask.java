@@ -181,7 +181,6 @@ public class BlockSyncTask {
     }
 
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
-        ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{
             // 入库前更新统计信息
             addressCacheUpdater.updateAddressStatistics();
@@ -198,9 +197,6 @@ public class BlockSyncTask {
             dbService.insertOrUpdate(basicData,bizData);
             // 清除暂存区
             blockChain.commitResult();
-            // 缓存整理
-            nodeCache.sweep();
-            proposalCache.sweep();
         }catch (Exception e){
             logger.error("数据批量入库出错：",e);
             throw new BusinessException("数据批量入库出错!");

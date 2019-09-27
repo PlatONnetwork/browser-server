@@ -7,6 +7,7 @@ import com.platon.browser.engine.bean.keybase.Components;
 import com.platon.browser.engine.bean.keybase.KeyBaseUser;
 import com.platon.browser.engine.bean.keybase.ValueScore;
 import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.task.bean.TaskStaking;
 import com.platon.browser.task.cache.StakingTaskCache;
@@ -79,6 +80,9 @@ public class StakingUpdateTask {
         });
         // 清除已合并的任务缓存
         taskCache.sweep();
+        // 节点缓存整理
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        nodeCache.sweep();
     }
 
     /**
