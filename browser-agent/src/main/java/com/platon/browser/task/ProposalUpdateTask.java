@@ -76,6 +76,8 @@ public class ProposalUpdateTask {
         for (CustomProposal proposal : proposals) {//如果已经补充则无需补充
             proposalHashes.add(proposal.getHash());
             TaskProposal cache = new TaskProposal();
+            // 设置缓存主键
+            cache.setHash(proposal.getHash());
             try {
                 // 调用外部URL获取信息，并更新当前提案
                 ProposalMarkDownDto resp = getMarkdownInfo(proposal.getUrl());

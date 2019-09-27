@@ -76,7 +76,9 @@ public class StakingEngine {
     /**
      * 加载并构造节点缓存结构
      */
-    public void loadNodes() throws CacheConstructException {
+    @PostConstruct
+    private void init() throws CacheConstructException {
+        // 加载并构造节点缓存结构
         Map<String,String> nodeNameMap = cacheHolder.getNodeNameMap();
         NodeCache nodeCache = cacheHolder.getNodeCache();
         List<CustomNode> nodeList = customNodeMapper.selectAll();
@@ -94,12 +96,6 @@ public class StakingEngine {
         List<CustomUnDelegation> unDelegationList = customUnDelegationMapper.selectByNodeIdList(nodeIds);
         nodeCache.init(nodeList,stakingList,delegationList,unDelegationList);
         nodeCache.sweep();
-    }
-
-    @PostConstruct
-    private void init() throws CacheConstructException {
-        // 加载并构造节点缓存结构
-        loadNodes();
     }
 
     /**

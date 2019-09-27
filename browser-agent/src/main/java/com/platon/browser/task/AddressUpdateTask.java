@@ -56,6 +56,7 @@ public class AddressUpdateTask {
                 RestrictingBalance rb = balanceMap.get(address.getAddress());
                 if(rb!=null){
                     TaskAddress cache = new TaskAddress();
+                    // 设置缓存主键
                     cache.setAddress(address.getAddress());
                     // 查看缓存中地址的属性值是否和查询回来的值有出入，有变动才需要更新, 防止大批量数据更新
                     String restrictingBalance=(rb.getLockBalance()!=null && rb.getPledgeBalance()!=null)?rb.getLockBalance().subtract(rb.getPledgeBalance()).toString():"0";
