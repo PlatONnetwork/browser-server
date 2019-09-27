@@ -8,9 +8,11 @@ import com.platon.browser.engine.bean.keybase.KeyBaseUser;
 import com.platon.browser.engine.bean.keybase.ValueScore;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.exception.GracefullyShutdownException;
 import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.task.bean.TaskStaking;
 import com.platon.browser.task.cache.StakingTaskCache;
+import com.platon.browser.util.GracefullyUtil;
 import com.platon.browser.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,6 +85,14 @@ public class StakingUpdateTask {
         // 节点缓存整理
         NodeCache nodeCache = cacheHolder.getNodeCache();
         nodeCache.sweep();
+
+        try {
+            GracefullyUtil.monitor();
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -17,6 +17,7 @@ import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.task.bean.TaskProposal;
 import com.platon.browser.task.cache.ProposalTaskCache;
+import com.platon.browser.util.GracefullyUtil;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -164,6 +165,14 @@ public class ProposalUpdateTask {
         // 整理提案缓存，注意：此操作不能放在采块线程，否则会造成找不到提案的错误
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         proposalCache.sweep();
+
+        try {
+            GracefullyUtil.monitor();
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateNodeOpt(List <String> proposalHashes) {

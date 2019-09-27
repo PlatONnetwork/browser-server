@@ -6,11 +6,9 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
-import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.CacheConstructException;
-import com.platon.browser.exception.CandidateException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.*;
+import com.platon.browser.util.GracefullyUtil;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +127,10 @@ public class BlockSyncTask {
      * @throws Exception
      */
     public void start() throws Exception {
-        while (true) if(collect()==null) break;
+        while (true) {
+            collect();
+            GracefullyUtil.monitor();
+        }
     }
 
     /**

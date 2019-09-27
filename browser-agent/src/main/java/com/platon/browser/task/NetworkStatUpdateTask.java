@@ -4,8 +4,10 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.GracefullyShutdownException;
 import com.platon.browser.task.bean.TaskNetworkStat;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
+import com.platon.browser.util.GracefullyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,13 @@ public class NetworkStatUpdateTask {
             cache.setMerged(false);
         } catch (Exception e) {
             logger.error("计算发行量和流通量出错:{}", e.getMessage());
+        }
+        try {
+            GracefullyUtil.monitor();
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

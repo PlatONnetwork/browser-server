@@ -5,9 +5,11 @@ import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.exception.GracefullyShutdownException;
 import com.platon.browser.task.bean.TaskAddress;
 import com.platon.browser.task.cache.AddressTaskCache;
 import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.util.GracefullyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +81,7 @@ public class AddressUpdateTask {
      * @param addresses
      * @throws ContractInvokeException
      */
-    public void batchQueryBalance(Collection<CustomAddress> addresses) throws ContractInvokeException {
+    public void batchQueryBalance(Collection<CustomAddress> addresses) throws ContractInvokeException, GracefullyShutdownException, InterruptedException {
         balanceMap.clear();
         // 为防止RPC调用请求体超出限制，需要对地址分批查询: 每200个地址查询一次
         StringBuilder sb = new StringBuilder();
@@ -98,6 +100,13 @@ public class AddressUpdateTask {
             }else{
                 sb.append(";");
             }
+        }
+        try {
+            GracefullyUtil.monitor();
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
