@@ -231,3 +231,11 @@ dbpass: ENC(57JHw+zxa44nIvs61CyO3Xo5NtgEZaQi)
 ```
 find . "(" -name "*Test.java" ")" -print | xargs awk '{if($0!="")print}' |wc -l
 ```
+
+###### 底层日志查看
+```
+批量解压日志：
+for file in `ls *.bz2`;do bunzip2 -d $file;done
+批量过滤处罚信息：
+for file in `ls .`;do cat $file|grep 'Call SlashCandidates';done
+```
