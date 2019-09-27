@@ -4,8 +4,8 @@ import com.platon.browser.TestBase;
 import com.platon.browser.client.RestrictingBalance;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.task.cache.AddressTaskCache;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,13 +14,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -35,23 +33,26 @@ public class AddressUpdateTaskTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(AddressUpdateTaskTest.class);
 
     @Spy
-    private AddressUpdateTask addressUpdateTask;
+    private AddressUpdateTask target;
     @Mock
     private SpecialContractApi sca;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private AddressTaskCache taskCache;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(addressUpdateTask, "cacheHolder", cacheHolder);
-        ReflectionTestUtils.setField(addressUpdateTask, "sca", sca);
+        ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(target, "sca", sca);
+        ReflectionTestUtils.setField(target, "taskCache", taskCache);
     }
 
     @Test
     public void testStart() throws Exception {
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
-        doReturn(addresses).when(addressUpdateTask).getAllAddress();
+        doReturn(addresses).when(target).getAllAddress();
         List<RestrictingBalance> data = new ArrayList<>();
         addresses.forEach(ca->{
             RestrictingBalance rb = new RestrictingBalance();
@@ -62,9 +63,9 @@ public class AddressUpdateTaskTest extends TestBase {
             data.add(rb);
         });
 
-        doReturn(data).when(addressUpdateTask).getRestrictingBalance(anyString());
-        addressUpdateTask.start();
+        doReturn(data).when(target).getRestrictingBalance(anyString());
+        target.start();
 
-        verify(addressUpdateTask, times(1)).start();
+        verify(target, times(1)).start();
     }
 }
