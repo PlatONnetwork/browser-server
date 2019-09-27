@@ -3,6 +3,7 @@ package com.platon.browser.engine.handler.epoch;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
@@ -47,8 +48,10 @@ public class NewConsensusEpochHandler implements EventHandler {
     private CandidateService candidateService;
     @Autowired
     private CacheHolder cacheHolder;
-    NodeCache nodeCache;
-    StakingStage stakingStage;
+    @Autowired
+    private BlockChainConfig chainConfig;
+    private NodeCache nodeCache;
+    private StakingStage stakingStage;
 
     @Override
     public void handle(EventContext context) throws CandidateException, NoSuchBeanException, InterruptedException {
@@ -132,7 +135,7 @@ public class NewConsensusEpochHandler implements EventHandler {
                 logger.debug("前一轮共识周期(未块:{})验证人:{}",blockNumber,msg);
                 break;
             } catch (Exception e) {
-                logger.error("【查询前轮共识验证人-底层出错】使用块号【{}】查询共识周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
+                logger.error("【查询前轮共识验证人-底层出错】使用块号【{}】查询共识周期验证人出错,将重试:",prevEpochLastBlockNumber,e);
             }
         }
         // 把前一结算周期验证人状态置否
@@ -147,6 +150,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             String msg = JSON.toJSONString(curValidator,true);
             logger.debug("下一轮共识周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,msg);
         }catch (Exception e){
+            logger.info("使用指定块号查询下一轮共识周期验证人出错,将调用实时查询接口:{}",e.getMessage());
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             curValidator = candidateService.getCurValidators();
             logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(curValidator,true));

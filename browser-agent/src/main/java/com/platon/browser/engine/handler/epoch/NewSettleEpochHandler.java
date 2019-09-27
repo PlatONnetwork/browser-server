@@ -106,6 +106,7 @@ public class NewSettleEpochHandler implements EventHandler {
             String msg = JSON.toJSONString(curVerifier,true);
             logger.debug("下一轮结算周期验证人(始块:{}):{}",nextEpochFirstBlockNumber,msg);
         } catch (Exception e) {
+            logger.info("使用指定块号查询下一轮结算周期验证人出错,将调用实时查询接口:{}",e.getMessage());
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             curVerifier=candidateService.getCurVerifiers();
             logger.debug("下一轮结算周期验证人(实时):{}",JSON.toJSONString(curVerifier,true));

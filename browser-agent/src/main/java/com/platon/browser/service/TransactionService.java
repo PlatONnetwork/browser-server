@@ -154,7 +154,7 @@ public class TransactionService {
             PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
             return result.getTransactionReceipt();
         } catch (Exception e) {
-            logger.error("查询交易回执失败,将重试:{}", e.getMessage());
+            logger.error("查询交易回执失败,将重试:", e);
             TimeUnit.SECONDS.sleep(1L);
         }
     }

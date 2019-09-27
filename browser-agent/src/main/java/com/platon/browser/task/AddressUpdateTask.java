@@ -72,7 +72,7 @@ public class AddressUpdateTask {
                 }
             });
         } catch (Exception e) {
-            logger.error("锁仓合约查询余额出错:{}",e.getMessage());
+            logger.error("锁仓合约查询余额出错:",e);
         }
         // 清除已合并的任务缓存
         taskCache.sweep();

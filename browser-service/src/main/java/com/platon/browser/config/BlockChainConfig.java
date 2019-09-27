@@ -48,7 +48,7 @@ public class BlockChainConfig {
             if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt=salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
-            logger.error("salt:{}",salt);
+            logger.info("salt:{}",salt);
         } catch (IOException | ConfigLoadingException e) {
             logger.error("加载解密文件出错",e);
             System.exit(1);

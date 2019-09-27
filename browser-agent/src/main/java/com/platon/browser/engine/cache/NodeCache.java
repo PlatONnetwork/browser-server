@@ -1,5 +1,10 @@
 package com.platon.browser.engine.cache;
 
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
@@ -8,9 +13,13 @@ import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 /**
  * 节点进程缓存
@@ -18,13 +27,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @Date: 2019/8/17 18:03
  * @Description:
  */
+@Component
 public class NodeCache {
     private static Logger logger = LoggerFactory.getLogger(NodeCache.class);
+
+    @Autowired
+    private StakingMapper stakingMapper;
+
     // <节点ID - 节点实体>
     private Map<String, CustomNode> nodeMap = new TreeMap<>();
     private Set<CustomStaking> stakingSet = new CopyOnWriteArraySet<>();
     private Set<CustomDelegation> delegationSet = new CopyOnWriteArraySet<>();
-
     public void init(List<CustomNode> nodeList,
                      List<CustomStaking> stakingList,
                      List<CustomDelegation> delegationList,
@@ -84,7 +97,20 @@ public class NodeCache {
     public CustomStaking getStaking(String nodeId,Long stakingNumber) throws NoSuchBeanException {
         CustomNode node = getNode(nodeId);
         CustomStaking staking = node.getStakings().get(stakingNumber);
-        if(staking==null) throw new NoSuchBeanException("节点未(id="+nodeId+")且质押区块号为("+stakingNumber+")的质押记录不存在");
+        if(staking==null){
+            logger.info("【nodeId={},stakingBlockNumber={}】的质押在缓存中不存在,将从数据库查询...",nodeId,stakingNumber);
+            StakingKey stakingKey = new StakingKey();
+            stakingKey.setNodeId(nodeId);
+            stakingKey.setStakingBlockNum(stakingNumber);
+            Staking dbStaking = stakingMapper.selectByPrimaryKey(stakingKey);
+            if(dbStaking==null) throw new NoSuchBeanException("【nodeId="+nodeId+",stakingBlockNumber="+stakingNumber+"】的质押不存在!");
+            staking = new CustomStaking();
+            BeanUtils.copyProperties(dbStaking,staking);
+            if(CustomStaking.StatusEnum.CANDIDATE.getCode()==staking.getStatus()||CustomStaking.StatusEnum.EXITING.getCode()==staking.getStatus()){
+                // 如果是候选中或退出中状态，则重新加入缓存
+                addStaking(staking);
+            }
+        }
         return staking;
     }
 
@@ -165,11 +191,9 @@ public class NodeCache {
      */
     public List<CustomStaking> getStakingByStatus(CustomStaking.StatusEnum... statusArr){
         List<?> statuses = Arrays.asList(statusArr);
-        List<CustomStaking> returnData = new ArrayList<>();
-        stakingSet.stream()
+        return stakingSet.stream()
                 .filter(staking -> statuses.contains(staking.getStatusEnum()))
-                .forEach(returnData::add);
-        return returnData;
+                .collect(Collectors.toList());
     }
 
     /**
@@ -177,11 +201,9 @@ public class NodeCache {
      */
     public List<CustomDelegation> getDelegationByIsHistory(CustomDelegation.YesNoEnum... statusArr){
         List<?> statuses = Arrays.asList(statusArr);
-        List<CustomDelegation> returnData = new ArrayList<>();
-        delegationSet.stream()
+        return delegationSet.stream()
                 .filter(delegation -> statuses.contains(delegation.getIsHistoryEnum()))
-                .forEach(returnData::add);
-        return returnData;
+                .collect(Collectors.toList());
     }
 
     /**

@@ -29,7 +29,7 @@ public class StakingCacheUpdater {
     @Autowired
     private CacheHolder cacheHolder;
 
-    String tpl = "节点ID:NODEID,现块号:CUR_NUM,前轮块数:PRE_COUNT,现轮块数:CUR_COUNT";
+    String tpl = "出块统计【nodeId:NODE_ID,curBlockNumber:CUR_NUM,preBlockQty:PRE_COUNT,curBlockQty:CUR_COUNT】";
     /**
      * 更新质押中与区块相关的信息, 每采集到一个区块调用一次
      */
@@ -37,7 +37,7 @@ public class StakingCacheUpdater {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         BlockChainStage stageData = cacheHolder.getStageData();
         CustomBlock curBlock = bc.getCurBlock();
-        String info = tpl.replace("NODEID",curBlock.getNodeId().substring(0,10))
+        String info = tpl.replace("NODE_ID",curBlock.getNodeId().substring(0,16))
                 .replace("CUR_NUM",curBlock.getBlockNumber().toString());
         try {
             CustomNode customNode = nodeCache.getNode(curBlock.getNodeId());
@@ -53,10 +53,10 @@ public class StakingCacheUpdater {
             // 把更改后的内容暂存至待更新列表
             stageData.getStakingStage().updateStaking(customStaking);
             info = info.replace("CUR_COUNT",customStaking.getCurConsBlockQty().toString());
+            logger.debug("{}",info);
         } catch (NoSuchBeanException e) {
             logger.error("更新出块奖励和共识出块数错误,找不到符合条件的质押信息:{}",e.getMessage());
         }
-        logger.debug("出块统计:{}", info);
     }
 
 
