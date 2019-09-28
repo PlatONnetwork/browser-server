@@ -82,7 +82,7 @@ public class TxParamResolver {
                         BigInteger versions =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(9));
 
                         CreateValidatorParam createValidatorParam = new CreateValidatorParam();
-                        createValidatorParam.init(stakingTyp.intValue(), addr, stakNodeId, extrnaId, stakNodeName,
+                        createValidatorParam.init(stakingTyp.intValue(), addr, stakNodeId, extrnaId.equals("0x")?"":extrnaId, stakNodeName,
                                 webSiteAdd, deteils, stakingAmount.toString(), String.valueOf(versions));
                         result.param = createValidatorParam;
                         break;
@@ -108,7 +108,7 @@ public class TxParamResolver {
 
 
                         EditValidatorParam editValidatorParam = new EditValidatorParam();
-                        editValidatorParam.init(editAddr,editNodeId,editExtrId,editNodeName,editWebSiteAdd,editDetail);
+                        editValidatorParam.init(editAddr,editNodeId,editExtrId.equals("0x")?"":editExtrId,editNodeName,editWebSiteAdd,editDetail);
                         result.param = editValidatorParam;
                         break;
                     case INCREASE_STAKING: // 1002
