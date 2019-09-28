@@ -28,7 +28,7 @@ public class TaskManager {
     }
 
     /**
-     * 是否所有任务都在运行中
+     * 是否有任务在运行中
      * @return
      */
     public boolean isRunning(){
