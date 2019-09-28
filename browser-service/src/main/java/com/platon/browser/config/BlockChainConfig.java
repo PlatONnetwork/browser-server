@@ -2,14 +2,9 @@ package com.platon.browser.config;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.config.bean.EconomicConfigParam;
-import com.platon.browser.config.bean.EconomicConfigResult;
-import com.platon.browser.config.bean.Web3Response;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
-import com.platon.browser.exception.HttpRequestException;
-import com.platon.browser.util.HttpUtil;
 import lombok.Data;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
@@ -52,7 +48,7 @@ public class BlockChainConfig {
             if(StringUtils.isBlank(salt)) throw new ConfigLoadingException("加密盐不能为空!");
             salt=salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD",salt);
-            logger.error("salt:{}",salt);
+            logger.info("salt:{}",salt);
         } catch (IOException | ConfigLoadingException e) {
             logger.error("加载解密文件出错",e);
             System.exit(1);
@@ -85,6 +81,14 @@ public class BlockChainConfig {
     private BigInteger settlePeriodBlockCount;
     //【通用】每个增发周期区块总数=ROUND_DOWN(增发周期的时间x60/(出块间隔x结算周期区块数))x结算周期区块数
     private BigInteger addIssuePeriodBlockCount;
+    //【通用】PlatOn基金会账户地址
+    private String platOnFundAccount;
+    //【通用】PlatOn基金会账户初始余额
+    private BigDecimal platOnFundInitAmount;
+    //【通用】开发者激励基金账户地址
+    private String communityFundAccount;
+    //【通用】开发者激励基金账户初始余额
+    private BigDecimal communityFundInitAmount;
 
     //【质押】质押门槛: 创建验证人最低的质押Token数(LAT)
     private BigDecimal stakeThreshold;
@@ -131,10 +135,6 @@ public class BlockChainConfig {
     private BigDecimal incentiveRateFromIssue;
     //每个共识轮中回退多少个块是选举下一轮验证人的时机
     private BigInteger electionBackwardBlockCount;
-    //开发者激励基金账户地址
-    private String developerIncentiveFundAccountAddr;
-    //PlatOn基金会账户地址
-    private String platonFundAccountAddr;
     //10年内基金会向激励池填充额度(LAT)
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
@@ -148,38 +148,32 @@ public class BlockChainConfig {
 
     @PostConstruct
     private void init() throws InterruptedException {
-        EconomicConfigParam ecp = new EconomicConfigParam("2.0","debug_economicConfig",Collections.emptyList(),1);
-        String param = JSON.toJSONString(ecp);
-        EconomicConfigResult ecr;
-        String web3jAddress=null;
+        EconomicConfig dec;
         while (true) try {
-            web3jAddress = client.getWeb3jAddress();
-            logger.info("Web3j RPC:{}",web3jAddress);
-            Web3Response response = HttpUtil.post(web3jAddress, param, Web3Response.class);
-            ecr = JSON.parseObject(response.getResult(), EconomicConfigResult.class);
+            dec = client.getWeb3j().getEconomicConfig().send().getEconomicConfig();
             break;
-        } catch (HttpRequestException e) {
-            logger.error("初始化链配置错误,将重试:we3j={},error={}", web3jAddress, e.getMessage());
+        } catch (IOException e) {
+            logger.error("初始化链配置错误,将重试:{}", e.getMessage());
             TimeUnit.SECONDS.sleep(1);
         }
-        String msg = JSON.toJSONString(ecr,true);
+        String msg = JSON.toJSONString(dec,true);
         logger.info("链上配置:{}",msg);
-        updateWithEconomicConfigResult(ecr);
+        updateWithEconomicConfig(dec);
     }
 
-    private void updateWithEconomicConfigResult(EconomicConfigResult ecr) {
+    private void updateWithEconomicConfig(EconomicConfig dec) {
         //【通用】每个验证人每个共识周期出块数量目标值
-        this.expectBlockCount=ecr.getCommon().getPerRoundBlocks();
+        this.expectBlockCount=dec.getCommon().getPerRoundBlocks();
         //【通用】每个共识轮验证节点数量
-        this.consensusValidatorCount=ecr.getCommon().getValidatorCount();
+        this.consensusValidatorCount=dec.getCommon().getValidatorCount();
         //【通用】增发周期规定的分钟数
-        this.additionalCycleMinutes=ecr.getCommon().getAdditionalCycleTime();
+        this.additionalCycleMinutes=dec.getCommon().getAdditionalCycleTime();
         //【通用】出块间隔 = 系统分配的节点出块时间窗口/每个验证人每个view出块数量目标值
-        this.blockInterval=ecr.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount);
+        this.blockInterval=dec.getCommon().getNodeBlockTimeWindow().divide(this.expectBlockCount);
         //【通用】共识轮区块数 = expectBlockCount x consensusValidatorCount
-        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(ecr.getCommon().getValidatorCount());
+        this.consensusPeriodBlockCount=this.expectBlockCount.multiply(dec.getCommon().getValidatorCount());
         //【通用】每个结算周期区块总数=ROUND_DOWN(结算周期规定的分钟数x60/(出块间隔x共识轮区块数))x共识轮区块数
-        this.settlePeriodBlockCount=ecr.getCommon().getExpectedMinutes()
+        this.settlePeriodBlockCount=dec.getCommon().getExpectedMinutes()
                 .multiply(BigInteger.valueOf(60))
                 .divide(this.blockInterval.multiply(this.consensusPeriodBlockCount))
                 .multiply(this.consensusPeriodBlockCount);
@@ -190,38 +184,47 @@ public class BlockChainConfig {
                 .multiply(this.settlePeriodBlockCount);
         //【通用】每个增发周期内的结算周期数=增发周期区块数/结算周期区块数
         this.settlePeriodCountPerIssue=this.addIssuePeriodBlockCount.divide(this.settlePeriodBlockCount);
+        //【通用】PlatOn基金会账户地址
+        this.platOnFundAccount=dec.getInnerAcc().getPlatONFundAccount();
+        //【通用】PlatOn基金会账户初始余额
+        this.platOnFundInitAmount=dec.getInnerAcc().getPlatONFundBalance();
+        //【通用】社区开发者激励基金账户地址
+        this.communityFundAccount=dec.getInnerAcc().getCDFAccount();
+        //【通用】社区开发者激励基金账户初始余额
+        this.communityFundInitAmount=dec.getInnerAcc().getCDFBalance();
+
         //【质押】创建验证人最低的质押Token数(LAT)
-        this.stakeThreshold= Convert.fromVon(ecr.getStaking().getStakeThreshold(), Convert.Unit.LAT);
+        this.stakeThreshold= Convert.fromVon(dec.getStaking().getStakeThreshold(), Convert.Unit.LAT);
         //【质押】委托人每次委托及赎回的最低Token数(LAT)
-        this.delegateThreshold=Convert.fromVon(ecr.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
+        this.delegateThreshold=Convert.fromVon(dec.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
         //【质押】节点质押退回锁定的结算周期数
-        this.unStakeRefundSettlePeriodCount=ecr.getStaking().getUnStakeFreezeRatio();
+        this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeRatio();
         //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
-        this.slashBlockThreshold=ecr.getSlashing().getPackAmountAbnormal();
+        this.slashBlockThreshold=dec.getSlashing().getPackAmountAbnormal();
         //【惩罚】低出块率处罚多少个区块奖励
-        this.slashBlockCount=ecr.getSlashing().getNumberOfBlockRewardForSlashing();
+        this.slashBlockCount=dec.getSlashing().getNumberOfBlockRewardForSlashing();
         //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing();
+        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing();
         //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=ecr.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
         //【治理】文本提案参与率: >
-        this.minProposalTextParticipationRate=ecr.getGov().getTextProposalVoteRate();
+        this.minProposalTextParticipationRate=dec.getGov().getTextProposalVoteRate();
         //【治理】文本提案支持率：>=
-        this.minProposalTextSupportRate=ecr.getGov().getTextProposalSupportRate();
+        this.minProposalTextSupportRate=dec.getGov().getTextProposalSupportRate();
         //【治理】取消提案参与率: >
-        this.minProposalCancelParticipationRate=ecr.getGov().getCancelProposalVoteRate();
+        this.minProposalCancelParticipationRate=dec.getGov().getCancelProposalVoteRate();
         //【治理】取消提案支持率：>=
-        this.minProposalCancelSupportRate=ecr.getGov().getCancelProposalSupportRate();
+        this.minProposalCancelSupportRate=dec.getGov().getCancelProposalSupportRate();
         //【治理】升级提案通过率
-        this.minProposalUpgradePassRate=ecr.getGov().getVersionProposalSupportRate();
+        this.minProposalUpgradePassRate=dec.getGov().getVersionProposalSupportRate();
         //【治理】文本提案投票周期
-        this.proposalTextConsensusRounds=ecr.getGov().getTextProposalVoteDurationSeconds()
-                .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
+        this.proposalTextConsensusRounds=dec.getGov().getTextProposalVoteDurationSeconds()
+                .divide(new BigDecimal(this.blockInterval.multiply(dec.getCommon().getPerRoundBlocks()).multiply(dec.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【治理】设置预升级开始轮数
-        this.versionProposalActiveConsensusRounds=ecr.getGov().getVersionProposalVoteDurationSeconds()
-                .divide(new BigDecimal(this.blockInterval.multiply(ecr.getCommon().getPerRoundBlocks()).multiply(ecr.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
+        this.versionProposalActiveConsensusRounds=dec.getGov().getVersionProposalVoteDurationSeconds()
+                .divide(new BigDecimal(this.blockInterval.multiply(dec.getCommon().getPerRoundBlocks()).multiply(dec.getCommon().getValidatorCount())),0,RoundingMode.FLOOR);
         //【奖励】激励池分配给出块激励的比例
-        this.blockRewardRate=ecr.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        this.blockRewardRate=dec.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
     }

@@ -34,7 +34,7 @@ public class ProposalCache {
 
     public CustomProposal getProposal(String hash) throws NoSuchBeanException {
         CustomProposal proposal = proposalMap.get(hash);
-        if(proposal==null) throw new NoSuchBeanException("提案(hash="+hash+")的不存在");
+        if(proposal==null) throw new NoSuchBeanException("提案(hash="+hash+")不存在");
         return proposal;
     }
     public void addProposal(CustomProposal proposal){

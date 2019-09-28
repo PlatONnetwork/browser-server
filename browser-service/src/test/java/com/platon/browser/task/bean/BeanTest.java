@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.platon.browser.client.AccuVerifiersCount;
-import com.platon.browser.config.bean.Common;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.req.PageReq;
@@ -54,17 +53,6 @@ public class BeanTest {
 					!(clazz.getName().endsWith("Test") || 
 					clazz.getAnnotations().length>0)
 					).forEach(target::add);
-		targetList.add(target);
-		
-		target = new ArrayList<>();
-		packageName = Common.class.getPackage().getName();
-		classSet = ClassUtil.getClasses(packageName);
-		classSet.stream()
-			.filter(clazz -> 
-					!(clazz.getName().endsWith("Test") ||
-					clazz.getName().endsWith("EconomicConfigParam") ||
-					clazz.getAnnotations().length>0)
-				).forEach(target::add);
 		targetList.add(target);
 		
 		target = new ArrayList<>();

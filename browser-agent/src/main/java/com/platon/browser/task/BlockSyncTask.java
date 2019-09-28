@@ -6,11 +6,9 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
-import com.platon.browser.exception.BlockNumberException;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.exception.CacheConstructException;
-import com.platon.browser.exception.CandidateException;
+import com.platon.browser.exception.*;
 import com.platon.browser.service.*;
+import com.platon.browser.util.GracefullyUtil;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @Description: 区块和交易同步任务
  */
 @Component
-public class BlockSyncTask {
+public class BlockSyncTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(BlockSyncTask.class);
 
     @Autowired
@@ -56,6 +54,9 @@ public class BlockSyncTask {
 
     private StakingStage stakingStage;
     private NodeCache nodeCache;
+
+    @Autowired
+    private TaskManager taskManager;
 
     // 已采集入库的最高块
     private long commitBlockNumber = 0;
@@ -129,7 +130,16 @@ public class BlockSyncTask {
      * @throws Exception
      */
     public void start() throws Exception {
-        while (true) if(collect()==null) break;
+        while (true) {
+            if(taskManager.isRunning()){
+                if(collect()==null) break;
+            }else {
+                // 其它任务停止后，再执行一遍采集功能，确保所有内存数据都落库
+                collect();
+                // 采集线程停止
+                GracefullyUtil.monitor(this);
+            }
+        }
     }
 
     /**
@@ -181,7 +191,6 @@ public class BlockSyncTask {
     }
 
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
-        ProposalCache proposalCache = cacheHolder.getProposalCache();
         try{
             // 入库前更新统计信息
             addressCacheUpdater.updateAddressStatistics();
@@ -198,9 +207,6 @@ public class BlockSyncTask {
             dbService.insertOrUpdate(basicData,bizData);
             // 清除暂存区
             blockChain.commitResult();
-            // 缓存整理
-            nodeCache.sweep();
-            proposalCache.sweep();
         }catch (Exception e){
             logger.error("数据批量入库出错：",e);
             throw new BusinessException("数据批量入库出错!");

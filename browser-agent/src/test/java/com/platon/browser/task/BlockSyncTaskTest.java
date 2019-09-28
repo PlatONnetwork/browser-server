@@ -1,16 +1,12 @@
 package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
-import com.platon.browser.service.BlockService;
-import com.platon.browser.service.CandidateService;
-import com.platon.browser.service.DbService;
-import com.platon.browser.service.TransactionService;
+import com.platon.browser.service.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +56,7 @@ public class BlockSyncTaskTest extends TestBase {
     @Mock
     private StakingCacheUpdater stakingCacheUpdater;
     @Mock
-    private BlockChainConfig chainConfig;
+    private TaskCacheService taskCacheService;
 
     @Before
     public void setup(){
@@ -74,7 +70,7 @@ public class BlockSyncTaskTest extends TestBase {
         ReflectionTestUtils.setField(target, "collectBatchSize", 10);
         ReflectionTestUtils.setField(target, "stakingCacheUpdater", stakingCacheUpdater);
         ReflectionTestUtils.setField(target, "addressCacheUpdater", addressCacheUpdater);
-        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(target, "taskCacheService", taskCacheService);
     }
 
     @Test
@@ -106,8 +102,6 @@ public class BlockSyncTaskTest extends TestBase {
         bcs.getStakingStage().insertUnDelegation(unDelegations.get(0));
         when(blockChain.exportResult()).thenReturn(bcs);
 
-        when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0x0000000000000000000000000222");
-        when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0x00000002300000000000000000222");
         List<Address> addrList = new ArrayList<>(addresses);
 
         target.init();

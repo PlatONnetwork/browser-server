@@ -123,7 +123,7 @@ public class CandidateService {
             logger.debug("前一轮共识周期(未块:{})验证人:{}", prevEpochLastBlockNumber, msg);
             break;
         } catch (Exception e) {
-            logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:{}]", prevEpochLastBlockNumber, e.getMessage());
+            logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:]", prevEpochLastBlockNumber, e);
             TimeUnit.SECONDS.sleep(1L);
         }
 
@@ -143,7 +143,7 @@ public class CandidateService {
                 logger.debug("下一轮共识周期验证人(实时):{}", msg);
                 break;
             } catch (Exception e1) {
-                logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:{}", e1.getMessage());
+                logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:", e1);
                 TimeUnit.SECONDS.sleep(1L);
             }
         }
@@ -247,7 +247,7 @@ public class CandidateService {
             }
             return br.data;
         } catch (Exception e) {
-            logger.error("底层链查询候选验证节点列表出错,将重试:{}", e.getMessage());
+            logger.error("底层链查询候选验证节点列表出错,将重试:", e);
             TimeUnit.SECONDS.sleep(1L);
         }
     }
@@ -283,7 +283,7 @@ public class CandidateService {
             }
             return br.data;
         } catch (Exception e) {
-            logger.error("底层链查询实时共识周期验证节点列表出错,将重试:{}", e.getMessage());
+            logger.error("底层链查询实时共识周期验证节点列表出错,将重试:", e);
             TimeUnit.SECONDS.sleep(1L);
         }
     }

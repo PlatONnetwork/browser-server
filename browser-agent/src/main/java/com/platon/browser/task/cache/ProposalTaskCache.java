@@ -1,6 +1,5 @@
 package com.platon.browser.task.cache;
 
-import com.platon.browser.task.bean.TaskAddress;
 import com.platon.browser.task.bean.TaskProposal;
 import org.springframework.stereotype.Component;
 

@@ -123,7 +123,7 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameter.valueOf(blockNumber),InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询验证人出错【函数类型:%s,区块号:%s】,返回为空!",String.valueOf(funcType),blockNumber));
+            throw new ContractInvokeException(String.format("【查询验证人出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(funcType),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
         if(br.isStatusOk()){
             String data = br.data;
@@ -136,8 +136,7 @@ public class SpecialContractApi {
             return result;
         }else{
             String msg = JSON.toJSONString(br,true);
-            logger.error("查询验证人出错【函数类型:{},区块号:{}】,返回数据:{}",funcType,blockNumber,msg);
-            throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
+            throw new ContractInvokeException(String.format("【查询验证人出错】函数类型:%s,区块号:%s,返回数据:%s",funcType,blockNumber.toString(),msg));
         }
     }
 
@@ -169,8 +168,7 @@ public class SpecialContractApi {
             return result;
         }else{
             String msg = JSON.toJSONString(br,true);
-            logger.error("查询锁仓余额出错【地址:{}】,返回数据:{}",addresses,msg);
-            throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
+            throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:{},返回数据:{}",addresses,msg));
         }
     }
 
@@ -213,8 +211,7 @@ public class SpecialContractApi {
             return pps;
         }else{
             String msg = JSON.toJSONString(br,true);
-            logger.error("查询提案参与者出错【提案Hash:{},区块Hash:{}】,返回数据:{}",proposalHash,blockHash,msg);
-            throw new ContractInvokeException(INVOKE_FAIL+br.errMsg);
+            throw new ContractInvokeException(String.format("【查询提案参与者出错】提案Hash:{},区块Hash:{},返回数据:{}",proposalHash,blockHash,msg));
         }
     }
 }

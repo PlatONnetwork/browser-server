@@ -4,8 +4,10 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.GracefullyShutdownException;
 import com.platon.browser.task.bean.TaskNetworkStat;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
+import com.platon.browser.util.GracefullyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: dongqile
@@ -26,7 +29,7 @@ import java.util.Map;
  * @Description: 区块链统计信息更新任务
  */
 @Component
-public class NetworkStatUpdateTask {
+public class NetworkStatUpdateTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(NetworkStatUpdateTask.class);
     @Autowired
     private BlockChain bc;
@@ -42,6 +45,16 @@ public class NetworkStatUpdateTask {
     private void cron(){start();}
 
     protected void start () {
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if(bc.getCurBlock()==null) return;
         try {
             TaskNetworkStat cache = taskCache.get();
@@ -76,9 +89,9 @@ public class NetworkStatUpdateTask {
                     .add(foundationAmount);
 
             //rpc获取锁仓余额
-            BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockNumber);
             //rpc获取质押余额
-            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), blockNumber);
             //计算流通量
             BigDecimal turnoverValue = circulation
                     .subtract(new BigDecimal(restrictingContractBalance))
@@ -101,11 +114,12 @@ public class NetworkStatUpdateTask {
      * @return
      * @throws IOException
      */
-    public BigInteger getBalance(String address,BigInteger blockNumber) {
+    public BigInteger getBalance(String address,BigInteger blockNumber) throws InterruptedException {
         while (true)try {
             return client.getWeb3j().platonGetBalance(address,DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber.longValue()))).send().getBalance();
         }catch (Exception e){
             logger.error("查询地址[{}]在区块[{}]的余额失败,将重试:{}",address,blockNumber,e);
+            TimeUnit.SECONDS.sleep(1L);
         }
     }
 }

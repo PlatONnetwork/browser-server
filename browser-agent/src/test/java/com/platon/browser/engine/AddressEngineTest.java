@@ -63,8 +63,8 @@ public class AddressEngineTest extends TestBase {
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
         when(customAddressMapper.selectAll()).thenReturn(addresses);
-        when(chainConfig.getPlatonFundAccountAddr()).thenReturn("0xaaaaaaaaaaaaaaaaaa");
-        when(chainConfig.getDeveloperIncentiveFundAccountAddr()).thenReturn("0xbbbbbbbbbbbbbbbbbb");
+        when(chainConfig.getPlatOnFundAccount()).thenReturn("0xaaaaaaaaaaaaaaaaaa");
+        when(chainConfig.getCommunityFundAccount()).thenReturn("0xbbbbbbbbbbbbbbbbbb");
 
         target.init();
         verify(target, times(1)).init();

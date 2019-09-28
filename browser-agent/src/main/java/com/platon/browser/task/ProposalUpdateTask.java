@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.ProposalParticiantStat;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.NodeOptExample;
 import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.mapper.NodeOptMapper;
+import com.platon.browser.dao.mapper.CustomNodeOptMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
@@ -19,11 +17,11 @@ import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.task.bean.TaskProposal;
 import com.platon.browser.task.cache.ProposalTaskCache;
+import com.platon.browser.util.GracefullyUtil;
 import com.platon.browser.util.MarkDownParserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -41,7 +39,7 @@ import java.util.List;
  * @Description: 提案信息更新任务
  */
 @Component
-public class ProposalUpdateTask {
+public class ProposalUpdateTask extends BaseTask {
     private static Logger logger = LoggerFactory.getLogger(ProposalUpdateTask.class);
     @Autowired
     private PlatOnClient client;
@@ -50,7 +48,7 @@ public class ProposalUpdateTask {
     @Autowired
     private SpecialContractApi sca;
     @Autowired
-    private NodeOptMapper nodeOptMapper;
+    private CustomNodeOptMapper customNodeOptMapper;
     @Autowired
     private CacheHolder cacheHolder;
 
@@ -69,6 +67,16 @@ public class ProposalUpdateTask {
     }
 
     public void start () {
+
+        try {
+            // 监控应用状态
+            GracefullyUtil.monitor(this);
+        } catch (GracefullyShutdownException e) {
+            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         //获取全量数据
         Collection<CustomProposal> proposals = getAllProposal();
         if (proposals.isEmpty()) return;
@@ -79,6 +87,8 @@ public class ProposalUpdateTask {
         for (CustomProposal proposal : proposals) {//如果已经补充则无需补充
             proposalHashes.add(proposal.getHash());
             TaskProposal cache = new TaskProposal();
+            // 设置缓存主键
+            cache.setHash(proposal.getHash());
             try {
                 // 调用外部URL获取信息，并更新当前提案
                 ProposalMarkDownDto resp = getMarkdownInfo(proposal.getUrl());
@@ -114,87 +124,79 @@ public class ProposalUpdateTask {
                         || CustomProposal.StatusEnum.PASS.getCode()==proposal.getStatus() // 已通过
                 ) {
                     //发送rpc请求查询提案结果
-                    try {
-                        ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(),curBlock.getHash());
-                        //设置参与人数
-                        if(pps.getVoterCount()!=null&& !pps.getVoterCount().equals(proposal.getAccuVerifiers())){
+                    ProposalParticiantStat pps = getProposalParticipantStat(proposal.getHash(),curBlock.getHash());
+                    //设置参与人数
+                    if(pps.getVoterCount()!=null&& !pps.getVoterCount().equals(proposal.getAccuVerifiers())){
+                        // 有变更
+                        cache.setAccuVerifiers(pps.getVoterCount());
+                        taskCache.update(cache);
+                    }
+
+                    //设置赞成票
+                    if(pps.getSupportCount()!=null&& !pps.getSupportCount().equals(proposal.getYeas())){
+                        // 有变更
+                        cache.setYeas(pps.getSupportCount());
+                        taskCache.update(cache);
+                    }
+
+                    //设置反对票
+                    if(pps.getOpposeCount()!=null&& !pps.getOpposeCount().equals(proposal.getNays())){
+                        // 有变更
+                        cache.setNays(pps.getOpposeCount());
+                        taskCache.update(cache);
+                    }
+
+                    //设置弃权票
+                    if(pps.getAbstainCount()!=null&& !pps.getAbstainCount().equals(proposal.getAbstentions())){
+                        // 有变更
+                        cache.setAbstentions(pps.getAbstainCount());
+                        taskCache.update(cache);
+                    }
+
+                    //只有在结束快高之后才有返回提案结果
+                    if (curBlock.getBlockNumber().longValue() >= Long.parseLong(proposal.getEndVotingBlock())) {
+                        //设置状态
+                        int status = getTallyResult(proposal.getHash()).getStatus();
+                        if(status!=proposal.getStatus()){
                             // 有变更
-                            cache.setAccuVerifiers(pps.getVoterCount());
+                            cache.setStatus(status);
                             taskCache.update(cache);
                         }
-
-                        //设置赞成票
-                        if(pps.getSupportCount()!=null&& !pps.getSupportCount().equals(proposal.getYeas())){
-                            // 有变更
-                            cache.setYeas(pps.getSupportCount());
-                            taskCache.update(cache);
-                        }
-
-                        //设置反对票
-                        if(pps.getOpposeCount()!=null&& !pps.getOpposeCount().equals(proposal.getNays())){
-                            // 有变更
-                            cache.setNays(pps.getOpposeCount());
-                            taskCache.update(cache);
-                        }
-
-                        //设置弃权票
-                        if(pps.getAbstainCount()!=null&& !pps.getAbstainCount().equals(proposal.getAbstentions())){
-                            // 有变更
-                            cache.setAbstentions(pps.getAbstainCount());
-                            taskCache.update(cache);
-                        }
-
-                        //只有在结束快高之后才有返回提案结果
-                        if (curBlock.getBlockNumber().longValue() >= Long.parseLong(proposal.getEndVotingBlock())) {
-                            //设置状态
-                            int status = getTallyResult(proposal.getHash()).getStatus();
-                            if(status!=proposal.getStatus()){
-                                // 有变更
-                                cache.setStatus(status);
-                                taskCache.update(cache);
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("更新提案({})的结果出错:{}", proposal.getPipId(), e.getMessage());
                     }
                 }
-            } catch (NoSuchBeanException e) {
-                logger.error("更新提案({})的主题和描述出错:{}", proposal.getPipId(), e.getMessage());
             } catch (Exception e){
-                logger.error("更新提案({})的主题和描述出错:发送http请求异常({})", proposal.getPipId(), e.getMessage());
+                logger.error("更新提案(proposal={})出错:", proposal.getHash(), e);
             }
         }
-        updateNodeOptInfo(proposalHashes);
+        // 更新操作日志
+        updateNodeOpt(proposalHashes);
         // 清除已合并的任务缓存
         taskCache.sweep();
+        // 整理提案缓存，注意：此操作不能放在采块线程，否则会造成找不到提案的错误
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+        proposalCache.sweep();
     }
 
-    private void updateNodeOptInfo ( List <String> proposalHashes ) {
+    private void updateNodeOpt(List <String> proposalHashes) {
+        if (proposalHashes.isEmpty()) return;
         ProposalCache proposalCache = cacheHolder.getProposalCache();
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         //补充操作记录中具体提案描述
-        if (!proposalHashes.isEmpty()) {
-            NodeOptExample nodeOptExample = new NodeOptExample();
-            nodeOptExample.createCriteria().andTxHashIn(proposalHashes);
-            List <NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
-            nodeOpts.forEach(nodeOpt -> {
-                try {
-                    Proposal proposal = proposalCache.getProposal(nodeOpt.getTxHash());
-                    String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
-                            .replace("ID", proposal.getPipId().toString())
-                            .replace("TITLE", proposal.getTopic())
-                            .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
-                    nodeOpt.setDesc(desc);
-
-                    CustomNodeOpt customNodeOpt = new CustomNodeOpt();
-                    BeanUtils.copyProperties(nodeOpt, customNodeOpt);
-                    // 放入入库暂存区
-                    stakingStage.insertNodeOpt(customNodeOpt);
-                } catch (NoSuchBeanException e) {
-                    logger.error("更新操作记录({})出错:{}", nodeOpt.getTxHash(), e.getMessage());
-                }
-            });
-        }
+        List <CustomNodeOpt> nodeOpts = customNodeOptMapper.selectByTxHashList(proposalHashes);
+        nodeOpts.forEach(nodeOpt -> {
+            try {
+                Proposal proposal = proposalCache.getProposal(nodeOpt.getTxHash());
+                String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
+                        .replace("ID", proposal.getPipId().toString())
+                        .replace("TITLE", proposal.getTopic())
+                        .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
+                nodeOpt.setDesc(desc);
+                // 放入入库暂存区
+                stakingStage.updateNodeOpt(nodeOpt);
+            } catch (NoSuchBeanException e) {
+                logger.error("更新操作记录(TxHash={})出错:{}", nodeOpt.getTxHash(), e.getMessage());
+            }
+        });
     }
 
     /**

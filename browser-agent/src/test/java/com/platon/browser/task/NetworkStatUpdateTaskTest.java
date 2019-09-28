@@ -2,10 +2,8 @@ package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.task.cache.NetworkStatTaskCache;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,34 +31,30 @@ import static org.mockito.Mockito.*;
 public class NetworkStatUpdateTaskTest extends TestBase {
     private static Logger logger = LoggerFactory.getLogger(NetworkStatUpdateTaskTest.class);
     @Spy
-    private NetworkStatUpdateTask networkStatUpdateTask;
+    private NetworkStatUpdateTask target;
     @Mock
-    private BlockChain blockChain;
+    private BlockChain bc;
     @Mock
     private BlockChainConfig chainConfig;
-    @Mock
-    private CacheHolder cacheHolder;
+    @Autowired
+    private NetworkStatTaskCache taskCache;
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(networkStatUpdateTask, "blockChain", blockChain);
-        ReflectionTestUtils.setField(networkStatUpdateTask, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(networkStatUpdateTask, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(target, "bc", bc);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(target, "taskCache", taskCache);
     }
 
     @Test
     public void testStart(){
-        BlockChainStage stageData = new BlockChainStage();
-        when(cacheHolder.getStageData()).thenReturn(stageData);
-        CustomNetworkStat networkStatCache = new CustomNetworkStat();
-        when(cacheHolder.getNetworkStatCache()).thenReturn(networkStatCache);
-        when(blockChain.getCurBlock()).thenReturn(blocks.get(0));
+        when(bc.getCurBlock()).thenReturn(blocks.get(0));
         Map<Integer, BigDecimal> foundationSubsidiesMap = new HashMap<>();
         foundationSubsidiesMap.put(1,BigDecimal.ONE);
         when(chainConfig.getFoundationSubsidies()).thenReturn(foundationSubsidiesMap);
-        when(blockChain.getAddIssueEpoch()).thenReturn(BigInteger.ONE);
-        when(blockChain.getChainConfig()).thenReturn(new BlockChainConfig());
-        networkStatUpdateTask.start();
-        verify(networkStatUpdateTask, times(1)).start();
+        when(bc.getAddIssueEpoch()).thenReturn(BigInteger.ONE);
+        when(bc.getChainConfig()).thenReturn(new BlockChainConfig());
+        target.start();
+        verify(target, times(1)).start();
     }
 }

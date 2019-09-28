@@ -4,8 +4,8 @@ import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.ProposalCache;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.task.cache.StakingTaskCache;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,16 +27,20 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StakingUpdateTaskTest extends TestBase {
     @Spy
-    private StakingUpdateTask stakingUpdateTask;
+    private StakingUpdateTask target;
     @Mock
     private BlockChainConfig chainConfig;
     @Mock
     private CacheHolder cacheHolder;
+    @Mock
+    private StakingTaskCache taskCache;
+    
 
     @Before
     public void setup(){
-        ReflectionTestUtils.setField(stakingUpdateTask, "chainConfig", chainConfig);
-        ReflectionTestUtils.setField(stakingUpdateTask, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(target, "chainConfig", chainConfig);
+        ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(target, "taskCache", taskCache);
     }
 
     @Test
@@ -50,8 +54,8 @@ public class StakingUpdateTaskTest extends TestBase {
             cc.setStakingIcon("");
             cc.setExternalId("2A0CD8DCB4BF2BE0");
         });
-        doReturn(customStakingSet).when(stakingUpdateTask).getAllStaking();
-        stakingUpdateTask.start();
-        verify(stakingUpdateTask, times(1)).start();
+        doReturn(customStakingSet).when(target).getAllStaking();
+        target.start();
+        verify(target, times(1)).start();
     }
 }
