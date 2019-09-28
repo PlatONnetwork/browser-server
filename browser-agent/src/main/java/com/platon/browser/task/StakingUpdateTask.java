@@ -41,17 +41,16 @@ public class StakingUpdateTask extends BaseTask{
     private StakingTaskCache taskCache;
 
     @Scheduled(cron = "0/3  * * * * ?")
-    private void cron(){start();}
+    private void cron() throws InterruptedException {start();}
 
-    public void start () {
+    public void start () throws InterruptedException {
 
         try {
             // 监控应用状态
             GracefullyUtil.monitor(this);
         } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("检测到SHUTDOWN钩子,放弃执行业务逻辑!");
+            return;
         }
 
         Set<CustomStaking> stakingSet = getAllStaking();

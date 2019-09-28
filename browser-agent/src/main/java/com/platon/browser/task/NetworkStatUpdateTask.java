@@ -42,17 +42,16 @@ public class NetworkStatUpdateTask extends BaseTask{
 
 
     @Scheduled(cron = "0/5  * * * * ?")
-    private void cron(){start();}
+    private void cron() throws InterruptedException {start();}
 
-    protected void start () {
+    protected void start () throws InterruptedException {
 
         try {
             // 监控应用状态
             GracefullyUtil.monitor(this);
         } catch (GracefullyShutdownException e) {
-            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("检测到SHUTDOWN钩子,放弃执行业务逻辑!");
+            return;
         }
 
         if(bc.getCurBlock()==null) return;
