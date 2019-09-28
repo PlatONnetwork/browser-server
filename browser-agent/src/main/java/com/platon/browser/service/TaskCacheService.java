@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
@@ -16,7 +15,6 @@ import com.platon.browser.task.cache.AddressTaskCache;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
 import com.platon.browser.task.cache.ProposalTaskCache;
 import com.platon.browser.task.cache.StakingTaskCache;
-import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
