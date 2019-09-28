@@ -72,7 +72,7 @@ public class ProposalTextHandler implements EventHandler {
         //设置url
         proposal.setUrl(url);
         //从交易解析参数获取需要设置pIDID
-        proposal.setPipId(Integer.parseInt(param.getPIDID()));
+        proposal.setPipId(param.getPIDID());
         //解析器将轮数换成结束块高直接使用
         BigDecimal endBlockNumber = RoundCalculation.endBlockNumCal(tx.getBlockNumber().toString(),chainConfig.getProposalTextConsensusRounds(),chainConfig);
 

@@ -1225,52 +1225,62 @@ public class ProposalExample {
             return (Criteria) this;
         }
 
-        public Criteria andPipIdEqualTo(Integer value) {
+        public Criteria andPipIdEqualTo(String value) {
             addCriterion("pip_id =", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdNotEqualTo(Integer value) {
+        public Criteria andPipIdNotEqualTo(String value) {
             addCriterion("pip_id <>", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdGreaterThan(Integer value) {
+        public Criteria andPipIdGreaterThan(String value) {
             addCriterion("pip_id >", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdGreaterThanOrEqualTo(Integer value) {
+        public Criteria andPipIdGreaterThanOrEqualTo(String value) {
             addCriterion("pip_id >=", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdLessThan(Integer value) {
+        public Criteria andPipIdLessThan(String value) {
             addCriterion("pip_id <", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdLessThanOrEqualTo(Integer value) {
+        public Criteria andPipIdLessThanOrEqualTo(String value) {
             addCriterion("pip_id <=", value, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdIn(List<Integer> values) {
+        public Criteria andPipIdLike(String value) {
+            addCriterion("pip_id like", value, "pipId");
+            return (Criteria) this;
+        }
+
+        public Criteria andPipIdNotLike(String value) {
+            addCriterion("pip_id not like", value, "pipId");
+            return (Criteria) this;
+        }
+
+        public Criteria andPipIdIn(List<String> values) {
             addCriterion("pip_id in", values, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdNotIn(List<Integer> values) {
+        public Criteria andPipIdNotIn(List<String> values) {
             addCriterion("pip_id not in", values, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdBetween(Integer value1, Integer value2) {
+        public Criteria andPipIdBetween(String value1, String value2) {
             addCriterion("pip_id between", value1, value2, "pipId");
             return (Criteria) this;
         }
 
-        public Criteria andPipIdNotBetween(Integer value1, Integer value2) {
+        public Criteria andPipIdNotBetween(String value1, String value2) {
             addCriterion("pip_id not between", value1, value2, "pipId");
             return (Criteria) this;
         }

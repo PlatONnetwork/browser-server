@@ -134,10 +134,15 @@ public class BlockSyncTask extends BaseTask{
             if(taskManager.isRunning()){
                 if(collect()==null) break;
             }else {
-                // 其它任务停止后，再执行一遍采集功能，确保所有内存数据都落库
-                collect();
-                // 采集线程停止
-                GracefullyUtil.monitor(this);
+                try {
+                    // 其它任务停止后, 监控本任务的状态
+                    GracefullyUtil.monitor(this);
+                } catch (GracefullyShutdownException e) {
+                    logger.warn("检测到SHUTDOWN钩子,执行最后一次采集,确保数据是最新的");
+                    collect();
+                    logger.warn("数据已同步入库,所有业务处理逻辑已停止,可安全停机!");
+                    System.exit(0);
+                }
             }
         }
     }

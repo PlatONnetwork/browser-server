@@ -1,6 +1,5 @@
 package com.platon.browser.service;
 
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomNetworkStat;
 import com.platon.browser.dto.CustomProposal;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

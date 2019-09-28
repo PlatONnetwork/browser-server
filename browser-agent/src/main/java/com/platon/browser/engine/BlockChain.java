@@ -110,8 +110,6 @@ public class BlockChain {
 
     @PostConstruct
     private void init () {
-        // 初始等于配置
-        this.curConsensusExpectBlockCount=new BigDecimal(chainConfig.getExpectBlockCount());
         // 数据库统计数据全量初始化
         NetworkStatExample example = new NetworkStatExample();
         example.setOrderByClause(" update_time desc");

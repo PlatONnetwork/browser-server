@@ -73,7 +73,7 @@
           #{item.pipNum,jdbcType=VARCHAR}
         </if>
         <if test="'pip_id'.toString() == column.value">
-          #{item.pipId,jdbcType=INTEGER}
+          #{item.pipId,jdbcType=VARCHAR}
         </if>
         <if test="'topic'.toString() == column.value">
           #{item.topic,jdbcType=VARCHAR}

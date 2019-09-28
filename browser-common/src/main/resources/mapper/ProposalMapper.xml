@@ -19,7 +19,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="pip_num" jdbcType="VARCHAR" property="pipNum" />
-    <result column="pip_id" jdbcType="INTEGER" property="pipId" />
+    <result column="pip_id" jdbcType="VARCHAR" property="pipId" />
     <result column="topic" jdbcType="VARCHAR" property="topic" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="canceled_pip_id" jdbcType="VARCHAR" property="canceledPipId" />
@@ -132,7 +132,7 @@
       #{endVotingBlock,jdbcType=VARCHAR}, #{activeBlock,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
       #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
       #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=VARCHAR}, 
       #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=VARCHAR}, 
       #{canceledTopic,jdbcType=VARCHAR})
   </insert>
@@ -259,7 +259,7 @@
         #{pipNum,jdbcType=VARCHAR},
       </if>
       <if test="pipId != null">
-        #{pipId,jdbcType=INTEGER},
+        #{pipId,jdbcType=VARCHAR},
       </if>
       <if test="topic != null">
         #{topic,jdbcType=VARCHAR},
@@ -336,7 +336,7 @@
         pip_num = #{record.pipNum,jdbcType=VARCHAR},
       </if>
       <if test="record.pipId != null">
-        pip_id = #{record.pipId,jdbcType=INTEGER},
+        pip_id = #{record.pipId,jdbcType=VARCHAR},
       </if>
       <if test="record.topic != null">
         topic = #{record.topic,jdbcType=VARCHAR},
@@ -374,7 +374,7 @@
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       pip_num = #{record.pipNum,jdbcType=VARCHAR},
-      pip_id = #{record.pipId,jdbcType=INTEGER},
+      pip_id = #{record.pipId,jdbcType=VARCHAR},
       topic = #{record.topic,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
       canceled_pip_id = #{record.canceledPipId,jdbcType=VARCHAR},
@@ -435,7 +435,7 @@
         pip_num = #{pipNum,jdbcType=VARCHAR},
       </if>
       <if test="pipId != null">
-        pip_id = #{pipId,jdbcType=INTEGER},
+        pip_id = #{pipId,jdbcType=VARCHAR},
       </if>
       <if test="topic != null">
         topic = #{topic,jdbcType=VARCHAR},
@@ -470,7 +470,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       pip_num = #{pipNum,jdbcType=VARCHAR},
-      pip_id = #{pipId,jdbcType=INTEGER},
+      pip_id = #{pipId,jdbcType=VARCHAR},
       topic = #{topic,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       canceled_pip_id = #{canceledPipId,jdbcType=VARCHAR},
@@ -495,7 +495,7 @@
         #{item.timestamp,jdbcType=TIMESTAMP}, #{item.yeas,jdbcType=BIGINT}, #{item.nays,jdbcType=BIGINT}, 
         #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
         #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.pipNum,jdbcType=VARCHAR}, 
-        #{item.pipId,jdbcType=INTEGER}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
+        #{item.pipId,jdbcType=VARCHAR}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
         #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR})
     </foreach>
   </insert>
@@ -566,7 +566,7 @@
           #{item.pipNum,jdbcType=VARCHAR}
         </if>
         <if test="'pip_id'.toString() == column.value">
-          #{item.pipId,jdbcType=INTEGER}
+          #{item.pipId,jdbcType=VARCHAR}
         </if>
         <if test="'topic'.toString() == column.value">
           #{item.topic,jdbcType=VARCHAR}
