@@ -89,9 +89,9 @@ public class NetworkStatUpdateTask extends BaseTask{
                     .add(foundationAmount);
 
             //rpc获取锁仓余额
-            BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockNumber);
             //rpc获取质押余额
-            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), bc.getCurBlock().getBlockNumber());
+            BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), blockNumber);
             //计算流通量
             BigDecimal turnoverValue = circulation
                     .subtract(new BigDecimal(restrictingContractBalance))
