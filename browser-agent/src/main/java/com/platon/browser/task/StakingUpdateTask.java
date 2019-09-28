@@ -35,7 +35,6 @@ public class StakingUpdateTask extends BaseTask{
     private static Logger logger = LoggerFactory.getLogger(StakingUpdateTask.class);
     @Autowired
     private BlockChainConfig chainConfig;
-    private static final String URI_PATH = "_/api/1.0/user/autocomplete.json?q=";
     @Autowired
     private CacheHolder cacheHolder;
     @Autowired
@@ -57,7 +56,8 @@ public class StakingUpdateTask extends BaseTask{
 
         Set<CustomStaking> stakingSet = getAllStaking();
         if (stakingSet.isEmpty()) return;
-        String keyStoreUrl = chainConfig.getKeyBase();
+        String keyBaseUrl = chainConfig.getKeyBase();
+        String keyBaseApi = chainConfig.getKeyBaseApi();
         stakingSet.forEach(staking -> {
             if(StringUtils.isNotBlank(staking.getExternalId())){
                 TaskStaking cache = new TaskStaking();
@@ -65,10 +65,10 @@ public class StakingUpdateTask extends BaseTask{
                 cache.setNodeId(staking.getNodeId());
                 cache.setStakingBlockNum(staking.getStakingBlockNum());
                 // 如果外部ID不为空，则发送获取请求
-                String url = keyStoreUrl.concat(URI_PATH.concat(staking.getExternalId()));
+                String url = keyBaseUrl.concat(keyBaseApi.concat(staking.getExternalId()));
                 try {
                     KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
-                    String userName = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
+                    String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
                     String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
                     if(StringUtils.isNotBlank(icon)&&!icon.equals(staking.getStakingIcon())){
                         cache.setStakingIcon(icon);

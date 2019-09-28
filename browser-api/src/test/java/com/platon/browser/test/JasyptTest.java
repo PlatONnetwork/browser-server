@@ -12,18 +12,25 @@ import com.platon.browser.BrowserApiApplication;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrowserApiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BrowserApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class JasyptTest {
 
     @Autowired
     StringEncryptor encryptor;
-    
+
+
     @Test
-    public void encry() {
+    public void encry () {
         String username = encryptor.encrypt("root");//加密root
         System.out.println("username:" + username);
         String password = encryptor.encrypt("Juzhen123!");//加密123456
         System.out.println("password:" + password);
         assertTrue(true);
-   }
+    }
+
+    @Test
+    public void dect () {
+        String deUserName = encryptor.decrypt("ENC(bpshgjWOgn2d+oGmSTBPNA==)");//解密
+        System.out.println("deUserName:" + deUserName);
+    }
 }

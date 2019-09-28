@@ -141,6 +141,8 @@ public class BlockChainConfig {
     private String proposalUrlTemplate;
     //keyBase
     private String keyBase;
+    //keyBaseApi
+    private String keyBaseApi;
     // 初始内置节点默认质押金额(LAT)
     private BigDecimal defaultStakingLockedAmount;
     // 初始内置节点信息

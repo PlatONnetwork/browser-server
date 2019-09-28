@@ -68,3 +68,5 @@ platon.config:
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keysBase网址
   keyBase: https://keybase.io/
+  #keyBase api
+  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
