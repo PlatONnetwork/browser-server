@@ -1,5 +1,5 @@
 
-package com.platon.browser.engine.bean.keybase;
+package com.platon.browser.dto.keybase;
 import lombok.Data;
 
 import java.util.List;
