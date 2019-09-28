@@ -1,5 +1,5 @@
 
-package com.platon.browser.engine.bean.keybase;
+package com.platon.browser.dto.keybase;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
