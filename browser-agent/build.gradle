@@ -37,6 +37,8 @@ task createDirs() {
 //task 用来复制build出来的主jar包
 task copyLibs(type: Copy) {
     from('build/libs')
+    from('jasypt.properties')
+    from('status.hook')
     into('build/package/browser-agent')
 }
 //task 用来复制配置文件

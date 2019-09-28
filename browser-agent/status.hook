@@ -1,2 +1,2 @@
 #可取值：RUNNING,PAUSE,SHUTDOWN
-status=RUNNING
+status=SHUTDOWN
