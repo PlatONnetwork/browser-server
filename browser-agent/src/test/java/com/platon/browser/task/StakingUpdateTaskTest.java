@@ -44,7 +44,7 @@ public class StakingUpdateTaskTest extends TestBase {
     }
 
     @Test
-    public void testStart() {
+    public void testStart() throws  Exception{
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
         when(chainConfig.getKeyBase()).thenReturn("https://keybase.io/");

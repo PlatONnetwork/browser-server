@@ -47,7 +47,7 @@ public class NetworkStatUpdateTaskTest extends TestBase {
     }
 
     @Test
-    public void testStart(){
+    public void testStart() throws  Exception{
         when(bc.getCurBlock()).thenReturn(blocks.get(0));
         Map<Integer, BigDecimal> foundationSubsidiesMap = new HashMap<>();
         foundationSubsidiesMap.put(1,BigDecimal.ONE);

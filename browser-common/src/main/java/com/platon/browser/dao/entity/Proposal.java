@@ -39,7 +39,7 @@ public class Proposal {
 
     private String pipNum;
 
-    private Integer pipId;
+    private String pipId;
 
     private String topic;
 
@@ -185,12 +185,12 @@ public class Proposal {
         this.pipNum = pipNum == null ? null : pipNum.trim();
     }
 
-    public Integer getPipId() {
+    public String getPipId() {
         return pipId;
     }
 
-    public void setPipId(Integer pipId) {
-        this.pipId = pipId;
+    public void setPipId(String pipId) {
+        this.pipId = pipId == null ? null : pipId.trim();
     }
 
     public String getTopic() {
@@ -250,7 +250,7 @@ public class Proposal {
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         pipNum("pip_num", "pipNum", "VARCHAR", false),
-        pipId("pip_id", "pipId", "INTEGER", false),
+        pipId("pip_id", "pipId", "VARCHAR", false),
         topic("topic", "topic", "VARCHAR", false),
         description("description", "description", "VARCHAR", false),
         canceledPipId("canceled_pip_id", "canceledPipId", "VARCHAR", false),

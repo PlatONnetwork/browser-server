@@ -104,7 +104,8 @@
                                 replaceString=""/>
         </table>
 
-                <table tableName="proposal" domainObjectName="Proposal">
+
+        <table tableName="node_opt" domainObjectName="NodeOpt">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -126,11 +127,11 @@
 
 -->
 
-
-        <table tableName="node_opt" domainObjectName="NodeOpt">
+        <table tableName="proposal" domainObjectName="Proposal">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
+
 
     </context>
 </generatorConfiguration>
