@@ -1,4 +1,4 @@
-package com.platon.browser.target;
+package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.client.ProposalParticiantStat;

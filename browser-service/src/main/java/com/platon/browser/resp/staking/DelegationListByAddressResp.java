@@ -74,6 +74,7 @@ public class DelegationListByAddressResp {
 	public void setDelegateReduction(String delegateReduction) {
 		this.delegateReduction = delegateReduction;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getDelegateTotalValue() {
 		return delegateTotalValue;
 	}

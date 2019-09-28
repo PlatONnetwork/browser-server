@@ -9,7 +9,7 @@ spring:
     ssl: true
 
 # 应用版本
-version: 0.7.0
+version: 0.7.2.0
 # 当前激活的配置名称(请不要修改)
 profile: preprod
 # MySQL数据库连接地址

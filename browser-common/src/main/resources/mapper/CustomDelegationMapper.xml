@@ -101,7 +101,7 @@
   <select id="selectSumDelegateByExample" resultMap="AndStakingResultMap">
 	select 
 	  	sum(cast(t1.delegate_has as Decimal(30)) + cast(t1.delegate_locked as Decimal(30))) as 'allDelegate',
-		sum(case when t2.status=2 then t1.delegate_locked else 0 end) as 'allLockDelegate'
+		sum(case when t2.status=1 then cast(t1.delegate_locked AS DECIMAL (30)) else 0 end) as 'allLockDelegate'
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>
@@ -116,7 +116,8 @@
   
   <select id="selectSumDelegateByAddress" resultMap="AndStakingResultMap">
 	select 
-	  	sum(cast(t1.delegate_has as Decimal(30)) + cast(t1.delegate_locked as Decimal(30))) as 'allDelegate'
+	  	sum(cast(t1.delegate_has as Decimal(30)) + cast(t1.delegate_locked as Decimal(30))) as 'allDelegate',
+	  	sum(case when t2.status=1 then cast(t1.delegate_locked AS DECIMAL (30)) else 0 end) as 'allLockDelegate'
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>

@@ -28,7 +28,7 @@ public class JasyptTest {
         assertTrue(true);
     }
 
-    @Test
+//    @Test
     public void dect () {
         String deUserName = encryptor.decrypt("ENC(bpshgjWOgn2d+oGmSTBPNA==)");//解密
         System.out.println("deUserName:" + deUserName);

@@ -173,6 +173,7 @@ public class StakingDetailsResp {
 	public void setStakingBlockNum(Long stakingBlockNum) {
 		this.stakingBlockNum = stakingBlockNum;
 	}
+	@JsonSerialize(using = CustomLatSerializer.class)
 	public String getStatDelegateReduction() {
 		return statDelegateReduction;
 	}

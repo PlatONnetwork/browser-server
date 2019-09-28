@@ -1,6 +1,7 @@
 package com.platon.browser.job;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
 import com.platon.browser.enums.I18nEnum;
@@ -102,9 +103,10 @@ public class StompPushJob {
     
     /**
      * 推送验证人列表相关信息
+     * @throws JsonProcessingException 
      */
     @Scheduled(cron="0/5 * * * * ?")
-    public void pushStakingChangeNew() {
+    public void pushStakingChangeNew() throws JsonProcessingException {
     	for (Entry<String, List<String>> m : BrowserCache.getKeys().entrySet()) {
     		MessageDto messageDto = new MessageDto();
     		messageDto = messageDto.analysisKey(m.getKey());
@@ -113,7 +115,8 @@ public class StompPushJob {
     		RespPage<AliveStakingListResp> alives = stakingService.aliveStakingList(req);
     		for(String userNo:  m.getValue()) {
     			try {
-    				BrowserCache.sendMessage(userNo, JSONObject.toJSONString(alives));
+    				ObjectMapper mapper = new ObjectMapper();  
+    				BrowserCache.sendMessage(userNo, mapper.writeValueAsString(alives));
     			}catch (IllegalStateException e) {
     				BrowserCache.getWebSocketSet().remove(userNo);
     				m.getValue().remove(userNo);

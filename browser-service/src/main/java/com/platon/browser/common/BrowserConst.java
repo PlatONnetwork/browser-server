@@ -10,9 +10,6 @@ package com.platon.browser.common;
 public class BrowserConst {
 	private BrowserConst(){}
 
-	/** 身份标识外部引用url */
-	public static final String EX_URL = "https://keybase.io/";
-	
 	/** 查询缓存最大数量 */
 	public static final Integer MAX_NUM = 500000;
 	

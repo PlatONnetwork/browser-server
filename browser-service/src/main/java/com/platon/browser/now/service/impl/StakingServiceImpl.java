@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
+import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeOpt;
@@ -71,6 +72,9 @@ public class StakingServiceImpl implements StakingService {
 
 	@Autowired
 	private I18nUtil i18n;
+	
+	@Autowired
+    private BlockChainConfig blockChainConfig;
 	
 	@Override
 	public StakingStatisticNewResp stakingStatisticNew() {
@@ -256,7 +260,7 @@ public class StakingServiceImpl implements StakingService {
 			resp.setWebsite(webSite);
 			/** 实际跳转地址是url拼接上名称 */
 			if (StringUtils.isNotBlank(stakingNode.getExternalName())) {
-				resp.setExternalUrl(BrowserConst.EX_URL + stakingNode.getExternalName());
+				resp.setExternalUrl(blockChainConfig.getKeyBase() + stakingNode.getExternalName());
 			}
 			if (StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {
 				resp.setRewardValue(stakingNode.getStatRewardValue());
@@ -274,6 +278,7 @@ public class StakingServiceImpl implements StakingService {
 				resp.setStakingValue(stakingNode.getStakingReduction());
 				String totalValue = new BigDecimal(resp.getStakingValue()).add(new BigDecimal(resp.getDelegateValue())).toString();
 				resp.setTotalValue(totalValue);
+				resp.setStatDelegateReduction(new BigDecimal(resp.getDelegateValue()).add(new BigDecimal(stakingNode.getStatDelegateReduction())).toString());
 			} else {
 				String delegateValue= new BigDecimal(stakingNode.getStatDelegateHas()).add(new BigDecimal(stakingNode.getStatDelegateLocked())).toString();
 				/** 候选中则返回单条委托的总金额 **/
@@ -366,7 +371,7 @@ public class StakingServiceImpl implements StakingService {
 			 * 委托金额等于has加上实际lock金额
 			 */
 			String delValue = new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(deleLock)).toString();
+					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
 			byStakingResp.setDelegateValue(delValue);
 			byStakingResp.setAllDelegateLocked(allLockDelegate);
 			byStakingResp.setDelegateTotalValue(allDelegate);
@@ -393,7 +398,6 @@ public class StakingServiceImpl implements StakingService {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationStaking, byAddressResp);
 			byAddressResp.setNodeName(delegationStaking.getStakingName());
-			byAddressResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
 			/** 如果状态等于候选中则正常显示，否则为0 */
 			String deletgateHas = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateHas():"0";
 			byAddressResp.setDelegateHas(deletgateHas);
@@ -409,6 +413,7 @@ public class StakingServiceImpl implements StakingService {
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString() ;
 			byAddressResp.setDelegateUnlock(deletgateUnLock);
 			byAddressResp.setDelegateTotalValue(sumDelegationStaking.get(0).getAllDelegate());
+			byAddressResp.setAllDelegateLocked(sumDelegationStaking.get(0).getAllLockDelegate());
 			lists.add(byAddressResp);
 		}
 		/** 统计总数 */

@@ -3,7 +3,6 @@ package com.platon.browser.now.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
@@ -12,6 +11,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.dto.CustomTransaction.TxReceiptStatusEnum;
 import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.account.AccountDownload;
+import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
@@ -34,7 +34,9 @@ import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
 import com.platon.browser.util.DateUtil;
 import com.platon.browser.util.EnergonUtil;
+import com.platon.browser.util.HttpUtil;
 import com.platon.browser.util.I18nUtil;
+import com.platon.browser.util.KeyBaseAnalysis;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -305,28 +307,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setDetails(createValidatorParam.getDetails());
 						resp.setProgramVersion(createValidatorParam.getProgramVersion());
 						resp.setTxAmount(createValidatorParam.getAmount());
-
-						StakingKey stakingKey = new StakingKey();
-						stakingKey.setNodeId(createValidatorParam.getNodeId());
-						/**
-						 * 如果块高是空的情况下，应该为失败的交易直接跳出
-						 */
-						if(StringUtils.isBlank(createValidatorParam.getBlockNumber())) {
-							break;
-						} else {
-							stakingKey.setStakingBlockNum(Long.valueOf(createValidatorParam.getBlockNumber()));
-						}
-						/**
-						 * 为了获取跳转地址
-						 */
-						Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
-						if(staking != null) {
-							String exName = "";
-							if(StringUtils.isNotBlank(staking.getExternalName())) {
-								exName = staking.getExternalName();
-							}
-							resp.setExternalUrl(BrowserConst.EX_URL + exName);
-						}
+						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//编辑验证人
 					case EDIT_VALIDATOR:
@@ -337,22 +318,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setWebsite(editValidatorParam.getWebsite());
 						resp.setDetails(editValidatorParam.getDetails());
 						resp.setNodeName(this.setStakingName(editValidatorParam.getNodeId(), editValidatorParam.getNodeName()));
-						/**
-						 * 如果块高是空的情况下，应该为失败的交易直接跳出
-						 */
-						StakingKey stakingKeyV = new StakingKey();
-						stakingKeyV.setNodeId(editValidatorParam.getNodeId());
-						if(StringUtils.isBlank(editValidatorParam.getBlockNumber())) {
-							break;
-						} else {
-							stakingKeyV.setStakingBlockNum(Long.valueOf(editValidatorParam.getBlockNumber()));
-						}
-						staking = stakingMapper.selectByPrimaryKey(stakingKeyV);
-						String exName = "";
-						if(StringUtils.isNotBlank(staking.getExternalName())) {
-							exName = staking.getExternalName();
-						}
-						resp.setExternalUrl(BrowserConst.EX_URL + exName);
+						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//增加质押
 					case INCREASE_STAKING:
@@ -373,7 +339,7 @@ public class TransactionServiceImpl implements TransactionService {
 						if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
 							stakingKeyE.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
 						}
-						staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
+						Staking staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 						if(staking!=null) {
 							resp.setRedeemLocked(staking.getStakingReduction());
 							//只有已退出，则金额才会退回到账户
@@ -621,6 +587,47 @@ public class TransactionServiceImpl implements TransactionService {
     		return stakings.get(0).getStakingName();
     	}
     	return nodeName;
+    }
+    
+    /**
+     * 统一设置验证人keybaseurl
+     * @method getStakingUrl
+     * @param externalId
+     * @param txReceiptStatus
+     * @param nodeId
+     * @return
+     */
+    private String getStakingUrl(String externalId,Integer txReceiptStatus) {
+    	
+    	String keyBaseUrl = blockChainConfig.getKeyBase();
+        String keyBaseApi = blockChainConfig.getKeyBaseApi();
+        String defaultBaseUrl = blockChainConfig.getKeyBase();
+    	/**
+		 * 如果externalId为空就不返回给前端url，反转跳转
+		 */
+		if(StringUtils.isNotBlank(externalId)) {
+			/**
+			 * 如果为失败的交易直接设置默认的url然后跳出
+			 */
+			if(txReceiptStatus.intValue() == TxReceiptStatusEnum.FAILURE.getCode()) {
+				return defaultBaseUrl;
+			}
+			
+			String url = keyBaseUrl.concat(keyBaseApi.concat(externalId));
+            String userName = "";
+			try {
+				KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
+				userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
+			} catch (Exception e) {
+				logger.error("getStakingUrl error.externalId:{},txReceiptStatus:{},error:{}",externalId, txReceiptStatus, e.getMessage());
+				return defaultBaseUrl;
+			}
+			if(StringUtils.isNotBlank(userName)) {
+				defaultBaseUrl += userName;
+			}
+			return defaultBaseUrl;
+		}
+    	return null;
     }
 
 }
