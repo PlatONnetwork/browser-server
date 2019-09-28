@@ -292,6 +292,7 @@ public class StakingServiceImpl implements StakingService {
 	@Override
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
 		NodeOptExample nodeOptExample = new NodeOptExample();
+		nodeOptExample.setOrderByClause(" id desc");
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
 		criteria.andNodeIdEqualTo(req.getNodeId());
@@ -358,12 +359,15 @@ public class StakingServiceImpl implements StakingService {
 		for (DelegationStaking delegationStaking: delegationStakings.getResult()) {
 			DelegationListByStakingResp byStakingResp = new DelegationListByStakingResp();
 			byStakingResp.setDelegateAddr(delegationStaking.getDelegateAddr());
-			String delValue = new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
-			byStakingResp.setDelegateValue(delValue);
 		   /**已锁定委托（LAT）如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation）  */
 			String deleLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateLocked():"0";
 			byStakingResp.setDelegateLocked(deleLock);
+			/**
+			 * 委托金额等于has加上实际lock金额
+			 */
+			String delValue = new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(deleLock)).toString();
+			byStakingResp.setDelegateValue(delValue);
 			byStakingResp.setAllDelegateLocked(allLockDelegate);
 			byStakingResp.setDelegateTotalValue(allDelegate);
 			lists.add(byStakingResp);
@@ -389,10 +393,6 @@ public class StakingServiceImpl implements StakingService {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationStaking, byAddressResp);
 			byAddressResp.setNodeName(delegationStaking.getStakingName());
-			/** 委托金额=犹豫期金额加上锁定期金额 */
-			String deleValue = new BigDecimal(delegationStaking.getDelegateHas())
-					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString();
-			byAddressResp.setDelegateValue(deleValue);
 			byAddressResp.setAllDelegateLocked(delegationStaking.getStatDelegateLocked());
 			/** 如果状态等于候选中则正常显示，否则为0 */
 			String deletgateHas = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateHas():"0";
@@ -400,6 +400,10 @@ public class StakingServiceImpl implements StakingService {
 			/** 如果关联的验证人状态正常则正常显示，如果其他情况则为零（delegation） */
 			String deletgateLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?delegationStaking.getDelegateLocked():"0";
 			byAddressResp.setDelegateLocked(deletgateLock);
+			/** 委托金额=犹豫期金额加上锁定期金额 */
+			String deleValue = new BigDecimal(delegationStaking.getDelegateHas())
+					.add(new BigDecimal(byAddressResp.getDelegateLocked())).toString();
+			byAddressResp.setDelegateValue(deleValue);
 			/** 如果关联的验证人状态退出中或已退出则为delegateHas+delegateLocked，如果其他情况则为0（delegation） */
 			String deletgateUnLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?"0":new BigDecimal(delegationStaking.getDelegateHas())
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString() ;

@@ -9,6 +9,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.CustomTransaction.TxReceiptStatusEnum;
 import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
@@ -365,7 +366,7 @@ public class TransactionServiceImpl implements TransactionService {
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 						ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
-						this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName());
+						resp.setNodeName(this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
 						resp.setApplyAmount(exitValidatorParam.getAmount());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
@@ -450,7 +451,7 @@ public class TransactionServiceImpl implements TransactionService {
 						VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
 						resp.setNodeId(votingProposalParam.getVerifier());
 						resp.setProposalOption(votingProposalParam.getProposalType());
-						resp.setProposalHash(req.getTxHash());
+						resp.setProposalHash(votingProposalParam.getProposalId());
 						resp.setProposalNewVersion(votingProposalParam.getProgramVersion());
 						resp.setNodeName(this.setStakingName(votingProposalParam.getVerifier(), votingProposalParam.getNodeName()));
 						if(StringUtils.isNotBlank(votingProposalParam.getPIDID())) {
@@ -462,12 +463,24 @@ public class TransactionServiceImpl implements TransactionService {
 							resp.setNodeId(customVoteProposal.getVerifier());
 							resp.setNodeName(customVoteProposal.getVerifierName());
 							resp.setProposalOption(customVoteProposal.getType());
-							resp.setProposalHash(req.getTxHash());
+							resp.setProposalHash(customVoteProposal.getProposalHash());
 							resp.setProposalNewVersion(customVoteProposal.getNewVersion());
 							resp.setPipNum(customVoteProposal.getPipNum());
 							resp.setProposalTitle(customVoteProposal.getTopic());
 							resp.setProposalUrl(customVoteProposal.getUrl());
 							resp.setVoteStatus(customVoteProposal.getOption());
+						}
+						/**
+						 * 失败情况下需要到提案上获取提案信息
+						 */
+						if(resp.getTxReceiptStatus().intValue() == TxReceiptStatusEnum.FAILURE.getCode()) {
+							Proposal proposal = proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
+							if(proposal != null) {
+								resp.setPipNum(proposal.getPipNum());
+								resp.setProposalTitle(proposal.getTopic());
+								resp.setProposalUrl(proposal.getUrl());
+								resp.setProposalOption(proposal.getType());
+							}
 						}
 						break;
 						//版本申明

@@ -16,7 +16,6 @@ import com.platon.browser.task.cache.AddressTaskCache;
 import com.platon.browser.task.cache.NetworkStatTaskCache;
 import com.platon.browser.task.cache.ProposalTaskCache;
 import com.platon.browser.task.cache.StakingTaskCache;
-import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
