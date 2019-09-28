@@ -4,7 +4,6 @@ import com.platon.browser.dto.keybase.Completion;
 import com.platon.browser.dto.keybase.Components;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.keybase.ValueScore;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class KeyBaseAnalysis {
 
-    public static String getKeyBaseUseName( KeyBaseUser keyBaseUser) throws Exception{
+    public static String getKeyBaseUseName(KeyBaseUser keyBaseUser) throws Exception{
         List <Completion> completions = keyBaseUser.getCompletions();
         if (completions == null || completions.isEmpty()) return null;
         // 取最新一条
