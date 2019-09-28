@@ -174,7 +174,7 @@ CREATE TABLE `proposal` (
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `pip_num` varchar(128) NOT NULL COMMENT 'pip编号(需要组装 PIP-编号)',
-  `pip_id` int(11) NOT NULL COMMENT '提案id',
+  `pip_id` varchar(128) NOT NULL COMMENT '提案id',
   `topic` varchar(255) DEFAULT NULL COMMENT '提案主题',
   `description` varchar(255) DEFAULT NULL COMMENT '提案描述',
   `canceled_pip_id` varchar(255) DEFAULT NULL COMMENT '被取消提案id',
@@ -183,6 +183,7 @@ CREATE TABLE `proposal` (
   KEY `hash` (`hash`) USING BTREE,
   KEY `type` (`type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 /*Table structure for table `rp_plan` */
 
