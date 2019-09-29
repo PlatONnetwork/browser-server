@@ -18,9 +18,9 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.config.BrowserCache;
 import com.platon.browser.config.MessageDto;
 
@@ -28,6 +28,7 @@ import com.platon.browser.config.MessageDto;
 
 @RestController
 @ServerEndpoint("/websocket/{message}")
+@CrossOrigin
 public class WebSocketController {
 	
 	private static Logger logger = LoggerFactory.getLogger(WebSocketController.class);
@@ -39,8 +40,8 @@ public class WebSocketController {
 	 */
 	@OnOpen
 	public void onOpen(@PathParam(value = "message") String message, Session session, EndpointConfig config) {
-		message = "{" + message + "}";
-		MessageDto messageDto = JSONObject.parseObject(message, MessageDto.class);
+		MessageDto messageDto = new MessageDto();
+		messageDto = messageDto.analysisData(message);
 		BrowserCache.getWebSocketSet().put(messageDto.getUserNo(), session);// 加入map中
 		/**
 		 * 用組合key来存储用户list

@@ -2,6 +2,7 @@ package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Block;
@@ -21,6 +22,7 @@ import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.RestrictingItem;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 
 /**
  * 地址具体逻辑实现方法
@@ -76,6 +79,15 @@ public class AddressServiceImpl implements AddressService {
         	BeanUtils.copyProperties(item, resp);
         	/** 预先设置是否展示锁仓 */
         	resp.setIsRestricting(0);
+        }
+        /** 特殊账户余额直接查询链  */
+        if(BrowserConst.ACCOUNT.equals(req.getAddress())) {
+        	try {
+				BigInteger balance = platonClient.getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
+				resp.setBalance(balance.toString());
+        	} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
         RpPlanExample rpPlanExample = new RpPlanExample();
 		RpPlanExample.Criteria criteria = rpPlanExample.createCriteria();

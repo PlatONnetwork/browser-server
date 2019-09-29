@@ -11,6 +11,7 @@ import lombok.Data;
  */
 @Data
 public class BlockListNewResp {
+	private Boolean isRefresh; // 是否更新
 	private Long number; // 区块高度
 	private Long timestamp; // 出块时间
 	private Long serverTime; // 服务器时间

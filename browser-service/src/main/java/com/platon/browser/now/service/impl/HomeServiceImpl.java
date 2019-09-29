@@ -65,6 +65,9 @@ public class HomeServiceImpl implements HomeService {
 	
 	/** 记录刷新值 */
 	private static Integer consensusNum = 0;
+	
+	/** 记录最新块高 */
+	private static Long newBlockNum = 0l;
 
 	@Override
 	public QueryNavigationResp queryNavigation(QueryNavigationRequest req) {
@@ -248,11 +251,24 @@ public class HomeServiceImpl implements HomeService {
 		/** 查询缓存最新的八条区块信息 */
 		List<Block> items = statisticCacheService.getBlockCache(0,8);
 		List<BlockListNewResp> lists = new LinkedList<>();
-		for (Block blockRedis : items) {
+		for (int i=0; i < items.size(); i++) {
 			BlockListNewResp blockListNewResp = new BlockListNewResp();
-			BeanUtils.copyProperties(blockRedis, blockListNewResp);
+			BeanUtils.copyProperties(items.get(i), blockListNewResp);
 			blockListNewResp.setServerTime(new Date().getTime());
-			blockListNewResp.setTimestamp(blockRedis.getTimestamp().getTime());
+			blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
+			blockListNewResp.setIsRefresh(true);
+			/**
+			 * 第一个块需要记录缓存，然后进行比对
+			 * 如果块没有增长则置为false
+			 */
+			if(i == 0) {
+				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
+				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
+					newBlockNum = items.get(i).getNumber();
+				} else {
+					blockListNewResp.setIsRefresh(false);
+				}
+			}
 			lists.add(blockListNewResp);
 		}
 		return lists;
