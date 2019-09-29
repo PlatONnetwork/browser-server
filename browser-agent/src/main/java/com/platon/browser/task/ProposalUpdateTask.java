@@ -194,7 +194,8 @@ public class ProposalUpdateTask extends BaseTask {
                 String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
                         .replace("ID", proposal.getPipId()==null?"":proposal.getPipId())
                         .replace("TITLE", proposal.getTopic()==null?"":proposal.getTopic())
-                        .replace("TYPE", proposal.getType());
+                        .replace("TYPE", proposal.getType())
+                        .replace("VERSION",proposal.getNewVersion()==null?"":proposal.getNewVersion());
                 nodeOpt.setDesc(desc);
                 // 放入入库暂存区
                 stakingStage.updateNodeOpt(nodeOpt);
