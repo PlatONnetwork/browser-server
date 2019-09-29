@@ -1564,6 +1564,76 @@ public class ProposalExample {
             addCriterion("canceled_topic not between", value1, value2, "canceledTopic");
             return (Criteria) this;
         }
+
+        public Criteria andBlockNumberIsNull() {
+            addCriterion("block_number is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberIsNotNull() {
+            addCriterion("block_number is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberEqualTo(String value) {
+            addCriterion("block_number =", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberNotEqualTo(String value) {
+            addCriterion("block_number <>", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberGreaterThan(String value) {
+            addCriterion("block_number >", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberGreaterThanOrEqualTo(String value) {
+            addCriterion("block_number >=", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberLessThan(String value) {
+            addCriterion("block_number <", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberLessThanOrEqualTo(String value) {
+            addCriterion("block_number <=", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberLike(String value) {
+            addCriterion("block_number like", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberNotLike(String value) {
+            addCriterion("block_number not like", value, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberIn(List<String> values) {
+            addCriterion("block_number in", values, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberNotIn(List<String> values) {
+            addCriterion("block_number not in", values, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberBetween(String value1, String value2) {
+            addCriterion("block_number between", value1, value2, "blockNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlockNumberNotBetween(String value1, String value2) {
+            addCriterion("block_number not between", value1, value2, "blockNumber");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

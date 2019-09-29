@@ -97,8 +97,8 @@ public class ProposalTextHandler implements EventHandler {
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
         String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
-                .replace("ID",proposal.getPipId().toString())
-                .replace("TITLE",proposal.getTopic())
+                .replace("ID",proposal.getPipId()==null?"":proposal.getPipId())
+                .replace("TITLE",proposal.getTopic()==null?"":proposal.getTopic())
                 .replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);

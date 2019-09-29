@@ -24,6 +24,7 @@
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="canceled_pip_id" jdbcType="VARCHAR" property="canceledPipId" />
     <result column="canceled_topic" jdbcType="VARCHAR" property="canceledTopic" />
+    <result column="block_number" jdbcType="VARCHAR" property="blockNumber" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -86,7 +87,7 @@
   <sql id="Base_Column_List">
     hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
     `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
-    pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic
+    pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic, block_number
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -126,7 +127,7 @@
       accu_verifiers, `status`, update_time, 
       create_time, pip_num, pip_id, 
       topic, description, canceled_pip_id, 
-      canceled_topic)
+      canceled_topic, block_number)
     values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{verifier,jdbcType=VARCHAR}, 
       #{verifierName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
       #{endVotingBlock,jdbcType=VARCHAR}, #{activeBlock,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
@@ -134,7 +135,7 @@
       #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=VARCHAR}, 
       #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=VARCHAR}, 
-      #{canceledTopic,jdbcType=VARCHAR})
+      #{canceledTopic,jdbcType=VARCHAR}, #{blockNumber,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal
@@ -205,6 +206,9 @@
       <if test="canceledTopic != null">
         canceled_topic,
       </if>
+      <if test="blockNumber != null">
+        block_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
@@ -272,6 +276,9 @@
       </if>
       <if test="canceledTopic != null">
         #{canceledTopic,jdbcType=VARCHAR},
+      </if>
+      <if test="blockNumber != null">
+        #{blockNumber,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -350,6 +357,9 @@
       <if test="record.canceledTopic != null">
         canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
       </if>
+      <if test="record.blockNumber != null">
+        block_number = #{record.blockNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -378,7 +388,8 @@
       topic = #{record.topic,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
       canceled_pip_id = #{record.canceledPipId,jdbcType=VARCHAR},
-      canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR}
+      canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
+      block_number = #{record.blockNumber,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -449,6 +460,9 @@
       <if test="canceledTopic != null">
         canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
       </if>
+      <if test="blockNumber != null">
+        block_number = #{blockNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
@@ -474,7 +488,8 @@
       topic = #{topic,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       canceled_pip_id = #{canceledPipId,jdbcType=VARCHAR},
-      canceled_topic = #{canceledTopic,jdbcType=VARCHAR}
+      canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
+      block_number = #{blockNumber,jdbcType=VARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -486,7 +501,8 @@
     insert into proposal
     (hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
       `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
-      pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic)
+      pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic, block_number
+      )
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.verifier,jdbcType=VARCHAR}, 
@@ -496,7 +512,8 @@
         #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
         #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.pipNum,jdbcType=VARCHAR}, 
         #{item.pipId,jdbcType=VARCHAR}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
-        #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR})
+        #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR}, 
+        #{item.blockNumber,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -579,6 +596,9 @@
         </if>
         <if test="'canceled_topic'.toString() == column.value">
           #{item.canceledTopic,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_number'.toString() == column.value">
+          #{item.blockNumber,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

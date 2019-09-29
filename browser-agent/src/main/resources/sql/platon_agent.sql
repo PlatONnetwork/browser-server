@@ -179,6 +179,7 @@ CREATE TABLE `proposal` (
   `description` varchar(255) DEFAULT NULL COMMENT '提案描述',
   `canceled_pip_id` varchar(255) DEFAULT NULL COMMENT '被取消提案id',
   `canceled_topic` varchar(255) DEFAULT NULL COMMENT '被取消的提案的主题',
+  `block_number` varchar(255) NOT NULL COMMENT '议案交易所在区块',
   PRIMARY KEY (`hash`),
   KEY `hash` (`hash`) USING BTREE,
   KEY `type` (`type`) USING BTREE

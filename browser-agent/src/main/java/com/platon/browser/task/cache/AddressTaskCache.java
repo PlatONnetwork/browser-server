@@ -12,9 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AddressTaskCache {
     private Map<String, TaskAddress> cacheMap = new ConcurrentHashMap<>();
     public Set<String> getKeySet(){
-        Set<String> keys = new HashSet<>();
-        keys.addAll(cacheMap.keySet());
-        return keys;
+        return new HashSet<>(cacheMap.keySet());
     }
 
     public void update(TaskAddress address){
@@ -22,16 +20,13 @@ public class AddressTaskCache {
     }
 
     public TaskAddress get(String key){
-        TaskAddress cache = cacheMap.get(key);
-        if(cache==null){
+        return cacheMap.computeIfAbsent(key,k->{
             // 如果缓存为空，则创建一个新的，并把合并状态变为true，防止采集线程合并此无效统计信息
-            cache = new TaskAddress();
-            cache.setAddress(key);
-            cache.setMerged(true);
-            cacheMap.put(key,cache);
-            return cache;
-        }
-        return cache;
+            TaskAddress ta = new TaskAddress();
+            ta.setAddress(k);
+            ta.setMerged(true);
+            return ta;
+        });
     }
 
     /**

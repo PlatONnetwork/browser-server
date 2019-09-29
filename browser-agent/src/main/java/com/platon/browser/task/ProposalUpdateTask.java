@@ -88,9 +88,15 @@ public class ProposalUpdateTask extends BaseTask {
             TaskProposal cache = new TaskProposal();
             // 设置缓存主键
             cache.setHash(proposal.getHash());
+            ProposalMarkDownDto resp = new ProposalMarkDownDto();
+            try {
+                 resp = getMarkdownInfo(proposal.getUrl());
+            }catch (HttpRequestException e){
+                if(!e.getMessage().contains("Not Found")) logger.error("更新提案(proposal={})出错: {}",proposal.getHash(),e.getMessage());
+            }
+
             try {
                 // 调用外部URL获取信息，并更新当前提案
-                ProposalMarkDownDto resp = getMarkdownInfo(proposal.getUrl());
 
                 /* 只有属性有变更才放入入库暂存，防止频繁的数据库更新操作 */
 
@@ -186,9 +192,9 @@ public class ProposalUpdateTask extends BaseTask {
             try {
                 Proposal proposal = proposalCache.getProposal(nodeOpt.getTxHash());
                 String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
-                        .replace("ID", proposal.getPipId().toString())
-                        .replace("TITLE", proposal.getTopic())
-                        .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
+                        .replace("ID", proposal.getPipId()==null?"":proposal.getPipId())
+                        .replace("TITLE", proposal.getTopic()==null?"":proposal.getTopic())
+                        .replace("TYPE", proposal.getType());
                 nodeOpt.setDesc(desc);
                 // 放入入库暂存区
                 stakingStage.updateNodeOpt(nodeOpt);
@@ -258,4 +264,5 @@ public class ProposalUpdateTask extends BaseTask {
             throw new HttpRequestException(e.getMessage());
         }
     }
+
 }

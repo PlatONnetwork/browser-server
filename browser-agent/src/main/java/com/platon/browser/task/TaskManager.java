@@ -30,7 +30,7 @@ public class TaskManager {
     @Autowired
     private StakingUpdateTask stakingUpdateTask;
 
-    private final static Set<BaseTask> tasks = new HashSet<>();
+    private static final Set<BaseTask> tasks = new HashSet<>();
     @PostConstruct
     private void init(){
         tasks.add(addressUpdateTask);
@@ -60,8 +60,8 @@ public class TaskManager {
             String status=properties.getProperty("status");
             status=status.trim();
             AppStatusEnum statusEnum = AppStatusEnum.valueOf(status.toUpperCase());
-            GracefullyUtil.status=statusEnum;
-            logger.info("Update app status:{}",statusEnum.name());
+            GracefullyUtil.setStatus(statusEnum);
+            logger.info("Update app status:{}",status);
         } catch (Exception e) {
             logger.error("无效状态,有效值:[{}]", Arrays.asList(AppStatusEnum.values()));
         }

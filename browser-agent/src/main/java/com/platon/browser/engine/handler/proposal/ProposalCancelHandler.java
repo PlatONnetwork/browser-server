@@ -112,9 +112,9 @@ public class ProposalCancelHandler implements EventHandler {
         CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.PROPOSALS);
         nodeOpt.updateWithCustomTransaction(tx);
         String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
-                .replace("ID",proposal.getPipId().toString())
-                .replace("TITLE",proposal.getTopic())
-                .replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode());
+                .replace("ID",proposal.getPipId()==null?"":proposal.getPipId())
+                .replace("TITLE",proposal.getTopic()==null?"":proposal.getTopic())
+                .replace("TYPE",CustomProposal.TypeEnum.CANCEL.getCode());
         nodeOpt.setDesc(desc);
         stakingStage.insertNodeOpt(nodeOpt);
     }

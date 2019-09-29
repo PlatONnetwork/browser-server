@@ -2,10 +2,7 @@ package com.platon.browser.task;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.keybase.Completion;
-import com.platon.browser.dto.keybase.Components;
 import com.platon.browser.dto.keybase.KeyBaseUser;
-import com.platon.browser.dto.keybase.ValueScore;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.exception.GracefullyShutdownException;
@@ -22,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 
 /**

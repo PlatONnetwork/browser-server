@@ -4,6 +4,7 @@ import com.platon.browser.TestBase;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.task.cache.StakingTaskCache;
 import org.junit.Before;
@@ -47,7 +48,9 @@ public class StakingUpdateTaskTest extends TestBase {
     public void testStart() throws  Exception{
         BlockChainStage stageData = new BlockChainStage();
         when(cacheHolder.getStageData()).thenReturn(stageData);
+        when(cacheHolder.getNodeCache()).thenReturn(mock(NodeCache.class));
         when(chainConfig.getKeyBase()).thenReturn("https://keybase.io/");
+        when(chainConfig.getKeyBaseApi()).thenReturn("_/api/1.0/user/autocomplete.json?q=");
         Set<CustomStaking> customStakingSet = new HashSet<>(stakings);
         customStakingSet.forEach(cc->{
             cc.setExternalName("");
