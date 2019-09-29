@@ -316,14 +316,20 @@ public class StakingServiceImpl implements StakingService {
 					/** 提案类型 */
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(desces[1]);
+						stakingOptRecordListResp.setTitle("inquiry".equals(desces[1])?"":desces[1]);
 						stakingOptRecordListResp.setOption(desces[2]);
+						if(desces.length > 3) {
+							stakingOptRecordListResp.setVersion(desces[3]);
+						}
 						break;
 					/** 投票类型 */
 					case VOTE:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
-						stakingOptRecordListResp.setTitle(desces[1]);
+						stakingOptRecordListResp.setTitle("inquiry".equals(desces[1])?"":desces[1]);
 						stakingOptRecordListResp.setOption(desces[2]);
+						if(desces.length > 3) {
+							stakingOptRecordListResp.setVersion(desces[3]);
+						}
 						break;
 					/** 双签 */
 					case MULTI_SIGN:

@@ -2,6 +2,7 @@ package com.platon.browser.resp.staking;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
+import com.platon.browser.config.CustomVersionSerializer;
 
 /**
  * 验证人操作列表返回对象
@@ -22,6 +23,7 @@ public class StakingOptRecordListResp {
     private String percent;  //处罚百分比
     private String amount;  //处罚金额
     private Integer isFire;  //是否踢出列表  0-否，1-是
+    private String version;  //版本号
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -88,6 +90,13 @@ public class StakingOptRecordListResp {
 	}
 	public void setIsFire(Integer isFire) {
 		this.isFire = isFire;
+	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
 	}
     
 }
