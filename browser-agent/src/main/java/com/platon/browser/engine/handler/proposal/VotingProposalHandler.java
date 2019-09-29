@@ -84,9 +84,9 @@ public class VotingProposalHandler implements EventHandler {
             CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.VOTE);
             nodeOpt.updateWithCustomTransaction(tx);
             String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
-                    .replace("ID",proposal.getPipId().toString())
-                    .replace("TITLE",proposal.getTopic())
-                    .replace("OPTION",param.getOption());
+                    .replace("ID",proposal.getPipId()==null?"":proposal.getPipId())
+                    .replace("TITLE",proposal.getTopic()==null?"":proposal.getTopic())
+                    .replace("OPTION",param.getOption()==null?"":param.getOption());
             nodeOpt.setDesc(desc);
             stageData.getStakingStage().insertNodeOpt(nodeOpt);
         }catch (NoSuchBeanException | BusinessException e){
