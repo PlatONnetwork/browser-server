@@ -192,8 +192,8 @@ public class ProposalUpdateTask extends BaseTask {
             try {
                 Proposal proposal = proposalCache.getProposal(nodeOpt.getTxHash());
                 String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
-                        .replace("ID", proposal.getPipId().toString())
-                        .replace("TITLE", proposal.getTopic())
+                        .replace("ID", proposal.getPipId()==null?"":proposal.getPipId())
+                        .replace("TITLE", proposal.getTopic()==null?"":proposal.getTopic())
                         .replace("TYPE", CustomProposal.TypeEnum.TEXT.getCode());
                 nodeOpt.setDesc(desc);
                 // 放入入库暂存区
