@@ -120,13 +120,15 @@ public class ProposalServiceImpl implements ProposalService {
 		}
         /** 不为文本提案则有生效时间 */
         if(!CustomProposal.TypeEnum.TEXT.getCode().equals(proposalDetailsResp.getType())){
-	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
-	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(proposal.getTimestamp().getTime()));
+	        BigDecimal actvieTime = (new BigDecimal(proposalDetailsResp.getActiveBlock()).subtract(new BigDecimal(proposal.getBlockNumber()))) 
+	        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).multiply(new BigDecimal(1000))
+	        		.add(new BigDecimal(proposal.getTimestamp().getTime()));
 	        proposalDetailsResp.setActiveBlockTime(actvieTime.longValue());
         }
         /** 结束时间预估：（生效区块-当前区块）*出块间隔 + 现有时间 */
-        BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposalDetailsResp.getCurBlock()))) 
-        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).add(new BigDecimal(proposal.getTimestamp().getTime()));
+        BigDecimal endTime = (new BigDecimal(proposalDetailsResp.getEndVotingBlock()).subtract(new BigDecimal(proposal.getBlockNumber()))) 
+        		.multiply(new BigDecimal(blockChainConfig.getBlockInterval())).multiply(new BigDecimal(1000))
+        		.add(new BigDecimal(proposal.getTimestamp().getTime()));
         proposalDetailsResp.setEndVotingBlockTime(endTime.longValue());
         /** 查询hash获取对应的交易区块号 */
         Transaction transaction = transactionMapper.selectByPrimaryKey(req.getProposalHash());

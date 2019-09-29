@@ -1,6 +1,8 @@
 package com.platon.browser.res.proposal;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.platon.browser.config.CustomVersionSerializer;
+
 
 /**
  *提案列表返回对象
@@ -9,7 +11,6 @@ import lombok.Data;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Data
 public class ProposalListResp {
 	private String pipNum; //pip num
 	private String proposalHash; // 提案内部标识
@@ -24,4 +25,78 @@ public class ProposalListResp {
 	private String newVersion; // 升级提案升级的版本
 	private String paramName; // 参数名
 	private Long timestamp; // 提案时间
+	public String getPipNum() {
+		return pipNum;
+	}
+	public void setPipNum(String pipNum) {
+		this.pipNum = pipNum;
+	}
+	public String getProposalHash() {
+		return proposalHash;
+	}
+	public void setProposalHash(String proposalHash) {
+		this.proposalHash = proposalHash;
+	}
+	public String getTopic() {
+		return topic;
+	}
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getCurBlock() {
+		return curBlock;
+	}
+	public void setCurBlock(String curBlock) {
+		this.curBlock = curBlock;
+	}
+	public String getEndVotingBlock() {
+		return endVotingBlock;
+	}
+	public void setEndVotingBlock(String endVotingBlock) {
+		this.endVotingBlock = endVotingBlock;
+	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
+	public String getNewVersion() {
+		return newVersion;
+	}
+	public void setNewVersion(String newVersion) {
+		this.newVersion = newVersion;
+	}
+	public String getParamName() {
+		return paramName;
+	}
+	public void setParamName(String paramName) {
+		this.paramName = paramName;
+	}
+	public Long getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
+	}
+	
 }

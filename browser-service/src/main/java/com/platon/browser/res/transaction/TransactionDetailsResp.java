@@ -301,6 +301,7 @@ public class TransactionDetailsResp {
 	public void setProposalOption(String proposalOption) {
 		this.proposalOption = proposalOption;
 	}
+	@JsonSerialize(using = CustomVersionSerializer.class)
 	public String getProposalNewVersion() {
 		return proposalNewVersion;
 	}

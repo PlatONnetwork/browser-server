@@ -20,7 +20,7 @@
     <result column="proposalUpdateTime" jdbcType="TIMESTAMP" property="proposalUpdateTime" />
     <result column="proposalCreateTime" jdbcType="TIMESTAMP" property="proposalCreateTime" />
     <result column="pip_num" jdbcType="VARCHAR" property="pipNum" />
-    <result column="pip_id" jdbcType="INTEGER" property="pipId" />
+    <result column="pip_id" jdbcType="VARCHAR" property="pipId" />
     <result column="topic" jdbcType="VARCHAR" property="topic" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="canceled_pip_id" jdbcType="VARCHAR" property="canceledPipId" />

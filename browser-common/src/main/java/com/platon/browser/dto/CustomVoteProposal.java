@@ -33,7 +33,7 @@ public class CustomVoteProposal extends Vote {
     private Date proposalUpdateTime;
     private Date proposalCreateTime;
     private String pipNum;
-    private Integer pipId;
+    private String pipId;
     private String topic;
     private String description;
     private String canceledPipId;

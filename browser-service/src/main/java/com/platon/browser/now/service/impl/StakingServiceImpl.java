@@ -308,7 +308,7 @@ public class StakingServiceImpl implements StakingService {
 		for (NodeOpt nodeOpt: nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
 			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
-			stakingOptRecordListResp.setTimestamp(nodeOpt.getCreateTime().getTime());
+			stakingOptRecordListResp.setTimestamp(nodeOpt.getTimestamp().getTime());
 			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
 				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
 				/** 根据不同类型组合返回 */
@@ -317,6 +317,7 @@ public class StakingServiceImpl implements StakingService {
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);
 						stakingOptRecordListResp.setTitle(desces[1]);
+						stakingOptRecordListResp.setOption(desces[2]);
 						break;
 					/** 投票类型 */
 					case VOTE:

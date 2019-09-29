@@ -150,7 +150,7 @@ public class AddressServiceImpl implements AddressService {
 			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
 			Block block = blockMapper.selectByPrimaryKey(rPlan.getNumber());
 			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval().multiply(BigInteger.valueOf(number - rPlan.getNumber()))
-					.add(BigInteger.valueOf(block.getTimestamp().getTime())).longValue());
+					.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(block.getTimestamp().getTime())).longValue());
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}
 		queryRPPlanDetailResp.setRpPlans(detailsRPPlanResps);
