@@ -9,13 +9,14 @@ import java.util.concurrent.TimeUnit;
 
 public class GracefullyUtil {
     private static final Logger logger = LoggerFactory.getLogger(GracefullyUtil.class);
-    public static AppStatusEnum status=AppStatusEnum.RUNNING;
+    private GracefullyUtil(){}
+    private static AppStatusEnum status=AppStatusEnum.RUNNING;
     public static void monitor(BaseTask task) throws GracefullyShutdownException, InterruptedException {
-        switch (status){
+        switch (getStatus()){
             case PAUSE:
                 task.setRunning(false);
                 logger.warn("线程已暂停");
-                while (status== AppStatusEnum.PAUSE){
+                while (getStatus() == AppStatusEnum.PAUSE){
                     TimeUnit.SECONDS.sleep(2);
                 }
                 task.setRunning(true);
@@ -27,5 +28,13 @@ public class GracefullyUtil {
                 throw new GracefullyShutdownException("线程已停止!");
             default:
         }
+    }
+
+    public static AppStatusEnum getStatus() {
+        return status;
+    }
+
+    public static void setStatus(AppStatusEnum status) {
+        GracefullyUtil.status = status;
     }
 }

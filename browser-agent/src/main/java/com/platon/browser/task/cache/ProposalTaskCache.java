@@ -12,9 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProposalTaskCache {
     private Map<String, TaskProposal> cacheMap = new ConcurrentHashMap<>();
     public Set<String> getKeySet(){
-        Set<String> keys = new HashSet<>();
-        keys.addAll(cacheMap.keySet());
-        return keys;
+        return new HashSet<>(cacheMap.keySet());
     }
 
     public void update(TaskProposal proposal){
@@ -22,16 +20,13 @@ public class ProposalTaskCache {
     }
 
     public TaskProposal get(String key){
-        TaskProposal cache = cacheMap.get(key);
-        if(cache==null){
+        return cacheMap.computeIfAbsent(key,k->{
             // 如果缓存为空，则创建一个新的，并把合并状态变为true，防止采集线程合并此无效统计信息
-            cache = new TaskProposal();
-            cache.setMerged(true);
-            cache.setHash(key);
-            cacheMap.put(key,cache);
-            return cache;
-        }
-        return cache;
+            TaskProposal tp = new TaskProposal();
+            tp.setHash(k);
+            tp.setMerged(true);
+            return tp;
+        });
     }
 
     /**

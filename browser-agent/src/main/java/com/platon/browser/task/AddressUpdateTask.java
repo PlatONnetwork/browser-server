@@ -90,7 +90,7 @@ public class AddressUpdateTask extends BaseTask{
      * @param addresses
      * @throws ContractInvokeException
      */
-    public void batchQueryBalance(Collection<CustomAddress> addresses) throws ContractInvokeException, GracefullyShutdownException, InterruptedException {
+    public void batchQueryBalance(Collection<CustomAddress> addresses) throws ContractInvokeException {
         balanceMap.clear();
         // 为防止RPC调用请求体超出限制，需要对地址分批查询: 每200个地址查询一次
         StringBuilder sb = new StringBuilder();

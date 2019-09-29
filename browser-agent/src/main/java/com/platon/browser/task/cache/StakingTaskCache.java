@@ -27,17 +27,14 @@ public class StakingTaskCache {
     
     public TaskStaking get(String nodeId,Long stakingBlockNumber){
         String key = nodeId+stakingBlockNumber;
-        TaskStaking cache = cacheMap.get(key);
-        if(cache==null){
+        return cacheMap.computeIfAbsent(key,k->{
             // 如果缓存为空，则创建一个新的，并把合并状态变为true，防止采集线程合并此无效统计信息
-            cache = new TaskStaking();
-            cache.setNodeId(nodeId);
-            cache.setStakingBlockNum(stakingBlockNumber);
-            cache.setMerged(true);
-            cacheMap.put(key,cache);
-            return cache;
-        }
-        return cacheMap.get(key);
+            TaskStaking ts = new TaskStaking();
+            ts.setNodeId(nodeId);
+            ts.setStakingBlockNum(stakingBlockNumber);
+            ts.setMerged(true);
+            return ts;
+        });
     }
 
     /**
