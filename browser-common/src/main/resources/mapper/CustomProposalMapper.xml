@@ -87,6 +87,9 @@
         <if test="'canceled_topic'.toString() == column.value">
           #{item.canceledTopic,jdbcType=VARCHAR}
         </if>
+        <if test="'block_number'.toString() == column.value">
+          #{item.blockNumber,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>

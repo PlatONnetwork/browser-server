@@ -39,6 +39,7 @@ public class CustomProposal extends Proposal {
         //设置成查询中，以便任务过滤并查询分析主题&描述
         this.setTopic(QUERY_FLAG);
         this.setDescription(QUERY_FLAG);
+        this.setBlockNumber(tx.getBlockNumber().toString());
     }
 
     public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto) {
