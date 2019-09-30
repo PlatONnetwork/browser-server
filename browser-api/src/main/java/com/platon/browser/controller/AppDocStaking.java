@@ -261,7 +261,8 @@ public interface AppDocStaking {
      *         "percent":"",    //处罚百分比
      *         "amount":"" , //处罚金额
      *         "isFire":"", //是否踢出列表  0-否，1-是
-     *         "version":"" 
+     *         "version":"" ,//版本号
+     *         "proposalType":""   //提案类型 
      *      }
      *   ]
      * }

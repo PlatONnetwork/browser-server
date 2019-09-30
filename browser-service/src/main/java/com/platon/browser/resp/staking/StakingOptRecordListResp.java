@@ -19,11 +19,12 @@ public class StakingOptRecordListResp {
     private String type; //类型
     private String id;  //提案id
     private String title;  //提案标题
-    private String option;  //提案选项
+    private String option;  //投票选型  1：支持；  2：反对；  3弃权  
     private String percent;  //处罚百分比
     private String amount;  //处罚金额
     private Integer isFire;  //是否踢出列表  0-否，1-是
     private String version;  //版本号
+    private String proposalType;  //提案类型  1：文本提案； 2：升级提案；  3参数提案。
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -97,6 +98,12 @@ public class StakingOptRecordListResp {
 	}
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	public String getProposalType() {
+		return proposalType;
+	}
+	public void setProposalType(String proposalType) {
+		this.proposalType = proposalType;
 	}
     
 }

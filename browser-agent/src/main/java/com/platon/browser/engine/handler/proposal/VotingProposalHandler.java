@@ -87,6 +87,7 @@ public class VotingProposalHandler implements EventHandler {
                     .replace("ID",proposal.getPipId()==null?"":proposal.getPipId())
                     .replace("TITLE",proposal.getTopic()==null?"":proposal.getTopic())
                     .replace("OPTION",param.getOption()==null?"":param.getOption())
+                    .replace("TYPE",param.getOption()==null?"":proposal.getType())
                     .replace("VERSION",proposal.getNewVersion()==null?"":proposal.getNewVersion());
             nodeOpt.setDesc(desc);
             stageData.getStakingStage().insertNodeOpt(nodeOpt);
