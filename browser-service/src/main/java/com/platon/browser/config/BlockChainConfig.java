@@ -103,6 +103,8 @@ public class BlockChainConfig {
     private BigDecimal slashBlockCount;
     //【惩罚】双签处罚百分比
     private BigDecimal duplicateSignSlashRate;
+    //【惩罚】双签奖励百分比
+    private BigDecimal duplicateSignReportRate;
 
     //【治理】文本提案参与率: >
     private BigDecimal minProposalTextParticipationRate;
@@ -207,6 +209,8 @@ public class BlockChainConfig {
         this.slashBlockCount=dec.getSlashing().getNumberOfBlockRewardForSlashing();
         //【惩罚】双签处罚百分比
         this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing();
+        //【惩罚】双签奖励百分比
+        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100));
         //【惩罚】双签处罚百分比
         this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
         //【治理】文本提案参与率: >
