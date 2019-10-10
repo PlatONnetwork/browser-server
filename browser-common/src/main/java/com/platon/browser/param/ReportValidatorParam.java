@@ -2,8 +2,10 @@ package com.platon.browser.param;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.platon.browser.param.evidence.Evidence;
 import lombok.Data;
 
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 
 /**
@@ -40,29 +42,43 @@ public class ReportValidatorParam {
      */
     private String stakingBlockNum;
 
-    public void init(BigInteger type, String data){
+    public void init ( BigInteger type, String data ) {
         this.type = type;
         this.data = data;
-        this.verify = format(type,data);
+        this.verify = format(type, data);
     }
 
 
-    private String format(BigInteger type,String date){
-        JSONObject jsonObject = JSON.parseObject(date);
-        JSONObject base = new JSONObject();
-        switch (type.intValue()){
-            case 1:
-                base =  jsonObject.getJSONObject("prepare_a");
-                break;
-            case 2:
-                base =  jsonObject.getJSONObject("vote_a");
-                break;
-            case 3:
-                base =  jsonObject.getJSONObject("view_a");
-                break;
-            default:
+    private String format ( BigInteger type, String date ) {
+        String info = "";
+        Evidence evidence = JSONObject.parseObject(date, Evidence.class);
+        if (isObjectFieldEmpty(evidence)) {
+            if (isObjectFieldEmpty(evidence.getPrepareA())) {
+                info = evidence.getPrepareA().getValidateNode().getNodeId();
+            }
         }
-        JSONObject validateNode = base.getJSONObject("validate_node");
-        return validateNode.getString("NodeID");
+        return info;
     }
+
+    //反射获取对象属性是否为空
+    public boolean isObjectFieldEmpty ( Object object ) {
+        boolean flag = false;
+        if (object != null) {
+            Class <?> entity = object.getClass();
+            Field[] fields = entity.getDeclaredFields();//获取该类的所有成员变量（私有的）
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true);
+                    if (field.get(object) != null && !"".equals(field.get(object))) {
+                        flag = true;
+                        break;
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return flag;
+    }
+
 }

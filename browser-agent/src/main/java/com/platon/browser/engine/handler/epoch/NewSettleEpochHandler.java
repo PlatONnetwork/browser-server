@@ -62,7 +62,7 @@ public class NewSettleEpochHandler implements EventHandler {
         updateVerifier(); // 更新缓存中的辅助结算周期验证人信息
         settleStaking(); // 结算
         updateDelegation(); // 更新委托信息
-        updateUnDelegation(); // 更新解委托信息
+        //updateUnDelegation(); // 更新解委托信息
     }
 
 

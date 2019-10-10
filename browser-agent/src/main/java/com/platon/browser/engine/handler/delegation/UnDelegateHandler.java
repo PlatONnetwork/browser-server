@@ -67,11 +67,11 @@ public class UnDelegateHandler implements EventHandler {
             BigDecimal delegateThresholdVon = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT);
             if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(delegateThresholdVon.toString())) < 0) {
                 //委托赎回金额为 =  原赎回金额 + 锁仓金额
-                delegation.setDelegateReduction(delegation.integerDelegateReduction().add(delegation.integerDelegateLocked()).toString());
+                delegation.setDelegateReduction("0");
                 delegation.setDelegateHas("0");
                 delegation.setDelegateLocked("0");
                 //设置赎回委托结构中的赎回锁定金额
-                unDelegation.setRedeemLocked(delegation.getDelegateReduction());
+                unDelegation.setRedeemLocked("0");
                 unDelegation.setRealAmount(delegationSum.toString());
             } else {
                 if (delegation.integerDelegateHas().compareTo(param.integerAmount()) > 0) {
@@ -88,9 +88,9 @@ public class UnDelegateHandler implements EventHandler {
                     //犹豫期设置为零
                     delegation.setDelegateHas("0");
                     //优先扣除所剩的犹豫期的金额，剩余委托赎回金额 = 原本需要赎回的金额 - 委托的犹豫期的金额
-                    unDelegation.setRedeemLocked(subHas.toString());
+                    unDelegation.setRedeemLocked("0");
                     //设置委托中的赎回金额，经过分析后的委托赎回金额 = 委托赎回金额 + 委托锁定期金额
-                    delegation.setDelegateReduction(delegation.integerDelegateReduction().add(unDelegation.integerRedeemLocked()).toString());
+                    //delegation.setDelegateReduction(delegation.integerDelegateReduction().add(param.integerAmount()).toString());
                 }
                 unDelegation.setRealAmount(param.getAmount());
             }
