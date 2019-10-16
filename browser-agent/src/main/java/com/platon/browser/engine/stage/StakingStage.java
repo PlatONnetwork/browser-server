@@ -83,6 +83,19 @@ public class StakingStage {
         insertNodeOpt(nodeOpt);
     }
 
+    /**
+     * 退出质押，并记录操作日志
+     * @param staking
+     * @param tx
+     */
+    public void exitStaking(CustomStaking staking,CustomTransaction tx){
+        stakingUpdateStage.add(staking);
+        // 构建操作日志
+        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(),CustomNodeOpt.TypeEnum.QUIT);
+        nodeOpt.updateWithCustomTransaction(tx);
+        insertNodeOpt(nodeOpt);
+    }
+
     public void insertDelegation(CustomDelegation delegation){
         delegationInsertStage.add(delegation);
     }
