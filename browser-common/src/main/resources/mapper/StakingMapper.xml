@@ -36,6 +36,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="external_name" jdbcType="VARCHAR" property="externalName" />
+    <result column="fee_reward_value" jdbcType="VARCHAR" property="feeRewardValue" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Staking">
     <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
@@ -105,7 +106,7 @@
     external_id, denefit_addr, expected_income, block_reward_value, pre_cons_block_qty, 
     cur_cons_block_qty, program_version, staking_reward_value, web_site, details, join_time, 
     leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time, 
-    external_name
+    external_name, fee_reward_value
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -172,8 +173,8 @@
       web_site, details, join_time, 
       leave_time, `status`, is_consensus, 
       is_setting, is_init, create_time, 
-      update_time, external_name, annualized_rate_info
-      )
+      update_time, external_name, fee_reward_value, 
+      annualized_rate_info)
     values (#{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{stakingTxIndex,jdbcType=INTEGER}, 
       #{stakingAddr,jdbcType=VARCHAR}, #{stakingHas,jdbcType=VARCHAR}, #{stakingLocked,jdbcType=VARCHAR}, 
       #{stakingReductionEpoch,jdbcType=INTEGER}, #{stakingReduction,jdbcType=VARCHAR}, 
@@ -185,8 +186,8 @@
       #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP}, 
       #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{isConsensus,jdbcType=INTEGER}, 
       #{isSetting,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{externalName,jdbcType=VARCHAR}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
-      )
+      #{updateTime,jdbcType=TIMESTAMP}, #{externalName,jdbcType=VARCHAR}, #{feeRewardValue,jdbcType=VARCHAR}, 
+      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Staking">
     insert into staking
@@ -292,6 +293,9 @@
       </if>
       <if test="externalName != null">
         external_name,
+      </if>
+      <if test="feeRewardValue != null">
+        fee_reward_value,
       </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info,
@@ -399,6 +403,9 @@
       </if>
       <if test="externalName != null">
         #{externalName,jdbcType=VARCHAR},
+      </if>
+      <if test="feeRewardValue != null">
+        #{feeRewardValue,jdbcType=VARCHAR},
       </if>
       <if test="annualizedRateInfo != null">
         #{annualizedRateInfo,jdbcType=LONGVARCHAR},
@@ -516,6 +523,9 @@
       <if test="record.externalName != null">
         external_name = #{record.externalName,jdbcType=VARCHAR},
       </if>
+      <if test="record.feeRewardValue != null">
+        fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR},
+      </if>
       <if test="record.annualizedRateInfo != null">
         annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -560,6 +570,7 @@
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       external_name = #{record.externalName,jdbcType=VARCHAR},
+      fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -600,7 +611,8 @@
       is_init = #{record.isInit,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      external_name = #{record.externalName,jdbcType=VARCHAR}
+      external_name = #{record.externalName,jdbcType=VARCHAR},
+      fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -704,6 +716,9 @@
       <if test="externalName != null">
         external_name = #{externalName,jdbcType=VARCHAR},
       </if>
+      <if test="feeRewardValue != null">
+        fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR},
+      </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
@@ -745,6 +760,7 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       external_name = #{externalName,jdbcType=VARCHAR},
+      fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
     where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
@@ -782,7 +798,8 @@
       is_init = #{isInit,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      external_name = #{externalName,jdbcType=VARCHAR}
+      external_name = #{externalName,jdbcType=VARCHAR},
+      fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR}
     where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
       and node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -799,7 +816,7 @@
       external_id, denefit_addr, expected_income, block_reward_value, pre_cons_block_qty, 
       cur_cons_block_qty, program_version, staking_reward_value, web_site, details, join_time, 
       leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time, 
-      external_name, annualized_rate_info)
+      external_name, fee_reward_value, annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.stakingBlockNum,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
@@ -815,8 +832,8 @@
         #{item.webSite,jdbcType=VARCHAR}, #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, 
         #{item.leaveTime,jdbcType=TIMESTAMP}, #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, 
         #{item.isSetting,jdbcType=INTEGER}, #{item.isInit,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.externalName,jdbcType=VARCHAR}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
-        )
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.externalName,jdbcType=VARCHAR}, #{item.feeRewardValue,jdbcType=VARCHAR}, 
+        #{item.annualizedRateInfo,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -935,6 +952,9 @@
         </if>
         <if test="'external_name'.toString() == column.value">
           #{item.externalName,jdbcType=VARCHAR}
+        </if>
+        <if test="'fee_reward_value'.toString() == column.value">
+          #{item.feeRewardValue,jdbcType=VARCHAR}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}

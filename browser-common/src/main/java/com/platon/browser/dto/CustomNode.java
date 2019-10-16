@@ -38,6 +38,8 @@ public class CustomNode extends Node {
           this.setStatVerifierTime(0);
           // 官方推荐 1：是 2：否
           this.setIsRecommend(2);
+          //节点手续费
+          this.setStatFeeRewardValue("0");
      }
 
      public void updateWithNode(org.web3j.platon.bean.Node node){

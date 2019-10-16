@@ -734,6 +734,76 @@ public class NodeExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andStatFeeRewardValueIsNull() {
+            addCriterion("stat_fee_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueIsNotNull() {
+            addCriterion("stat_fee_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueEqualTo(String value) {
+            addCriterion("stat_fee_reward_value =", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotEqualTo(String value) {
+            addCriterion("stat_fee_reward_value <>", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueGreaterThan(String value) {
+            addCriterion("stat_fee_reward_value >", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueGreaterThanOrEqualTo(String value) {
+            addCriterion("stat_fee_reward_value >=", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueLessThan(String value) {
+            addCriterion("stat_fee_reward_value <", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueLessThanOrEqualTo(String value) {
+            addCriterion("stat_fee_reward_value <=", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueLike(String value) {
+            addCriterion("stat_fee_reward_value like", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotLike(String value) {
+            addCriterion("stat_fee_reward_value not like", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueIn(List<String> values) {
+            addCriterion("stat_fee_reward_value in", values, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotIn(List<String> values) {
+            addCriterion("stat_fee_reward_value not in", values, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueBetween(String value1, String value2) {
+            addCriterion("stat_fee_reward_value between", value1, value2, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotBetween(String value1, String value2) {
+            addCriterion("stat_fee_reward_value not between", value1, value2, "statFeeRewardValue");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

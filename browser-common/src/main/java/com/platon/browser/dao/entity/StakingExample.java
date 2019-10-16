@@ -2334,6 +2334,76 @@ public class StakingExample {
             addCriterion("external_name not between", value1, value2, "externalName");
             return (Criteria) this;
         }
+
+        public Criteria andFeeRewardValueIsNull() {
+            addCriterion("fee_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueIsNotNull() {
+            addCriterion("fee_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueEqualTo(String value) {
+            addCriterion("fee_reward_value =", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotEqualTo(String value) {
+            addCriterion("fee_reward_value <>", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueGreaterThan(String value) {
+            addCriterion("fee_reward_value >", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueGreaterThanOrEqualTo(String value) {
+            addCriterion("fee_reward_value >=", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueLessThan(String value) {
+            addCriterion("fee_reward_value <", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueLessThanOrEqualTo(String value) {
+            addCriterion("fee_reward_value <=", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueLike(String value) {
+            addCriterion("fee_reward_value like", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotLike(String value) {
+            addCriterion("fee_reward_value not like", value, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueIn(List<String> values) {
+            addCriterion("fee_reward_value in", values, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotIn(List<String> values) {
+            addCriterion("fee_reward_value not in", values, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueBetween(String value1, String value2) {
+            addCriterion("fee_reward_value between", value1, value2, "feeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andFeeRewardValueNotBetween(String value1, String value2) {
+            addCriterion("fee_reward_value not between", value1, value2, "feeRewardValue");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -12,6 +12,7 @@
     <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="stat_fee_reward_value" jdbcType="VARCHAR" property="statFeeRewardValue" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +74,7 @@
   </sql>
   <sql id="Base_Column_List">
     node_id, stat_slash_multi_qty, stat_slash_low_qty, stat_block_qty, stat_expect_block_qty, 
-    stat_reward_value, stat_verifier_time, is_recommend, create_time, update_time
+    stat_reward_value, stat_verifier_time, is_recommend, create_time, update_time, stat_fee_reward_value
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
     select
@@ -109,11 +110,11 @@
     insert into node (node_id, stat_slash_multi_qty, stat_slash_low_qty, 
       stat_block_qty, stat_expect_block_qty, stat_reward_value, 
       stat_verifier_time, is_recommend, create_time, 
-      update_time)
+      update_time, stat_fee_reward_value)
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
       #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=VARCHAR}, #{statRewardValue,jdbcType=VARCHAR}, 
       #{statVerifierTime,jdbcType=INTEGER}, #{isRecommend,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{statFeeRewardValue,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -148,6 +149,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="statFeeRewardValue != null">
+        stat_fee_reward_value,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="nodeId != null">
@@ -179,6 +183,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statFeeRewardValue != null">
+        #{statFeeRewardValue,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -221,6 +228,9 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.statFeeRewardValue != null">
+        stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -237,7 +247,8 @@
       stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
       is_recommend = #{record.isRecommend,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -272,6 +283,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="statFeeRewardValue != null">
+        stat_fee_reward_value = #{statFeeRewardValue,jdbcType=VARCHAR},
+      </if>
     </set>
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
@@ -285,7 +299,8 @@
       stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
       is_recommend = #{isRecommend,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      stat_fee_reward_value = #{statFeeRewardValue,jdbcType=VARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -296,14 +311,15 @@
     -->
     insert into node
     (node_id, stat_slash_multi_qty, stat_slash_low_qty, stat_block_qty, stat_expect_block_qty, 
-      stat_reward_value, stat_verifier_time, is_recommend, create_time, update_time)
+      stat_reward_value, stat_verifier_time, is_recommend, create_time, update_time, 
+      stat_fee_reward_value)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
         #{item.statBlockQty,jdbcType=BIGINT}, #{item.statExpectBlockQty,jdbcType=VARCHAR}, 
         #{item.statRewardValue,jdbcType=VARCHAR}, #{item.statVerifierTime,jdbcType=INTEGER}, 
-        #{item.isRecommend,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
-        )
+        #{item.isRecommend,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+        #{item.statFeeRewardValue,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -351,9 +367,11 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'stat_fee_reward_value'.toString() == column.value">
+          #{item.statFeeRewardValue,jdbcType=VARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
-
 </mapper>

@@ -69,6 +69,8 @@ public class Staking extends StakingKey {
 
     private String externalName;
 
+    private String feeRewardValue;
+
     private String annualizedRateInfo;
 
     public Integer getStakingTxIndex() {
@@ -327,6 +329,14 @@ public class Staking extends StakingKey {
         this.externalName = externalName == null ? null : externalName.trim();
     }
 
+    public String getFeeRewardValue() {
+        return feeRewardValue;
+    }
+
+    public void setFeeRewardValue(String feeRewardValue) {
+        this.feeRewardValue = feeRewardValue == null ? null : feeRewardValue.trim();
+    }
+
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -377,6 +387,7 @@ public class Staking extends StakingKey {
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
         externalName("external_name", "externalName", "VARCHAR", false),
+        feeRewardValue("fee_reward_value", "feeRewardValue", "VARCHAR", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

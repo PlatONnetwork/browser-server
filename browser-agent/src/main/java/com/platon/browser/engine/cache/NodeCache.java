@@ -1,9 +1,7 @@
 package com.platon.browser.engine.cache;
 
 import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomDelegation;
 import com.platon.browser.dto.CustomNode;
