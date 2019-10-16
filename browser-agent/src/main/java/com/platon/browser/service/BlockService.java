@@ -90,7 +90,7 @@ public class BlockService {
      * @param blockNumber
      * @return
      */
-    public CustomBlock getBlock(BigInteger blockNumber) throws InterruptedException {
+    public CustomBlock getBlock(BigInteger blockNumber) {
         while (true) try {
             Web3j web3j = client.getWeb3j();
             PlatonBlock.Block pbb = web3j.platonGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
@@ -100,7 +100,11 @@ public class BlockService {
             return block;
         } catch (Exception e) {
             logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
-            TimeUnit.SECONDS.sleep(1L);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -108,12 +112,16 @@ public class BlockService {
      * 取链上当前块号
      * @return
      */
-    public BigInteger getLatestNumber() throws InterruptedException {
+    public BigInteger getLatestNumber() {
         while (true) try {
             return client.getWeb3j().platonBlockNumber().send().getBlockNumber();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("取链上最新区块号失败,将重试{}:", e.getMessage());
-            TimeUnit.SECONDS.sleep(1L);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

@@ -186,10 +186,19 @@ public class BlockSyncTask extends BaseTask{
                 }
                 // 记录已采入库最高区块号
                 commitBlockNumber = blocks.get(blocks.size()-1).getNumber();
+                try {
+                    TimeUnit.SECONDS.sleep(1L);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         } else {
             logger.info("当前链最高块({}),等待下一批块...",curChainBlockNumber);
-            TimeUnit.SECONDS.sleep(1);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
         return true;
     }
