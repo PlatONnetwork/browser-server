@@ -179,6 +179,9 @@
         <if test="'external_name'.toString() == column.value">
           #{item.externalName,jdbcType=VARCHAR}
         </if>
+        <if test="'fee_reward_value'.toString() == column.value">
+          #{item.feeRewardValue,jdbcType=VARCHAR}
+        </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
         </if>

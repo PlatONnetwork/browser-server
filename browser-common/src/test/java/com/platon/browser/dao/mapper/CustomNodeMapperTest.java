@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.platon.browser.dao.entity.Node;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dto.CustomNode;
 
 public class CustomNodeMapperTest extends TestBase {

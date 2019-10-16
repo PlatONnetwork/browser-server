@@ -42,12 +42,13 @@ public class StakingCacheUpdater {
         try {
             CustomNode customNode = nodeCache.getNode(curBlock.getNodeId());
             CustomStaking customStaking = customNode.getLatestStaking();
-
+            customNode.setStatFeeRewardValue(new BigDecimal(customNode.getStatFeeRewardValue()).add(new BigDecimal(curBlock.getStatTxFee())).toString());
             info = info.replace("PRE_COUNT",customStaking.getPreConsBlockQty().toString());
             // 当前共识周期出块奖励
             BigDecimal curConsBlockReward = customStaking.decimalBlockRewardValue().add(bc.getBlockReward());
             customStaking.setBlockRewardValue(curConsBlockReward.toString());
-
+            //添加staking 质押期间手续费收益汇总
+            customStaking.setFeeRewardValue(customStaking.decimalStatFeeRwardValue().add(new BigDecimal(curBlock.getStatTxFee())).toString());
             // 节点出块数加1
             customStaking.setCurConsBlockQty(customStaking.getCurConsBlockQty()+1);
             // 把更改后的内容暂存至待更新列表

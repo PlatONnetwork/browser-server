@@ -73,6 +73,8 @@ public class CustomStaking extends Staking {
         this.setIsConsensus(YesNoEnum.NO.code);
         // 是否为链初始化时内置的候选人
         this.setIsInit(YesNoEnum.NO.code);
+        //节点质押期间手续费
+        this.setFeeRewardValue("0");
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
@@ -84,6 +86,7 @@ public class CustomStaking extends Staking {
     public BigDecimal decimalStatDelegateHas(){return new BigDecimal(this.getStatDelegateHas());}
     public BigDecimal decimalStatDelegateLocked(){return new BigDecimal(this.getStatDelegateLocked());}
     public BigDecimal decimalStatDelegateReduction(){return new BigDecimal(this.getStatDelegateReduction());}
+    public BigDecimal decimalStatFeeRwardValue(){return new BigDecimal(this.getFeeRewardValue());}
     /********把字符串类数值转换为大整数的便捷方法********/
     public BigInteger integerStakingLocked(){return new BigInteger(this.getStakingLocked());}
     public BigInteger integerStakingHas(){return new BigInteger(this.getStakingHas());}
@@ -94,7 +97,6 @@ public class CustomStaking extends Staking {
     public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}
     public BigInteger integerStatDelegateReduction(){return new BigInteger(this.getStatDelegateReduction());}
     public BigInteger integerStakingBlockNum(){return BigInteger.valueOf(this.getStakingBlockNum());}
-
     /**
      * 使用节点信息更新质押信息
      * @param node
