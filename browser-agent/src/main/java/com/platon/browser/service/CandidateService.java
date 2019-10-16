@@ -65,7 +65,7 @@ public class CandidateService {
      * @throws CandidateException
      * @throws BlockNumberException
      */
-    public CandidateResult getVerifiers(Long blockNumber) throws CandidateException, BlockNumberException, InterruptedException {
+    public CandidateResult getVerifiers(Long blockNumber) throws CandidateException, BlockNumberException {
         CandidateResult cr = new CandidateResult();
         // ==================================更新前一周期验证人列表=======================================
         // 入参区块号属于前一结算周期，因此可以通过它查询前一结算周期验证人历史列表
@@ -77,7 +77,11 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}", prevEpochLastBlockNumber, e.getMessage());
-            TimeUnit.SECONDS.sleep(1L);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -98,7 +102,11 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错,将重试:{}", e1.getMessage());
-                TimeUnit.SECONDS.sleep(1L);
+                try {
+                    TimeUnit.SECONDS.sleep(1L);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
@@ -114,7 +122,7 @@ public class CandidateService {
      * @throws BlockNumberException
      * @throws CandidateException
      */
-    public CandidateResult getValidators(Long blockNumber) throws BlockNumberException, CandidateException, InterruptedException {
+    public CandidateResult getValidators(Long blockNumber) throws BlockNumberException, CandidateException {
         CandidateResult cr = new CandidateResult();
         Long prevEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getConsensusPeriodBlockCount().longValue());
         while (true) try {
@@ -124,7 +132,11 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:]", prevEpochLastBlockNumber, e);
-            TimeUnit.SECONDS.sleep(1L);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -144,7 +156,11 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:", e1);
-                TimeUnit.SECONDS.sleep(1L);
+                try {
+                    TimeUnit.SECONDS.sleep(1L);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 

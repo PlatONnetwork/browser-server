@@ -37,6 +37,7 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Chendongming
@@ -300,6 +301,11 @@ public class BlockChain {
                 break;
             } catch (Exception e) {
                 logger.error("查询激励池(addr={})在块号({})的账户余额失败,将重试:{}",incentivePoolAccountAddr,blockNumber,e.getMessage());
+                try {
+                    TimeUnit.SECONDS.sleep(1L);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 

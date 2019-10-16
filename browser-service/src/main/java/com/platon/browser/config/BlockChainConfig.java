@@ -149,14 +149,18 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakings=new ArrayList<>();
 
     @PostConstruct
-    private void init() throws InterruptedException {
+    private void init() {
         EconomicConfig dec;
         while (true) try {
             dec = client.getWeb3j().getEconomicConfig().send().getEconomicConfig();
             break;
         } catch (IOException e) {
             logger.error("初始化链配置错误,将重试:{}", e.getMessage());
-            TimeUnit.SECONDS.sleep(1);
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
         String msg = JSON.toJSONString(dec,true);
         logger.info("链上配置:{}",msg);
