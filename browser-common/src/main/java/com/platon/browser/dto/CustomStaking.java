@@ -97,6 +97,7 @@ public class CustomStaking extends Staking {
     public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}
     public BigInteger integerStatDelegateReduction(){return new BigInteger(this.getStatDelegateReduction());}
     public BigInteger integerStakingBlockNum(){return BigInteger.valueOf(this.getStakingBlockNum());}
+    public BigInteger integerStakingFeeRwardValue(){return new BigInteger(this.getFeeRewardValue());}
     /**
      * 使用节点信息更新质押信息
      * @param node

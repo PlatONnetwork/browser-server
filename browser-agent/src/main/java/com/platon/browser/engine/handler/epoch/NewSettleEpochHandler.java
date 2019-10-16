@@ -287,7 +287,7 @@ public class NewSettleEpochHandler implements EventHandler {
         }
         // 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
         // 添加上一周期的收益
-        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue());
+        BigInteger profit = curStaking.integerStakingRewardValue().add(curStaking.integerBlockRewardValue()).add(curStaking.integerStakingFeeRwardValue());
         ari.getProfit().add(new PeriodValueElement(bc.getCurSettingEpoch(),profit));
         if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
             // 按结算周期由大到小排序
