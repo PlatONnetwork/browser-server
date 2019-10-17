@@ -55,7 +55,8 @@ public class CustomNodeOpt extends NodeOpt {
         PROPOSALS("4", "提案","ID|TITLE|TYPE|VERSION"),
         VOTE("5", "投票","ID|TITLE|OPTION|TYPE|VERSION"),
         MULTI_SIGN("6", "双签","PERCENT|AMOUNT"),
-        LOW_BLOCK_RATE("7", "出块率低","BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT")
+        LOW_BLOCK_RATE("7", "出块率低","BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT"),
+        VERSION("8", "版本声明","NODE_NAME|ACTIVE_NODE|VERSION"),
         ;
         private String code;
         private String desc;
