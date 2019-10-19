@@ -306,6 +306,7 @@ public class BlockChain {
                 break;
             } catch (Exception e) {
                 logger.error("查询激励池(addr={})在块号({})的账户余额失败,将重试:{}",incentivePoolAccountAddr,blockNumber,e.getMessage());
+                client.updateCurrentValidWeb3j();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
                 } catch (InterruptedException ex) {

@@ -77,6 +77,7 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}", prevEpochLastBlockNumber, e.getMessage());
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {
@@ -132,6 +133,7 @@ public class CandidateService {
             break;
         } catch (Exception e) {
             logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:]", prevEpochLastBlockNumber, e);
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {
@@ -255,7 +257,7 @@ public class CandidateService {
      * @return
      * @throws Exception
      */
-    public List<Node> getCurCandidates() throws InterruptedException {
+    public List<Node> getCurCandidates() {
         while (true) try {
             BaseResponse<List<Node>> br = client.getNodeContract().getCandidateList().send();
             if (!br.isStatusOk()) {
@@ -264,7 +266,12 @@ public class CandidateService {
             return br.data;
         } catch (Exception e) {
             logger.error("底层链查询候选验证节点列表出错,将重试:", e);
-            TimeUnit.SECONDS.sleep(1L);
+            client.updateCurrentValidWeb3j();
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -273,7 +280,7 @@ public class CandidateService {
      * @return
      * @throws Exception
      */
-    public List<Node> getCurVerifiers() throws InterruptedException {
+    public List<Node> getCurVerifiers() {
         while (true) try {
             BaseResponse<List<Node>> br = client.getNodeContract().getVerifierList().send();
             if (!br.isStatusOk()) {
@@ -282,7 +289,12 @@ public class CandidateService {
             return br.data;
         } catch (Exception e) {
             logger.error("底层链查询实时结算周期验证节点列表出错,将重试:{}", e.getMessage());
-            TimeUnit.SECONDS.sleep(1L);
+            client.updateCurrentValidWeb3j();
+            try {
+                TimeUnit.SECONDS.sleep(1L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

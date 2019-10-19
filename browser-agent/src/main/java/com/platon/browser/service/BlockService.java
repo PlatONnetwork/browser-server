@@ -100,6 +100,7 @@ public class BlockService {
             return block;
         } catch (Exception e) {
             logger.error("搜集区块[{}]异常,将重试:", blockNumber, e);
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {
@@ -117,6 +118,7 @@ public class BlockService {
             return client.getWeb3j().platonBlockNumber().send().getBlockNumber();
         } catch (Exception e) {
             logger.error("取链上最新区块号失败,将重试{}:", e.getMessage());
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {
