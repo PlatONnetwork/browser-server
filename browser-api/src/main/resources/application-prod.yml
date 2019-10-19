@@ -16,6 +16,10 @@ port: 38030
 dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
 dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
+#web3j配置
+web3j:
+  addresses: http://18.140.20.252:6789
+  collect.batch-size: 100
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
