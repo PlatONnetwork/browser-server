@@ -130,7 +130,7 @@ public class PlatOnClient {
     /**
      * web3j实例保活
      */
-    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0/20 * * * * ?")
     protected void keepAlive () {
         logger.debug("*** In the detect task *** ");
         try {

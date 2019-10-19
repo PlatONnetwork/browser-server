@@ -94,6 +94,7 @@ public class NewSettleEpochHandler implements EventHandler {
                 break;
             } catch (Exception e) {
                 logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}",prevEpochLastBlockNumber,e.getMessage());
+                client.updateCurrentValidWeb3j();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
                 } catch (InterruptedException ex) {
