@@ -6,6 +6,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.handler.EventContext;
+import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.exception.CacheConstructException;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -54,6 +55,8 @@ public class DeclareVersionHandlerTest extends TestBase {
     public void testHandler () throws NoSuchBeanException {
         NodeCache nodeCache = mock(NodeCache.class);
         when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
         CustomNode node = mock(CustomNode.class);
         when(nodeCache.getNode(any())).thenReturn(node);
         when(node.getLatestStaking()).thenReturn(stakings.get(0));

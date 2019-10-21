@@ -156,6 +156,7 @@ public class BlockChainConfig {
             break;
         } catch (IOException e) {
             logger.error("初始化链配置错误,将重试:{}", e.getMessage());
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {

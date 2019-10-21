@@ -118,6 +118,7 @@ public class NetworkStatUpdateTask extends BaseTask{
             return client.getWeb3j().platonGetBalance(address,DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber.longValue()))).send().getBalance();
         }catch (Exception e){
             logger.error("查询地址[{}]在区块[{}]的余额失败,将重试:{}",address,blockNumber,e);
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {

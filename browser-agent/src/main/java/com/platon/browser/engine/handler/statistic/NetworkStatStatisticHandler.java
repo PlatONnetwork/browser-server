@@ -6,6 +6,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.cache.TpsCalcCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.EventHandler;
 import com.platon.browser.engine.stage.NetworkStatStage;
@@ -40,6 +41,9 @@ public class NetworkStatStatisticHandler implements EventHandler {
     private BlockChainConfig chainConfig;
     @Autowired
     private CacheHolder cacheHolder;
+
+    @Autowired
+    private TpsCalcCache tpsCalcCache;
 
     @Override
     public void handle ( EventContext context ) {
@@ -90,10 +94,11 @@ public class NetworkStatStatisticHandler implements EventHandler {
                         }
                     });
 
-            //当前区块交易总数
-            networkStatCache.setCurrentTps(curBlock.getStatTxQty());
+            //当前交易TPS
+            int currentTps = tpsCalcCache.getTps();
+            networkStatCache.setCurrentTps(currentTps);
             //已统计区块中最高交易个数
-            networkStatCache.setMaxTps(networkStatCache.getMaxTps() > curBlock.getStatTxQty() ? networkStatCache.getMaxTps() : curBlock.getStatTxQty());
+            networkStatCache.setMaxTps(networkStatCache.getMaxTps() > currentTps ? networkStatCache.getMaxTps() : currentTps);
             //出块奖励
             networkStatCache.setBlockReward(bc.getBlockReward().toString());
             //统计质押金额

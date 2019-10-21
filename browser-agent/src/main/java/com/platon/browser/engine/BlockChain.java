@@ -14,6 +14,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCacheUpdater;
 import com.platon.browser.engine.cache.StakingCacheUpdater;
+import com.platon.browser.engine.cache.TpsCalcCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
@@ -98,6 +99,8 @@ public class BlockChain {
     @Autowired
     private NewIssueEpochHandler newIssueEpochHandler;
 
+    @Autowired
+    private TpsCalcCache tpsCalcCache;
 
     /***
      * 以下字段业务使用说明：
@@ -127,6 +130,8 @@ public class BlockChain {
      */
     public void execute ( CustomBlock block ) throws Exception {
         curBlock = block;
+        // 更新交易TPS
+        tpsCalcCache.update(block);
         // 推算并更新共识周期和结算周期轮数
         updateEpoch(curBlock.getNumber());
         // 更新staking表中与区块统计相关的信息
@@ -301,6 +306,7 @@ public class BlockChain {
                 break;
             } catch (Exception e) {
                 logger.error("查询激励池(addr={})在块号({})的账户余额失败,将重试:{}",incentivePoolAccountAddr,blockNumber,e.getMessage());
+                client.updateCurrentValidWeb3j();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
                 } catch (InterruptedException ex) {

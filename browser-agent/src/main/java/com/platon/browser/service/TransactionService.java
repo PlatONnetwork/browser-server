@@ -155,6 +155,7 @@ public class TransactionService {
             return result.getTransactionReceipt();
         } catch (Exception e) {
             logger.error("查询交易回执失败,将重试:", e);
+            client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
             } catch (InterruptedException ex) {

@@ -1,6 +1,5 @@
 package com.platon.browser.client;
 
-import com.platon.browser.exception.ContractInvokeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,10 @@ import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -100,28 +102,25 @@ public class PlatOnClient {
 
     public void updateCurrentValidWeb3j(){
         WEB3J_CONFIG_LOCK.writeLock().lock();
-        Web3j originWeb3j = currentValidWeb3j;
         try {
-            // 检查currentValidWeb3j连通性
-            try {
-                if(currentValidWeb3j==null) throw new ContractInvokeException("currentValidWeb3j需要初始化！");
-                currentValidWeb3j.platonBlockNumber().send();
-                updateContract();
-            } catch (Exception e1) {
-                logger.info("当前Web3j实例({})无效，重新选举Web3j实例！",currentValidWeb3j);
-                // 连不通，则需要更新
-                web3jMap.forEach((web3j,address)->{
-                    try {
-                        web3j.platonBlockNumber().send();
-                        currentValidWeb3j=web3j;
-                        currentValidAddress=address;
-                    } catch (IOException e2) {
-                        logger.info("候选Web3j实例({})无效！",web3j);
+            // 检查currentValidWeb3j连通性, 取块高最高的作为当前web3j
+            long maxBlockNumber = 0;
+            for (Map.Entry<Web3j, String> entry : web3jMap.entrySet()) {
+                Web3j web3j = entry.getKey();
+                String address = entry.getValue();
+                try {
+                    BigInteger blockNumber = web3j.platonBlockNumber().send().getBlockNumber();
+                    if (blockNumber.longValue() > maxBlockNumber) {
+                        maxBlockNumber = blockNumber.longValue();
+                        currentValidWeb3j = web3j;
+                        currentValidAddress = address;
                     }
-                });
-                if(originWeb3j==currentValidWeb3j){
-                    logger.info("当前所有候选Web3j实例均无法连通！");
+                } catch (IOException e2) {
+                    logger.info("候选Web3j实例({})无效！", web3j);
                 }
+            }
+            if(maxBlockNumber==0){
+                logger.info("当前所有候选Web3j实例均无法连通！");
             }
         }finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
@@ -131,7 +130,7 @@ public class PlatOnClient {
     /**
      * web3j实例保活
      */
-    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0/20 * * * * ?")
     protected void keepAlive () {
         logger.debug("*** In the detect task *** ");
         try {
