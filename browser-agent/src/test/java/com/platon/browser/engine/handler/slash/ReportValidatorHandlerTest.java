@@ -81,6 +81,7 @@ public class ReportValidatorHandlerTest extends TestBase {
         Map<String, Node> validatorMap = new HashMap<>();
         validators.forEach(validator->validatorMap.put(HexTool.prefix(validator.getNodeId()),validator));
         when(chainConfig.getDuplicateSignSlashRate()).thenReturn(BigDecimal.valueOf(100));
+        when(chainConfig.getDuplicateSignReportRate()).thenReturn(BigDecimal.valueOf(50));
         when(bc.getCurBlock()).thenReturn(blocks.get(0));
         when(bc.getCurSettingEpoch()).thenReturn(BigInteger.ONE);
 

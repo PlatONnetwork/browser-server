@@ -8,6 +8,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;
 import com.platon.browser.engine.cache.ProposalCache;
+import com.platon.browser.engine.cache.TpsCalcCache;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
@@ -52,6 +53,8 @@ public class NetworkStatStatisticHandlerTest extends TestBase {
     private BlockChainConfig chainConfig;
     @Mock
     private BlockChain bc;
+    @Mock
+    private TpsCalcCache tpsCalcCache;
 
     /**
      * 测试开始前，设置相关行为属性
@@ -64,6 +67,7 @@ public class NetworkStatStatisticHandlerTest extends TestBase {
         ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
         ReflectionTestUtils.setField(handler, "chainConfig", chainConfig);
         ReflectionTestUtils.setField(handler, "bc", bc);
+        ReflectionTestUtils.setField(handler, "tpsCalcCache", tpsCalcCache);
     }
 
     /**
