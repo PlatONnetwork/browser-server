@@ -105,6 +105,8 @@ public class BlockChainConfig {
     private BigDecimal duplicateSignSlashRate;
     //【惩罚】双签奖励百分比
     private BigDecimal duplicateSignReportRate;
+    //【惩罚】举报证据生效周期数
+    private BigDecimal evidenceValidEpoch;
 
     //【治理】文本提案参与率: >
     private BigDecimal minProposalTextParticipationRate;
@@ -125,6 +127,8 @@ public class BlockChainConfig {
     private BigDecimal blockRewardRate;
     //【奖励】激励池分配给质押激励的比例
     private BigDecimal stakeRewardRate;
+    //【奖励】Platon基金会年限
+    private BigInteger platOnFoundationYear;
 
     /*******************以下参数通过从应用配置文件获取*******************/
     // 质押节点统计年化率最多取多少个连续周期
@@ -215,9 +219,12 @@ public class BlockChainConfig {
         //【惩罚】双签处罚百分比
         this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing();
         //【惩罚】双签奖励百分比
-        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        //this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【惩罚】双签处罚百分比
         this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        //【惩罚】举报证据有效周期数
+        this.evidenceValidEpoch=dec.getSlashing().getEvidenceValidEpoch();
+
         //【治理】文本提案参与率: >
         this.minProposalTextParticipationRate=dec.getGov().getTextProposalVoteRate();
         //【治理】文本提案支持率：>=
@@ -238,5 +245,7 @@ public class BlockChainConfig {
         this.blockRewardRate=dec.getReward().getNewBlockRate().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【奖励】激励池分配给质押激励的比例 = 1-区块奖励比例
         this.stakeRewardRate=BigDecimal.ONE.subtract(this.blockRewardRate);
+        //【奖励】Platon基金会年限
+        this.platOnFoundationYear=dec.getReward().getPlatONFoundationYear();
     }
 }
