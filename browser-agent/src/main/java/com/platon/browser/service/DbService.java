@@ -52,40 +52,41 @@ public class DbService {
     @Autowired
     private CustomNetworkStatMapper customNetworkStatMapper;
 
-    @Autowired
-    private BlockCacheService blockCacheService;
-    @Autowired
-    private TransactionCacheService transactionCacheService;
-    @Autowired
-    private NetworkStatCacheService networkStatCacheService;
-
+    public static class CacheContainer{
+        public final List<Block> blocks = new ArrayList<>();
+        public final List<TransactionWithBLOBs> transactions = new ArrayList<>();
+        public final Set<NetworkStat> networkStats=new HashSet<>();
+        public void clear(){
+            blocks.clear();
+            transactions.clear();
+            networkStats.clear();
+        }
+    }
+    public static final CacheContainer CC = new CacheContainer(); 
     @Transactional
-    public void insertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
+    public CacheContainer batchInsertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
+        CC.clear();
     	logger.debug("DbService insertOrUpdate");
-        List <Block> blocks = new ArrayList <>();
-        List <TransactionWithBLOBs> transactions = new ArrayList <>();
         basicData.forEach(block -> {
-            blocks.add(block);
-            transactions.addAll(block.getTransactionList());
+            CC.blocks.add(block);
+            CC.transactions.addAll(block.getTransactionList());
             // 区块交易列表设置为空，防止redis缓存数据剧增
             block.setTransactionList(null);
         });
         // 批量入库区块数据并更新redis缓存
-        if (!blocks.isEmpty()) {
-            blockMapper.batchInsert(blocks);
-            blockCacheService.update(new HashSet <>(blocks));
+        if (!CC.blocks.isEmpty()) {
+            blockMapper.batchInsert(CC.blocks);
         }
         // 批量入库交易数据并更新redis缓存
-        if (!transactions.isEmpty()) {
-            transactionMapper.batchInsert(transactions);
-            transactionCacheService.update(new HashSet <>(transactions));
+        if (!CC.transactions.isEmpty()) {
+            transactionMapper.batchInsert(CC.transactions);
         }
         // 统计数据入库并更新redis缓存
         NetworkStatStage nsr = bizData.getNetworkStatStage();
         Set<NetworkStat> networkStats = nsr.exportNetworkStat();
         if (!networkStats.isEmpty()) {
             customNetworkStatMapper.batchInsertOrUpdateSelective(networkStats, NetworkStat.Column.values());
-            networkStatCacheService.update(networkStats);
+            CC.networkStats.addAll(networkStats);
         }
         // ****************批量新增或更新质押相关数据*******************
         StakingStage ser = bizData.getStakingStage();
@@ -128,5 +129,7 @@ public class DbService {
         //批量插入锁仓计划
         Set<RpPlan> planSet = rs.exportRpPlanSet();
         if(!planSet.isEmpty())rpPlanMapper.batchInsert(new ArrayList <>(planSet));
+
+        return CC;
     }
 }
