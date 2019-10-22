@@ -160,7 +160,7 @@ public class NewConsensusEpochHandler implements EventHandler {
             logger.info("使用指定块号查询下一轮共识周期验证人出错,将调用实时查询接口:{}",e.getMessage());
             // 如果取不到节点列表，证明agent已经追上链，则使用实时接口查询节点列表
             curValidator = candidateService.getCurValidators();
-            logger.debug("下一轮共识周期验证人(实时):{}",JSON.toJSONString(curValidator,true));
+            logger.debug("当前块号:{},下一轮共识周期验证人(实时):{}",blockNumber,JSON.toJSONString(curValidator,true));
         }
 
         bc.getCurValidator().clear();
@@ -187,6 +187,7 @@ public class NewConsensusEpochHandler implements EventHandler {
                 CustomNode node = nodeCache.getNode(nodeId);
                 CustomStaking staking = node.getLatestStaking();
                 staking.setIsConsensus(isConsensus.getCode());
+                if(isConsensus.getCode()==1) staking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
                 stakingStage.updateStaking(staking);
             } catch (NoSuchBeanException e) {
                 logger.error("找不到[{}]对应的节点信息!",nodeId);

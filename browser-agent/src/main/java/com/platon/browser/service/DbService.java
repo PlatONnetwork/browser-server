@@ -67,6 +67,8 @@ public class DbService {
         basicData.forEach(block -> {
             blocks.add(block);
             transactions.addAll(block.getTransactionList());
+            // 区块交易列表设置为空，防止redis缓存数据剧增
+            block.setTransactionList(null);
         });
         // 批量入库区块数据并更新redis缓存
         if (!blocks.isEmpty()) {
