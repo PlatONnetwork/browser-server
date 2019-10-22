@@ -1,7 +1,7 @@
 package com.platon.browser.resp.staking;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.platon.browser.config.CustomLatSerializer;
+import com.platon.browser.config.CustomLowLatSerializer;
 
 /**
  * 活跃验证人列表返回对象
@@ -56,14 +56,14 @@ public class AliveStakingListResp {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	@JsonSerialize(using = CustomLatSerializer.class)
+	@JsonSerialize(using = CustomLowLatSerializer.class)
 	public String getTotalValue() {
 		return totalValue;
 	}
 	public void setTotalValue(String totalValue) {
 		this.totalValue = totalValue;
 	}
-	@JsonSerialize(using = CustomLatSerializer.class)
+	@JsonSerialize(using = CustomLowLatSerializer.class)
 	public String getDelegateValue() {
 		return delegateValue;
 	}

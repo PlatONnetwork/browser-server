@@ -93,7 +93,8 @@ public class TxParamResolver {
                         //被质押的节点的NodeId
                         String editNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
                         //外部Id
-                        String editExtrId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        String hexeditExtrId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        String extrId = new String(Numeric.hexStringToByteArray(hexeditExtrId));
                         //被质押节点的名称
                         String hexEditNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
                         String editNodeName = new String(Numeric.hexStringToByteArray(hexEditNodeName));
@@ -108,7 +109,7 @@ public class TxParamResolver {
 
 
                         EditValidatorParam editValidatorParam = new EditValidatorParam();
-                        editValidatorParam.init(editAddr,editNodeId,editExtrId.equals("0x")?"":editExtrId,editNodeName,editWebSiteAdd,editDetail);
+                        editValidatorParam.init(editAddr,editNodeId,extrId.equals("0x")?"":extrId,editNodeName,editWebSiteAdd,editDetail);
                         result.param = editValidatorParam;
                         break;
                     case INCREASE_STAKING: // 1002

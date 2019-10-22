@@ -256,9 +256,14 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTimestamp().getTime());
     		resp.setServerTime(new Date().getTime());
-    		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+    		List<Block> blocks = statisticCacheService.getBlockCache(0, 1);
     		/** 确认区块数等于当前区块书减去交易区块数  */
-    		resp.setConfirmNum(String.valueOf(networkStatRedis.getCurrentNumber()-transaction.getBlockNumber()));
+    		if(blocks.size() > 0 ) {
+    			resp.setConfirmNum(String.valueOf(blocks.get(0).getNumber()-transaction.getBlockNumber()));
+    		} else {
+    			resp.setConfirmNum("0");
+			}
+    		
     		/** 暂时只有账户合约 */
     		resp.setReceiveType("account");
     		/** 如果数据值为null 则置为空 */
