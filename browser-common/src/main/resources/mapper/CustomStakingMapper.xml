@@ -207,8 +207,8 @@
     		and s.is_setting = #{isSetting,jdbcType=INTEGER}
     	</if>
     </where>
-    order by cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) +
-    cast(stat_delegate_has as Decimal(30)) + cast(stat_delegate_locked as Decimal(30)) desc, s.program_version desc,s.staking_addr desc,s.node_id desc,s.staking_block_num desc
+    order by s.program_version desc,cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) +
+    cast(stat_delegate_has as Decimal(30)) + cast(stat_delegate_locked as Decimal(30)) desc, s.staking_block_num ,s.staking_tx_index desc
   </select>
   <select id="selectStakingAndNodeByNodeId" resultMap="AndNodeResultMap">
     select allDelegate,allDelegateQty,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,

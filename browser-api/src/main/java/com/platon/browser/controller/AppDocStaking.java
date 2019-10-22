@@ -57,6 +57,7 @@ public interface AppDocStaking {
      */	
 	@ApiOperation(value = "topic/staking/statistic/new", nickname = "", notes = "", tags = { "Staking" })
 	@SubscribeMapping(value = "topic/staking/statistic/new")
+	@PostMapping(value = "staking/statistic", produces = { "application/json" })
 	BaseResp<StakingStatisticNewResp> stakingStatisticNew();
 	
     /**
