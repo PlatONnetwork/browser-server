@@ -64,7 +64,7 @@ public class NetworkStatUpdateTask extends BaseTask{
             int curIssueEpoch=bc.getAddIssueEpoch().intValue();
             int subsidiesSize=subsidiesMap.size();
 
-            // 基金会补贴部分
+            // 计算士基金会补贴部分
             BigDecimal foundationAmount = BigDecimal.ZERO;
             // 前subsidiesSize年才有补贴，其余时候为0
             if(curIssueEpoch<=subsidiesSize) foundationAmount = subsidiesMap.get(curIssueEpoch);
@@ -80,7 +80,7 @@ public class NetworkStatUpdateTask extends BaseTask{
 
             //年份增发量 = (1+增发比例)的增发年份次方
             BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
-            //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
+            //计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年计算士基金会补贴
             // 发行量
             BigDecimal circulation = initIssueAmount
                     .multiply(circulationByYear)
