@@ -261,6 +261,8 @@ public class BlockSyncTask extends BaseTask{
             // 批量更新交易缓存
             if(!cc.networkStats.isEmpty()){
                 while (true)try{
+                    BigInteger currNum = blockChain.getCurBlock().getBlockNumber();
+                    cc.networkStats.forEach(ns->ns.setCurrentNumber(currNum.longValue()));
                     networkStatCacheService.update(cc.networkStats);
                     cc.networkStats.clear(); // 释放内存
                     break;
