@@ -228,14 +228,16 @@ public class BlockSyncTask extends BaseTask{
             // 串行批量入库
             DbService.CacheContainer cc = dbService.batchInsertOrUpdate(basicData,bizData);
 
-            // 批量更新区块缓存
-            if(!cc.blocks.isEmpty()){
+            // 批量更新统计缓存
+            if(!cc.networkStats.isEmpty()){
                 while (true)try{
-                    blockCacheService.update(new HashSet<>(cc.blocks));
-                    cc.blocks.clear(); // 释放内存
+                    BigInteger currNum = blockChain.getCurBlock().getBlockNumber();
+                    cc.networkStats.forEach(ns->ns.setCurrentNumber(currNum.longValue()));
+                    networkStatCacheService.update(cc.networkStats);
+                    cc.networkStats.clear(); // 释放内存
                     break;
                 }catch (Exception e){
-                    logger.error("【更新区块缓存出错,将重试:",e);
+                    logger.error("【更新统计缓存出错,将重试:",e);
                     try {
                         TimeUnit.SECONDS.sleep(1L);
                     } catch (InterruptedException ex) {
@@ -258,16 +260,14 @@ public class BlockSyncTask extends BaseTask{
                     }
                 }
             }
-            // 批量更新交易缓存
-            if(!cc.networkStats.isEmpty()){
+            // 批量更新区块缓存
+            if(!cc.blocks.isEmpty()){
                 while (true)try{
-                    BigInteger currNum = blockChain.getCurBlock().getBlockNumber();
-                    cc.networkStats.forEach(ns->ns.setCurrentNumber(currNum.longValue()));
-                    networkStatCacheService.update(cc.networkStats);
-                    cc.networkStats.clear(); // 释放内存
+                    blockCacheService.update(new HashSet<>(cc.blocks));
+                    cc.blocks.clear(); // 释放内存
                     break;
                 }catch (Exception e){
-                    logger.error("【更新统计缓存出错,将重试:",e);
+                    logger.error("【更新区块缓存出错,将重试:",e);
                     try {
                         TimeUnit.SECONDS.sleep(1L);
                     } catch (InterruptedException ex) {
