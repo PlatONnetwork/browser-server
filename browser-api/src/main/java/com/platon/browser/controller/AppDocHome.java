@@ -125,6 +125,7 @@ public interface AppDocHome {
      */	
 	@ApiOperation(value = "/topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "/topic/chain/statistic/new")
+	@PostMapping(value = "chain/statistic", produces = { "application/json" })
 	BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
 	
