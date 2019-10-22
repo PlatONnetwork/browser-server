@@ -187,6 +187,7 @@ public class NewConsensusEpochHandler implements EventHandler {
                 CustomNode node = nodeCache.getNode(nodeId);
                 CustomStaking staking = node.getLatestStaking();
                 staking.setIsConsensus(isConsensus.getCode());
+                if(isConsensus.getCode()==1) staking.setIsSetting(CustomStaking.YesNoEnum.YES.getCode());
                 stakingStage.updateStaking(staking);
             } catch (NoSuchBeanException e) {
                 logger.error("找不到[{}]对应的节点信息!",nodeId);
