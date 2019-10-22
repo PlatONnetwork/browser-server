@@ -67,9 +67,7 @@ public class NewElectionEpochHandlerTest extends TestBase {
         validators.forEach(validator->validatorMap.put(HexTool.prefix(validator.getNodeId()),validator));
         when(bc.getPreValidator()).thenReturn(validatorMap);
         when(nodeCache.getNode(anyString())).thenReturn(nodes.get(0));
-        when(chainConfig.getSlashBlockThreshold()).thenReturn(BigDecimal.valueOf(6));
         when(bc.getBlockReward()).thenReturn(BigDecimal.valueOf(2000000));
-        when(chainConfig.getSlashBlockCount()).thenReturn(BigDecimal.valueOf(20));
         when(bc.getCurSettingEpoch()).thenReturn(BigInteger.ONE);
         when(chainConfig.getStakeThreshold()).thenReturn(BigDecimal.valueOf(10000000L));
 
