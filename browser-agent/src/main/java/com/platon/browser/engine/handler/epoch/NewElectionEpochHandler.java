@@ -20,11 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.platon.bean.Node;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -51,116 +49,55 @@ public class NewElectionEpochHandler implements EventHandler {
             // 需要判断被处罚质押是否在上一轮共识周期验证人
             Node exist = bc.getPreValidator().get(staking.getNodeId());
             if(exist==null) continue;
-            // 根据前一个共识周期的出块数判断是否触发最低处罚
-            boolean isSlash = staking.getPreConsBlockQty()<=chainConfig.getSlashBlockThreshold().longValue();
-            if(isSlash){
-                // 处罚金额=当前区块奖励x处罚块数
-                BigDecimal slashAmount = bc.getBlockReward().multiply(chainConfig.getSlashBlockCount());
-                markSlashInfo(nodeCache,stakingStage,staking,kickOut(staking,slashAmount),slashAmount);
-            }
-        }
-    }
-
-    /**
-     * 执行踢出逻辑
-     * @param staking
-     * @param slashAmount
-     * @return
-     */
-    private boolean kickOut(CustomStaking staking,BigDecimal slashAmount){
-        // 判断是否需要踢出验证人列表：
-        // 1、出块数为零；
-        // 2、扣除罚金后，剩余质押金小于最低质押门槛
-        // 总质押金=犹豫金额+锁定金额
-        BigDecimal totalAmount = staking.decimalStakingHas().add(staking.decimalStakingLocked());
-        // 剩余质押金额=总质押金额-处罚金额
-        BigDecimal remainAmount = totalAmount.subtract(slashAmount);
-        BigDecimal stakingThreshold = Convert.toVon(chainConfig.getStakeThreshold(), Convert.Unit.LAT);
-        // 前一共识周期出块数为0||(剩余质押金<质押门槛), 则需要被踢出验证人列表
-        boolean isKickOut = (staking.getPreConsBlockQty()==0)||(remainAmount.compareTo(stakingThreshold)<0);
-        if(isKickOut){
-            // 犹豫期金额置零
-            staking.setStakingHas(BigInteger.ZERO.toString());
-            // 设置离开时间
-            staking.setLeaveTime(bc.getCurBlock().getTimestamp());
-            if(remainAmount.compareTo(BigDecimal.ZERO)>0){ // 剩余金额大于零，则进入退回质押金流程
-                // 剩余质押金额全部置为退回状态
-                staking.setStakingReduction(remainAmount.setScale(0,RoundingMode.FLOOR).toString());
-                // 锁定金额置0
-                staking.setStakingLocked(BigInteger.ZERO.toString());
-                // 设定退回时所在结算周期
-                staking.setStakingReductionEpoch(bc.getCurSettingEpoch().intValue());
-                // 节点状态设为退出中
+            // 上一轮出块数为0，则移除候选列表
+            boolean isKickOut = staking.getPreConsBlockQty()==0;
+            if(isKickOut){
+                // 把节点置为退出中
                 staking.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
-            }else{// 剩余金额等于零
-                // 锁定金额置零
-                staking.setStakingLocked(BigInteger.ZERO.toString());
-                // 节点状态设为已退出
-                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                staking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
+                staking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
+                stakingStage.updateStaking(staking);
+
+                // **************记录日志**************
+                // 记录处罚信息至年化率信息里面
+                String annualizedRateInfo = staking.getAnnualizedRateInfo();
+                AnnualizedRateInfo ari = new AnnualizedRateInfo();
+                if(StringUtils.isNotBlank(annualizedRateInfo)){
+                    ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
+                }
+                SlashInfo si = new SlashInfo();
+                si.setBlockNumber(bc.getCurBlock().getBlockNumber());
+                si.setBlockCount(BigInteger.valueOf(staking.getPreConsBlockQty()));
+                si.setKickOut(true);
+                si.setSlashBlockCount(BigInteger.ZERO);
+                si.setSlashAmount(BigDecimal.ZERO);
+                si.setSlashTime(bc.getCurBlock().getTimestamp());
+                ari.getSlash().add(si);
+                staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
+
+                // 把更新暂存到待入库列表, 记录出块率低处罚
+                stakingStage.updateStaking(staking);
+                // 记录操作日志
+                CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
+                nodeOpt.updateWithCustomBlock(bc.getCurBlock());
+                // BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT
+                String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getTpl()
+                        .replace("SLASH_BLOCK_COUNT",BigInteger.ZERO.toString())
+                        .replace("BLOCK_COUNT",staking.getPreConsBlockQty().toString())
+                        .replace("AMOUNT",BigInteger.ZERO.toString())
+                        .replace("KICK_OUT",isKickOut?"1":"0");
+                nodeOpt.setDesc(desc);
+                stakingStage.insertNodeOpt(nodeOpt);
+
+                // 更新被处罚节点统计信息（如果存在）
+                try {
+                    CustomNode node = nodeCache.getNode(staking.getNodeId());
+                    node.setStatSlashLowQty(node.getStatSlashLowQty()+1);
+                    stakingStage.updateNode(node);
+                } catch (NoSuchBeanException e) {
+                    logger.error("更新被处罚节点统计信息出错：{}",e.getMessage());
+                }
             }
-            staking.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
-            staking.setIsSetting(CustomStaking.YesNoEnum.NO.getCode());
-        } else {
-            // 普通出块率低，则扣点钱完事
-            if(staking.decimalStakingHas().compareTo(slashAmount)>=0){
-                // 如果犹豫期金额>=处罚金额,则直接从犹豫期中扣除罚款
-                staking.setStakingHas(staking.decimalStakingHas().subtract(slashAmount).setScale(0,RoundingMode.CEILING).toString());
-            }else{
-                // 犹豫期金额置0
-                staking.setStakingHas(BigInteger.ZERO.toString());
-                // 锁定期金额设置为：犹豫金额+锁定金额-处罚金额
-                staking.setStakingLocked(remainAmount.setScale(0,RoundingMode.FLOOR).toString());
-            }
-        }
-        return isKickOut;
-    }
-
-    /**
-     * 记录惩罚信息
-     * @param nodeCache
-     * @param stakingStage
-     * @param staking
-     * @param isKickOut
-     * @param slashAmount
-     */
-    private void markSlashInfo(NodeCache nodeCache,StakingStage stakingStage, CustomStaking staking,boolean isKickOut,BigDecimal slashAmount){
-        // 记录处罚信息至年化率信息里面
-        String annualizedRateInfo = staking.getAnnualizedRateInfo();
-        AnnualizedRateInfo ari = new AnnualizedRateInfo();
-        if(StringUtils.isNotBlank(annualizedRateInfo)){
-            ari = JSON.parseObject(annualizedRateInfo,AnnualizedRateInfo.class);
-        }
-        SlashInfo si = new SlashInfo();
-        si.setBlockNumber(bc.getCurBlock().getBlockNumber());
-        si.setBlockCount(BigInteger.valueOf(staking.getPreConsBlockQty()));
-        si.setKickOut(isKickOut);
-        si.setSlashBlockCount(BigInteger.valueOf(chainConfig.getSlashBlockCount().longValue()));
-        si.setSlashAmount(slashAmount);
-        si.setSlashTime(bc.getCurBlock().getTimestamp());
-        ari.getSlash().add(si);
-        staking.setAnnualizedRateInfo(JSON.toJSONString(ari));
-
-        // 把更新暂存到待入库列表, 记录出块率低处罚
-        stakingStage.updateStaking(staking);
-        // 记录操作日志
-        CustomNodeOpt nodeOpt = new CustomNodeOpt(staking.getNodeId(), CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE);
-        nodeOpt.updateWithCustomBlock(bc.getCurBlock());
-        // BLOCK_COUNT|SLASH_BLOCK_COUNT|AMOUNT|KICK_OUT
-        String desc = CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getTpl()
-                .replace("SLASH_BLOCK_COUNT",chainConfig.getSlashBlockCount().toString())
-                .replace("BLOCK_COUNT",staking.getPreConsBlockQty().toString())
-                .replace("AMOUNT",slashAmount.setScale(0,RoundingMode.CEILING).toString())
-                .replace("KICK_OUT",isKickOut?"1":"0");
-        nodeOpt.setDesc(desc);
-        stakingStage.insertNodeOpt(nodeOpt);
-
-        // 更新被处罚节点统计信息（如果存在）
-        try {
-            CustomNode node = nodeCache.getNode(staking.getNodeId());
-            node.setStatSlashLowQty(node.getStatSlashLowQty()+1);
-            stakingStage.updateNode(node);
-        } catch (NoSuchBeanException e) {
-            logger.error("更新被处罚节点统计信息出错：{}",e.getMessage());
         }
     }
 }
