@@ -46,10 +46,10 @@ public class NewElectionEpochHandler implements EventHandler {
         StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
         List<CustomStaking> stakingList = nodeCache.getStakingByStatus(CustomStaking.StatusEnum.CANDIDATE);
         for (CustomStaking staking:stakingList){
-            // 需要判断被处罚质押是否在上一轮共识周期验证人
+            // 当前验证人是否在上一轮共识周期
             Node exist = bc.getPreValidator().get(staking.getNodeId());
             if(exist==null) continue;
-            // 上一轮出块数为0，则移除候选列表
+            // 当前验证人在上一轮共识中出块数为0，则移除候选列表
             boolean isKickOut = staking.getPreConsBlockQty()==0;
             if(isKickOut){
                 // 把节点置为退出中
