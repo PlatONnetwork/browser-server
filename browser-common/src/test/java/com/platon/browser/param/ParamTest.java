@@ -55,7 +55,7 @@ public class ParamTest extends TestBase {
                             args[i]=Boolean.TRUE;
                             continue;
                         }
-                        if(Double.class==types[i]){
+                        if(Double.class==types[i]||"double".equals(types[i].getName())){
                             args[i]=11.3;
                             continue;
                         }
@@ -63,15 +63,20 @@ public class ParamTest extends TestBase {
                             args[i]="333";
                             continue;
                         }
-                        if(Integer.class==types[i]){
+                        if(Integer.class==types[i]||"int".equals(types[i].getName())){
                             args[i]=333;
                             continue;
                         }
-                        if(Long.class==types[i]){
+                        if(Long.class==types[i]||"long".equals(types[i].getName())){
                             args[i]=333L;
                             continue;
                         }
-                        args[i]=mock(types[i]);
+                        try{
+                            args[i]=mock(types[i]);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                     }
                     method.invoke(instance,args);
                     continue;
