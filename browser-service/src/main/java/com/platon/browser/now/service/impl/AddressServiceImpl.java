@@ -86,7 +86,7 @@ public class AddressServiceImpl implements AddressService {
 				BigInteger balance = platonClient.getWeb3j().platonGetBalance(req.getAddress(),DefaultBlockParameterName.LATEST).send().getBalance();
 				resp.setBalance(balance.toString());
         	} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("",e);
 			}
         }
         RpPlanExample rpPlanExample = new RpPlanExample();

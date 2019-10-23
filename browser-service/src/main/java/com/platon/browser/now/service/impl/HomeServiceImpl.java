@@ -194,10 +194,9 @@ public class HomeServiceImpl implements HomeService {
 	public ChainStatisticNewResp chainStatisticNew() {
 		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		ChainStatisticNewResp chainStatisticNewResp = new ChainStatisticNewResp();
-		if(networkStatRedis != null) {
-			/** 查询redis统计信息并转换对应返回对象 */
-			BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
-		}
+		if(networkStatRedis == null) return chainStatisticNewResp;
+		/** 查询redis统计信息并转换对应返回对象 */
+		BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
 		Long bNumber = networkStatRedis.getCurrentNumber();
 		/** 查询缓存最新的八条区块信息 */
 		List<Block> items = statisticCacheService.getBlockCache(0,8);
