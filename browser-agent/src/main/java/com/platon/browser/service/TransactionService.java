@@ -118,7 +118,7 @@ public class TransactionService {
     /**
      * 分析区块获取code&交易回执
      */
-    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException, InterruptedException {
+    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException {
         Optional<TransactionReceipt> receipt = getReceipt(tx);
         // 如果交易回执存在，则更新交易中与回执相关的信息
         if(receipt.isPresent()) {
@@ -158,8 +158,8 @@ public class TransactionService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }

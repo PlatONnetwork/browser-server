@@ -62,31 +62,31 @@ public class DbService {
             networkStats.clear();
         }
     }
-    private CacheContainer CC = new CacheContainer();
+    private CacheContainer cacheContainer = new CacheContainer();
     @Transactional
     public CacheContainer batchInsertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
-        CC.clear();
+        cacheContainer.clear();
     	logger.debug("DbService insertOrUpdate");
         basicData.forEach(block -> {
-            CC.blocks.add(block);
-            CC.transactions.addAll(block.getTransactionList());
+            cacheContainer.blocks.add(block);
+            cacheContainer.transactions.addAll(block.getTransactionList());
             // 区块交易列表设置为空，防止redis缓存数据剧增
             block.setTransactionList(null);
         });
         // 批量入库区块数据并更新redis缓存
-        if (!CC.blocks.isEmpty()) {
-            blockMapper.batchInsert(CC.blocks);
+        if (!cacheContainer.blocks.isEmpty()) {
+            blockMapper.batchInsert(cacheContainer.blocks);
         }
         // 批量入库交易数据并更新redis缓存
-        if (!CC.transactions.isEmpty()) {
-            transactionMapper.batchInsert(CC.transactions);
+        if (!cacheContainer.transactions.isEmpty()) {
+            transactionMapper.batchInsert(cacheContainer.transactions);
         }
         // 统计数据入库并更新redis缓存
         NetworkStatStage nsr = bizData.getNetworkStatStage();
         Set<NetworkStat> networkStats = nsr.exportNetworkStat();
         if (!networkStats.isEmpty()) {
             customNetworkStatMapper.batchInsertOrUpdateSelective(networkStats, NetworkStat.Column.values());
-            CC.networkStats.addAll(networkStats);
+            cacheContainer.networkStats.addAll(networkStats);
         }
         // ****************批量新增或更新质押相关数据*******************
         StakingStage ser = bizData.getStakingStage();
@@ -130,6 +130,6 @@ public class DbService {
         Set<RpPlan> planSet = rs.exportRpPlanSet();
         if(!planSet.isEmpty())rpPlanMapper.batchInsert(new ArrayList <>(planSet));
 
-        return CC;
+        return cacheContainer;
     }
 }

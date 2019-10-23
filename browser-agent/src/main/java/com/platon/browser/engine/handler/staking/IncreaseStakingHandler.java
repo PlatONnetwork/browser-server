@@ -44,7 +44,7 @@ public class IncreaseStakingHandler implements EventHandler {
             latestStaking.updateWithIncreaseStakingParam(param);
             param.setNodeName(latestStaking.getStakingName());
             stakingStage.modifyStaking(latestStaking,tx);
-            tx.setTxInfo(JSONObject.toJSONString(param));
+            tx.setTxInfo(JSON.toJSONString(param));
         } catch (NoSuchBeanException e) {
             logger.error("无法修改质押信息: {}",e.getMessage());
         }

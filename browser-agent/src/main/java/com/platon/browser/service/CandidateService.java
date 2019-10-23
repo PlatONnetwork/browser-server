@@ -80,8 +80,8 @@ public class CandidateService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
 
@@ -105,8 +105,8 @@ public class CandidateService {
                 logger.error("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错,将重试:{}", e1.getMessage());
                 try {
                     TimeUnit.SECONDS.sleep(1L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    logger.error("",ex);
                 }
             }
         }
@@ -136,8 +136,8 @@ public class CandidateService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
 
@@ -160,8 +160,8 @@ public class CandidateService {
                 logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:", e1);
                 try {
                     TimeUnit.SECONDS.sleep(1L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    logger.error("",ex);
                 }
             }
         }
@@ -269,8 +269,8 @@ public class CandidateService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }
@@ -292,8 +292,8 @@ public class CandidateService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }

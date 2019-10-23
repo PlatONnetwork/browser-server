@@ -2,7 +2,6 @@ package com.platon.browser.engine.stage;
 
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.Vote;
-import com.platon.browser.dto.CustomAddress;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomVote;
 

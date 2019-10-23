@@ -3,7 +3,6 @@ package com.platon.browser.engine.handler.proposal;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomNodeOpt;
-import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.cache.CacheHolder;
 import com.platon.browser.engine.cache.NodeCache;

@@ -1,11 +1,12 @@
 package com.platon.browser.task;
 
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
-import com.platon.browser.engine.cache.*;
+import com.platon.browser.engine.cache.AddressCacheUpdater;
+import com.platon.browser.engine.cache.CacheHolder;
+import com.platon.browser.engine.cache.NodeCache;
+import com.platon.browser.engine.cache.StakingCacheUpdater;
 import com.platon.browser.engine.stage.BlockChainStage;
 import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.*;
@@ -190,16 +191,16 @@ public class BlockSyncTask extends BaseTask{
                 commitBlockNumber = blocks.get(blocks.size()-1).getNumber();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    logger.error("",ex);
                 }
             }
         } else {
             logger.info("当前链最高块({}),等待下一批块...",curChainBlockNumber);
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
         return true;
@@ -240,8 +241,8 @@ public class BlockSyncTask extends BaseTask{
                     logger.error("【更新统计缓存出错,将重试:",e);
                     try {
                         TimeUnit.SECONDS.sleep(1L);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        logger.error("",e);
                     }
                 }
             }
@@ -255,8 +256,8 @@ public class BlockSyncTask extends BaseTask{
                     logger.error("【更新交易缓存出错,将重试:",e);
                     try {
                         TimeUnit.SECONDS.sleep(1L);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        logger.error("",e);
                     }
                 }
             }
@@ -270,8 +271,8 @@ public class BlockSyncTask extends BaseTask{
                     logger.error("【更新区块缓存出错,将重试:",e);
                     try {
                         TimeUnit.SECONDS.sleep(1L);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        logger.error("",e);
                     }
                 }
             }
