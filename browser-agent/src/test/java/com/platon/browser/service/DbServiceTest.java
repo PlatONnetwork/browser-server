@@ -95,15 +95,15 @@ public class DbServiceTest extends TestBase {
         bcs.getStakingStage().insertStaking(stakings.get(0));
         bcs.getStakingStage().insertDelegation(delegations.get(0));
         bcs.getStakingStage().insertUnDelegation(unDelegations.get(0));
-        dbService.insertOrUpdate(blocks,bcs);
+        dbService.batchInsertOrUpdate(blocks,bcs);
 
         bcs = new BlockChainStage();
         bcs.getStakingStage().updateNode(nodes.get(0));
         bcs.getStakingStage().updateStaking(stakings.get(0));
         bcs.getStakingStage().updateDelegation(delegations.get(0));
         bcs.getStakingStage().updateUnDelegation(unDelegations.get(0));
-        dbService.insertOrUpdate(blocks,bcs);
-        verify(dbService, times(2)).insertOrUpdate(anyList(),any(BlockChainStage.class));
+        dbService.batchInsertOrUpdate(blocks,bcs);
+        verify(dbService, times(2)).batchInsertOrUpdate(anyList(),any(BlockChainStage.class));
 
     }
 }
