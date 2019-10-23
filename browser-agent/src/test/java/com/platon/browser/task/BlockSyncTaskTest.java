@@ -2,7 +2,10 @@ package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
 import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
+import com.platon.browser.dto.CustomBlock;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.stage.BlockChainStage;
@@ -15,6 +18,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
@@ -58,6 +62,13 @@ public class BlockSyncTaskTest extends TestBase {
     @Mock
     private TaskCacheService taskCacheService;
 
+    @Mock
+    private BlockCacheService blockCacheService;
+    @Mock
+    private TransactionCacheService transactionCacheService;
+    @Mock
+    private NetworkStatCacheService networkStatCacheService;
+
     @Before
     public void setup(){
         ReflectionTestUtils.setField(target, "cacheHolder", cacheHolder);
@@ -71,6 +82,9 @@ public class BlockSyncTaskTest extends TestBase {
         ReflectionTestUtils.setField(target, "stakingCacheUpdater", stakingCacheUpdater);
         ReflectionTestUtils.setField(target, "addressCacheUpdater", addressCacheUpdater);
         ReflectionTestUtils.setField(target, "taskCacheService", taskCacheService);
+        ReflectionTestUtils.setField(target, "blockCacheService", blockCacheService);
+        ReflectionTestUtils.setField(target, "transactionCacheService", transactionCacheService);
+        ReflectionTestUtils.setField(target, "networkStatCacheService", networkStatCacheService);
     }
 
     @Test
@@ -94,6 +108,17 @@ public class BlockSyncTaskTest extends TestBase {
         when(blockChain.getCurVerifier()).thenReturn(new HashMap<>());
         when(blockChain.getPreValidator()).thenReturn(new HashMap<>());
         when(blockChain.getCurValidator()).thenReturn(new HashMap<>());
+
+        CustomBlock cb = new CustomBlock();
+        cb.setNumber(888l);
+        when(blockChain.getCurBlock()).thenReturn(cb);
+
+        DbService.CacheContainer cc = new DbService.CacheContainer();
+        cc.networkStats.add(new NetworkStat());
+        cc.transactions.add(new CustomTransaction());
+        cc.blocks.add(new CustomBlock());
+
+        when(dbService.batchInsertOrUpdate(any(),any())).thenReturn(cc);
 
         BlockChainStage bcs = new BlockChainStage();
         bcs.getStakingStage().insertNode(nodes.get(0));

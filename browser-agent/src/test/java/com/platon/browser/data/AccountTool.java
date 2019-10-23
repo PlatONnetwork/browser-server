@@ -3,7 +3,6 @@
 //import com.alibaba.fastjson.JSON;
 //import com.platon.browser.engine.bean.AnnualizedRateInfo;
 //import com.platon.browser.engine.bean.PeriodValueElement;
-//import com.platon.browser.engine.bean.keybase.KeyBaseUser;
 //import com.platon.browser.enums.InnerContractAddrEnum;
 //import org.bouncycastle.util.encoders.Hex;
 //import org.junit.Test;
@@ -21,6 +20,9 @@
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
 //import java.math.RoundingMode;
+//import java.util.concurrent.CountDownLatch;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 //
 ///**
 // * @Auther: Chendongming
@@ -39,18 +41,32 @@
 ////    private Credentials credentials = WalletUtils.loadCredentials("88888888","D:\\Workspace\\browser-server\\browser-agent\\src\\test\\resources\\0127de1d120dc61b57ab51afcc0fa59022a1be94.json");
 //
 //    // 充钱
-//    //@Test
+//    @Test
 //    public void charge() throws Exception {
-//        Transfer.sendFunds(
-//                currentValidWeb3j,
-//                credentials,
-//                chainId,
-//                "0x0127de1d120dc61b57ab51afcc0fa59022a1be94",
-//                BigDecimal.valueOf(5),
-//                Convert.Unit.LAT
-//        ).send();
-//        BigInteger balance = currentValidWeb3j.platonGetBalance("0x0127de1d120dc61b57ab51afcc0fa59022a1be94", DefaultBlockParameterName.LATEST).send().getBalance();
-//        logger.debug("balance:{}",balance);
+//        ExecutorService executor = Executors.newFixedThreadPool(100);
+//
+//        while (true){
+//            CountDownLatch latch = new CountDownLatch(100);
+//            for (int i=0;i<100;i++){
+//                executor.submit(()->{
+//                    try {
+//                        Transfer.sendFunds(
+//                                currentValidWeb3j,
+//                                credentials,
+//                                chainId,
+//                                "0x0127de1d120dc61b57ab51afcc0fa59022a1be94",
+//                                BigDecimal.valueOf(5),
+//                                Convert.Unit.VON
+//                        ).send();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        latch.countDown();
+//                    }
+//                });
+//            }
+//            latch.await();
+//        }
 //    }
 //
 //    //@Test
@@ -84,7 +100,7 @@
 //    public void getIncentiveBalance(){
 //        // 激励池账户地址
 //        Web3j web3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
-//        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.address;
+//        String incentivePoolAccountAddr = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
 //        try {
 //            // 根据激励池地址查询前一增发周期末激励池账户余额：查询前一增发周期末块高时的激励池账户余额
 //            BigInteger incentivePoolAccountBalance = web3j.platonGetBalance(incentivePoolAccountAddr, DefaultBlockParameter.valueOf(BigInteger.valueOf(3399)))
@@ -703,8 +719,6 @@
 //                "  ]\n" +
 //                "}\n";
 //
-//        KeyBaseUser ku = JSON.parseObject(str, KeyBaseUser.class);
-//        System.out.println(ku);
 //    }
 //
 //}

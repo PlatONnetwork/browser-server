@@ -34,7 +34,7 @@ public class TpsCalcCache {
             // 离now时间差大于等于10秒的都需要清理
             Set<Long> invalid = new HashSet<>();
             cacheMap.keySet().forEach(second->{
-                if(now-second>=10) invalid.add(second);
+                if(now-second>=100) invalid.add(second);
             });
             cacheMap.keySet().removeAll(invalid);
         }finally {
@@ -58,7 +58,7 @@ public class TpsCalcCache {
             }
             if(totalTxCount==0||maxSecond<minSecond) return 0;
             if (maxSecond==minSecond) return totalTxCount;
-            BigDecimal tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond),0,RoundingMode.FLOOR);
+            BigDecimal tps = BigDecimal.valueOf(totalTxCount).divide(BigDecimal.valueOf(maxSecond-minSecond),RoundingMode.CEILING);
             return tps.intValue();
         }finally {
             LOCK.readLock().unlock();

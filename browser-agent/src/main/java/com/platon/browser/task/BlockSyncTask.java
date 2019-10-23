@@ -1,5 +1,7 @@
 package com.platon.browser.task;
 
+import com.platon.browser.dao.entity.Block;
+import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.engine.BlockChain;
@@ -203,6 +205,13 @@ public class BlockSyncTask extends BaseTask{
         return true;
     }
 
+
+    @Autowired
+    private BlockCacheService blockCacheService;
+    @Autowired
+    private TransactionCacheService transactionCacheService;
+    @Autowired
+    private NetworkStatCacheService networkStatCacheService;
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
             // 入库前更新统计信息
@@ -217,7 +226,55 @@ public class BlockSyncTask extends BaseTask{
             // 合并网络状态统计任务缓存
             taskCacheService.mergeTaskNetworkStatCache();
             // 串行批量入库
-            dbService.insertOrUpdate(basicData,bizData);
+            DbService.CacheContainer cc = dbService.batchInsertOrUpdate(basicData,bizData);
+
+            // 批量更新统计缓存
+            if(!cc.networkStats.isEmpty()){
+                while (true)try{
+                    BigInteger currNum = blockChain.getCurBlock().getBlockNumber();
+                    cc.networkStats.forEach(ns->ns.setCurrentNumber(currNum.longValue()));
+                    networkStatCacheService.update(cc.networkStats);
+                    cc.networkStats.clear(); // 释放内存
+                    break;
+                }catch (Exception e){
+                    logger.error("【更新统计缓存出错,将重试:",e);
+                    try {
+                        TimeUnit.SECONDS.sleep(1L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            // 批量更新交易缓存
+            if(!cc.transactions.isEmpty()){
+                while (true)try{
+                    transactionCacheService.update(new HashSet<>(cc.transactions));
+                    cc.transactions.clear(); // 释放内存
+                    break;
+                }catch (Exception e){
+                    logger.error("【更新交易缓存出错,将重试:",e);
+                    try {
+                        TimeUnit.SECONDS.sleep(1L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            // 批量更新区块缓存
+            if(!cc.blocks.isEmpty()){
+                while (true)try{
+                    blockCacheService.update(new HashSet<>(cc.blocks));
+                    cc.blocks.clear(); // 释放内存
+                    break;
+                }catch (Exception e){
+                    logger.error("【更新区块缓存出错,将重试:",e);
+                    try {
+                        TimeUnit.SECONDS.sleep(1L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
             // 清除暂存区
             blockChain.commitResult();
         }catch (Exception e){
