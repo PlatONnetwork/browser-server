@@ -262,8 +262,8 @@ public class StakingServiceImpl implements StakingService {
 			if (StringUtils.isNotBlank(stakingNode.getExternalName())) {
 				resp.setExternalUrl(blockChainConfig.getKeyBase() + stakingNode.getExternalName());
 			}
-			if (StringUtils.isNotBlank(stakingNode.getStatRewardValue())) {
-				resp.setRewardValue(stakingNode.getStatRewardValue());
+			if (StringUtils.isNotBlank(stakingNode.getFeeRewardValue())) {
+				resp.setRewardValue(stakingNode.getFeeRewardValue());
 			}
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());

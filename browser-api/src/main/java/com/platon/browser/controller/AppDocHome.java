@@ -90,6 +90,7 @@ public interface AppDocHome {
      */
 	@ApiOperation(value = "topic/block/statistic/new", nickname = "", notes = "", response = BlockStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "topic/block/statistic/new")
+	@PostMapping(value = "home/blockStatistic", produces = { "application/json" })
 	BaseResp<BlockStatisticNewResp> blockStatisticNew();
 	
     /**
@@ -120,12 +121,23 @@ public interface AppDocHome {
      *       "addressQty":"",          //地址数
      *       "proposalQty":"",         //总提案数
      *       "doingProposalQty":""     //进行中提案数
+     *       "blockList":[
+     *       {
+     *       	"isRefresh":true // 是否更新,false不更新区块，true更新区块
+     *          "number":33,           //区块高度
+     *          "timestamp":33333,     //出块时间
+     *          "serverTime":44444,    //服务器时间
+     *          "nodeId":"",           //出块节点id
+     *          "nodeName":"",         //出块节点名称
+     *          "statTxQty":333        //交易数
+     *       }
+     *    ]
      *    }
      * }
      */	
 	@ApiOperation(value = "/topic/chain/statistic/new", nickname = "", notes = "", response = ChainStatisticNewResp.class, tags = { "Home" })
 	@SubscribeMapping(value = "/topic/chain/statistic/new")
-	@PostMapping(value = "chain/statistic", produces = { "application/json" })
+	@PostMapping(value = "home/chainStatistic", produces = { "application/json" })
 	BaseResp<ChainStatisticNewResp> chainStatisticNew();
 	
 	
@@ -136,6 +148,7 @@ public interface AppDocHome {
      * @apiGroup home
      * @apiDescription
      * 1. 功能：推送最新8条区块信息<br/>
+     * (移到chainStatisticNew接口实现)
      * 2. 实现逻辑：<br/>
      * - 查询redis结构：browser:blocks<br/>
      * - 5s全量推送一次

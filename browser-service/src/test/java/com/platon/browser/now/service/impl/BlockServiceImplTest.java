@@ -3,6 +3,8 @@ package com.platon.browser.now.service.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,8 +59,7 @@ public class BlockServiceImplTest extends TestBase{
 	@Test
 	public void blockListByNodeIdDownload() {
 		String nodeId = "0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc";
-		String date = "2019-08-22";
-		BlockDownload download = blockService.blockListByNodeIdDownload(nodeId, date, "en");
+		BlockDownload download = blockService.blockListByNodeIdDownload(nodeId, new Date().getTime(), "en", "+8");
 		assertNotNull(download.getData());
 	}
 	

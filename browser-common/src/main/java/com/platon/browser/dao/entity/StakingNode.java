@@ -99,6 +99,8 @@ public class StakingNode extends StakingKey {
     private String allDelegate;
     
     private Integer allDelegateQty;
+    
+    private String feeRewardValue;
 
     public String getDisnodeid() {
 		return disnodeid;
@@ -460,6 +462,14 @@ public class StakingNode extends StakingKey {
 		this.annualizedRateInfo = annualizedRateInfo;
 	}
 	
+	public String getFeeRewardValue() {
+		return feeRewardValue;
+	}
+
+	public void setFeeRewardValue(String feeRewardValue) {
+		this.feeRewardValue = feeRewardValue;
+	}
+
 	public String getAllDelegate() {
 		return allDelegate;
 	}

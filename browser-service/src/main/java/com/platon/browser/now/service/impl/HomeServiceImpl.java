@@ -198,6 +198,41 @@ public class HomeServiceImpl implements HomeService {
 			/** 查询redis统计信息并转换对应返回对象 */
 			BeanUtils.copyProperties(networkStatRedis, chainStatisticNewResp);
 		}
+		Long bNumber = networkStatRedis.getCurrentNumber();
+		/** 查询缓存最新的八条区块信息 */
+		List<Block> items = statisticCacheService.getBlockCache(0,8);
+		if(items.size() > 0 ) {
+			/**
+			 * 如果统计区块小于区块交易则重新查询新的区块
+			 */
+			Long dValue = items.get(0).getNumber()-bNumber;
+			if(dValue > 0) {
+				items = statisticCacheService.getBlockCacheByStartEnd(dValue, dValue+8);
+			} 
+		}
+		
+		List<BlockListNewResp> lists = new LinkedList<>();
+		for (int i=0; i < items.size(); i++) {
+			BlockListNewResp blockListNewResp = new BlockListNewResp();
+			BeanUtils.copyProperties(items.get(i), blockListNewResp);
+			blockListNewResp.setServerTime(new Date().getTime());
+			blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
+			blockListNewResp.setIsRefresh(true);
+			/**
+			 * 第一个块需要记录缓存，然后进行比对
+			 * 如果块没有增长则置为false
+			 */
+			if(i == 0) {
+				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
+				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
+					newBlockNum = items.get(i).getNumber();
+				} else {
+					blockListNewResp.setIsRefresh(false);
+				}
+			}
+			lists.add(blockListNewResp);
+		}
+		chainStatisticNewResp.setBlockList(lists);
 		return chainStatisticNewResp;
 	}
 
@@ -248,29 +283,41 @@ public class HomeServiceImpl implements HomeService {
 
 	@Override
 	public List<BlockListNewResp> blockListNew() {
-		/** 查询缓存最新的八条区块信息 */
-		List<Block> items = statisticCacheService.getBlockCache(0,8);
+//		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+//		Long bNumber = networkStatRedis.getCurrentNumber();
+//		/** 查询缓存最新的八条区块信息 */
+//		List<Block> items = statisticCacheService.getBlockCache(0,8);
+//		if(items.size() > 0 ) {
+//			/**
+//			 * 如果统计区块小于区块交易则重新查询新的区块
+//			 */
+//			Long dValue = items.get(0).getNumber()-bNumber;
+//			if(dValue > 0) {
+//				items = statisticCacheService.getBlockCache(dValue.intValue()/8+1, 8);
+//			} 
+//		}
+//		
 		List<BlockListNewResp> lists = new LinkedList<>();
-		for (int i=0; i < items.size(); i++) {
-			BlockListNewResp blockListNewResp = new BlockListNewResp();
-			BeanUtils.copyProperties(items.get(i), blockListNewResp);
-			blockListNewResp.setServerTime(new Date().getTime());
-			blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
-			blockListNewResp.setIsRefresh(true);
-			/**
-			 * 第一个块需要记录缓存，然后进行比对
-			 * 如果块没有增长则置为false
-			 */
-			if(i == 0) {
-				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
-				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
-					newBlockNum = items.get(i).getNumber();
-				} else {
-					blockListNewResp.setIsRefresh(false);
-				}
-			}
-			lists.add(blockListNewResp);
-		}
+//		for (int i=0; i < items.size(); i++) {
+//			BlockListNewResp blockListNewResp = new BlockListNewResp();
+//			BeanUtils.copyProperties(items.get(i), blockListNewResp);
+//			blockListNewResp.setServerTime(new Date().getTime());
+//			blockListNewResp.setTimestamp(items.get(i).getTimestamp().getTime());
+//			blockListNewResp.setIsRefresh(true);
+//			/**
+//			 * 第一个块需要记录缓存，然后进行比对
+//			 * 如果块没有增长则置为false
+//			 */
+//			if(i == 0) {
+//				log.debug("newBlockNum:{},item number:{},isFresh:{}",newBlockNum , items.get(i).getNumber(),blockListNewResp.getIsRefresh());
+//				if(items.get(i).getNumber().longValue() != newBlockNum.longValue()) {
+//					newBlockNum = items.get(i).getNumber();
+//				} else {
+//					blockListNewResp.setIsRefresh(false);
+//				}
+//			}
+//			lists.add(blockListNewResp);
+//		}
 		return lists;
 	}
 

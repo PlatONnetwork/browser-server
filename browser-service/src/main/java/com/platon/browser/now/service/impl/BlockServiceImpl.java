@@ -72,9 +72,32 @@ public class BlockServiceImpl implements BlockService {
 	public RespPage<BlockListResp> blockList(PageReq req) {
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
+		/** 查询现阶段最大区块数 */
+		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+		Long bNumber = networkStatRedis.getCurrentNumber();
 		/** 小于50万条查询redis */
 		if (req.getPageNo().intValue() * req.getPageSize().intValue() < BrowserConst.MAX_NUM) {
-			List<Block> items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
+			/**
+			 * 当页号等于1，重新获取数据，与首页保持一致
+			 */
+			List<Block> items = new ArrayList<>();
+			if(req.getPageNo().intValue() == 1) {
+				/** 查询缓存最新的八条区块信息 */
+				items = statisticCacheService.getBlockCache(0,1);
+				if(items.size() > 0 ) {
+					/**
+					 * 如果统计区块小于区块交易则重新查询新的区块
+					 */
+					Long dValue = items.get(0).getNumber()-bNumber;
+					if(dValue > 0) {
+						items = statisticCacheService.getBlockCache(dValue.intValue()/req.getPageSize()+1,req.getPageSize());
+					} else {
+						items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
+					}
+				}
+			} else {
+				items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
+			}
 			for (Block blockRedis:items) {
 				BlockListResp blockListNewResp = new BlockListResp();
 				BeanUtils.copyProperties(blockRedis, blockListNewResp);
@@ -96,10 +119,8 @@ public class BlockServiceImpl implements BlockService {
 				lists.add(blockListNewResp);
 			}
 		}
-		/** 查询现阶段最大区块数 */
-		NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(networkStatRedis.getCurrentNumber());
+		page.setTotal(bNumber);
 		respPage.init(page, lists);
 		return respPage;
 	}
@@ -136,11 +157,11 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	@Override
-	public BlockDownload blockListByNodeIdDownload(String nodeId, String date, String local) {
+	public BlockDownload blockListByNodeIdDownload(String nodeId, Long date, String local, String timeZone) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
 		String msg = dateFormat.format(now);
-        logger.info("导出数据起始日期：{},结束日期：{}",date,msg);
+        logger.info("导出数据起始日期：{},结束时间：{}",date,msg);
         /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
         /** 设置根据时间和nodeId查询数据 */
@@ -148,19 +169,14 @@ public class BlockServiceImpl implements BlockService {
         blockExample.setOrderByClause("number desc ");
         Criteria criteria = blockExample.createCriteria();
         criteria.andNodeIdEqualTo(nodeId);
-        try {
-        	criteria.andCreateTimeBetween(dateFormat.parse(date), now);
-		} catch (Exception e) {
-			logger.error("导出数据起始日期有误：{},{}",date,e.getMessage());
-    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
-		}
+        criteria.andCreateTimeBetween(new Date(date), now);
         List<Block> blockList = blockMapper.selectByExample(blockExample);
         /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
         blockList.forEach(block->{
             Object[] row = {
                     block.getNumber(),
-                    DateUtil.getGMT(block.getTimestamp()),
+                    DateUtil.timeZoneTransfer(block.getTimestamp(), "0", timeZone),
                     block.getStatTxQty(),
                     EnergonUtil.format(Convert.fromVon(block.getBlockReward(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN)),
                     EnergonUtil.format(Convert.fromVon(block.getStatTxFee(), Convert.Unit.LAT).setScale(18,RoundingMode.DOWN))

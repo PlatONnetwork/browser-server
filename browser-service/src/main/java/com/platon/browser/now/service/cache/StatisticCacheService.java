@@ -24,6 +24,14 @@ public interface StatisticCacheService {
 	public List<Block> getBlockCache(Integer pageNum, Integer pageSize);
 	
 	/**
+	 * 根据开始结束获取区块缓存数据
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	public List<Block> getBlockCacheByStartEnd(Long start, Long end);
+	
+	/**
 	 * 获取缓存统计信息
 	 * @method getNetworkStatCache
 	 * @return

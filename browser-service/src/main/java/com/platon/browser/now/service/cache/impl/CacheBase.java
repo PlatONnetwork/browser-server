@@ -101,4 +101,23 @@ public class CacheBase {
         return cpi;
     }
     
+    protected <T> CachePageInfo <T> getCachePageInfoByStartEnd(String cacheKey,long start,long end,T target, I18nUtil i18n, RedisTemplate<String,String> redisTemplate, long maxItemNum){
+        RespPage<T> page = new RespPage<>();
+        page.setErrMsg(i18n.i(I18nEnum.SUCCESS));
+
+        CachePageInfo<T> cpi = new CachePageInfo<>();
+        Long size = redisTemplate.opsForZSet().size(cacheKey);
+        Long pagingTotalCount = size;
+        if(pagingTotalCount>maxItemNum){
+            // 如果缓存数量大于maxItemNum，则以maxItemNum作为分页数量
+            pagingTotalCount = maxItemNum;
+        }
+        page.setTotalCount(pagingTotalCount.intValue());
+
+        Set<String> cache = redisTemplate.opsForZSet().reverseRange(cacheKey, start, end);
+        cpi.data = cache;
+        cpi.page = page;
+        return cpi;
+    }
+    
 }

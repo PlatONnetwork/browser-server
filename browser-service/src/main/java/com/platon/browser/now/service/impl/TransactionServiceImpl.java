@@ -17,8 +17,6 @@ import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
-import com.platon.browser.enums.RetEnum;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.param.*;
@@ -167,7 +165,7 @@ public class TransactionServiceImpl implements TransactionService {
     	return lists;
     }
 
-    public AccountDownload transactionListByAddressDownload(String address, String date,String local) {
+    public AccountDownload transactionListByAddressDownload(String address, Long date,String local, String timeZone) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentServerTime = new Date();
         String msg = dateFormat.format(currentServerTime);
@@ -179,13 +177,8 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionExample.Criteria second = transactionExample.createCriteria();
         first.andFromEqualTo(address);
         second.andToEqualTo(address);
-        try {
-        	first.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
-        	second.andCreateTimeBetween(dateFormat.parse(date), currentServerTime);
-		} catch (Exception e) {
-			logger.error("导出数据起始日期有误：{},{}",date,e.getMessage());
-    		throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.DOWNLOAD_ACCOUNT_CSV_TIME));
-		}
+    	first.andCreateTimeBetween(new Date(date), currentServerTime);
+    	second.andCreateTimeBetween(new Date(date), currentServerTime);
 
         /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
@@ -204,7 +197,7 @@ public class TransactionServiceImpl implements TransactionService {
             Object[] row = {
                     transaction.getHash(),
                     transaction.getBlockNumber(),
-                    DateUtil.getGMT(transaction.getTimestamp()),
+                    DateUtil.timeZoneTransfer(transaction.getTimestamp(), "0", timeZone),
                     i18n.getMessageForStr(CustomTransaction.TxTypeEnum.getEnum(transaction.getTxType()).toString(), local),
                     transaction.getFrom(),
                     transaction.getTo(),
