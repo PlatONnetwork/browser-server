@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TaskNetworkStat  extends TaskBase{
-    private volatile String issueValue;
-    private volatile String turnValue;
-    private volatile Long currentNumber;
+    private String issueValue;
+    private String turnValue;
+    private Long currentNumber;
 }
