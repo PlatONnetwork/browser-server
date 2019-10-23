@@ -62,7 +62,7 @@ public class DbService {
             networkStats.clear();
         }
     }
-    public static final CacheContainer CC = new CacheContainer(); 
+    private CacheContainer CC = new CacheContainer();
     @Transactional
     public CacheContainer batchInsertOrUpdate ( List <CustomBlock> basicData, BlockChainStage bizData ) {
         CC.clear();
