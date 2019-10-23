@@ -46,6 +46,7 @@ public class ReportValidatorHandler implements EventHandler {
         //通过nodeId获取多签举报的质押信息列表，因为举报Data可以举报多个节点
         ReportValidatorParam param = tx.getTxParam(ReportValidatorParam.class);
         //通过结果获取，证据中的举报人的nodeId
+        param.getData();
         try {
             CustomNode node = nodeCache.getNode(HexTool.prefix(param.getVerify()));
             CustomStaking latestStaking = node.getLatestStaking();

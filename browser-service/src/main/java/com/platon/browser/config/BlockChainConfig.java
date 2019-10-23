@@ -97,10 +97,6 @@ public class BlockChainConfig {
     //【质押】节点质押退回锁定的结算周期数
     private BigInteger unStakeRefundSettlePeriodCount;
 
-    //【惩罚】违规-低出块率-触发处罚的出块阈值(块数)
-    private BigDecimal slashBlockThreshold;
-    //【惩罚】低出块率处罚多少个区块奖励
-    private BigDecimal slashBlockCount;
     //【惩罚】双签处罚百分比
     private BigDecimal duplicateSignSlashRate;
     //【惩罚】双签奖励百分比
@@ -212,16 +208,10 @@ public class BlockChainConfig {
         this.delegateThreshold=Convert.fromVon(dec.getStaking().getMinimumThreshold(), Convert.Unit.LAT);
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeRatio();
-        //【惩罚】违规-低出块率-触发处罚的出块率阈值 60%
-        this.slashBlockThreshold=dec.getSlashing().getPackAmountAbnormal();
-        //【惩罚】低出块率处罚多少个区块奖励
-        this.slashBlockCount=dec.getSlashing().getNumberOfBlockRewardForSlashing();
-        //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing();
         //【惩罚】双签奖励百分比
-        //this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
+        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(10000),2, RoundingMode.FLOOR);
         //【惩罚】举报证据有效周期数
         this.evidenceValidEpoch=dec.getSlashing().getEvidenceValidEpoch();
 

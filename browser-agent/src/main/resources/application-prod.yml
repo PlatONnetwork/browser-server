@@ -48,20 +48,20 @@ platon.config:
   incentiveRateFromIssue: 0.8
   #每个共识轮中回退多少个块是选举下一轮验证人的时机
   electionBackwardBlockCount: 20
-  #10年内基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
   foundationSubsidies: {
-    '1':62215742.4869165,
-    '2':55965742.4869165,
-    '3':49559492.4869165,
-    '4':42993086.2369165,
-    '5':36262519.8306666,
-    '6':29363689.2642633,
-    '7':22292387.9336939,
-    '8':15044304.0698633,
-    '9':7615018.1094369
+    '1':0,
+    '2':55965742,
+    '3':49559492,
+    '4':42993086,
+    '5':36262520,
+    '6':29363689,
+    '7':22292388,
+    '8':15044304,
+    '9':7615018
   }
   # 初始内置节点默认质押金额(LAT)
-  defaultStakingLockedAmount: 10000000
+  defaultStakingLockedAmount: 1500000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/PlatONnetwork/PIPs/github/blob/master/PIPs/PIP-{pip_id}.md
   #keysBase网址
