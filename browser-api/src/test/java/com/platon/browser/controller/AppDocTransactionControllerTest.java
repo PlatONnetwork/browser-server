@@ -72,8 +72,9 @@ public class AppDocTransactionControllerTest {
     	mockMvc
     		.perform(MockMvcRequestBuilders.get("/transaction/addressTransactionDownload")
     		.param("address", "0x8b77ac9fabb6fe247ee91ca07ea4f62c6761e79b")
-    		.param("date", "2019-08-20")
+    		.param("date", "1571813653000")
     		.param("local", "en")
+    		.param("timeZone", "+8")
     		.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
     		.andDo(result -> {
 				result.getResponse().setCharacterEncoding("UTF-8");

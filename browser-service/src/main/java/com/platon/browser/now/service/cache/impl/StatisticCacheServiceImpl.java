@@ -84,4 +84,18 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 		return new TransactionCacheDto(transactionRedisList, cpi.page);
 	}
 
+	@Override
+	public List<Block> getBlockCacheByStartEnd(Long start, Long end) {
+		/** 分页根据key来获取数据 */
+		CachePageInfo<Class<Block>> cpi = this.getCachePageInfoByStartEnd(blockCacheKey, start, end, Block.class, i18n,
+				redisTemplate, maxItemNum);
+		List<Block> blockRedisList = new LinkedList<>();
+		cpi.data.forEach(str -> {
+			/** 获取数据转换成区块对象 */
+			Block blockRedis = JSON.parseObject(str, Block.class);
+			blockRedisList.add(blockRedis);
+		});
+		return blockRedisList;
+	}
+
 }

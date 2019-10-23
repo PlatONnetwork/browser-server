@@ -50,7 +50,7 @@ public interface TransactionService {
      * @param date
      * @return
      */
-    AccountDownload transactionListByAddressDownload(String address, String date, String local);
+    AccountDownload transactionListByAddressDownload(String address, Long date, String local, String timeZone);
 
     /**
      * 根据交易hash查询交易详情

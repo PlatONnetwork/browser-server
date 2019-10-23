@@ -51,6 +51,7 @@
     <result column="node_create_time" jdbcType="TIMESTAMP" property="nodeCreateTime" />
     <result column="node_update_time" jdbcType="TIMESTAMP" property="nodeUpdateTime" />
     <result column="external_name" jdbcType="VARCHAR" property="externalName" />
+    <result column="fee_reward_value" jdbcType="VARCHAR" property="feeRewardValue" />
   </resultMap>
   <select id="selectByNodeId" resultMap="BaseResultMap">
     select

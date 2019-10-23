@@ -65,8 +65,9 @@ public class AppDocBlockControllerTest {
     	mockMvc
     		.perform(MockMvcRequestBuilders.get("/block/blockListByNodeIdDownload")
     		.param("nodeId", "0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc")
-    		.param("date", "2019-08-20")
+    		.param("date", "1571813653000")
     		.param("local", "en")
+    		.param("timeZone", "+8")
     		.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
     		.andDo(result -> {
 				result.getResponse().setCharacterEncoding("UTF-8");

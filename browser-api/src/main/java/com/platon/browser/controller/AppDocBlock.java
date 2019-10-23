@@ -112,8 +112,9 @@ public interface AppDocBlock {
 	@ApiOperation(value = "block/blockListByNodeIdDownload", nickname = "", notes = "", tags = { "Block" })
 	@GetMapping(value = "block/blockListByNodeIdDownload", produces = { "application/json" })
     void blockListByNodeIdDownload(@ApiParam(value = "nodeId ", required = true)@RequestParam(value = "nodeId", required = false)String nodeId,
-    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)String date,
-    		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true)String local,HttpServletResponse response);
+    		@ApiParam(value = "date ", required = true)@RequestParam(value = "date", required = true)Long date,
+    		@ApiParam(value = "local en或者zh-cn", required = true)@RequestParam(value = "local", required = true)String local,
+    		@ApiParam(value = "time zone", required = true)@RequestParam(value = "timeZone", required = true) String timeZone,HttpServletResponse response);
 	
 	
     /**

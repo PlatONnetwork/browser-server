@@ -1,5 +1,7 @@
 package com.platon.browser.res.home;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.CustomLatSerializer;
 
@@ -23,6 +25,8 @@ public class ChainStatisticNewResp {
 	private Integer addressQty; // 地址数
 	private Integer proposalQty; // 总提案数
 	private Integer doingProposalQty; // 进行中提案数
+	
+	private List<BlockListNewResp> blockList;
 	public Long getCurrentNumber() {
 		return currentNumber;
 	}
@@ -98,6 +102,11 @@ public class ChainStatisticNewResp {
 	public void setDoingProposalQty(Integer doingProposalQty) {
 		this.doingProposalQty = doingProposalQty;
 	}
-	
+	public List<BlockListNewResp> getBlockList() {
+		return blockList;
+	}
+	public void setBlockList(List<BlockListNewResp> blockList) {
+		this.blockList = blockList;
+	}
 	
 }
