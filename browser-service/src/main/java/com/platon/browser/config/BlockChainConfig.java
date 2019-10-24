@@ -209,9 +209,9 @@ public class BlockChainConfig {
         //【质押】节点质押退回锁定的结算周期数
         this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeRatio();
         //【惩罚】双签奖励万分比
-        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(10000),2,RoundingMode.FLOOR);
+        this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
         //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(100),2, RoundingMode.FLOOR);
+        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR);
         //【惩罚】举报证据有效周期数
         this.evidenceValidEpoch=dec.getSlashing().getEvidenceValidEpoch();
 
