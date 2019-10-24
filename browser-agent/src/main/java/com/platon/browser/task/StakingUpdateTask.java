@@ -65,11 +65,11 @@ public class StakingUpdateTask extends BaseTask{
                     KeyBaseUser keyBaseUser = HttpUtil.get(url,KeyBaseUser.class);
                     String userName = KeyBaseAnalysis.getKeyBaseUseName(keyBaseUser);
                     String icon = KeyBaseAnalysis.getKeyBaseIcon(keyBaseUser);
-                    if(StringUtils.isNotBlank(icon)&&!icon.equals(staking.getStakingIcon())){
+                    if(!icon.equals(staking.getStakingIcon())){
                         cache.setStakingIcon(icon);
                         taskCache.update(cache);
                     }
-                    if(StringUtils.isNotBlank(userName)&&!userName.equals(staking.getExternalName())){
+                    if(!userName.equals(staking.getExternalName())){
                         cache.setExternalName(userName);
                         taskCache.update(cache);
                     }
