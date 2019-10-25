@@ -213,6 +213,8 @@ public class BlockSyncTask extends BaseTask{
     private TransactionCacheService transactionCacheService;
     @Autowired
     private NetworkStatCacheService networkStatCacheService;
+    @Autowired
+    private EsService esService;
     private void batchSave(List<CustomBlock> basicData, BlockChainStage bizData) throws BusinessException {
         try{
             // 入库前更新统计信息
@@ -228,6 +230,9 @@ public class BlockSyncTask extends BaseTask{
             taskCacheService.mergeTaskNetworkStatCache();
             // 串行批量入库
             DbService.CacheContainer cc = dbService.batchInsertOrUpdate(basicData,bizData);
+
+            // 批量入库ES
+            esService.batchInsertOrUpdate(cc.blocks,cc.transactions,Collections.emptyList());
 
             // 批量更新统计缓存
             if(!cc.networkStats.isEmpty()){
