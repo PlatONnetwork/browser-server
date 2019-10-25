@@ -86,6 +86,8 @@ public class UnDelegateHandler implements EventHandler {
                 if (delegation.integerDelegateHas().compareTo(param.integerAmount()) > 0) {
                     //犹豫期金额>赎回金额，则从犹豫期金额中扣除
                     delegation.setDelegateHas(delegation.integerDelegateHas().subtract(param.integerAmount()).toString());
+                    // 4、解委托记录中的赎回被锁定的金额置零（当前实现是实时退回，此字段相当于作废了）
+                    unDelegation.setRedeemLocked("0");
                 } else {
                     //犹豫期金额<赎回金额，优先扣除所有犹豫期金额，不足的从锁定期金额中扣除
                     //差值 = 赎回金额 - 犹豫期金额
@@ -107,13 +109,17 @@ public class UnDelegateHandler implements EventHandler {
             if (sumAmount.compareTo(BigInteger.ZERO)==0) {
                 delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
-            //判断此委托赎回是否已经完成
-            if (unDelegation.integerRedeemLocked().compareTo(BigInteger.ZERO)==0) {
-                //锁定期赎回金额为0则表示：本次赎回的金额在犹豫期金额足够，全部扣除，本次委托赎回已经完成
-                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
-            } else {
-                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.getCode());
-            }
+
+//            //判断此委托赎回是否已经完成
+//            if (unDelegation.integerRedeemLocked().compareTo(BigInteger.ZERO)==0) {
+//                //锁定期赎回金额为0则表示：本次赎回的金额在犹豫期金额足够，全部扣除，本次委托赎回已经完成
+//                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
+//            } else {
+//                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.getCode());
+//            }
+
+            // 解委托实时生效
+            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
 
             //交易数据回填
             param.setNodeName(customStaking.getStakingName());
