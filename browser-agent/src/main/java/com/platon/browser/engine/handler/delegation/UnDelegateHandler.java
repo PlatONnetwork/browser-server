@@ -40,15 +40,18 @@ public class UnDelegateHandler implements EventHandler {
         CustomTransaction tx = context.getTransaction();
         UnDelegateParam param = tx.getTxParam(UnDelegateParam.class);
         try {
+            // 通过解委托参数中的nodeId获取节点信息
             CustomNode node = nodeCache.getNode(param.getNodeId());
             String msg = JSON.toJSONString(param);
             logger.debug("减持/撤销委托(赎回委托):{}", msg);
 
-            //根据委托赎回参数blockNumber找到对应当时委托的质押信息
+            // 通过解委托参数中的stakingBlockNum获取节点质押信息
             CustomStaking customStaking = node.getStakings().get(param.getStakingBlockNum());
 
-            //获取到对应质押节点的委托信息，key为委托地址（赎回委托交易发送地址）
+            // 通过解委托交易的from地址获对应的委托信息
             CustomDelegation delegation = customStaking.getDelegations().get(tx.getFrom());
+
+            // 创建解委托记录
             CustomUnDelegation unDelegation = new CustomUnDelegation();
             unDelegation.updateWithUnDelegateParam(param, tx);
             /*
@@ -56,45 +59,48 @@ public class UnDelegateHandler implements EventHandler {
              *  2.根据委托信息，判断，余额
              *  3.判断是否是全部退出
              *   a.yes
-             *       委托的犹豫期金额 + 锁定期金额 - 赎回委托的金额 < 最小委托金额，则全部退出，并创建赎回委托结构
+             *       委托的犹豫期金额 + 锁定期金额 - 赎回委托的金额 < 最小委托金额，则全部退出
              *   b.no
              *       b1.若委托犹豫期金额 >= 本次赎回委托的金额，则直接扣去相应的金额
              *       b2.若委托犹豫期金额 < 本次赎回委托的金额，优先扣除犹豫期所剩的金额
              * */
 
+            // 当前委托总额=犹豫期金额+锁定期金额
             BigInteger delegationSum = delegation.integerDelegateHas().add(delegation.integerDelegateLocked());
-            //配置文件中委托门槛单位是LAT
+            // 委托门槛（配置文件中委托门槛单位是LAT）
             BigDecimal delegateThresholdVon = Convert.toVon(chainConfig.getDelegateThreshold(), Convert.Unit.LAT);
             if (delegationSum.subtract(param.integerAmount()).compareTo(new BigInteger(delegateThresholdVon.toString())) < 0) {
-                //委托赎回金额为 =  原赎回金额 + 锁仓金额
-                delegation.setDelegateReduction("0");
+                // **************** 如果（当前委托总额-解委托中指定的金额）<委托门槛， 则此委托不再符合委托条件，做如下处理：****************
+                // 1、犹豫期金额全部退回
                 delegation.setDelegateHas("0");
+                // 2、锁定期金额全部退回
                 delegation.setDelegateLocked("0");
-                //设置赎回委托结构中的赎回锁定金额
+                // 3、赎回中金额置零（当前实现是实时退回，此字段相当于作废了）
+                delegation.setDelegateReduction("0");
+                // 4、解委托记录中的赎回被锁定的金额置零（当前实现是实时退回，此字段相当于作废了）
                 unDelegation.setRedeemLocked("0");
+                // 5、设置解委托真实的退回金额
                 unDelegation.setRealAmount(delegationSum.toString());
             } else {
+                // **************** 如果（当前委托总额-解委托中指定的金额）>=委托门槛， 则此委托依然符合委托条件，做如下处理：****************
                 if (delegation.integerDelegateHas().compareTo(param.integerAmount()) > 0) {
-                    //犹豫期的金额 > 赎回委托金额，直接扣除犹豫期金额
-                    //该委托的变更犹豫期金额 = 委托原本的犹豫期金额 - 委托赎回的金额
+                    //犹豫期金额>赎回金额，则从犹豫期金额中扣除
                     delegation.setDelegateHas(delegation.integerDelegateHas().subtract(param.integerAmount()).toString());
-
                 } else {
-                    //犹豫期金额 < 赎回委托金额，优先扣除所剩的犹豫期金额，不足的从锁定期金额中扣除
-                    //差值 = 要赎回的金额 - 犹豫期的金额
+                    //犹豫期金额<赎回金额，优先扣除所有犹豫期金额，不足的从锁定期金额中扣除
+                    //差值 = 赎回金额 - 犹豫期金额
                     BigInteger subHas = param.integerAmount().subtract(delegation.integerDelegateHas());
-                    //解委托后锁定期金额= 解委托前锁定期 - 差值
-                    delegation.setDelegateLocked(delegation.integerDelegateLocked().subtract(subHas).toString());
                     //犹豫期设置为零
                     delegation.setDelegateHas("0");
-                    //优先扣除所剩的犹豫期的金额，剩余委托赎回金额 = 原本需要赎回的金额 - 委托的犹豫期的金额
+                    //解委托后锁定期金额= 解委托前锁定期 - 差值
+                    delegation.setDelegateLocked(delegation.integerDelegateLocked().subtract(subHas).toString());
+                    //解委托记录中的赎回被锁定的金额置零（当前实现是实时退回，此字段相当于作废了）
                     unDelegation.setRedeemLocked("0");
-                    //设置委托中的赎回金额，经过分析后的委托赎回金额 = 委托赎回金额 + 委托锁定期金额
-                    //delegation.setDelegateReduction(delegation.integerDelegateReduction().add(param.integerAmount()).toString());
                 }
+                // 设置解委托真实的退回金额
                 unDelegation.setRealAmount(param.getAmount());
             }
-            //判断此赎回委托的交易对应的委托交易是否完成，若完成则将更新委托交易，设置成委托历史；委托犹豫期金额 + 委托锁定期金额 + 委托赎回金额，是否等于0
+            // 如果（委托犹豫期金额+委托锁定期金额+委托赎回金额）==0，则把委托状态设置为历史
             BigInteger sumAmount = delegation.integerDelegateHas() // 委托犹豫期金额
                     .add(delegation.integerDelegateLocked()) // +委托锁定期金额
                     .add(delegation.integerDelegateReduction());
@@ -115,10 +121,10 @@ public class UnDelegateHandler implements EventHandler {
 
             // 添加至解委托缓存
             nodeCache.addUnDelegation(unDelegation);
-            //更新分析委托结果
-            stakingStage.updateDelegation(delegation);
-            //新增分析委托赎回结果
+            // 将新的解委托记录放入待入库暂存区
             stakingStage.insertUnDelegation(unDelegation);
+            // 将委托记录放入待更新暂存区
+            stakingStage.updateDelegation(delegation);
         } catch (NoSuchBeanException e) {
             logger.error("{}", e.getMessage());
             throw  new NoSuchBeanException("缓存中找不到对应的解除质押信息:");

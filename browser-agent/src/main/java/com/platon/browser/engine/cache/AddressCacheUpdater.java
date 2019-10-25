@@ -105,7 +105,7 @@ public class AddressCacheUpdater {
                     stat.delegateLocked = stat.delegateLocked.add(delegation.integerDelegateLocked());
                     stat.delegateReduction = stat.delegateReduction.add(delegation.integerDelegateReduction());
                     stat.candidateCount = stat.candidateCount.add(BigInteger.ONE);
-                    Integer status = 0;
+                    /*Integer status = 0;
                     CustomStaking staking = new CustomStaking();
                     try {
                         staking = nodeCache.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
@@ -116,7 +116,7 @@ public class AddressCacheUpdater {
                     if (status.equals(CustomStaking.StatusEnum.EXITING.getCode()) || status.equals(CustomStaking.StatusEnum.EXITED.getCode())) {
                         stat.delegateUnlock = stat.delegateUnlock.add(staking.integerStatDelegateHas().add(staking.integerStatDelegateLocked()));
                         stat.delegateLocked = stat.delegateLocked.subtract(stat.delegateUnlock);
-                    }
+                    }*/
                 }
             }
             stat.redeemedValue = stat.stakingRedeemed.add(stat.delegateRedeemed);
