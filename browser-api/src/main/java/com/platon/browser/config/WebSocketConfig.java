@@ -45,20 +45,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic");
         // 全局使用的消息前缀（客户端订阅路径上会体现出来）
         config.setApplicationDestinationPrefixes("/app");
-        
-    	/**
-         * 设置单独发送到某个user需要添加的前缀，用户订阅地址/user/topic/td1地址后会去掉/user，并加上用户名（需要springsecurity支持）等唯一标识组成新的目的地发送回去，
-         * 对于这个url来说 加上后缀之后走代理。发送时需要制定用户名:convertAndSendToUser或者sendtouser注解.*/
-//    	config.setUserDestinationPrefix("/user");
-        
-        /*基于mq实现stomp代理，适用于集群。
-         * 以/topic和/queue开头的消息会发送到stomp代理中:mq等。
-         * 每个mq适用的前缀不一样且有限制。activemq支持stomp的端口为61613
-         */
-//        config.enableStompBrokerRelay("/topic","/queue").setRelayHost(brokenHost)
-//        	.setRelayPort(Integer.parseInt(brokenPort)).setSystemLogin(systemUserName)
-//        	.setSystemPasscode(systemPassword).setClientLogin(clientUserName)
-//        	.setClientPasscode(clientPassword);
+
+//        设置单独发送到某个user需要添加的前缀，用户订阅地址/user/topic/td1地址后会去掉/user，并加上用户名（需要springsecurity支持）等唯一标识组成新的目的地发送回去，
+//        对于这个url来说 加上后缀之后走代理。发送时需要制定用户名:convertAndSendToUser或者sendtouser注解.
     }
 
     /**

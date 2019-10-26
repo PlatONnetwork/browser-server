@@ -1,43 +1,29 @@
 package com.platon.browser.now.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.CustomStaking;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.entity.StakingExample.Criteria;
-import com.platon.browser.dao.entity.Transaction;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.HomeService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.home.QueryNavigationRequest;
-import com.platon.browser.res.home.BlockListNewResp;
-import com.platon.browser.res.home.BlockStatisticNewResp;
-import com.platon.browser.res.home.ChainStatisticNewResp;
-import com.platon.browser.res.home.QueryNavigationResp;
-import com.platon.browser.res.home.QueryNavigationStructResp;
-import com.platon.browser.res.home.StakingListNewResp;
-import com.platon.browser.res.home.StakingListResp;
+import com.platon.browser.res.home.*;
 import com.platon.browser.util.I18nUtil;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *  首页接口逻辑具体实现方法

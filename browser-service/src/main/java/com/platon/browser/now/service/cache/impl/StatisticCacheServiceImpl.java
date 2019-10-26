@@ -1,13 +1,5 @@
 package com.platon.browser.now.service.cache.impl;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
@@ -16,6 +8,13 @@ import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.util.I18nUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 获取缓存逻辑具体实现

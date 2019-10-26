@@ -1,13 +1,13 @@
 package com.platon.browser.serializer;
 
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * json序列化编辑器

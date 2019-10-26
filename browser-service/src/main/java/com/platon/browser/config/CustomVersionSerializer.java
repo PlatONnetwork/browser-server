@@ -1,14 +1,13 @@
 package com.platon.browser.config;
 
-import java.io.IOException;
-import java.math.BigInteger;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.platon.browser.util.VerUtil;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  *  返回版本转化实现类

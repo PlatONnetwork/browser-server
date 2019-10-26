@@ -1,33 +1,20 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.enums.I18nEnum;
+import com.platon.browser.enums.RetEnum;
+import com.platon.browser.now.service.StakingService;
+import com.platon.browser.req.staking.*;
+import com.platon.browser.res.BaseResp;
+import com.platon.browser.res.RespPage;
+import com.platon.browser.resp.staking.*;
+import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
-import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.enums.RetEnum;
-import com.platon.browser.now.service.StakingService;
-import com.platon.browser.req.staking.AliveStakingListReq;
-import com.platon.browser.req.staking.DelegationListByAddressReq;
-import com.platon.browser.req.staking.DelegationListByStakingReq;
-import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.req.staking.StakingOptRecordListReq;
-import com.platon.browser.res.BaseResp;
-import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.DelegationListByAddressResp;
-import com.platon.browser.resp.staking.DelegationListByStakingResp;
-import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingDetailsResp;
-import com.platon.browser.resp.staking.StakingOptRecordListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
-import com.platon.browser.util.I18nUtil;
+import javax.validation.Valid;
 
 /**
  *  验证人模块Contract。定义使用方法

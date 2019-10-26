@@ -1,33 +1,11 @@
 package com.platon.browser.now.service.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.platon.browser.dao.mapper.NodeOptMapper;
-import com.platon.browser.dao.mapper.StakingMapper;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.DelegationStaking;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.NodeOpt;
-import com.platon.browser.dao.entity.NodeOptExample;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.entity.StakingNode;
-import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.CustomDelegationMapper;
-import com.platon.browser.dao.mapper.CustomStakingMapper;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.*;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
@@ -36,23 +14,20 @@ import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
 import com.platon.browser.now.service.StakingService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
-import com.platon.browser.req.staking.AliveStakingListReq;
-import com.platon.browser.req.staking.DelegationListByAddressReq;
-import com.platon.browser.req.staking.DelegationListByStakingReq;
-import com.platon.browser.req.staking.HistoryStakingListReq;
-import com.platon.browser.req.staking.StakingDetailsReq;
-import com.platon.browser.req.staking.StakingOptRecordListReq;
+import com.platon.browser.req.staking.*;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.RespPage;
-import com.platon.browser.resp.staking.AliveStakingListResp;
-import com.platon.browser.resp.staking.DelegationListByAddressResp;
-import com.platon.browser.resp.staking.DelegationListByStakingResp;
-import com.platon.browser.resp.staking.HistoryStakingListResp;
-import com.platon.browser.resp.staking.StakingChangeNewResp;
-import com.platon.browser.resp.staking.StakingDetailsResp;
-import com.platon.browser.resp.staking.StakingOptRecordListResp;
-import com.platon.browser.resp.staking.StakingStatisticNewResp;
+import com.platon.browser.resp.staking.*;
 import com.platon.browser.util.I18nUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *  验证人模块方法
