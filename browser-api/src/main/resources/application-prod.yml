@@ -6,6 +6,14 @@ spring:
       nodes: 10.0.0.8:21006,10.0.0.8:21007,10.0.0.8:21008,10.0.0.8:21009,10.0.0.8:21010,10.0.0.8:21011
     password: platscan
     ssl: true
+#ES配置
+elasticsearch:
+  hosts: 192.168.120.172
+  port: 9200
+  schema: http
+  blockIndexName: browser_block_1
+  transactionIndexName: browser_transaction_1
+  nodeOptIndexName: browser_nodeopt_1
 # 应用版本
 version: 0.7.2.0
 # 当前激活的配置名称(请不要修改)

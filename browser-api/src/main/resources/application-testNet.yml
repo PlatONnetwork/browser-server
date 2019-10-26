@@ -7,6 +7,14 @@ spring:
       nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
     password: platscan
     ssl: true
+#ES配置
+elasticsearch:
+  hosts: 192.168.120.172
+  port: 9200
+  schema: http
+  blockIndexName: browser_block_1
+  transactionIndexName: browser_transaction_1
+  nodeOptIndexName: browser_nodeopt_1
 # 服务器端口号
 port: 9061
 # 应用版本

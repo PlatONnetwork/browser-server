@@ -1,4 +1,4 @@
-package com.platon.browser.repository.es;
+package com.platon.browser.elasticsearch;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.platon.browser.repository.es;
+package com.platon.browser.elasticsearch;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -6,11 +6,12 @@ import org.springframework.stereotype.Repository;
 /**
  * @Auther: Chendongming
  * @Date: 2019/10/25 15:12
- * @Description: 节点日志操作
+ * @Description: 区块操作
  */
 @Repository
-public class NodeOptESRepository extends ESRepository {
-    @Value("${elasticsearch.nodeOptIndexName}")
+public class BlockESRepository extends ESRepository {
+
+    @Value("${elasticsearch.blockIndexName}")
     private String indexName;
 
     @Override

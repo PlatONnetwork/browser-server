@@ -5,6 +5,14 @@ spring:
       max-redirects: 3
       nodes: 192.168.16.171:7000,192.168.16.171:7001,192.168.16.171:7002,192.168.16.172:7000,192.168.16.172:7001,192.168.16.171:7002
     password: platscan
+#ES配置
+elasticsearch:
+  hosts: 192.168.120.172
+  port: 9200
+  schema: http
+  blockIndexName: browser_block_1
+  transactionIndexName: browser_transaction_1
+  nodeOptIndexName: browser_nodeopt_1
 # 应用版本
 version: 0.7.0
 # 当前激活的配置名称(请不要修改)

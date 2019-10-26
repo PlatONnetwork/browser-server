@@ -1,4 +1,4 @@
-package com.platon.browser.repository.es;
+package com.platon.browser.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;

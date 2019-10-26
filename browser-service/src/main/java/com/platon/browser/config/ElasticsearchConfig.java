@@ -17,7 +17,7 @@ import java.util.List;
  * @Description: ES配置
  */
 @Configuration
-public class EsConfiguration {
+public class ElasticsearchConfig {
     @Value("${elasticsearch.hosts}")
     private List<String> addresses; // 集群地址，多个用,隔开
     @Value("${elasticsearch.port}")

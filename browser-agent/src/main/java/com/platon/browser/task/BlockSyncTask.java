@@ -232,7 +232,7 @@ public class BlockSyncTask extends BaseTask{
             DbService.CacheContainer cc = dbService.batchInsertOrUpdate(basicData,bizData);
 
             // 批量入库ES
-            esService.batchInsertOrUpdate(cc.blocks,cc.transactions,Collections.emptyList());
+            esService.batchInsertOrUpdate(basicData,cc.transactions,Collections.emptyList());
 
             // 批量更新统计缓存
             if(!cc.networkStats.isEmpty()){
