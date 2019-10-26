@@ -29,9 +29,9 @@ public class BlockService {
     private ExecutorService executor;
 
     // 并发采集的块信息，无序
-    private final static Map<Long, CustomBlock> BLOCK_MAP = new ConcurrentHashMap<>();
+    private static final Map<Long, CustomBlock> BLOCK_MAP = new ConcurrentHashMap<>();
     // 由于异常而未采集的区块号列表
-    private final static Set<BigInteger> RETRY_NUMBER = new CopyOnWriteArraySet<>();
+    private static final Set<BigInteger> RETRY_NUMBER = new CopyOnWriteArraySet<>();
     List <CustomBlock> getSortedBlocks() {
         List<CustomBlock> sortedBlock = new LinkedList<>(BLOCK_MAP.values());
         sortedBlock.sort(Comparator.comparing(Block::getNumber));

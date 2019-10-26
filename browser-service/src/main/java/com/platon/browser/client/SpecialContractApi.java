@@ -37,7 +37,6 @@ import java.util.concurrent.Callable;
  */
 @Component
 public class SpecialContractApi {
-    private static Logger logger = LoggerFactory.getLogger(SpecialContractApi.class);
 
     /**
      * 查询结算周期历史验证人队列

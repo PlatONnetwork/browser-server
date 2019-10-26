@@ -80,11 +80,11 @@ public class BlockServiceImpl implements BlockService {
 			/**
 			 * 当页号等于1，重新获取数据，与首页保持一致
 			 */
-			List<Block> items = new ArrayList<>();
+			List<Block> items;
 			if(req.getPageNo().intValue() == 1) {
 				/** 查询缓存最新的八条区块信息 */
 				items = statisticCacheService.getBlockCache(0,1);
-				if(items.size() > 0 ) {
+				if(!items.isEmpty()) {
 					/**
 					 * 如果统计区块小于区块交易则重新查询新的区块
 					 */

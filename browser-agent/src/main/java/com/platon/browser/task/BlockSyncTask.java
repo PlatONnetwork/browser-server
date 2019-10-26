@@ -12,6 +12,7 @@ import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.exception.*;
 import com.platon.browser.service.*;
 import com.platon.browser.util.GracefullyUtil;
+import com.platon.browser.util.SleepUtil;
 import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,19 +190,11 @@ public class BlockSyncTask extends BaseTask{
                 }
                 // 记录已采入库最高区块号
                 commitBlockNumber = blocks.get(blocks.size()-1).getNumber();
-                try {
-                    TimeUnit.SECONDS.sleep(1L);
-                } catch (Exception ex) {
-                    logger.error("",ex);
-                }
+                SleepUtil.sleep(1L);
             }
         } else {
             logger.info("当前链最高块({}),等待下一批块...",curChainBlockNumber);
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
         return true;
     }
@@ -239,11 +232,7 @@ public class BlockSyncTask extends BaseTask{
                     break;
                 }catch (Exception e){
                     logger.error("【更新统计缓存出错,将重试:",e);
-                    try {
-                        TimeUnit.SECONDS.sleep(1L);
-                    } catch (Exception ex) {
-                        logger.error("",e);
-                    }
+                    SleepUtil.sleep(1L);
                 }
             }
             // 批量更新交易缓存
@@ -254,11 +243,7 @@ public class BlockSyncTask extends BaseTask{
                     break;
                 }catch (Exception e){
                     logger.error("【更新交易缓存出错,将重试:",e);
-                    try {
-                        TimeUnit.SECONDS.sleep(1L);
-                    } catch (Exception ex) {
-                        logger.error("",e);
-                    }
+                    SleepUtil.sleep(1L);
                 }
             }
             // 批量更新区块缓存
@@ -269,11 +254,7 @@ public class BlockSyncTask extends BaseTask{
                     break;
                 }catch (Exception e){
                     logger.error("【更新区块缓存出错,将重试:",e);
-                    try {
-                        TimeUnit.SECONDS.sleep(1L);
-                    } catch (Exception ex) {
-                        logger.error("",e);
-                    }
+                    SleepUtil.sleep(1L);
                 }
             }
             // 清除暂存区

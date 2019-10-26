@@ -30,11 +30,7 @@ import com.platon.browser.res.transaction.TransactionDetailsEvidencesResp;
 import com.platon.browser.res.transaction.TransactionDetailsRPPlanResp;
 import com.platon.browser.res.transaction.TransactionDetailsResp;
 import com.platon.browser.res.transaction.TransactionListResp;
-import com.platon.browser.util.DateUtil;
-import com.platon.browser.util.EnergonUtil;
-import com.platon.browser.util.HttpUtil;
-import com.platon.browser.util.I18nUtil;
-import com.platon.browser.util.KeyBaseAnalysis;
+import com.platon.browser.util.*;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
@@ -251,7 +247,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setServerTime(new Date().getTime());
     		List<Block> blocks = statisticCacheService.getBlockCache(0, 1);
     		/** 确认区块数等于当前区块书减去交易区块数  */
-    		if(blocks.size() > 0 ) {
+    		if(!blocks.isEmpty()) {
     			resp.setConfirmNum(String.valueOf(blocks.get(0).getNumber()-transaction.getBlockNumber()));
     		} else {
     			resp.setConfirmNum("0");
@@ -581,7 +577,7 @@ public class TransactionServiceImpl implements TransactionService {
     	StakingExample.Criteria criteria = stakingExample.createCriteria();
     	criteria.andNodeIdEqualTo(nodeId);
     	List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
-    	if(stakings != null && stakings.size()>0) {
+    	if(stakings != null && !stakings.isEmpty()) {
     		return stakings.get(0).getStakingName();
     	}
     	return nodeName;
@@ -592,7 +588,6 @@ public class TransactionServiceImpl implements TransactionService {
      * @method getStakingUrl
      * @param externalId
      * @param txReceiptStatus
-     * @param nodeId
      * @return
      */
     private String getStakingUrl(String externalId,Integer txReceiptStatus) {

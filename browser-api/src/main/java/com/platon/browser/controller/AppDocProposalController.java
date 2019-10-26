@@ -2,6 +2,7 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
@@ -56,7 +57,7 @@ public class AppDocProposalController implements AppDocProposal {
     @Override
     public RespPage<VoteListResp> voteList(@Valid VoteListRequest req) {
     	if(Objects.isNull(req)|| StringUtils.isBlank(req.getProposalHash())){
-    	    String msg = JSONObject.toJSONString(req);
+    	    String msg = JSON.toJSONString(req);
     		logger.error("## ERROR # proposal param error req:{}", msg);
     		throw new BusinessException(RetEnum.RET_PARAM_VALLID.getCode(),i18n.i(I18nEnum.PROPOSAL_PARAM_ERROR));
 		}

@@ -13,6 +13,7 @@ import java.util.Objects;
  * @Description:
  */
 public class HttpUtil {
+    private HttpUtil(){}
     /**
      * 发送POST请求
      * @param url

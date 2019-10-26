@@ -168,21 +168,6 @@ public class NewSettleEpochHandler implements EventHandler {
         });
     }
 
-    //结算周期变更导致的委托赎回的变更
-    private void updateUnDelegation() {
-        //由于结算周期的变更，对所有的节点下的质押的委托的委托赎回更新
-        //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-        List<CustomUnDelegation> unDelegations = nodeCache.getUnDelegationByStatus(CustomUnDelegation.StatusEnum.EXITING);
-        unDelegations.forEach(unDelegation -> {
-            //更新赎回委托的锁定中的金额：赎回锁定金额，在一个结算周期后到账，修改锁定期金额
-            unDelegation.setRedeemLocked("0");
-            //当锁定期金额为零时，认为此笔赎回委托交易已经完成
-            unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
-            //添加需要更新的赎回委托信息到赎回委托更新列表
-            stakingStage.updateUnDelegation(unDelegation);
-        });
-    }
-
     /**
      * 对上一结算周期的质押节点结算
      * 对所有候选中和退出中的节点进行结算

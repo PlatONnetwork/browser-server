@@ -2,6 +2,7 @@ package com.platon.browser.controller;
 
 import javax.validation.Valid;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -67,7 +68,7 @@ public class AppDocStakingController implements AppDocStaking {
 	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor) {
 		AliveStakingListReq req = new AliveStakingListReq();
 		RespPage<AliveStakingListResp> aliveStakingListResp = stakingService.aliveStakingList(req);
-		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSONObject.toJSONString(aliveStakingListResp));
+		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSON.toJSONString(aliveStakingListResp));
 		return stakingService.aliveStakingList(req);
 	}
 
