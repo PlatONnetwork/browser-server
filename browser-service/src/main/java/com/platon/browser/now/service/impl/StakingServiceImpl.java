@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.platon.browser.dao.mapper.NodeOptMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dao.entity.NodeOptExample;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.entity.StakingNode;
+import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.CustomDelegationMapper;
 import com.platon.browser.dao.mapper.CustomStakingMapper;
 import com.platon.browser.dto.CustomNodeOpt;
@@ -65,10 +71,16 @@ public class StakingServiceImpl implements StakingService {
 	private CustomStakingMapper customStakingMapper;
 	
 	@Autowired
+	private StakingMapper stakingMapper;
+	
+	@Autowired
 	private CustomDelegationMapper customDelegationMapper;
 	
 	@Autowired
 	private NodeOptMapper nodeOptMapper;
+	
+	@Autowired
+	private AddressMapper addressMapper;
 
 	@Autowired
 	private I18nUtil i18n;
@@ -243,7 +255,9 @@ public class StakingServiceImpl implements StakingService {
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(stakingNode.getExpectedIncome());
+				resp.setRewardValue("");
 			} else {
+				resp.setRewardValue(stakingNode.getFeeRewardValue());
 				resp.setExpectedIncome("");
 			}
 			String webSite = "";
@@ -261,9 +275,6 @@ public class StakingServiceImpl implements StakingService {
 			/** 实际跳转地址是url拼接上名称 */
 			if (StringUtils.isNotBlank(stakingNode.getExternalName())) {
 				resp.setExternalUrl(blockChainConfig.getKeyBase() + stakingNode.getExternalName());
-			}
-			if (StringUtils.isNotBlank(stakingNode.getFeeRewardValue())) {
-				resp.setRewardValue(stakingNode.getFeeRewardValue());
 			}
 			if (stakingNode.getLeaveTime() != null) {
 				resp.setLeaveTime(stakingNode.getLeaveTime().getTime());
@@ -334,6 +345,9 @@ public class StakingServiceImpl implements StakingService {
 						break;
 					/** 双签 */
 					case MULTI_SIGN:
+						stakingOptRecordListResp.setPercent(desces[0]);
+						stakingOptRecordListResp.setAmount(desces[1]);
+						break;
 					/** 出块率低 */
 					case LOW_BLOCK_RATE:
 						stakingOptRecordListResp.setPercent(desces[0]);
@@ -357,12 +371,23 @@ public class StakingServiceImpl implements StakingService {
 	
 	@Override
 	public RespPage<DelegationListByStakingResp> delegationListByStaking( DelegationListByStakingReq req) {
+		StakingKey stakingKey = new StakingKey();
+		stakingKey.setNodeId(req.getNodeId());
+		stakingKey.setStakingBlockNum(Long.valueOf(req.getStakingBlockNum()));
+		Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+		Long num = Long.valueOf(req.getStakingBlockNum());
+		/**
+		 * 如果验证人状态不为候选中则无需查询总数
+		 */
+		if(staking !=  null && StatusEnum.CANDIDATE.getCode() != staking.getStatus().intValue()) {
+			num = null;
+		}
 		PageHelper.startPage(req.getPageNo(), req.getPageSize());
 		List<DelegationListByStakingResp> lists = new LinkedList<>();
 		/** 根据节点id和区块查询验证委托信息 */
 		Page<DelegationStaking> delegationStakings = 
-				customDelegationMapper.selectDelegationAndStakingByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()),null);
-		List<DelegationStaking> sumDelegationStaking = customDelegationMapper.selectSumDelegateByExample(req.getNodeId(),Long.parseLong(req.getStakingBlockNum()));
+				customDelegationMapper.selectStakingByExample(req.getNodeId(),num );
+		List<DelegationStaking> sumDelegationStaking = customDelegationMapper.selectSumDelegateByExample(req.getNodeId(),num);
 		String allDelegate = "0";
 		String allLockDelegate = "0";
 		if( sumDelegationStaking.get(0) != null) {
@@ -399,9 +424,9 @@ public class StakingServiceImpl implements StakingService {
 		List<DelegationListByAddressResp> lists = new LinkedList<>();
 		/** 根据地址分页查询委托列表 */
 		Page<DelegationStaking> delegationStakings = 
-				customDelegationMapper.selectDelegationAndStakingByExample(null,null,req.getAddress());
+				customDelegationMapper.selectDelegationByExample(req.getAddress());
 		
-		List<DelegationStaking> sumDelegationStaking = customDelegationMapper.selectSumDelegateByAddress(req.getAddress());
+		Address item = addressMapper.selectByPrimaryKey(req.getAddress());
 		for (DelegationStaking delegationStaking:  delegationStakings.getResult()) {
 			DelegationListByAddressResp byAddressResp = new DelegationListByAddressResp();
 			BeanUtils.copyProperties(delegationStaking, byAddressResp);
@@ -420,8 +445,8 @@ public class StakingServiceImpl implements StakingService {
 			String deletgateUnLock = delegationStaking.getStatus()==CustomStaking.StatusEnum.CANDIDATE.getCode()?"0":new BigDecimal(delegationStaking.getDelegateHas())
 					.add(new BigDecimal(delegationStaking.getDelegateLocked())).toString() ;
 			byAddressResp.setDelegateUnlock(deletgateUnLock);
-			byAddressResp.setDelegateTotalValue(sumDelegationStaking.get(0).getAllDelegate());
-			byAddressResp.setAllDelegateLocked(sumDelegationStaking.get(0).getAllLockDelegate());
+			byAddressResp.setDelegateTotalValue(item.getDelegateUnlock());
+			byAddressResp.setAllDelegateLocked(item.getDelegateLocked());
 			lists.add(byAddressResp);
 		}
 		/** 统计总数 */

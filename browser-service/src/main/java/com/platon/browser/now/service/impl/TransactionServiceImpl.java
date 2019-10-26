@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
 
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.setOrderByClause(" timestamp desc");
+        transactionExample.setOrderByClause(" sequence desc");
         /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
                 .andFromEqualTo(req.getAddress());
@@ -171,7 +171,7 @@ public class TransactionServiceImpl implements TransactionService {
         String msg = dateFormat.format(currentServerTime);
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.setOrderByClause(" timestamp desc");
+        transactionExample.setOrderByClause(" sequence desc");
         /** 根据地址查询交易，则可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria();
         TransactionExample.Criteria second = transactionExample.createCriteria();
@@ -470,7 +470,7 @@ public class TransactionServiceImpl implements TransactionService {
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
-						resp.setNodeName(this.setStakingName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
+						transactionDetailsEvidencesResp.setNodeName(this.setStakingName(reportValidatorParam.getVerify(), reportValidatorParam.getNodeName()));
 						resp.setEvidence(reportValidatorParam.getData());
 						transactionDetailsEvidencesResps.add(transactionDetailsEvidencesResp);
 						Slash slash = slashMapper.selectByPrimaryKey(req.getTxHash());

@@ -79,16 +79,13 @@
     </foreach>
   </insert>
   
-  <select id="selectDelegationAndStakingByExample" resultMap="AndStakingResultMap">
+  <select id="selectStakingByExample" resultMap="AndStakingResultMap">
   	SELECT 
 		t1.delegate_addr,t1.staking_block_num,t1.node_id,t1.delegate_has,t1.delegate_locked,t1.delegate_reduction,
 		t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>
-		<if test="delegateAddr != null">
-			AND t1.delegate_addr=#{delegateAddr,jdbcType=VARCHAR}
-		</if>
 		<if test="nodeId != null">
 			AND t1.node_id=#{nodeId,jdbcType=VARCHAR}
 		</if>
@@ -96,6 +93,21 @@
 			AND t1.staking_block_num=#{stakingBlockNum,jdbcType=BIGINT}
 		</if>
 	</where>
+	 order by t1.cur_delegation_block_num desc
+  </select>
+  
+  <select id="selectDelegationByExample" resultMap="AndStakingResultMap">
+  	SELECT 
+		t1.delegate_addr,t1.staking_block_num,t1.node_id,sum(cast(t1.delegate_has as Decimal(30))) as delegate_has,sum(cast(t1.delegate_locked as Decimal(30))) as delegate_locked
+		,t1.delegate_reduction,t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name
+	FROM delegation t1
+	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
+	<where>
+		<if test="delegateAddr != null">
+			AND t1.delegate_addr=#{delegateAddr,jdbcType=VARCHAR}
+		</if>
+	</where>
+	group by t1.node_id order by t1.cur_delegation_block_num desc
   </select>
   
   <select id="selectSumDelegateByExample" resultMap="AndStakingResultMap">
@@ -114,7 +126,7 @@
 	</where>
   </select>
   
-  <select id="selectSumDelegateByAddress" resultMap="AndStakingResultMap">
+<!--   <select id="selectSumDelegateByAddress" resultMap="AndStakingResultMap">
 	select 
 	  	sum(cast(t1.delegate_has as Decimal(30)) + cast(t1.delegate_locked as Decimal(30))) as 'allDelegate',
 	  	sum(case when t2.status=1 then cast(t1.delegate_locked AS DECIMAL (30)) else 0 end) as 'allLockDelegate'
@@ -125,6 +137,6 @@
 			AND t1.delegate_addr=#{delegateAddr,jdbcType=VARCHAR}
 		</if>
 	</where>
-  </select>
+  </select> -->
   
 </mapper>

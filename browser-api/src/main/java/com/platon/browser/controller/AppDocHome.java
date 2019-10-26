@@ -170,9 +170,9 @@ public interface AppDocHome {
      *    ]
      * }
      */
-	@ApiOperation(value = "home/blockList", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
-	@SubscribeMapping(value = "topic/block/list/new")
-	@PostMapping(value = "home/blockList", produces = { "application/json" })
+//	@ApiOperation(value = "home/blockList", nickname = "", notes = "", response = BlockListNewResp.class, tags = { "Home" })
+//	@SubscribeMapping(value = "topic/block/list/new")
+//	@PostMapping(value = "home/blockList", produces = { "application/json" })
 	BaseResp<List<BlockListNewResp>> blockListNew();
 	
     /**
