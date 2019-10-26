@@ -21,13 +21,6 @@ import com.platon.browser.res.address.DetailsRPPlanResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +29,12 @@ import org.springframework.stereotype.Service;
 import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.RestrictingItem;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 地址具体逻辑实现方法

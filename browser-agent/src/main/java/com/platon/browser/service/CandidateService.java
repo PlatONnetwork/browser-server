@@ -10,6 +10,7 @@ import com.platon.browser.engine.BlockChain;
 import com.platon.browser.engine.bean.AnnualizedRateInfo;
 import com.platon.browser.engine.bean.PeriodValueElement;
 import com.platon.browser.exception.*;
+import com.platon.browser.util.SleepUtil;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
@@ -78,11 +79,7 @@ public class CandidateService {
         } catch (Exception e) {
             logger.error("【查询前轮结算验证人-底层出错】使用块号【{}】查询结算周期验证人出错,将重试:{}", prevEpochLastBlockNumber, e.getMessage());
             client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -103,11 +100,7 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前结算验证人-底层出错】查询实时结算周期验证人出错,将重试:{}", e1.getMessage());
-                try {
-                    TimeUnit.SECONDS.sleep(1L);
-                } catch (Exception ex) {
-                    logger.error("",ex);
-                }
+                SleepUtil.sleep(1L);
             }
         }
 
@@ -134,11 +127,7 @@ public class CandidateService {
         } catch (Exception e) {
             logger.error("【查询前轮共识验证人-底层出错】查询块号在【{}】的共识周期验证人历史出错,将重试:]", prevEpochLastBlockNumber, e);
             client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
 
         // ==================================更新当前周期验证人列表=======================================
@@ -158,11 +147,7 @@ public class CandidateService {
                 break;
             } catch (Exception e1) {
                 logger.error("【查询当前共识验证人-底层出错】查询实时共识周期验证人出错,将重试:", e1);
-                try {
-                    TimeUnit.SECONDS.sleep(1L);
-                } catch (Exception ex) {
-                    logger.error("",ex);
-                }
+                SleepUtil.sleep(1L);
             }
         }
 
@@ -267,11 +252,7 @@ public class CandidateService {
         } catch (Exception e) {
             logger.error("底层链查询候选验证节点列表出错,将重试:", e);
             client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
     }
 
@@ -290,11 +271,7 @@ public class CandidateService {
         } catch (Exception e) {
             logger.error("底层链查询实时结算周期验证节点列表出错,将重试:{}", e.getMessage());
             client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
     }
 

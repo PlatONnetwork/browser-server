@@ -19,7 +19,7 @@ public class ResolverTest {
 	@Test
 	public void testStringResolver() {
 		RlpString rlpString = RlpString.create(new BigInteger("123"));
-		String num = Resolver.StringResolver(rlpString);
+		String num = Resolver.stringResolver(rlpString);
 		assertTrue("0x7b".equals(num));
 	}
 

@@ -14,7 +14,9 @@ import java.util.List;
  */
 public class KeyBaseAnalysis {
 
-    public static String getKeyBaseUseName(KeyBaseUser keyBaseUser) throws Exception{
+    private KeyBaseAnalysis(){}
+
+    public static String getKeyBaseUseName(KeyBaseUser keyBaseUser){
         List <Completion> completions = keyBaseUser.getCompletions();
         if (completions == null || completions.isEmpty()) return null;
         // 取最新一条
@@ -27,7 +29,7 @@ public class KeyBaseAnalysis {
     }
 
 
-    public static String getKeyBaseIcon( KeyBaseUser keyBaseUser) throws Exception{
+    public static String getKeyBaseIcon( KeyBaseUser keyBaseUser){
         List <Completion> completions = keyBaseUser.getCompletions();
         if (completions == null || completions.isEmpty()) return null;
         // 取最新一条

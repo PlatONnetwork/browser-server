@@ -1,25 +1,5 @@
 package com.platon.browser.now.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.math.RoundingMode;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.platon.browser.dao.mapper.BlockMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
@@ -27,6 +7,7 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.BlockExample.Criteria;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RetEnum;
@@ -46,6 +27,24 @@ import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.web3j.utils.Convert;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *  区块方法逻辑具体实现
@@ -80,11 +79,11 @@ public class BlockServiceImpl implements BlockService {
 			/**
 			 * 当页号等于1，重新获取数据，与首页保持一致
 			 */
-			List<Block> items = new ArrayList<>();
+			List<Block> items;
 			if(req.getPageNo().intValue() == 1) {
 				/** 查询缓存最新的八条区块信息 */
 				items = statisticCacheService.getBlockCache(0,1);
-				if(items.size() > 0 ) {
+				if(!items.isEmpty()) {
 					/**
 					 * 如果统计区块小于区块交易则重新查询新的区块
 					 */

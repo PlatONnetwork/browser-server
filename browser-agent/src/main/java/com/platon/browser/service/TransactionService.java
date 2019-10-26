@@ -8,6 +8,7 @@ import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.util.SleepUtil;
 import com.platon.browser.util.TxParamResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,11 +157,7 @@ public class TransactionService {
         } catch (Exception e) {
             logger.error("查询交易回执失败,将重试:", e);
             client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
+            SleepUtil.sleep(1L);
         }
     }
 }

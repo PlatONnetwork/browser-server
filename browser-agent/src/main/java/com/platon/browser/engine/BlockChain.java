@@ -5,7 +5,6 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
@@ -16,10 +15,12 @@ import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
-import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.*;
-import com.platon.browser.param.*;
+import com.platon.browser.param.DelegateParam;
+import com.platon.browser.param.EditValidatorParam;
+import com.platon.browser.param.IncreaseStakingParam;
+import com.platon.browser.param.UnDelegateParam;
 import com.platon.browser.service.DbService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -127,7 +128,7 @@ public class BlockChain {
      *
      * @param block
      */
-    public void execute ( CustomBlock block ) throws Exception {
+    public void execute ( CustomBlock block ) throws BusinessException, BlockChainException, NoSuchBeanException, InterruptedException, CandidateException, SettleEpochChangeException {
         curBlock = block;
         // 更新交易TPS
         tpsCalcCache.update(block);

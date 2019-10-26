@@ -27,14 +27,14 @@ public  class Resolver {
         return new BigInteger(1, integersString.getBytes());
     }
 
-    public static String StringResolver ( RlpString rlpString ) {
-        RlpString Strings = rlpString;
-        RlpList StringsList = RlpDecoder.decode(Strings.getBytes());
-        RlpString StringsListString = (RlpString) StringsList.getValues().get(0);
-        return Numeric.toHexString(StringsListString.getBytes());
+    public static String stringResolver ( RlpString rlpString ) {
+        RlpString strings = rlpString;
+        RlpList stringsList = RlpDecoder.decode(strings.getBytes());
+        RlpString stringsListString = (RlpString) stringsList.getValues().get(0);
+        return Numeric.toHexString(stringsListString.getBytes());
     }
 
-    public static List<PlanParam> ObjectResolver ( RlpString rlpString ) {
+    public static List<PlanParam> objectResolver ( RlpString rlpString ) {
         List<PlanParam> list = new ArrayList <>();
         RlpList bean = RlpDecoder.decode(rlpString.getBytes());
         List <RlpType> beanList = ((RlpList) bean.getValues().get(0)).getValues();

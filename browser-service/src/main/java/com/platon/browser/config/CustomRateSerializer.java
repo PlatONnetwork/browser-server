@@ -1,13 +1,12 @@
 package com.platon.browser.config;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  *  返回百分比转化实现类

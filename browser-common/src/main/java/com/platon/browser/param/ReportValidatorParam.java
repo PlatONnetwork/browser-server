@@ -1,7 +1,6 @@
 package com.platon.browser.param;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.platon.browser.param.evidence.Evidence;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class ReportValidatorParam {
 
     private String format ( BigInteger type, String date ) {
         String info = "";
-        Evidence evidence = JSONObject.parseObject(date, Evidence.class);
+        Evidence evidence = JSON.parseObject(date, Evidence.class);
         if (isObjectFieldEmpty(evidence)) {
             if (isObjectFieldEmpty(evidence.getPrepareA())) {
                 info = evidence.getPrepareA().getValidateNode().getNodeId();

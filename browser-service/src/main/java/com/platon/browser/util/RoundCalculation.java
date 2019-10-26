@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 
 public class RoundCalculation {
 
+    private RoundCalculation(){}
+
     /**
      * 投票结束轮数转化区块高度
      * 结束块高 = 提案交易所在块高 + 共识周期块数 - 提案交易所在块高%共识周期块数 + 提案入参轮数 * 共识周期块数 - 20
