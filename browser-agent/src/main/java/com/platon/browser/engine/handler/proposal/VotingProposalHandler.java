@@ -64,7 +64,7 @@ public class VotingProposalHandler implements EventHandler {
             }
 
             // 交易信息回填
-            param.setPIDID(proposal.getPipId().toString());
+            param.setPIDID(proposal.getPipId());
             param.setProposalType(proposal.getType());
             param.setNodeName(staking.getStakingName());
             param.setUrl(proposal.getUrl());

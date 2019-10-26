@@ -12,7 +12,6 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
@@ -103,8 +102,8 @@ public class BlockService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }
@@ -121,8 +120,8 @@ public class BlockService {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }

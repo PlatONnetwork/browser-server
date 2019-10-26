@@ -37,7 +37,7 @@ public class CustomNode extends Node {
           // 进入共识验证轮次数
           this.setStatVerifierTime(0);
           // 官方推荐 1：是 2：否
-          this.setIsRecommend(2);
+          this.setIsRecommend(YesNoEnum.NO.getCode());
           //节点手续费
           this.setStatFeeRewardValue("0");
      }

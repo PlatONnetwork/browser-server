@@ -45,7 +45,7 @@ public class DateUtilTest {
 		// Tue, 10 Sep 2019 02:50:46 GMT
 		Date date = new Date(1568083846564L);
 		String gmtStr = DateUtil.getGMT(date);
-		assertTrue("Tue, 10 Sep 2019 02:50:46 GMT".equals(gmtStr));
+		assertTrue("Tue Sep 10 2019 02:50:46".equals(gmtStr));
 	}
 
 }

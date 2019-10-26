@@ -161,8 +161,8 @@ public class BlockChainConfig {
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
         String msg = JSON.toJSONString(dec,true);
@@ -210,8 +210,8 @@ public class BlockChainConfig {
         this.unStakeRefundSettlePeriodCount=dec.getStaking().getUnStakeFreezeRatio();
         //【惩罚】双签奖励百分比
         this.duplicateSignReportRate=dec.getSlashing().getDuplicateSignReportReward().divide(BigDecimal.valueOf(100),2,RoundingMode.FLOOR);
-        //【惩罚】双签处罚百分比
-        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(10000),2, RoundingMode.FLOOR);
+        //【惩罚】双签处罚万分比
+        this.duplicateSignSlashRate=dec.getSlashing().getDuplicateSignHighSlashing().divide(BigDecimal.valueOf(10000),16, RoundingMode.FLOOR);
         //【惩罚】举报证据有效周期数
         this.evidenceValidEpoch=dec.getSlashing().getEvidenceValidEpoch();
 

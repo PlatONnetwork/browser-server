@@ -85,7 +85,7 @@ public class NetworkStatUpdateTask extends BaseTask{
             BigDecimal circulation = initIssueAmount
                     .multiply(circulationByYear)
                     .subtract(new BigDecimal(incentivePoolAccountBalance))
-                    .add(foundationAmount);
+                    .add(Convert.toVon(foundationAmount,Convert.Unit.LAT));
 
             //rpc获取锁仓余额
             BigInteger restrictingContractBalance = getBalance(InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockNumber);
@@ -121,8 +121,8 @@ public class NetworkStatUpdateTask extends BaseTask{
             client.updateCurrentValidWeb3j();
             try {
                 TimeUnit.SECONDS.sleep(1L);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                logger.error("",ex);
             }
         }
     }

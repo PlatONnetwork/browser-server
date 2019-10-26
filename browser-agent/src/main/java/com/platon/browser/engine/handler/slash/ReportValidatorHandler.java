@@ -77,7 +77,8 @@ public class ReportValidatorHandler implements EventHandler {
             //新增举报交易结构
             CustomSlash slash = new CustomSlash();
             slash.updateWithSlash(tx, param);
-            slash.setReward(slashValue.multiply(chainConfig.getDuplicateSignReportRate()).toString());
+            BigDecimal reward = slashValue.multiply(chainConfig.getDuplicateSignReportRate());
+            slash.setReward(reward.setScale(2,RoundingMode.FLOOR).toString());
             slash.setSlashRate(chainConfig.getDuplicateSignSlashRate().toString());
 
             //新增分析多重签名结果

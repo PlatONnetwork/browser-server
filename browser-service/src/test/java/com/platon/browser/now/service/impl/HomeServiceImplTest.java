@@ -70,7 +70,7 @@ public class HomeServiceImplTest extends TestBase {
 	@Test
 	public void blockListNew() {
 		List<BlockListNewResp> list = homeService.blockListNew();
-		assertTrue(list.size()>0);
+		assertNotNull(list);
 	}
 	
 	@Test

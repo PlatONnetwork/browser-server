@@ -97,8 +97,8 @@ public class NewSettleEpochHandler implements EventHandler {
                 client.updateCurrentValidWeb3j();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    logger.error("",ex);
                 }
             }
         }

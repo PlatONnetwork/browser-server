@@ -96,6 +96,7 @@ public class AddressCacheUpdater {
             }
             // 查看当前地址是否有委托信息, 若有, 则统计当前地址委托相关金额
             Set<CustomDelegation> delegationSet = addressDelegationMap.get(address.getAddress());
+            Set<String> delegationNodeIds=new HashSet<>();
             if(delegationSet!=null){
                 stat.delegateUnlock = BigInteger.ZERO;
                 for(CustomDelegation delegation:delegationSet){
@@ -104,8 +105,8 @@ public class AddressCacheUpdater {
                     stat.delegateHes = stat.delegateHes.add(delegation.integerDelegateHas());
                     stat.delegateLocked = stat.delegateLocked.add(delegation.integerDelegateLocked());
                     stat.delegateReduction = stat.delegateReduction.add(delegation.integerDelegateReduction());
-                    stat.candidateCount = stat.candidateCount.add(BigInteger.ONE);
-                    Integer status = 0;
+                    delegationNodeIds.add(delegation.getNodeId());
+                    /*Integer status = 0;
                     CustomStaking staking = new CustomStaking();
                     try {
                         staking = nodeCache.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
@@ -116,9 +117,10 @@ public class AddressCacheUpdater {
                     if (status.equals(CustomStaking.StatusEnum.EXITING.getCode()) || status.equals(CustomStaking.StatusEnum.EXITED.getCode())) {
                         stat.delegateUnlock = stat.delegateUnlock.add(staking.integerStatDelegateHas().add(staking.integerStatDelegateLocked()));
                         stat.delegateLocked = stat.delegateLocked.subtract(stat.delegateUnlock);
-                    }
+                    }*/
                 }
             }
+            stat.candidateCount = BigInteger.valueOf(delegationNodeIds.size());
             stat.redeemedValue = stat.stakingRedeemed.add(stat.delegateRedeemed);
 
             //address引用对象更新

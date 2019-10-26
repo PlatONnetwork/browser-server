@@ -59,7 +59,7 @@ public class DbServiceTest extends TestBase {
     private CustomAddressMapper customAddressMapper;
     @Mock
     private CustomNetworkStatMapper customNetworkStatMapper;
-    private DbService.CacheContainer CC = new DbService.CacheContainer();
+    private DbService.CacheContainer cacheContainer = new DbService.CacheContainer();
 
     /**
      * 测试开始前，设置相关行为属性
@@ -67,7 +67,7 @@ public class DbServiceTest extends TestBase {
     @Before
     public void setup() throws InterruptedException {
         ReflectionTestUtils.setField(dbService, "blockMapper", blockMapper);
-        ReflectionTestUtils.setField(dbService, "CC", CC);
+        ReflectionTestUtils.setField(dbService, "cacheContainer", cacheContainer);
         ReflectionTestUtils.setField(dbService, "transactionMapper", transactionMapper);
         ReflectionTestUtils.setField(dbService, "rpPlanMapper", rpPlanMapper);
         ReflectionTestUtils.setField(dbService, "customNodeMapper", customNodeMapper);

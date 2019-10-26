@@ -1,26 +1,25 @@
 package com.platon.browser.engine;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.NetworkStatExample;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dto.CustomAddress;
-import com.platon.browser.dto.CustomBlock;
-import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.engine.cache.CacheHolder;
-import com.platon.browser.engine.cache.NodeCacheUpdater;
-import com.platon.browser.engine.cache.StakingCacheUpdater;
-import com.platon.browser.engine.cache.TpsCalcCache;
+import com.platon.browser.dto.*;
+import com.platon.browser.engine.cache.*;
 import com.platon.browser.engine.handler.EventContext;
 import com.platon.browser.engine.handler.epoch.NewIssueEpochHandler;
 import com.platon.browser.engine.handler.statistic.NetworkStatStatisticHandler;
 import com.platon.browser.engine.stage.BlockChainStage;
+import com.platon.browser.engine.stage.StakingStage;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.*;
+import com.platon.browser.param.*;
 import com.platon.browser.service.DbService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -162,7 +161,43 @@ public class BlockChain {
             // 统计地址相关信息
             addressExecute.execute(tx);
             // 链上执行失败的交易不予处理
-            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.getCode() == tx.getTxReceiptStatus()) return;
+            if (CustomTransaction.TxReceiptStatusEnum.FAILURE.getCode() == tx.getTxReceiptStatus()) {
+                // 失败的交易需要补充节点名称到交易参数信息中
+                NodeCache nodeCache = cacheHolder.getNodeCache();
+                switch (tx.getTypeEnum()) {
+                    case INCREASE_STAKING: // 增持质押
+                        IncreaseStakingParam isp = tx.getTxParam(IncreaseStakingParam.class);
+                        CustomNode node = nodeCache.getNode(isp.getNodeId());
+                        CustomStaking latestStaking = node.getLatestStaking();
+                        isp.setNodeName(latestStaking.getStakingName());
+                        tx.setTxInfo(JSON.toJSONString(isp));
+                        break;
+                    case EXIT_VALIDATOR: // 撤销质押
+                        EditValidatorParam evp = tx.getTxParam(EditValidatorParam.class);
+                        node = nodeCache.getNode(evp.getNodeId());
+                        latestStaking = node.getLatestStaking();
+                        evp.setNodeName(latestStaking.getStakingName());
+                        tx.setTxInfo(JSON.toJSONString(evp));
+                        break;
+                    case DELEGATE: // 发起委托
+                        DelegateParam dp = tx.getTxParam(DelegateParam.class);
+                        node = nodeCache.getNode(dp.getNodeId());
+                        latestStaking = node.getLatestStaking();
+                        dp.setNodeName(latestStaking.getStakingName());
+                        tx.setTxInfo(JSON.toJSONString(dp));
+                        break;
+                    case UN_DELEGATE: // 撤销委托
+                        UnDelegateParam udp = tx.getTxParam(UnDelegateParam.class);
+                        node = nodeCache.getNode(udp.getNodeId());
+                        latestStaking = node.getLatestStaking();
+                        udp.setNodeName(latestStaking.getStakingName());
+                        tx.setTxInfo(JSON.toJSONString(udp));
+                        break;
+                    default:
+                        return;
+                }
+            }
+
             // 调用交易分析引擎分析交易，以补充相关数据
             switch (tx.getTypeEnum()) {
                 case CREATE_VALIDATOR: // 创建验证人
@@ -309,8 +344,8 @@ public class BlockChain {
                 client.updateCurrentValidWeb3j();
                 try {
                     TimeUnit.SECONDS.sleep(1L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    logger.error("",ex);
                 }
             }
         }

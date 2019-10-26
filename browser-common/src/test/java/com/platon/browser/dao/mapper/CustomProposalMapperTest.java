@@ -43,6 +43,7 @@ public class CustomProposalMapperTest extends TestBase {
 		proposal.setStatus(1);
 		proposal.setPipNum("pipNum");
 		proposal.setPipId("3");
+		proposal.setBlockNumber("3");
 		set.add(proposal);
 		int num = customProposalMapper.batchInsertOrUpdateSelective(set, Proposal.Column.values());
 		assertTrue(num>=0);
