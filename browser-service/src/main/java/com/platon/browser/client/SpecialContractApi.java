@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ContractInvokeException;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.BytesType;
@@ -56,7 +54,6 @@ public class SpecialContractApi {
     public static final int GET_PROPOSAL_RES_FUNC_TYPE = 2105;
 
     private static final String BLANK_RES = "结果为空!";
-    private static final String INVOKE_FAIL = "调用合约失败:";
 
     /**
      * rpc调用接口
@@ -167,7 +164,7 @@ public class SpecialContractApi {
             return result;
         }else{
             String msg = JSON.toJSONString(br,true);
-            throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:{},返回数据:{}",addresses,msg));
+            throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:%s,返回数据:%s",addresses,msg));
         }
     }
 
@@ -210,7 +207,7 @@ public class SpecialContractApi {
             return pps;
         }else{
             String msg = JSON.toJSONString(br,true);
-            throw new ContractInvokeException(String.format("【查询提案参与者出错】提案Hash:{},区块Hash:{},返回数据:{}",proposalHash,blockHash,msg));
+            throw new ContractInvokeException(String.format("【查询提案参与者出错】提案Hash:%s,区块Hash:%s,返回数据:%s",proposalHash,blockHash,msg));
         }
     }
 }
