@@ -15,11 +15,4 @@ dependencies {
 	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
 	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
     compile group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
-
-    compile ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticSearchVersion"){
-        exclude module: 'elasticsearch'
-        exclude module: 'elasticsearch-rest-client'
-    }
-    compile "org.elasticsearch:elasticsearch:$elasticSearchVersion"
-    compile "org.elasticsearch.client:elasticsearch-rest-client:$elasticSearchVersion"
 }
