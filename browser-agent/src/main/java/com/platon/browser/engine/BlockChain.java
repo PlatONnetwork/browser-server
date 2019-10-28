@@ -165,37 +165,41 @@ public class BlockChain {
             if (CustomTransaction.TxReceiptStatusEnum.FAILURE.getCode() == tx.getTxReceiptStatus()) {
                 // 失败的交易需要补充节点名称到交易参数信息中
                 NodeCache nodeCache = cacheHolder.getNodeCache();
-                switch (tx.getTypeEnum()) {
-                    case INCREASE_STAKING: // 增持质押
-                        IncreaseStakingParam isp = tx.getTxParam(IncreaseStakingParam.class);
-                        CustomNode node = nodeCache.getNode(isp.getNodeId());
-                        CustomStaking latestStaking = node.getLatestStaking();
-                        isp.setNodeName(latestStaking.getStakingName());
-                        tx.setTxInfo(JSON.toJSONString(isp));
-                        break;
-                    case EXIT_VALIDATOR: // 撤销质押
-                        EditValidatorParam evp = tx.getTxParam(EditValidatorParam.class);
-                        node = nodeCache.getNode(evp.getNodeId());
-                        latestStaking = node.getLatestStaking();
-                        evp.setNodeName(latestStaking.getStakingName());
-                        tx.setTxInfo(JSON.toJSONString(evp));
-                        break;
-                    case DELEGATE: // 发起委托
-                        DelegateParam dp = tx.getTxParam(DelegateParam.class);
-                        node = nodeCache.getNode(dp.getNodeId());
-                        latestStaking = node.getLatestStaking();
-                        dp.setNodeName(latestStaking.getStakingName());
-                        tx.setTxInfo(JSON.toJSONString(dp));
-                        break;
-                    case UN_DELEGATE: // 撤销委托
-                        UnDelegateParam udp = tx.getTxParam(UnDelegateParam.class);
-                        node = nodeCache.getNode(udp.getNodeId());
-                        latestStaking = node.getLatestStaking();
-                        udp.setNodeName(latestStaking.getStakingName());
-                        tx.setTxInfo(JSON.toJSONString(udp));
-                        break;
-                    default:
-                        return;
+                try {
+                    switch (tx.getTypeEnum()) {
+                        case INCREASE_STAKING: // 增持质押
+                            IncreaseStakingParam isp = tx.getTxParam(IncreaseStakingParam.class);
+                            CustomNode node = nodeCache.getNode(isp.getNodeId());
+                            CustomStaking latestStaking = node.getLatestStaking();
+                            isp.setNodeName(latestStaking.getStakingName());
+                            tx.setTxInfo(JSON.toJSONString(isp));
+                            break;
+                        case EXIT_VALIDATOR: // 撤销质押
+                            EditValidatorParam evp = tx.getTxParam(EditValidatorParam.class);
+                            node = nodeCache.getNode(evp.getNodeId());
+                            latestStaking = node.getLatestStaking();
+                            evp.setNodeName(latestStaking.getStakingName());
+                            tx.setTxInfo(JSON.toJSONString(evp));
+                            break;
+                        case DELEGATE: // 发起委托
+                            DelegateParam dp = tx.getTxParam(DelegateParam.class);
+                            node = nodeCache.getNode(dp.getNodeId());
+                            latestStaking = node.getLatestStaking();
+                            dp.setNodeName(latestStaking.getStakingName());
+                            tx.setTxInfo(JSON.toJSONString(dp));
+                            break;
+                        case UN_DELEGATE: // 撤销委托
+                            UnDelegateParam udp = tx.getTxParam(UnDelegateParam.class);
+                            node = nodeCache.getNode(udp.getNodeId());
+                            latestStaking = node.getLatestStaking();
+                            udp.setNodeName(latestStaking.getStakingName());
+                            tx.setTxInfo(JSON.toJSONString(udp));
+                            break;
+                        default:
+                            return;
+                    }
+                }catch (NoSuchBeanException e){
+                    logger.error("交易[{}]失败,且找不到对应的质押信息，无法补充交易中的节点名称信息！",tx.getHash());
                 }
             }
 
