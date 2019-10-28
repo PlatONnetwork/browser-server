@@ -23,11 +23,11 @@ public class HttpUtil {
      * @return
      * @throws HttpRequestException
      */
+    private static final OkHttpClient CLIENT = new OkHttpClient();
     public static  <T> T post(String url,String param,Class<T> clazz) throws HttpRequestException {
-        OkHttpClient httpClient = new OkHttpClient();
         MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
         Request request = new Request.Builder().post(RequestBody.create(param,mediaType)).url(url).build();
-        return resolve(httpClient,request,url,clazz);
+        return resolve(request,url,clazz);
     }
 
     /**
@@ -39,14 +39,12 @@ public class HttpUtil {
      * @throws HttpRequestException
      */
     public static <T> T get(String url,Class<T> clazz) throws HttpRequestException {
-        OkHttpClient httpClient = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
-        return resolve(httpClient,request,url,clazz);
+        return resolve(request,url,clazz);
     }
 
     /**
      * 解析结果
-     * @param httpClient
      * @param request
      * @param url
      * @param clazz
@@ -55,10 +53,10 @@ public class HttpUtil {
      * @throws HttpRequestException
      */
     @SuppressWarnings("unchecked")
-	private static <T> T resolve(OkHttpClient httpClient,Request request,String url,Class<T> clazz) throws HttpRequestException {
+	private static <T> T resolve(Request request,String url,Class<T> clazz) throws HttpRequestException {
         Response response;
         try {
-            response = httpClient.newCall(request).execute();
+            response = CLIENT.newCall(request).execute();
         } catch (IOException e) {
             throw new HttpRequestException("请求地址["+url+"]出错:"+e.getMessage());
         }
