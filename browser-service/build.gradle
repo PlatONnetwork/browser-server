@@ -15,4 +15,6 @@ dependencies {
 	testCompile "org.springframework.boot:spring-boot-test:$springbootVersion"
 	testCompile "org.springframework.boot:spring-boot-starter-test:$springbootVersion"
     compile group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
+    compile group: 'redis.clients', name: 'jedis', version: '3.1.0'
+
 }
