@@ -35,6 +35,8 @@ public class RedisSentinelConfig {
 
     @Value("${spring.redis.sentinel.nodes}")
     private List<String> nodes;
+    @Value("${spring.redis.sentinel.master}")
+    private String master;
     @Value("${spring.redis.password}")
     private String password;
 
