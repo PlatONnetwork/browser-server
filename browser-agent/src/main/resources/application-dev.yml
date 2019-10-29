@@ -1,19 +1,19 @@
 # ***************************开发配置**************************** #
-# 集群模式
-#spring:
-#  redis:
-#    cluster:
-#      max-redirects: 3
-#      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
-#    password: platscan
-# Sentinel模式
+##集群模式
 spring:
   redis:
-    sentinel:
-      master: mymaster
-      nodes: 192.168.16.172:26379,192.168.16.172:26380,192.168.16.172:26381
-    password: foobared
-    database: 0
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+    password: platscan
+##Sentinel模式
+#spring:
+#  redis:
+#    sentinel:
+#      master: mymaster
+#      nodes: 192.168.16.172:26379,192.168.16.172:26380,192.168.16.172:26381
+#    password: foobared
+#    database: 0
 #ES配置
 elasticsearch:
   hosts: 192.168.120.172
