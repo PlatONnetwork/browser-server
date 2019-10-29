@@ -2,25 +2,17 @@ package com.platon.browser.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.entity.TransactionWithBLOBs;
-import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.web3j.platon.BaseResponse;
-import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.utils.JSONUtil;
 
-import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: Chendongming
@@ -56,61 +48,6 @@ public class CustomTransaction extends TransactionWithBLOBs {
             this.setSequence(sequence);
         } catch (Exception e) {
             logger.error("更新交易出错",e);
-        }
-    }
-
-    /**
-     * 根据交易回执设置交易的成功标识
-     * @param receipt
-     * @throws BeanCreateOrUpdateException
-     */
-    @SuppressWarnings("rawtypes")
-	public void updateWithTransactionReceipt (TransactionReceipt receipt,Set<String> innerContractAddr) throws BeanCreateOrUpdateException {
-        try{
-            this.setGasUsed(receipt.getGasUsed().toString());
-            this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            if(innerContractAddr.contains(receipt.getTo())){
-                // 第一种：ppos内置合约交易类型
-                // 成功：logs.get(0).getData()来解析出Status字段，并且为true
-                // 失败：非成功
-                List<Log> logs =  receipt.getLogs();
-                if(logs==null||logs.isEmpty()){
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                }else {
-                    Log log = logs.get(0);
-                    String data = log.getData();
-                    if(StringUtils.isNotBlank(data)) {
-                        data=data.replace("0x","");
-                    }else{
-                        this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                    }
-                    RlpList b = RlpDecoder.decode(Hex.decode(data));
-                    RlpList group = (RlpList) b.getValues().get(0);
-                    RlpString out = (RlpString) group.getValues().get(0);
-                    String res = new String(out.getBytes());
-                    BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
-                    if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                    if(response!=null){
-                        if(response.isStatusOk()) {
-                            this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                        }else{
-                            this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                            this.setFailReason(response.errMsg);
-                        }
-                    }
-                }
-            }else {
-                // 第二种：非第一种
-                //成功：交易回执的状态： status为空或者status=1，代表成功
-                //失败：非成功
-                if(receipt.isStatusOK()){
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                }else {
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                }
-            }
-        }catch (Exception e){
-            throw new BeanCreateOrUpdateException("使用交易回执更新交易出错:"+e.getMessage());
         }
     }
 
