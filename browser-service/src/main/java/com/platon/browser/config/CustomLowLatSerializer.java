@@ -1,14 +1,13 @@
 package com.platon.browser.config;
 
-import java.io.IOException;
-import java.math.RoundingMode;
-
-import org.apache.commons.lang3.StringUtils;
-import org.web3j.utils.Convert;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.apache.commons.lang3.StringUtils;
+import org.web3j.utils.Convert;
+
+import java.io.IOException;
+import java.math.RoundingMode;
 
 /**
  *  返回金额转化实现类

@@ -1,11 +1,9 @@
 package com.platon.browser.config;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.req.PageReq;
-
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 /**
  * 获取message的dto
  *  @file MessageDto.java

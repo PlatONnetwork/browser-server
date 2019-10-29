@@ -1,10 +1,9 @@
 package com.platon.browser.req.address;
 
+import com.platon.browser.req.PageReq;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-
-import com.platon.browser.req.PageReq;
 
 /**
  *  查询地址锁仓详情请求对象

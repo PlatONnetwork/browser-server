@@ -65,7 +65,7 @@ public class AddressCacheUpdater {
      *      h.delegate_reduction  赎回中的
      *
      */
-    public void updateAddressStatistics () throws BusinessException {
+    public void updateAddressStatistics () {
         NodeCache nodeCache = cacheHolder.getNodeCache();
         AddressCache addressCache = cacheHolder.getAddressCache();
         AddressStage addressStage = cacheHolder.getStageData().getAddressStage();
@@ -106,18 +106,6 @@ public class AddressCacheUpdater {
                     stat.delegateLocked = stat.delegateLocked.add(delegation.integerDelegateLocked());
                     stat.delegateReduction = stat.delegateReduction.add(delegation.integerDelegateReduction());
                     delegationNodeIds.add(delegation.getNodeId());
-                    /*Integer status = 0;
-                    CustomStaking staking = new CustomStaking();
-                    try {
-                        staking = nodeCache.getStaking(delegation.getNodeId(),delegation.getStakingBlockNum());
-                        status = staking.getStatus();
-                    } catch (NoSuchBeanException e) {
-                        throw new BusinessException(e.getMessage());
-                    }
-                    if (status.equals(CustomStaking.StatusEnum.EXITING.getCode()) || status.equals(CustomStaking.StatusEnum.EXITED.getCode())) {
-                        stat.delegateUnlock = stat.delegateUnlock.add(staking.integerStatDelegateHas().add(staking.integerStatDelegateLocked()));
-                        stat.delegateLocked = stat.delegateLocked.subtract(stat.delegateUnlock);
-                    }*/
                 }
             }
             stat.candidateCount = BigInteger.valueOf(delegationNodeIds.size());

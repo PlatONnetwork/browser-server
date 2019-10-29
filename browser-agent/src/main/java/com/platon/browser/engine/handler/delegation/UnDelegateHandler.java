@@ -109,15 +109,6 @@ public class UnDelegateHandler implements EventHandler {
             if (sumAmount.compareTo(BigInteger.ZERO)==0) {
                 delegation.setIsHistory(CustomDelegation.YesNoEnum.YES.getCode());
             }
-
-//            //判断此委托赎回是否已经完成
-//            if (unDelegation.integerRedeemLocked().compareTo(BigInteger.ZERO)==0) {
-//                //锁定期赎回金额为0则表示：本次赎回的金额在犹豫期金额足够，全部扣除，本次委托赎回已经完成
-//                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
-//            } else {
-//                unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITING.getCode());
-//            }
-
             // 解委托实时生效
             unDelegation.setStatus(CustomUnDelegation.StatusEnum.EXITED.getCode());
 

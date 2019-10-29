@@ -88,7 +88,6 @@ public class ClassUtil {
                                                             + className));
                                         } catch (ClassNotFoundException e) {
                                             // log
-                                            // .error("添加用户自定义视图类错误 找不到此类的.class文件");
                                             logger.error("添加用户自定义视图类错误:",e);
                                         }
                                     }
@@ -96,7 +95,6 @@ public class ClassUtil {
                             }
                         }
                     } catch (IOException e) {
-                        // log.error("在扫描用户定义视图时从jar包获取文件出错");
                         logger.error("在扫描用户定义视图时从jar包获取文件出错:",e);
                     }
                 }

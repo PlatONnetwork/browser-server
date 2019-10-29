@@ -57,22 +57,22 @@ public class TxParamResolver {
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
                         BigInteger stakingTyp =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
                         //用于接受出块奖励和质押奖励的收益账户benefitAddress
-                        String addr = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String addr = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         //被质押的节点的NodeId
-                        String stakNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        String stakNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(3));
                         //外部Id externalId
-                        String extrnaIdHex = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String extrnaIdHex = Resolver.stringResolver((RlpString) rlpList1.getValues().get(4));
                         String extrnaId = new String(Numeric.hexStringToByteArray(extrnaIdHex));
 
                         //被质押节点的名称 nodeName
-                        String hexStakNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String hexStakNodeName = Resolver.stringResolver((RlpString) rlpList1.getValues().get(5));
                         String stakNodeName = new String(Numeric.hexStringToByteArray(hexStakNodeName));
                         //节点的第三方主页 website
-                        String hexWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String hexWebSiteAdd = Resolver.stringResolver((RlpString) rlpList1.getValues().get(6));
                         String webSiteAdd = new String(Numeric.hexStringToByteArray(hexWebSiteAdd));
 
                         //节点的描述 details
-                        String hexDeteils = Resolver.StringResolver((RlpString) rlpList1.getValues().get(7));
+                        String hexDeteils = Resolver.stringResolver((RlpString) rlpList1.getValues().get(7));
                         String deteils = new String(Numeric.hexStringToByteArray(hexDeteils));
 
                         //质押的von amount programVersion
@@ -89,22 +89,22 @@ public class TxParamResolver {
                     case EDIT_VALIDATOR: // 1001
                         // 修改质押信息
                         //用于接受出块奖励和质押奖励的收益账户
-                        String editAddr = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String editAddr = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //被质押的节点的NodeId
-                        String editNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String editNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         //外部Id
-                        String hexeditExtrId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        String hexeditExtrId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(3));
                         String extrId = new String(Numeric.hexStringToByteArray(hexeditExtrId));
                         //被质押节点的名称
-                        String hexEditNodeName = Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String hexEditNodeName = Resolver.stringResolver((RlpString) rlpList1.getValues().get(4));
                         String editNodeName = new String(Numeric.hexStringToByteArray(hexEditNodeName));
 
                         //节点的第三方主页
-                        String hexEditWebSiteAdd = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String hexEditWebSiteAdd = Resolver.stringResolver((RlpString) rlpList1.getValues().get(5));
                         String editWebSiteAdd = new String(Numeric.hexStringToByteArray(hexEditWebSiteAdd));
 
                         //节点的描述
-                        String hexEditDetail = Resolver.StringResolver((RlpString) rlpList1.getValues().get(6));
+                        String hexEditDetail = Resolver.stringResolver((RlpString) rlpList1.getValues().get(6));
                         String editDetail = new String(Numeric.hexStringToByteArray(hexEditDetail));
 
 
@@ -116,7 +116,7 @@ public class TxParamResolver {
                         // 增持质押
 
                         //被质押的节点的NodeId
-                        String increaseNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String increaseNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
                         BigInteger increaseTyp =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(2));
                         //质押的von
@@ -130,7 +130,7 @@ public class TxParamResolver {
                         // 撤销质押
 
                         //被质押的节点的NodeId
-                        String exitNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String exitNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         ExitValidatorParam exitValidatorParam = new ExitValidatorParam();
                         exitValidatorParam.init(exitNodeId,"","");
                         result.param = exitValidatorParam;
@@ -141,7 +141,7 @@ public class TxParamResolver {
                         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
                         BigInteger type =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
                         //被质押的节点的NodeId
-                        String delegateNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String delegateNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         //委托的金额
                         BigInteger delegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
@@ -153,9 +153,9 @@ public class TxParamResolver {
                         // 减持/撤销委托
 
                         //代表着某个node的某次质押的唯一标示
-                        String stakingBlockNum = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String stakingBlockNum = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //被质押的节点的NodeId
-                        String unDelegateNodeId = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String unDelegateNodeId = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         //减持委托的金额(按照最小单位算，1LAT = 10**18 von)
                         BigInteger unDelegateAmount =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
 
@@ -168,9 +168,9 @@ public class TxParamResolver {
                         // 提交文本提案
 
                         //提交提案的验证人
-                        String proposalVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String proposalVerifier = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //pIDID
-                        String proposalPIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String proposalPIDID = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         String PIDID =  new String(Numeric.hexStringToByteArray(proposalPIDID));
                         CreateProposalTextParam createProposalTextParam = new CreateProposalTextParam();
                         createProposalTextParam.init(proposalVerifier,PIDID);
@@ -180,9 +180,9 @@ public class TxParamResolver {
                         // 提交升级提案
 
                         //提交提案的验证人
-                        String upgradeVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String upgradeVerifier = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //pIDID
-                        String upgradelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String upgradelpIDID = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         String upgradelpidid =  new String(Numeric.hexStringToByteArray(upgradelpIDID));
                         //升级版本
                         BigInteger newVersion =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
@@ -198,14 +198,14 @@ public class TxParamResolver {
                         // 提交取消提案
 
                         //提交提案的验证人
-                        String cancelVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String cancelVerifier = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //本提案的pIDID
-                        String cancelpIDID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String cancelpIDID = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         String cancelpidid =  new String(Numeric.hexStringToByteArray(cancelpIDID));
                         //投票截止区块高度
                         BigInteger cancelEndBlockRound =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //被取消的pIDID
-                        String canceledProposalID =  Resolver.StringResolver((RlpString) rlpList1.getValues().get(4));
+                        String canceledProposalID =  Resolver.stringResolver((RlpString) rlpList1.getValues().get(4));
 
 
                         CancelProposalParam cancelProposalParam = new CancelProposalParam();
@@ -216,15 +216,15 @@ public class TxParamResolver {
                         // 给提案投票
 
                         //投票验证人
-                        String voteVerifier = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String voteVerifier = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //提案ID
-                        String proposalID = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String proposalID = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         //投票选项
                         BigInteger option =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(3));
                         //节点代码版本，有rpc的getProgramVersion接口获取
                         BigInteger programVersions =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(4));
                         //代码版本签名，有rpc的getProgramVersion接口获取
-                        String versionSign = Resolver.StringResolver((RlpString) rlpList1.getValues().get(5));
+                        String versionSign = Resolver.stringResolver((RlpString) rlpList1.getValues().get(5));
 
                         VotingProposalParam votingProposalParam = new VotingProposalParam();
                         votingProposalParam.init(voteVerifier,proposalID,option.toString(),programVersions.toString(),versionSign);
@@ -234,11 +234,11 @@ public class TxParamResolver {
                         // 版本声明
 
                         //声明的节点，只能是验证人/候选人
-                        String activeNode = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String activeNode = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
                         //声明的版本，有rpc的getProgramVersion接口获取
                         BigInteger version =  Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(2));
                         //声明的版本签名，有rpc的getProgramVersion接口获取
-                        String versionSigns = Resolver.StringResolver((RlpString) rlpList1.getValues().get(3));
+                        String versionSigns = Resolver.stringResolver((RlpString) rlpList1.getValues().get(3));
                         DeclareVersionParam declareVersionParam = new DeclareVersionParam();
                         declareVersionParam.init(activeNode,version.intValue(),versionSigns);
                         result.param = declareVersionParam;
@@ -248,7 +248,7 @@ public class TxParamResolver {
                         //type
                         BigInteger dupType = Resolver.bigIntegerResolver((RlpString) rlpList1.getValues().get(1));
                         //data
-                        String data = Resolver.StringResolver((RlpString) rlpList1.getValues().get(2));
+                        String data = Resolver.stringResolver((RlpString) rlpList1.getValues().get(2));
                         String evdences = new String(Numeric.hexStringToByteArray(data));
 
                         ReportValidatorParam reportValidatorParam = new ReportValidatorParam();
@@ -259,10 +259,10 @@ public class TxParamResolver {
                         //创建锁仓计划
 
                         //锁仓释放到账账户
-                        String account = Resolver.StringResolver((RlpString) rlpList1.getValues().get(1));
+                        String account = Resolver.stringResolver((RlpString) rlpList1.getValues().get(1));
 
                         // RestrictingPlan 类型的列表（数组）
-                        List<PlanParam> planDtoList = Resolver.ObjectResolver((RlpString) rlpList1.getValues().get(2));
+                        List<PlanParam> planDtoList = Resolver.objectResolver((RlpString) rlpList1.getValues().get(2));
 
                         CreateRestrictingParam createRestrictingParam = new CreateRestrictingParam();
                         createRestrictingParam.setPlan(planDtoList);

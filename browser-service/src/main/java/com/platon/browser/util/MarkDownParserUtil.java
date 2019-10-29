@@ -1,8 +1,7 @@
 package com.platon.browser.util;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.HttpRequestException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,6 +20,9 @@ import java.util.Map;
  * Desc:
  */
 public final class MarkDownParserUtil {
+
+    private MarkDownParserUtil(){}
+
     private static final String MARKDOWN_BEFORE_INDEX = "<article class=\"markdown-body";
     private static final String MARKDOWN_LAST_INDEX = "</article>";
 
@@ -44,7 +46,7 @@ public final class MarkDownParserUtil {
         for (int i = 0; i < ths.size(); i++) {
             tableMap.put(ths.get(i).text(),trs.get(i).text());
         }
-        return JSONObject.toJSONString(tableMap);
+        return JSON.toJSONString(tableMap);
     }
 
 }

@@ -1,19 +1,18 @@
 package com.platon.browser.controller;
 
-import javax.validation.Valid;
-
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.AddressService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.platon.browser.req.address.QueryDetailRequest;
 import com.platon.browser.req.address.QueryRPPlanDetailRequest;
 import com.platon.browser.res.BaseResp;
 import com.platon.browser.res.address.QueryDetailResp;
 import com.platon.browser.res.address.QueryRPPlanDetailResp;
 import com.platon.browser.util.I18nUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  *          地址具体实现Controller 提供地址详情页面使用

@@ -59,7 +59,7 @@ public class AppDocHomeController implements AppDocHome {
 		/**
 		 * 第一次返回都设为true
 		 */
-		if(lists !=null && lists.size() > 0) {
+		if(lists !=null && !lists.isEmpty()) {
 			lists.get(0).setIsRefresh(true);
 		}
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),lists);

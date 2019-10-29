@@ -24,7 +24,7 @@ import java.util.TimeZone;
  */
 @Service
 public class DateUtil {
-	private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
 	
 	private static final String DATE_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
 
