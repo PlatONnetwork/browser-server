@@ -1,5 +1,8 @@
 package com.platon.browser.client;
 
+import com.platon.browser.client.result.RpcTxReceiptResult;
+import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -139,5 +142,25 @@ public class PlatOnClient {
             logger.error("detect exception:{}", e);
         }
         logger.debug("*** End the detect task *** ");
+    }
+
+    /**
+     * 根据区块号取交易回执
+     * @param blockNumber
+     */
+    private RpcParam rpcParam = new RpcParam();
+    public RpcTxReceiptResult getReceiptByBlockNumber(long blockNumber){
+        rpcParam.setMethod("platon_getTransactionByBlock");
+        rpcParam.getParams().clear();
+        rpcParam.getParams().add(blockNumber);
+        int tryTime = 0;
+        while (true) try {
+            if (tryTime==10) throw new HttpRequestException("已经重试取交易回执超过10次!");
+            RpcTxReceiptResult result = HttpUtil.post(getWeb3jAddress(),rpcParam.toJsonString(), RpcTxReceiptResult.class);
+            return result;
+        } catch (HttpRequestException e) {
+            tryTime++;
+            logger.error("{}",e);
+        }
     }
 }
