@@ -230,7 +230,8 @@ public class StakingServiceImpl implements StakingService {
 			/** 只有不是内置节点才计算年化率  */
 			if (CustomStaking.YesNoEnum.YES.getCode() != stakingNode.getIsInit()) {
 				resp.setExpectedIncome(stakingNode.getExpectedIncome());
-				resp.setRewardValue("");
+				String allReward = new BigDecimal(stakingNode.getFeeRewardValue()).add(new BigDecimal(stakingNode.getStatRewardValue())).toString();
+				resp.setRewardValue(allReward);
 			} else {
 				resp.setRewardValue(stakingNode.getFeeRewardValue());
 				resp.setExpectedIncome("");
