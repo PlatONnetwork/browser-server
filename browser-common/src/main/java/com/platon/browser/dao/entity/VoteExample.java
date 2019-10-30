@@ -175,143 +175,143 @@ public class VoteExample {
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameIsNull() {
-            addCriterion("verifier_name is null");
+        public Criteria andNodeIdIsNull() {
+            addCriterion("node_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameIsNotNull() {
-            addCriterion("verifier_name is not null");
+        public Criteria andNodeIdIsNotNull() {
+            addCriterion("node_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameEqualTo(String value) {
-            addCriterion("verifier_name =", value, "verifierName");
+        public Criteria andNodeIdEqualTo(String value) {
+            addCriterion("node_id =", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameNotEqualTo(String value) {
-            addCriterion("verifier_name <>", value, "verifierName");
+        public Criteria andNodeIdNotEqualTo(String value) {
+            addCriterion("node_id <>", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameGreaterThan(String value) {
-            addCriterion("verifier_name >", value, "verifierName");
+        public Criteria andNodeIdGreaterThan(String value) {
+            addCriterion("node_id >", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameGreaterThanOrEqualTo(String value) {
-            addCriterion("verifier_name >=", value, "verifierName");
+        public Criteria andNodeIdGreaterThanOrEqualTo(String value) {
+            addCriterion("node_id >=", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameLessThan(String value) {
-            addCriterion("verifier_name <", value, "verifierName");
+        public Criteria andNodeIdLessThan(String value) {
+            addCriterion("node_id <", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameLessThanOrEqualTo(String value) {
-            addCriterion("verifier_name <=", value, "verifierName");
+        public Criteria andNodeIdLessThanOrEqualTo(String value) {
+            addCriterion("node_id <=", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameLike(String value) {
-            addCriterion("verifier_name like", value, "verifierName");
+        public Criteria andNodeIdLike(String value) {
+            addCriterion("node_id like", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameNotLike(String value) {
-            addCriterion("verifier_name not like", value, "verifierName");
+        public Criteria andNodeIdNotLike(String value) {
+            addCriterion("node_id not like", value, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameIn(List<String> values) {
-            addCriterion("verifier_name in", values, "verifierName");
+        public Criteria andNodeIdIn(List<String> values) {
+            addCriterion("node_id in", values, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameNotIn(List<String> values) {
-            addCriterion("verifier_name not in", values, "verifierName");
+        public Criteria andNodeIdNotIn(List<String> values) {
+            addCriterion("node_id not in", values, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameBetween(String value1, String value2) {
-            addCriterion("verifier_name between", value1, value2, "verifierName");
+        public Criteria andNodeIdBetween(String value1, String value2) {
+            addCriterion("node_id between", value1, value2, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNameNotBetween(String value1, String value2) {
-            addCriterion("verifier_name not between", value1, value2, "verifierName");
+        public Criteria andNodeIdNotBetween(String value1, String value2) {
+            addCriterion("node_id not between", value1, value2, "nodeId");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierIsNull() {
-            addCriterion("verifier is null");
+        public Criteria andNodeNameIsNull() {
+            addCriterion("node_name is null");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierIsNotNull() {
-            addCriterion("verifier is not null");
+        public Criteria andNodeNameIsNotNull() {
+            addCriterion("node_name is not null");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierEqualTo(String value) {
-            addCriterion("verifier =", value, "verifier");
+        public Criteria andNodeNameEqualTo(String value) {
+            addCriterion("node_name =", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNotEqualTo(String value) {
-            addCriterion("verifier <>", value, "verifier");
+        public Criteria andNodeNameNotEqualTo(String value) {
+            addCriterion("node_name <>", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierGreaterThan(String value) {
-            addCriterion("verifier >", value, "verifier");
+        public Criteria andNodeNameGreaterThan(String value) {
+            addCriterion("node_name >", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierGreaterThanOrEqualTo(String value) {
-            addCriterion("verifier >=", value, "verifier");
+        public Criteria andNodeNameGreaterThanOrEqualTo(String value) {
+            addCriterion("node_name >=", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierLessThan(String value) {
-            addCriterion("verifier <", value, "verifier");
+        public Criteria andNodeNameLessThan(String value) {
+            addCriterion("node_name <", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierLessThanOrEqualTo(String value) {
-            addCriterion("verifier <=", value, "verifier");
+        public Criteria andNodeNameLessThanOrEqualTo(String value) {
+            addCriterion("node_name <=", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierLike(String value) {
-            addCriterion("verifier like", value, "verifier");
+        public Criteria andNodeNameLike(String value) {
+            addCriterion("node_name like", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNotLike(String value) {
-            addCriterion("verifier not like", value, "verifier");
+        public Criteria andNodeNameNotLike(String value) {
+            addCriterion("node_name not like", value, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierIn(List<String> values) {
-            addCriterion("verifier in", values, "verifier");
+        public Criteria andNodeNameIn(List<String> values) {
+            addCriterion("node_name in", values, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNotIn(List<String> values) {
-            addCriterion("verifier not in", values, "verifier");
+        public Criteria andNodeNameNotIn(List<String> values) {
+            addCriterion("node_name not in", values, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierBetween(String value1, String value2) {
-            addCriterion("verifier between", value1, value2, "verifier");
+        public Criteria andNodeNameBetween(String value1, String value2) {
+            addCriterion("node_name between", value1, value2, "nodeName");
             return (Criteria) this;
         }
 
-        public Criteria andVerifierNotBetween(String value1, String value2) {
-            addCriterion("verifier not between", value1, value2, "verifier");
+        public Criteria andNodeNameNotBetween(String value1, String value2) {
+            addCriterion("node_name not between", value1, value2, "nodeName");
             return (Criteria) this;
         }
 
@@ -325,62 +325,52 @@ public class VoteExample {
             return (Criteria) this;
         }
 
-        public Criteria andOptionEqualTo(String value) {
+        public Criteria andOptionEqualTo(Integer value) {
             addCriterion("`option` =", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionNotEqualTo(String value) {
+        public Criteria andOptionNotEqualTo(Integer value) {
             addCriterion("`option` <>", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionGreaterThan(String value) {
+        public Criteria andOptionGreaterThan(Integer value) {
             addCriterion("`option` >", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionGreaterThanOrEqualTo(String value) {
+        public Criteria andOptionGreaterThanOrEqualTo(Integer value) {
             addCriterion("`option` >=", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionLessThan(String value) {
+        public Criteria andOptionLessThan(Integer value) {
             addCriterion("`option` <", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionLessThanOrEqualTo(String value) {
+        public Criteria andOptionLessThanOrEqualTo(Integer value) {
             addCriterion("`option` <=", value, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionLike(String value) {
-            addCriterion("`option` like", value, "option");
-            return (Criteria) this;
-        }
-
-        public Criteria andOptionNotLike(String value) {
-            addCriterion("`option` not like", value, "option");
-            return (Criteria) this;
-        }
-
-        public Criteria andOptionIn(List<String> values) {
+        public Criteria andOptionIn(List<Integer> values) {
             addCriterion("`option` in", values, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionNotIn(List<String> values) {
+        public Criteria andOptionNotIn(List<Integer> values) {
             addCriterion("`option` not in", values, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionBetween(String value1, String value2) {
+        public Criteria andOptionBetween(Integer value1, Integer value2) {
             addCriterion("`option` between", value1, value2, "option");
             return (Criteria) this;
         }
 
-        public Criteria andOptionNotBetween(String value1, String value2) {
+        public Criteria andOptionNotBetween(Integer value1, Integer value2) {
             addCriterion("`option` not between", value1, value2, "option");
             return (Criteria) this;
         }

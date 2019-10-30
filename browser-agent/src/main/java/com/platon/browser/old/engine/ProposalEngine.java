@@ -1,0 +1,84 @@
+package com.platon.browser.old.engine;
+
+import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.mapper.CustomVoteMapper;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.dto.CustomVote;
+import com.platon.browser.old.engine.cache.CacheHolder;
+import com.platon.browser.old.engine.cache.ProposalCache;
+import com.platon.browser.old.engine.handler.EventContext;
+import com.platon.browser.old.engine.handler.proposal.*;
+import com.platon.browser.old.exception.BusinessException;
+import com.platon.browser.old.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+
+/**
+ * @Auther: Chendongming
+ * @Date: 2019/8/10 16:12
+ * @Description: 提案业务处理引擎
+ */
+//@Component
+public class ProposalEngine {
+    private static Logger logger = LoggerFactory.getLogger(ProposalEngine.class);
+
+    public static final String PID_ID_NUM = "PIP-{pip_id}";
+
+    public static final String KEY = "{pip_id}";
+    @Autowired
+    private CustomProposalMapper customProposalMapper;
+    @Autowired
+    private CustomVoteMapper customVoteMapper;
+    @Autowired
+    private CacheHolder cacheHolder;
+
+    /*********************业务事件处理器*********************/
+
+    @Autowired
+    private ProposalTextHandler proposalTextHandler;
+    @Autowired
+    private ProposalCancelHandler proposalCancelHandler;
+    @Autowired
+    private ProposalUpgradeHandler proposalUpgradeHandler;
+    @Autowired
+    private VotingProposalHandler votingProposalHandler;
+    @Autowired
+    private DeclareVersionHandler declareVersionHandler;
+
+    private EventContext context = new EventContext();
+
+    @PostConstruct
+    public void init() throws CacheConstructException {
+        ProposalCache proposalCache = cacheHolder.getProposalCache();
+    	logger.debug("init ProposalEngine");
+        // 初始化全量数据
+        List<CustomProposal> proposalList = customProposalMapper.selectAll();
+        List<CustomVote> voteList = customVoteMapper.selectAll();
+        proposalCache.init(proposalList,voteList);
+        proposalCache.sweep();
+    }
+
+    /**
+     * 执行交易
+     * @param tx 交易
+     */
+    void execute(CustomTransaction tx) throws BusinessException, NoSuchBeanException {
+        // 事件上下文
+        context.setTransaction(tx);
+        switch (tx.getTypeEnum()){
+            case CREATE_PROPOSAL_TEXT: proposalTextHandler.handle(context);break; //提交文本提案(创建提案)
+            case CREATE_PROPOSAL_UPGRADE: proposalUpgradeHandler.handle(context);break; //提交升级提案(创建提案)
+            case CANCEL_PROPOSAL: proposalCancelHandler.handle(context);break; //创建取消提案
+            case VOTING_PROPOSAL: votingProposalHandler.handle(context);break; //给提案投票(提案投票)
+            case DECLARE_VERSION: declareVersionHandler.handle(context);break;//版本声明
+			default:
+				break;
+        }
+    }
+}

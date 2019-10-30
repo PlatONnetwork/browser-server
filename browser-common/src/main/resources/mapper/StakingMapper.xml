@@ -2,41 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.mapper.StakingMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Staking">
-    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
     <result column="staking_tx_index" jdbcType="INTEGER" property="stakingTxIndex" />
-    <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
-    <result column="staking_has" jdbcType="VARCHAR" property="stakingHas" />
-    <result column="staking_locked" jdbcType="VARCHAR" property="stakingLocked" />
+    <result column="staking_hes" jdbcType="DECIMAL" property="stakingHes" />
+    <result column="staking_locked" jdbcType="DECIMAL" property="stakingLocked" />
+    <result column="staking_reduction" jdbcType="DECIMAL" property="stakingReduction" />
     <result column="staking_reduction_epoch" jdbcType="INTEGER" property="stakingReductionEpoch" />
-    <result column="staking_reduction" jdbcType="VARCHAR" property="stakingReduction" />
-    <result column="stat_delegate_has" jdbcType="VARCHAR" property="statDelegateHas" />
-    <result column="stat_delegate_locked" jdbcType="VARCHAR" property="statDelegateLocked" />
-    <result column="stat_delegate_reduction" jdbcType="VARCHAR" property="statDelegateReduction" />
-    <result column="stat_delegate_qty" jdbcType="INTEGER" property="statDelegateQty" />
-    <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
-    <result column="staking_name" jdbcType="VARCHAR" property="stakingName" />
-    <result column="staking_icon" jdbcType="VARCHAR" property="stakingIcon" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
+    <result column="node_icon" jdbcType="VARCHAR" property="nodeIcon" />
     <result column="external_id" jdbcType="VARCHAR" property="externalId" />
-    <result column="denefit_addr" jdbcType="VARCHAR" property="denefitAddr" />
-    <result column="expected_income" jdbcType="VARCHAR" property="expectedIncome" />
-    <result column="block_reward_value" jdbcType="VARCHAR" property="blockRewardValue" />
-    <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
-    <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />
+    <result column="external_name" jdbcType="VARCHAR" property="externalName" />
+    <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
+    <result column="benefit_addr" jdbcType="VARCHAR" property="benefitAddr" />
+    <result column="annualized_rate" jdbcType="DOUBLE" property="annualizedRate" />
     <result column="program_version" jdbcType="VARCHAR" property="programVersion" />
-    <result column="staking_reward_value" jdbcType="VARCHAR" property="stakingRewardValue" />
+    <result column="big_version" jdbcType="VARCHAR" property="bigVersion" />
     <result column="web_site" jdbcType="VARCHAR" property="webSite" />
     <result column="details" jdbcType="VARCHAR" property="details" />
     <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
     <result column="leave_time" jdbcType="TIMESTAMP" property="leaveTime" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="is_consensus" jdbcType="INTEGER" property="isConsensus" />
-    <result column="is_setting" jdbcType="INTEGER" property="isSetting" />
+    <result column="is_settle" jdbcType="INTEGER" property="isSettle" />
     <result column="is_init" jdbcType="INTEGER" property="isInit" />
+    <result column="stat_delegate_hes" jdbcType="DECIMAL" property="statDelegateHes" />
+    <result column="stat_delegate_locked" jdbcType="DECIMAL" property="statDelegateLocked" />
+    <result column="stat_delegate_released" jdbcType="DECIMAL" property="statDelegateReleased" />
+    <result column="block_reward_value" jdbcType="DECIMAL" property="blockRewardValue" />
+    <result column="fee_reward_value" jdbcType="DECIMAL" property="feeRewardValue" />
+    <result column="staking_reward_value" jdbcType="DECIMAL" property="stakingRewardValue" />
+    <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />
+    <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="external_name" jdbcType="VARCHAR" property="externalName" />
-    <result column="fee_reward_value" jdbcType="VARCHAR" property="feeRewardValue" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Staking">
     <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
@@ -100,13 +99,12 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    staking_block_num, node_id, staking_tx_index, staking_addr, staking_has, staking_locked, 
-    staking_reduction_epoch, staking_reduction, stat_delegate_has, stat_delegate_locked, 
-    stat_delegate_reduction, stat_delegate_qty, stat_verifier_time, staking_name, staking_icon, 
-    external_id, denefit_addr, expected_income, block_reward_value, pre_cons_block_qty, 
-    cur_cons_block_qty, program_version, staking_reward_value, web_site, details, join_time, 
-    leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time, 
-    external_name, fee_reward_value
+    node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction, 
+    staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr, 
+    benefit_addr, annualized_rate, program_version, big_version, web_site, details, join_time, 
+    leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked, 
+    stat_delegate_released, block_reward_value, fee_reward_value, staking_reward_value, 
+    cur_cons_block_qty, pre_cons_block_qty, create_time, update_time
   </sql>
   <sql id="Blob_Column_List">
     annualized_rate_info
@@ -147,13 +145,13 @@
     ,
     <include refid="Blob_Column_List" />
     from staking
-    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
-      and node_id = #{nodeId,jdbcType=VARCHAR}
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="com.platon.browser.dao.entity.StakingKey">
     delete from staking
-    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
-      and node_id = #{nodeId,jdbcType=VARCHAR}
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.platon.browser.dao.entity.StakingExample">
     delete from staking
@@ -162,104 +160,81 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Staking">
-    insert into staking (staking_block_num, node_id, staking_tx_index, 
-      staking_addr, staking_has, staking_locked, 
-      staking_reduction_epoch, staking_reduction, 
-      stat_delegate_has, stat_delegate_locked, stat_delegate_reduction, 
-      stat_delegate_qty, stat_verifier_time, staking_name, 
-      staking_icon, external_id, denefit_addr, 
-      expected_income, block_reward_value, pre_cons_block_qty, 
-      cur_cons_block_qty, program_version, staking_reward_value, 
-      web_site, details, join_time, 
-      leave_time, `status`, is_consensus, 
-      is_setting, is_init, create_time, 
-      update_time, external_name, fee_reward_value, 
-      annualized_rate_info)
-    values (#{stakingBlockNum,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, #{stakingTxIndex,jdbcType=INTEGER}, 
-      #{stakingAddr,jdbcType=VARCHAR}, #{stakingHas,jdbcType=VARCHAR}, #{stakingLocked,jdbcType=VARCHAR}, 
-      #{stakingReductionEpoch,jdbcType=INTEGER}, #{stakingReduction,jdbcType=VARCHAR}, 
-      #{statDelegateHas,jdbcType=VARCHAR}, #{statDelegateLocked,jdbcType=VARCHAR}, #{statDelegateReduction,jdbcType=VARCHAR}, 
-      #{statDelegateQty,jdbcType=INTEGER}, #{statVerifierTime,jdbcType=INTEGER}, #{stakingName,jdbcType=VARCHAR}, 
-      #{stakingIcon,jdbcType=VARCHAR}, #{externalId,jdbcType=VARCHAR}, #{denefitAddr,jdbcType=VARCHAR}, 
-      #{expectedIncome,jdbcType=VARCHAR}, #{blockRewardValue,jdbcType=VARCHAR}, #{preConsBlockQty,jdbcType=BIGINT}, 
-      #{curConsBlockQty,jdbcType=BIGINT}, #{programVersion,jdbcType=VARCHAR}, #{stakingRewardValue,jdbcType=VARCHAR}, 
-      #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP}, 
-      #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{isConsensus,jdbcType=INTEGER}, 
-      #{isSetting,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{externalName,jdbcType=VARCHAR}, #{feeRewardValue,jdbcType=VARCHAR}, 
-      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
+    insert into staking (node_id, staking_block_num, staking_tx_index, 
+      staking_hes, staking_locked, staking_reduction, 
+      staking_reduction_epoch, node_name, node_icon, 
+      external_id, external_name, staking_addr, 
+      benefit_addr, annualized_rate, program_version, 
+      big_version, web_site, details, 
+      join_time, leave_time, `status`, 
+      is_consensus, is_settle, is_init, 
+      stat_delegate_hes, stat_delegate_locked, stat_delegate_released, 
+      block_reward_value, fee_reward_value, staking_reward_value, 
+      cur_cons_block_qty, pre_cons_block_qty, create_time, 
+      update_time, annualized_rate_info)
+    values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER}, 
+      #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL}, 
+      #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR}, 
+      #{externalId,jdbcType=VARCHAR}, #{externalName,jdbcType=VARCHAR}, #{stakingAddr,jdbcType=VARCHAR}, 
+      #{benefitAddr,jdbcType=VARCHAR}, #{annualizedRate,jdbcType=DOUBLE}, #{programVersion,jdbcType=VARCHAR}, 
+      #{bigVersion,jdbcType=VARCHAR}, #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR}, 
+      #{joinTime,jdbcType=TIMESTAMP}, #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, 
+      #{isConsensus,jdbcType=INTEGER}, #{isSettle,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, 
+      #{statDelegateHes,jdbcType=DECIMAL}, #{statDelegateLocked,jdbcType=DECIMAL}, #{statDelegateReleased,jdbcType=DECIMAL}, 
+      #{blockRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{stakingRewardValue,jdbcType=DECIMAL}, 
+      #{curConsBlockQty,jdbcType=BIGINT}, #{preConsBlockQty,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{annualizedRateInfo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Staking">
     insert into staking
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="stakingBlockNum != null">
-        staking_block_num,
-      </if>
       <if test="nodeId != null">
         node_id,
+      </if>
+      <if test="stakingBlockNum != null">
+        staking_block_num,
       </if>
       <if test="stakingTxIndex != null">
         staking_tx_index,
       </if>
-      <if test="stakingAddr != null">
-        staking_addr,
-      </if>
-      <if test="stakingHas != null">
-        staking_has,
+      <if test="stakingHes != null">
+        staking_hes,
       </if>
       <if test="stakingLocked != null">
         staking_locked,
       </if>
-      <if test="stakingReductionEpoch != null">
-        staking_reduction_epoch,
-      </if>
       <if test="stakingReduction != null">
         staking_reduction,
       </if>
-      <if test="statDelegateHas != null">
-        stat_delegate_has,
+      <if test="stakingReductionEpoch != null">
+        staking_reduction_epoch,
       </if>
-      <if test="statDelegateLocked != null">
-        stat_delegate_locked,
+      <if test="nodeName != null">
+        node_name,
       </if>
-      <if test="statDelegateReduction != null">
-        stat_delegate_reduction,
-      </if>
-      <if test="statDelegateQty != null">
-        stat_delegate_qty,
-      </if>
-      <if test="statVerifierTime != null">
-        stat_verifier_time,
-      </if>
-      <if test="stakingName != null">
-        staking_name,
-      </if>
-      <if test="stakingIcon != null">
-        staking_icon,
+      <if test="nodeIcon != null">
+        node_icon,
       </if>
       <if test="externalId != null">
         external_id,
       </if>
-      <if test="denefitAddr != null">
-        denefit_addr,
+      <if test="externalName != null">
+        external_name,
       </if>
-      <if test="expectedIncome != null">
-        expected_income,
+      <if test="stakingAddr != null">
+        staking_addr,
       </if>
-      <if test="blockRewardValue != null">
-        block_reward_value,
+      <if test="benefitAddr != null">
+        benefit_addr,
       </if>
-      <if test="preConsBlockQty != null">
-        pre_cons_block_qty,
-      </if>
-      <if test="curConsBlockQty != null">
-        cur_cons_block_qty,
+      <if test="annualizedRate != null">
+        annualized_rate,
       </if>
       <if test="programVersion != null">
         program_version,
       </if>
-      <if test="stakingRewardValue != null">
-        staking_reward_value,
+      <if test="bigVersion != null">
+        big_version,
       </if>
       <if test="webSite != null">
         web_site,
@@ -279,11 +254,35 @@
       <if test="isConsensus != null">
         is_consensus,
       </if>
-      <if test="isSetting != null">
-        is_setting,
+      <if test="isSettle != null">
+        is_settle,
       </if>
       <if test="isInit != null">
         is_init,
+      </if>
+      <if test="statDelegateHes != null">
+        stat_delegate_hes,
+      </if>
+      <if test="statDelegateLocked != null">
+        stat_delegate_locked,
+      </if>
+      <if test="statDelegateReleased != null">
+        stat_delegate_released,
+      </if>
+      <if test="blockRewardValue != null">
+        block_reward_value,
+      </if>
+      <if test="feeRewardValue != null">
+        fee_reward_value,
+      </if>
+      <if test="stakingRewardValue != null">
+        staking_reward_value,
+      </if>
+      <if test="curConsBlockQty != null">
+        cur_cons_block_qty,
+      </if>
+      <if test="preConsBlockQty != null">
+        pre_cons_block_qty,
       </if>
       <if test="createTime != null">
         create_time,
@@ -291,85 +290,58 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="externalName != null">
-        external_name,
-      </if>
-      <if test="feeRewardValue != null">
-        fee_reward_value,
-      </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="stakingBlockNum != null">
-        #{stakingBlockNum,jdbcType=BIGINT},
-      </if>
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="stakingBlockNum != null">
+        #{stakingBlockNum,jdbcType=BIGINT},
       </if>
       <if test="stakingTxIndex != null">
         #{stakingTxIndex,jdbcType=INTEGER},
       </if>
-      <if test="stakingAddr != null">
-        #{stakingAddr,jdbcType=VARCHAR},
-      </if>
-      <if test="stakingHas != null">
-        #{stakingHas,jdbcType=VARCHAR},
+      <if test="stakingHes != null">
+        #{stakingHes,jdbcType=DECIMAL},
       </if>
       <if test="stakingLocked != null">
-        #{stakingLocked,jdbcType=VARCHAR},
+        #{stakingLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="stakingReduction != null">
+        #{stakingReduction,jdbcType=DECIMAL},
       </if>
       <if test="stakingReductionEpoch != null">
         #{stakingReductionEpoch,jdbcType=INTEGER},
       </if>
-      <if test="stakingReduction != null">
-        #{stakingReduction,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
       </if>
-      <if test="statDelegateHas != null">
-        #{statDelegateHas,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateLocked != null">
-        #{statDelegateLocked,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateReduction != null">
-        #{statDelegateReduction,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateQty != null">
-        #{statDelegateQty,jdbcType=INTEGER},
-      </if>
-      <if test="statVerifierTime != null">
-        #{statVerifierTime,jdbcType=INTEGER},
-      </if>
-      <if test="stakingName != null">
-        #{stakingName,jdbcType=VARCHAR},
-      </if>
-      <if test="stakingIcon != null">
-        #{stakingIcon,jdbcType=VARCHAR},
+      <if test="nodeIcon != null">
+        #{nodeIcon,jdbcType=VARCHAR},
       </if>
       <if test="externalId != null">
         #{externalId,jdbcType=VARCHAR},
       </if>
-      <if test="denefitAddr != null">
-        #{denefitAddr,jdbcType=VARCHAR},
+      <if test="externalName != null">
+        #{externalName,jdbcType=VARCHAR},
       </if>
-      <if test="expectedIncome != null">
-        #{expectedIncome,jdbcType=VARCHAR},
+      <if test="stakingAddr != null">
+        #{stakingAddr,jdbcType=VARCHAR},
       </if>
-      <if test="blockRewardValue != null">
-        #{blockRewardValue,jdbcType=VARCHAR},
+      <if test="benefitAddr != null">
+        #{benefitAddr,jdbcType=VARCHAR},
       </if>
-      <if test="preConsBlockQty != null">
-        #{preConsBlockQty,jdbcType=BIGINT},
-      </if>
-      <if test="curConsBlockQty != null">
-        #{curConsBlockQty,jdbcType=BIGINT},
+      <if test="annualizedRate != null">
+        #{annualizedRate,jdbcType=DOUBLE},
       </if>
       <if test="programVersion != null">
         #{programVersion,jdbcType=VARCHAR},
       </if>
-      <if test="stakingRewardValue != null">
-        #{stakingRewardValue,jdbcType=VARCHAR},
+      <if test="bigVersion != null">
+        #{bigVersion,jdbcType=VARCHAR},
       </if>
       <if test="webSite != null">
         #{webSite,jdbcType=VARCHAR},
@@ -389,23 +361,41 @@
       <if test="isConsensus != null">
         #{isConsensus,jdbcType=INTEGER},
       </if>
-      <if test="isSetting != null">
-        #{isSetting,jdbcType=INTEGER},
+      <if test="isSettle != null">
+        #{isSettle,jdbcType=INTEGER},
       </if>
       <if test="isInit != null">
         #{isInit,jdbcType=INTEGER},
+      </if>
+      <if test="statDelegateHes != null">
+        #{statDelegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="statDelegateLocked != null">
+        #{statDelegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="statDelegateReleased != null">
+        #{statDelegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="blockRewardValue != null">
+        #{blockRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="feeRewardValue != null">
+        #{feeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="stakingRewardValue != null">
+        #{stakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="curConsBlockQty != null">
+        #{curConsBlockQty,jdbcType=BIGINT},
+      </if>
+      <if test="preConsBlockQty != null">
+        #{preConsBlockQty,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="externalName != null">
-        #{externalName,jdbcType=VARCHAR},
-      </if>
-      <if test="feeRewardValue != null">
-        #{feeRewardValue,jdbcType=VARCHAR},
       </if>
       <if test="annualizedRateInfo != null">
         #{annualizedRateInfo,jdbcType=LONGVARCHAR},
@@ -421,74 +411,53 @@
   <update id="updateByExampleSelective" parameterType="map">
     update staking
     <set>
-      <if test="record.stakingBlockNum != null">
-        staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
-      </if>
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stakingBlockNum != null">
+        staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
       </if>
       <if test="record.stakingTxIndex != null">
         staking_tx_index = #{record.stakingTxIndex,jdbcType=INTEGER},
       </if>
-      <if test="record.stakingAddr != null">
-        staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
-      </if>
-      <if test="record.stakingHas != null">
-        staking_has = #{record.stakingHas,jdbcType=VARCHAR},
+      <if test="record.stakingHes != null">
+        staking_hes = #{record.stakingHes,jdbcType=DECIMAL},
       </if>
       <if test="record.stakingLocked != null">
-        staking_locked = #{record.stakingLocked,jdbcType=VARCHAR},
+        staking_locked = #{record.stakingLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="record.stakingReduction != null">
+        staking_reduction = #{record.stakingReduction,jdbcType=DECIMAL},
       </if>
       <if test="record.stakingReductionEpoch != null">
         staking_reduction_epoch = #{record.stakingReductionEpoch,jdbcType=INTEGER},
       </if>
-      <if test="record.stakingReduction != null">
-        staking_reduction = #{record.stakingReduction,jdbcType=VARCHAR},
+      <if test="record.nodeName != null">
+        node_name = #{record.nodeName,jdbcType=VARCHAR},
       </if>
-      <if test="record.statDelegateHas != null">
-        stat_delegate_has = #{record.statDelegateHas,jdbcType=VARCHAR},
-      </if>
-      <if test="record.statDelegateLocked != null">
-        stat_delegate_locked = #{record.statDelegateLocked,jdbcType=VARCHAR},
-      </if>
-      <if test="record.statDelegateReduction != null">
-        stat_delegate_reduction = #{record.statDelegateReduction,jdbcType=VARCHAR},
-      </if>
-      <if test="record.statDelegateQty != null">
-        stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
-      </if>
-      <if test="record.statVerifierTime != null">
-        stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
-      </if>
-      <if test="record.stakingName != null">
-        staking_name = #{record.stakingName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.stakingIcon != null">
-        staking_icon = #{record.stakingIcon,jdbcType=VARCHAR},
+      <if test="record.nodeIcon != null">
+        node_icon = #{record.nodeIcon,jdbcType=VARCHAR},
       </if>
       <if test="record.externalId != null">
         external_id = #{record.externalId,jdbcType=VARCHAR},
       </if>
-      <if test="record.denefitAddr != null">
-        denefit_addr = #{record.denefitAddr,jdbcType=VARCHAR},
+      <if test="record.externalName != null">
+        external_name = #{record.externalName,jdbcType=VARCHAR},
       </if>
-      <if test="record.expectedIncome != null">
-        expected_income = #{record.expectedIncome,jdbcType=VARCHAR},
+      <if test="record.stakingAddr != null">
+        staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
       </if>
-      <if test="record.blockRewardValue != null">
-        block_reward_value = #{record.blockRewardValue,jdbcType=VARCHAR},
+      <if test="record.benefitAddr != null">
+        benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
       </if>
-      <if test="record.preConsBlockQty != null">
-        pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
-      </if>
-      <if test="record.curConsBlockQty != null">
-        cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      <if test="record.annualizedRate != null">
+        annualized_rate = #{record.annualizedRate,jdbcType=DOUBLE},
       </if>
       <if test="record.programVersion != null">
         program_version = #{record.programVersion,jdbcType=VARCHAR},
       </if>
-      <if test="record.stakingRewardValue != null">
-        staking_reward_value = #{record.stakingRewardValue,jdbcType=VARCHAR},
+      <if test="record.bigVersion != null">
+        big_version = #{record.bigVersion,jdbcType=VARCHAR},
       </if>
       <if test="record.webSite != null">
         web_site = #{record.webSite,jdbcType=VARCHAR},
@@ -508,23 +477,41 @@
       <if test="record.isConsensus != null">
         is_consensus = #{record.isConsensus,jdbcType=INTEGER},
       </if>
-      <if test="record.isSetting != null">
-        is_setting = #{record.isSetting,jdbcType=INTEGER},
+      <if test="record.isSettle != null">
+        is_settle = #{record.isSettle,jdbcType=INTEGER},
       </if>
       <if test="record.isInit != null">
         is_init = #{record.isInit,jdbcType=INTEGER},
+      </if>
+      <if test="record.statDelegateHes != null">
+        stat_delegate_hes = #{record.statDelegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="record.statDelegateLocked != null">
+        stat_delegate_locked = #{record.statDelegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="record.statDelegateReleased != null">
+        stat_delegate_released = #{record.statDelegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="record.blockRewardValue != null">
+        block_reward_value = #{record.blockRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.feeRewardValue != null">
+        fee_reward_value = #{record.feeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.stakingRewardValue != null">
+        staking_reward_value = #{record.stakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.curConsBlockQty != null">
+        cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      </if>
+      <if test="record.preConsBlockQty != null">
+        pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.externalName != null">
-        external_name = #{record.externalName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.feeRewardValue != null">
-        fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR},
       </if>
       <if test="record.annualizedRateInfo != null">
         annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
@@ -536,41 +523,40 @@
   </update>
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update staking
-    set staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
-      node_id = #{record.nodeId,jdbcType=VARCHAR},
+    set node_id = #{record.nodeId,jdbcType=VARCHAR},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
       staking_tx_index = #{record.stakingTxIndex,jdbcType=INTEGER},
-      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
-      staking_has = #{record.stakingHas,jdbcType=VARCHAR},
-      staking_locked = #{record.stakingLocked,jdbcType=VARCHAR},
+      staking_hes = #{record.stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{record.stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{record.stakingReduction,jdbcType=DECIMAL},
       staking_reduction_epoch = #{record.stakingReductionEpoch,jdbcType=INTEGER},
-      staking_reduction = #{record.stakingReduction,jdbcType=VARCHAR},
-      stat_delegate_has = #{record.statDelegateHas,jdbcType=VARCHAR},
-      stat_delegate_locked = #{record.statDelegateLocked,jdbcType=VARCHAR},
-      stat_delegate_reduction = #{record.statDelegateReduction,jdbcType=VARCHAR},
-      stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
-      stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
-      staking_name = #{record.stakingName,jdbcType=VARCHAR},
-      staking_icon = #{record.stakingIcon,jdbcType=VARCHAR},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      node_icon = #{record.nodeIcon,jdbcType=VARCHAR},
       external_id = #{record.externalId,jdbcType=VARCHAR},
-      denefit_addr = #{record.denefitAddr,jdbcType=VARCHAR},
-      expected_income = #{record.expectedIncome,jdbcType=VARCHAR},
-      block_reward_value = #{record.blockRewardValue,jdbcType=VARCHAR},
-      pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
-      cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      external_name = #{record.externalName,jdbcType=VARCHAR},
+      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{record.annualizedRate,jdbcType=DOUBLE},
       program_version = #{record.programVersion,jdbcType=VARCHAR},
-      staking_reward_value = #{record.stakingRewardValue,jdbcType=VARCHAR},
+      big_version = #{record.bigVersion,jdbcType=VARCHAR},
       web_site = #{record.webSite,jdbcType=VARCHAR},
       details = #{record.details,jdbcType=VARCHAR},
       join_time = #{record.joinTime,jdbcType=TIMESTAMP},
       leave_time = #{record.leaveTime,jdbcType=TIMESTAMP},
       `status` = #{record.status,jdbcType=INTEGER},
       is_consensus = #{record.isConsensus,jdbcType=INTEGER},
-      is_setting = #{record.isSetting,jdbcType=INTEGER},
+      is_settle = #{record.isSettle,jdbcType=INTEGER},
       is_init = #{record.isInit,jdbcType=INTEGER},
+      stat_delegate_hes = #{record.statDelegateHes,jdbcType=DECIMAL},
+      stat_delegate_locked = #{record.statDelegateLocked,jdbcType=DECIMAL},
+      stat_delegate_released = #{record.statDelegateReleased,jdbcType=DECIMAL},
+      block_reward_value = #{record.blockRewardValue,jdbcType=DECIMAL},
+      fee_reward_value = #{record.feeRewardValue,jdbcType=DECIMAL},
+      staking_reward_value = #{record.stakingRewardValue,jdbcType=DECIMAL},
+      cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      external_name = #{record.externalName,jdbcType=VARCHAR},
-      fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR},
       annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -578,41 +564,40 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update staking
-    set staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
-      node_id = #{record.nodeId,jdbcType=VARCHAR},
+    set node_id = #{record.nodeId,jdbcType=VARCHAR},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
       staking_tx_index = #{record.stakingTxIndex,jdbcType=INTEGER},
-      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
-      staking_has = #{record.stakingHas,jdbcType=VARCHAR},
-      staking_locked = #{record.stakingLocked,jdbcType=VARCHAR},
+      staking_hes = #{record.stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{record.stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{record.stakingReduction,jdbcType=DECIMAL},
       staking_reduction_epoch = #{record.stakingReductionEpoch,jdbcType=INTEGER},
-      staking_reduction = #{record.stakingReduction,jdbcType=VARCHAR},
-      stat_delegate_has = #{record.statDelegateHas,jdbcType=VARCHAR},
-      stat_delegate_locked = #{record.statDelegateLocked,jdbcType=VARCHAR},
-      stat_delegate_reduction = #{record.statDelegateReduction,jdbcType=VARCHAR},
-      stat_delegate_qty = #{record.statDelegateQty,jdbcType=INTEGER},
-      stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
-      staking_name = #{record.stakingName,jdbcType=VARCHAR},
-      staking_icon = #{record.stakingIcon,jdbcType=VARCHAR},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      node_icon = #{record.nodeIcon,jdbcType=VARCHAR},
       external_id = #{record.externalId,jdbcType=VARCHAR},
-      denefit_addr = #{record.denefitAddr,jdbcType=VARCHAR},
-      expected_income = #{record.expectedIncome,jdbcType=VARCHAR},
-      block_reward_value = #{record.blockRewardValue,jdbcType=VARCHAR},
-      pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
-      cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      external_name = #{record.externalName,jdbcType=VARCHAR},
+      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{record.annualizedRate,jdbcType=DOUBLE},
       program_version = #{record.programVersion,jdbcType=VARCHAR},
-      staking_reward_value = #{record.stakingRewardValue,jdbcType=VARCHAR},
+      big_version = #{record.bigVersion,jdbcType=VARCHAR},
       web_site = #{record.webSite,jdbcType=VARCHAR},
       details = #{record.details,jdbcType=VARCHAR},
       join_time = #{record.joinTime,jdbcType=TIMESTAMP},
       leave_time = #{record.leaveTime,jdbcType=TIMESTAMP},
       `status` = #{record.status,jdbcType=INTEGER},
       is_consensus = #{record.isConsensus,jdbcType=INTEGER},
-      is_setting = #{record.isSetting,jdbcType=INTEGER},
+      is_settle = #{record.isSettle,jdbcType=INTEGER},
       is_init = #{record.isInit,jdbcType=INTEGER},
+      stat_delegate_hes = #{record.statDelegateHes,jdbcType=DECIMAL},
+      stat_delegate_locked = #{record.statDelegateLocked,jdbcType=DECIMAL},
+      stat_delegate_released = #{record.statDelegateReleased,jdbcType=DECIMAL},
+      block_reward_value = #{record.blockRewardValue,jdbcType=DECIMAL},
+      fee_reward_value = #{record.feeRewardValue,jdbcType=DECIMAL},
+      staking_reward_value = #{record.stakingRewardValue,jdbcType=DECIMAL},
+      cur_cons_block_qty = #{record.curConsBlockQty,jdbcType=BIGINT},
+      pre_cons_block_qty = #{record.preConsBlockQty,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      external_name = #{record.externalName,jdbcType=VARCHAR},
-      fee_reward_value = #{record.feeRewardValue,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -623,65 +608,44 @@
       <if test="stakingTxIndex != null">
         staking_tx_index = #{stakingTxIndex,jdbcType=INTEGER},
       </if>
-      <if test="stakingAddr != null">
-        staking_addr = #{stakingAddr,jdbcType=VARCHAR},
-      </if>
-      <if test="stakingHas != null">
-        staking_has = #{stakingHas,jdbcType=VARCHAR},
+      <if test="stakingHes != null">
+        staking_hes = #{stakingHes,jdbcType=DECIMAL},
       </if>
       <if test="stakingLocked != null">
-        staking_locked = #{stakingLocked,jdbcType=VARCHAR},
+        staking_locked = #{stakingLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="stakingReduction != null">
+        staking_reduction = #{stakingReduction,jdbcType=DECIMAL},
       </if>
       <if test="stakingReductionEpoch != null">
         staking_reduction_epoch = #{stakingReductionEpoch,jdbcType=INTEGER},
       </if>
-      <if test="stakingReduction != null">
-        staking_reduction = #{stakingReduction,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
       </if>
-      <if test="statDelegateHas != null">
-        stat_delegate_has = #{statDelegateHas,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateLocked != null">
-        stat_delegate_locked = #{statDelegateLocked,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateReduction != null">
-        stat_delegate_reduction = #{statDelegateReduction,jdbcType=VARCHAR},
-      </if>
-      <if test="statDelegateQty != null">
-        stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
-      </if>
-      <if test="statVerifierTime != null">
-        stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
-      </if>
-      <if test="stakingName != null">
-        staking_name = #{stakingName,jdbcType=VARCHAR},
-      </if>
-      <if test="stakingIcon != null">
-        staking_icon = #{stakingIcon,jdbcType=VARCHAR},
+      <if test="nodeIcon != null">
+        node_icon = #{nodeIcon,jdbcType=VARCHAR},
       </if>
       <if test="externalId != null">
         external_id = #{externalId,jdbcType=VARCHAR},
       </if>
-      <if test="denefitAddr != null">
-        denefit_addr = #{denefitAddr,jdbcType=VARCHAR},
+      <if test="externalName != null">
+        external_name = #{externalName,jdbcType=VARCHAR},
       </if>
-      <if test="expectedIncome != null">
-        expected_income = #{expectedIncome,jdbcType=VARCHAR},
+      <if test="stakingAddr != null">
+        staking_addr = #{stakingAddr,jdbcType=VARCHAR},
       </if>
-      <if test="blockRewardValue != null">
-        block_reward_value = #{blockRewardValue,jdbcType=VARCHAR},
+      <if test="benefitAddr != null">
+        benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
       </if>
-      <if test="preConsBlockQty != null">
-        pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
-      </if>
-      <if test="curConsBlockQty != null">
-        cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      <if test="annualizedRate != null">
+        annualized_rate = #{annualizedRate,jdbcType=DOUBLE},
       </if>
       <if test="programVersion != null">
         program_version = #{programVersion,jdbcType=VARCHAR},
       </if>
-      <if test="stakingRewardValue != null">
-        staking_reward_value = #{stakingRewardValue,jdbcType=VARCHAR},
+      <if test="bigVersion != null">
+        big_version = #{bigVersion,jdbcType=VARCHAR},
       </if>
       <if test="webSite != null">
         web_site = #{webSite,jdbcType=VARCHAR},
@@ -701,11 +665,35 @@
       <if test="isConsensus != null">
         is_consensus = #{isConsensus,jdbcType=INTEGER},
       </if>
-      <if test="isSetting != null">
-        is_setting = #{isSetting,jdbcType=INTEGER},
+      <if test="isSettle != null">
+        is_settle = #{isSettle,jdbcType=INTEGER},
       </if>
       <if test="isInit != null">
         is_init = #{isInit,jdbcType=INTEGER},
+      </if>
+      <if test="statDelegateHes != null">
+        stat_delegate_hes = #{statDelegateHes,jdbcType=DECIMAL},
+      </if>
+      <if test="statDelegateLocked != null">
+        stat_delegate_locked = #{statDelegateLocked,jdbcType=DECIMAL},
+      </if>
+      <if test="statDelegateReleased != null">
+        stat_delegate_released = #{statDelegateReleased,jdbcType=DECIMAL},
+      </if>
+      <if test="blockRewardValue != null">
+        block_reward_value = #{blockRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="feeRewardValue != null">
+        fee_reward_value = #{feeRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="stakingRewardValue != null">
+        staking_reward_value = #{stakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="curConsBlockQty != null">
+        cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      </if>
+      <if test="preConsBlockQty != null">
+        pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -713,95 +701,87 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="externalName != null">
-        external_name = #{externalName,jdbcType=VARCHAR},
-      </if>
-      <if test="feeRewardValue != null">
-        fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR},
-      </if>
       <if test="annualizedRateInfo != null">
         annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
-      and node_id = #{nodeId,jdbcType=VARCHAR}
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Staking">
     update staking
     set staking_tx_index = #{stakingTxIndex,jdbcType=INTEGER},
-      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
-      staking_has = #{stakingHas,jdbcType=VARCHAR},
-      staking_locked = #{stakingLocked,jdbcType=VARCHAR},
+      staking_hes = #{stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{stakingReduction,jdbcType=DECIMAL},
       staking_reduction_epoch = #{stakingReductionEpoch,jdbcType=INTEGER},
-      staking_reduction = #{stakingReduction,jdbcType=VARCHAR},
-      stat_delegate_has = #{statDelegateHas,jdbcType=VARCHAR},
-      stat_delegate_locked = #{statDelegateLocked,jdbcType=VARCHAR},
-      stat_delegate_reduction = #{statDelegateReduction,jdbcType=VARCHAR},
-      stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
-      stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
-      staking_name = #{stakingName,jdbcType=VARCHAR},
-      staking_icon = #{stakingIcon,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_icon = #{nodeIcon,jdbcType=VARCHAR},
       external_id = #{externalId,jdbcType=VARCHAR},
-      denefit_addr = #{denefitAddr,jdbcType=VARCHAR},
-      expected_income = #{expectedIncome,jdbcType=VARCHAR},
-      block_reward_value = #{blockRewardValue,jdbcType=VARCHAR},
-      pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
-      cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      external_name = #{externalName,jdbcType=VARCHAR},
+      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{annualizedRate,jdbcType=DOUBLE},
       program_version = #{programVersion,jdbcType=VARCHAR},
-      staking_reward_value = #{stakingRewardValue,jdbcType=VARCHAR},
+      big_version = #{bigVersion,jdbcType=VARCHAR},
       web_site = #{webSite,jdbcType=VARCHAR},
       details = #{details,jdbcType=VARCHAR},
       join_time = #{joinTime,jdbcType=TIMESTAMP},
       leave_time = #{leaveTime,jdbcType=TIMESTAMP},
       `status` = #{status,jdbcType=INTEGER},
       is_consensus = #{isConsensus,jdbcType=INTEGER},
-      is_setting = #{isSetting,jdbcType=INTEGER},
+      is_settle = #{isSettle,jdbcType=INTEGER},
       is_init = #{isInit,jdbcType=INTEGER},
+      stat_delegate_hes = #{statDelegateHes,jdbcType=DECIMAL},
+      stat_delegate_locked = #{statDelegateLocked,jdbcType=DECIMAL},
+      stat_delegate_released = #{statDelegateReleased,jdbcType=DECIMAL},
+      block_reward_value = #{blockRewardValue,jdbcType=DECIMAL},
+      fee_reward_value = #{feeRewardValue,jdbcType=DECIMAL},
+      staking_reward_value = #{stakingRewardValue,jdbcType=DECIMAL},
+      cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      external_name = #{externalName,jdbcType=VARCHAR},
-      fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR},
       annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
-    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
-      and node_id = #{nodeId,jdbcType=VARCHAR}
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Staking">
     update staking
     set staking_tx_index = #{stakingTxIndex,jdbcType=INTEGER},
-      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
-      staking_has = #{stakingHas,jdbcType=VARCHAR},
-      staking_locked = #{stakingLocked,jdbcType=VARCHAR},
+      staking_hes = #{stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{stakingReduction,jdbcType=DECIMAL},
       staking_reduction_epoch = #{stakingReductionEpoch,jdbcType=INTEGER},
-      staking_reduction = #{stakingReduction,jdbcType=VARCHAR},
-      stat_delegate_has = #{statDelegateHas,jdbcType=VARCHAR},
-      stat_delegate_locked = #{statDelegateLocked,jdbcType=VARCHAR},
-      stat_delegate_reduction = #{statDelegateReduction,jdbcType=VARCHAR},
-      stat_delegate_qty = #{statDelegateQty,jdbcType=INTEGER},
-      stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
-      staking_name = #{stakingName,jdbcType=VARCHAR},
-      staking_icon = #{stakingIcon,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_icon = #{nodeIcon,jdbcType=VARCHAR},
       external_id = #{externalId,jdbcType=VARCHAR},
-      denefit_addr = #{denefitAddr,jdbcType=VARCHAR},
-      expected_income = #{expectedIncome,jdbcType=VARCHAR},
-      block_reward_value = #{blockRewardValue,jdbcType=VARCHAR},
-      pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
-      cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      external_name = #{externalName,jdbcType=VARCHAR},
+      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{annualizedRate,jdbcType=DOUBLE},
       program_version = #{programVersion,jdbcType=VARCHAR},
-      staking_reward_value = #{stakingRewardValue,jdbcType=VARCHAR},
+      big_version = #{bigVersion,jdbcType=VARCHAR},
       web_site = #{webSite,jdbcType=VARCHAR},
       details = #{details,jdbcType=VARCHAR},
       join_time = #{joinTime,jdbcType=TIMESTAMP},
       leave_time = #{leaveTime,jdbcType=TIMESTAMP},
       `status` = #{status,jdbcType=INTEGER},
       is_consensus = #{isConsensus,jdbcType=INTEGER},
-      is_setting = #{isSetting,jdbcType=INTEGER},
+      is_settle = #{isSettle,jdbcType=INTEGER},
       is_init = #{isInit,jdbcType=INTEGER},
+      stat_delegate_hes = #{statDelegateHes,jdbcType=DECIMAL},
+      stat_delegate_locked = #{statDelegateLocked,jdbcType=DECIMAL},
+      stat_delegate_released = #{statDelegateReleased,jdbcType=DECIMAL},
+      block_reward_value = #{blockRewardValue,jdbcType=DECIMAL},
+      fee_reward_value = #{feeRewardValue,jdbcType=DECIMAL},
+      staking_reward_value = #{stakingRewardValue,jdbcType=DECIMAL},
+      cur_cons_block_qty = #{curConsBlockQty,jdbcType=BIGINT},
+      pre_cons_block_qty = #{preConsBlockQty,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      external_name = #{externalName,jdbcType=VARCHAR},
-      fee_reward_value = #{feeRewardValue,jdbcType=VARCHAR}
-    where staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
-      and node_id = #{nodeId,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+      and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
     <!--
@@ -810,30 +790,29 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into staking
-    (staking_block_num, node_id, staking_tx_index, staking_addr, staking_has, staking_locked, 
-      staking_reduction_epoch, staking_reduction, stat_delegate_has, stat_delegate_locked, 
-      stat_delegate_reduction, stat_delegate_qty, stat_verifier_time, staking_name, staking_icon, 
-      external_id, denefit_addr, expected_income, block_reward_value, pre_cons_block_qty, 
-      cur_cons_block_qty, program_version, staking_reward_value, web_site, details, join_time, 
-      leave_time, `status`, is_consensus, is_setting, is_init, create_time, update_time, 
-      external_name, fee_reward_value, annualized_rate_info)
+    (node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction, 
+      staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr, 
+      benefit_addr, annualized_rate, program_version, big_version, web_site, details, 
+      join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, 
+      stat_delegate_locked, stat_delegate_released, block_reward_value, fee_reward_value, 
+      staking_reward_value, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time, 
+      annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.stakingBlockNum,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
-        #{item.stakingAddr,jdbcType=VARCHAR}, #{item.stakingHas,jdbcType=VARCHAR}, #{item.stakingLocked,jdbcType=VARCHAR}, 
-        #{item.stakingReductionEpoch,jdbcType=INTEGER}, #{item.stakingReduction,jdbcType=VARCHAR}, 
-        #{item.statDelegateHas,jdbcType=VARCHAR}, #{item.statDelegateLocked,jdbcType=VARCHAR}, 
-        #{item.statDelegateReduction,jdbcType=VARCHAR}, #{item.statDelegateQty,jdbcType=INTEGER}, 
-        #{item.statVerifierTime,jdbcType=INTEGER}, #{item.stakingName,jdbcType=VARCHAR}, 
-        #{item.stakingIcon,jdbcType=VARCHAR}, #{item.externalId,jdbcType=VARCHAR}, #{item.denefitAddr,jdbcType=VARCHAR}, 
-        #{item.expectedIncome,jdbcType=VARCHAR}, #{item.blockRewardValue,jdbcType=VARCHAR}, 
-        #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.curConsBlockQty,jdbcType=BIGINT}, 
-        #{item.programVersion,jdbcType=VARCHAR}, #{item.stakingRewardValue,jdbcType=VARCHAR}, 
-        #{item.webSite,jdbcType=VARCHAR}, #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, 
-        #{item.leaveTime,jdbcType=TIMESTAMP}, #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, 
-        #{item.isSetting,jdbcType=INTEGER}, #{item.isInit,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.externalName,jdbcType=VARCHAR}, #{item.feeRewardValue,jdbcType=VARCHAR}, 
-        #{item.annualizedRateInfo,jdbcType=LONGVARCHAR})
+      (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
+        #{item.stakingHes,jdbcType=DECIMAL}, #{item.stakingLocked,jdbcType=DECIMAL}, #{item.stakingReduction,jdbcType=DECIMAL}, 
+        #{item.stakingReductionEpoch,jdbcType=INTEGER}, #{item.nodeName,jdbcType=VARCHAR}, 
+        #{item.nodeIcon,jdbcType=VARCHAR}, #{item.externalId,jdbcType=VARCHAR}, #{item.externalName,jdbcType=VARCHAR}, 
+        #{item.stakingAddr,jdbcType=VARCHAR}, #{item.benefitAddr,jdbcType=VARCHAR}, #{item.annualizedRate,jdbcType=DOUBLE}, 
+        #{item.programVersion,jdbcType=VARCHAR}, #{item.bigVersion,jdbcType=VARCHAR}, #{item.webSite,jdbcType=VARCHAR}, 
+        #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, #{item.leaveTime,jdbcType=TIMESTAMP}, 
+        #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, #{item.isSettle,jdbcType=INTEGER}, 
+        #{item.isInit,jdbcType=INTEGER}, #{item.statDelegateHes,jdbcType=DECIMAL}, #{item.statDelegateLocked,jdbcType=DECIMAL}, 
+        #{item.statDelegateReleased,jdbcType=DECIMAL}, #{item.blockRewardValue,jdbcType=DECIMAL}, 
+        #{item.feeRewardValue,jdbcType=DECIMAL}, #{item.stakingRewardValue,jdbcType=DECIMAL}, 
+        #{item.curConsBlockQty,jdbcType=BIGINT}, #{item.preConsBlockQty,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -851,74 +830,53 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
-        <if test="'staking_block_num'.toString() == column.value">
-          #{item.stakingBlockNum,jdbcType=BIGINT}
-        </if>
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
         </if>
         <if test="'staking_tx_index'.toString() == column.value">
           #{item.stakingTxIndex,jdbcType=INTEGER}
         </if>
-        <if test="'staking_addr'.toString() == column.value">
-          #{item.stakingAddr,jdbcType=VARCHAR}
-        </if>
-        <if test="'staking_has'.toString() == column.value">
-          #{item.stakingHas,jdbcType=VARCHAR}
+        <if test="'staking_hes'.toString() == column.value">
+          #{item.stakingHes,jdbcType=DECIMAL}
         </if>
         <if test="'staking_locked'.toString() == column.value">
-          #{item.stakingLocked,jdbcType=VARCHAR}
+          #{item.stakingLocked,jdbcType=DECIMAL}
+        </if>
+        <if test="'staking_reduction'.toString() == column.value">
+          #{item.stakingReduction,jdbcType=DECIMAL}
         </if>
         <if test="'staking_reduction_epoch'.toString() == column.value">
           #{item.stakingReductionEpoch,jdbcType=INTEGER}
         </if>
-        <if test="'staking_reduction'.toString() == column.value">
-          #{item.stakingReduction,jdbcType=VARCHAR}
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
         </if>
-        <if test="'stat_delegate_has'.toString() == column.value">
-          #{item.statDelegateHas,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_locked'.toString() == column.value">
-          #{item.statDelegateLocked,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_reduction'.toString() == column.value">
-          #{item.statDelegateReduction,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_qty'.toString() == column.value">
-          #{item.statDelegateQty,jdbcType=INTEGER}
-        </if>
-        <if test="'stat_verifier_time'.toString() == column.value">
-          #{item.statVerifierTime,jdbcType=INTEGER}
-        </if>
-        <if test="'staking_name'.toString() == column.value">
-          #{item.stakingName,jdbcType=VARCHAR}
-        </if>
-        <if test="'staking_icon'.toString() == column.value">
-          #{item.stakingIcon,jdbcType=VARCHAR}
+        <if test="'node_icon'.toString() == column.value">
+          #{item.nodeIcon,jdbcType=VARCHAR}
         </if>
         <if test="'external_id'.toString() == column.value">
           #{item.externalId,jdbcType=VARCHAR}
         </if>
-        <if test="'denefit_addr'.toString() == column.value">
-          #{item.denefitAddr,jdbcType=VARCHAR}
+        <if test="'external_name'.toString() == column.value">
+          #{item.externalName,jdbcType=VARCHAR}
         </if>
-        <if test="'expected_income'.toString() == column.value">
-          #{item.expectedIncome,jdbcType=VARCHAR}
+        <if test="'staking_addr'.toString() == column.value">
+          #{item.stakingAddr,jdbcType=VARCHAR}
         </if>
-        <if test="'block_reward_value'.toString() == column.value">
-          #{item.blockRewardValue,jdbcType=VARCHAR}
+        <if test="'benefit_addr'.toString() == column.value">
+          #{item.benefitAddr,jdbcType=VARCHAR}
         </if>
-        <if test="'pre_cons_block_qty'.toString() == column.value">
-          #{item.preConsBlockQty,jdbcType=BIGINT}
-        </if>
-        <if test="'cur_cons_block_qty'.toString() == column.value">
-          #{item.curConsBlockQty,jdbcType=BIGINT}
+        <if test="'annualized_rate'.toString() == column.value">
+          #{item.annualizedRate,jdbcType=DOUBLE}
         </if>
         <if test="'program_version'.toString() == column.value">
           #{item.programVersion,jdbcType=VARCHAR}
         </if>
-        <if test="'staking_reward_value'.toString() == column.value">
-          #{item.stakingRewardValue,jdbcType=VARCHAR}
+        <if test="'big_version'.toString() == column.value">
+          #{item.bigVersion,jdbcType=VARCHAR}
         </if>
         <if test="'web_site'.toString() == column.value">
           #{item.webSite,jdbcType=VARCHAR}
@@ -938,23 +896,41 @@
         <if test="'is_consensus'.toString() == column.value">
           #{item.isConsensus,jdbcType=INTEGER}
         </if>
-        <if test="'is_setting'.toString() == column.value">
-          #{item.isSetting,jdbcType=INTEGER}
+        <if test="'is_settle'.toString() == column.value">
+          #{item.isSettle,jdbcType=INTEGER}
         </if>
         <if test="'is_init'.toString() == column.value">
           #{item.isInit,jdbcType=INTEGER}
+        </if>
+        <if test="'stat_delegate_hes'.toString() == column.value">
+          #{item.statDelegateHes,jdbcType=DECIMAL}
+        </if>
+        <if test="'stat_delegate_locked'.toString() == column.value">
+          #{item.statDelegateLocked,jdbcType=DECIMAL}
+        </if>
+        <if test="'stat_delegate_released'.toString() == column.value">
+          #{item.statDelegateReleased,jdbcType=DECIMAL}
+        </if>
+        <if test="'block_reward_value'.toString() == column.value">
+          #{item.blockRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'fee_reward_value'.toString() == column.value">
+          #{item.feeRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'staking_reward_value'.toString() == column.value">
+          #{item.stakingRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'cur_cons_block_qty'.toString() == column.value">
+          #{item.curConsBlockQty,jdbcType=BIGINT}
+        </if>
+        <if test="'pre_cons_block_qty'.toString() == column.value">
+          #{item.preConsBlockQty,jdbcType=BIGINT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'external_name'.toString() == column.value">
-          #{item.externalName,jdbcType=VARCHAR}
-        </if>
-        <if test="'fee_reward_value'.toString() == column.value">
-          #{item.feeRewardValue,jdbcType=VARCHAR}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}

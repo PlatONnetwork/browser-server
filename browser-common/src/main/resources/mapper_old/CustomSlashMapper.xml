@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomSlashMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomSlash" extends="com.platon.browser.dao.mapper.SlashMapper.BaseResultMap"/>
+
+  <select id="selectByNodeId" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.SlashMapper.Base_Column_List" />
+    from slash where node_id = #{nodeId}
+  </select>
+
+  <select id="selectByNodeIdList" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.SlashMapper.Base_Column_List" />
+    from slash where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into slash (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'hash'.toString() == column.value">
+          #{item.hash,jdbcType=VARCHAR}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'slash_rate'.toString() == column.value">
+          #{item.slashRate,jdbcType=VARCHAR}
+        </if>
+        <if test="'is_quit'.toString() == column.value">
+          #{item.isQuit,jdbcType=INTEGER}
+        </if>
+        <if test="'reward'.toString() == column.value">
+          #{item.reward,jdbcType=VARCHAR}
+        </if>
+        <if test="'denefit_addr'.toString() == column.value">
+          #{item.denefitAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'data'.toString() == column.value">
+          #{item.data,jdbcType=VARCHAR}
+        </if>
+        <if test="'status'.toString() == column.value">
+          #{item.status,jdbcType=INTEGER}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

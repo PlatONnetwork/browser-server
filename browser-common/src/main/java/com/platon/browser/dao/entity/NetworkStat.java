@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -7,41 +8,41 @@ import java.util.Date;
 public class NetworkStat {
     private Integer id;
 
-    private Long currentNumber;
-
-    private String nodeName;
+    private Long curNumber;
 
     private String nodeId;
 
+    private String nodeName;
+
     private Integer txQty;
 
-    private Integer currentTps;
+    private Integer curTps;
 
     private Integer maxTps;
 
-    private String issueValue;
+    private BigDecimal issueValue;
 
-    private String turnValue;
+    private BigDecimal turnValue;
 
-    private String stakingDelegationValue;
+    private BigDecimal stakingDelegationValue;
 
-    private String stakingValue;
-
-    private Integer proposalQty;
+    private BigDecimal stakingValue;
 
     private Integer doingProposalQty;
 
+    private Integer proposalQty;
+
     private Integer addressQty;
 
-    private String blockReward;
+    private BigDecimal blockReward;
 
-    private String stakingReward;
+    private BigDecimal stakingReward;
 
     private Long addIssueBegin;
 
     private Long addIssueEnd;
 
-    private Long nextSetting;
+    private Long nextSettle;
 
     private Date createTime;
 
@@ -55,20 +56,12 @@ public class NetworkStat {
         this.id = id;
     }
 
-    public Long getCurrentNumber() {
-        return currentNumber;
+    public Long getCurNumber() {
+        return curNumber;
     }
 
-    public void setCurrentNumber(Long currentNumber) {
-        this.currentNumber = currentNumber;
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName == null ? null : nodeName.trim();
+    public void setCurNumber(Long curNumber) {
+        this.curNumber = curNumber;
     }
 
     public String getNodeId() {
@@ -79,6 +72,14 @@ public class NetworkStat {
         this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName == null ? null : nodeName.trim();
+    }
+
     public Integer getTxQty() {
         return txQty;
     }
@@ -87,12 +88,12 @@ public class NetworkStat {
         this.txQty = txQty;
     }
 
-    public Integer getCurrentTps() {
-        return currentTps;
+    public Integer getCurTps() {
+        return curTps;
     }
 
-    public void setCurrentTps(Integer currentTps) {
-        this.currentTps = currentTps;
+    public void setCurTps(Integer curTps) {
+        this.curTps = curTps;
     }
 
     public Integer getMaxTps() {
@@ -103,44 +104,36 @@ public class NetworkStat {
         this.maxTps = maxTps;
     }
 
-    public String getIssueValue() {
+    public BigDecimal getIssueValue() {
         return issueValue;
     }
 
-    public void setIssueValue(String issueValue) {
-        this.issueValue = issueValue == null ? null : issueValue.trim();
+    public void setIssueValue(BigDecimal issueValue) {
+        this.issueValue = issueValue;
     }
 
-    public String getTurnValue() {
+    public BigDecimal getTurnValue() {
         return turnValue;
     }
 
-    public void setTurnValue(String turnValue) {
-        this.turnValue = turnValue == null ? null : turnValue.trim();
+    public void setTurnValue(BigDecimal turnValue) {
+        this.turnValue = turnValue;
     }
 
-    public String getStakingDelegationValue() {
+    public BigDecimal getStakingDelegationValue() {
         return stakingDelegationValue;
     }
 
-    public void setStakingDelegationValue(String stakingDelegationValue) {
-        this.stakingDelegationValue = stakingDelegationValue == null ? null : stakingDelegationValue.trim();
+    public void setStakingDelegationValue(BigDecimal stakingDelegationValue) {
+        this.stakingDelegationValue = stakingDelegationValue;
     }
 
-    public String getStakingValue() {
+    public BigDecimal getStakingValue() {
         return stakingValue;
     }
 
-    public void setStakingValue(String stakingValue) {
-        this.stakingValue = stakingValue == null ? null : stakingValue.trim();
-    }
-
-    public Integer getProposalQty() {
-        return proposalQty;
-    }
-
-    public void setProposalQty(Integer proposalQty) {
-        this.proposalQty = proposalQty;
+    public void setStakingValue(BigDecimal stakingValue) {
+        this.stakingValue = stakingValue;
     }
 
     public Integer getDoingProposalQty() {
@@ -151,6 +144,14 @@ public class NetworkStat {
         this.doingProposalQty = doingProposalQty;
     }
 
+    public Integer getProposalQty() {
+        return proposalQty;
+    }
+
+    public void setProposalQty(Integer proposalQty) {
+        this.proposalQty = proposalQty;
+    }
+
     public Integer getAddressQty() {
         return addressQty;
     }
@@ -159,20 +160,20 @@ public class NetworkStat {
         this.addressQty = addressQty;
     }
 
-    public String getBlockReward() {
+    public BigDecimal getBlockReward() {
         return blockReward;
     }
 
-    public void setBlockReward(String blockReward) {
-        this.blockReward = blockReward == null ? null : blockReward.trim();
+    public void setBlockReward(BigDecimal blockReward) {
+        this.blockReward = blockReward;
     }
 
-    public String getStakingReward() {
+    public BigDecimal getStakingReward() {
         return stakingReward;
     }
 
-    public void setStakingReward(String stakingReward) {
-        this.stakingReward = stakingReward == null ? null : stakingReward.trim();
+    public void setStakingReward(BigDecimal stakingReward) {
+        this.stakingReward = stakingReward;
     }
 
     public Long getAddIssueBegin() {
@@ -191,12 +192,12 @@ public class NetworkStat {
         this.addIssueEnd = addIssueEnd;
     }
 
-    public Long getNextSetting() {
-        return nextSetting;
+    public Long getNextSettle() {
+        return nextSettle;
     }
 
-    public void setNextSetting(Long nextSetting) {
-        this.nextSetting = nextSetting;
+    public void setNextSettle(Long nextSettle) {
+        this.nextSettle = nextSettle;
     }
 
     public Date getCreateTime() {
@@ -224,24 +225,24 @@ public class NetworkStat {
      */
     public enum Column {
         id("id", "id", "INTEGER", false),
-        currentNumber("current_number", "currentNumber", "BIGINT", false),
-        nodeName("node_name", "nodeName", "VARCHAR", false),
+        curNumber("cur_number", "curNumber", "BIGINT", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
         txQty("tx_qty", "txQty", "INTEGER", false),
-        currentTps("current_tps", "currentTps", "INTEGER", false),
+        curTps("cur_tps", "curTps", "INTEGER", false),
         maxTps("max_tps", "maxTps", "INTEGER", false),
-        issueValue("issue_value", "issueValue", "VARCHAR", false),
-        turnValue("turn_value", "turnValue", "VARCHAR", false),
-        stakingDelegationValue("staking_delegation_value", "stakingDelegationValue", "VARCHAR", false),
-        stakingValue("staking_value", "stakingValue", "VARCHAR", false),
-        proposalQty("proposal_qty", "proposalQty", "INTEGER", false),
+        issueValue("issue_value", "issueValue", "DECIMAL", false),
+        turnValue("turn_value", "turnValue", "DECIMAL", false),
+        stakingDelegationValue("staking_delegation_value", "stakingDelegationValue", "DECIMAL", false),
+        stakingValue("staking_value", "stakingValue", "DECIMAL", false),
         doingProposalQty("doing_proposal_qty", "doingProposalQty", "INTEGER", false),
+        proposalQty("proposal_qty", "proposalQty", "INTEGER", false),
         addressQty("address_qty", "addressQty", "INTEGER", false),
-        blockReward("block_reward", "blockReward", "VARCHAR", false),
-        stakingReward("staking_reward", "stakingReward", "VARCHAR", false),
+        blockReward("block_reward", "blockReward", "DECIMAL", false),
+        stakingReward("staking_reward", "stakingReward", "DECIMAL", false),
         addIssueBegin("add_issue_begin", "addIssueBegin", "BIGINT", false),
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
-        nextSetting("next_setting", "nextSetting", "BIGINT", false),
+        nextSettle("next_settle", "nextSettle", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 

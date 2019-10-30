@@ -1,4 +1,4 @@
-//package com.platon.browser.other;
+package com.platon.browser.other;//package com.platon.browser.other;
 //
 //import com.platon.browser.BrowserAgentApplication;
 //import com.platon.browser.client.PlatonClient;

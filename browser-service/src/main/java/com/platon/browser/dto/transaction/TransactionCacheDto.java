@@ -18,7 +18,7 @@ public class TransactionCacheDto {
 	 * 交易构造初始方法
 	 * @param page
 	 */
-	public TransactionCacheDto(List<TransactionWithBLOBs> transactionList,RespPage<?> page) {
+	public TransactionCacheDto( List<TransactionWithBLOBs> transactionList, RespPage<?> page) {
 		this.transactionList = transactionList;
 		this.page = page;
 	}

@@ -5,10 +5,10 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="address" jdbcType="VARCHAR" property="address" />
     <result column="epoch" jdbcType="BIGINT" property="epoch" />
-    <result column="amount" jdbcType="VARCHAR" property="amount" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="number" jdbcType="BIGINT" property="number" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="number" jdbcType="BIGINT" property="number" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, address, epoch, amount, create_time, update_time, `number`
+    id, address, epoch, amount, `number`, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.RpPlanExample" resultMap="BaseResultMap">
     select
@@ -103,11 +103,11 @@
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.RpPlan">
     insert into rp_plan (id, address, epoch, 
-      amount, create_time, update_time, 
-      `number`)
+      amount, `number`, create_time, 
+      update_time)
     values (#{id,jdbcType=BIGINT}, #{address,jdbcType=VARCHAR}, #{epoch,jdbcType=BIGINT}, 
-      #{amount,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{number,jdbcType=BIGINT})
+      #{amount,jdbcType=DECIMAL}, #{number,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.RpPlan">
     insert into rp_plan
@@ -124,14 +124,14 @@
       <if test="amount != null">
         amount,
       </if>
+      <if test="number != null">
+        `number`,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
       <if test="updateTime != null">
         update_time,
-      </if>
-      <if test="number != null">
-        `number`,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -145,16 +145,16 @@
         #{epoch,jdbcType=BIGINT},
       </if>
       <if test="amount != null">
-        #{amount,jdbcType=VARCHAR},
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="number != null">
+        #{number,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="number != null">
-        #{number,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -177,16 +177,16 @@
         epoch = #{record.epoch,jdbcType=BIGINT},
       </if>
       <if test="record.amount != null">
-        amount = #{record.amount,jdbcType=VARCHAR},
+        amount = #{record.amount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.number != null">
+        `number` = #{record.number,jdbcType=BIGINT},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.number != null">
-        `number` = #{record.number,jdbcType=BIGINT},
       </if>
     </set>
     <if test="_parameter != null">
@@ -198,10 +198,10 @@
     set id = #{record.id,jdbcType=BIGINT},
       address = #{record.address,jdbcType=VARCHAR},
       epoch = #{record.epoch,jdbcType=BIGINT},
-      amount = #{record.amount,jdbcType=VARCHAR},
+      amount = #{record.amount,jdbcType=DECIMAL},
+      `number` = #{record.number,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      `number` = #{record.number,jdbcType=BIGINT}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -216,16 +216,16 @@
         epoch = #{epoch,jdbcType=BIGINT},
       </if>
       <if test="amount != null">
-        amount = #{amount,jdbcType=VARCHAR},
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="number != null">
+        `number` = #{number,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="number != null">
-        `number` = #{number,jdbcType=BIGINT},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -234,10 +234,10 @@
     update rp_plan
     set address = #{address,jdbcType=VARCHAR},
       epoch = #{epoch,jdbcType=BIGINT},
-      amount = #{amount,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      `number` = #{number,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      `number` = #{number,jdbcType=BIGINT}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -247,12 +247,12 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into rp_plan
-    (id, address, epoch, amount, create_time, update_time, `number`)
+    (id, address, epoch, amount, `number`, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=BIGINT}, #{item.address,jdbcType=VARCHAR}, #{item.epoch,jdbcType=BIGINT}, 
-        #{item.amount,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
-        #{item.number,jdbcType=BIGINT})
+        #{item.amount,jdbcType=DECIMAL}, #{item.number,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -280,16 +280,16 @@
           #{item.epoch,jdbcType=BIGINT}
         </if>
         <if test="'amount'.toString() == column.value">
-          #{item.amount,jdbcType=VARCHAR}
+          #{item.amount,jdbcType=DECIMAL}
+        </if>
+        <if test="'number'.toString() == column.value">
+          #{item.number,jdbcType=BIGINT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'number'.toString() == column.value">
-          #{item.number,jdbcType=BIGINT}
         </if>
       </foreach>
       )

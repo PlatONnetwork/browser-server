@@ -49,7 +49,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	private RedisTemplate<String, String> redisTemplate;
 
 	@Override
-	public List<Block> getBlockCache(Integer pageNum, Integer pageSize) {
+	public List<Block> getBlockCache( Integer pageNum, Integer pageSize) {
 		/** 分页根据key来获取数据 */
 		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, Block.class, i18n,
 				redisTemplate, maxItemNum);

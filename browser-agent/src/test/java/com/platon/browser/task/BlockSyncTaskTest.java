@@ -1,9 +1,6 @@
 package com.platon.browser.task;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.CustomBlockMapper;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.engine.BlockChain;
@@ -18,7 +15,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;

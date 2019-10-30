@@ -1,7 +1,6 @@
 package com.platon.browser.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.service.NetworkStatCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

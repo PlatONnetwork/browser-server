@@ -74,7 +74,7 @@ public class TransactionSender {
 			        chainId,
 			        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
 			        BigDecimal.valueOf(1000000000),
-			        Convert.Unit.LAT
+			        Unit.LAT
 			).send();
 //			Transfer.sendFunds(
 //			        currentValidWeb3j,
@@ -105,7 +105,6 @@ public class TransactionSender {
         String webSite = "www.baidu.com";
         String details = "chendai-node1-details";
         BigDecimal stakingAmount = Convert.toVon("20000000", Unit.LAT);
-
         PlatonSendTransaction platonSendTransaction = stakingContract.stakingReturnTransaction(new StakingParam.Builder()
                .setNodeId(stakingPubKey)
                .setAmount(stakingAmount.toBigInteger())
@@ -335,9 +334,9 @@ public class TransactionSender {
         }
 
 
-        BigDecimal bg = Convert.toVon("1", Convert.Unit.LAT);
+        BigDecimal bg = Convert.toVon("1", Unit.LAT);
         System.out.println(bg);
-        bg = Convert.fromVon("10000000000000000000000000", Convert.Unit.LAT);
+        bg = Convert.fromVon("10000000000000000000000000", Unit.LAT);
         System.out.println(bg);
 
         BaseResponse<Node> nodes = stakingContract.getStakingInfo("0xef97cb9caf757c70e9aca9062a9f6607ce89c3e7cac90ffee56d3fcffffa55aebd20b48c0db3924438911fd1c88c297d6532b434c56dbb5d9758f0794c6841dc").send();
@@ -346,10 +345,10 @@ public class TransactionSender {
 
     @Test
     public void TestAll() throws Exception {
-    	this.transfer();
+   /* 	this.transfer();
     	this.staking();
     	this.updateStakingInfo();
-    	this.addStaking();
+    	this.addStaking();*/
     	this.delegate();
     }
 }

@@ -10,7 +10,6 @@ import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.BlockMapper;
-import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;

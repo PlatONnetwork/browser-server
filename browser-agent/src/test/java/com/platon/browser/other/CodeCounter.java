@@ -1,4 +1,4 @@
-//package com.platon.browser.other;
+package com.platon.browser.other;//package com.platon.browser.other;
 //
 ///**
 // * User: dongqile

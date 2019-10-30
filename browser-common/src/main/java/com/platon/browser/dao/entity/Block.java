@@ -1,58 +1,59 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 public class Block {
-    private Long number;
+    private Long num;
 
     private String hash;
 
-    private String parentHash;
+    private String pHash;
 
-    private Date timestamp;
+    private Date time;
 
     private Integer size;
 
-    private String gasLimit;
+    private BigDecimal gasLimit;
 
-    private String gasUsed;
+    private BigDecimal gasUsed;
 
-    private Integer statTxQty;
+    private Integer txQty;
 
-    private Integer statTransferQty;
+    private Integer tranQty;
 
-    private Integer statStakingQty;
+    private Integer sQty;
 
-    private Integer statProposalQty;
+    private Integer pQty;
 
-    private Integer statDelegateQty;
+    private Integer dQty;
 
-    private String statTxGasLimit;
+    private BigDecimal txGasLimit;
 
-    private String statTxFee;
+    private BigDecimal txFee;
 
     private String nodeName;
 
     private String nodeId;
 
-    private String blockReward;
+    private BigDecimal reward;
 
     private String miner;
 
-    private Date createTime;
+    private Date creTime;
 
-    private Date updateTime;
+    private Date updTime;
 
-    private String extraData;
+    private String extra;
 
-    public Long getNumber() {
-        return number;
+    public Long getNum() {
+        return num;
     }
 
-    public void setNumber(Long number) {
-        this.number = number;
+    public void setNum(Long num) {
+        this.num = num;
     }
 
     public String getHash() {
@@ -63,20 +64,20 @@ public class Block {
         this.hash = hash == null ? null : hash.trim();
     }
 
-    public String getParentHash() {
-        return parentHash;
+    public String getpHash() {
+        return pHash;
     }
 
-    public void setParentHash(String parentHash) {
-        this.parentHash = parentHash == null ? null : parentHash.trim();
+    public void setpHash(String pHash) {
+        this.pHash = pHash == null ? null : pHash.trim();
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public Date getTime() {
+        return time;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     public Integer getSize() {
@@ -87,76 +88,76 @@ public class Block {
         this.size = size;
     }
 
-    public String getGasLimit() {
+    public BigDecimal getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(String gasLimit) {
-        this.gasLimit = gasLimit == null ? null : gasLimit.trim();
+    public void setGasLimit(BigDecimal gasLimit) {
+        this.gasLimit = gasLimit;
     }
 
-    public String getGasUsed() {
+    public BigDecimal getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(String gasUsed) {
-        this.gasUsed = gasUsed == null ? null : gasUsed.trim();
+    public void setGasUsed(BigDecimal gasUsed) {
+        this.gasUsed = gasUsed;
     }
 
-    public Integer getStatTxQty() {
-        return statTxQty;
+    public Integer getTxQty() {
+        return txQty;
     }
 
-    public void setStatTxQty(Integer statTxQty) {
-        this.statTxQty = statTxQty;
+    public void setTxQty(Integer txQty) {
+        this.txQty = txQty;
     }
 
-    public Integer getStatTransferQty() {
-        return statTransferQty;
+    public Integer getTranQty() {
+        return tranQty;
     }
 
-    public void setStatTransferQty(Integer statTransferQty) {
-        this.statTransferQty = statTransferQty;
+    public void setTranQty(Integer tranQty) {
+        this.tranQty = tranQty;
     }
 
-    public Integer getStatStakingQty() {
-        return statStakingQty;
+    public Integer getsQty() {
+        return sQty;
     }
 
-    public void setStatStakingQty(Integer statStakingQty) {
-        this.statStakingQty = statStakingQty;
+    public void setsQty(Integer sQty) {
+        this.sQty = sQty;
     }
 
-    public Integer getStatProposalQty() {
-        return statProposalQty;
+    public Integer getpQty() {
+        return pQty;
     }
 
-    public void setStatProposalQty(Integer statProposalQty) {
-        this.statProposalQty = statProposalQty;
+    public void setpQty(Integer pQty) {
+        this.pQty = pQty;
     }
 
-    public Integer getStatDelegateQty() {
-        return statDelegateQty;
+    public Integer getdQty() {
+        return dQty;
     }
 
-    public void setStatDelegateQty(Integer statDelegateQty) {
-        this.statDelegateQty = statDelegateQty;
+    public void setdQty(Integer dQty) {
+        this.dQty = dQty;
     }
 
-    public String getStatTxGasLimit() {
-        return statTxGasLimit;
+    public BigDecimal getTxGasLimit() {
+        return txGasLimit;
     }
 
-    public void setStatTxGasLimit(String statTxGasLimit) {
-        this.statTxGasLimit = statTxGasLimit == null ? null : statTxGasLimit.trim();
+    public void setTxGasLimit(BigDecimal txGasLimit) {
+        this.txGasLimit = txGasLimit;
     }
 
-    public String getStatTxFee() {
-        return statTxFee;
+    public BigDecimal getTxFee() {
+        return txFee;
     }
 
-    public void setStatTxFee(String statTxFee) {
-        this.statTxFee = statTxFee == null ? null : statTxFee.trim();
+    public void setTxFee(BigDecimal txFee) {
+        this.txFee = txFee;
     }
 
     public String getNodeName() {
@@ -175,12 +176,12 @@ public class Block {
         this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getBlockReward() {
-        return blockReward;
+    public BigDecimal getReward() {
+        return reward;
     }
 
-    public void setBlockReward(String blockReward) {
-        this.blockReward = blockReward == null ? null : blockReward.trim();
+    public void setReward(BigDecimal reward) {
+        this.reward = reward;
     }
 
     public String getMiner() {
@@ -191,28 +192,28 @@ public class Block {
         this.miner = miner == null ? null : miner.trim();
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreTime() {
+        return creTime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreTime(Date creTime) {
+        this.creTime = creTime;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Date getUpdTime() {
+        return updTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdTime(Date updTime) {
+        this.updTime = updTime;
     }
 
-    public String getExtraData() {
-        return extraData;
+    public String getExtra() {
+        return extra;
     }
 
-    public void setExtraData(String extraData) {
-        this.extraData = extraData == null ? null : extraData.trim();
+    public void setExtra(String extra) {
+        this.extra = extra == null ? null : extra.trim();
     }
 
     /**
@@ -223,27 +224,27 @@ public class Block {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        number("number", "number", "BIGINT", true),
+        num("num", "num", "BIGINT", false),
         hash("hash", "hash", "VARCHAR", false),
-        parentHash("parent_hash", "parentHash", "VARCHAR", false),
-        timestamp("timestamp", "timestamp", "TIMESTAMP", true),
+        pHash("p_hash", "pHash", "VARCHAR", false),
+        time("time", "time", "TIMESTAMP", true),
         size("size", "size", "INTEGER", true),
-        gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
-        gasUsed("gas_used", "gasUsed", "VARCHAR", false),
-        statTxQty("stat_tx_qty", "statTxQty", "INTEGER", false),
-        statTransferQty("stat_transfer_qty", "statTransferQty", "INTEGER", false),
-        statStakingQty("stat_staking_qty", "statStakingQty", "INTEGER", false),
-        statProposalQty("stat_proposal_qty", "statProposalQty", "INTEGER", false),
-        statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
-        statTxGasLimit("stat_tx_gas_limit", "statTxGasLimit", "VARCHAR", false),
-        statTxFee("stat_tx_fee", "statTxFee", "VARCHAR", false),
+        gasLimit("gas_limit", "gasLimit", "DECIMAL", false),
+        gasUsed("gas_used", "gasUsed", "DECIMAL", false),
+        txQty("tx_qty", "txQty", "INTEGER", false),
+        tranQty("tran_qty", "tranQty", "INTEGER", false),
+        sQty("s_qty", "sQty", "INTEGER", false),
+        pQty("p_qty", "pQty", "INTEGER", false),
+        dQty("d_qty", "dQty", "INTEGER", false),
+        txGasLimit("tx_gas_limit", "txGasLimit", "DECIMAL", false),
+        txFee("tx_fee", "txFee", "DECIMAL", false),
         nodeName("node_name", "nodeName", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
-        blockReward("block_reward", "blockReward", "VARCHAR", false),
+        reward("reward", "reward", "DECIMAL", false),
         miner("miner", "miner", "VARCHAR", false),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        extraData("extra_data", "extraData", "LONGVARCHAR", false);
+        creTime("cre_time", "creTime", "TIMESTAMP", false),
+        updTime("upd_time", "updTime", "TIMESTAMP", false),
+        extra("extra", "extra", "LONGVARCHAR", false);
 
         /**
          * This field was generated by MyBatis Generator.

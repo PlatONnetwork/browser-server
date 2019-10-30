@@ -3,10 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-@Mapper
+
 public interface RpPlanMapper {
     long countByExample(RpPlanExample example);
 

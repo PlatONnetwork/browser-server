@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,35 +10,33 @@ public class Address {
 
     private Integer type;
 
-    private String balance;
+    private BigDecimal balance;
 
-    private String restrictingBalance;
+    private BigDecimal restrictingBalance;
 
-    private String stakingValue;
+    private BigDecimal stakingValue;
 
-    private String delegateValue;
+    private BigDecimal delegateValue;
 
-    private String redeemedValue;
+    private BigDecimal redeemedValue;
 
     private Integer txQty;
 
     private Integer transferQty;
 
+    private Integer delegateQty;
+
     private Integer stakingQty;
 
     private Integer proposalQty;
 
-    private Integer delegateQty;
-
     private Integer candidateCount;
 
-    private String delegateHes;
+    private BigDecimal delegateHes;
 
-    private String delegateLocked;
+    private BigDecimal delegateLocked;
 
-    private String delegateUnlock;
-
-    private String delegateReduction;
+    private BigDecimal delegateReleased;
 
     private String contractName;
 
@@ -65,44 +64,44 @@ public class Address {
         this.type = type;
     }
 
-    public String getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
-        this.balance = balance == null ? null : balance.trim();
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
-    public String getRestrictingBalance() {
+    public BigDecimal getRestrictingBalance() {
         return restrictingBalance;
     }
 
-    public void setRestrictingBalance(String restrictingBalance) {
-        this.restrictingBalance = restrictingBalance == null ? null : restrictingBalance.trim();
+    public void setRestrictingBalance(BigDecimal restrictingBalance) {
+        this.restrictingBalance = restrictingBalance;
     }
 
-    public String getStakingValue() {
+    public BigDecimal getStakingValue() {
         return stakingValue;
     }
 
-    public void setStakingValue(String stakingValue) {
-        this.stakingValue = stakingValue == null ? null : stakingValue.trim();
+    public void setStakingValue(BigDecimal stakingValue) {
+        this.stakingValue = stakingValue;
     }
 
-    public String getDelegateValue() {
+    public BigDecimal getDelegateValue() {
         return delegateValue;
     }
 
-    public void setDelegateValue(String delegateValue) {
-        this.delegateValue = delegateValue == null ? null : delegateValue.trim();
+    public void setDelegateValue(BigDecimal delegateValue) {
+        this.delegateValue = delegateValue;
     }
 
-    public String getRedeemedValue() {
+    public BigDecimal getRedeemedValue() {
         return redeemedValue;
     }
 
-    public void setRedeemedValue(String redeemedValue) {
-        this.redeemedValue = redeemedValue == null ? null : redeemedValue.trim();
+    public void setRedeemedValue(BigDecimal redeemedValue) {
+        this.redeemedValue = redeemedValue;
     }
 
     public Integer getTxQty() {
@@ -121,6 +120,14 @@ public class Address {
         this.transferQty = transferQty;
     }
 
+    public Integer getDelegateQty() {
+        return delegateQty;
+    }
+
+    public void setDelegateQty(Integer delegateQty) {
+        this.delegateQty = delegateQty;
+    }
+
     public Integer getStakingQty() {
         return stakingQty;
     }
@@ -137,14 +144,6 @@ public class Address {
         this.proposalQty = proposalQty;
     }
 
-    public Integer getDelegateQty() {
-        return delegateQty;
-    }
-
-    public void setDelegateQty(Integer delegateQty) {
-        this.delegateQty = delegateQty;
-    }
-
     public Integer getCandidateCount() {
         return candidateCount;
     }
@@ -153,36 +152,28 @@ public class Address {
         this.candidateCount = candidateCount;
     }
 
-    public String getDelegateHes() {
+    public BigDecimal getDelegateHes() {
         return delegateHes;
     }
 
-    public void setDelegateHes(String delegateHes) {
-        this.delegateHes = delegateHes == null ? null : delegateHes.trim();
+    public void setDelegateHes(BigDecimal delegateHes) {
+        this.delegateHes = delegateHes;
     }
 
-    public String getDelegateLocked() {
+    public BigDecimal getDelegateLocked() {
         return delegateLocked;
     }
 
-    public void setDelegateLocked(String delegateLocked) {
-        this.delegateLocked = delegateLocked == null ? null : delegateLocked.trim();
+    public void setDelegateLocked(BigDecimal delegateLocked) {
+        this.delegateLocked = delegateLocked;
     }
 
-    public String getDelegateUnlock() {
-        return delegateUnlock;
+    public BigDecimal getDelegateReleased() {
+        return delegateReleased;
     }
 
-    public void setDelegateUnlock(String delegateUnlock) {
-        this.delegateUnlock = delegateUnlock == null ? null : delegateUnlock.trim();
-    }
-
-    public String getDelegateReduction() {
-        return delegateReduction;
-    }
-
-    public void setDelegateReduction(String delegateReduction) {
-        this.delegateReduction = delegateReduction == null ? null : delegateReduction.trim();
+    public void setDelegateReleased(BigDecimal delegateReleased) {
+        this.delegateReleased = delegateReleased;
     }
 
     public String getContractName() {
@@ -235,21 +226,20 @@ public class Address {
     public enum Column {
         address("address", "address", "VARCHAR", false),
         type("type", "type", "INTEGER", true),
-        balance("balance", "balance", "VARCHAR", false),
-        restrictingBalance("restricting_balance", "restrictingBalance", "VARCHAR", false),
-        stakingValue("staking_value", "stakingValue", "VARCHAR", false),
-        delegateValue("delegate_value", "delegateValue", "VARCHAR", false),
-        redeemedValue("redeemed_value", "redeemedValue", "VARCHAR", false),
+        balance("balance", "balance", "DECIMAL", false),
+        restrictingBalance("restricting_balance", "restrictingBalance", "DECIMAL", false),
+        stakingValue("staking_value", "stakingValue", "DECIMAL", false),
+        delegateValue("delegate_value", "delegateValue", "DECIMAL", false),
+        redeemedValue("redeemed_value", "redeemedValue", "DECIMAL", false),
         txQty("tx_qty", "txQty", "INTEGER", false),
         transferQty("transfer_qty", "transferQty", "INTEGER", false),
+        delegateQty("delegate_qty", "delegateQty", "INTEGER", false),
         stakingQty("staking_qty", "stakingQty", "INTEGER", false),
         proposalQty("proposal_qty", "proposalQty", "INTEGER", false),
-        delegateQty("delegate_qty", "delegateQty", "INTEGER", false),
         candidateCount("candidate_count", "candidateCount", "INTEGER", false),
-        delegateHes("delegate_hes", "delegateHes", "VARCHAR", false),
-        delegateLocked("delegate_locked", "delegateLocked", "VARCHAR", false),
-        delegateUnlock("delegate_unlock", "delegateUnlock", "VARCHAR", false),
-        delegateReduction("delegate_reduction", "delegateReduction", "VARCHAR", false),
+        delegateHes("delegate_hes", "delegateHes", "DECIMAL", false),
+        delegateLocked("delegate_locked", "delegateLocked", "DECIMAL", false),
+        delegateReleased("delegate_released", "delegateReleased", "DECIMAL", false),
         contractName("contract_name", "contractName", "VARCHAR", false),
         contractCreate("contract_create", "contractCreate", "VARCHAR", false),
         contractCreatehash("contract_createHash", "contractCreatehash", "VARCHAR", false),

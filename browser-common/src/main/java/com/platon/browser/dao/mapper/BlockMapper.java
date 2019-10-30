@@ -1,19 +1,16 @@
 package com.platon.browser.dao.mapper;
 
-import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-@Mapper
+
 public interface BlockMapper {
     long countByExample(BlockExample example);
 
     int deleteByExample(BlockExample example);
 
-    int deleteByPrimaryKey(Long number);
+    int deleteByPrimaryKey(Long num);
 
     int insert(Block record);
 
@@ -21,9 +18,9 @@ public interface BlockMapper {
 
     List<Block> selectByExampleWithBLOBs(BlockExample example);
 
-    Page<Block> selectByExample(BlockExample example);
+    List<Block> selectByExample(BlockExample example);
 
-    Block selectByPrimaryKey(Long number);
+    Block selectByPrimaryKey(Long num);
 
     int updateByExampleSelective(@Param("record") Block record, @Param("example") BlockExample example);
 

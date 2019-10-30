@@ -1,0 +1,50 @@
+package com.platon.browser.old.engine.handler.staking;
+
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.old.engine.cache.CacheHolder;
+import com.platon.browser.old.engine.cache.NodeCache;
+import com.platon.browser.old.engine.handler.EventContext;
+import com.platon.browser.old.engine.handler.EventHandler;
+import com.platon.browser.old.engine.stage.StakingStage;
+import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.param.IncreaseStakingParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * @Auther: Chendongming
+ * @Date: 2019/8/17 20:09
+ * @Description: 增持质押(增加自有质押)事件处理类
+ */
+//@Component
+public class IncreaseStakingHandler implements EventHandler {
+    private static Logger logger = LoggerFactory.getLogger(IncreaseStakingHandler.class);
+    @Autowired
+    private CacheHolder cacheHolder;
+    @Override
+    public void handle(EventContext context) {
+        NodeCache nodeCache = cacheHolder.getNodeCache();
+        StakingStage stakingStage = cacheHolder.getStageData().getStakingStage();
+        CustomTransaction tx = context.getTransaction();
+
+        // 获取交易入参
+        IncreaseStakingParam param = tx.getTxParam(IncreaseStakingParam.class);
+        String msg = JSON.toJSONString(param);
+        logger.debug("增持质押(增加自有质押):{}", msg);
+        try{
+            CustomNode node = nodeCache.getNode(param.getNodeId());
+            // 取当前节点最新质押信息来修改
+            CustomStaking latestStaking = node.getLatestStaking();
+            latestStaking.updateWithIncreaseStakingParam(param);
+            param.setNodeName(latestStaking.getStakingName());
+            stakingStage.modifyStaking(latestStaking,tx);
+            tx.setTxInfo(JSON.toJSONString(param));
+        } catch (NoSuchBeanException e) {
+            logger.error("无法修改质押信息: {}",e.getMessage());
+        }
+    }
+}

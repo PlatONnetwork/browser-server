@@ -4,21 +4,20 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Address">
     <id column="address" jdbcType="VARCHAR" property="address" />
     <result column="type" jdbcType="INTEGER" property="type" />
-    <result column="balance" jdbcType="VARCHAR" property="balance" />
-    <result column="restricting_balance" jdbcType="VARCHAR" property="restrictingBalance" />
-    <result column="staking_value" jdbcType="VARCHAR" property="stakingValue" />
-    <result column="delegate_value" jdbcType="VARCHAR" property="delegateValue" />
-    <result column="redeemed_value" jdbcType="VARCHAR" property="redeemedValue" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="restricting_balance" jdbcType="DECIMAL" property="restrictingBalance" />
+    <result column="staking_value" jdbcType="DECIMAL" property="stakingValue" />
+    <result column="delegate_value" jdbcType="DECIMAL" property="delegateValue" />
+    <result column="redeemed_value" jdbcType="DECIMAL" property="redeemedValue" />
     <result column="tx_qty" jdbcType="INTEGER" property="txQty" />
     <result column="transfer_qty" jdbcType="INTEGER" property="transferQty" />
+    <result column="delegate_qty" jdbcType="INTEGER" property="delegateQty" />
     <result column="staking_qty" jdbcType="INTEGER" property="stakingQty" />
     <result column="proposal_qty" jdbcType="INTEGER" property="proposalQty" />
-    <result column="delegate_qty" jdbcType="INTEGER" property="delegateQty" />
     <result column="candidate_count" jdbcType="INTEGER" property="candidateCount" />
-    <result column="delegate_hes" jdbcType="VARCHAR" property="delegateHes" />
-    <result column="delegate_locked" jdbcType="VARCHAR" property="delegateLocked" />
-    <result column="delegate_unlock" jdbcType="VARCHAR" property="delegateUnlock" />
-    <result column="delegate_reduction" jdbcType="VARCHAR" property="delegateReduction" />
+    <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes" />
+    <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked" />
+    <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased" />
     <result column="contract_name" jdbcType="VARCHAR" property="contractName" />
     <result column="contract_create" jdbcType="VARCHAR" property="contractCreate" />
     <result column="contract_createHash" jdbcType="VARCHAR" property="contractCreatehash" />
@@ -85,9 +84,9 @@
   </sql>
   <sql id="Base_Column_List">
     address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-    tx_qty, transfer_qty, staking_qty, proposal_qty, delegate_qty, candidate_count, delegate_hes, 
-    delegate_locked, delegate_unlock, delegate_reduction, contract_name, contract_create, 
-    contract_createHash, create_time, update_time
+    tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes, 
+    delegate_locked, delegate_released, contract_name, contract_create, contract_createHash, 
+    create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.AddressExample" resultMap="BaseResultMap">
     select
@@ -123,19 +122,19 @@
     insert into address (address, `type`, balance, 
       restricting_balance, staking_value, delegate_value, 
       redeemed_value, tx_qty, transfer_qty, 
-      staking_qty, proposal_qty, delegate_qty, 
+      delegate_qty, staking_qty, proposal_qty, 
       candidate_count, delegate_hes, delegate_locked, 
-      delegate_unlock, delegate_reduction, contract_name, 
-      contract_create, contract_createHash, create_time, 
-      update_time)
-    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=VARCHAR}, 
-      #{restrictingBalance,jdbcType=VARCHAR}, #{stakingValue,jdbcType=VARCHAR}, #{delegateValue,jdbcType=VARCHAR}, 
-      #{redeemedValue,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
-      #{stakingQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, #{delegateQty,jdbcType=INTEGER}, 
-      #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=VARCHAR}, #{delegateLocked,jdbcType=VARCHAR}, 
-      #{delegateUnlock,jdbcType=VARCHAR}, #{delegateReduction,jdbcType=VARCHAR}, #{contractName,jdbcType=VARCHAR}, 
-      #{contractCreate,jdbcType=VARCHAR}, #{contractCreatehash,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      delegate_released, contract_name, contract_create, 
+      contract_createHash, create_time, update_time
+      )
+    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
+      #{restrictingBalance,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{delegateValue,jdbcType=DECIMAL}, 
+      #{redeemedValue,jdbcType=DECIMAL}, #{txQty,jdbcType=INTEGER}, #{transferQty,jdbcType=INTEGER}, 
+      #{delegateQty,jdbcType=INTEGER}, #{stakingQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, 
+      #{candidateCount,jdbcType=INTEGER}, #{delegateHes,jdbcType=DECIMAL}, #{delegateLocked,jdbcType=DECIMAL}, 
+      #{delegateReleased,jdbcType=DECIMAL}, #{contractName,jdbcType=VARCHAR}, #{contractCreate,jdbcType=VARCHAR}, 
+      #{contractCreatehash,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Address">
     insert into address
@@ -167,14 +166,14 @@
       <if test="transferQty != null">
         transfer_qty,
       </if>
+      <if test="delegateQty != null">
+        delegate_qty,
+      </if>
       <if test="stakingQty != null">
         staking_qty,
       </if>
       <if test="proposalQty != null">
         proposal_qty,
-      </if>
-      <if test="delegateQty != null">
-        delegate_qty,
       </if>
       <if test="candidateCount != null">
         candidate_count,
@@ -185,11 +184,8 @@
       <if test="delegateLocked != null">
         delegate_locked,
       </if>
-      <if test="delegateUnlock != null">
-        delegate_unlock,
-      </if>
-      <if test="delegateReduction != null">
-        delegate_reduction,
+      <if test="delegateReleased != null">
+        delegate_released,
       </if>
       <if test="contractName != null">
         contract_name,
@@ -215,19 +211,19 @@
         #{type,jdbcType=INTEGER},
       </if>
       <if test="balance != null">
-        #{balance,jdbcType=VARCHAR},
+        #{balance,jdbcType=DECIMAL},
       </if>
       <if test="restrictingBalance != null">
-        #{restrictingBalance,jdbcType=VARCHAR},
+        #{restrictingBalance,jdbcType=DECIMAL},
       </if>
       <if test="stakingValue != null">
-        #{stakingValue,jdbcType=VARCHAR},
+        #{stakingValue,jdbcType=DECIMAL},
       </if>
       <if test="delegateValue != null">
-        #{delegateValue,jdbcType=VARCHAR},
+        #{delegateValue,jdbcType=DECIMAL},
       </if>
       <if test="redeemedValue != null">
-        #{redeemedValue,jdbcType=VARCHAR},
+        #{redeemedValue,jdbcType=DECIMAL},
       </if>
       <if test="txQty != null">
         #{txQty,jdbcType=INTEGER},
@@ -235,29 +231,26 @@
       <if test="transferQty != null">
         #{transferQty,jdbcType=INTEGER},
       </if>
+      <if test="delegateQty != null">
+        #{delegateQty,jdbcType=INTEGER},
+      </if>
       <if test="stakingQty != null">
         #{stakingQty,jdbcType=INTEGER},
       </if>
       <if test="proposalQty != null">
         #{proposalQty,jdbcType=INTEGER},
       </if>
-      <if test="delegateQty != null">
-        #{delegateQty,jdbcType=INTEGER},
-      </if>
       <if test="candidateCount != null">
         #{candidateCount,jdbcType=INTEGER},
       </if>
       <if test="delegateHes != null">
-        #{delegateHes,jdbcType=VARCHAR},
+        #{delegateHes,jdbcType=DECIMAL},
       </if>
       <if test="delegateLocked != null">
-        #{delegateLocked,jdbcType=VARCHAR},
+        #{delegateLocked,jdbcType=DECIMAL},
       </if>
-      <if test="delegateUnlock != null">
-        #{delegateUnlock,jdbcType=VARCHAR},
-      </if>
-      <if test="delegateReduction != null">
-        #{delegateReduction,jdbcType=VARCHAR},
+      <if test="delegateReleased != null">
+        #{delegateReleased,jdbcType=DECIMAL},
       </if>
       <if test="contractName != null">
         #{contractName,jdbcType=VARCHAR},
@@ -292,19 +285,19 @@
         `type` = #{record.type,jdbcType=INTEGER},
       </if>
       <if test="record.balance != null">
-        balance = #{record.balance,jdbcType=VARCHAR},
+        balance = #{record.balance,jdbcType=DECIMAL},
       </if>
       <if test="record.restrictingBalance != null">
-        restricting_balance = #{record.restrictingBalance,jdbcType=VARCHAR},
+        restricting_balance = #{record.restrictingBalance,jdbcType=DECIMAL},
       </if>
       <if test="record.stakingValue != null">
-        staking_value = #{record.stakingValue,jdbcType=VARCHAR},
+        staking_value = #{record.stakingValue,jdbcType=DECIMAL},
       </if>
       <if test="record.delegateValue != null">
-        delegate_value = #{record.delegateValue,jdbcType=VARCHAR},
+        delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
       </if>
       <if test="record.redeemedValue != null">
-        redeemed_value = #{record.redeemedValue,jdbcType=VARCHAR},
+        redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       </if>
       <if test="record.txQty != null">
         tx_qty = #{record.txQty,jdbcType=INTEGER},
@@ -312,29 +305,26 @@
       <if test="record.transferQty != null">
         transfer_qty = #{record.transferQty,jdbcType=INTEGER},
       </if>
+      <if test="record.delegateQty != null">
+        delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
+      </if>
       <if test="record.stakingQty != null">
         staking_qty = #{record.stakingQty,jdbcType=INTEGER},
       </if>
       <if test="record.proposalQty != null">
         proposal_qty = #{record.proposalQty,jdbcType=INTEGER},
       </if>
-      <if test="record.delegateQty != null">
-        delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
-      </if>
       <if test="record.candidateCount != null">
         candidate_count = #{record.candidateCount,jdbcType=INTEGER},
       </if>
       <if test="record.delegateHes != null">
-        delegate_hes = #{record.delegateHes,jdbcType=VARCHAR},
+        delegate_hes = #{record.delegateHes,jdbcType=DECIMAL},
       </if>
       <if test="record.delegateLocked != null">
-        delegate_locked = #{record.delegateLocked,jdbcType=VARCHAR},
+        delegate_locked = #{record.delegateLocked,jdbcType=DECIMAL},
       </if>
-      <if test="record.delegateUnlock != null">
-        delegate_unlock = #{record.delegateUnlock,jdbcType=VARCHAR},
-      </if>
-      <if test="record.delegateReduction != null">
-        delegate_reduction = #{record.delegateReduction,jdbcType=VARCHAR},
+      <if test="record.delegateReleased != null">
+        delegate_released = #{record.delegateReleased,jdbcType=DECIMAL},
       </if>
       <if test="record.contractName != null">
         contract_name = #{record.contractName,jdbcType=VARCHAR},
@@ -360,21 +350,20 @@
     update address
     set address = #{record.address,jdbcType=VARCHAR},
       `type` = #{record.type,jdbcType=INTEGER},
-      balance = #{record.balance,jdbcType=VARCHAR},
-      restricting_balance = #{record.restrictingBalance,jdbcType=VARCHAR},
-      staking_value = #{record.stakingValue,jdbcType=VARCHAR},
-      delegate_value = #{record.delegateValue,jdbcType=VARCHAR},
-      redeemed_value = #{record.redeemedValue,jdbcType=VARCHAR},
+      balance = #{record.balance,jdbcType=DECIMAL},
+      restricting_balance = #{record.restrictingBalance,jdbcType=DECIMAL},
+      staking_value = #{record.stakingValue,jdbcType=DECIMAL},
+      delegate_value = #{record.delegateValue,jdbcType=DECIMAL},
+      redeemed_value = #{record.redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
       transfer_qty = #{record.transferQty,jdbcType=INTEGER},
+      delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       staking_qty = #{record.stakingQty,jdbcType=INTEGER},
       proposal_qty = #{record.proposalQty,jdbcType=INTEGER},
-      delegate_qty = #{record.delegateQty,jdbcType=INTEGER},
       candidate_count = #{record.candidateCount,jdbcType=INTEGER},
-      delegate_hes = #{record.delegateHes,jdbcType=VARCHAR},
-      delegate_locked = #{record.delegateLocked,jdbcType=VARCHAR},
-      delegate_unlock = #{record.delegateUnlock,jdbcType=VARCHAR},
-      delegate_reduction = #{record.delegateReduction,jdbcType=VARCHAR},
+      delegate_hes = #{record.delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{record.delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{record.delegateReleased,jdbcType=DECIMAL},
       contract_name = #{record.contractName,jdbcType=VARCHAR},
       contract_create = #{record.contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{record.contractCreatehash,jdbcType=VARCHAR},
@@ -391,19 +380,19 @@
         `type` = #{type,jdbcType=INTEGER},
       </if>
       <if test="balance != null">
-        balance = #{balance,jdbcType=VARCHAR},
+        balance = #{balance,jdbcType=DECIMAL},
       </if>
       <if test="restrictingBalance != null">
-        restricting_balance = #{restrictingBalance,jdbcType=VARCHAR},
+        restricting_balance = #{restrictingBalance,jdbcType=DECIMAL},
       </if>
       <if test="stakingValue != null">
-        staking_value = #{stakingValue,jdbcType=VARCHAR},
+        staking_value = #{stakingValue,jdbcType=DECIMAL},
       </if>
       <if test="delegateValue != null">
-        delegate_value = #{delegateValue,jdbcType=VARCHAR},
+        delegate_value = #{delegateValue,jdbcType=DECIMAL},
       </if>
       <if test="redeemedValue != null">
-        redeemed_value = #{redeemedValue,jdbcType=VARCHAR},
+        redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       </if>
       <if test="txQty != null">
         tx_qty = #{txQty,jdbcType=INTEGER},
@@ -411,29 +400,26 @@
       <if test="transferQty != null">
         transfer_qty = #{transferQty,jdbcType=INTEGER},
       </if>
+      <if test="delegateQty != null">
+        delegate_qty = #{delegateQty,jdbcType=INTEGER},
+      </if>
       <if test="stakingQty != null">
         staking_qty = #{stakingQty,jdbcType=INTEGER},
       </if>
       <if test="proposalQty != null">
         proposal_qty = #{proposalQty,jdbcType=INTEGER},
       </if>
-      <if test="delegateQty != null">
-        delegate_qty = #{delegateQty,jdbcType=INTEGER},
-      </if>
       <if test="candidateCount != null">
         candidate_count = #{candidateCount,jdbcType=INTEGER},
       </if>
       <if test="delegateHes != null">
-        delegate_hes = #{delegateHes,jdbcType=VARCHAR},
+        delegate_hes = #{delegateHes,jdbcType=DECIMAL},
       </if>
       <if test="delegateLocked != null">
-        delegate_locked = #{delegateLocked,jdbcType=VARCHAR},
+        delegate_locked = #{delegateLocked,jdbcType=DECIMAL},
       </if>
-      <if test="delegateUnlock != null">
-        delegate_unlock = #{delegateUnlock,jdbcType=VARCHAR},
-      </if>
-      <if test="delegateReduction != null">
-        delegate_reduction = #{delegateReduction,jdbcType=VARCHAR},
+      <if test="delegateReleased != null">
+        delegate_released = #{delegateReleased,jdbcType=DECIMAL},
       </if>
       <if test="contractName != null">
         contract_name = #{contractName,jdbcType=VARCHAR},
@@ -456,21 +442,20 @@
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Address">
     update address
     set `type` = #{type,jdbcType=INTEGER},
-      balance = #{balance,jdbcType=VARCHAR},
-      restricting_balance = #{restrictingBalance,jdbcType=VARCHAR},
-      staking_value = #{stakingValue,jdbcType=VARCHAR},
-      delegate_value = #{delegateValue,jdbcType=VARCHAR},
-      redeemed_value = #{redeemedValue,jdbcType=VARCHAR},
+      balance = #{balance,jdbcType=DECIMAL},
+      restricting_balance = #{restrictingBalance,jdbcType=DECIMAL},
+      staking_value = #{stakingValue,jdbcType=DECIMAL},
+      delegate_value = #{delegateValue,jdbcType=DECIMAL},
+      redeemed_value = #{redeemedValue,jdbcType=DECIMAL},
       tx_qty = #{txQty,jdbcType=INTEGER},
       transfer_qty = #{transferQty,jdbcType=INTEGER},
+      delegate_qty = #{delegateQty,jdbcType=INTEGER},
       staking_qty = #{stakingQty,jdbcType=INTEGER},
       proposal_qty = #{proposalQty,jdbcType=INTEGER},
-      delegate_qty = #{delegateQty,jdbcType=INTEGER},
       candidate_count = #{candidateCount,jdbcType=INTEGER},
-      delegate_hes = #{delegateHes,jdbcType=VARCHAR},
-      delegate_locked = #{delegateLocked,jdbcType=VARCHAR},
-      delegate_unlock = #{delegateUnlock,jdbcType=VARCHAR},
-      delegate_reduction = #{delegateReduction,jdbcType=VARCHAR},
+      delegate_hes = #{delegateHes,jdbcType=DECIMAL},
+      delegate_locked = #{delegateLocked,jdbcType=DECIMAL},
+      delegate_released = #{delegateReleased,jdbcType=DECIMAL},
       contract_name = #{contractName,jdbcType=VARCHAR},
       contract_create = #{contractCreate,jdbcType=VARCHAR},
       contract_createHash = #{contractCreatehash,jdbcType=VARCHAR},
@@ -486,21 +471,20 @@
     -->
     insert into address
     (address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value, 
-      tx_qty, transfer_qty, staking_qty, proposal_qty, delegate_qty, candidate_count, 
-      delegate_hes, delegate_locked, delegate_unlock, delegate_reduction, contract_name, 
-      contract_create, contract_createHash, create_time, update_time)
+      tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, 
+      delegate_hes, delegate_locked, delegate_released, contract_name, contract_create, 
+      contract_createHash, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=VARCHAR}, 
-        #{item.restrictingBalance,jdbcType=VARCHAR}, #{item.stakingValue,jdbcType=VARCHAR}, 
-        #{item.delegateValue,jdbcType=VARCHAR}, #{item.redeemedValue,jdbcType=VARCHAR}, 
-        #{item.txQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, #{item.stakingQty,jdbcType=INTEGER}, 
-        #{item.proposalQty,jdbcType=INTEGER}, #{item.delegateQty,jdbcType=INTEGER}, #{item.candidateCount,jdbcType=INTEGER}, 
-        #{item.delegateHes,jdbcType=VARCHAR}, #{item.delegateLocked,jdbcType=VARCHAR}, 
-        #{item.delegateUnlock,jdbcType=VARCHAR}, #{item.delegateReduction,jdbcType=VARCHAR}, 
-        #{item.contractName,jdbcType=VARCHAR}, #{item.contractCreate,jdbcType=VARCHAR}, 
-        #{item.contractCreatehash,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP})
+      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.balance,jdbcType=DECIMAL}, 
+        #{item.restrictingBalance,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
+        #{item.delegateValue,jdbcType=DECIMAL}, #{item.redeemedValue,jdbcType=DECIMAL}, 
+        #{item.txQty,jdbcType=INTEGER}, #{item.transferQty,jdbcType=INTEGER}, #{item.delegateQty,jdbcType=INTEGER}, 
+        #{item.stakingQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, #{item.candidateCount,jdbcType=INTEGER}, 
+        #{item.delegateHes,jdbcType=DECIMAL}, #{item.delegateLocked,jdbcType=DECIMAL}, 
+        #{item.delegateReleased,jdbcType=DECIMAL}, #{item.contractName,jdbcType=VARCHAR}, 
+        #{item.contractCreate,jdbcType=VARCHAR}, #{item.contractCreatehash,jdbcType=VARCHAR}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -525,19 +509,19 @@
           #{item.type,jdbcType=INTEGER}
         </if>
         <if test="'balance'.toString() == column.value">
-          #{item.balance,jdbcType=VARCHAR}
+          #{item.balance,jdbcType=DECIMAL}
         </if>
         <if test="'restricting_balance'.toString() == column.value">
-          #{item.restrictingBalance,jdbcType=VARCHAR}
+          #{item.restrictingBalance,jdbcType=DECIMAL}
         </if>
         <if test="'staking_value'.toString() == column.value">
-          #{item.stakingValue,jdbcType=VARCHAR}
+          #{item.stakingValue,jdbcType=DECIMAL}
         </if>
         <if test="'delegate_value'.toString() == column.value">
-          #{item.delegateValue,jdbcType=VARCHAR}
+          #{item.delegateValue,jdbcType=DECIMAL}
         </if>
         <if test="'redeemed_value'.toString() == column.value">
-          #{item.redeemedValue,jdbcType=VARCHAR}
+          #{item.redeemedValue,jdbcType=DECIMAL}
         </if>
         <if test="'tx_qty'.toString() == column.value">
           #{item.txQty,jdbcType=INTEGER}
@@ -545,29 +529,26 @@
         <if test="'transfer_qty'.toString() == column.value">
           #{item.transferQty,jdbcType=INTEGER}
         </if>
+        <if test="'delegate_qty'.toString() == column.value">
+          #{item.delegateQty,jdbcType=INTEGER}
+        </if>
         <if test="'staking_qty'.toString() == column.value">
           #{item.stakingQty,jdbcType=INTEGER}
         </if>
         <if test="'proposal_qty'.toString() == column.value">
           #{item.proposalQty,jdbcType=INTEGER}
         </if>
-        <if test="'delegate_qty'.toString() == column.value">
-          #{item.delegateQty,jdbcType=INTEGER}
-        </if>
         <if test="'candidate_count'.toString() == column.value">
           #{item.candidateCount,jdbcType=INTEGER}
         </if>
         <if test="'delegate_hes'.toString() == column.value">
-          #{item.delegateHes,jdbcType=VARCHAR}
+          #{item.delegateHes,jdbcType=DECIMAL}
         </if>
         <if test="'delegate_locked'.toString() == column.value">
-          #{item.delegateLocked,jdbcType=VARCHAR}
+          #{item.delegateLocked,jdbcType=DECIMAL}
         </if>
-        <if test="'delegate_unlock'.toString() == column.value">
-          #{item.delegateUnlock,jdbcType=VARCHAR}
-        </if>
-        <if test="'delegate_reduction'.toString() == column.value">
-          #{item.delegateReduction,jdbcType=VARCHAR}
+        <if test="'delegate_released'.toString() == column.value">
+          #{item.delegateReleased,jdbcType=DECIMAL}
         </if>
         <if test="'contract_name'.toString() == column.value">
           #{item.contractName,jdbcType=VARCHAR}

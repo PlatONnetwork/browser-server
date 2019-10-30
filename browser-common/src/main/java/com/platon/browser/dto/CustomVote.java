@@ -27,14 +27,14 @@ public class CustomVote extends Vote {
     public void updateWithVote( CustomTransaction tx, VotingProposalParam param ){
         this.setHash(tx.getHash());
         this.setProposalHash(param.getProposalId());
-        this.setOption(param.getOption());
-        this.setTimestamp(tx.getTimestamp());
-        this.setVerifier(param.getVerifier());
+//        this.setOption(param.getOption());
+//        this.setTimestamp(tx.getTimestamp());
+//        this.setVerifier(param.getVerifier());
     }
 
-    public OptionEnum getOptionEnum(){
-        return OptionEnum.getEnum(this.getOption());
-    }
+//    public OptionEnum getOptionEnum(){
+//        return OptionEnum.getEnum(this.getOption());
+//    }
 
     /**
      * 投票类型枚举类：

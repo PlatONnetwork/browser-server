@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.dto.CustomNodeOpt;
 
 public class CustomNodeOptMapperTest extends TestBase {

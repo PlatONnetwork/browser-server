@@ -1,0 +1,91 @@
+package com.platon.browser.old.engine.handler.staking;
+
+import com.platon.browser.TestBase;
+import com.platon.browser.dto.CustomNode;
+import com.platon.browser.dto.CustomTransaction;
+import com.platon.browser.old.engine.BlockChain;
+import com.platon.browser.old.engine.cache.CacheHolder;
+import com.platon.browser.old.engine.cache.NodeCache;
+import com.platon.browser.old.engine.cache.ProposalCache;
+import com.platon.browser.old.engine.handler.EventContext;
+import com.platon.browser.old.engine.stage.BlockChainStage;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.old.exception.BlockChainException;
+import com.platon.browser.old.exception.CacheConstructException;
+import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.utils.HexTool;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.web3j.platon.bean.Node;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+/**
+ * @Auther: dongqile
+ * @Date: 2019/9/5
+ * @Description: 质押业务测试类
+ */
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class CreateValidatorHandlerTest extends TestBase {
+    private static Logger logger = LoggerFactory.getLogger(CreateValidatorHandlerTest.class);
+    @Spy
+    private CreateValidatorHandler handler;
+    @Mock
+    private CacheHolder cacheHolder;
+    @Mock
+    private BlockChain bc;
+
+    /**
+     * 测试开始前，设置相关行为属性
+     * @throws IOException
+     * @throws BeanCreateOrUpdateException
+     */
+    @Before
+    public void setup() {
+        ReflectionTestUtils.setField(handler, "cacheHolder", cacheHolder);
+        ReflectionTestUtils.setField(handler, "bc", bc);
+    }
+
+    /**
+     *  质押测试方法
+     */
+    @Test
+    public void testHandler () throws NoSuchBeanException, CacheConstructException, BlockChainException {
+        NodeCache nodeCache = mock(NodeCache.class);
+        when(cacheHolder.getNodeCache()).thenReturn(nodeCache);
+        BlockChainStage stageData = new BlockChainStage();
+        when(cacheHolder.getStageData()).thenReturn(stageData);
+        ProposalCache proposalCache = mock(ProposalCache.class);
+        when(cacheHolder.getProposalCache()).thenReturn(proposalCache);
+        when(proposalCache.getProposal(any())).thenReturn(proposals.get(0));
+        CustomNode node = mock(CustomNode.class);
+        when(nodeCache.getNode(any())).thenReturn(node);
+        when(node.getLatestStaking()).thenReturn(stakings.get(0));
+        Map<String, Node> validatorMap = new HashMap<>();
+        validators.forEach(validator->validatorMap.put(HexTool.prefix(validator.getNodeId()),validator));
+        when(bc.getCurBlock()).thenReturn(blocks.get(0));
+        when(bc.getCurConsensusExpectBlockCount()).thenReturn(BigDecimal.valueOf(250));
+
+        EventContext context = new EventContext();
+
+        transactions.stream()
+                .filter(tx->CustomTransaction.TxTypeEnum.CREATE_VALIDATOR.getCode().equals(tx.getTxType()))
+                .forEach(context::setTransaction);
+        handler.handle(context);
+
+        verify(handler, times(1)).handle(any(EventContext.class));
+    }
+}

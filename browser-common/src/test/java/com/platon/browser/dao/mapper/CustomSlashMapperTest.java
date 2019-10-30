@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dto.CustomSlash;
 
 public class CustomSlashMapperTest extends TestBase {

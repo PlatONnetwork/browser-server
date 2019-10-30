@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -7,45 +8,31 @@ import java.util.Date;
 public class Staking extends StakingKey {
     private Integer stakingTxIndex;
 
-    private String stakingAddr;
+    private BigDecimal stakingHes;
 
-    private String stakingHas;
+    private BigDecimal stakingLocked;
 
-    private String stakingLocked;
+    private BigDecimal stakingReduction;
 
     private Integer stakingReductionEpoch;
 
-    private String stakingReduction;
+    private String nodeName;
 
-    private String statDelegateHas;
-
-    private String statDelegateLocked;
-
-    private String statDelegateReduction;
-
-    private Integer statDelegateQty;
-
-    private Integer statVerifierTime;
-
-    private String stakingName;
-
-    private String stakingIcon;
+    private String nodeIcon;
 
     private String externalId;
 
-    private String denefitAddr;
+    private String externalName;
 
-    private String expectedIncome;
+    private String stakingAddr;
 
-    private String blockRewardValue;
+    private String benefitAddr;
 
-    private Long preConsBlockQty;
-
-    private Long curConsBlockQty;
+    private Double annualizedRate;
 
     private String programVersion;
 
-    private String stakingRewardValue;
+    private String bigVersion;
 
     private String webSite;
 
@@ -59,17 +46,29 @@ public class Staking extends StakingKey {
 
     private Integer isConsensus;
 
-    private Integer isSetting;
+    private Integer isSettle;
 
     private Integer isInit;
+
+    private BigDecimal statDelegateHes;
+
+    private BigDecimal statDelegateLocked;
+
+    private BigDecimal statDelegateReleased;
+
+    private BigDecimal blockRewardValue;
+
+    private BigDecimal feeRewardValue;
+
+    private BigDecimal stakingRewardValue;
+
+    private Long curConsBlockQty;
+
+    private Long preConsBlockQty;
 
     private Date createTime;
 
     private Date updateTime;
-
-    private String externalName;
-
-    private String feeRewardValue;
 
     private String annualizedRateInfo;
 
@@ -81,28 +80,28 @@ public class Staking extends StakingKey {
         this.stakingTxIndex = stakingTxIndex;
     }
 
-    public String getStakingAddr() {
-        return stakingAddr;
+    public BigDecimal getStakingHes() {
+        return stakingHes;
     }
 
-    public void setStakingAddr(String stakingAddr) {
-        this.stakingAddr = stakingAddr == null ? null : stakingAddr.trim();
+    public void setStakingHes(BigDecimal stakingHes) {
+        this.stakingHes = stakingHes;
     }
 
-    public String getStakingHas() {
-        return stakingHas;
-    }
-
-    public void setStakingHas(String stakingHas) {
-        this.stakingHas = stakingHas == null ? null : stakingHas.trim();
-    }
-
-    public String getStakingLocked() {
+    public BigDecimal getStakingLocked() {
         return stakingLocked;
     }
 
-    public void setStakingLocked(String stakingLocked) {
-        this.stakingLocked = stakingLocked == null ? null : stakingLocked.trim();
+    public void setStakingLocked(BigDecimal stakingLocked) {
+        this.stakingLocked = stakingLocked;
+    }
+
+    public BigDecimal getStakingReduction() {
+        return stakingReduction;
+    }
+
+    public void setStakingReduction(BigDecimal stakingReduction) {
+        this.stakingReduction = stakingReduction;
     }
 
     public Integer getStakingReductionEpoch() {
@@ -113,68 +112,20 @@ public class Staking extends StakingKey {
         this.stakingReductionEpoch = stakingReductionEpoch;
     }
 
-    public String getStakingReduction() {
-        return stakingReduction;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public void setStakingReduction(String stakingReduction) {
-        this.stakingReduction = stakingReduction == null ? null : stakingReduction.trim();
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName == null ? null : nodeName.trim();
     }
 
-    public String getStatDelegateHas() {
-        return statDelegateHas;
+    public String getNodeIcon() {
+        return nodeIcon;
     }
 
-    public void setStatDelegateHas(String statDelegateHas) {
-        this.statDelegateHas = statDelegateHas == null ? null : statDelegateHas.trim();
-    }
-
-    public String getStatDelegateLocked() {
-        return statDelegateLocked;
-    }
-
-    public void setStatDelegateLocked(String statDelegateLocked) {
-        this.statDelegateLocked = statDelegateLocked == null ? null : statDelegateLocked.trim();
-    }
-
-    public String getStatDelegateReduction() {
-        return statDelegateReduction;
-    }
-
-    public void setStatDelegateReduction(String statDelegateReduction) {
-        this.statDelegateReduction = statDelegateReduction == null ? null : statDelegateReduction.trim();
-    }
-
-    public Integer getStatDelegateQty() {
-        return statDelegateQty;
-    }
-
-    public void setStatDelegateQty(Integer statDelegateQty) {
-        this.statDelegateQty = statDelegateQty;
-    }
-
-    public Integer getStatVerifierTime() {
-        return statVerifierTime;
-    }
-
-    public void setStatVerifierTime(Integer statVerifierTime) {
-        this.statVerifierTime = statVerifierTime;
-    }
-
-    public String getStakingName() {
-        return stakingName;
-    }
-
-    public void setStakingName(String stakingName) {
-        this.stakingName = stakingName == null ? null : stakingName.trim();
-    }
-
-    public String getStakingIcon() {
-        return stakingIcon;
-    }
-
-    public void setStakingIcon(String stakingIcon) {
-        this.stakingIcon = stakingIcon == null ? null : stakingIcon.trim();
+    public void setNodeIcon(String nodeIcon) {
+        this.nodeIcon = nodeIcon == null ? null : nodeIcon.trim();
     }
 
     public String getExternalId() {
@@ -185,44 +136,36 @@ public class Staking extends StakingKey {
         this.externalId = externalId == null ? null : externalId.trim();
     }
 
-    public String getDenefitAddr() {
-        return denefitAddr;
+    public String getExternalName() {
+        return externalName;
     }
 
-    public void setDenefitAddr(String denefitAddr) {
-        this.denefitAddr = denefitAddr == null ? null : denefitAddr.trim();
+    public void setExternalName(String externalName) {
+        this.externalName = externalName == null ? null : externalName.trim();
     }
 
-    public String getExpectedIncome() {
-        return expectedIncome;
+    public String getStakingAddr() {
+        return stakingAddr;
     }
 
-    public void setExpectedIncome(String expectedIncome) {
-        this.expectedIncome = expectedIncome == null ? null : expectedIncome.trim();
+    public void setStakingAddr(String stakingAddr) {
+        this.stakingAddr = stakingAddr == null ? null : stakingAddr.trim();
     }
 
-    public String getBlockRewardValue() {
-        return blockRewardValue;
+    public String getBenefitAddr() {
+        return benefitAddr;
     }
 
-    public void setBlockRewardValue(String blockRewardValue) {
-        this.blockRewardValue = blockRewardValue == null ? null : blockRewardValue.trim();
+    public void setBenefitAddr(String benefitAddr) {
+        this.benefitAddr = benefitAddr == null ? null : benefitAddr.trim();
     }
 
-    public Long getPreConsBlockQty() {
-        return preConsBlockQty;
+    public Double getAnnualizedRate() {
+        return annualizedRate;
     }
 
-    public void setPreConsBlockQty(Long preConsBlockQty) {
-        this.preConsBlockQty = preConsBlockQty;
-    }
-
-    public Long getCurConsBlockQty() {
-        return curConsBlockQty;
-    }
-
-    public void setCurConsBlockQty(Long curConsBlockQty) {
-        this.curConsBlockQty = curConsBlockQty;
+    public void setAnnualizedRate(Double annualizedRate) {
+        this.annualizedRate = annualizedRate;
     }
 
     public String getProgramVersion() {
@@ -233,12 +176,12 @@ public class Staking extends StakingKey {
         this.programVersion = programVersion == null ? null : programVersion.trim();
     }
 
-    public String getStakingRewardValue() {
-        return stakingRewardValue;
+    public String getBigVersion() {
+        return bigVersion;
     }
 
-    public void setStakingRewardValue(String stakingRewardValue) {
-        this.stakingRewardValue = stakingRewardValue == null ? null : stakingRewardValue.trim();
+    public void setBigVersion(String bigVersion) {
+        this.bigVersion = bigVersion == null ? null : bigVersion.trim();
     }
 
     public String getWebSite() {
@@ -289,12 +232,12 @@ public class Staking extends StakingKey {
         this.isConsensus = isConsensus;
     }
 
-    public Integer getIsSetting() {
-        return isSetting;
+    public Integer getIsSettle() {
+        return isSettle;
     }
 
-    public void setIsSetting(Integer isSetting) {
-        this.isSetting = isSetting;
+    public void setIsSettle(Integer isSettle) {
+        this.isSettle = isSettle;
     }
 
     public Integer getIsInit() {
@@ -303,6 +246,70 @@ public class Staking extends StakingKey {
 
     public void setIsInit(Integer isInit) {
         this.isInit = isInit;
+    }
+
+    public BigDecimal getStatDelegateHes() {
+        return statDelegateHes;
+    }
+
+    public void setStatDelegateHes(BigDecimal statDelegateHes) {
+        this.statDelegateHes = statDelegateHes;
+    }
+
+    public BigDecimal getStatDelegateLocked() {
+        return statDelegateLocked;
+    }
+
+    public void setStatDelegateLocked(BigDecimal statDelegateLocked) {
+        this.statDelegateLocked = statDelegateLocked;
+    }
+
+    public BigDecimal getStatDelegateReleased() {
+        return statDelegateReleased;
+    }
+
+    public void setStatDelegateReleased(BigDecimal statDelegateReleased) {
+        this.statDelegateReleased = statDelegateReleased;
+    }
+
+    public BigDecimal getBlockRewardValue() {
+        return blockRewardValue;
+    }
+
+    public void setBlockRewardValue(BigDecimal blockRewardValue) {
+        this.blockRewardValue = blockRewardValue;
+    }
+
+    public BigDecimal getFeeRewardValue() {
+        return feeRewardValue;
+    }
+
+    public void setFeeRewardValue(BigDecimal feeRewardValue) {
+        this.feeRewardValue = feeRewardValue;
+    }
+
+    public BigDecimal getStakingRewardValue() {
+        return stakingRewardValue;
+    }
+
+    public void setStakingRewardValue(BigDecimal stakingRewardValue) {
+        this.stakingRewardValue = stakingRewardValue;
+    }
+
+    public Long getCurConsBlockQty() {
+        return curConsBlockQty;
+    }
+
+    public void setCurConsBlockQty(Long curConsBlockQty) {
+        this.curConsBlockQty = curConsBlockQty;
+    }
+
+    public Long getPreConsBlockQty() {
+        return preConsBlockQty;
+    }
+
+    public void setPreConsBlockQty(Long preConsBlockQty) {
+        this.preConsBlockQty = preConsBlockQty;
     }
 
     public Date getCreateTime() {
@@ -321,22 +328,6 @@ public class Staking extends StakingKey {
         this.updateTime = updateTime;
     }
 
-    public String getExternalName() {
-        return externalName;
-    }
-
-    public void setExternalName(String externalName) {
-        this.externalName = externalName == null ? null : externalName.trim();
-    }
-
-    public String getFeeRewardValue() {
-        return feeRewardValue;
-    }
-
-    public void setFeeRewardValue(String feeRewardValue) {
-        this.feeRewardValue = feeRewardValue == null ? null : feeRewardValue.trim();
-    }
-
     public String getAnnualizedRateInfo() {
         return annualizedRateInfo;
     }
@@ -353,41 +344,40 @@ public class Staking extends StakingKey {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        stakingBlockNum("staking_block_num", "stakingBlockNum", "BIGINT", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
+        stakingBlockNum("staking_block_num", "stakingBlockNum", "BIGINT", false),
         stakingTxIndex("staking_tx_index", "stakingTxIndex", "INTEGER", false),
-        stakingAddr("staking_addr", "stakingAddr", "VARCHAR", false),
-        stakingHas("staking_has", "stakingHas", "VARCHAR", false),
-        stakingLocked("staking_locked", "stakingLocked", "VARCHAR", false),
+        stakingHes("staking_hes", "stakingHes", "DECIMAL", false),
+        stakingLocked("staking_locked", "stakingLocked", "DECIMAL", false),
+        stakingReduction("staking_reduction", "stakingReduction", "DECIMAL", false),
         stakingReductionEpoch("staking_reduction_epoch", "stakingReductionEpoch", "INTEGER", false),
-        stakingReduction("staking_reduction", "stakingReduction", "VARCHAR", false),
-        statDelegateHas("stat_delegate_has", "statDelegateHas", "VARCHAR", false),
-        statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "VARCHAR", false),
-        statDelegateReduction("stat_delegate_reduction", "statDelegateReduction", "VARCHAR", false),
-        statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
-        statVerifierTime("stat_verifier_time", "statVerifierTime", "INTEGER", false),
-        stakingName("staking_name", "stakingName", "VARCHAR", false),
-        stakingIcon("staking_icon", "stakingIcon", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
+        nodeIcon("node_icon", "nodeIcon", "VARCHAR", false),
         externalId("external_id", "externalId", "VARCHAR", false),
-        denefitAddr("denefit_addr", "denefitAddr", "VARCHAR", false),
-        expectedIncome("expected_income", "expectedIncome", "VARCHAR", false),
-        blockRewardValue("block_reward_value", "blockRewardValue", "VARCHAR", false),
-        preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
-        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
+        externalName("external_name", "externalName", "VARCHAR", false),
+        stakingAddr("staking_addr", "stakingAddr", "VARCHAR", false),
+        benefitAddr("benefit_addr", "benefitAddr", "VARCHAR", false),
+        annualizedRate("annualized_rate", "annualizedRate", "DOUBLE", false),
         programVersion("program_version", "programVersion", "VARCHAR", false),
-        stakingRewardValue("staking_reward_value", "stakingRewardValue", "VARCHAR", false),
+        bigVersion("big_version", "bigVersion", "VARCHAR", false),
         webSite("web_site", "webSite", "VARCHAR", false),
         details("details", "details", "VARCHAR", false),
         joinTime("join_time", "joinTime", "TIMESTAMP", false),
         leaveTime("leave_time", "leaveTime", "TIMESTAMP", false),
         status("status", "status", "INTEGER", true),
         isConsensus("is_consensus", "isConsensus", "INTEGER", false),
-        isSetting("is_setting", "isSetting", "INTEGER", false),
+        isSettle("is_settle", "isSettle", "INTEGER", false),
         isInit("is_init", "isInit", "INTEGER", false),
+        statDelegateHes("stat_delegate_hes", "statDelegateHes", "DECIMAL", false),
+        statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "DECIMAL", false),
+        statDelegateReleased("stat_delegate_released", "statDelegateReleased", "DECIMAL", false),
+        blockRewardValue("block_reward_value", "blockRewardValue", "DECIMAL", false),
+        feeRewardValue("fee_reward_value", "feeRewardValue", "DECIMAL", false),
+        stakingRewardValue("staking_reward_value", "stakingRewardValue", "DECIMAL", false),
+        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
+        preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        externalName("external_name", "externalName", "VARCHAR", false),
-        feeRewardValue("fee_reward_value", "feeRewardValue", "VARCHAR", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

@@ -3,28 +3,28 @@
 <mapper namespace="com.platon.browser.dao.mapper.ProposalMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Proposal">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="type" jdbcType="VARCHAR" property="type" />
-    <result column="verifier" jdbcType="VARCHAR" property="verifier" />
-    <result column="verifier_name" jdbcType="VARCHAR" property="verifierName" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
     <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="new_version" jdbcType="VARCHAR" property="newVersion" />
-    <result column="end_voting_block" jdbcType="VARCHAR" property="endVotingBlock" />
-    <result column="active_block" jdbcType="VARCHAR" property="activeBlock" />
+    <result column="end_voting_block" jdbcType="BIGINT" property="endVotingBlock" />
+    <result column="active_block" jdbcType="BIGINT" property="activeBlock" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="yeas" jdbcType="BIGINT" property="yeas" />
     <result column="nays" jdbcType="BIGINT" property="nays" />
     <result column="abstentions" jdbcType="BIGINT" property="abstentions" />
     <result column="accu_verifiers" jdbcType="BIGINT" property="accuVerifiers" />
     <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="pip_num" jdbcType="VARCHAR" property="pipNum" />
     <result column="pip_id" jdbcType="VARCHAR" property="pipId" />
     <result column="topic" jdbcType="VARCHAR" property="topic" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="canceled_pip_id" jdbcType="VARCHAR" property="canceledPipId" />
     <result column="canceled_topic" jdbcType="VARCHAR" property="canceledTopic" />
-    <result column="block_number" jdbcType="VARCHAR" property="blockNumber" />
+    <result column="block_number" jdbcType="BIGINT" property="blockNumber" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -85,9 +85,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
-    `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
-    pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic, block_number
+    hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
+    `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
+    topic, description, canceled_pip_id, canceled_topic, block_number, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.ProposalExample" resultMap="BaseResultMap">
     select
@@ -120,22 +120,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Proposal">
-    insert into proposal (hash, `type`, verifier, 
-      verifier_name, url, new_version, 
+    insert into proposal (hash, `type`, node_id, 
+      node_name, url, new_version, 
       end_voting_block, active_block, `timestamp`, 
       yeas, nays, abstentions, 
-      accu_verifiers, `status`, update_time, 
-      create_time, pip_num, pip_id, 
-      topic, description, canceled_pip_id, 
-      canceled_topic, block_number)
-    values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{verifier,jdbcType=VARCHAR}, 
-      #{verifierName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
-      #{endVotingBlock,jdbcType=VARCHAR}, #{activeBlock,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
+      accu_verifiers, `status`, pip_num, 
+      pip_id, topic, description, 
+      canceled_pip_id, canceled_topic, block_number, 
+      create_time, update_time)
+    values (#{hash,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{nodeId,jdbcType=VARCHAR}, 
+      #{nodeName,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{newVersion,jdbcType=VARCHAR}, 
+      #{endVotingBlock,jdbcType=BIGINT}, #{activeBlock,jdbcType=BIGINT}, #{timestamp,jdbcType=TIMESTAMP}, 
       #{yeas,jdbcType=BIGINT}, #{nays,jdbcType=BIGINT}, #{abstentions,jdbcType=BIGINT}, 
-      #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{pipNum,jdbcType=VARCHAR}, #{pipId,jdbcType=VARCHAR}, 
-      #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{canceledPipId,jdbcType=VARCHAR}, 
-      #{canceledTopic,jdbcType=VARCHAR}, #{blockNumber,jdbcType=VARCHAR})
+      #{accuVerifiers,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{pipNum,jdbcType=VARCHAR}, 
+      #{pipId,jdbcType=VARCHAR}, #{topic,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{canceledPipId,jdbcType=VARCHAR}, #{canceledTopic,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Proposal">
     insert into proposal
@@ -146,11 +146,11 @@
       <if test="type != null">
         `type`,
       </if>
-      <if test="verifier != null">
-        verifier,
+      <if test="nodeId != null">
+        node_id,
       </if>
-      <if test="verifierName != null">
-        verifier_name,
+      <if test="nodeName != null">
+        node_name,
       </if>
       <if test="url != null">
         url,
@@ -182,12 +182,6 @@
       <if test="status != null">
         `status`,
       </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
       <if test="pipNum != null">
         pip_num,
       </if>
@@ -209,19 +203,25 @@
       <if test="blockNumber != null">
         block_number,
       </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        #{type,jdbcType=VARCHAR},
+        #{type,jdbcType=INTEGER},
       </if>
-      <if test="verifier != null">
-        #{verifier,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="verifierName != null">
-        #{verifierName,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
       </if>
       <if test="url != null">
         #{url,jdbcType=VARCHAR},
@@ -230,10 +230,10 @@
         #{newVersion,jdbcType=VARCHAR},
       </if>
       <if test="endVotingBlock != null">
-        #{endVotingBlock,jdbcType=VARCHAR},
+        #{endVotingBlock,jdbcType=BIGINT},
       </if>
       <if test="activeBlock != null">
-        #{activeBlock,jdbcType=VARCHAR},
+        #{activeBlock,jdbcType=BIGINT},
       </if>
       <if test="timestamp != null">
         #{timestamp,jdbcType=TIMESTAMP},
@@ -252,12 +252,6 @@
       </if>
       <if test="status != null">
         #{status,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="pipNum != null">
         #{pipNum,jdbcType=VARCHAR},
@@ -278,7 +272,13 @@
         #{canceledTopic,jdbcType=VARCHAR},
       </if>
       <if test="blockNumber != null">
-        #{blockNumber,jdbcType=VARCHAR},
+        #{blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -295,13 +295,13 @@
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
       <if test="record.type != null">
-        `type` = #{record.type,jdbcType=VARCHAR},
+        `type` = #{record.type,jdbcType=INTEGER},
       </if>
-      <if test="record.verifier != null">
-        verifier = #{record.verifier,jdbcType=VARCHAR},
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="record.verifierName != null">
-        verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      <if test="record.nodeName != null">
+        node_name = #{record.nodeName,jdbcType=VARCHAR},
       </if>
       <if test="record.url != null">
         url = #{record.url,jdbcType=VARCHAR},
@@ -310,10 +310,10 @@
         new_version = #{record.newVersion,jdbcType=VARCHAR},
       </if>
       <if test="record.endVotingBlock != null">
-        end_voting_block = #{record.endVotingBlock,jdbcType=VARCHAR},
+        end_voting_block = #{record.endVotingBlock,jdbcType=BIGINT},
       </if>
       <if test="record.activeBlock != null">
-        active_block = #{record.activeBlock,jdbcType=VARCHAR},
+        active_block = #{record.activeBlock,jdbcType=BIGINT},
       </if>
       <if test="record.timestamp != null">
         `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
@@ -332,12 +332,6 @@
       </if>
       <if test="record.status != null">
         `status` = #{record.status,jdbcType=INTEGER},
-      </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.pipNum != null">
         pip_num = #{record.pipNum,jdbcType=VARCHAR},
@@ -358,7 +352,13 @@
         canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
       </if>
       <if test="record.blockNumber != null">
-        block_number = #{record.blockNumber,jdbcType=VARCHAR},
+        block_number = #{record.blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -368,28 +368,28 @@
   <update id="updateByExample" parameterType="map">
     update proposal
     set hash = #{record.hash,jdbcType=VARCHAR},
-      `type` = #{record.type,jdbcType=VARCHAR},
-      verifier = #{record.verifier,jdbcType=VARCHAR},
-      verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      `type` = #{record.type,jdbcType=INTEGER},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
       url = #{record.url,jdbcType=VARCHAR},
       new_version = #{record.newVersion,jdbcType=VARCHAR},
-      end_voting_block = #{record.endVotingBlock,jdbcType=VARCHAR},
-      active_block = #{record.activeBlock,jdbcType=VARCHAR},
+      end_voting_block = #{record.endVotingBlock,jdbcType=BIGINT},
+      active_block = #{record.activeBlock,jdbcType=BIGINT},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       yeas = #{record.yeas,jdbcType=BIGINT},
       nays = #{record.nays,jdbcType=BIGINT},
       abstentions = #{record.abstentions,jdbcType=BIGINT},
       accu_verifiers = #{record.accuVerifiers,jdbcType=BIGINT},
       `status` = #{record.status,jdbcType=INTEGER},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
       pip_num = #{record.pipNum,jdbcType=VARCHAR},
       pip_id = #{record.pipId,jdbcType=VARCHAR},
       topic = #{record.topic,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=VARCHAR},
       canceled_pip_id = #{record.canceledPipId,jdbcType=VARCHAR},
       canceled_topic = #{record.canceledTopic,jdbcType=VARCHAR},
-      block_number = #{record.blockNumber,jdbcType=VARCHAR}
+      block_number = #{record.blockNumber,jdbcType=BIGINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -398,13 +398,13 @@
     update proposal
     <set>
       <if test="type != null">
-        `type` = #{type,jdbcType=VARCHAR},
+        `type` = #{type,jdbcType=INTEGER},
       </if>
-      <if test="verifier != null">
-        verifier = #{verifier,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="verifierName != null">
-        verifier_name = #{verifierName,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
       </if>
       <if test="url != null">
         url = #{url,jdbcType=VARCHAR},
@@ -413,10 +413,10 @@
         new_version = #{newVersion,jdbcType=VARCHAR},
       </if>
       <if test="endVotingBlock != null">
-        end_voting_block = #{endVotingBlock,jdbcType=VARCHAR},
+        end_voting_block = #{endVotingBlock,jdbcType=BIGINT},
       </if>
       <if test="activeBlock != null">
-        active_block = #{activeBlock,jdbcType=VARCHAR},
+        active_block = #{activeBlock,jdbcType=BIGINT},
       </if>
       <if test="timestamp != null">
         `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
@@ -435,12 +435,6 @@
       </if>
       <if test="status != null">
         `status` = #{status,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="pipNum != null">
         pip_num = #{pipNum,jdbcType=VARCHAR},
@@ -461,35 +455,41 @@
         canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
       </if>
       <if test="blockNumber != null">
-        block_number = #{blockNumber,jdbcType=VARCHAR},
+        block_number = #{blockNumber,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Proposal">
     update proposal
-    set `type` = #{type,jdbcType=VARCHAR},
-      verifier = #{verifier,jdbcType=VARCHAR},
-      verifier_name = #{verifierName,jdbcType=VARCHAR},
+    set `type` = #{type,jdbcType=INTEGER},
+      node_id = #{nodeId,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
       url = #{url,jdbcType=VARCHAR},
       new_version = #{newVersion,jdbcType=VARCHAR},
-      end_voting_block = #{endVotingBlock,jdbcType=VARCHAR},
-      active_block = #{activeBlock,jdbcType=VARCHAR},
+      end_voting_block = #{endVotingBlock,jdbcType=BIGINT},
+      active_block = #{activeBlock,jdbcType=BIGINT},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       yeas = #{yeas,jdbcType=BIGINT},
       nays = #{nays,jdbcType=BIGINT},
       abstentions = #{abstentions,jdbcType=BIGINT},
       accu_verifiers = #{accuVerifiers,jdbcType=BIGINT},
       `status` = #{status,jdbcType=INTEGER},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       pip_num = #{pipNum,jdbcType=VARCHAR},
       pip_id = #{pipId,jdbcType=VARCHAR},
       topic = #{topic,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       canceled_pip_id = #{canceledPipId,jdbcType=VARCHAR},
       canceled_topic = #{canceledTopic,jdbcType=VARCHAR},
-      block_number = #{blockNumber,jdbcType=VARCHAR}
+      block_number = #{blockNumber,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -499,21 +499,21 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into proposal
-    (hash, `type`, verifier, verifier_name, url, new_version, end_voting_block, active_block, 
-      `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, update_time, create_time, 
-      pip_num, pip_id, topic, description, canceled_pip_id, canceled_topic, block_number
-      )
+    (hash, `type`, node_id, node_name, url, new_version, end_voting_block, active_block, 
+      `timestamp`, yeas, nays, abstentions, accu_verifiers, `status`, pip_num, pip_id, 
+      topic, description, canceled_pip_id, canceled_topic, block_number, create_time, 
+      update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.verifier,jdbcType=VARCHAR}, 
-        #{item.verifierName,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.newVersion,jdbcType=VARCHAR}, 
-        #{item.endVotingBlock,jdbcType=VARCHAR}, #{item.activeBlock,jdbcType=VARCHAR}, 
-        #{item.timestamp,jdbcType=TIMESTAMP}, #{item.yeas,jdbcType=BIGINT}, #{item.nays,jdbcType=BIGINT}, 
-        #{item.abstentions,jdbcType=BIGINT}, #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.pipNum,jdbcType=VARCHAR}, 
+      (#{item.hash,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, #{item.nodeId,jdbcType=VARCHAR}, 
+        #{item.nodeName,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.newVersion,jdbcType=VARCHAR}, 
+        #{item.endVotingBlock,jdbcType=BIGINT}, #{item.activeBlock,jdbcType=BIGINT}, #{item.timestamp,jdbcType=TIMESTAMP}, 
+        #{item.yeas,jdbcType=BIGINT}, #{item.nays,jdbcType=BIGINT}, #{item.abstentions,jdbcType=BIGINT}, 
+        #{item.accuVerifiers,jdbcType=BIGINT}, #{item.status,jdbcType=INTEGER}, #{item.pipNum,jdbcType=VARCHAR}, 
         #{item.pipId,jdbcType=VARCHAR}, #{item.topic,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, 
         #{item.canceledPipId,jdbcType=VARCHAR}, #{item.canceledTopic,jdbcType=VARCHAR}, 
-        #{item.blockNumber,jdbcType=VARCHAR})
+        #{item.blockNumber,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -535,13 +535,13 @@
           #{item.hash,jdbcType=VARCHAR}
         </if>
         <if test="'type'.toString() == column.value">
-          #{item.type,jdbcType=VARCHAR}
+          #{item.type,jdbcType=INTEGER}
         </if>
-        <if test="'verifier'.toString() == column.value">
-          #{item.verifier,jdbcType=VARCHAR}
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="'verifier_name'.toString() == column.value">
-          #{item.verifierName,jdbcType=VARCHAR}
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
         </if>
         <if test="'url'.toString() == column.value">
           #{item.url,jdbcType=VARCHAR}
@@ -550,10 +550,10 @@
           #{item.newVersion,jdbcType=VARCHAR}
         </if>
         <if test="'end_voting_block'.toString() == column.value">
-          #{item.endVotingBlock,jdbcType=VARCHAR}
+          #{item.endVotingBlock,jdbcType=BIGINT}
         </if>
         <if test="'active_block'.toString() == column.value">
-          #{item.activeBlock,jdbcType=VARCHAR}
+          #{item.activeBlock,jdbcType=BIGINT}
         </if>
         <if test="'timestamp'.toString() == column.value">
           #{item.timestamp,jdbcType=TIMESTAMP}
@@ -572,12 +572,6 @@
         </if>
         <if test="'status'.toString() == column.value">
           #{item.status,jdbcType=INTEGER}
-        </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'create_time'.toString() == column.value">
-          #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'pip_num'.toString() == column.value">
           #{item.pipNum,jdbcType=VARCHAR}
@@ -598,7 +592,13 @@
           #{item.canceledTopic,jdbcType=VARCHAR}
         </if>
         <if test="'block_number'.toString() == column.value">
-          #{item.blockNumber,jdbcType=VARCHAR}
+          #{item.blockNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
       </foreach>
       )

@@ -1,4 +1,4 @@
-//package com.platon.browser.data;
+package com.platon.browser.data;//package com.platon.browser.data;
 //
 //import com.alibaba.fastjson.JSON;
 //import com.platon.browser.engine.bean.AnnualizedRateInfo;

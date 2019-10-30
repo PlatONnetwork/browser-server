@@ -2,7 +2,6 @@ package com.platon.browser.dao.mapper;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.DelegationStaking;
 import com.platon.browser.dto.CustomDelegation;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

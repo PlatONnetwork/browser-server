@@ -2,7 +2,6 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.entity.StakingExample.Criteria;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.mapper.TransactionMapper;
