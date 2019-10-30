@@ -15,7 +15,7 @@ import java.math.BigInteger;
 /**
  * @Auther: Chendongming
  * @Date: 2019/10/30 10:14
- * @Description: 区块服务
+ * @Description: 带重试功能的区块服务
  */
 @Slf4j
 @Service
