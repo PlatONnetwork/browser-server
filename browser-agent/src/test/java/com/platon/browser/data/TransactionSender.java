@@ -1,6 +1,7 @@
 package com.platon.browser.data;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,13 @@ import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,6 +59,11 @@ public class TransactionSender {
 //    private String stakingBlsKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
     public TransactionSender() throws IOException, CipherException {}
 
+    @Before
+	public void init() {
+    	HttpService httpService = new HttpService("http://192.168.112.172:8789");
+    	currentValidWeb3j = Web3j.build(httpService);
+    }
     // 发送转账交易
     @Test
     public void transfer() throws Exception {
@@ -70,7 +80,7 @@ public class TransactionSender {
 //			        currentValidWeb3j,
 //			        delegateCredentials,
 //			        chainId,
-//			        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+//			        "0xfd9d508df262a1c968e0d6c757ab08b96d741f4b",
 //			        BigDecimal.valueOf(10),
 //			        Convert.Unit.LAT
 //			).sendAsync();
@@ -117,7 +127,7 @@ public class TransactionSender {
     	UpdateStakingParam.Builder uBuilder = new UpdateStakingParam.Builder();
     	uBuilder.setBenifitAddress("0x60ceca9c1290ee56b98d4e160ef0453f7c40d219");
     	uBuilder.setDetails("Node of CDM");
-    	uBuilder.setExternalId("");
+    	uBuilder.setExternalId("5FD68B690010632B");
     	uBuilder.setNodeId(stakingPubKey);
     	uBuilder.setNodeName("cdm-004");
     	uBuilder.setWebSite("WWW.CCC.COM");
@@ -179,10 +189,85 @@ public class TransactionSender {
     	BigDecimal delegate = Convert.toVon("10000", Unit.LAT);
         BaseResponse<?> res = delegateContract.unDelegate(
         		stakingPubKey,
-                BigInteger.valueOf(128),
+                BigInteger.valueOf(5576),
                 delegate.toBigInteger()
         ).send();
         logger.debug("res:{}",res);
+    }
+    
+    @Test
+    public void testPress() throws Exception {
+//    	String path = "d://111//";
+//    	FileWriter fileWriter = new FileWriter("d://111//summary.txt");
+//    	for(int i=0;i<1000;i++) {
+//    		String wpath = WalletUtils.generateFullNewWalletFile("88888888", new File(path));
+//    		wpath = path + wpath;
+//    		Credentials credentialsTemp = WalletUtils.loadCredentials("88888888", wpath);
+//    		Transfer.sendFunds(
+//			        currentValidWeb3j,
+//			        credentials,
+//			        chainId,
+//			        credentialsTemp.getAddress(),
+//			        BigDecimal.valueOf(10000),
+//			        Convert.Unit.LAT
+//			).send();
+//    		byte[] byteArray = credentials.getEcKeyPair().getPrivateKey().toByteArray();
+//            String privateKey = Hex.toHexString(byteArray);
+//    		fileWriter.write(privateKey + ";");
+//    	}
+//    	fileWriter.close();
+    	
+    	FileReader fileReader = new FileReader("d://111//summary.txt");
+    	char[] buf=new char[1024];
+		//read(char [])返回读到的字符个数
+		int num=0;
+		String data = "";
+		while((num=fileReader.read(buf))!=-1) //记住即可，read方法如果没有可读取的了，则返回-1，所以就是一直读取，并将读取的内容存入ch，一直到结尾
+		{
+			data = data + new String(buf,0,num);//打印读取的结果，由于ch是int类型，将其强制转换为String类型
+		}
+		fileReader.close();
+		System.out.println(data);
+		String[] pData = data.split(";");
+		List<Credentials> credentialsList = new ArrayList<>();
+		for(String privateKey: pData) {
+			Credentials c = Credentials.create(privateKey);
+			credentialsList.add(c);
+		}
+//		for(Credentials c:credentialsList) {
+//			Transfer.sendFunds(
+//			        currentValidWeb3j,
+//			        credentials,
+//			        chainId,
+//			        c.getAddress(),
+//			        BigDecimal.valueOf(100),
+//			        Convert.Unit.LAT
+//			).send();
+//		}
+		
+		
+		String urls = "http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.171:5789,"
+				+ "http://192.168.112.172:6789,http://192.168.112.172:7789,http://192.168.112.172:8789";
+		List<Web3j> web3js = new ArrayList<>();
+		for(String url:urls.split(",") ) {
+			Web3j web3j = Web3j.build(new HttpService(url));
+			web3js.add(web3j);
+		}
+		for (int i = 0; i < 100; i++) {
+			for(Credentials c:credentialsList) {
+				for(Web3j web3j : web3js) {
+					Transfer.sendFunds(
+							web3j,
+					        c,
+					        chainId,
+					        "0x60ceca9c1290ee56b98d4e160ef0453f7c40d219",
+					        BigDecimal.valueOf(1),
+					        Convert.Unit.LAT
+					).sendAsync();
+					System.out.println("发送交易："+i);
+				}
+			}
+		}
     }
 
     @Test
