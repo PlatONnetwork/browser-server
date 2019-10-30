@@ -29,7 +29,7 @@ public class CollectionBlockEventPublisher {
     private int ringBufferSize;
 
     @Autowired
-    private CollectionBlockEventHandler blockHandler;
+    private CollectionBlockEventHandler handler;
 
     private CollectionBlockEventProducerWithTranslator producer;
     @PostConstruct
@@ -40,7 +40,7 @@ public class CollectionBlockEventPublisher {
         ThreadFactory consumeThreadFactory = Thread::new;
         Disruptor<CollectionBlockEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, consumeThreadFactory);
         // 设置事件处理器
-        disruptor.handleEventsWith(blockHandler);
+        disruptor.handleEventsWith(handler);
         // 启动Disruptor,让所有生产和消息线程运行
         disruptor.start();
         // 获取环形缓冲引用，用于发布事件
