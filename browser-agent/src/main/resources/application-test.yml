@@ -34,7 +34,6 @@ dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
 web3j:
   addresses: http://192.168.112.172:8789
-  collect.batch-size: 1000
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
