@@ -23,7 +23,7 @@ elasticsearch:
   transactionIndexName: browser_transaction_1
   nodeOptIndexName: browser_nodeopt_1
 # 应用版本
-version: 0.7.0
+version: 0.7.3.1
 # 当前激活的配置名称(请不要修改)
 profile: test
 # 服务器端口号
