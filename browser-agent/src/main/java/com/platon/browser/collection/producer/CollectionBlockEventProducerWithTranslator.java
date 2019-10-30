@@ -10,7 +10,6 @@ import com.platon.browser.queue.event.collection.CollectionBlockEventBody;
  */
 public class CollectionBlockEventProducerWithTranslator implements EventProducer {
     private final RingBuffer<CollectionBlockEvent> ringBuffer;
-    //一个translator可以看做一个事件初始化器，publicEvent方法会调用它
     //填充Event
     private final EventTranslatorOneArg<CollectionBlockEvent, CollectionBlockEventBody> translator = (event, sequence, eventBody) -> event.setBody(eventBody);
     public CollectionBlockEventProducerWithTranslator(RingBuffer<CollectionBlockEvent> ringBuffer) {

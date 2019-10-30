@@ -1,13 +1,11 @@
 package com.platon.browser.complement.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.old.exception.BusinessException;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.queue.event.collection.CollectionBlockEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * 搜集区块事件处理器
@@ -15,20 +13,23 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @Component
 public class CollectionBlockEventHandler implements EventHandler<CollectionBlockEvent> {
-    @Autowired
-    private CollectionBlockEventChecker eventChecker;
+
     @Override
-    public void onEvent(CollectionBlockEvent event, long sequence, boolean endOfBatch) throws BusinessException {
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void onEvent(CollectionBlockEvent event, long sequence, boolean endOfBatch) {
         // 等待CompletableFuture完成
-        eventChecker.isDone(event);
+        log.debug("{}:sequence({}),endOfBatch({})",Thread.currentThread().getStackTrace()[1].getMethodName(),sequence,endOfBatch);
+        if(!event.getBody().getBlockCF().isDone()){
+            throw new BusinessException("区块采集线程未完成,稍后重新检查!");
+        }
+        if(!event.getBody().getReceiptCF().isDone()){
+            throw new BusinessException("交易回执线程未完成,稍后重新检查!");
+        }
         try {
             // 调用回调处理业务
-            event.getBody().getBlockCB().call(event.getBody().getBlockCF().get());
-            event.getBody().getReceiptCB().call(event.getBody().getReceiptCF().get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            event.getBody().getEventCB().call(event);
+        } catch (Exception e) {
+            log.error("调用回调处理业务出错:",e);
         }
     }
 }

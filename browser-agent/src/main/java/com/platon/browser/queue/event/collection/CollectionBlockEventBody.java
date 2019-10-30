@@ -12,8 +12,12 @@ import java.util.concurrent.CompletableFuture;
  */
 @Data
 public class CollectionBlockEventBody {
+    // 当前原生区块的Future
     private CompletableFuture<PlatonBlock> blockCF;
+    // 当前原生区块内所有交易回执的Future
     private CompletableFuture<ReceiptResult> receiptCF;
-    private ConsumeCallback<PlatonBlock> blockCB;
-    private ConsumeCallback<ReceiptResult> receiptCB;
+    // 当前原生区块的处理回调, 由环形队生产端指定，由消费端调用
+    private ConsumeCallback<CollectionBlockEvent> eventCB;
+    // 当前区块相关的所有事件信息(共识周期切换事件/结算周期切换事件/增发周期切换事件)
+    private EpochMessage epochMessage;
 }

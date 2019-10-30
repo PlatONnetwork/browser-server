@@ -1,11 +1,13 @@
 package com.platon.browser;
 
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.application.CollectionBlockEventPublisher;
 import com.platon.browser.collection.service.BlockService;
 import com.platon.browser.collection.service.TransactionService;
 import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
-import com.platon.browser.complement.queue.callback.CollectionReceiptCallback;
+import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
+import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -38,22 +41,27 @@ public class AgentApplication implements ApplicationRunner {
 	// 区块发布服务
 	@Autowired
 	private CollectionBlockEventPublisher collectionBlockEventPublisher;
-	// 已采集的最高块号
-	private Long collectedNumber = 0L;
-
 	@Autowired
 	private CollectionBlockCallback collectionBlockCallback;
 	@Autowired
-	private CollectionReceiptCallback collectionReceiptCallback;
+	private PlatOnClient platOnClient;
+	@Autowired
+	private SpecialContractApi specialContractApi;
+	// 已采集的最高块号
+	private Long collectedNumber = 0L;
 
 	@Override
 	public void run(ApplicationArguments args) {
 		for (;true;){
 			try {
 				collectedNumber++;
+				// 异步获取区块
 				CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(collectedNumber);
+				// 异步获取交易回执
 				CompletableFuture<ReceiptResult> receiptCF = transactionService.getReceiptAsync(collectedNumber);
-				collectionBlockEventPublisher.publish(blockCF, collectionBlockCallback, receiptCF, collectionReceiptCallback);
+				// 构造
+				EpochMessage epochMessage = new EpochMessage(BigInteger.valueOf(collectedNumber),platOnClient,specialContractApi);
+				collectionBlockEventPublisher.publish(blockCF, receiptCF,epochMessage,collectionBlockCallback);
 			}catch (Exception e){
 				break;
 			}

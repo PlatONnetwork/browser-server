@@ -10,6 +10,7 @@ import com.platon.browser.queue.event.collection.CollectionBlockEventBody;
 import com.platon.browser.queue.event.collection.CollectionBlockEventFactory;
 import com.platon.browser.collection.producer.CollectionBlockEventProducerWithTranslator;
 import com.platon.browser.queue.callback.ConsumeCallback;
+import com.platon.browser.queue.event.collection.EpochMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -54,21 +55,21 @@ public class CollectionBlockEventPublisher {
     /**
      * 发布事件
      * @param blockCF 区块CompletableFuture对象
-     * @param blockCB 区块处理回调对象
      * @param receiptCF 交易回执CompletableFuture对象
-     * @param receiptCB 交易回执处理回调对象
+     * @param epochMessage 周期切换信息对象
+     * @param eventCB 处理回调对象
      */
     public void publish(
             CompletableFuture<PlatonBlock> blockCF,
-            ConsumeCallback<PlatonBlock> blockCB,
             CompletableFuture<ReceiptResult> receiptCF,
-            ConsumeCallback<ReceiptResult> receiptCB
+            EpochMessage epochMessage,
+            ConsumeCallback<CollectionBlockEvent> eventCB
     ){
         CollectionBlockEventBody eb = new CollectionBlockEventBody();
         eb.setBlockCF(blockCF);
-        eb.setBlockCB(blockCB);
         eb.setReceiptCF(receiptCF);
-        eb.setReceiptCB(receiptCB);
+        eb.setEpochMessage(epochMessage);
+        eb.setEventCB(eventCB);
         producer.publish(eb);
     }
 }
