@@ -2,28 +2,26 @@ package com.platon.browser.service;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.result.Result;
+import com.platon.browser.client.result.RpcTxReceiptResult;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomBlock;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.util.SleepUtil;
 import com.platon.browser.util.TxParamResolver;
+import com.platon.browser.utils.HexTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.protocol.core.methods.response.PlatonGetTransactionReceipt;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: Chendongming
@@ -48,21 +46,44 @@ public class TransactionService {
     /**
      * 并行分析区块及交易
      */
-    public List<CustomBlock> analyze(List<CustomBlock> blocks) throws InterruptedException {
+    public List<CustomBlock> analyze(List<CustomBlock> blocks) throws InterruptedException, BeanCreateOrUpdateException {
         // 对需要复杂分析的区块或交易信息，开启并行处理
         for (CustomBlock block:blocks){
             List <CustomTransaction> txList = block.getTransactionList();
-            CountDownLatch latch = new CountDownLatch(txList.size());
-            txList.forEach(tx -> executor.submit(() -> {
-                try {
-                    updateTransaction(tx);
-                } catch (Exception e) {
-                    logger.error("更新交易信息错误：{}", e.getMessage());
-                } finally {
-                    latch.countDown();
+            if(!txList.isEmpty()){
+                RpcTxReceiptResult receiptResult = client.getReceiptByBlockNumber(block.getNumber());
+                // 解码log
+                receiptResult.resolve();
+                Map<String, Result> map = receiptResult.getMap();
+                for (CustomTransaction tx : txList) {
+                    Result result = map.get(HexTool.prefix(tx.getHash()));
+                    if (result != null) {
+                        tx.setGasUsed(result.getGasUsed().toString());
+                        tx.setActualTxCost(result.getGasUsed().multiply(new BigInteger(tx.getGasPrice())).toString());
+                        tx.setFailReason(result.getFailReason());
+                        if (chainConfig.getInnerContractAddr().contains(tx.getTo())) {
+                            // 内置合约
+                            tx.setTxReceiptStatus(result.getLogStatus());
+                        } else {
+                            tx.setTxReceiptStatus(result.getStatus());
+                        }
+                    }
+
+                    try {
+                        TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
+                        tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
+                        tx.setTxType(String.valueOf(txParams.getTxTypeEnum().getCode()));
+                        tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
+                        if (null != tx.getValue() && !InnerContractAddrEnum.getAddresses().contains(tx.getTo())) {
+                            tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.getCode()));
+                            tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
+                        }
+                    } catch (Exception e) {
+                        throw new BeanCreateOrUpdateException("交易[hash=" + tx.getHash() + "]的参数解析出错:" + e.getMessage());
+                    }
                 }
-            }));
-            latch.await();
+
+            }
         }
 
         // 汇总区块相关的统计信息
@@ -116,48 +137,4 @@ public class TransactionService {
         return blocks;
     }
 
-    /**
-     * 分析区块获取code&交易回执
-     */
-    public CustomTransaction updateTransaction(CustomTransaction tx) throws BeanCreateOrUpdateException {
-        Optional<TransactionReceipt> receipt = getReceipt(tx);
-        // 如果交易回执存在，则更新交易中与回执相关的信息
-        if(receipt.isPresent()) {
-            TransactionReceipt tr = receipt.get();
-            tx.updateWithTransactionReceipt(tr,chainConfig.getInnerContractAddr());
-        }
-
-        // 解析交易参数，补充交易中与交易参数相关的信息
-        try {
-            TxParamResolver.Result txParams = TxParamResolver.analysis(tx.getInput());
-            tx.setTxInfo(JSON.toJSONString(txParams.getParam()));
-            tx.setTxType(String.valueOf(txParams.getTxTypeEnum().getCode()));
-            tx.setReceiveType(ReceiveTypeEnum.CONTRACT.name().toLowerCase());
-            if(null != tx.getValue() && ! InnerContractAddrEnum.getAddresses().contains(tx.getTo())){
-                tx.setTxType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.getCode()));
-                tx.setReceiveType(ReceiveTypeEnum.ACCOUNT.name().toLowerCase());
-            }
-        }catch (Exception e){
-            throw new BeanCreateOrUpdateException("交易[hash="+tx.getHash()+"]的参数解析出错:"+e.getMessage());
-        }
-        return tx;
-    }
-
-    /**
-     * 获取交易回执
-     * @param tx
-     * @return
-     * @throws IOException
-     */
-    public Optional<TransactionReceipt> getReceipt(CustomTransaction tx) {
-        // 查询交易回执
-        while (true) try {
-            PlatonGetTransactionReceipt result = client.getWeb3j().platonGetTransactionReceipt(tx.getHash()).send();
-            return result.getTransactionReceipt();
-        } catch (Exception e) {
-            logger.error("查询交易回执失败,将重试:", e);
-            client.updateCurrentValidWeb3j();
-            SleepUtil.sleep(1L);
-        }
-    }
 }
