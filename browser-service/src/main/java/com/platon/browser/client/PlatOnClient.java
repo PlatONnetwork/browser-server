@@ -1,5 +1,7 @@
 package com.platon.browser.client;
 
+import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -139,5 +142,22 @@ public class PlatOnClient {
             logger.error("detect exception:{}", e);
         }
         logger.debug("*** End the detect task *** ");
+    }
+
+
+    /**
+     * 根据区块号取交易回执
+     * @param blockNumber
+     */
+    private RpcParam rpcParam = new RpcParam();
+    public CompletableFuture<ReceiptResult> getReceiptAsync(long blockNumber){
+        rpcParam.setMethod("platon_getTransactionByBlock");
+        rpcParam.getParams().clear();
+        rpcParam.getParams().add(blockNumber);
+        CompletableFuture<ReceiptResult> cf = com.platon.browser.util.HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
+        while (cf.isCompletedExceptionally()){
+            cf = HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
+        }
+        return cf;
     }
 }

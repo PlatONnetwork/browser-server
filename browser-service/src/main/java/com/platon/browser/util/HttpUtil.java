@@ -2,18 +2,55 @@ package com.platon.browser.util;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.exception.HttpRequestException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/9 14:49
  * @Description:
  */
+@Slf4j
 public class HttpUtil {
     private HttpUtil(){}
+
+    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+
+    public static <T> CompletableFuture<T> postAsync(String url, String param, Class<T> clazz){
+        CompletableFuture<T> future = new CompletableFuture<>();
+        EXECUTOR.submit(()->{
+            try {
+                T result = post(url,param,clazz);
+                future.complete(result);
+            } catch (HttpRequestException e) {
+                log.error("查询[{}]出错!",url);
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
+    }
+
+    public static <T> CompletableFuture<T> getAsync(String url,Class<T> clazz){
+        CompletableFuture<T> future = new CompletableFuture<>();
+        EXECUTOR.submit(()->{
+            try {
+                T result = get(url,clazz);
+                future.complete(result);
+            } catch (HttpRequestException e) {
+                log.error("查询[{}]出错,将重试!",url);
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
+    }
+
     /**
      * 发送POST请求
      * @param url
@@ -23,7 +60,6 @@ public class HttpUtil {
      * @return
      * @throws HttpRequestException
      */
-    private static final OkHttpClient CLIENT = new OkHttpClient();
     public static  <T> T post(String url,String param,Class<T> clazz) throws HttpRequestException {
         MediaType mediaType = MediaType.parse("application/json;charset=UTF-8");
         Request request = new Request.Builder().post(RequestBody.create(param,mediaType)).url(url).build();

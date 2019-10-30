@@ -1,11 +1,11 @@
 package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.task.bean.NodeBean;
-import com.platon.browser.task.bean.TransactionBean;
+import com.platon.browser.old.task.bean.NodeBean;
+import com.platon.browser.old.task.bean.TransactionBean;
 import com.platon.browser.dto.*;
-import com.platon.browser.engine.cache.NodeCache;
-import com.platon.browser.exception.CacheConstructException;
+import com.platon.browser.old.engine.cache.NodeCache;
+import com.platon.browser.old.exception.CacheConstructException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.slf4j.Logger;

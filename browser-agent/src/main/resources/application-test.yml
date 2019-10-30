@@ -33,8 +33,12 @@ dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
 # MySQL数据库密码
 dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
 web3j:
-  addresses: http://192.168.112.171:6789,http://192.168.112.171:7789,http://192.168.112.172:6789,http://192.168.112.172:7789
+  addresses: http://192.168.112.172:8789
   collect.batch-size: 1000
+# 内存环形缓冲区大小，必须是2的指数倍
+disruptor:
+  queue:
+    ring.buffer.size: 4
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
