@@ -3,9 +3,9 @@
 <mapper namespace="com.platon.browser.dao.mapper.VoteMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Vote">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="verifier_name" jdbcType="VARCHAR" property="verifierName" />
-    <result column="verifier" jdbcType="VARCHAR" property="verifier" />
-    <result column="option" jdbcType="VARCHAR" property="option" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
+    <result column="option" jdbcType="INTEGER" property="option" />
     <result column="proposal_hash" jdbcType="VARCHAR" property="proposalHash" />
     <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -70,8 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, verifier_name, verifier, `option`, proposal_hash, `timestamp`, create_time, 
-    update_time
+    hash, node_id, node_name, `option`, proposal_hash, `timestamp`, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.VoteExample" resultMap="BaseResultMap">
     select
@@ -104,11 +103,11 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Vote">
-    insert into vote (hash, verifier_name, verifier, 
+    insert into vote (hash, node_id, node_name, 
       `option`, proposal_hash, `timestamp`, 
       create_time, update_time)
-    values (#{hash,jdbcType=VARCHAR}, #{verifierName,jdbcType=VARCHAR}, #{verifier,jdbcType=VARCHAR}, 
-      #{option,jdbcType=VARCHAR}, #{proposalHash,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
+    values (#{hash,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, 
+      #{option,jdbcType=INTEGER}, #{proposalHash,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Vote">
@@ -117,11 +116,11 @@
       <if test="hash != null">
         hash,
       </if>
-      <if test="verifierName != null">
-        verifier_name,
+      <if test="nodeId != null">
+        node_id,
       </if>
-      <if test="verifier != null">
-        verifier,
+      <if test="nodeName != null">
+        node_name,
       </if>
       <if test="option != null">
         `option`,
@@ -143,14 +142,14 @@
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="verifierName != null">
-        #{verifierName,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="verifier != null">
-        #{verifier,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
       </if>
       <if test="option != null">
-        #{option,jdbcType=VARCHAR},
+        #{option,jdbcType=INTEGER},
       </if>
       <if test="proposalHash != null">
         #{proposalHash,jdbcType=VARCHAR},
@@ -178,14 +177,14 @@
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
-      <if test="record.verifierName != null">
-        verifier_name = #{record.verifierName,jdbcType=VARCHAR},
+      <if test="record.nodeId != null">
+        node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="record.verifier != null">
-        verifier = #{record.verifier,jdbcType=VARCHAR},
+      <if test="record.nodeName != null">
+        node_name = #{record.nodeName,jdbcType=VARCHAR},
       </if>
       <if test="record.option != null">
-        `option` = #{record.option,jdbcType=VARCHAR},
+        `option` = #{record.option,jdbcType=INTEGER},
       </if>
       <if test="record.proposalHash != null">
         proposal_hash = #{record.proposalHash,jdbcType=VARCHAR},
@@ -207,9 +206,9 @@
   <update id="updateByExample" parameterType="map">
     update vote
     set hash = #{record.hash,jdbcType=VARCHAR},
-      verifier_name = #{record.verifierName,jdbcType=VARCHAR},
-      verifier = #{record.verifier,jdbcType=VARCHAR},
-      `option` = #{record.option,jdbcType=VARCHAR},
+      node_id = #{record.nodeId,jdbcType=VARCHAR},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      `option` = #{record.option,jdbcType=INTEGER},
       proposal_hash = #{record.proposalHash,jdbcType=VARCHAR},
       `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -221,14 +220,14 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.Vote">
     update vote
     <set>
-      <if test="verifierName != null">
-        verifier_name = #{verifierName,jdbcType=VARCHAR},
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=VARCHAR},
       </if>
-      <if test="verifier != null">
-        verifier = #{verifier,jdbcType=VARCHAR},
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
       </if>
       <if test="option != null">
-        `option` = #{option,jdbcType=VARCHAR},
+        `option` = #{option,jdbcType=INTEGER},
       </if>
       <if test="proposalHash != null">
         proposal_hash = #{proposalHash,jdbcType=VARCHAR},
@@ -247,9 +246,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Vote">
     update vote
-    set verifier_name = #{verifierName,jdbcType=VARCHAR},
-      verifier = #{verifier,jdbcType=VARCHAR},
-      `option` = #{option,jdbcType=VARCHAR},
+    set node_id = #{nodeId,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      `option` = #{option,jdbcType=INTEGER},
       proposal_hash = #{proposalHash,jdbcType=VARCHAR},
       `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -263,12 +262,12 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into vote
-    (hash, verifier_name, verifier, `option`, proposal_hash, `timestamp`, create_time, 
-      update_time)
+    (hash, node_id, node_name, `option`, proposal_hash, `timestamp`, create_time, update_time
+      )
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.verifierName,jdbcType=VARCHAR}, #{item.verifier,jdbcType=VARCHAR}, 
-        #{item.option,jdbcType=VARCHAR}, #{item.proposalHash,jdbcType=VARCHAR}, #{item.timestamp,jdbcType=TIMESTAMP}, 
+      (#{item.hash,jdbcType=VARCHAR}, #{item.nodeId,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, 
+        #{item.option,jdbcType=INTEGER}, #{item.proposalHash,jdbcType=VARCHAR}, #{item.timestamp,jdbcType=TIMESTAMP}, 
         #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
@@ -290,14 +289,14 @@
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
         </if>
-        <if test="'verifier_name'.toString() == column.value">
-          #{item.verifierName,jdbcType=VARCHAR}
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="'verifier'.toString() == column.value">
-          #{item.verifier,jdbcType=VARCHAR}
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
         </if>
         <if test="'option'.toString() == column.value">
-          #{item.option,jdbcType=VARCHAR}
+          #{item.option,jdbcType=INTEGER}
         </if>
         <if test="'proposal_hash'.toString() == column.value">
           #{item.proposalHash,jdbcType=VARCHAR}

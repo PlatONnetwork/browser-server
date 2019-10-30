@@ -1,10 +1,7 @@
 package com.platon.browser.now.service.cache;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
-import com.platon.browser.now.service.cache.StatisticCacheService;
 
 import static org.junit.Assert.assertNotNull;
 

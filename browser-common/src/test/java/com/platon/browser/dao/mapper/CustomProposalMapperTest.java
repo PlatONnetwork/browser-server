@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dto.CustomProposal;
 
 public class CustomProposalMapperTest extends TestBase {

@@ -31,15 +31,15 @@ public class CustomNode extends Node {
           // 节点处块数统计
           this.setStatBlockQty(0L);
           // 节点期望出块数
-          this.setStatExpectBlockQty(BigDecimal.ZERO.toString());
-          // 节点收益统计(出块奖励 + 质押奖励)
-          this.setStatRewardValue(BigDecimal.ZERO.toString());
+//          this.setStatExpectBlockQty(BigDecimal.ZERO.toString());
+//          // 节点收益统计(出块奖励 + 质押奖励)
+//          this.setStatRewardValue(BigDecimal.ZERO.toString());
           // 进入共识验证轮次数
           this.setStatVerifierTime(0);
           // 官方推荐 1：是 2：否
           this.setIsRecommend(YesNoEnum.NO.getCode());
           //节点手续费
-          this.setStatFeeRewardValue("0");
+//          this.setStatFeeRewardValue("0");
      }
 
      public void updateWithNode(org.web3j.platon.bean.Node node){

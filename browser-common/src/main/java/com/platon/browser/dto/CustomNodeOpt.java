@@ -17,26 +17,26 @@ public class CustomNodeOpt extends NodeOpt {
     public CustomNodeOpt(){
         super();
         Date date = new Date();
-        this.setUpdateTime(date);
-        this.setCreateTime(date);
+//        this.setUpdateTime(date);
+//        this.setCreateTime(date);
     }
 
     public CustomNodeOpt(String nodeId, TypeEnum typeEnum) {
         this();
         this.setNodeId(nodeId);
-        this.setType(typeEnum.code);
+//        this.setType(typeEnum.code);
     }
 
     public void updateWithCustomTransaction(CustomTransaction tx) {
         this.setTxHash(tx.getHash());
-        this.setBlockNumber(tx.getBlockNumber());
-        this.setTimestamp(tx.getTimestamp());
+//        this.setBlockNumber(tx.getBlockNumber());
+//        this.setTimestamp(tx.getTimestamp());
     }
 
     public void updateWithCustomBlock(CustomBlock block) {
         this.setTxHash("BlockHash:"+block.getHash());
-        this.setBlockNumber(block.getNumber());
-        this.setTimestamp(block.getTimestamp());
+//        this.setBlockNumber(block.getNumber());
+//        this.setTimestamp(block.getTimestamp());
     }
 
     /**

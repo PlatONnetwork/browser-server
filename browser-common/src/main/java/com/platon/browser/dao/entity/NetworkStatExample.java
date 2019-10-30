@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -165,133 +166,63 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberIsNull() {
-            addCriterion("current_number is null");
+        public Criteria andCurNumberIsNull() {
+            addCriterion("cur_number is null");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberIsNotNull() {
-            addCriterion("current_number is not null");
+        public Criteria andCurNumberIsNotNull() {
+            addCriterion("cur_number is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberEqualTo(Long value) {
-            addCriterion("current_number =", value, "currentNumber");
+        public Criteria andCurNumberEqualTo(Long value) {
+            addCriterion("cur_number =", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberNotEqualTo(Long value) {
-            addCriterion("current_number <>", value, "currentNumber");
+        public Criteria andCurNumberNotEqualTo(Long value) {
+            addCriterion("cur_number <>", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberGreaterThan(Long value) {
-            addCriterion("current_number >", value, "currentNumber");
+        public Criteria andCurNumberGreaterThan(Long value) {
+            addCriterion("cur_number >", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberGreaterThanOrEqualTo(Long value) {
-            addCriterion("current_number >=", value, "currentNumber");
+        public Criteria andCurNumberGreaterThanOrEqualTo(Long value) {
+            addCriterion("cur_number >=", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberLessThan(Long value) {
-            addCriterion("current_number <", value, "currentNumber");
+        public Criteria andCurNumberLessThan(Long value) {
+            addCriterion("cur_number <", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberLessThanOrEqualTo(Long value) {
-            addCriterion("current_number <=", value, "currentNumber");
+        public Criteria andCurNumberLessThanOrEqualTo(Long value) {
+            addCriterion("cur_number <=", value, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberIn(List<Long> values) {
-            addCriterion("current_number in", values, "currentNumber");
+        public Criteria andCurNumberIn(List<Long> values) {
+            addCriterion("cur_number in", values, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberNotIn(List<Long> values) {
-            addCriterion("current_number not in", values, "currentNumber");
+        public Criteria andCurNumberNotIn(List<Long> values) {
+            addCriterion("cur_number not in", values, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberBetween(Long value1, Long value2) {
-            addCriterion("current_number between", value1, value2, "currentNumber");
+        public Criteria andCurNumberBetween(Long value1, Long value2) {
+            addCriterion("cur_number between", value1, value2, "curNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentNumberNotBetween(Long value1, Long value2) {
-            addCriterion("current_number not between", value1, value2, "currentNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameIsNull() {
-            addCriterion("node_name is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameIsNotNull() {
-            addCriterion("node_name is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameEqualTo(String value) {
-            addCriterion("node_name =", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameNotEqualTo(String value) {
-            addCriterion("node_name <>", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameGreaterThan(String value) {
-            addCriterion("node_name >", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameGreaterThanOrEqualTo(String value) {
-            addCriterion("node_name >=", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameLessThan(String value) {
-            addCriterion("node_name <", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameLessThanOrEqualTo(String value) {
-            addCriterion("node_name <=", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameLike(String value) {
-            addCriterion("node_name like", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameNotLike(String value) {
-            addCriterion("node_name not like", value, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameIn(List<String> values) {
-            addCriterion("node_name in", values, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameNotIn(List<String> values) {
-            addCriterion("node_name not in", values, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameBetween(String value1, String value2) {
-            addCriterion("node_name between", value1, value2, "nodeName");
-            return (Criteria) this;
-        }
-
-        public Criteria andNodeNameNotBetween(String value1, String value2) {
-            addCriterion("node_name not between", value1, value2, "nodeName");
+        public Criteria andCurNumberNotBetween(Long value1, Long value2) {
+            addCriterion("cur_number not between", value1, value2, "curNumber");
             return (Criteria) this;
         }
 
@@ -365,6 +296,76 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andNodeNameIsNull() {
+            addCriterion("node_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameIsNotNull() {
+            addCriterion("node_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameEqualTo(String value) {
+            addCriterion("node_name =", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameNotEqualTo(String value) {
+            addCriterion("node_name <>", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameGreaterThan(String value) {
+            addCriterion("node_name >", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameGreaterThanOrEqualTo(String value) {
+            addCriterion("node_name >=", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameLessThan(String value) {
+            addCriterion("node_name <", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameLessThanOrEqualTo(String value) {
+            addCriterion("node_name <=", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameLike(String value) {
+            addCriterion("node_name like", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameNotLike(String value) {
+            addCriterion("node_name not like", value, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameIn(List<String> values) {
+            addCriterion("node_name in", values, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameNotIn(List<String> values) {
+            addCriterion("node_name not in", values, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameBetween(String value1, String value2) {
+            addCriterion("node_name between", value1, value2, "nodeName");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeNameNotBetween(String value1, String value2) {
+            addCriterion("node_name not between", value1, value2, "nodeName");
+            return (Criteria) this;
+        }
+
         public Criteria andTxQtyIsNull() {
             addCriterion("tx_qty is null");
             return (Criteria) this;
@@ -425,63 +426,63 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsIsNull() {
-            addCriterion("current_tps is null");
+        public Criteria andCurTpsIsNull() {
+            addCriterion("cur_tps is null");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsIsNotNull() {
-            addCriterion("current_tps is not null");
+        public Criteria andCurTpsIsNotNull() {
+            addCriterion("cur_tps is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsEqualTo(Integer value) {
-            addCriterion("current_tps =", value, "currentTps");
+        public Criteria andCurTpsEqualTo(Integer value) {
+            addCriterion("cur_tps =", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsNotEqualTo(Integer value) {
-            addCriterion("current_tps <>", value, "currentTps");
+        public Criteria andCurTpsNotEqualTo(Integer value) {
+            addCriterion("cur_tps <>", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsGreaterThan(Integer value) {
-            addCriterion("current_tps >", value, "currentTps");
+        public Criteria andCurTpsGreaterThan(Integer value) {
+            addCriterion("cur_tps >", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsGreaterThanOrEqualTo(Integer value) {
-            addCriterion("current_tps >=", value, "currentTps");
+        public Criteria andCurTpsGreaterThanOrEqualTo(Integer value) {
+            addCriterion("cur_tps >=", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsLessThan(Integer value) {
-            addCriterion("current_tps <", value, "currentTps");
+        public Criteria andCurTpsLessThan(Integer value) {
+            addCriterion("cur_tps <", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsLessThanOrEqualTo(Integer value) {
-            addCriterion("current_tps <=", value, "currentTps");
+        public Criteria andCurTpsLessThanOrEqualTo(Integer value) {
+            addCriterion("cur_tps <=", value, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsIn(List<Integer> values) {
-            addCriterion("current_tps in", values, "currentTps");
+        public Criteria andCurTpsIn(List<Integer> values) {
+            addCriterion("cur_tps in", values, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsNotIn(List<Integer> values) {
-            addCriterion("current_tps not in", values, "currentTps");
+        public Criteria andCurTpsNotIn(List<Integer> values) {
+            addCriterion("cur_tps not in", values, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsBetween(Integer value1, Integer value2) {
-            addCriterion("current_tps between", value1, value2, "currentTps");
+        public Criteria andCurTpsBetween(Integer value1, Integer value2) {
+            addCriterion("cur_tps between", value1, value2, "curTps");
             return (Criteria) this;
         }
 
-        public Criteria andCurrentTpsNotBetween(Integer value1, Integer value2) {
-            addCriterion("current_tps not between", value1, value2, "currentTps");
+        public Criteria andCurTpsNotBetween(Integer value1, Integer value2) {
+            addCriterion("cur_tps not between", value1, value2, "curTps");
             return (Criteria) this;
         }
 
@@ -555,62 +556,52 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueEqualTo(String value) {
+        public Criteria andIssueValueEqualTo(BigDecimal value) {
             addCriterion("issue_value =", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueNotEqualTo(String value) {
+        public Criteria andIssueValueNotEqualTo(BigDecimal value) {
             addCriterion("issue_value <>", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueGreaterThan(String value) {
+        public Criteria andIssueValueGreaterThan(BigDecimal value) {
             addCriterion("issue_value >", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueGreaterThanOrEqualTo(String value) {
+        public Criteria andIssueValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("issue_value >=", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueLessThan(String value) {
+        public Criteria andIssueValueLessThan(BigDecimal value) {
             addCriterion("issue_value <", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueLessThanOrEqualTo(String value) {
+        public Criteria andIssueValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("issue_value <=", value, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueLike(String value) {
-            addCriterion("issue_value like", value, "issueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andIssueValueNotLike(String value) {
-            addCriterion("issue_value not like", value, "issueValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andIssueValueIn(List<String> values) {
+        public Criteria andIssueValueIn(List<BigDecimal> values) {
             addCriterion("issue_value in", values, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueNotIn(List<String> values) {
+        public Criteria andIssueValueNotIn(List<BigDecimal> values) {
             addCriterion("issue_value not in", values, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueBetween(String value1, String value2) {
+        public Criteria andIssueValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("issue_value between", value1, value2, "issueValue");
             return (Criteria) this;
         }
 
-        public Criteria andIssueValueNotBetween(String value1, String value2) {
+        public Criteria andIssueValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("issue_value not between", value1, value2, "issueValue");
             return (Criteria) this;
         }
@@ -625,62 +616,52 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueEqualTo(String value) {
+        public Criteria andTurnValueEqualTo(BigDecimal value) {
             addCriterion("turn_value =", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueNotEqualTo(String value) {
+        public Criteria andTurnValueNotEqualTo(BigDecimal value) {
             addCriterion("turn_value <>", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueGreaterThan(String value) {
+        public Criteria andTurnValueGreaterThan(BigDecimal value) {
             addCriterion("turn_value >", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueGreaterThanOrEqualTo(String value) {
+        public Criteria andTurnValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("turn_value >=", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueLessThan(String value) {
+        public Criteria andTurnValueLessThan(BigDecimal value) {
             addCriterion("turn_value <", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueLessThanOrEqualTo(String value) {
+        public Criteria andTurnValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("turn_value <=", value, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueLike(String value) {
-            addCriterion("turn_value like", value, "turnValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTurnValueNotLike(String value) {
-            addCriterion("turn_value not like", value, "turnValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andTurnValueIn(List<String> values) {
+        public Criteria andTurnValueIn(List<BigDecimal> values) {
             addCriterion("turn_value in", values, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueNotIn(List<String> values) {
+        public Criteria andTurnValueNotIn(List<BigDecimal> values) {
             addCriterion("turn_value not in", values, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueBetween(String value1, String value2) {
+        public Criteria andTurnValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("turn_value between", value1, value2, "turnValue");
             return (Criteria) this;
         }
 
-        public Criteria andTurnValueNotBetween(String value1, String value2) {
+        public Criteria andTurnValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("turn_value not between", value1, value2, "turnValue");
             return (Criteria) this;
         }
@@ -695,62 +676,52 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueEqualTo(String value) {
+        public Criteria andStakingDelegationValueEqualTo(BigDecimal value) {
             addCriterion("staking_delegation_value =", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueNotEqualTo(String value) {
+        public Criteria andStakingDelegationValueNotEqualTo(BigDecimal value) {
             addCriterion("staking_delegation_value <>", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueGreaterThan(String value) {
+        public Criteria andStakingDelegationValueGreaterThan(BigDecimal value) {
             addCriterion("staking_delegation_value >", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueGreaterThanOrEqualTo(String value) {
+        public Criteria andStakingDelegationValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_delegation_value >=", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueLessThan(String value) {
+        public Criteria andStakingDelegationValueLessThan(BigDecimal value) {
             addCriterion("staking_delegation_value <", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueLessThanOrEqualTo(String value) {
+        public Criteria andStakingDelegationValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_delegation_value <=", value, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueLike(String value) {
-            addCriterion("staking_delegation_value like", value, "stakingDelegationValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingDelegationValueNotLike(String value) {
-            addCriterion("staking_delegation_value not like", value, "stakingDelegationValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingDelegationValueIn(List<String> values) {
+        public Criteria andStakingDelegationValueIn(List<BigDecimal> values) {
             addCriterion("staking_delegation_value in", values, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueNotIn(List<String> values) {
+        public Criteria andStakingDelegationValueNotIn(List<BigDecimal> values) {
             addCriterion("staking_delegation_value not in", values, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueBetween(String value1, String value2) {
+        public Criteria andStakingDelegationValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_delegation_value between", value1, value2, "stakingDelegationValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingDelegationValueNotBetween(String value1, String value2) {
+        public Criteria andStakingDelegationValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_delegation_value not between", value1, value2, "stakingDelegationValue");
             return (Criteria) this;
         }
@@ -765,123 +736,53 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueEqualTo(String value) {
+        public Criteria andStakingValueEqualTo(BigDecimal value) {
             addCriterion("staking_value =", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotEqualTo(String value) {
+        public Criteria andStakingValueNotEqualTo(BigDecimal value) {
             addCriterion("staking_value <>", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueGreaterThan(String value) {
+        public Criteria andStakingValueGreaterThan(BigDecimal value) {
             addCriterion("staking_value >", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueGreaterThanOrEqualTo(String value) {
+        public Criteria andStakingValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_value >=", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLessThan(String value) {
+        public Criteria andStakingValueLessThan(BigDecimal value) {
             addCriterion("staking_value <", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLessThanOrEqualTo(String value) {
+        public Criteria andStakingValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_value <=", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLike(String value) {
-            addCriterion("staking_value like", value, "stakingValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingValueNotLike(String value) {
-            addCriterion("staking_value not like", value, "stakingValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingValueIn(List<String> values) {
+        public Criteria andStakingValueIn(List<BigDecimal> values) {
             addCriterion("staking_value in", values, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotIn(List<String> values) {
+        public Criteria andStakingValueNotIn(List<BigDecimal> values) {
             addCriterion("staking_value not in", values, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueBetween(String value1, String value2) {
+        public Criteria andStakingValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_value between", value1, value2, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotBetween(String value1, String value2) {
+        public Criteria andStakingValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_value not between", value1, value2, "stakingValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyIsNull() {
-            addCriterion("proposal_qty is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyIsNotNull() {
-            addCriterion("proposal_qty is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyEqualTo(Integer value) {
-            addCriterion("proposal_qty =", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyNotEqualTo(Integer value) {
-            addCriterion("proposal_qty <>", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyGreaterThan(Integer value) {
-            addCriterion("proposal_qty >", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("proposal_qty >=", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyLessThan(Integer value) {
-            addCriterion("proposal_qty <", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyLessThanOrEqualTo(Integer value) {
-            addCriterion("proposal_qty <=", value, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyIn(List<Integer> values) {
-            addCriterion("proposal_qty in", values, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyNotIn(List<Integer> values) {
-            addCriterion("proposal_qty not in", values, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyBetween(Integer value1, Integer value2) {
-            addCriterion("proposal_qty between", value1, value2, "proposalQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andProposalQtyNotBetween(Integer value1, Integer value2) {
-            addCriterion("proposal_qty not between", value1, value2, "proposalQty");
             return (Criteria) this;
         }
 
@@ -942,6 +843,66 @@ public class NetworkStatExample {
 
         public Criteria andDoingProposalQtyNotBetween(Integer value1, Integer value2) {
             addCriterion("doing_proposal_qty not between", value1, value2, "doingProposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyIsNull() {
+            addCriterion("proposal_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyIsNotNull() {
+            addCriterion("proposal_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyEqualTo(Integer value) {
+            addCriterion("proposal_qty =", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyNotEqualTo(Integer value) {
+            addCriterion("proposal_qty <>", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyGreaterThan(Integer value) {
+            addCriterion("proposal_qty >", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("proposal_qty >=", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyLessThan(Integer value) {
+            addCriterion("proposal_qty <", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("proposal_qty <=", value, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyIn(List<Integer> values) {
+            addCriterion("proposal_qty in", values, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyNotIn(List<Integer> values) {
+            addCriterion("proposal_qty not in", values, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyBetween(Integer value1, Integer value2) {
+            addCriterion("proposal_qty between", value1, value2, "proposalQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andProposalQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("proposal_qty not between", value1, value2, "proposalQty");
             return (Criteria) this;
         }
 
@@ -1015,62 +976,52 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardEqualTo(String value) {
+        public Criteria andBlockRewardEqualTo(BigDecimal value) {
             addCriterion("block_reward =", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardNotEqualTo(String value) {
+        public Criteria andBlockRewardNotEqualTo(BigDecimal value) {
             addCriterion("block_reward <>", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardGreaterThan(String value) {
+        public Criteria andBlockRewardGreaterThan(BigDecimal value) {
             addCriterion("block_reward >", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardGreaterThanOrEqualTo(String value) {
+        public Criteria andBlockRewardGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("block_reward >=", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardLessThan(String value) {
+        public Criteria andBlockRewardLessThan(BigDecimal value) {
             addCriterion("block_reward <", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardLessThanOrEqualTo(String value) {
+        public Criteria andBlockRewardLessThanOrEqualTo(BigDecimal value) {
             addCriterion("block_reward <=", value, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardLike(String value) {
-            addCriterion("block_reward like", value, "blockReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockRewardNotLike(String value) {
-            addCriterion("block_reward not like", value, "blockReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlockRewardIn(List<String> values) {
+        public Criteria andBlockRewardIn(List<BigDecimal> values) {
             addCriterion("block_reward in", values, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardNotIn(List<String> values) {
+        public Criteria andBlockRewardNotIn(List<BigDecimal> values) {
             addCriterion("block_reward not in", values, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardBetween(String value1, String value2) {
+        public Criteria andBlockRewardBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("block_reward between", value1, value2, "blockReward");
             return (Criteria) this;
         }
 
-        public Criteria andBlockRewardNotBetween(String value1, String value2) {
+        public Criteria andBlockRewardNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("block_reward not between", value1, value2, "blockReward");
             return (Criteria) this;
         }
@@ -1085,62 +1036,52 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardEqualTo(String value) {
+        public Criteria andStakingRewardEqualTo(BigDecimal value) {
             addCriterion("staking_reward =", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardNotEqualTo(String value) {
+        public Criteria andStakingRewardNotEqualTo(BigDecimal value) {
             addCriterion("staking_reward <>", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardGreaterThan(String value) {
+        public Criteria andStakingRewardGreaterThan(BigDecimal value) {
             addCriterion("staking_reward >", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardGreaterThanOrEqualTo(String value) {
+        public Criteria andStakingRewardGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_reward >=", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardLessThan(String value) {
+        public Criteria andStakingRewardLessThan(BigDecimal value) {
             addCriterion("staking_reward <", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardLessThanOrEqualTo(String value) {
+        public Criteria andStakingRewardLessThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_reward <=", value, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardLike(String value) {
-            addCriterion("staking_reward like", value, "stakingReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingRewardNotLike(String value) {
-            addCriterion("staking_reward not like", value, "stakingReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingRewardIn(List<String> values) {
+        public Criteria andStakingRewardIn(List<BigDecimal> values) {
             addCriterion("staking_reward in", values, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardNotIn(List<String> values) {
+        public Criteria andStakingRewardNotIn(List<BigDecimal> values) {
             addCriterion("staking_reward not in", values, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardBetween(String value1, String value2) {
+        public Criteria andStakingRewardBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_reward between", value1, value2, "stakingReward");
             return (Criteria) this;
         }
 
-        public Criteria andStakingRewardNotBetween(String value1, String value2) {
+        public Criteria andStakingRewardNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_reward not between", value1, value2, "stakingReward");
             return (Criteria) this;
         }
@@ -1265,63 +1206,63 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingIsNull() {
-            addCriterion("next_setting is null");
+        public Criteria andNextSettleIsNull() {
+            addCriterion("next_settle is null");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingIsNotNull() {
-            addCriterion("next_setting is not null");
+        public Criteria andNextSettleIsNotNull() {
+            addCriterion("next_settle is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingEqualTo(Long value) {
-            addCriterion("next_setting =", value, "nextSetting");
+        public Criteria andNextSettleEqualTo(Long value) {
+            addCriterion("next_settle =", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingNotEqualTo(Long value) {
-            addCriterion("next_setting <>", value, "nextSetting");
+        public Criteria andNextSettleNotEqualTo(Long value) {
+            addCriterion("next_settle <>", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingGreaterThan(Long value) {
-            addCriterion("next_setting >", value, "nextSetting");
+        public Criteria andNextSettleGreaterThan(Long value) {
+            addCriterion("next_settle >", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingGreaterThanOrEqualTo(Long value) {
-            addCriterion("next_setting >=", value, "nextSetting");
+        public Criteria andNextSettleGreaterThanOrEqualTo(Long value) {
+            addCriterion("next_settle >=", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingLessThan(Long value) {
-            addCriterion("next_setting <", value, "nextSetting");
+        public Criteria andNextSettleLessThan(Long value) {
+            addCriterion("next_settle <", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingLessThanOrEqualTo(Long value) {
-            addCriterion("next_setting <=", value, "nextSetting");
+        public Criteria andNextSettleLessThanOrEqualTo(Long value) {
+            addCriterion("next_settle <=", value, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingIn(List<Long> values) {
-            addCriterion("next_setting in", values, "nextSetting");
+        public Criteria andNextSettleIn(List<Long> values) {
+            addCriterion("next_settle in", values, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingNotIn(List<Long> values) {
-            addCriterion("next_setting not in", values, "nextSetting");
+        public Criteria andNextSettleNotIn(List<Long> values) {
+            addCriterion("next_settle not in", values, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingBetween(Long value1, Long value2) {
-            addCriterion("next_setting between", value1, value2, "nextSetting");
+        public Criteria andNextSettleBetween(Long value1, Long value2) {
+            addCriterion("next_settle between", value1, value2, "nextSettle");
             return (Criteria) this;
         }
 
-        public Criteria andNextSettingNotBetween(Long value1, Long value2) {
-            addCriterion("next_setting not between", value1, value2, "nextSetting");
+        public Criteria andNextSettleNotBetween(Long value1, Long value2) {
+            addCriterion("next_settle not between", value1, value2, "nextSettle");
             return (Criteria) this;
         }
 

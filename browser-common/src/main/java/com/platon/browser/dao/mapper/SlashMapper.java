@@ -3,10 +3,8 @@ package com.platon.browser.dao.mapper;
 import com.platon.browser.dao.entity.Slash;
 import com.platon.browser.dao.entity.SlashExample;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-@Mapper
+
 public interface SlashMapper {
     long countByExample(SlashExample example);
 
@@ -18,15 +16,21 @@ public interface SlashMapper {
 
     int insertSelective(Slash record);
 
+    List<Slash> selectByExampleWithBLOBs(SlashExample example);
+
     List<Slash> selectByExample(SlashExample example);
 
     Slash selectByPrimaryKey(String hash);
 
     int updateByExampleSelective(@Param("record") Slash record, @Param("example") SlashExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") Slash record, @Param("example") SlashExample example);
+
     int updateByExample(@Param("record") Slash record, @Param("example") SlashExample example);
 
     int updateByPrimaryKeySelective(Slash record);
+
+    int updateByPrimaryKeyWithBLOBs(Slash record);
 
     int updateByPrimaryKey(Slash record);
 

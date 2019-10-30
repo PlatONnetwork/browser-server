@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dto.CustomRpPlan;
 
 public class CustomRpPlanMapperTest extends TestBase {

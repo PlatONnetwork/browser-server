@@ -33,8 +33,8 @@ public class CustomTransaction extends TransactionWithBLOBs {
 
     public CustomTransaction(){
         Date date = new Date();
-        this.setCreateTime(date);
-        this.setUpdateTime(date);
+//        this.setCreateTime(date);
+//        this.setUpdateTime(date);
     }
 
     /**
@@ -44,16 +44,16 @@ public class CustomTransaction extends TransactionWithBLOBs {
     @SuppressWarnings("rawtypes")
 	public void updateWithTransactionResult (PlatonBlock.TransactionResult tr ) {
         try {
-            Transaction transaction = (Transaction) tr;
-            BeanUtils.copyProperties(transaction, this);
-            this.setBlockNumber(transaction.getBlockNumber().longValue());
-            this.setTransactionIndex(transaction.getTransactionIndex().intValue());
-            this.setGasPrice(transaction.getGasPrice().toString());
-            this.setGasLimit(transaction.getGas().toString());
-            this.setValue(transaction.getValue().toString());
-            this.setNonce(transaction.getNonce().toString());
-            Long sequence = this.getBlockNumber()*10000 + this.getTransactionIndex();
-            this.setSequence(sequence);
+//            Transaction transaction = (Transaction) tr;
+//            BeanUtils.copyProperties(transaction, this);
+//            this.setBlockNumber(transaction.getBlockNumber().longValue());
+//            this.setTransactionIndex(transaction.getTransactionIndex().intValue());
+//            this.setGasPrice(transaction.getGasPrice().toString());
+//            this.setGasLimit(transaction.getGas().toString());
+//            this.setValue(transaction.getValue().toString());
+//            this.setNonce(transaction.getNonce().toString());
+//            Long sequence = this.getBlockNumber()*10000 + this.getTransactionIndex();
+//            this.setSequence(sequence);
         } catch (Exception e) {
             logger.error("更新交易出错",e);
         }
@@ -66,66 +66,66 @@ public class CustomTransaction extends TransactionWithBLOBs {
      */
     @SuppressWarnings("rawtypes")
 	public void updateWithTransactionReceipt (TransactionReceipt receipt,Set<String> innerContractAddr) throws BeanCreateOrUpdateException {
-        try{
-            this.setGasUsed(receipt.getGasUsed().toString());
-            this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
-            if(innerContractAddr.contains(receipt.getTo())){
-                // 第一种：ppos内置合约交易类型
-                // 成功：logs.get(0).getData()来解析出Status字段，并且为true
-                // 失败：非成功
-                List<Log> logs =  receipt.getLogs();
-                if(logs==null||logs.isEmpty()){
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                }else {
-                    Log log = logs.get(0);
-                    String data = log.getData();
-                    if(StringUtils.isNotBlank(data)) {
-                        data=data.replace("0x","");
-                    }else{
-                        this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                    }
-                    RlpList b = RlpDecoder.decode(Hex.decode(data));
-                    RlpList group = (RlpList) b.getValues().get(0);
-                    RlpString out = (RlpString) group.getValues().get(0);
-                    String res = new String(out.getBytes());
-                    BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
-                    if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                    if(response!=null){
-                        if(response.isStatusOk()) {
-                            this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                        }else{
-                            this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                            this.setFailReason(response.errMsg);
-                        }
-                    }
-                }
-            }else {
-                // 第二种：非第一种
-                //成功：交易回执的状态： status为空或者status=1，代表成功
-                //失败：非成功
-                if(receipt.isStatusOK()){
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
-                }else {
-                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
-                }
-            }
-        }catch (Exception e){
-            throw new BeanCreateOrUpdateException("使用交易回执更新交易出错:"+e.getMessage());
-        }
+//        try{
+//            this.setGasUsed(receipt.getGasUsed().toString());
+//            this.setActualTxCost(receipt.getGasUsed().multiply(new BigInteger(this.getGasPrice())).toString());
+//            if(innerContractAddr.contains(receipt.getTo())){
+//                // 第一种：ppos内置合约交易类型
+//                // 成功：logs.get(0).getData()来解析出Status字段，并且为true
+//                // 失败：非成功
+//                List<Log> logs =  receipt.getLogs();
+//                if(logs==null||logs.isEmpty()){
+//                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+//                }else {
+//                    Log log = logs.get(0);
+//                    String data = log.getData();
+//                    if(StringUtils.isNotBlank(data)) {
+//                        data=data.replace("0x","");
+//                    }else{
+//                        this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+//                    }
+//                    RlpList b = RlpDecoder.decode(Hex.decode(data));
+//                    RlpList group = (RlpList) b.getValues().get(0);
+//                    RlpString out = (RlpString) group.getValues().get(0);
+//                    String res = new String(out.getBytes());
+//                    BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
+//                    if(response==null) this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+//                    if(response!=null){
+//                        if(response.isStatusOk()) {
+//                            this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+//                        }else{
+//                            this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+//                            this.setFailReason(response.errMsg);
+//                        }
+//                    }
+//                }
+//            }else {
+//                // 第二种：非第一种
+//                //成功：交易回执的状态： status为空或者status=1，代表成功
+//                //失败：非成功
+//                if(receipt.isStatusOK()){
+//                    this.setTxReceiptStatus(TxReceiptStatusEnum.SUCCESS.code);
+//                }else {
+//                    this.setTxReceiptStatus(TxReceiptStatusEnum.FAILURE.code);
+//                }
+//            }
+//        }catch (Exception e){
+//            throw new BeanCreateOrUpdateException("使用交易回执更新交易出错:"+e.getMessage());
+ //       }
     }
 
-    public TxTypeEnum getTypeEnum(){
-        return TxTypeEnum.getEnum(this.getTxType());
-    }
+//    public TxTypeEnum getTypeEnum(){
+//        return TxTypeEnum.getEnum(this.getTxType());
+//    }
 
     /**
      * 根据类型获取交易参数信息对象
      *
      * @return
      */
-    public <T> T getTxParam (Class<T> clazz) {
-        return JSON.parseObject(this.getTxInfo(), clazz);
-    }
+//    public <T> T getTxParam (Class<T> clazz) {
+//        return JSON.parseObject(this.getTxInfo(), clazz);
+//    }
 
     public enum TxTypeEnum {
         TRANSFER("0", "转账"),

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomAddressMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomAddress" extends="com.platon.browser.dao.mapper.AddressMapper.BaseResultMap"/>
+
+  <!--查询所有地址-->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="com.platon.browser.dao.mapper.AddressMapper.Base_Column_List" />
+    from address
+  </select>
+
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into address (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'address'.toString() == column.value">
+          #{item.address,jdbcType=VARCHAR}
+        </if>
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=INTEGER}
+        </if>
+        <if test="'balance'.toString() == column.value">
+          #{item.balance,jdbcType=VARCHAR}
+        </if>
+        <if test="'restricting_balance'.toString() == column.value">
+          #{item.restrictingBalance,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_value'.toString() == column.value">
+          #{item.stakingValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_value'.toString() == column.value">
+          #{item.delegateValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'redeemed_value'.toString() == column.value">
+          #{item.redeemedValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'tx_qty'.toString() == column.value">
+          #{item.txQty,jdbcType=INTEGER}
+        </if>
+        <if test="'transfer_qty'.toString() == column.value">
+          #{item.transferQty,jdbcType=INTEGER}
+        </if>
+        <if test="'staking_qty'.toString() == column.value">
+          #{item.stakingQty,jdbcType=INTEGER}
+        </if>
+        <if test="'proposal_qty'.toString() == column.value">
+          #{item.proposalQty,jdbcType=INTEGER}
+        </if>
+        <if test="'delegate_qty'.toString() == column.value">
+          #{item.delegateQty,jdbcType=INTEGER}
+        </if>
+        <if test="'candidate_count'.toString() == column.value">
+          #{item.candidateCount,jdbcType=INTEGER}
+        </if>
+        <if test="'delegate_hes'.toString() == column.value">
+          #{item.delegateHes,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_locked'.toString() == column.value">
+          #{item.delegateLocked,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_unlock'.toString() == column.value">
+          #{item.delegateUnlock,jdbcType=VARCHAR}
+        </if>
+        <if test="'delegate_reduction'.toString() == column.value">
+          #{item.delegateReduction,jdbcType=VARCHAR}
+        </if>
+        <if test="'contract_name'.toString() == column.value">
+          #{item.contractName,jdbcType=VARCHAR}
+        </if>
+        <if test="'contract_create'.toString() == column.value">
+          #{item.contractCreate,jdbcType=VARCHAR}
+        </if>
+        <if test="'contract_createHash'.toString() == column.value">
+          #{item.contractCreatehash,jdbcType=VARCHAR}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+</mapper>

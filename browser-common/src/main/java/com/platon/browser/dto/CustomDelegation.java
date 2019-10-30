@@ -16,7 +16,7 @@ import java.util.*;
 @Data
 public class CustomDelegation extends Delegation {
 
-    private List<CustomUnDelegation> unDelegations = new ArrayList<>();
+//    private List<CustomUnDelegation> unDelegations = new ArrayList<>();
 
     public CustomDelegation() {
         super();
@@ -26,24 +26,24 @@ public class CustomDelegation extends Delegation {
     }
 
     public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
-        this.setDelegateHas(param.getAmount());
-        this.setDelegateLocked("0");
-        this.setDelegateReduction("0");
-        this.setNodeId(param.getNodeId());
-        this.setIsHistory(YesNoEnum.NO.code);
-        this.setDelegateAddr(tx.getFrom());
-        this.setSequence(tx.getBlockNumber()*10000+tx.getTransactionIndex());
-        this.setCurDelegationBlockNum(tx.getBlockNumber());
+//        this.setDelegateHas(param.getAmount());
+//        this.setDelegateLocked("0");
+//        this.setDelegateReduction("0");
+//        this.setNodeId(param.getNodeId());
+//        this.setIsHistory(YesNoEnum.NO.code);
+//        this.setDelegateAddr(tx.getFrom());
+//        this.setSequence(tx.getBlockNumber()*10000+tx.getTransactionIndex());
+//        this.setCurDelegationBlockNum(tx.getBlockNumber());
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
-    public BigDecimal decimalDelegateHas(){return new BigDecimal(this.getDelegateHas());}
-    public BigDecimal decimalDelegateLocked(){return new BigDecimal(this.getDelegateLocked());}
-    public BigDecimal decimalDelegateReduction(){return new BigDecimal(this.getDelegateReduction());}
-    /********把字符串类数值转换为大整数的便捷方法********/
-    public BigInteger integerDelegateHas(){return new BigInteger(this.getDelegateHas());}
-    public BigInteger integerDelegateLocked(){return new BigInteger(this.getDelegateLocked());}
-    public BigInteger integerDelegateReduction(){return new BigInteger(this.getDelegateReduction());}
+//    public BigDecimal decimalDelegateHas(){return new BigDecimal(this.getDelegateHas());}
+//    public BigDecimal decimalDelegateLocked(){return new BigDecimal(this.getDelegateLocked());}
+//    public BigDecimal decimalDelegateReduction(){return new BigDecimal(this.getDelegateReduction());}
+//    /********把字符串类数值转换为大整数的便捷方法********/
+//    public BigInteger integerDelegateHas(){return new BigInteger(this.getDelegateHas());}
+//    public BigInteger integerDelegateLocked(){return new BigInteger(this.getDelegateLocked());}
+//    public BigInteger integerDelegateReduction(){return new BigInteger(this.getDelegateReduction());}
 
     public YesNoEnum getIsHistoryEnum() {
         return YesNoEnum.getEnum(this.getIsHistory());

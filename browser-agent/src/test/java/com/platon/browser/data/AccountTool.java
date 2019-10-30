@@ -1,8 +1,8 @@
-//package com.platon.browser.data;
+package com.platon.browser.data;//package com.platon.browser.data;
 //
 //import com.alibaba.fastjson.JSON;
-//import com.platon.browser.old.engine.bean.AnnualizedRateInfo;
-//import com.platon.browser.old.engine.bean.PeriodValueElement;
+//import com.platon.browser.engine.bean.AnnualizedRateInfo;
+//import com.platon.browser.engine.bean.PeriodValueElement;
 //import com.platon.browser.enums.InnerContractAddrEnum;
 //import org.bouncycastle.util.encoders.Hex;
 //import org.junit.Test;

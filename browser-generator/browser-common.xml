@@ -24,9 +24,9 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/platon_browser_0.7.0_agent?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
-                        userId="platon"
-                        password="platon"/>
+                        connectionURL="jdbc:mysql://192.168.16.171:3306/platon_browser_0.7.3.1_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        userId="root"
+                        password="Juzhen123!"/>
 
         <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="../browser-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
@@ -46,43 +46,12 @@
                        enableCountByExample="false" enableUpdateByExample="false"
                        enableDeleteByExample="false" enableSelectByExample="false"
                        selectByExampleQueryId="false"/>&ndash;&gt;-->
-
-       <!-- <table tableName="block" domainObjectName="Block">
+    <table tableName="address" domainObjectName="Address">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
 
-
-        <table tableName="transaction" domainObjectName="Transaction">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="address" domainObjectName="Address">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-
-        <table tableName="node" domainObjectName="Node">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-
-        <table tableName="un_delegation" domainObjectName="UnDelegation">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="vote" domainObjectName="Vote">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-        <table tableName="network_stat" domainObjectName="NetworkStat">
+        <table tableName="block" domainObjectName="Block">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -93,7 +62,43 @@
                                 replaceString=""/>
         </table>
 
+
+        <table tableName="network_stat" domainObjectName="NetworkStat">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="node" domainObjectName="Node">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="node_opt" domainObjectName="NodeOpt">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="proposal" domainObjectName="Proposal">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="rp_plan" domainObjectName="RpPlan">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="staking" domainObjectName="Staking">
+        <columnRenamingRule searchString="^D_"
+                            replaceString=""/>
+        </table>
+
         <table tableName="slash" domainObjectName="Slash">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -103,35 +108,6 @@
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
-
-
-        <table tableName="node_opt" domainObjectName="NodeOpt">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-                <table tableName="staking" domainObjectName="Staking">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-                <table tableName="rp_plan" domainObjectName="RpPlan">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
-
-        <table tableName="address" domainObjectName="Address">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
--->
-
-        <table tableName="proposal" domainObjectName="Proposal">
-            <columnRenamingRule searchString="^D_"
-                                replaceString=""/>
-        </table>
-
 
     </context>
 </generatorConfiguration>

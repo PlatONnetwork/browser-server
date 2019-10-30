@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -245,62 +246,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andBalanceEqualTo(String value) {
+        public Criteria andBalanceEqualTo(BigDecimal value) {
             addCriterion("balance =", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotEqualTo(String value) {
+        public Criteria andBalanceNotEqualTo(BigDecimal value) {
             addCriterion("balance <>", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceGreaterThan(String value) {
+        public Criteria andBalanceGreaterThan(BigDecimal value) {
             addCriterion("balance >", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceGreaterThanOrEqualTo(String value) {
+        public Criteria andBalanceGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("balance >=", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceLessThan(String value) {
+        public Criteria andBalanceLessThan(BigDecimal value) {
             addCriterion("balance <", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceLessThanOrEqualTo(String value) {
+        public Criteria andBalanceLessThanOrEqualTo(BigDecimal value) {
             addCriterion("balance <=", value, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceLike(String value) {
-            addCriterion("balance like", value, "balance");
-            return (Criteria) this;
-        }
-
-        public Criteria andBalanceNotLike(String value) {
-            addCriterion("balance not like", value, "balance");
-            return (Criteria) this;
-        }
-
-        public Criteria andBalanceIn(List<String> values) {
+        public Criteria andBalanceIn(List<BigDecimal> values) {
             addCriterion("balance in", values, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotIn(List<String> values) {
+        public Criteria andBalanceNotIn(List<BigDecimal> values) {
             addCriterion("balance not in", values, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceBetween(String value1, String value2) {
+        public Criteria andBalanceBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("balance between", value1, value2, "balance");
             return (Criteria) this;
         }
 
-        public Criteria andBalanceNotBetween(String value1, String value2) {
+        public Criteria andBalanceNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("balance not between", value1, value2, "balance");
             return (Criteria) this;
         }
@@ -315,62 +306,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceEqualTo(String value) {
+        public Criteria andRestrictingBalanceEqualTo(BigDecimal value) {
             addCriterion("restricting_balance =", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceNotEqualTo(String value) {
+        public Criteria andRestrictingBalanceNotEqualTo(BigDecimal value) {
             addCriterion("restricting_balance <>", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceGreaterThan(String value) {
+        public Criteria andRestrictingBalanceGreaterThan(BigDecimal value) {
             addCriterion("restricting_balance >", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceGreaterThanOrEqualTo(String value) {
+        public Criteria andRestrictingBalanceGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("restricting_balance >=", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceLessThan(String value) {
+        public Criteria andRestrictingBalanceLessThan(BigDecimal value) {
             addCriterion("restricting_balance <", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceLessThanOrEqualTo(String value) {
+        public Criteria andRestrictingBalanceLessThanOrEqualTo(BigDecimal value) {
             addCriterion("restricting_balance <=", value, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceLike(String value) {
-            addCriterion("restricting_balance like", value, "restrictingBalance");
-            return (Criteria) this;
-        }
-
-        public Criteria andRestrictingBalanceNotLike(String value) {
-            addCriterion("restricting_balance not like", value, "restrictingBalance");
-            return (Criteria) this;
-        }
-
-        public Criteria andRestrictingBalanceIn(List<String> values) {
+        public Criteria andRestrictingBalanceIn(List<BigDecimal> values) {
             addCriterion("restricting_balance in", values, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceNotIn(List<String> values) {
+        public Criteria andRestrictingBalanceNotIn(List<BigDecimal> values) {
             addCriterion("restricting_balance not in", values, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceBetween(String value1, String value2) {
+        public Criteria andRestrictingBalanceBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("restricting_balance between", value1, value2, "restrictingBalance");
             return (Criteria) this;
         }
 
-        public Criteria andRestrictingBalanceNotBetween(String value1, String value2) {
+        public Criteria andRestrictingBalanceNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("restricting_balance not between", value1, value2, "restrictingBalance");
             return (Criteria) this;
         }
@@ -385,62 +366,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueEqualTo(String value) {
+        public Criteria andStakingValueEqualTo(BigDecimal value) {
             addCriterion("staking_value =", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotEqualTo(String value) {
+        public Criteria andStakingValueNotEqualTo(BigDecimal value) {
             addCriterion("staking_value <>", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueGreaterThan(String value) {
+        public Criteria andStakingValueGreaterThan(BigDecimal value) {
             addCriterion("staking_value >", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueGreaterThanOrEqualTo(String value) {
+        public Criteria andStakingValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_value >=", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLessThan(String value) {
+        public Criteria andStakingValueLessThan(BigDecimal value) {
             addCriterion("staking_value <", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLessThanOrEqualTo(String value) {
+        public Criteria andStakingValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("staking_value <=", value, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueLike(String value) {
-            addCriterion("staking_value like", value, "stakingValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingValueNotLike(String value) {
-            addCriterion("staking_value not like", value, "stakingValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStakingValueIn(List<String> values) {
+        public Criteria andStakingValueIn(List<BigDecimal> values) {
             addCriterion("staking_value in", values, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotIn(List<String> values) {
+        public Criteria andStakingValueNotIn(List<BigDecimal> values) {
             addCriterion("staking_value not in", values, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueBetween(String value1, String value2) {
+        public Criteria andStakingValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_value between", value1, value2, "stakingValue");
             return (Criteria) this;
         }
 
-        public Criteria andStakingValueNotBetween(String value1, String value2) {
+        public Criteria andStakingValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("staking_value not between", value1, value2, "stakingValue");
             return (Criteria) this;
         }
@@ -455,62 +426,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueEqualTo(String value) {
+        public Criteria andDelegateValueEqualTo(BigDecimal value) {
             addCriterion("delegate_value =", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueNotEqualTo(String value) {
+        public Criteria andDelegateValueNotEqualTo(BigDecimal value) {
             addCriterion("delegate_value <>", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueGreaterThan(String value) {
+        public Criteria andDelegateValueGreaterThan(BigDecimal value) {
             addCriterion("delegate_value >", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueGreaterThanOrEqualTo(String value) {
+        public Criteria andDelegateValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_value >=", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueLessThan(String value) {
+        public Criteria andDelegateValueLessThan(BigDecimal value) {
             addCriterion("delegate_value <", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueLessThanOrEqualTo(String value) {
+        public Criteria andDelegateValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_value <=", value, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueLike(String value) {
-            addCriterion("delegate_value like", value, "delegateValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateValueNotLike(String value) {
-            addCriterion("delegate_value not like", value, "delegateValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateValueIn(List<String> values) {
+        public Criteria andDelegateValueIn(List<BigDecimal> values) {
             addCriterion("delegate_value in", values, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueNotIn(List<String> values) {
+        public Criteria andDelegateValueNotIn(List<BigDecimal> values) {
             addCriterion("delegate_value not in", values, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueBetween(String value1, String value2) {
+        public Criteria andDelegateValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_value between", value1, value2, "delegateValue");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateValueNotBetween(String value1, String value2) {
+        public Criteria andDelegateValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_value not between", value1, value2, "delegateValue");
             return (Criteria) this;
         }
@@ -525,62 +486,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueEqualTo(String value) {
+        public Criteria andRedeemedValueEqualTo(BigDecimal value) {
             addCriterion("redeemed_value =", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueNotEqualTo(String value) {
+        public Criteria andRedeemedValueNotEqualTo(BigDecimal value) {
             addCriterion("redeemed_value <>", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueGreaterThan(String value) {
+        public Criteria andRedeemedValueGreaterThan(BigDecimal value) {
             addCriterion("redeemed_value >", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueGreaterThanOrEqualTo(String value) {
+        public Criteria andRedeemedValueGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("redeemed_value >=", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueLessThan(String value) {
+        public Criteria andRedeemedValueLessThan(BigDecimal value) {
             addCriterion("redeemed_value <", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueLessThanOrEqualTo(String value) {
+        public Criteria andRedeemedValueLessThanOrEqualTo(BigDecimal value) {
             addCriterion("redeemed_value <=", value, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueLike(String value) {
-            addCriterion("redeemed_value like", value, "redeemedValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andRedeemedValueNotLike(String value) {
-            addCriterion("redeemed_value not like", value, "redeemedValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andRedeemedValueIn(List<String> values) {
+        public Criteria andRedeemedValueIn(List<BigDecimal> values) {
             addCriterion("redeemed_value in", values, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueNotIn(List<String> values) {
+        public Criteria andRedeemedValueNotIn(List<BigDecimal> values) {
             addCriterion("redeemed_value not in", values, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueBetween(String value1, String value2) {
+        public Criteria andRedeemedValueBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("redeemed_value between", value1, value2, "redeemedValue");
             return (Criteria) this;
         }
 
-        public Criteria andRedeemedValueNotBetween(String value1, String value2) {
+        public Criteria andRedeemedValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("redeemed_value not between", value1, value2, "redeemedValue");
             return (Criteria) this;
         }
@@ -705,6 +656,66 @@ public class AddressExample {
             return (Criteria) this;
         }
 
+        public Criteria andDelegateQtyIsNull() {
+            addCriterion("delegate_qty is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyIsNotNull() {
+            addCriterion("delegate_qty is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyEqualTo(Integer value) {
+            addCriterion("delegate_qty =", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyNotEqualTo(Integer value) {
+            addCriterion("delegate_qty <>", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyGreaterThan(Integer value) {
+            addCriterion("delegate_qty >", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("delegate_qty >=", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyLessThan(Integer value) {
+            addCriterion("delegate_qty <", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyLessThanOrEqualTo(Integer value) {
+            addCriterion("delegate_qty <=", value, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyIn(List<Integer> values) {
+            addCriterion("delegate_qty in", values, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyNotIn(List<Integer> values) {
+            addCriterion("delegate_qty not in", values, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyBetween(Integer value1, Integer value2) {
+            addCriterion("delegate_qty between", value1, value2, "delegateQty");
+            return (Criteria) this;
+        }
+
+        public Criteria andDelegateQtyNotBetween(Integer value1, Integer value2) {
+            addCriterion("delegate_qty not between", value1, value2, "delegateQty");
+            return (Criteria) this;
+        }
+
         public Criteria andStakingQtyIsNull() {
             addCriterion("staking_qty is null");
             return (Criteria) this;
@@ -825,66 +836,6 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andDelegateQtyIsNull() {
-            addCriterion("delegate_qty is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyIsNotNull() {
-            addCriterion("delegate_qty is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyEqualTo(Integer value) {
-            addCriterion("delegate_qty =", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyNotEqualTo(Integer value) {
-            addCriterion("delegate_qty <>", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyGreaterThan(Integer value) {
-            addCriterion("delegate_qty >", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyGreaterThanOrEqualTo(Integer value) {
-            addCriterion("delegate_qty >=", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyLessThan(Integer value) {
-            addCriterion("delegate_qty <", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyLessThanOrEqualTo(Integer value) {
-            addCriterion("delegate_qty <=", value, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyIn(List<Integer> values) {
-            addCriterion("delegate_qty in", values, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyNotIn(List<Integer> values) {
-            addCriterion("delegate_qty not in", values, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyBetween(Integer value1, Integer value2) {
-            addCriterion("delegate_qty between", value1, value2, "delegateQty");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateQtyNotBetween(Integer value1, Integer value2) {
-            addCriterion("delegate_qty not between", value1, value2, "delegateQty");
-            return (Criteria) this;
-        }
-
         public Criteria andCandidateCountIsNull() {
             addCriterion("candidate_count is null");
             return (Criteria) this;
@@ -955,62 +906,52 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesEqualTo(String value) {
+        public Criteria andDelegateHesEqualTo(BigDecimal value) {
             addCriterion("delegate_hes =", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesNotEqualTo(String value) {
+        public Criteria andDelegateHesNotEqualTo(BigDecimal value) {
             addCriterion("delegate_hes <>", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesGreaterThan(String value) {
+        public Criteria andDelegateHesGreaterThan(BigDecimal value) {
             addCriterion("delegate_hes >", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesGreaterThanOrEqualTo(String value) {
+        public Criteria andDelegateHesGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_hes >=", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesLessThan(String value) {
+        public Criteria andDelegateHesLessThan(BigDecimal value) {
             addCriterion("delegate_hes <", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesLessThanOrEqualTo(String value) {
+        public Criteria andDelegateHesLessThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_hes <=", value, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesLike(String value) {
-            addCriterion("delegate_hes like", value, "delegateHes");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateHesNotLike(String value) {
-            addCriterion("delegate_hes not like", value, "delegateHes");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateHesIn(List<String> values) {
+        public Criteria andDelegateHesIn(List<BigDecimal> values) {
             addCriterion("delegate_hes in", values, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesNotIn(List<String> values) {
+        public Criteria andDelegateHesNotIn(List<BigDecimal> values) {
             addCriterion("delegate_hes not in", values, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesBetween(String value1, String value2) {
+        public Criteria andDelegateHesBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_hes between", value1, value2, "delegateHes");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateHesNotBetween(String value1, String value2) {
+        public Criteria andDelegateHesNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_hes not between", value1, value2, "delegateHes");
             return (Criteria) this;
         }
@@ -1025,203 +966,113 @@ public class AddressExample {
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedEqualTo(String value) {
+        public Criteria andDelegateLockedEqualTo(BigDecimal value) {
             addCriterion("delegate_locked =", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedNotEqualTo(String value) {
+        public Criteria andDelegateLockedNotEqualTo(BigDecimal value) {
             addCriterion("delegate_locked <>", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedGreaterThan(String value) {
+        public Criteria andDelegateLockedGreaterThan(BigDecimal value) {
             addCriterion("delegate_locked >", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedGreaterThanOrEqualTo(String value) {
+        public Criteria andDelegateLockedGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_locked >=", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedLessThan(String value) {
+        public Criteria andDelegateLockedLessThan(BigDecimal value) {
             addCriterion("delegate_locked <", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedLessThanOrEqualTo(String value) {
+        public Criteria andDelegateLockedLessThanOrEqualTo(BigDecimal value) {
             addCriterion("delegate_locked <=", value, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedLike(String value) {
-            addCriterion("delegate_locked like", value, "delegateLocked");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateLockedNotLike(String value) {
-            addCriterion("delegate_locked not like", value, "delegateLocked");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateLockedIn(List<String> values) {
+        public Criteria andDelegateLockedIn(List<BigDecimal> values) {
             addCriterion("delegate_locked in", values, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedNotIn(List<String> values) {
+        public Criteria andDelegateLockedNotIn(List<BigDecimal> values) {
             addCriterion("delegate_locked not in", values, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedBetween(String value1, String value2) {
+        public Criteria andDelegateLockedBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_locked between", value1, value2, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateLockedNotBetween(String value1, String value2) {
+        public Criteria andDelegateLockedNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("delegate_locked not between", value1, value2, "delegateLocked");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockIsNull() {
-            addCriterion("delegate_unlock is null");
+        public Criteria andDelegateReleasedIsNull() {
+            addCriterion("delegate_released is null");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockIsNotNull() {
-            addCriterion("delegate_unlock is not null");
+        public Criteria andDelegateReleasedIsNotNull() {
+            addCriterion("delegate_released is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockEqualTo(String value) {
-            addCriterion("delegate_unlock =", value, "delegateUnlock");
+        public Criteria andDelegateReleasedEqualTo(BigDecimal value) {
+            addCriterion("delegate_released =", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockNotEqualTo(String value) {
-            addCriterion("delegate_unlock <>", value, "delegateUnlock");
+        public Criteria andDelegateReleasedNotEqualTo(BigDecimal value) {
+            addCriterion("delegate_released <>", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockGreaterThan(String value) {
-            addCriterion("delegate_unlock >", value, "delegateUnlock");
+        public Criteria andDelegateReleasedGreaterThan(BigDecimal value) {
+            addCriterion("delegate_released >", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockGreaterThanOrEqualTo(String value) {
-            addCriterion("delegate_unlock >=", value, "delegateUnlock");
+        public Criteria andDelegateReleasedGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("delegate_released >=", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockLessThan(String value) {
-            addCriterion("delegate_unlock <", value, "delegateUnlock");
+        public Criteria andDelegateReleasedLessThan(BigDecimal value) {
+            addCriterion("delegate_released <", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockLessThanOrEqualTo(String value) {
-            addCriterion("delegate_unlock <=", value, "delegateUnlock");
+        public Criteria andDelegateReleasedLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("delegate_released <=", value, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockLike(String value) {
-            addCriterion("delegate_unlock like", value, "delegateUnlock");
+        public Criteria andDelegateReleasedIn(List<BigDecimal> values) {
+            addCriterion("delegate_released in", values, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockNotLike(String value) {
-            addCriterion("delegate_unlock not like", value, "delegateUnlock");
+        public Criteria andDelegateReleasedNotIn(List<BigDecimal> values) {
+            addCriterion("delegate_released not in", values, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockIn(List<String> values) {
-            addCriterion("delegate_unlock in", values, "delegateUnlock");
+        public Criteria andDelegateReleasedBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("delegate_released between", value1, value2, "delegateReleased");
             return (Criteria) this;
         }
 
-        public Criteria andDelegateUnlockNotIn(List<String> values) {
-            addCriterion("delegate_unlock not in", values, "delegateUnlock");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateUnlockBetween(String value1, String value2) {
-            addCriterion("delegate_unlock between", value1, value2, "delegateUnlock");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateUnlockNotBetween(String value1, String value2) {
-            addCriterion("delegate_unlock not between", value1, value2, "delegateUnlock");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionIsNull() {
-            addCriterion("delegate_reduction is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionIsNotNull() {
-            addCriterion("delegate_reduction is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionEqualTo(String value) {
-            addCriterion("delegate_reduction =", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionNotEqualTo(String value) {
-            addCriterion("delegate_reduction <>", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionGreaterThan(String value) {
-            addCriterion("delegate_reduction >", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionGreaterThanOrEqualTo(String value) {
-            addCriterion("delegate_reduction >=", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionLessThan(String value) {
-            addCriterion("delegate_reduction <", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionLessThanOrEqualTo(String value) {
-            addCriterion("delegate_reduction <=", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionLike(String value) {
-            addCriterion("delegate_reduction like", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionNotLike(String value) {
-            addCriterion("delegate_reduction not like", value, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionIn(List<String> values) {
-            addCriterion("delegate_reduction in", values, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionNotIn(List<String> values) {
-            addCriterion("delegate_reduction not in", values, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionBetween(String value1, String value2) {
-            addCriterion("delegate_reduction between", value1, value2, "delegateReduction");
-            return (Criteria) this;
-        }
-
-        public Criteria andDelegateReductionNotBetween(String value1, String value2) {
-            addCriterion("delegate_reduction not between", value1, value2, "delegateReduction");
+        public Criteria andDelegateReleasedNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("delegate_released not between", value1, value2, "delegateReleased");
             return (Criteria) this;
         }
 

@@ -10,9 +10,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.res.proposal.ProposalDetailsResp;
-import com.platon.browser.util.BeanConvertUtil;
 
 public class BeanConvertUtilTest {
 

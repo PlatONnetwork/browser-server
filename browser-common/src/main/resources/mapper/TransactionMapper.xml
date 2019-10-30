@@ -3,28 +3,28 @@
 <mapper namespace="com.platon.browser.dao.mapper.TransactionMapper">
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.Transaction">
     <id column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="block_number" jdbcType="BIGINT" property="blockNumber" />
-    <result column="block_hash" jdbcType="VARCHAR" property="blockHash" />
-    <result column="transaction_index" jdbcType="INTEGER" property="transactionIndex" />
-    <result column="timestamp" jdbcType="TIMESTAMP" property="timestamp" />
+    <result column="b_hash" jdbcType="VARCHAR" property="bHash" />
+    <result column="num" jdbcType="BIGINT" property="num" />
+    <result column="index" jdbcType="INTEGER" property="index" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="nonce" jdbcType="VARCHAR" property="nonce" />
-    <result column="tx_receipt_status" jdbcType="INTEGER" property="txReceiptStatus" />
-    <result column="gas_price" jdbcType="VARCHAR" property="gasPrice" />
-    <result column="gas_used" jdbcType="VARCHAR" property="gasUsed" />
-    <result column="gas_limit" jdbcType="VARCHAR" property="gasLimit" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="gas_price" jdbcType="DECIMAL" property="gasPrice" />
+    <result column="gas_used" jdbcType="DECIMAL" property="gasUsed" />
+    <result column="gas_limit" jdbcType="DECIMAL" property="gasLimit" />
     <result column="from" jdbcType="VARCHAR" property="from" />
     <result column="to" jdbcType="VARCHAR" property="to" />
-    <result column="value" jdbcType="VARCHAR" property="value" />
-    <result column="tx_type" jdbcType="VARCHAR" property="txType" />
-    <result column="actual_tx_cost" jdbcType="VARCHAR" property="actualTxCost" />
-    <result column="receive_type" jdbcType="VARCHAR" property="receiveType" />
-    <result column="sequence" jdbcType="BIGINT" property="sequence" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="value" jdbcType="DECIMAL" property="value" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="cost" jdbcType="DECIMAL" property="cost" />
+    <result column="to_type" jdbcType="INTEGER" property="toType" />
+    <result column="seq" jdbcType="BIGINT" property="seq" />
+    <result column="cre_time" jdbcType="TIMESTAMP" property="creTime" />
+    <result column="upd_time" jdbcType="TIMESTAMP" property="updTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TransactionWithBLOBs">
     <result column="input" jdbcType="LONGVARCHAR" property="input" />
-    <result column="tx_info" jdbcType="LONGVARCHAR" property="txInfo" />
+    <result column="info" jdbcType="LONGVARCHAR" property="info" />
     <result column="fail_reason" jdbcType="LONGVARCHAR" property="failReason" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -86,12 +86,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    hash, block_number, block_hash, transaction_index, `timestamp`, nonce, tx_receipt_status, 
-    gas_price, gas_used, gas_limit, `from`, `to`, `value`, tx_type, actual_tx_cost, receive_type, 
-    `sequence`, create_time, update_time
+    hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
+    `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time
   </sql>
   <sql id="Blob_Column_List">
-    `input`, tx_info, fail_reason
+    `input`, info, fail_reason
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TransactionExample" resultMap="ResultMapWithBLOBs">
     select
@@ -142,21 +141,21 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.TransactionWithBLOBs">
-    insert into transaction (hash, block_number, block_hash, 
-      transaction_index, `timestamp`, nonce, 
-      tx_receipt_status, gas_price, gas_used, 
+    insert into transaction (hash, b_hash, num, 
+      `index`, `time`, nonce, 
+      `status`, gas_price, gas_used, 
       gas_limit, `from`, `to`, 
-      `value`, tx_type, actual_tx_cost, 
-      receive_type, `sequence`, create_time, 
-      update_time, `input`, tx_info, 
+      `value`, `type`, cost, 
+      to_type, seq, cre_time, 
+      upd_time, `input`, info, 
       fail_reason)
-    values (#{hash,jdbcType=VARCHAR}, #{blockNumber,jdbcType=BIGINT}, #{blockHash,jdbcType=VARCHAR}, 
-      #{transactionIndex,jdbcType=INTEGER}, #{timestamp,jdbcType=TIMESTAMP}, #{nonce,jdbcType=VARCHAR}, 
-      #{txReceiptStatus,jdbcType=INTEGER}, #{gasPrice,jdbcType=VARCHAR}, #{gasUsed,jdbcType=VARCHAR}, 
-      #{gasLimit,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, 
-      #{value,jdbcType=VARCHAR}, #{txType,jdbcType=VARCHAR}, #{actualTxCost,jdbcType=VARCHAR}, 
-      #{receiveType,jdbcType=VARCHAR}, #{sequence,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{input,jdbcType=LONGVARCHAR}, #{txInfo,jdbcType=LONGVARCHAR}, 
+    values (#{hash,jdbcType=VARCHAR}, #{bHash,jdbcType=VARCHAR}, #{num,jdbcType=BIGINT}, 
+      #{index,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, #{nonce,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{gasPrice,jdbcType=DECIMAL}, #{gasUsed,jdbcType=DECIMAL}, 
+      #{gasLimit,jdbcType=DECIMAL}, #{from,jdbcType=VARCHAR}, #{to,jdbcType=VARCHAR}, 
+      #{value,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{cost,jdbcType=DECIMAL}, 
+      #{toType,jdbcType=INTEGER}, #{seq,jdbcType=BIGINT}, #{creTime,jdbcType=TIMESTAMP}, 
+      #{updTime,jdbcType=TIMESTAMP}, #{input,jdbcType=LONGVARCHAR}, #{info,jdbcType=LONGVARCHAR}, 
       #{failReason,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.TransactionWithBLOBs">
@@ -165,23 +164,23 @@
       <if test="hash != null">
         hash,
       </if>
-      <if test="blockNumber != null">
-        block_number,
+      <if test="bHash != null">
+        b_hash,
       </if>
-      <if test="blockHash != null">
-        block_hash,
+      <if test="num != null">
+        num,
       </if>
-      <if test="transactionIndex != null">
-        transaction_index,
+      <if test="index != null">
+        `index`,
       </if>
-      <if test="timestamp != null">
-        `timestamp`,
+      <if test="time != null">
+        `time`,
       </if>
       <if test="nonce != null">
         nonce,
       </if>
-      <if test="txReceiptStatus != null">
-        tx_receipt_status,
+      <if test="status != null">
+        `status`,
       </if>
       <if test="gasPrice != null">
         gas_price,
@@ -201,29 +200,29 @@
       <if test="value != null">
         `value`,
       </if>
-      <if test="txType != null">
-        tx_type,
+      <if test="type != null">
+        `type`,
       </if>
-      <if test="actualTxCost != null">
-        actual_tx_cost,
+      <if test="cost != null">
+        cost,
       </if>
-      <if test="receiveType != null">
-        receive_type,
+      <if test="toType != null">
+        to_type,
       </if>
-      <if test="sequence != null">
-        `sequence`,
+      <if test="seq != null">
+        seq,
       </if>
-      <if test="createTime != null">
-        create_time,
+      <if test="creTime != null">
+        cre_time,
       </if>
-      <if test="updateTime != null">
-        update_time,
+      <if test="updTime != null">
+        upd_time,
       </if>
       <if test="input != null">
         `input`,
       </if>
-      <if test="txInfo != null">
-        tx_info,
+      <if test="info != null">
+        info,
       </if>
       <if test="failReason != null">
         fail_reason,
@@ -233,32 +232,32 @@
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="blockNumber != null">
-        #{blockNumber,jdbcType=BIGINT},
+      <if test="bHash != null">
+        #{bHash,jdbcType=VARCHAR},
       </if>
-      <if test="blockHash != null">
-        #{blockHash,jdbcType=VARCHAR},
+      <if test="num != null">
+        #{num,jdbcType=BIGINT},
       </if>
-      <if test="transactionIndex != null">
-        #{transactionIndex,jdbcType=INTEGER},
+      <if test="index != null">
+        #{index,jdbcType=INTEGER},
       </if>
-      <if test="timestamp != null">
-        #{timestamp,jdbcType=TIMESTAMP},
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
       </if>
       <if test="nonce != null">
         #{nonce,jdbcType=VARCHAR},
       </if>
-      <if test="txReceiptStatus != null">
-        #{txReceiptStatus,jdbcType=INTEGER},
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="gasPrice != null">
-        #{gasPrice,jdbcType=VARCHAR},
+        #{gasPrice,jdbcType=DECIMAL},
       </if>
       <if test="gasUsed != null">
-        #{gasUsed,jdbcType=VARCHAR},
+        #{gasUsed,jdbcType=DECIMAL},
       </if>
       <if test="gasLimit != null">
-        #{gasLimit,jdbcType=VARCHAR},
+        #{gasLimit,jdbcType=DECIMAL},
       </if>
       <if test="from != null">
         #{from,jdbcType=VARCHAR},
@@ -267,31 +266,31 @@
         #{to,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        #{value,jdbcType=VARCHAR},
+        #{value,jdbcType=DECIMAL},
       </if>
-      <if test="txType != null">
-        #{txType,jdbcType=VARCHAR},
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
       </if>
-      <if test="actualTxCost != null">
-        #{actualTxCost,jdbcType=VARCHAR},
+      <if test="cost != null">
+        #{cost,jdbcType=DECIMAL},
       </if>
-      <if test="receiveType != null">
-        #{receiveType,jdbcType=VARCHAR},
+      <if test="toType != null">
+        #{toType,jdbcType=INTEGER},
       </if>
-      <if test="sequence != null">
-        #{sequence,jdbcType=BIGINT},
+      <if test="seq != null">
+        #{seq,jdbcType=BIGINT},
       </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
+      <if test="creTime != null">
+        #{creTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
+      <if test="updTime != null">
+        #{updTime,jdbcType=TIMESTAMP},
       </if>
       <if test="input != null">
         #{input,jdbcType=LONGVARCHAR},
       </if>
-      <if test="txInfo != null">
-        #{txInfo,jdbcType=LONGVARCHAR},
+      <if test="info != null">
+        #{info,jdbcType=LONGVARCHAR},
       </if>
       <if test="failReason != null">
         #{failReason,jdbcType=LONGVARCHAR},
@@ -310,32 +309,32 @@
       <if test="record.hash != null">
         hash = #{record.hash,jdbcType=VARCHAR},
       </if>
-      <if test="record.blockNumber != null">
-        block_number = #{record.blockNumber,jdbcType=BIGINT},
+      <if test="record.bHash != null">
+        b_hash = #{record.bHash,jdbcType=VARCHAR},
       </if>
-      <if test="record.blockHash != null">
-        block_hash = #{record.blockHash,jdbcType=VARCHAR},
+      <if test="record.num != null">
+        num = #{record.num,jdbcType=BIGINT},
       </if>
-      <if test="record.transactionIndex != null">
-        transaction_index = #{record.transactionIndex,jdbcType=INTEGER},
+      <if test="record.index != null">
+        `index` = #{record.index,jdbcType=INTEGER},
       </if>
-      <if test="record.timestamp != null">
-        `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
+      <if test="record.time != null">
+        `time` = #{record.time,jdbcType=TIMESTAMP},
       </if>
       <if test="record.nonce != null">
         nonce = #{record.nonce,jdbcType=VARCHAR},
       </if>
-      <if test="record.txReceiptStatus != null">
-        tx_receipt_status = #{record.txReceiptStatus,jdbcType=INTEGER},
+      <if test="record.status != null">
+        `status` = #{record.status,jdbcType=INTEGER},
       </if>
       <if test="record.gasPrice != null">
-        gas_price = #{record.gasPrice,jdbcType=VARCHAR},
+        gas_price = #{record.gasPrice,jdbcType=DECIMAL},
       </if>
       <if test="record.gasUsed != null">
-        gas_used = #{record.gasUsed,jdbcType=VARCHAR},
+        gas_used = #{record.gasUsed,jdbcType=DECIMAL},
       </if>
       <if test="record.gasLimit != null">
-        gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+        gas_limit = #{record.gasLimit,jdbcType=DECIMAL},
       </if>
       <if test="record.from != null">
         `from` = #{record.from,jdbcType=VARCHAR},
@@ -344,31 +343,31 @@
         `to` = #{record.to,jdbcType=VARCHAR},
       </if>
       <if test="record.value != null">
-        `value` = #{record.value,jdbcType=VARCHAR},
+        `value` = #{record.value,jdbcType=DECIMAL},
       </if>
-      <if test="record.txType != null">
-        tx_type = #{record.txType,jdbcType=VARCHAR},
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=VARCHAR},
       </if>
-      <if test="record.actualTxCost != null">
-        actual_tx_cost = #{record.actualTxCost,jdbcType=VARCHAR},
+      <if test="record.cost != null">
+        cost = #{record.cost,jdbcType=DECIMAL},
       </if>
-      <if test="record.receiveType != null">
-        receive_type = #{record.receiveType,jdbcType=VARCHAR},
+      <if test="record.toType != null">
+        to_type = #{record.toType,jdbcType=INTEGER},
       </if>
-      <if test="record.sequence != null">
-        `sequence` = #{record.sequence,jdbcType=BIGINT},
+      <if test="record.seq != null">
+        seq = #{record.seq,jdbcType=BIGINT},
       </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="record.creTime != null">
+        cre_time = #{record.creTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="record.updTime != null">
+        upd_time = #{record.updTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.input != null">
         `input` = #{record.input,jdbcType=LONGVARCHAR},
       </if>
-      <if test="record.txInfo != null">
-        tx_info = #{record.txInfo,jdbcType=LONGVARCHAR},
+      <if test="record.info != null">
+        info = #{record.info,jdbcType=LONGVARCHAR},
       </if>
       <if test="record.failReason != null">
         fail_reason = #{record.failReason,jdbcType=LONGVARCHAR},
@@ -381,26 +380,26 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update transaction
     set hash = #{record.hash,jdbcType=VARCHAR},
-      block_number = #{record.blockNumber,jdbcType=BIGINT},
-      block_hash = #{record.blockHash,jdbcType=VARCHAR},
-      transaction_index = #{record.transactionIndex,jdbcType=INTEGER},
-      `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
+      b_hash = #{record.bHash,jdbcType=VARCHAR},
+      num = #{record.num,jdbcType=BIGINT},
+      `index` = #{record.index,jdbcType=INTEGER},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
       nonce = #{record.nonce,jdbcType=VARCHAR},
-      tx_receipt_status = #{record.txReceiptStatus,jdbcType=INTEGER},
-      gas_price = #{record.gasPrice,jdbcType=VARCHAR},
-      gas_used = #{record.gasUsed,jdbcType=VARCHAR},
-      gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+      `status` = #{record.status,jdbcType=INTEGER},
+      gas_price = #{record.gasPrice,jdbcType=DECIMAL},
+      gas_used = #{record.gasUsed,jdbcType=DECIMAL},
+      gas_limit = #{record.gasLimit,jdbcType=DECIMAL},
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
-      `value` = #{record.value,jdbcType=VARCHAR},
-      tx_type = #{record.txType,jdbcType=VARCHAR},
-      actual_tx_cost = #{record.actualTxCost,jdbcType=VARCHAR},
-      receive_type = #{record.receiveType,jdbcType=VARCHAR},
-      `sequence` = #{record.sequence,jdbcType=BIGINT},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      `value` = #{record.value,jdbcType=DECIMAL},
+      `type` = #{record.type,jdbcType=VARCHAR},
+      cost = #{record.cost,jdbcType=DECIMAL},
+      to_type = #{record.toType,jdbcType=INTEGER},
+      seq = #{record.seq,jdbcType=BIGINT},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP},
       `input` = #{record.input,jdbcType=LONGVARCHAR},
-      tx_info = #{record.txInfo,jdbcType=LONGVARCHAR},
+      info = #{record.info,jdbcType=LONGVARCHAR},
       fail_reason = #{record.failReason,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -409,24 +408,24 @@
   <update id="updateByExample" parameterType="map">
     update transaction
     set hash = #{record.hash,jdbcType=VARCHAR},
-      block_number = #{record.blockNumber,jdbcType=BIGINT},
-      block_hash = #{record.blockHash,jdbcType=VARCHAR},
-      transaction_index = #{record.transactionIndex,jdbcType=INTEGER},
-      `timestamp` = #{record.timestamp,jdbcType=TIMESTAMP},
+      b_hash = #{record.bHash,jdbcType=VARCHAR},
+      num = #{record.num,jdbcType=BIGINT},
+      `index` = #{record.index,jdbcType=INTEGER},
+      `time` = #{record.time,jdbcType=TIMESTAMP},
       nonce = #{record.nonce,jdbcType=VARCHAR},
-      tx_receipt_status = #{record.txReceiptStatus,jdbcType=INTEGER},
-      gas_price = #{record.gasPrice,jdbcType=VARCHAR},
-      gas_used = #{record.gasUsed,jdbcType=VARCHAR},
-      gas_limit = #{record.gasLimit,jdbcType=VARCHAR},
+      `status` = #{record.status,jdbcType=INTEGER},
+      gas_price = #{record.gasPrice,jdbcType=DECIMAL},
+      gas_used = #{record.gasUsed,jdbcType=DECIMAL},
+      gas_limit = #{record.gasLimit,jdbcType=DECIMAL},
       `from` = #{record.from,jdbcType=VARCHAR},
       `to` = #{record.to,jdbcType=VARCHAR},
-      `value` = #{record.value,jdbcType=VARCHAR},
-      tx_type = #{record.txType,jdbcType=VARCHAR},
-      actual_tx_cost = #{record.actualTxCost,jdbcType=VARCHAR},
-      receive_type = #{record.receiveType,jdbcType=VARCHAR},
-      `sequence` = #{record.sequence,jdbcType=BIGINT},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      `value` = #{record.value,jdbcType=DECIMAL},
+      `type` = #{record.type,jdbcType=VARCHAR},
+      cost = #{record.cost,jdbcType=DECIMAL},
+      to_type = #{record.toType,jdbcType=INTEGER},
+      seq = #{record.seq,jdbcType=BIGINT},
+      cre_time = #{record.creTime,jdbcType=TIMESTAMP},
+      upd_time = #{record.updTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -434,32 +433,32 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.platon.browser.dao.entity.TransactionWithBLOBs">
     update transaction
     <set>
-      <if test="blockNumber != null">
-        block_number = #{blockNumber,jdbcType=BIGINT},
+      <if test="bHash != null">
+        b_hash = #{bHash,jdbcType=VARCHAR},
       </if>
-      <if test="blockHash != null">
-        block_hash = #{blockHash,jdbcType=VARCHAR},
+      <if test="num != null">
+        num = #{num,jdbcType=BIGINT},
       </if>
-      <if test="transactionIndex != null">
-        transaction_index = #{transactionIndex,jdbcType=INTEGER},
+      <if test="index != null">
+        `index` = #{index,jdbcType=INTEGER},
       </if>
-      <if test="timestamp != null">
-        `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
       </if>
       <if test="nonce != null">
         nonce = #{nonce,jdbcType=VARCHAR},
       </if>
-      <if test="txReceiptStatus != null">
-        tx_receipt_status = #{txReceiptStatus,jdbcType=INTEGER},
+      <if test="status != null">
+        `status` = #{status,jdbcType=INTEGER},
       </if>
       <if test="gasPrice != null">
-        gas_price = #{gasPrice,jdbcType=VARCHAR},
+        gas_price = #{gasPrice,jdbcType=DECIMAL},
       </if>
       <if test="gasUsed != null">
-        gas_used = #{gasUsed,jdbcType=VARCHAR},
+        gas_used = #{gasUsed,jdbcType=DECIMAL},
       </if>
       <if test="gasLimit != null">
-        gas_limit = #{gasLimit,jdbcType=VARCHAR},
+        gas_limit = #{gasLimit,jdbcType=DECIMAL},
       </if>
       <if test="from != null">
         `from` = #{from,jdbcType=VARCHAR},
@@ -468,31 +467,31 @@
         `to` = #{to,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        `value` = #{value,jdbcType=VARCHAR},
+        `value` = #{value,jdbcType=DECIMAL},
       </if>
-      <if test="txType != null">
-        tx_type = #{txType,jdbcType=VARCHAR},
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
       </if>
-      <if test="actualTxCost != null">
-        actual_tx_cost = #{actualTxCost,jdbcType=VARCHAR},
+      <if test="cost != null">
+        cost = #{cost,jdbcType=DECIMAL},
       </if>
-      <if test="receiveType != null">
-        receive_type = #{receiveType,jdbcType=VARCHAR},
+      <if test="toType != null">
+        to_type = #{toType,jdbcType=INTEGER},
       </if>
-      <if test="sequence != null">
-        `sequence` = #{sequence,jdbcType=BIGINT},
+      <if test="seq != null">
+        seq = #{seq,jdbcType=BIGINT},
       </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
+      <if test="creTime != null">
+        cre_time = #{creTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      <if test="updTime != null">
+        upd_time = #{updTime,jdbcType=TIMESTAMP},
       </if>
       <if test="input != null">
         `input` = #{input,jdbcType=LONGVARCHAR},
       </if>
-      <if test="txInfo != null">
-        tx_info = #{txInfo,jdbcType=LONGVARCHAR},
+      <if test="info != null">
+        info = #{info,jdbcType=LONGVARCHAR},
       </if>
       <if test="failReason != null">
         fail_reason = #{failReason,jdbcType=LONGVARCHAR},
@@ -502,49 +501,49 @@
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.TransactionWithBLOBs">
     update transaction
-    set block_number = #{blockNumber,jdbcType=BIGINT},
-      block_hash = #{blockHash,jdbcType=VARCHAR},
-      transaction_index = #{transactionIndex,jdbcType=INTEGER},
-      `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
+    set b_hash = #{bHash,jdbcType=VARCHAR},
+      num = #{num,jdbcType=BIGINT},
+      `index` = #{index,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=TIMESTAMP},
       nonce = #{nonce,jdbcType=VARCHAR},
-      tx_receipt_status = #{txReceiptStatus,jdbcType=INTEGER},
-      gas_price = #{gasPrice,jdbcType=VARCHAR},
-      gas_used = #{gasUsed,jdbcType=VARCHAR},
-      gas_limit = #{gasLimit,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      gas_price = #{gasPrice,jdbcType=DECIMAL},
+      gas_used = #{gasUsed,jdbcType=DECIMAL},
+      gas_limit = #{gasLimit,jdbcType=DECIMAL},
       `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
-      `value` = #{value,jdbcType=VARCHAR},
-      tx_type = #{txType,jdbcType=VARCHAR},
-      actual_tx_cost = #{actualTxCost,jdbcType=VARCHAR},
-      receive_type = #{receiveType,jdbcType=VARCHAR},
-      `sequence` = #{sequence,jdbcType=BIGINT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      `value` = #{value,jdbcType=DECIMAL},
+      `type` = #{type,jdbcType=VARCHAR},
+      cost = #{cost,jdbcType=DECIMAL},
+      to_type = #{toType,jdbcType=INTEGER},
+      seq = #{seq,jdbcType=BIGINT},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP},
       `input` = #{input,jdbcType=LONGVARCHAR},
-      tx_info = #{txInfo,jdbcType=LONGVARCHAR},
+      info = #{info,jdbcType=LONGVARCHAR},
       fail_reason = #{failReason,jdbcType=LONGVARCHAR}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Transaction">
     update transaction
-    set block_number = #{blockNumber,jdbcType=BIGINT},
-      block_hash = #{blockHash,jdbcType=VARCHAR},
-      transaction_index = #{transactionIndex,jdbcType=INTEGER},
-      `timestamp` = #{timestamp,jdbcType=TIMESTAMP},
+    set b_hash = #{bHash,jdbcType=VARCHAR},
+      num = #{num,jdbcType=BIGINT},
+      `index` = #{index,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=TIMESTAMP},
       nonce = #{nonce,jdbcType=VARCHAR},
-      tx_receipt_status = #{txReceiptStatus,jdbcType=INTEGER},
-      gas_price = #{gasPrice,jdbcType=VARCHAR},
-      gas_used = #{gasUsed,jdbcType=VARCHAR},
-      gas_limit = #{gasLimit,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      gas_price = #{gasPrice,jdbcType=DECIMAL},
+      gas_used = #{gasUsed,jdbcType=DECIMAL},
+      gas_limit = #{gasLimit,jdbcType=DECIMAL},
       `from` = #{from,jdbcType=VARCHAR},
       `to` = #{to,jdbcType=VARCHAR},
-      `value` = #{value,jdbcType=VARCHAR},
-      tx_type = #{txType,jdbcType=VARCHAR},
-      actual_tx_cost = #{actualTxCost,jdbcType=VARCHAR},
-      receive_type = #{receiveType,jdbcType=VARCHAR},
-      `sequence` = #{sequence,jdbcType=BIGINT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      `value` = #{value,jdbcType=DECIMAL},
+      `type` = #{type,jdbcType=VARCHAR},
+      cost = #{cost,jdbcType=DECIMAL},
+      to_type = #{toType,jdbcType=INTEGER},
+      seq = #{seq,jdbcType=BIGINT},
+      cre_time = #{creTime,jdbcType=TIMESTAMP},
+      upd_time = #{updTime,jdbcType=TIMESTAMP}
     where hash = #{hash,jdbcType=VARCHAR}
   </update>
   <insert id="batchInsert" parameterType="map">
@@ -554,20 +553,19 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into transaction
-    (hash, block_number, block_hash, transaction_index, `timestamp`, nonce, tx_receipt_status, 
-      gas_price, gas_used, gas_limit, `from`, `to`, `value`, tx_type, actual_tx_cost, 
-      receive_type, `sequence`, create_time, update_time, `input`, tx_info, fail_reason
-      )
+    (hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
+      `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, `input`, 
+      info, fail_reason)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.hash,jdbcType=VARCHAR}, #{item.blockNumber,jdbcType=BIGINT}, #{item.blockHash,jdbcType=VARCHAR}, 
-        #{item.transactionIndex,jdbcType=INTEGER}, #{item.timestamp,jdbcType=TIMESTAMP}, 
-        #{item.nonce,jdbcType=VARCHAR}, #{item.txReceiptStatus,jdbcType=INTEGER}, #{item.gasPrice,jdbcType=VARCHAR}, 
-        #{item.gasUsed,jdbcType=VARCHAR}, #{item.gasLimit,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, 
-        #{item.to,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.txType,jdbcType=VARCHAR}, 
-        #{item.actualTxCost,jdbcType=VARCHAR}, #{item.receiveType,jdbcType=VARCHAR}, #{item.sequence,jdbcType=BIGINT}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.input,jdbcType=LONGVARCHAR}, 
-        #{item.txInfo,jdbcType=LONGVARCHAR}, #{item.failReason,jdbcType=LONGVARCHAR})
+      (#{item.hash,jdbcType=VARCHAR}, #{item.bHash,jdbcType=VARCHAR}, #{item.num,jdbcType=BIGINT}, 
+        #{item.index,jdbcType=INTEGER}, #{item.time,jdbcType=TIMESTAMP}, #{item.nonce,jdbcType=VARCHAR}, 
+        #{item.status,jdbcType=INTEGER}, #{item.gasPrice,jdbcType=DECIMAL}, #{item.gasUsed,jdbcType=DECIMAL}, 
+        #{item.gasLimit,jdbcType=DECIMAL}, #{item.from,jdbcType=VARCHAR}, #{item.to,jdbcType=VARCHAR}, 
+        #{item.value,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}, #{item.cost,jdbcType=DECIMAL}, 
+        #{item.toType,jdbcType=INTEGER}, #{item.seq,jdbcType=BIGINT}, #{item.creTime,jdbcType=TIMESTAMP}, 
+        #{item.updTime,jdbcType=TIMESTAMP}, #{item.input,jdbcType=LONGVARCHAR}, #{item.info,jdbcType=LONGVARCHAR}, 
+        #{item.failReason,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -588,32 +586,32 @@
         <if test="'hash'.toString() == column.value">
           #{item.hash,jdbcType=VARCHAR}
         </if>
-        <if test="'block_number'.toString() == column.value">
-          #{item.blockNumber,jdbcType=BIGINT}
+        <if test="'b_hash'.toString() == column.value">
+          #{item.bHash,jdbcType=VARCHAR}
         </if>
-        <if test="'block_hash'.toString() == column.value">
-          #{item.blockHash,jdbcType=VARCHAR}
+        <if test="'num'.toString() == column.value">
+          #{item.num,jdbcType=BIGINT}
         </if>
-        <if test="'transaction_index'.toString() == column.value">
-          #{item.transactionIndex,jdbcType=INTEGER}
+        <if test="'index'.toString() == column.value">
+          #{item.index,jdbcType=INTEGER}
         </if>
-        <if test="'timestamp'.toString() == column.value">
-          #{item.timestamp,jdbcType=TIMESTAMP}
+        <if test="'time'.toString() == column.value">
+          #{item.time,jdbcType=TIMESTAMP}
         </if>
         <if test="'nonce'.toString() == column.value">
           #{item.nonce,jdbcType=VARCHAR}
         </if>
-        <if test="'tx_receipt_status'.toString() == column.value">
-          #{item.txReceiptStatus,jdbcType=INTEGER}
+        <if test="'status'.toString() == column.value">
+          #{item.status,jdbcType=INTEGER}
         </if>
         <if test="'gas_price'.toString() == column.value">
-          #{item.gasPrice,jdbcType=VARCHAR}
+          #{item.gasPrice,jdbcType=DECIMAL}
         </if>
         <if test="'gas_used'.toString() == column.value">
-          #{item.gasUsed,jdbcType=VARCHAR}
+          #{item.gasUsed,jdbcType=DECIMAL}
         </if>
         <if test="'gas_limit'.toString() == column.value">
-          #{item.gasLimit,jdbcType=VARCHAR}
+          #{item.gasLimit,jdbcType=DECIMAL}
         </if>
         <if test="'from'.toString() == column.value">
           #{item.from,jdbcType=VARCHAR}
@@ -622,31 +620,31 @@
           #{item.to,jdbcType=VARCHAR}
         </if>
         <if test="'value'.toString() == column.value">
-          #{item.value,jdbcType=VARCHAR}
+          #{item.value,jdbcType=DECIMAL}
         </if>
-        <if test="'tx_type'.toString() == column.value">
-          #{item.txType,jdbcType=VARCHAR}
+        <if test="'type'.toString() == column.value">
+          #{item.type,jdbcType=VARCHAR}
         </if>
-        <if test="'actual_tx_cost'.toString() == column.value">
-          #{item.actualTxCost,jdbcType=VARCHAR}
+        <if test="'cost'.toString() == column.value">
+          #{item.cost,jdbcType=DECIMAL}
         </if>
-        <if test="'receive_type'.toString() == column.value">
-          #{item.receiveType,jdbcType=VARCHAR}
+        <if test="'to_type'.toString() == column.value">
+          #{item.toType,jdbcType=INTEGER}
         </if>
-        <if test="'sequence'.toString() == column.value">
-          #{item.sequence,jdbcType=BIGINT}
+        <if test="'seq'.toString() == column.value">
+          #{item.seq,jdbcType=BIGINT}
         </if>
-        <if test="'create_time'.toString() == column.value">
-          #{item.createTime,jdbcType=TIMESTAMP}
+        <if test="'cre_time'.toString() == column.value">
+          #{item.creTime,jdbcType=TIMESTAMP}
         </if>
-        <if test="'update_time'.toString() == column.value">
-          #{item.updateTime,jdbcType=TIMESTAMP}
+        <if test="'upd_time'.toString() == column.value">
+          #{item.updTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'input'.toString() == column.value">
           #{item.input,jdbcType=LONGVARCHAR}
         </if>
-        <if test="'tx_info'.toString() == column.value">
-          #{item.txInfo,jdbcType=LONGVARCHAR}
+        <if test="'info'.toString() == column.value">
+          #{item.info,jdbcType=LONGVARCHAR}
         </if>
         <if test="'fail_reason'.toString() == column.value">
           #{item.failReason,jdbcType=LONGVARCHAR}

@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class TransactionWithBLOBs extends Transaction {
     private String input;
 
-    private String txInfo;
+    private String info;
 
     private String failReason;
 
@@ -18,12 +18,12 @@ public class TransactionWithBLOBs extends Transaction {
         this.input = input == null ? null : input.trim();
     }
 
-    public String getTxInfo() {
-        return txInfo;
+    public String getInfo() {
+        return info;
     }
 
-    public void setTxInfo(String txInfo) {
-        this.txInfo = txInfo == null ? null : txInfo.trim();
+    public void setInfo(String info) {
+        this.info = info == null ? null : info.trim();
     }
 
     public String getFailReason() {
@@ -43,26 +43,26 @@ public class TransactionWithBLOBs extends Transaction {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        blockNumber("block_number", "blockNumber", "BIGINT", false),
-        blockHash("block_hash", "blockHash", "VARCHAR", false),
-        transactionIndex("transaction_index", "transactionIndex", "INTEGER", false),
-        timestamp("timestamp", "timestamp", "TIMESTAMP", true),
+        bHash("b_hash", "bHash", "VARCHAR", false),
+        num("num", "num", "BIGINT", false),
+        index("index", "index", "INTEGER", true),
+        time("time", "time", "TIMESTAMP", true),
         nonce("nonce", "nonce", "VARCHAR", false),
-        txReceiptStatus("tx_receipt_status", "txReceiptStatus", "INTEGER", false),
-        gasPrice("gas_price", "gasPrice", "VARCHAR", false),
-        gasUsed("gas_used", "gasUsed", "VARCHAR", false),
-        gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
+        status("status", "status", "INTEGER", true),
+        gasPrice("gas_price", "gasPrice", "DECIMAL", false),
+        gasUsed("gas_used", "gasUsed", "DECIMAL", false),
+        gasLimit("gas_limit", "gasLimit", "DECIMAL", false),
         from("from", "from", "VARCHAR", true),
         to("to", "to", "VARCHAR", true),
-        value("value", "value", "VARCHAR", true),
-        txType("tx_type", "txType", "VARCHAR", false),
-        actualTxCost("actual_tx_cost", "actualTxCost", "VARCHAR", false),
-        receiveType("receive_type", "receiveType", "VARCHAR", false),
-        sequence("sequence", "sequence", "BIGINT", true),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        value("value", "value", "DECIMAL", true),
+        type("type", "type", "VARCHAR", true),
+        cost("cost", "cost", "DECIMAL", false),
+        toType("to_type", "toType", "INTEGER", false),
+        seq("seq", "seq", "BIGINT", false),
+        creTime("cre_time", "creTime", "TIMESTAMP", false),
+        updTime("upd_time", "updTime", "TIMESTAMP", false),
         input("input", "input", "LONGVARCHAR", true),
-        txInfo("tx_info", "txInfo", "LONGVARCHAR", false),
+        info("info", "info", "LONGVARCHAR", false),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false);
 
         /**

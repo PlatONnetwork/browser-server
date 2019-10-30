@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.BlockExample;
-import com.platon.browser.dao.entity.BlockExample.Criteria;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.enums.I18nEnum;

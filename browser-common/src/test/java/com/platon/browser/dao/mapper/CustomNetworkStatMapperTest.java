@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.NetworkStat;
 
 public class CustomNetworkStatMapperTest extends TestBase {
 

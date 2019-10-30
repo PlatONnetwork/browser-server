@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dto.CustomAddress;
 
 public class CustomAddressMapperTest extends TestBase {

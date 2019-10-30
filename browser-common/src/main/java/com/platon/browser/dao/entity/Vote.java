@@ -7,11 +7,11 @@ import java.util.Date;
 public class Vote {
     private String hash;
 
-    private String verifierName;
+    private String nodeId;
 
-    private String verifier;
+    private String nodeName;
 
-    private String option;
+    private Integer option;
 
     private String proposalHash;
 
@@ -29,28 +29,28 @@ public class Vote {
         this.hash = hash == null ? null : hash.trim();
     }
 
-    public String getVerifierName() {
-        return verifierName;
+    public String getNodeId() {
+        return nodeId;
     }
 
-    public void setVerifierName(String verifierName) {
-        this.verifierName = verifierName == null ? null : verifierName.trim();
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getVerifier() {
-        return verifier;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public void setVerifier(String verifier) {
-        this.verifier = verifier == null ? null : verifier.trim();
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName == null ? null : nodeName.trim();
     }
 
-    public String getOption() {
+    public Integer getOption() {
         return option;
     }
 
-    public void setOption(String option) {
-        this.option = option == null ? null : option.trim();
+    public void setOption(Integer option) {
+        this.option = option;
     }
 
     public String getProposalHash() {
@@ -94,9 +94,9 @@ public class Vote {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        verifierName("verifier_name", "verifierName", "VARCHAR", false),
-        verifier("verifier", "verifier", "VARCHAR", false),
-        option("option", "option", "VARCHAR", true),
+        nodeId("node_id", "nodeId", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
+        option("option", "option", "INTEGER", true),
         proposalHash("proposal_hash", "proposalHash", "VARCHAR", false),
         timestamp("timestamp", "timestamp", "TIMESTAMP", true),
         createTime("create_time", "createTime", "TIMESTAMP", false),

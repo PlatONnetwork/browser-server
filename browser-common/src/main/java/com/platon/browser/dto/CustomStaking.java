@@ -32,72 +32,72 @@ public class CustomStaking extends Staking {
         this.setJoinTime(date);
         /* 初始化默认值 */
         // 质押金额(犹豫期金额)
-        this.setStakingHas(BigInteger.ZERO.toString());
-        // 质押金额(锁定金额)
-        this.setStakingLocked(BigInteger.ZERO.toString());
-        // 委托交易总金额(犹豫期金额)
-        this.setStatDelegateHas(BigInteger.ZERO.toString());
-        // 委托交易总金额(锁定期金额)
-        this.setStatDelegateLocked(BigInteger.ZERO.toString());
-        // 质押金额(退回中金额)
-        this.setStakingReduction(BigInteger.ZERO.toString());
-        // 委托交易总金额(退回中金额)
-        this.setStatDelegateReduction(BigInteger.ZERO.toString());
-        // 节点名称(质押节点名称)
-        this.setStakingName("Unknown");
-        // 节点头像(关联external_id，第三方软件获取)
-        this.setStakingIcon("");
-        // 预计年化率
-        this.setExpectedIncome(BigInteger.ZERO.toString());
-        // 出块奖励
-        this.setBlockRewardValue(BigInteger.ZERO.toString());
-        // 程序版本
-        this.setProgramVersion(BigInteger.ZERO.toString());
-        // 质押奖励
-        this.setStakingRewardValue(BigInteger.ZERO.toString());
-        // 结算周期标识
-        this.setStakingReductionEpoch(0);
-        // 委托交易总数(关联的委托交易总数)
-        this.setStatDelegateQty(0);
-        // 进入共识验证论次数
-        this.setStatVerifierTime(0);
-        // 上个共识周期出块数
-        this.setPreConsBlockQty(0l);
-        // 当前共识周期出块数
-        this.setCurConsBlockQty(0l);
-        // 节点状态 1：候选中 2：退出中 3：已退出
-        this.setStatus(StatusEnum.CANDIDATE.code);
-        //是否结算周期验证人
-        this.setIsSetting(YesNoEnum.NO.code);
-        //是否共识周期验证人
-        this.setIsConsensus(YesNoEnum.NO.code);
-        // 是否为链初始化时内置的候选人
-        this.setIsInit(YesNoEnum.NO.code);
-        //节点质押期间手续费
-        this.setFeeRewardValue("0");
+//        this.setStakingHas(BigInteger.ZERO.toString());
+//        // 质押金额(锁定金额)
+//        this.setStakingLocked(BigInteger.ZERO.toString());
+//        // 委托交易总金额(犹豫期金额)
+//        this.setStatDelegateHas(BigInteger.ZERO.toString());
+//        // 委托交易总金额(锁定期金额)
+//        this.setStatDelegateLocked(BigInteger.ZERO.toString());
+//        // 质押金额(退回中金额)
+//        this.setStakingReduction(BigInteger.ZERO.toString());
+//        // 委托交易总金额(退回中金额)
+//        this.setStatDelegateReduction(BigInteger.ZERO.toString());
+//        // 节点名称(质押节点名称)
+//        this.setStakingName("Unknown");
+//        // 节点头像(关联external_id，第三方软件获取)
+//        this.setStakingIcon("");
+//        // 预计年化率
+//        this.setExpectedIncome(BigInteger.ZERO.toString());
+//        // 出块奖励
+//        this.setBlockRewardValue(BigInteger.ZERO.toString());
+//        // 程序版本
+//        this.setProgramVersion(BigInteger.ZERO.toString());
+//        // 质押奖励
+//        this.setStakingRewardValue(BigInteger.ZERO.toString());
+//        // 结算周期标识
+//        this.setStakingReductionEpoch(0);
+//        // 委托交易总数(关联的委托交易总数)
+//        this.setStatDelegateQty(0);
+//        // 进入共识验证论次数
+//        this.setStatVerifierTime(0);
+//        // 上个共识周期出块数
+//        this.setPreConsBlockQty(0l);
+//        // 当前共识周期出块数
+//        this.setCurConsBlockQty(0l);
+//        // 节点状态 1：候选中 2：退出中 3：已退出
+//        this.setStatus(StatusEnum.CANDIDATE.code);
+//        //是否结算周期验证人
+//        this.setIsSetting(YesNoEnum.NO.code);
+//        //是否共识周期验证人
+//        this.setIsConsensus(YesNoEnum.NO.code);
+//        // 是否为链初始化时内置的候选人
+//        this.setIsInit(YesNoEnum.NO.code);
+//        //节点质押期间手续费
+//        this.setFeeRewardValue("0");
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
-    public BigDecimal decimalStakingLocked(){return new BigDecimal(this.getStakingLocked());}
-    public BigDecimal decimalStakingHas(){return new BigDecimal(this.getStakingHas());}
-    public BigDecimal decimalBlockRewardValue(){return new BigDecimal(this.getBlockRewardValue());}
-    public BigDecimal decimalStakingRewardValue(){return new BigDecimal(this.getStakingRewardValue());}
-    public BigDecimal decimalStakingReduction(){return new BigDecimal(this.getStakingReduction());}
-    public BigDecimal decimalStatDelegateHas(){return new BigDecimal(this.getStatDelegateHas());}
-    public BigDecimal decimalStatDelegateLocked(){return new BigDecimal(this.getStatDelegateLocked());}
-    public BigDecimal decimalStatDelegateReduction(){return new BigDecimal(this.getStatDelegateReduction());}
-    public BigDecimal decimalStatFeeRwardValue(){return new BigDecimal(this.getFeeRewardValue());}
-    /********把字符串类数值转换为大整数的便捷方法********/
-    public BigInteger integerStakingLocked(){return new BigInteger(this.getStakingLocked());}
-    public BigInteger integerStakingHas(){return new BigInteger(this.getStakingHas());}
-    public BigInteger integerBlockRewardValue(){return new BigInteger(this.getBlockRewardValue());}
-    public BigInteger integerStakingRewardValue(){return new BigInteger(this.getStakingRewardValue());}
-    public BigInteger integerStakingReduction(){return new BigInteger(this.getStakingReduction());}
-    public BigInteger integerStatDelegateHas(){return new BigInteger(this.getStatDelegateHas());}
-    public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}
-    public BigInteger integerStatDelegateReduction(){return new BigInteger(this.getStatDelegateReduction());}
-    public BigInteger integerStakingBlockNum(){return BigInteger.valueOf(this.getStakingBlockNum());}
-    public BigInteger integerStakingFeeRwardValue(){return new BigInteger(this.getFeeRewardValue());}
+//    public BigDecimal decimalStakingLocked(){return new BigDecimal(this.getStakingLocked());}
+//    public BigDecimal decimalStakingHas(){return new BigDecimal(this.getStakingHas());}
+//    public BigDecimal decimalBlockRewardValue(){return new BigDecimal(this.getBlockRewardValue());}
+//    public BigDecimal decimalStakingRewardValue(){return new BigDecimal(this.getStakingRewardValue());}
+//    public BigDecimal decimalStakingReduction(){return new BigDecimal(this.getStakingReduction());}
+//    public BigDecimal decimalStatDelegateHas(){return new BigDecimal(this.getStatDelegateHas());}
+//    public BigDecimal decimalStatDelegateLocked(){return new BigDecimal(this.getStatDelegateLocked());}
+//    public BigDecimal decimalStatDelegateReduction(){return new BigDecimal(this.getStatDelegateReduction());}
+//    public BigDecimal decimalStatFeeRwardValue(){return new BigDecimal(this.getFeeRewardValue());}
+//    /********把字符串类数值转换为大整数的便捷方法********/
+//    public BigInteger integerStakingLocked(){return new BigInteger(this.getStakingLocked());}
+//    public BigInteger integerStakingHas(){return new BigInteger(this.getStakingHas());}
+//    public BigInteger integerBlockRewardValue(){return new BigInteger(this.getBlockRewardValue());}
+//    public BigInteger integerStakingRewardValue(){return new BigInteger(this.getStakingRewardValue());}
+//    public BigInteger integerStakingReduction(){return new BigInteger(this.getStakingReduction());}
+//    public BigInteger integerStatDelegateHas(){return new BigInteger(this.getStatDelegateHas());}
+//    public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}
+//    public BigInteger integerStatDelegateReduction(){return new BigInteger(this.getStatDelegateReduction());}
+//    public BigInteger integerStakingBlockNum(){return BigInteger.valueOf(this.getStakingBlockNum());}
+//    public BigInteger integerStakingFeeRwardValue(){return new BigInteger(this.getFeeRewardValue());}
     /**
      * 使用节点信息更新质押信息
      * @param node
@@ -114,11 +114,11 @@ public class CustomStaking extends Staking {
         // 第三方社交软件关联id
         this.setExternalId(node.getExternalId());
         // 收益地址
-        this.setDenefitAddr(node.getBenifitAddress());
-        // 节点状态 1：候选中 2：退出中 3：已退出
-        if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
-        // 节点名称(质押节点名称)
-        this.setStakingName(StringUtils.isBlank(node.getNodeName())?this.getStakingName():node.getNodeName());
+//        this.setDenefitAddr(node.getBenifitAddress());
+//        // 节点状态 1：候选中 2：退出中 3：已退出
+//        if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
+//        // 节点名称(质押节点名称)
+//        this.setStakingName(StringUtils.isBlank(node.getNodeName())?this.getStakingName():node.getNodeName());
         // 节点的第三方主页
         this.setWebSite(node.getWebsite());
         this.setDetails(node.getDetails());
@@ -129,23 +129,23 @@ public class CustomStaking extends Staking {
      * @param tx
      */
     public void updateWithCustomTransaction(CustomTransaction tx){
-        // 质押块号
-        this.setStakingBlockNum(tx.getBlockNumber());
-        // 质押交易索引
-        this.setStakingTxIndex(tx.getTransactionIndex());
-        // 发起质押的账户地址
-        this.setStakingAddr(tx.getFrom());
-        /**********从交易入参中取相关信息***********/
-        CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
-        this.setNodeId(param.getNodeId());
-        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
-        this.setDenefitAddr(param.getBenefitAddress());
-        this.setStakingHas(param.getAmount());
-        this.setWebSite(param.getWebsite());
-        this.setProgramVersion(param.getProgramVersion());
-        this.setDetails(param.getDetails());
-        this.setExternalId(param.getExternalId());
-        this.setJoinTime(tx.getTimestamp());
+//        // 质押块号
+//        this.setStakingBlockNum(tx.getBlockNumber());
+//        // 质押交易索引
+//        this.setStakingTxIndex(tx.getTransactionIndex());
+//        // 发起质押的账户地址
+//        this.setStakingAddr(tx.getFrom());
+//        /**********从交易入参中取相关信息***********/
+//        CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
+//        this.setNodeId(param.getNodeId());
+//        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
+//        this.setDenefitAddr(param.getBenefitAddress());
+//        this.setStakingHas(param.getAmount());
+//        this.setWebSite(param.getWebsite());
+//        this.setProgramVersion(param.getProgramVersion());
+//        this.setDetails(param.getDetails());
+//        this.setExternalId(param.getExternalId());
+//        this.setJoinTime(tx.getTimestamp());
     }
 
     /**
@@ -153,12 +153,12 @@ public class CustomStaking extends Staking {
      * @param param
      */
     public void updateWithEditValidatorParam(EditValidatorParam param) {
-        this.setExternalId(param.getExternalId());
-        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
-        this.setDetails(param.getDetails());
-        this.setDenefitAddr(param.getBenefitAddress());
-        this.setWebSite(param.getWebsite());
-        this.setUpdateTime(new Date());
+//        this.setExternalId(param.getExternalId());
+//        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
+//        this.setDetails(param.getDetails());
+//        this.setDenefitAddr(param.getBenefitAddress());
+//        this.setWebSite(param.getWebsite());
+//        this.setUpdateTime(new Date());
     }
 
     /**
@@ -168,9 +168,9 @@ public class CustomStaking extends Staking {
     public void updateWithIncreaseStakingParam(IncreaseStakingParam param) {
         if(StringUtils.isNotBlank(param.getAmount())){
             BigInteger addAmount = new BigInteger(param.getAmount());
-            BigInteger stakingHas = new BigInteger(this.getStakingHas());
-            BigInteger total = stakingHas.add(addAmount);
-            this.setStakingHas(total.toString());
+//            BigInteger stakingHas = new BigInteger(this.getStakingHas());
+//            BigInteger total = stakingHas.add(addAmount);
+//            this.setStakingHas(total.toString());
         }
     }
 
@@ -180,18 +180,18 @@ public class CustomStaking extends Staking {
      * @param curSettingEpoch
      */
     public void updateWithExitValidatorParam(ExitValidatorParam param, BigInteger curSettingEpoch) {
-        this.setStakingHas(BigInteger.ZERO.toString());
-        this.setLeaveTime(new Date());
-        BigInteger stakingLocked = new BigInteger(getStakingLocked());
-        if(stakingLocked.compareTo(BigInteger.ZERO)>0){
-            this.setStakingReduction(getStakingLocked());
-            this.setStakingLocked(BigInteger.ZERO.toString());
-            this.setStakingReductionEpoch(curSettingEpoch.intValue());
-            this.setStatus(StatusEnum.EXITING.code);
-        }else {
-            this.setStakingLocked(BigInteger.ZERO.toString());
-            this.setStatus(StatusEnum.EXITED.code);
-        }
+//        this.setStakingHas(BigInteger.ZERO.toString());
+//        this.setLeaveTime(new Date());
+//        BigInteger stakingLocked = new BigInteger(getStakingLocked());
+//        if(stakingLocked.compareTo(BigInteger.ZERO)>0){
+//            this.setStakingReduction(getStakingLocked());
+//            this.setStakingLocked(BigInteger.ZERO.toString());
+//            this.setStakingReductionEpoch(curSettingEpoch.intValue());
+//            this.setStatus(StatusEnum.EXITING.code);
+//        }else {
+//            this.setStakingLocked(BigInteger.ZERO.toString());
+//            this.setStatus(StatusEnum.EXITED.code);
+//        }
     }
 
     public StatusEnum getStatusEnum(){

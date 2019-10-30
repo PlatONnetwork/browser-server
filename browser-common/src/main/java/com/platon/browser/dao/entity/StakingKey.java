@@ -4,17 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class StakingKey {
-    private Long stakingBlockNum;
-
     private String nodeId;
 
-    public Long getStakingBlockNum() {
-        return stakingBlockNum;
-    }
-
-    public void setStakingBlockNum(Long stakingBlockNum) {
-        this.stakingBlockNum = stakingBlockNum;
-    }
+    private Long stakingBlockNum;
 
     public String getNodeId() {
         return nodeId;
@@ -22,6 +14,14 @@ public class StakingKey {
 
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId == null ? null : nodeId.trim();
+    }
+
+    public Long getStakingBlockNum() {
+        return stakingBlockNum;
+    }
+
+    public void setStakingBlockNum(Long stakingBlockNum) {
+        this.stakingBlockNum = stakingBlockNum;
     }
 
     /**
@@ -32,41 +32,40 @@ public class StakingKey {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     public enum Column {
-        stakingBlockNum("staking_block_num", "stakingBlockNum", "BIGINT", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
+        stakingBlockNum("staking_block_num", "stakingBlockNum", "BIGINT", false),
         stakingTxIndex("staking_tx_index", "stakingTxIndex", "INTEGER", false),
-        stakingAddr("staking_addr", "stakingAddr", "VARCHAR", false),
-        stakingHas("staking_has", "stakingHas", "VARCHAR", false),
-        stakingLocked("staking_locked", "stakingLocked", "VARCHAR", false),
+        stakingHes("staking_hes", "stakingHes", "DECIMAL", false),
+        stakingLocked("staking_locked", "stakingLocked", "DECIMAL", false),
+        stakingReduction("staking_reduction", "stakingReduction", "DECIMAL", false),
         stakingReductionEpoch("staking_reduction_epoch", "stakingReductionEpoch", "INTEGER", false),
-        stakingReduction("staking_reduction", "stakingReduction", "VARCHAR", false),
-        statDelegateHas("stat_delegate_has", "statDelegateHas", "VARCHAR", false),
-        statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "VARCHAR", false),
-        statDelegateReduction("stat_delegate_reduction", "statDelegateReduction", "VARCHAR", false),
-        statDelegateQty("stat_delegate_qty", "statDelegateQty", "INTEGER", false),
-        statVerifierTime("stat_verifier_time", "statVerifierTime", "INTEGER", false),
-        stakingName("staking_name", "stakingName", "VARCHAR", false),
-        stakingIcon("staking_icon", "stakingIcon", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
+        nodeIcon("node_icon", "nodeIcon", "VARCHAR", false),
         externalId("external_id", "externalId", "VARCHAR", false),
-        denefitAddr("denefit_addr", "denefitAddr", "VARCHAR", false),
-        expectedIncome("expected_income", "expectedIncome", "VARCHAR", false),
-        blockRewardValue("block_reward_value", "blockRewardValue", "VARCHAR", false),
-        preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
-        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
+        externalName("external_name", "externalName", "VARCHAR", false),
+        stakingAddr("staking_addr", "stakingAddr", "VARCHAR", false),
+        benefitAddr("benefit_addr", "benefitAddr", "VARCHAR", false),
+        annualizedRate("annualized_rate", "annualizedRate", "DOUBLE", false),
         programVersion("program_version", "programVersion", "VARCHAR", false),
-        stakingRewardValue("staking_reward_value", "stakingRewardValue", "VARCHAR", false),
+        bigVersion("big_version", "bigVersion", "VARCHAR", false),
         webSite("web_site", "webSite", "VARCHAR", false),
         details("details", "details", "VARCHAR", false),
         joinTime("join_time", "joinTime", "TIMESTAMP", false),
         leaveTime("leave_time", "leaveTime", "TIMESTAMP", false),
         status("status", "status", "INTEGER", true),
         isConsensus("is_consensus", "isConsensus", "INTEGER", false),
-        isSetting("is_setting", "isSetting", "INTEGER", false),
+        isSettle("is_settle", "isSettle", "INTEGER", false),
         isInit("is_init", "isInit", "INTEGER", false),
+        statDelegateHes("stat_delegate_hes", "statDelegateHes", "DECIMAL", false),
+        statDelegateLocked("stat_delegate_locked", "statDelegateLocked", "DECIMAL", false),
+        statDelegateReleased("stat_delegate_released", "statDelegateReleased", "DECIMAL", false),
+        blockRewardValue("block_reward_value", "blockRewardValue", "DECIMAL", false),
+        feeRewardValue("fee_reward_value", "feeRewardValue", "DECIMAL", false),
+        stakingRewardValue("staking_reward_value", "stakingRewardValue", "DECIMAL", false),
+        curConsBlockQty("cur_cons_block_qty", "curConsBlockQty", "BIGINT", false),
+        preConsBlockQty("pre_cons_block_qty", "preConsBlockQty", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        externalName("external_name", "externalName", "VARCHAR", false),
-        feeRewardValue("fee_reward_value", "feeRewardValue", "VARCHAR", false),
         annualizedRateInfo("annualized_rate_info", "annualizedRateInfo", "LONGVARCHAR", false);
 
         /**

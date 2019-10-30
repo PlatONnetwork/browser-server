@@ -29,9 +29,9 @@ public class CustomSlash extends Slash {
         this.setNodeId(param.getVerify());
         String date = JSON.toJSONString(param);
         this.setData(date);
-        this.setDenefitAddr(tx.getFrom());
-        this.setHash(tx.getHash());
-        this.setStatus(StatusEnum.SUCCESS.code);
+//        this.setDenefitAddr(tx.getFrom());
+//        this.setHash(tx.getHash());
+//        this.setStatus(StatusEnum.SUCCESS.code);
         this.setIsQuit(YesNoEnum.YES.code);
     }
 

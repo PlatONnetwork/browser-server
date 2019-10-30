@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingNode;
 import com.platon.browser.dto.CustomStaking;
 
 public class CustomStakingMapperTest extends TestBase {

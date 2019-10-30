@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomStakingMapper">
+  <resultMap id="BaseResultMap" type="com.platon.browser.dto.CustomStaking" extends="com.platon.browser.dao.mapper.StakingMapper.ResultMapWithBLOBs"/>
+  <resultMap id="AndNodeResultMap" type="com.platon.browser.dao.entity.StakingNode">
+    <id column="staking_block_num" jdbcType="BIGINT" property="stakingBlockNum" />
+    <id column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="disnodeid" jdbcType="VARCHAR" property="disnodeid" />
+    <result column="allDelegate" jdbcType="VARCHAR" property="allDelegate" />
+    <result column="allDelegateQty" jdbcType="INTEGER" property="allDelegateQty" />
+    <result column="staking_tx_index" jdbcType="INTEGER" property="stakingTxIndex" />
+    <result column="staking_addr" jdbcType="VARCHAR" property="stakingAddr" />
+    <result column="staking_has" jdbcType="VARCHAR" property="stakingHas" />
+    <result column="staking_locked" jdbcType="VARCHAR" property="stakingLocked" />
+    <result column="staking_reduction_epoch" jdbcType="INTEGER" property="stakingReductionEpoch" />
+    <result column="staking_reduction" jdbcType="VARCHAR" property="stakingReduction" />
+    <result column="stat_delegate_has" jdbcType="VARCHAR" property="statDelegateHas" />
+    <result column="stat_delegate_locked" jdbcType="VARCHAR" property="statDelegateLocked" />
+    <result column="stat_delegate_reduction" jdbcType="VARCHAR" property="statDelegateReduction" />
+    <result column="stat_delegate_qty" jdbcType="INTEGER" property="statDelegateQty" />
+    <result column="stat_verifier_time" jdbcType="INTEGER" property="statVerifierTime" />
+    <result column="staking_name" jdbcType="VARCHAR" property="stakingName" />
+    <result column="staking_icon" jdbcType="VARCHAR" property="stakingIcon" />
+    <result column="external_id" jdbcType="VARCHAR" property="externalId" />
+    <result column="denefit_addr" jdbcType="VARCHAR" property="denefitAddr" />
+    <result column="expected_income" jdbcType="VARCHAR" property="expectedIncome" />
+    <result column="block_reward_value" jdbcType="VARCHAR" property="blockRewardValue" />
+    <result column="pre_set_block_reward_value" jdbcType="VARCHAR" property="preSetBlockRewardValue" />
+    <result column="pre_cons_block_qty" jdbcType="BIGINT" property="preConsBlockQty" />
+    <result column="cur_cons_block_qty" jdbcType="BIGINT" property="curConsBlockQty" />
+    <result column="program_version" jdbcType="VARCHAR" property="programVersion" />
+    <result column="staking_reward_value" jdbcType="VARCHAR" property="stakingRewardValue" />
+    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
+    <result column="details" jdbcType="VARCHAR" property="details" />
+    <result column="join_time" jdbcType="TIMESTAMP" property="joinTime" />
+    <result column="leave_time" jdbcType="TIMESTAMP" property="leaveTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="is_consensus" jdbcType="INTEGER" property="isConsensus" />
+    <result column="is_setting" jdbcType="INTEGER" property="isSetting" />
+    <result column="is_init" jdbcType="INTEGER" property="isInit" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="node_node_id" jdbcType="VARCHAR" property="nodeNodeId" />
+    <result column="stat_slash_multi_qty" jdbcType="INTEGER" property="statSlashMultiQty" />
+    <result column="stat_slash_low_qty" jdbcType="INTEGER" property="statSlashLowQty" />
+    <result column="stat_block_qty" jdbcType="BIGINT" property="statBlockQty" />
+    <result column="stat_expect_block_qty" jdbcType="BIGINT" property="statExpectBlockQty" />
+    <result column="stat_reward_value" jdbcType="VARCHAR" property="statRewardValue" />
+    <result column="node_stat_verifier_time" jdbcType="INTEGER" property="nodeStatVerifierTime" />
+    <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
+    <result column="node_create_time" jdbcType="TIMESTAMP" property="nodeCreateTime" />
+    <result column="node_update_time" jdbcType="TIMESTAMP" property="nodeUpdateTime" />
+    <result column="external_name" jdbcType="VARCHAR" property="externalName" />
+    <result column="fee_reward_value" jdbcType="VARCHAR" property="feeRewardValue" />
+  </resultMap>
+  <select id="selectByNodeId" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
+    ,
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Blob_Column_List" />
+    from staking where node_id = #{nodeId}
+  </select>
+  <select id="selectByNodeIdList" resultMap="BaseResultMap">
+    select
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Base_Column_List" />
+    ,
+    <include refid="com.platon.browser.dao.mapper.StakingMapper.Blob_Column_List" />
+    from staking where node_id IN (<foreach collection="nodeIds" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+  </select>
+  <!--批量选择性插入或更新-->
+  <insert id="batchInsertOrUpdateSelective" parameterType="map">
+    replace into staking (
+    <foreach collection="selective" item="column" separator=",">
+      ${column.escapedColumnName}
+    </foreach>
+    )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      <foreach collection="selective" item="column" separator=",">
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
+        </if>
+        <if test="'node_id'.toString() == column.value">
+          #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_tx_index'.toString() == column.value">
+          #{item.stakingTxIndex,jdbcType=INTEGER}
+        </if>
+        <if test="'staking_addr'.toString() == column.value">
+          #{item.stakingAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_has'.toString() == column.value">
+          #{item.stakingHas,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_locked'.toString() == column.value">
+          #{item.stakingLocked,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_reduction_epoch'.toString() == column.value">
+          #{item.stakingReductionEpoch,jdbcType=INTEGER}
+        </if>
+        <if test="'staking_reduction'.toString() == column.value">
+          #{item.stakingReduction,jdbcType=VARCHAR}
+        </if>
+        <if test="'stat_delegate_has'.toString() == column.value">
+          #{item.statDelegateHas,jdbcType=VARCHAR}
+        </if>
+        <if test="'stat_delegate_locked'.toString() == column.value">
+          #{item.statDelegateLocked,jdbcType=VARCHAR}
+        </if>
+        <if test="'stat_delegate_reduction'.toString() == column.value">
+          #{item.statDelegateReduction,jdbcType=VARCHAR}
+        </if>
+        <if test="'stat_delegate_qty'.toString() == column.value">
+          #{item.statDelegateQty,jdbcType=INTEGER}
+        </if>
+        <if test="'stat_verifier_time'.toString() == column.value">
+          #{item.statVerifierTime,jdbcType=INTEGER}
+        </if>
+        <if test="'staking_name'.toString() == column.value">
+          #{item.stakingName,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_icon'.toString() == column.value">
+          #{item.stakingIcon,jdbcType=VARCHAR}
+        </if>
+        <if test="'external_id'.toString() == column.value">
+          #{item.externalId,jdbcType=VARCHAR}
+        </if>
+        <if test="'denefit_addr'.toString() == column.value">
+          #{item.denefitAddr,jdbcType=VARCHAR}
+        </if>
+        <if test="'expected_income'.toString() == column.value">
+          #{item.expectedIncome,jdbcType=VARCHAR}
+        </if>
+        <if test="'block_reward_value'.toString() == column.value">
+          #{item.blockRewardValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'pre_cons_block_qty'.toString() == column.value">
+          #{item.preConsBlockQty,jdbcType=BIGINT}
+        </if>
+        <if test="'cur_cons_block_qty'.toString() == column.value">
+          #{item.curConsBlockQty,jdbcType=BIGINT}
+        </if>
+        <if test="'program_version'.toString() == column.value">
+          #{item.programVersion,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_reward_value'.toString() == column.value">
+          #{item.stakingRewardValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'web_site'.toString() == column.value">
+          #{item.webSite,jdbcType=VARCHAR}
+        </if>
+        <if test="'details'.toString() == column.value">
+          #{item.details,jdbcType=VARCHAR}
+        </if>
+        <if test="'join_time'.toString() == column.value">
+          #{item.joinTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'leave_time'.toString() == column.value">
+          #{item.leaveTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'status'.toString() == column.value">
+          #{item.status,jdbcType=INTEGER}
+        </if>
+        <if test="'is_consensus'.toString() == column.value">
+          #{item.isConsensus,jdbcType=INTEGER}
+        </if>
+        <if test="'is_setting'.toString() == column.value">
+          #{item.isSetting,jdbcType=INTEGER}
+        </if>
+        <if test="'is_init'.toString() == column.value">
+          #{item.isInit,jdbcType=INTEGER}
+        </if>
+        <if test="'create_time'.toString() == column.value">
+          #{item.createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'update_time'.toString() == column.value">
+          #{item.updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="'external_name'.toString() == column.value">
+          #{item.externalName,jdbcType=VARCHAR}
+        </if>
+        <if test="'fee_reward_value'.toString() == column.value">
+          #{item.feeRewardValue,jdbcType=VARCHAR}
+        </if>
+        <if test="'annualized_rate_info'.toString() == column.value">
+          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        </if>
+      </foreach>
+      )
+    </foreach>
+  </insert>
+  <select id="selectStakingAndNodeByExample" resultMap="AndNodeResultMap">
+    select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
+    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
+    from staking s left join node n on s.node_id = n.node_id
+    <where>
+        <if test="nodeId != null">
+            and s.node_id = #{nodeId,jdbcType=VARCHAR}
+        </if>
+    	<if test="name != null and name != ''">
+    		and s.staking_name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+    	</if>
+    	<if test="status != null">
+    		and s.status = #{status,jdbcType=INTEGER}
+    	</if>
+    	<if test="isConsensus != null">
+    		and s.is_consensus = #{isConsensus,jdbcType=INTEGER}
+    	</if>
+    	<if test="isSetting != null">
+    		and s.is_setting = #{isSetting,jdbcType=INTEGER}
+    	</if>
+    </where>
+    order by s.program_version desc,cast(s.staking_has as Decimal(30)) + cast(staking_locked as Decimal(30)) +
+    cast(stat_delegate_has as Decimal(30)) + cast(stat_delegate_locked as Decimal(30)) desc, s.staking_block_num ,s.staking_tx_index desc
+  </select>
+  <select id="selectStakingAndNodeByNodeId" resultMap="AndNodeResultMap">
+    select allDelegate,allDelegateQty,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
+    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
+    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate,
+    sum(sng.stat_delegate_qty) as allDelegateQty from (SELECT s.*
+FROM staking s
+    <where>
+        <if test="nodeId != null">
+            and s.node_id = #{nodeId,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn left join node n on sn.node_id = n.node_id
+  </select>
+  <select id="selectStakingAndNodeActive" resultMap="AndNodeResultMap">
+    select s.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
+    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
+    from  staking s left join node n on s.node_id = n.node_id
+    <where>
+        <if test="nodeId != null">
+            and s.node_id = #{nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="status != null">
+    		and s.status = #{status,jdbcType=INTEGER}
+    	</if>
+    </where>
+  </select>
+  <select id="selectHistoryNode" resultMap="AndNodeResultMap">
+    select sn.node_id as disnodeid,allDelegate,sn.*,n.stat_slash_multi_qty, n.stat_slash_low_qty, n.stat_block_qty, n.stat_expect_block_qty,
+    n.stat_reward_value, n.stat_verifier_time as node_stat_verifier_time, n.is_recommend, n.create_time as node_create_time, n.update_time as node_update_time
+    from (select sng.*,sum(cast(sng.stat_delegate_has as Decimal(30)) + cast(sng.stat_delegate_locked as Decimal(30)))  as allDelegate from (SELECT s.*
+FROM staking s
+    <where>
+    	<if test="statusList != null and statusList.size() > 0">
+    		s.status in
+    		<foreach collection="statusList" item="item" index="index" open="(" close=")" separator=",">
+	 			#{item,jdbcType=INTEGER}
+			</foreach>
+    	</if>
+    	<if test="key != null and key != ''">
+    		and s.staking_name like CONCAT('%',#{key},'%')
+    	</if>
+    	and s.node_id not in  (select s1.node_id from staking s1 where s1.status = 1 )
+    </where>
+    order by s.leave_time desc limit 999999) sng GROUP BY sng.node_id ) sn LEFT JOIN node n ON sn.node_id = n.node_id
+  </select>
+  
+  <select id="selectSumExitDelegate" resultType="string">
+  	SELECT SUM(stat_delegate_has+stat_delegate_locked+stat_delegate_reduction) sumDelegate 
+	FROM staking WHERE `status` in (2,3)
+  </select>
+  
+</mapper>

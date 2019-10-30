@@ -7,19 +7,19 @@ import java.util.Date;
 public class Proposal {
     private String hash;
 
-    private String type;
+    private Integer type;
 
-    private String verifier;
+    private String nodeId;
 
-    private String verifierName;
+    private String nodeName;
 
     private String url;
 
     private String newVersion;
 
-    private String endVotingBlock;
+    private Long endVotingBlock;
 
-    private String activeBlock;
+    private Long activeBlock;
 
     private Date timestamp;
 
@@ -33,10 +33,6 @@ public class Proposal {
 
     private Integer status;
 
-    private Date updateTime;
-
-    private Date createTime;
-
     private String pipNum;
 
     private String pipId;
@@ -49,7 +45,11 @@ public class Proposal {
 
     private String canceledTopic;
 
-    private String blockNumber;
+    private Long blockNumber;
+
+    private Date createTime;
+
+    private Date updateTime;
 
     public String getHash() {
         return hash;
@@ -59,28 +59,28 @@ public class Proposal {
         this.hash = hash == null ? null : hash.trim();
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type == null ? null : type.trim();
+    public void setType(Integer type) {
+        this.type = type;
     }
 
-    public String getVerifier() {
-        return verifier;
+    public String getNodeId() {
+        return nodeId;
     }
 
-    public void setVerifier(String verifier) {
-        this.verifier = verifier == null ? null : verifier.trim();
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId == null ? null : nodeId.trim();
     }
 
-    public String getVerifierName() {
-        return verifierName;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public void setVerifierName(String verifierName) {
-        this.verifierName = verifierName == null ? null : verifierName.trim();
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName == null ? null : nodeName.trim();
     }
 
     public String getUrl() {
@@ -99,20 +99,20 @@ public class Proposal {
         this.newVersion = newVersion == null ? null : newVersion.trim();
     }
 
-    public String getEndVotingBlock() {
+    public Long getEndVotingBlock() {
         return endVotingBlock;
     }
 
-    public void setEndVotingBlock(String endVotingBlock) {
-        this.endVotingBlock = endVotingBlock == null ? null : endVotingBlock.trim();
+    public void setEndVotingBlock(Long endVotingBlock) {
+        this.endVotingBlock = endVotingBlock;
     }
 
-    public String getActiveBlock() {
+    public Long getActiveBlock() {
         return activeBlock;
     }
 
-    public void setActiveBlock(String activeBlock) {
-        this.activeBlock = activeBlock == null ? null : activeBlock.trim();
+    public void setActiveBlock(Long activeBlock) {
+        this.activeBlock = activeBlock;
     }
 
     public Date getTimestamp() {
@@ -163,22 +163,6 @@ public class Proposal {
         this.status = status;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
     public String getPipNum() {
         return pipNum;
     }
@@ -227,12 +211,28 @@ public class Proposal {
         this.canceledTopic = canceledTopic == null ? null : canceledTopic.trim();
     }
 
-    public String getBlockNumber() {
+    public Long getBlockNumber() {
         return blockNumber;
     }
 
-    public void setBlockNumber(String blockNumber) {
-        this.blockNumber = blockNumber == null ? null : blockNumber.trim();
+    public void setBlockNumber(Long blockNumber) {
+        this.blockNumber = blockNumber;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     /**
@@ -244,28 +244,28 @@ public class Proposal {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        type("type", "type", "VARCHAR", true),
-        verifier("verifier", "verifier", "VARCHAR", false),
-        verifierName("verifier_name", "verifierName", "VARCHAR", false),
+        type("type", "type", "INTEGER", true),
+        nodeId("node_id", "nodeId", "VARCHAR", false),
+        nodeName("node_name", "nodeName", "VARCHAR", false),
         url("url", "url", "VARCHAR", false),
         newVersion("new_version", "newVersion", "VARCHAR", false),
-        endVotingBlock("end_voting_block", "endVotingBlock", "VARCHAR", false),
-        activeBlock("active_block", "activeBlock", "VARCHAR", false),
+        endVotingBlock("end_voting_block", "endVotingBlock", "BIGINT", false),
+        activeBlock("active_block", "activeBlock", "BIGINT", false),
         timestamp("timestamp", "timestamp", "TIMESTAMP", true),
         yeas("yeas", "yeas", "BIGINT", false),
         nays("nays", "nays", "BIGINT", false),
         abstentions("abstentions", "abstentions", "BIGINT", false),
         accuVerifiers("accu_verifiers", "accuVerifiers", "BIGINT", false),
         status("status", "status", "INTEGER", true),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
         pipNum("pip_num", "pipNum", "VARCHAR", false),
         pipId("pip_id", "pipId", "VARCHAR", false),
         topic("topic", "topic", "VARCHAR", false),
         description("description", "description", "VARCHAR", false),
         canceledPipId("canceled_pip_id", "canceledPipId", "VARCHAR", false),
         canceledTopic("canceled_topic", "canceledTopic", "VARCHAR", false),
-        blockNumber("block_number", "blockNumber", "VARCHAR", false);
+        blockNumber("block_number", "blockNumber", "BIGINT", false),
+        createTime("create_time", "createTime", "TIMESTAMP", false),
+        updateTime("update_time", "updateTime", "TIMESTAMP", false);
 
         /**
          * This field was generated by MyBatis Generator.

@@ -1,4 +1,4 @@
-//package com.platon.browser.data;
+package com.platon.browser.data;//package com.platon.browser.data;
 //
 //import org.junit.Before;
 //import org.junit.Test;

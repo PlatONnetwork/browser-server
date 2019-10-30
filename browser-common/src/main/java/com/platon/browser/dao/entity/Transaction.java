@@ -1,5 +1,6 @@
 package com.platon.browser.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -7,41 +8,41 @@ import java.util.Date;
 public class Transaction {
     private String hash;
 
-    private Long blockNumber;
+    private String bHash;
 
-    private String blockHash;
+    private Long num;
 
-    private Integer transactionIndex;
+    private Integer index;
 
-    private Date timestamp;
+    private Date time;
 
     private String nonce;
 
-    private Integer txReceiptStatus;
+    private Integer status;
 
-    private String gasPrice;
+    private BigDecimal gasPrice;
 
-    private String gasUsed;
+    private BigDecimal gasUsed;
 
-    private String gasLimit;
+    private BigDecimal gasLimit;
 
     private String from;
 
     private String to;
 
-    private String value;
+    private BigDecimal value;
 
-    private String txType;
+    private String type;
 
-    private String actualTxCost;
+    private BigDecimal cost;
 
-    private String receiveType;
+    private Integer toType;
 
-    private Long sequence;
+    private Long seq;
 
-    private Date createTime;
+    private Date creTime;
 
-    private Date updateTime;
+    private Date updTime;
 
     public String getHash() {
         return hash;
@@ -51,36 +52,36 @@ public class Transaction {
         this.hash = hash == null ? null : hash.trim();
     }
 
-    public Long getBlockNumber() {
-        return blockNumber;
+    public String getbHash() {
+        return bHash;
     }
 
-    public void setBlockNumber(Long blockNumber) {
-        this.blockNumber = blockNumber;
+    public void setbHash(String bHash) {
+        this.bHash = bHash == null ? null : bHash.trim();
     }
 
-    public String getBlockHash() {
-        return blockHash;
+    public Long getNum() {
+        return num;
     }
 
-    public void setBlockHash(String blockHash) {
-        this.blockHash = blockHash == null ? null : blockHash.trim();
+    public void setNum(Long num) {
+        this.num = num;
     }
 
-    public Integer getTransactionIndex() {
-        return transactionIndex;
+    public Integer getIndex() {
+        return index;
     }
 
-    public void setTransactionIndex(Integer transactionIndex) {
-        this.transactionIndex = transactionIndex;
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public Date getTime() {
+        return time;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     public String getNonce() {
@@ -91,36 +92,36 @@ public class Transaction {
         this.nonce = nonce == null ? null : nonce.trim();
     }
 
-    public Integer getTxReceiptStatus() {
-        return txReceiptStatus;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setTxReceiptStatus(Integer txReceiptStatus) {
-        this.txReceiptStatus = txReceiptStatus;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public String getGasPrice() {
+    public BigDecimal getGasPrice() {
         return gasPrice;
     }
 
-    public void setGasPrice(String gasPrice) {
-        this.gasPrice = gasPrice == null ? null : gasPrice.trim();
+    public void setGasPrice(BigDecimal gasPrice) {
+        this.gasPrice = gasPrice;
     }
 
-    public String getGasUsed() {
+    public BigDecimal getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(String gasUsed) {
-        this.gasUsed = gasUsed == null ? null : gasUsed.trim();
+    public void setGasUsed(BigDecimal gasUsed) {
+        this.gasUsed = gasUsed;
     }
 
-    public String getGasLimit() {
+    public BigDecimal getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(String gasLimit) {
-        this.gasLimit = gasLimit == null ? null : gasLimit.trim();
+    public void setGasLimit(BigDecimal gasLimit) {
+        this.gasLimit = gasLimit;
     }
 
     public String getFrom() {
@@ -139,60 +140,60 @@ public class Transaction {
         this.to = to == null ? null : to.trim();
     }
 
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value == null ? null : value.trim();
+    public void setValue(BigDecimal value) {
+        this.value = value;
     }
 
-    public String getTxType() {
-        return txType;
+    public String getType() {
+        return type;
     }
 
-    public void setTxType(String txType) {
-        this.txType = txType == null ? null : txType.trim();
+    public void setType(String type) {
+        this.type = type == null ? null : type.trim();
     }
 
-    public String getActualTxCost() {
-        return actualTxCost;
+    public BigDecimal getCost() {
+        return cost;
     }
 
-    public void setActualTxCost(String actualTxCost) {
-        this.actualTxCost = actualTxCost == null ? null : actualTxCost.trim();
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 
-    public String getReceiveType() {
-        return receiveType;
+    public Integer getToType() {
+        return toType;
     }
 
-    public void setReceiveType(String receiveType) {
-        this.receiveType = receiveType == null ? null : receiveType.trim();
+    public void setToType(Integer toType) {
+        this.toType = toType;
     }
 
-    public Long getSequence() {
-        return sequence;
+    public Long getSeq() {
+        return seq;
     }
 
-    public void setSequence(Long sequence) {
-        this.sequence = sequence;
+    public void setSeq(Long seq) {
+        this.seq = seq;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreTime() {
+        return creTime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreTime(Date creTime) {
+        this.creTime = creTime;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Date getUpdTime() {
+        return updTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdTime(Date updTime) {
+        this.updTime = updTime;
     }
 
     /**
@@ -204,26 +205,26 @@ public class Transaction {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
-        blockNumber("block_number", "blockNumber", "BIGINT", false),
-        blockHash("block_hash", "blockHash", "VARCHAR", false),
-        transactionIndex("transaction_index", "transactionIndex", "INTEGER", false),
-        timestamp("timestamp", "timestamp", "TIMESTAMP", true),
+        bHash("b_hash", "bHash", "VARCHAR", false),
+        num("num", "num", "BIGINT", false),
+        index("index", "index", "INTEGER", true),
+        time("time", "time", "TIMESTAMP", true),
         nonce("nonce", "nonce", "VARCHAR", false),
-        txReceiptStatus("tx_receipt_status", "txReceiptStatus", "INTEGER", false),
-        gasPrice("gas_price", "gasPrice", "VARCHAR", false),
-        gasUsed("gas_used", "gasUsed", "VARCHAR", false),
-        gasLimit("gas_limit", "gasLimit", "VARCHAR", false),
+        status("status", "status", "INTEGER", true),
+        gasPrice("gas_price", "gasPrice", "DECIMAL", false),
+        gasUsed("gas_used", "gasUsed", "DECIMAL", false),
+        gasLimit("gas_limit", "gasLimit", "DECIMAL", false),
         from("from", "from", "VARCHAR", true),
         to("to", "to", "VARCHAR", true),
-        value("value", "value", "VARCHAR", true),
-        txType("tx_type", "txType", "VARCHAR", false),
-        actualTxCost("actual_tx_cost", "actualTxCost", "VARCHAR", false),
-        receiveType("receive_type", "receiveType", "VARCHAR", false),
-        sequence("sequence", "sequence", "BIGINT", true),
-        createTime("create_time", "createTime", "TIMESTAMP", false),
-        updateTime("update_time", "updateTime", "TIMESTAMP", false),
+        value("value", "value", "DECIMAL", true),
+        type("type", "type", "VARCHAR", true),
+        cost("cost", "cost", "DECIMAL", false),
+        toType("to_type", "toType", "INTEGER", false),
+        seq("seq", "seq", "BIGINT", false),
+        creTime("cre_time", "creTime", "TIMESTAMP", false),
+        updTime("upd_time", "updTime", "TIMESTAMP", false),
         input("input", "input", "LONGVARCHAR", true),
-        txInfo("tx_info", "txInfo", "LONGVARCHAR", false),
+        info("info", "info", "LONGVARCHAR", false),
         failReason("fail_reason", "failReason", "LONGVARCHAR", false);
 
         /**
