@@ -29,7 +29,7 @@ public class TransactionRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException {
+    ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException {
         log.debug("获取回执:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
         RpcParam param = new RpcParam();
         param.setMethod(RECEIPT_RPC_INTERFACE);
