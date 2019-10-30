@@ -5,7 +5,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.platon.browser.queue.event.collection.CollectionBlockEvent;
 import com.platon.browser.queue.event.collection.CollectionBlockEventBody;
 
-public class CollectionBlockEventProducerWithTranslator<B,R> {
+public class CollectionBlockEventProducerWithTranslator {
     private final RingBuffer<CollectionBlockEvent> ringBuffer;
     //一个translator可以看做一个事件初始化器，publicEvent方法会调用它
     //填充Event
