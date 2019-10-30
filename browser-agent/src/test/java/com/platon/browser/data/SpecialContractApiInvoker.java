@@ -11,9 +11,7 @@ import org.web3j.platon.contracts.NodeContract;
 import org.web3j.platon.contracts.ProposalContract;
 import org.web3j.platon.contracts.RestrictingPlanContract;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.http.HttpService;
-import sun.awt.EventQueueDelegate;
 
 import java.math.BigInteger;
 import java.util.List;
