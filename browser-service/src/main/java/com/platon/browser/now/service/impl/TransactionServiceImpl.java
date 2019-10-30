@@ -3,6 +3,7 @@ package com.platon.browser.now.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
@@ -94,7 +95,13 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionListResp> lists = this.tranferList(items);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
-        result.setTotalCount(transactionCacheDto.getPage().getTotalCount());
+        NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+        if(transactionCacheDto.getPage().getTotalCount() > BrowserConst.MAX_NUM) {
+        	result.setDisplayTotalCount(BrowserConst.MAX_NUM);
+        } else {
+        	result.setDisplayTotalCount(transactionCacheDto.getPage().getTotalCount());
+        }
+        result.setTotalCount(networkStat.getTxQty());
         result.setTotalPages(transactionCacheDto.getPage().getTotalPages());
         return result;
     }
