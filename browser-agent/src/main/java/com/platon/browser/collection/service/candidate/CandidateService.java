@@ -1,11 +1,10 @@
 package com.platon.browser.collection.service.candidate;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.web3j.platon.bean.Node;
 
-import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,41 +15,16 @@ import java.util.List;
  * a、当前共识周期验证人列表                                                       curValidators
  *    前一共识周期验证人列表                                                       preValidators
  * b、当前结算周期验证人列表                                                       curVerifiers
- *    前一结算周期验证人列表
+ *    前一结算周期验证人列表                                                       preVerifiers
  */
 @Slf4j
 @Service
 public class CandidateService {
-    /**
-     * 当前共识周期验证人列表
-     * @param blockNumber
-     * @return
-     */
-    public List<Node> getCurValidators(BigInteger blockNumber){
-        return Collections.EMPTY_LIST;
-    }
-    /**
-     * 前一共识周期验证人列表
-     * @param blockNumber
-     * @return
-     */
-    public List<Node> getPreValidators(BigInteger blockNumber){
-        return Collections.EMPTY_LIST;
-    }
-    /**
-     * 当前结算周期验证人列表
-     * @param blockNumber
-     * @return
-     */
-    public List<Node> getCurVerifiers(BigInteger blockNumber){
-        return Collections.EMPTY_LIST;
-    }
-    /**
-     * 前一结算周期验证人列表
-     * @param blockNumber
-     * @return
-     */
-    public List<Node> getPreVerifiers(BigInteger blockNumber){
-        return Collections.EMPTY_LIST;
-    }
+
+    @Getter private List<Node> curValidators; // 当前共识周期验证人列表
+    @Getter private List<Node> preValidators; // 前一共识周期验证人列表
+    @Getter private List<Node> curVerifiers; // 当前结算周期验证人列表
+    @Getter private List<Node> preVerifiers; // 前一结算周期验证人列表
+
+
 }

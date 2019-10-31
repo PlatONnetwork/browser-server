@@ -19,7 +19,7 @@ public class TransactionService {
     private TransactionRetryService retryService;
 
     /**
-     * 异步获取区块 persistent
+     * 异步获取区块
      */
     public CompletableFuture<ReceiptResult> getReceiptAsync(Long blockNumber) {
         return CompletableFuture.supplyAsync(()->{

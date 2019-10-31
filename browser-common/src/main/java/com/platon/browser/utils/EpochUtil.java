@@ -19,10 +19,11 @@ public class EpochUtil {
      * @param blockCountPerEpoch 每个周期的区块数量
      * @return
      */
-    public static Long getEpoch(BigInteger blockNumber, Long blockCountPerEpoch) throws BlockNumberException {
-        if(BigInteger.ZERO.compareTo(blockNumber)>=0||blockCountPerEpoch<=0) throw new BlockNumberException("区块号或周期区块数必须大于0");
-        BigDecimal epoch = new BigDecimal(blockNumber).divide(BigDecimal.valueOf(blockCountPerEpoch),0, RoundingMode.CEILING);
-        return epoch.longValue();
+    public static BigInteger getEpoch(BigInteger blockNumber, BigInteger blockCountPerEpoch) throws BlockNumberException {
+        if(BigInteger.ZERO.compareTo(blockCountPerEpoch)>=0) throw new BlockNumberException("周期区块数必须大于0");
+        if(BigInteger.ZERO.compareTo(blockNumber)>0) return BigInteger.ZERO;
+        BigDecimal epoch = new BigDecimal(blockNumber).divide(new BigDecimal(blockCountPerEpoch),0, RoundingMode.CEILING);
+        return epoch.toBigInteger();
     }
     /**
      * 取上一周期最后一个区块号
@@ -30,11 +31,12 @@ public class EpochUtil {
      * @param blockCountPerEpoch 每个周期的区块数量
      * @return
      */
-    public static BigInteger getPreEpochLastBlockNumber(BigInteger blockNumber, Long blockCountPerEpoch) throws BlockNumberException {
-        Long curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
-        if(curEpoch<=0) throw new BlockNumberException("当前周期为("+curEpoch+"),没有上一周期");
-        Long prevEpoch = curEpoch-1;
-        return BigInteger.valueOf(prevEpoch*blockCountPerEpoch);
+    public static BigInteger getPreEpochLastBlockNumber(BigInteger blockNumber, BigInteger blockCountPerEpoch) throws BlockNumberException {
+        BigInteger curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
+        if(BigInteger.ZERO.compareTo(curEpoch)>0) throw new BlockNumberException("当前周期为("+curEpoch+"),没有上一周期");
+        if(BigInteger.ZERO.compareTo(curEpoch)==0) return curEpoch;
+        BigInteger prevEpoch = curEpoch.subtract(BigInteger.ONE);
+        return prevEpoch.multiply(blockCountPerEpoch);
     }
 
     /**
@@ -43,8 +45,8 @@ public class EpochUtil {
      * @param blockCountPerEpoch 每个周期的区块数量
      * @return
      */
-    public static BigInteger getCurEpochLastBlockNumber(BigInteger blockNumber, Long blockCountPerEpoch) throws BlockNumberException {
-        Long curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
-        return BigInteger.valueOf(curEpoch*blockCountPerEpoch);
+    public static BigInteger getCurEpochLastBlockNumber(BigInteger blockNumber, BigInteger blockCountPerEpoch) throws BlockNumberException {
+        BigInteger curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
+        return curEpoch.multiply(blockCountPerEpoch);
     }
 }

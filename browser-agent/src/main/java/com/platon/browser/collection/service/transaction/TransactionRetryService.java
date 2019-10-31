@@ -23,9 +23,9 @@ public class TransactionRetryService {
     private PlatOnClient client;
 
     /**
-     * 根据区块号获取区块内所有交易的回执信息
+     * 带有重试功能的根据区块号获取区块内所有交易的回执信息
      * @param blockNumber
-     * @return 带有交易回扏信息
+     * @return 交易回扏信息
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
