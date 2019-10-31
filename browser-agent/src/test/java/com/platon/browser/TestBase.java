@@ -1,6 +1,8 @@
 package com.platon.browser;//package com.platon.browser;
 
 
+import com.platon.browser.common.enums.AppStatus;
+
 /**
  * @Auther: Chendongming
  * @Date: 2019/9/7 16:35
@@ -9,7 +11,7 @@ package com.platon.browser;//package com.platon.browser;
 public class TestBase {
 
     static {
-        System.setProperty("START_APP","false");
+        System.setProperty(AppStatus.class.getName(),AppStatus.STOP.name());
     }
 
     /*private static Logger logger = LoggerFactory.getLogger(TestBase.class);

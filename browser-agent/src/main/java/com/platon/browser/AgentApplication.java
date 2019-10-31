@@ -6,6 +6,7 @@ import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.application.CollectionBlockEventPublisher;
 import com.platon.browser.collection.service.BlockService;
 import com.platon.browser.collection.service.TransactionService;
+import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
 import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
@@ -53,8 +54,8 @@ public class AgentApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		String isStart = System.getProperty("START_APP");
-		if(StringUtils.isNotBlank(isStart)&&!Boolean.valueOf(isStart)) return;
+		String status = System.getProperty(AppStatus.class.getName());
+		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
 
 		for (;true;){
 			try {
