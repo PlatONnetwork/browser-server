@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service;
+package com.platon.browser.collection.service.transaction;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.RpcParam;

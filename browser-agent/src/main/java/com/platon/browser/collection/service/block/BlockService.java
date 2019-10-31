@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service;
+package com.platon.browser.collection.service.block;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
