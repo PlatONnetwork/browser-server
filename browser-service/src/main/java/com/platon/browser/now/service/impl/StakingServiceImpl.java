@@ -207,7 +207,7 @@ public class StakingServiceImpl implements StakingService {
 		/**
 		 * 先查询是否活跃节点，查不到再查询是否历史汇总
 		 */
-		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeActive(nodeId, StatusEnum.CANDIDATE.getCode());
+		List<StakingNode> stakings = customStakingMapper.selectStakingAndNodeActive(nodeId);
 		if(stakings == null || stakings.isEmpty()) {
 			/**
 			 * 历史详情汇总查询

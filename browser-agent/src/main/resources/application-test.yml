@@ -16,7 +16,7 @@ spring:
 #    database: 0
 #ES配置
 elasticsearch:
-  hosts: 192.168.120.172
+  hosts: 192.168.120.103,192.168.120.104,192.168.120.105
   port: 9200
   schema: http
   blockIndexName: browser_block_1

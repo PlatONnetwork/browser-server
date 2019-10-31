@@ -13,6 +13,9 @@ import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
+import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.dto.ESSortDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
@@ -34,6 +37,7 @@ import com.platon.browser.util.*;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -52,8 +56,10 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 交易方法逻辑实现
@@ -66,8 +72,10 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
+//    @Autowired
+//    private TransactionMapper transactionMapper;
     @Autowired
-    private TransactionMapper transactionMapper;
+    private TransactionESRepository transactionESRepository;
     @Autowired
     private I18nUtil i18n;
     @Autowired
@@ -106,15 +114,23 @@ public class TransactionServiceImpl implements TransactionService {
         if (req.getTxType() != null && !req.getTxType().isEmpty()) {
             criteria.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         }
-        PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        /** 根据区块号和类型分页查询交易信息 */
-        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        List<TransactionListResp> lists = this.tranferList(items);
+//        PageHelper.startPage(req.getPageNo(),req.getPageSize());
+//        /** 根据区块号和类型分页查询交易信息 */
+//        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
+        
+        Map<String, Object> filter = new HashMap<>();
+		filter.put("num", req.getBlockNumber().longValue());
+        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		try {
+			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+		} catch (IOException e) {
+			logger.error("查询es交易信息错误", e);
+		}
+        List<TransactionListResp> lists = this.tranferList(items.getRsData());
         /** 统计交易信息 */
-        long count  = transactionMapper.countByExample(transactionExample);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
-        result.setTotalCount(count);
+        result.setTotalCount(items.getTotal());
         return result;
     }
 
@@ -123,7 +139,7 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
 
         TransactionExample transactionExample = new TransactionExample();
-        transactionExample.setOrderByClause(" sequence desc");
+        transactionExample.setOrderByClause("sequence desc");
         /** 地址信息可能是from也可能是to */
         TransactionExample.Criteria first = transactionExample.createCriteria()
                 .andFromEqualTo(req.getAddress());
@@ -133,16 +149,23 @@ public class TransactionServiceImpl implements TransactionService {
         	first.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         	second.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
         }
-        PageHelper.startPage(req.getPageNo(),req.getPageSize());
+//        PageHelper.startPage(req.getPageNo(),req.getPageSize());
         transactionExample.or(second);
         /** 根据地址查询分页交易信息 */
-        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
-        List<TransactionListResp> lists = this.tranferList(items);
-        /** 查询总数 */
-        long count  = transactionMapper.countByExample(transactionExample);
+//        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
+        
+        Map<String, Object> filter = new HashMap<>();
+//		filter.put("num", req.getBlockNumber().longValue());
+        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		try {
+			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+		} catch (IOException e) {
+			logger.error("查询es交易信息错误", e);
+		}
+        List<TransactionListResp> lists = this.tranferList(items.getRsData());
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
-        result.setTotalCount(count);
+        result.setTotalCount(items.getTotal());
         return result;
     }
 
@@ -177,9 +200,20 @@ public class TransactionServiceImpl implements TransactionService {
         /** 限制最多导出3万条记录 */
         PageHelper.startPage(1,30000);
         transactionExample.or(second);
-        List<Transaction> items = transactionMapper.selectByExample(transactionExample);
+//        List<Transaction> items = transactionMapper.selectByExample(transactionExample);
+        
+        Map<String, Object> filter = new HashMap<>();
+//		filter.put("num", req.getBlockNumber().longValue());
+        List<ESSortDto> esSortDtos = new ArrayList<>();
+        esSortDtos.add(new ESSortDto("seq", SortOrder.DESC));
+        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		try {
+			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, esSortDtos, 1,30000);
+		} catch (IOException e) {
+			logger.error("查询es交易信息错误", e);
+		}
         List<Object[]> rows = new ArrayList<>();
-        items.forEach(transaction -> {
+        items.getRsData().forEach(transaction -> {
         	/**
         	 * 判断是否为to地址
         	 * 如果为to地址则导出报表为收入金额
@@ -236,9 +270,19 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDetailsResp transactionDetails( TransactionDetailsReq req) {
     	/** 根据hash查询具体的交易数据 */
-    	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
+//    	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
+    	
+    	Map<String, Object> filter = new HashMap<>();
+		filter.put("hash", req.getTxHash());
+        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		try {
+			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, 1,1);
+		} catch (IOException e) {
+			logger.error("查询es交易信息错误", e);
+		}
     	TransactionDetailsResp resp = new TransactionDetailsResp();
-    	if(transaction!=null) {
+    	if(items!=null && items.getRsData().size() > 0) {
+    		TransactionWithBLOBs transaction = items.getRsData().get(0);
     		BeanUtils.copyProperties(transaction, resp);
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
@@ -261,28 +305,28 @@ public class TransactionServiceImpl implements TransactionService {
     		 * "first":false,            //是否第一条记录
     		 * "last":true,              //是否最后一条记录
     		 */
-    		TransactionExample condition = new TransactionExample();
-    		condition.createCriteria().andSeqLessThan(transaction.getSeq());
-    		condition.setOrderByClause("sequence DESC");
-    		PageHelper.startPage(1,1);
-    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应父hash */
-    		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
-    		if(transactionList.isEmpty()){
-    			resp.setFirst(true);
-    		}else {
-    			resp.setPreHash(transactionList.get(0).getHash());
-    		}
-    		condition = new TransactionExample();
-    		condition.createCriteria().andSeqGreaterThan(transaction.getSeq());
-    		condition.setOrderByClause("sequence ASC");
-    		PageHelper.startPage(1,1);
-    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应下一个hash */
-    		transactionList = transactionMapper.selectByExample(condition);
-    		if(transactionList.isEmpty()){
-    			resp.setLast(true);
-    		}else {
-    			resp.setNextHash(transactionList.get(0).getHash());
-    		}
+//    		TransactionExample condition = new TransactionExample();
+//    		condition.createCriteria().andSeqLessThan(transaction.getSeq());
+//    		condition.setOrderByClause("sequence DESC");
+//    		PageHelper.startPage(1,1);
+//    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应父hash */
+//    		List<Transaction> transactionList = transactionMapper.selectByExample(condition);
+//    		if(transactionList.isEmpty()){
+//    			resp.setFirst(true);
+//    		}else {
+//    			resp.setPreHash(transactionList.get(0).getHash());
+//    		}
+//    		condition = new TransactionExample();
+//    		condition.createCriteria().andSeqGreaterThan(transaction.getSeq());
+//    		condition.setOrderByClause("sequence ASC");
+//    		PageHelper.startPage(1,1);
+//    		/** 倒序查询交易数据，判断是否第一条交易记录，不为第一条则设置对应下一个hash */
+//    		transactionList = transactionMapper.selectByExample(condition);
+//    		if(transactionList.isEmpty()){
+//    			resp.setLast(true);
+//    		}else {
+//    			resp.setNextHash(transactionList.get(0).getHash());
+//    		}
     		String txInfo = transaction.getInfo();
     		/** 根据不同交易类型判断逻辑 */
     		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
@@ -507,8 +551,17 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req) {
     	TransactionListResp resp = new TransactionListResp();
     	/** 根据hash查询交易具体指 */
-    	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
-    	if(currentDetail != null) {
+//    	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
+    	Map<String, Object> filter = new HashMap<>();
+		filter.put("hash", req.getTxHash());
+        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		try {
+			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, 1,1);
+		} catch (IOException e) {
+			logger.error("查询es交易信息错误", e);
+		}
+    	if(items.getRsData() != null && items.getRsData().size() > 0) {
+    		TransactionWithBLOBs currentDetail = items.getRsData().get(0);
 	    	TransactionExample condition = new TransactionExample();
 	    	TransactionExample.Criteria criteria = condition.createCriteria();
 	    	/** 区分是上一条数据还是下一条数据 */
@@ -520,16 +573,15 @@ public class TransactionServiceImpl implements TransactionService {
 				criteria.andSeqGreaterThan(currentDetail.getSeq());
 				condition.setOrderByClause("sequence asc");
 			}
-	    	PageHelper.startPage(1,1);
-	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-	    	if(!transactions.isEmpty()){
-	    		/** 获取数据第一条进行转换对象 */
-	        	TransactionWithBLOBs transaction = transactions.get(0);
-	        	BeanUtils.copyProperties(transaction, resp);
-	        	resp.setTxHash(transaction.getHash());
-	        	resp.setServerTime(new Date().getTime());
-	        	resp.setTimestamp(transaction.getTime().getTime());
-	    	}
+//	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
+//	    	if(!transactions.isEmpty()){
+//	    		/** 获取数据第一条进行转换对象 */
+//	        	TransactionWithBLOBs transaction = transactions.get(0);
+//	        	BeanUtils.copyProperties(transaction, resp);
+//	        	resp.setTxHash(transaction.getHash());
+//	        	resp.setServerTime(new Date().getTime());
+//	        	resp.setTimestamp(transaction.getTime().getTime());
+//	    	}
     	}
     	return resp;
     }

@@ -1,16 +1,14 @@
 package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.common.BrowserConst;
 import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.BlockExample;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.mapper.BlockMapper;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.dto.ESSortDto;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
-import com.platon.browser.enums.RetEnum;
-import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.BlockService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.req.PageReq;
@@ -26,6 +24,8 @@ import com.platon.browser.util.EnergonUtil;
 import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -42,8 +42,10 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  区块方法逻辑具体实现
@@ -60,8 +62,11 @@ public class BlockServiceImpl implements BlockService {
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 
+//	@Autowired
+//	private BlockMapper blockMapper;
+	
 	@Autowired
-	private BlockMapper blockMapper;
+	private BlockESRepository blockESRepository;
 
 	@Autowired
 	private I18nUtil i18n;
@@ -105,11 +110,15 @@ public class BlockServiceImpl implements BlockService {
 			}
 		} else {
 			/** 查询超过五十万条数据，根据区块号倒序 */
-			BlockExample blockExample = new BlockExample();
-			blockExample.setOrderByClause(" number desc");
-			PageHelper.startPage(req.getPageNo(), req.getPageSize());
-			List<Block> blocks = blockMapper.selectByExample(blockExample);
-			for(Block block:blocks) {
+			List<ESSortDto> esSortDtos = new ArrayList<>();
+			esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+			ESResult<Block> blocks = new ESResult<>();
+			try {
+				blocks = blockESRepository.search(null, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
+			} catch (IOException e) {
+				logger.error("获取区块错误。", e);
+			}
+			for(Block block:blocks.getRsData()) {
 				BlockListResp blockListNewResp = new BlockListResp();
 				BeanUtils.copyProperties(block, blockListNewResp);
 				blockListNewResp.setServerTime(new Date().getTime());
@@ -125,18 +134,21 @@ public class BlockServiceImpl implements BlockService {
 
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
-		/** 更具nodeId 查询区块列表，以区块号倒序  */
-		BlockExample blockExample = new BlockExample();
-		blockExample.setOrderByClause("number desc ");
-		BlockExample.Criteria criteria = blockExample.createCriteria();
-		criteria.andNodeIdEqualTo(req.getNodeId());
-		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-		Page<Block> blockPage = blockMapper.selectByExample(blockExample);
+		/** 根据nodeId 查询区块列表，以区块号倒序  */
+		Map<String, Object> filter = new HashMap<>();
+		filter.put("nodeId", req.getNodeId());
+		List<ESSortDto> esSortDtos = new ArrayList<>();
+		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+		ESResult<Block> blocks = new ESResult<>();
+		try {
+			blocks = blockESRepository.search(filter, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
+		} catch (IOException e) {
+			logger.error("获取区块错误。", e);
+		}
 		/** 初始化返回对象 */
-		List<Block> blocks = blockPage.getResult();
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
-		for (Block block : blocks) {
+		for (Block block : blocks.getRsData()) {
 			BlockListResp blockListResp = new BlockListResp();
 			BeanUtils.copyProperties(block, blockListResp);
 			blockListResp.setServerTime(new Date().getTime());
@@ -145,10 +157,10 @@ public class BlockServiceImpl implements BlockService {
 		}
 		/** 设置返回的分页数据 */
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		if(blockPage.getTotal() > 5000) {
+		if(blocks.getTotal() > 5000) {
 			page.setTotal(5000);
 		} else {
-			page.setTotal(blockPage.getTotal());
+			page.setTotal(blocks.getTotal());
 		}
 		respPage.init(page, lists);
 		return respPage;
@@ -161,17 +173,30 @@ public class BlockServiceImpl implements BlockService {
 		String msg = dateFormat.format(now);
         logger.info("导出数据起始日期：{},结束时间：{}",date,msg);
         /** 限制最多导出3万条记录 */
-        PageHelper.startPage(1,30000);
+//        PageHelper.startPage(1,30000);
         /** 设置根据时间和nodeId查询数据 */
-        BlockExample blockExample = new BlockExample();
-        blockExample.setOrderByClause("number desc ");
-        BlockExample.Criteria criteria = blockExample.createCriteria();
-        criteria.andNodeIdEqualTo(nodeId);
-        criteria.andCreTimeBetween(new Date(date), now);
-        List<Block> blockList = blockMapper.selectByExample(blockExample);
+//        BlockExample blockExample = new BlockExample();
+//        blockExample.setOrderByClause("number desc ");
+//        BlockExample.Criteria criteria = blockExample.createCriteria();
+//        criteria.andNodeIdEqualTo(nodeId);
+        
+//        criteria.andCreTimeBetween(new Date(date), now);
+        
+//        List<Block> blockList = blockMapper.selectByExample(blockExample);
+        
+        Map<String, Object> filter = new HashMap<>();
+		filter.put("nodeId", nodeId);
+		List<ESSortDto> esSortDtos = new ArrayList<>();
+		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+		ESResult<Block> blockList = new ESResult<>();
+		try {
+			blockList = blockESRepository.search(filter, Block.class, esSortDtos, 1, 30000);
+		} catch (IOException e) {
+			logger.error("获取区块错误。", e);
+		}
         /** 将查询数据转成对应list */
         List<Object[]> rows = new ArrayList<>();
-        blockList.forEach(block->{
+        blockList.getRsData().forEach(block->{
             Object[] row = {
                     block.getNum(),
                     DateUtil.timeZoneTransfer(block.getTime(), "0", timeZone),
@@ -229,9 +254,18 @@ public class BlockServiceImpl implements BlockService {
 
 	private BlockDetailResp queryBlockByNumber(long blockNumber) {
 		/** 根据区块号查询对应数据 */
-		Block block = blockMapper.selectByPrimaryKey(blockNumber);
+//		Block block = blockMapper.selectByPrimaryKey(blockNumber);
+		Map<String, Object> filter = new HashMap<>();
+		filter.put("num", blockNumber);
+		ESResult<Block> blockList = new ESResult<>();
+		try {
+			blockList = blockESRepository.search(filter, Block.class, null, 1, 1);
+		} catch (IOException e) {
+			logger.error("获取区块错误。", e);
+		}
 		BlockDetailResp blockDetailResp = new BlockDetailResp();
-		if (block != null) {
+		if (blockList.getRsData() != null && blockList.getRsData().size() > 0) {
+			Block block = blockList.getRsData().get(0);
 			BeanUtils.copyProperties(block, blockDetailResp);
 			blockDetailResp.setTxQty(block.getTxQty());
 			blockDetailResp.setTransferQty(block.getTranQty());
@@ -243,30 +277,43 @@ public class BlockServiceImpl implements BlockService {
 			blockDetailResp.setServerTime(new Date().getTime());
 
 			/** 取上一个区块,如果存在则设置标识和hash */
-			BlockExample blockExample = new BlockExample();
-	        blockExample.createCriteria().andNumEqualTo(blockNumber - 1);
-	        List<Block> blocks = blockMapper.selectByExample(blockExample);
-	        if (blocks.size()>1){
-	            logger.error("duplicate block: block number {}",blockNumber);
-	            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
-	        }
-	        if(blocks.isEmpty()){
-	        	blockDetailResp.setTimeDiff(0l);
-	            /** 当前块没有上一个块证明这是第一个块, 设置first标识  */
-	            blockDetailResp.setFirst(true);
-	        }else{
-	            Block prevBlock = blocks.get(0);
-	            blockDetailResp.setTimeDiff(blockDetailResp.getTimestamp()-prevBlock.getTime().getTime());
-	        }
+//			BlockExample blockExample = new BlockExample();
+//	        blockExample.createCriteria().andNumEqualTo(blockNumber - 1);
+//	        List<Block> blocks = blockMapper.selectByExample(blockExample);
+//	        if (blocks.size()>1){
+//	            logger.error("duplicate block: block number {}",blockNumber);
+//	            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
+//	        }
+//	        if(blocks.isEmpty()){
+//	        	blockDetailResp.setTimeDiff(0l);
+//	            /** 当前块没有上一个块证明这是第一个块, 设置first标识  */
+//	            blockDetailResp.setFirst(true);
+//	        }else{
+//	            Block prevBlock = blocks.get(0);
+//	            blockDetailResp.setTimeDiff(blockDetailResp.getTimestamp()-prevBlock.getTime().getTime());
+//	        }
+	        blockDetailResp.setFirst(false);
+	        if(blockNumber == 1) {
+	        	blockDetailResp.setFirst(true);
+	        } 
 
 	        /** 设置last标识 **/
-	        blockExample = new BlockExample();
-	        blockExample.createCriteria().andNumEqualTo(blockNumber+1);
-	        blocks = blockMapper.selectByExample(blockExample);
-	        if(blocks.isEmpty()){
-	            /** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
-	        	blockDetailResp.setLast(true);
-	        }
+//	        blockExample = new BlockExample();
+//	        blockExample.createCriteria().andNumEqualTo(blockNumber+1);
+//	        blocks = blockMapper.selectByExample(blockExample);
+//	        if(blocks.isEmpty()){
+//	            /** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
+//	        	blockDetailResp.setLast(true);
+//	        }
+	        
+	        /** 查询现阶段最大区块数 */
+	        blockDetailResp.setLast(false);
+			NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+			Long bNumber = networkStatRedis.getCurNumber();
+			if(blockNumber >= bNumber) {
+				blockDetailResp.setLast(true);
+			}
+			
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 		}
 		return blockDetailResp;

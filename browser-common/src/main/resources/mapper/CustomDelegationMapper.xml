@@ -101,8 +101,8 @@
   
   <select id="selectDelegationByExample" resultMap="AndStakingResultMap">
   	SELECT 
-		t1.delegate_addr,t1.staking_block_num,t1.node_id,sum(t1.delegate_hes) as delegate_hes,sum(t1.delegate_locked)) as delegate_locked
-		,t1.delegate_released,t2.stat_delegate_has,t2.stat_delegate_locked,t2.status,t2.staking_name
+		t1.delegate_addr,t1.staking_block_num,t1.node_id,sum(t1.delegate_hes) as delegate_hes,sum(t1.delegate_locked) as delegate_locked
+		,t1.delegate_released,t2.stat_delegate_hes,t2.stat_delegate_locked,t2.status,t2.node_name
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>
@@ -116,7 +116,7 @@
   <select id="selectSumDelegateByExample" resultMap="AndStakingResultMap">
 	select 
 	  	sum(t1.delegate_hes+ t1.delegate_locked ) as 'allDelegate',
-		sum(case when t2.status=1 then castt1.delegate_locked  else 0 end) as 'allLockDelegate'
+		sum(case when t2.status=1 then t1.delegate_locked  else 0 end) as 'allLockDelegate'
 	FROM delegation t1
 	LEFT JOIN staking t2 ON t1.node_id=t2.node_id AND t1.staking_block_num=t2.staking_block_num
 	<where>

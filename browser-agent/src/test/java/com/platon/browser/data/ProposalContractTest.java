@@ -108,6 +108,10 @@ public class ProposalContractTest {
 	}
 
 	public void voteForProposal(String proposalID) {
+//		vote(proposalID,
+//				"bfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf",
+//				"http://192.168.112.171:5789", VoteOption.YEAS);
+//		
 		vote(proposalID,
 				"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
 				"http://192.168.112.172:8789", VoteOption.YEAS);

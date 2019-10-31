@@ -77,74 +77,53 @@
     <foreach collection="list" item="item" separator=",">
       (
       <foreach collection="selective" item="column" separator=",">
-        <if test="'staking_block_num'.toString() == column.value">
-          #{item.stakingBlockNum,jdbcType=BIGINT}
-        </if>
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
+        </if>
+        <if test="'staking_block_num'.toString() == column.value">
+          #{item.stakingBlockNum,jdbcType=BIGINT}
         </if>
         <if test="'staking_tx_index'.toString() == column.value">
           #{item.stakingTxIndex,jdbcType=INTEGER}
         </if>
-        <if test="'staking_addr'.toString() == column.value">
-          #{item.stakingAddr,jdbcType=VARCHAR}
-        </if>
-        <if test="'staking_has'.toString() == column.value">
-          #{item.stakingHas,jdbcType=VARCHAR}
+        <if test="'staking_hes'.toString() == column.value">
+          #{item.stakingHes,jdbcType=DECIMAL}
         </if>
         <if test="'staking_locked'.toString() == column.value">
-          #{item.stakingLocked,jdbcType=VARCHAR}
+          #{item.stakingLocked,jdbcType=DECIMAL}
+        </if>
+        <if test="'staking_reduction'.toString() == column.value">
+          #{item.stakingReduction,jdbcType=DECIMAL}
         </if>
         <if test="'staking_reduction_epoch'.toString() == column.value">
           #{item.stakingReductionEpoch,jdbcType=INTEGER}
         </if>
-        <if test="'staking_reduction'.toString() == column.value">
-          #{item.stakingReduction,jdbcType=VARCHAR}
+        <if test="'node_name'.toString() == column.value">
+          #{item.nodeName,jdbcType=VARCHAR}
         </if>
-        <if test="'stat_delegate_has'.toString() == column.value">
-          #{item.statDelegateHas,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_locked'.toString() == column.value">
-          #{item.statDelegateLocked,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_reduction'.toString() == column.value">
-          #{item.statDelegateReduction,jdbcType=VARCHAR}
-        </if>
-        <if test="'stat_delegate_qty'.toString() == column.value">
-          #{item.statDelegateQty,jdbcType=INTEGER}
-        </if>
-        <if test="'stat_verifier_time'.toString() == column.value">
-          #{item.statVerifierTime,jdbcType=INTEGER}
-        </if>
-        <if test="'staking_name'.toString() == column.value">
-          #{item.stakingName,jdbcType=VARCHAR}
-        </if>
-        <if test="'staking_icon'.toString() == column.value">
-          #{item.stakingIcon,jdbcType=VARCHAR}
+        <if test="'node_icon'.toString() == column.value">
+          #{item.nodeIcon,jdbcType=VARCHAR}
         </if>
         <if test="'external_id'.toString() == column.value">
           #{item.externalId,jdbcType=VARCHAR}
         </if>
-        <if test="'denefit_addr'.toString() == column.value">
-          #{item.denefitAddr,jdbcType=VARCHAR}
+        <if test="'external_name'.toString() == column.value">
+          #{item.externalName,jdbcType=VARCHAR}
         </if>
-        <if test="'expected_income'.toString() == column.value">
-          #{item.expectedIncome,jdbcType=VARCHAR}
+        <if test="'staking_addr'.toString() == column.value">
+          #{item.stakingAddr,jdbcType=VARCHAR}
         </if>
-        <if test="'block_reward_value'.toString() == column.value">
-          #{item.blockRewardValue,jdbcType=VARCHAR}
+        <if test="'benefit_addr'.toString() == column.value">
+          #{item.benefitAddr,jdbcType=VARCHAR}
         </if>
-        <if test="'pre_cons_block_qty'.toString() == column.value">
-          #{item.preConsBlockQty,jdbcType=BIGINT}
-        </if>
-        <if test="'cur_cons_block_qty'.toString() == column.value">
-          #{item.curConsBlockQty,jdbcType=BIGINT}
+        <if test="'annualized_rate'.toString() == column.value">
+          #{item.annualizedRate,jdbcType=DOUBLE}
         </if>
         <if test="'program_version'.toString() == column.value">
           #{item.programVersion,jdbcType=VARCHAR}
         </if>
-        <if test="'staking_reward_value'.toString() == column.value">
-          #{item.stakingRewardValue,jdbcType=VARCHAR}
+        <if test="'big_version'.toString() == column.value">
+          #{item.bigVersion,jdbcType=VARCHAR}
         </if>
         <if test="'web_site'.toString() == column.value">
           #{item.webSite,jdbcType=VARCHAR}
@@ -164,23 +143,41 @@
         <if test="'is_consensus'.toString() == column.value">
           #{item.isConsensus,jdbcType=INTEGER}
         </if>
-        <if test="'is_setting'.toString() == column.value">
-          #{item.isSetting,jdbcType=INTEGER}
+        <if test="'is_settle'.toString() == column.value">
+          #{item.isSettle,jdbcType=INTEGER}
         </if>
         <if test="'is_init'.toString() == column.value">
           #{item.isInit,jdbcType=INTEGER}
+        </if>
+        <if test="'stat_delegate_hes'.toString() == column.value">
+          #{item.statDelegateHes,jdbcType=DECIMAL}
+        </if>
+        <if test="'stat_delegate_locked'.toString() == column.value">
+          #{item.statDelegateLocked,jdbcType=DECIMAL}
+        </if>
+        <if test="'stat_delegate_released'.toString() == column.value">
+          #{item.statDelegateReleased,jdbcType=DECIMAL}
+        </if>
+        <if test="'block_reward_value'.toString() == column.value">
+          #{item.blockRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'fee_reward_value'.toString() == column.value">
+          #{item.feeRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'staking_reward_value'.toString() == column.value">
+          #{item.stakingRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'cur_cons_block_qty'.toString() == column.value">
+          #{item.curConsBlockQty,jdbcType=BIGINT}
+        </if>
+        <if test="'pre_cons_block_qty'.toString() == column.value">
+          #{item.preConsBlockQty,jdbcType=BIGINT}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="'external_name'.toString() == column.value">
-          #{item.externalName,jdbcType=VARCHAR}
-        </if>
-        <if test="'fee_reward_value'.toString() == column.value">
-          #{item.feeRewardValue,jdbcType=VARCHAR}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
           #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
@@ -200,7 +197,7 @@
             and s.node_id = #{nodeId,jdbcType=VARCHAR}
         </if>
     	<if test="name != null and name != ''">
-    		and s.staking_name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+    		and s.node_name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
     	</if>
     	<if test="status != null">
     		and s.status = #{status,jdbcType=INTEGER}
@@ -208,8 +205,8 @@
     	<if test="isConsensus != null">
     		and s.is_consensus = #{isConsensus,jdbcType=INTEGER}
     	</if>
-    	<if test="isSetting != null">
-    		and s.is_setting = #{isSetting,jdbcType=INTEGER}
+    	<if test="isSettle != null">
+    		and s.isSettle = #{isSetting,jdbcType=INTEGER}
     	</if>
     </where>
     order by s.big_version desc,s.staking_hes + staking_locked +
@@ -236,9 +233,6 @@ FROM staking s
         <if test="nodeId != null">
             and s.node_id = #{nodeId,jdbcType=VARCHAR}
         </if>
-        <if test="status != null">
-    		and s.status = #{status,jdbcType=INTEGER}
-    	</if>
     </where>
   </select>
   <select id="selectHistoryNode" resultMap="AndNodeResultMap">
@@ -254,7 +248,7 @@ FROM staking s
 			</foreach>
     	</if>
     	<if test="key != null and key != ''">
-    		and s.staking_name like CONCAT('%',#{key},'%')
+    		and s.node_name like CONCAT('%',#{key},'%')
     	</if>
     	and s.node_id not in  (select s1.node_id from staking s1 where s1.status = 1 )
     </where>
