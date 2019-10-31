@@ -2,6 +2,7 @@ package com.platon.browser.common.service;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -28,10 +29,15 @@ public class AccountService {
      * @param blockNumber
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public BigInteger getInciteBalance(BigInteger blockNumber) throws IOException {
-        BigInteger inciteBalance = platOnClient.getWeb3j()
-                        .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
-                        .send().getBalance();
+    public BigInteger getInciteBalance(BigInteger blockNumber) {
+        BigInteger inciteBalance = null;
+        try {
+            inciteBalance = platOnClient.getWeb3j()
+                            .platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber))
+                            .send().getBalance();
+        } catch (IOException e) {
+            throw new BusinessException("获取激励池["+INCITE_ACCOUNT_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage());
+        }
         return inciteBalance;
     }
 

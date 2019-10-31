@@ -44,13 +44,7 @@ logging:
   #日志级别
   level:
     org.springframework: debug
-    com.platon.browser: debug
-    com.platon.browser.service: debug
-    com.platon.browser.task: debug
-    com.platon.browser.client: debug
-    com.platon.browser.dao: debug
-    com.platon.browser.engine: debug
-    com.platon.browser.engine.handler.epoch: error
+    com.platon.browser.complement.queue.callback: debug
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:}

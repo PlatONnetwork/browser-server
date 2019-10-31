@@ -59,7 +59,7 @@ public class EpochService {
      * 使用区块号更新服务内部状态
      * @param blockNumber
      */
-    public void update(BigInteger blockNumber) {
+    public void update(BigInteger blockNumber) throws BlockNumberException {
         this.currentBlockNumber=blockNumber;
 
         // 暂存未计算前的增发周期值
@@ -80,29 +80,23 @@ public class EpochService {
         if(oldIssueEpochRound!=this.issueEpochRound){
             // 如果增发周期变更,则更新相应的奖励字段
             // 当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
-            try {
-                // 上一增发周期最后一个块号
-                BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getAddIssuePeriodBlockCount().longValue());
-                // 当前增发周期开始时的激励池余额
-                BigInteger newInciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
-                // 更新激励池余额
-                this.inciteBalance = newInciteBalance;
-                // 激励池余额分给区块奖励部分
-                BigDecimal blockRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getBlockRewardRate());
-                this.inciteAmount4Block = blockRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
-                // 当前增发周期内每个区块的奖励
-                this.blockReward = blockRewardPart.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),0,RoundingMode.FLOOR).toBigInteger();
-                // 激励池余额分给质押奖励部分
-                BigDecimal stakeRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getStakeRewardRate());
-                this.inciteAmount4Stake = stakeRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
-                // 当前增发周期内每个结算周期的质押奖励
-                this.settleStakeReward = stakeRewardPart.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR).toBigInteger();
+            // 上一增发周期最后一个块号
+            BigInteger preIssueEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(blockNumber,chainConfig.getAddIssuePeriodBlockCount().longValue());
+            // 当前增发周期开始时的激励池余额
+            BigInteger newInciteBalance = accountService.getInciteBalance(preIssueEpochLastBlockNumber);
+            // 更新激励池余额
+            this.inciteBalance = newInciteBalance;
+            // 激励池余额分给区块奖励部分
+            BigDecimal blockRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getBlockRewardRate());
+            this.inciteAmount4Block = blockRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
+            // 当前增发周期内每个区块的奖励
+            this.blockReward = blockRewardPart.divide(new BigDecimal(chainConfig.getAddIssuePeriodBlockCount()),0,RoundingMode.FLOOR).toBigInteger();
+            // 激励池余额分给质押奖励部分
+            BigDecimal stakeRewardPart = new BigDecimal(inciteBalance).multiply(chainConfig.getStakeRewardRate());
+            this.inciteAmount4Stake = stakeRewardPart.setScale(0,RoundingMode.FLOOR).toBigInteger();
+            // 当前增发周期内每个结算周期的质押奖励
+            this.settleStakeReward = stakeRewardPart.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR).toBigInteger();
 
-            } catch (BlockNumberException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
