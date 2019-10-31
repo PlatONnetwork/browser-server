@@ -37,7 +37,7 @@ web3j:
 # 内存环形缓冲区大小，必须是2的指数倍
 disruptor:
   queue:
-    ring.buffer.size: 4
+    ring.buffer.size: 1024
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log

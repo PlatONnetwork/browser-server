@@ -6,10 +6,12 @@ import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.application.CollectionBlockEventPublisher;
 import com.platon.browser.collection.service.BlockService;
 import com.platon.browser.collection.service.TransactionService;
+import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
 import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -52,6 +54,9 @@ public class AgentApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
+		String status = System.getProperty(AppStatus.class.getName());
+		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
+
 		for (;true;){
 			try {
 				collectedNumber++;

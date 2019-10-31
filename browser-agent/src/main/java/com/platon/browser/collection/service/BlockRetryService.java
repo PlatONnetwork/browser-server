@@ -30,7 +30,7 @@ public class BlockRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public PlatonBlock getBlock(Long blockNumber) throws IOException {
+    PlatonBlock getBlock(Long blockNumber) throws IOException {
         log.debug("{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
         DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
         return client.getWeb3j().platonGetBlockByNumber(dp,true).send();
