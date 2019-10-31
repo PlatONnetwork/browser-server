@@ -10,6 +10,7 @@ import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
 import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -52,6 +53,9 @@ public class AgentApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
+		String isStart = System.getProperty("START_APP");
+		if(StringUtils.isNotBlank(isStart)&&!Boolean.valueOf(isStart)) return;
+
 		for (;true;){
 			try {
 				collectedNumber++;
