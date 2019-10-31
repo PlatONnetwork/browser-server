@@ -16,7 +16,7 @@ public class CollectionBlockCallback implements ConsumeCallback<CollectionBlockE
     public void call(CollectionBlockEvent cbe) throws ExecutionException, InterruptedException {
 
         log.info("block number:{}",cbe.getBody().getBlockCF().get().getBlock().getNumber());
-        log.info("block number:{}",cbe.getBody().getReceiptCF().get().getResult());
+        log.info("transaction receipts:{}",cbe.getBody().getReceiptCF().get().getResult());
 
     }
 }
