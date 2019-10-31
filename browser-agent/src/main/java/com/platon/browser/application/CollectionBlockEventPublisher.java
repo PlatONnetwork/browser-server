@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadFactory;
 public class CollectionBlockEventPublisher {
 
     // 指定环形队列大小,必须是2的指数倍
-    @Value("${disruptor.queue.ring.buffer.size}")
+    @Value("${disruptor.queue.collection.buffer-size}")
     private int ringBufferSize;
 
     @Autowired

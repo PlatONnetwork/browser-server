@@ -1,4 +1,4 @@
-package com.platon.browser.collection.service;
+package com.platon.browser.collection.service.block;
 
 import com.platon.browser.client.PlatOnClient;
 import lombok.extern.slf4j.Slf4j;

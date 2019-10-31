@@ -19,12 +19,12 @@ public class CollectionBlockEventHandler implements EventHandler<CollectionBlock
     public void onEvent(CollectionBlockEvent event, long sequence, boolean endOfBatch) {
         // 等待CompletableFuture完成
         log.debug("{}:sequence({}),endOfBatch({})",Thread.currentThread().getStackTrace()[1].getMethodName(),sequence,endOfBatch);
-        if(!event.getBody().getBlockCF().isDone()){
+        /*if(!event.getBody().getBlockCF().isDone()){
             throw new BusinessException("区块采集线程未完成,稍后重新检查!");
         }
         if(!event.getBody().getReceiptCF().isDone()){
             throw new BusinessException("交易回执线程未完成,稍后重新检查!");
-        }
+        }*/
         try {
             // 调用回调处理业务
             event.getBody().getEventCB().call(event);

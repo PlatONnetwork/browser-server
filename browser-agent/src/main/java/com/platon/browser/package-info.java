@@ -5,6 +5,7 @@
  * 3、persistence: 业务数据持久化模块, 在上一步数据的基础上，对数据进行入库逻辑调用(插入,统计/字段变更,关联表更新);
  * 4、queue: 环形缓冲队列，用于各以上各模块间的数据交互；
  * 5、application: 将以上各模块组件组合在一起，形成统一应用调用入口；
- * 6、AgentApplication: 整个应用的启动入口；
+ * 6、common: 一些通用工具和服务；
+ * 7、AgentApplication: 整个应用的启动入口；
  */
 package com.platon.browser;

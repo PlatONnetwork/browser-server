@@ -14,6 +14,9 @@ public class CollectionBlockCallback implements ConsumeCallback<CollectionBlockE
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void call(CollectionBlockEvent cbe) throws ExecutionException, InterruptedException {
+
         log.info("block number:{}",cbe.getBody().getBlockCF().get().getBlock().getNumber());
+        log.info("transaction receipts:{}",cbe.getBody().getReceiptCF().get().getResult());
+
     }
 }

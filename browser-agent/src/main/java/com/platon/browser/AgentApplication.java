@@ -4,14 +4,15 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.application.CollectionBlockEventPublisher;
-import com.platon.browser.collection.service.BlockService;
-import com.platon.browser.collection.service.TransactionService;
+import com.platon.browser.collection.service.block.BlockService;
+import com.platon.browser.collection.service.transaction.TransactionService;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
 import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -29,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
+@MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.persistence.dao.mapper"})
 public class AgentApplication implements ApplicationRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(AgentApplication.class, args);
