@@ -17,15 +17,10 @@ import java.math.BigInteger;
  *
  * 1、根据区块号计算周期切换相关值：
  *      名称/含义                                                                   变量名称
- * a、当前所处共识周期轮数                                                         consensusEpochRound
- * b、当前所处结算周期轮数                                                         settleEpochRound
- * c、当前所处结算周期轮数                                                         issueEpochRound
- *    当前增发周期开始时的激励池余额 IB                                             inciteBalance
- *    当前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例               inciteAmount4Block
- *    当前增发周期每个区块奖励值 BR/增发周期区块总数                                 blockReward
- *    当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例               inciteAmount4Stake
- *    当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数        settleStakeReward
- *    当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数         stakeReward
+ *   当前区块号                                                                  currentBlockNumber
+ *   当前所处共识周期轮数                                                         consensusEpochRound
+ *   当前所处结算周期轮数                                                         settleEpochRound
+ *   当前所处结算周期轮数                                                         issueEpochRound
  */
 @Slf4j
 @Service
@@ -41,7 +36,6 @@ public class EpochService {
     @Getter private BigInteger settleEpochRound=BigInteger.ZERO; // 当前所处结算周期轮数
     @Getter private BigInteger issueEpochRound=BigInteger.ZERO; // 当前所处结算周期轮数
 
-    private EpochMessage epochMessage = new EpochMessage();
     /**
      * 使用区块号更新服务内部状态
      * @param blockNumber
@@ -88,6 +82,7 @@ public class EpochService {
             }
         }
 
+        EpochMessage epochMessage = new EpochMessage();
         BeanUtils.copyProperties(this,epochMessage);
         BeanUtils.copyProperties(epochRetryService,epochMessage);
         return epochMessage;
