@@ -1,7 +1,10 @@
 package com.platon.browser.common.dto;
 
+import com.platon.browser.collection.service.epoch.EpochRetryService;
+import com.platon.browser.collection.service.epoch.EpochService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.web3j.platon.bean.Node;
 
 import java.math.BigInteger;
@@ -27,4 +30,17 @@ public class EpochMessage {
     private BigInteger stakeReward=BigInteger.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
     private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
     private List<Node> curVerifiers=new ArrayList<>(); // 当前结算周期验证人列表
+
+    private EpochMessage(){}
+    public static EpochMessage newInstance(){
+        return new EpochMessage();
+    }
+    public EpochMessage updateWithEpochService(EpochService epochService){
+        BeanUtils.copyProperties(epochService,this);
+        return this;
+    }
+    public EpochMessage updateWithEpochRetryService(EpochRetryService epochRetryService){
+        BeanUtils.copyProperties(epochRetryService,this);
+        return this;
+    }
 }

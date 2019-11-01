@@ -6,7 +6,6 @@ import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,10 +80,8 @@ public class EpochService {
                 log.error("增发周期变更执行失败:",e);
             }
         }
-
-        EpochMessage epochMessage = new EpochMessage();
-        BeanUtils.copyProperties(this,epochMessage);
-        BeanUtils.copyProperties(epochRetryService,epochMessage);
-        return epochMessage;
+        return EpochMessage.newInstance()
+                .updateWithEpochService(this)
+                .updateWithEpochRetryService(epochRetryService);
     }
 }
