@@ -92,7 +92,8 @@ public class NetworkStatUpdateTask extends BaseTask{
             //rpc获取质押余额
             BigInteger stakingContractBalance = getBalance(InnerContractAddrEnum.STAKING_CONTRACT.getAddress(), blockNumber);
             //计算流通量
-            BigDecimal turnoverValue = circulation
+            BigDecimal turnoverValue = initIssueAmount
+                    .multiply(circulationByYear)
                     .subtract(new BigDecimal(restrictingContractBalance))
                     .subtract(new BigDecimal(stakingContractBalance))
                     .subtract(new BigDecimal(incentivePoolAccountBalance));

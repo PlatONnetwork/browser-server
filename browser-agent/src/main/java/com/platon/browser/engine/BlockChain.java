@@ -201,6 +201,7 @@ public class BlockChain {
                 }catch (NoSuchBeanException e){
                     logger.error("交易[{}]失败,且找不到对应的质押信息，无法补充交易中的节点名称信息！",tx.getHash());
                 }
+                return;
             }
 
             // 调用交易分析引擎分析交易，以补充相关数据
