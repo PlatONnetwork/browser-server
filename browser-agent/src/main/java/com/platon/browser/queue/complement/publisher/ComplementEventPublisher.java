@@ -28,7 +28,7 @@ public class ComplementEventPublisher {
     TRANSLATOR = (event, sequence, block,transactions,businessParam)->event.setBlock(block).setTransactions(transactions).setBusinessParams(businessParam);
     private RingBuffer<ComplementEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
-    @Value("${disruptor.queue.collection.buffer-size}")
+    @Value("${disruptor.queue.complement.buffer-size}")
     private int ringBufferSize;
     private EventFactory<ComplementEvent> eventFactory = ComplementEvent::newInstance;
     @Autowired
