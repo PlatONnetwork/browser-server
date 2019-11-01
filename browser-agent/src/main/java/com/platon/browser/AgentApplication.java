@@ -3,12 +3,11 @@ package com.platon.browser;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.client.result.ReceiptResult;
-import com.platon.browser.application.CollectionBlockEventPublisher;
+import com.platon.browser.common.dto.EpochMessage;
+import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.transaction.TransactionService;
 import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.complement.queue.callback.CollectionBlockCallback;
-import com.platon.browser.queue.event.collection.EpochMessage;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,17 +41,15 @@ public class AgentApplication implements ApplicationRunner {
 	// 交易服务
 	@Autowired
 	private TransactionService transactionService;
-	// 区块发布服务
+	// 区块事件发布服务
 	@Autowired
-	private CollectionBlockEventPublisher collectionBlockEventPublisher;
-	@Autowired
-	private CollectionBlockCallback collectionBlockCallback;
+	private BlockEventPublisher blockEventPublisher;
 	@Autowired
 	private PlatOnClient platOnClient;
 	@Autowired
 	private SpecialContractApi specialContractApi;
 	// 已采集的最高块号
-	private Long collectedNumber = 0L;
+	private Long collectedNumber = 79369L;
 
 	@Override
 	public void run(ApplicationArguments args) {
@@ -68,7 +65,7 @@ public class AgentApplication implements ApplicationRunner {
 				CompletableFuture<ReceiptResult> receiptCF = transactionService.getReceiptAsync(collectedNumber);
 				// 构造
 				EpochMessage epochMessage = new EpochMessage(BigInteger.valueOf(collectedNumber),platOnClient,specialContractApi);
-				collectionBlockEventPublisher.publish(blockCF, receiptCF,epochMessage,collectionBlockCallback);
+				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);
 			}catch (Exception e){
 				break;
 			}

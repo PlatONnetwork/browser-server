@@ -1,4 +1,4 @@
-package com.platon.browser.queue.event.collection;
+package com.platon.browser.common.dto;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 
 @Data
-public class ConsensusEpochEvent extends EpochEvent {
+public class ConsensusEpoch extends EpochEvent {
 
     private BigInteger perBlockReward;
 
@@ -27,7 +27,7 @@ public class ConsensusEpochEvent extends EpochEvent {
      */
     public BigInteger getPerBlockReward(){
         return new BigDecimal(this.getPeriodBlockReward())
-                .divide(BigDecimal.valueOf(this.getCurValidators().size()),0, RoundingMode.FLOOR)
+                .divide(BigDecimal.valueOf(this.getCandidates().size()),0, RoundingMode.FLOOR)
                 .toBigInteger();
     }
 

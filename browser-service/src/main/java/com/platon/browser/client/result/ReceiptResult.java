@@ -14,11 +14,11 @@ import java.util.concurrent.Executors;
 public class ReceiptResult {
     private String jsonrpc;
     private int id;
-    private List<Result> result;
+    private List<Receipt> result;
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(100);
 
-    private Map<String,Result> map = new ConcurrentHashMap<>();
+    private Map<String,Receipt> map = new ConcurrentHashMap<>();
 
     /**
      * 并行解码Logs

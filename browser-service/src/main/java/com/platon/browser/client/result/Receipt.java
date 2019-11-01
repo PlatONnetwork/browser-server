@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Data
-public class Result {
+public class Receipt {
     private String gasUsed;
     private List<Log> logs;
     private String transactionHash;

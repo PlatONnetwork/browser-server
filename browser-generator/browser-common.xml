@@ -33,7 +33,7 @@
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="mapper"
+        <!--<sqlMapGenerator targetPackage="mapper"
                          targetProject="../browser-common/src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
@@ -41,12 +41,12 @@
         <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
                              targetProject="../browser-common/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
-        </javaClientGenerator>
+        </javaClientGenerator>-->
         <!--      <table tableName="T_FEE_AGTBILL" domainObjectName="FeeAgentBill"
                        enableCountByExample="false" enableUpdateByExample="false"
                        enableDeleteByExample="false" enableSelectByExample="false"
                        selectByExampleQueryId="false"/>&ndash;&gt;-->
-    <table tableName="address" domainObjectName="Address">
+   <!-- <table tableName="address" domainObjectName="Address">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>
@@ -98,13 +98,12 @@
                                 replaceString=""/>
         </table>
 
-        <table tableName="transaction" domainObjectName="Transaction">
+        <table tableName="vote" domainObjectName="Vote">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>
+        </table>-->
 
-
-        <table tableName="vote" domainObjectName="Vote">
+        <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

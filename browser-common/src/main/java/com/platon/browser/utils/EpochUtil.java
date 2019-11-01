@@ -40,7 +40,7 @@ public class EpochUtil {
     }
 
     /**
-     * 取上一周期最后一个区块号
+     * 取当前周期最后一个区块号
      * @param blockNumber 当前区块号
      * @param blockCountPerEpoch 每个周期的区块数量
      * @return

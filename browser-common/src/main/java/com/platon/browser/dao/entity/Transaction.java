@@ -8,6 +8,8 @@ import java.util.Date;
 public class Transaction {
     private String hash;
 
+    private Long id;
+
     private String bHash;
 
     private Long num;
@@ -50,6 +52,14 @@ public class Transaction {
 
     public void setHash(String hash) {
         this.hash = hash == null ? null : hash.trim();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getbHash() {
@@ -205,6 +215,7 @@ public class Transaction {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
+        id("id", "id", "BIGINT", false),
         bHash("b_hash", "bHash", "VARCHAR", false),
         num("num", "num", "BIGINT", false),
         index("index", "index", "INTEGER", true),

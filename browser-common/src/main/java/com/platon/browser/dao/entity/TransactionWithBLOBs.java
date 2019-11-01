@@ -43,6 +43,7 @@ public class TransactionWithBLOBs extends Transaction {
      */
     public enum Column {
         hash("hash", "hash", "VARCHAR", false),
+        id("id", "id", "BIGINT", false),
         bHash("b_hash", "bHash", "VARCHAR", false),
         num("num", "num", "BIGINT", false),
         index("index", "index", "INTEGER", true),

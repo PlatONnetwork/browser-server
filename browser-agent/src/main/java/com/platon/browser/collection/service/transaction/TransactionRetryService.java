@@ -29,12 +29,13 @@ public class TransactionRetryService {
      * @throws
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException {
+    ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException, InterruptedException {
         log.debug("获取回执:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
         RpcParam param = new RpcParam();
         param.setMethod(RECEIPT_RPC_INTERFACE);
         param.getParams().add(blockNumber);
         ReceiptResult result = HttpUtil.post(client.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
+        result.resolve();
         log.debug("回执结果:{}", result);
         return result;
     }

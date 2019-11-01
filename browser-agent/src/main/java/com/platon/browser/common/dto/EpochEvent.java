@@ -1,4 +1,4 @@
-package com.platon.browser.queue.event.collection;
+package com.platon.browser.common.dto;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
@@ -20,9 +20,7 @@ public abstract class EpochEvent {
     // 当前所处周期,从1开始
     private Long epoch;
     // 当前周期的验证人
-    private List<Node> curValidators;
-    // 上一个周期的验证人
-    private List<Node> prevValidators;
+    private List<Node> candidates;
     // 周期区块奖励
     private BigInteger periodBlockReward;
     // 周期质押奖励

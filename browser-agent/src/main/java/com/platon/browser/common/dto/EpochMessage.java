@@ -1,4 +1,4 @@
-package com.platon.browser.queue.event.collection;
+package com.platon.browser.common.dto;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
@@ -14,11 +14,11 @@ import java.math.BigInteger;
 @Slf4j
 public class EpochMessage {
     private BigInteger blockNumber;
-    private ConsensusEpochEvent consensusEpochEvent=new ConsensusEpochEvent();
-    private SettlementEpochEvent settlementEpochEvent=new SettlementEpochEvent();
+    private ConsensusEpoch consensusEpoch=new ConsensusEpoch();
+    private SettlementEpoch settlementEpoch=new SettlementEpoch();
     public EpochMessage(BigInteger blockNumber, PlatOnClient platOnClient, SpecialContractApi specialContractApi){
         this.blockNumber = blockNumber;
-        consensusEpochEvent.init(blockNumber,platOnClient,specialContractApi);
-        settlementEpochEvent.init(blockNumber,platOnClient,specialContractApi);
+        consensusEpoch.init(blockNumber,platOnClient,specialContractApi);
+        settlementEpoch.init(blockNumber,platOnClient,specialContractApi);
     }
 }

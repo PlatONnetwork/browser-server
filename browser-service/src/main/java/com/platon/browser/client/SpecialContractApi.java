@@ -2,6 +2,7 @@ package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.exception.BlankResponseException;
 import com.platon.browser.exception.ContractInvokeException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -92,7 +93,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-    public List<Node> getHistoryVerifierList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException {
+    public List<Node> getHistoryVerifierList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         return nodeCall(web3j,blockNumber,GET_HISTORY_VERIFIER_LIST_FUNC_TYPE);
     }
 
@@ -102,7 +103,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-    public List<Node> getHistoryValidatorList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException {
+    public List<Node> getHistoryValidatorList(Web3j web3j,BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         return nodeCall(web3j,blockNumber,GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE);
     }
 
@@ -111,7 +112,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-	private List<Node> nodeCall(Web3j web3j,BigInteger blockNumber,int funcType) throws ContractInvokeException {
+	private List<Node> nodeCall(Web3j web3j,BigInteger blockNumber,int funcType) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(
             funcType,
             Collections.singletonList(new Uint256(blockNumber)),
@@ -119,12 +120,12 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameter.valueOf(blockNumber),InnerContractAddrEnum.NODE_CONTRACT.getAddress(),InnerContractAddrEnum.NODE_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("【查询验证人出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(funcType),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
+            throw new BlankResponseException(String.format("【查询验证人出错】函数类型:%s,区块号:%s,返回为空!%s",String.valueOf(funcType),blockNumber,JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
         if(br.isStatusOk()){
             String data = br.data;
             if(StringUtils.isBlank(data)){
-                throw new ContractInvokeException(BLANK_RES);
+                throw new BlankResponseException(BLANK_RES);
             }
             data = data.replace("\"Shares\":null","\"Shares\":\"0x0\"");
             List<Node> result;
@@ -142,7 +143,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException {
+    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(
             GET_RESTRICTING_BALANCE_FUNC_TYPE,
             Collections.singletonList(new Utf8String(addresses)),
@@ -150,12 +151,12 @@ public class SpecialContractApi {
         );
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(),InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
+            throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!",addresses));
         }
         if(br.isStatusOk()){
             String data = br.data;
             if(StringUtils.isBlank(data)){
-                throw new ContractInvokeException(BLANK_RES);
+                throw new BlankResponseException(BLANK_RES);
             }
             data = data.replace("\"lockBalance\":null","\"lockBalance\":\"0x0\"");
             data = data.replace("\"pledgeBalance\":null","\"pledgeBalance\":\"0x0\"");
@@ -176,7 +177,7 @@ public class SpecialContractApi {
      * @return
      * @throws Exception
      */
-	public ProposalParticiantStat getProposalParticipants ( Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException {
+	public ProposalParticiantStat getProposalParticipants ( Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(
             GET_PROPOSAL_RES_FUNC_TYPE,
             Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)),
@@ -186,12 +187,12 @@ public class SpecialContractApi {
 
         BaseResponse<String> br = rpc(web3j,function,DefaultBlockParameterName.LATEST,InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(),InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
         if(br==null||br.data==null){
-            throw new ContractInvokeException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
+            throw new BlankResponseException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】",proposalHash,blockHash));
         }
         if(br.isStatusOk()){
             String data = br.data;
             if(StringUtils.isBlank(data)){
-                throw new ContractInvokeException(BLANK_RES);
+                throw new BlankResponseException(BLANK_RES);
             }
             String[] a = data.replace("[","").replace("]","").split(",");
             if (a.length<4) throw new ContractInvokeException("返回数据不完整!");
