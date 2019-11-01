@@ -45,7 +45,6 @@ public class EpochRetryService {
     @Autowired
     private SpecialContractApi specialContractApi;
 
-
     @Getter private BigInteger inciteBalance=BigInteger.ZERO; // 当前增发周期开始时的激励池余额 IB
     @Getter private BigInteger inciteAmount4Block=BigInteger.ZERO; // 前增发周期开始时的激励池余额分给区块奖励部分 BR=IB*区块奖励比例
     @Getter private BigInteger blockReward=BigInteger.ZERO; // 当前增发周期每个区块奖励值 BR/增发周期区块总数
@@ -98,13 +97,13 @@ public class EpochRetryService {
         Web3j web3j = platOnClient.getWeb3j();
         BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
         BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getConsensusPeriodBlockCount());
-        // 上一个共识周期的最后一个块号
+        // 上一个周期的最后一个块号
         BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
         // 重置验证人
         curValidators.clear();
         if(latestEpoch.compareTo(currentEpoch)>0){
             // >>>>如果链上最新块所在周期>当前块所处周期, 则查询特殊节点历史接口
-            // 当前共识周期的第一个块号
+            // 当前周期的第一个块号
             BigInteger curEpochFirstBlockNumber = preEpochLastBlockNumber.add(BigInteger.ONE);
             List<Node> curNodes = specialContractApi.getHistoryValidatorList(web3j,curEpochFirstBlockNumber);
             curValidators.addAll(curNodes);
@@ -122,19 +121,19 @@ public class EpochRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void settlementEpochChange(BigInteger currentBlockNumber) throws Exception {
-        // 当前块所处的结算周期
+        // 当前块所处周期
         BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
-        // 链上最新块所处的共识周期
+        // 链上最新块所处周期
         Web3j web3j = platOnClient.getWeb3j();
         BigInteger latestBlockNumber = platOnClient.getLatestBlockNumber();
         BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getSettlePeriodBlockCount());
-        // 上一个共识周期的最后一个块号
+        // 上一个周期的最后一个块号
         BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
         // 重置验证人
         curVerifiers.clear();
         if(latestEpoch.compareTo(currentEpoch)>0){
             // >>>>如果链上最新块所在周期>当前块所处周期, 则查询特殊节点历史接口
-            // 当前共识周期的第一个块号
+            // 当前周期的第一个块号
             BigInteger curEpochFirstBlockNumber = preEpochLastBlockNumber.add(BigInteger.ONE);
             List<Node> curNodes = specialContractApi.getHistoryVerifierList(web3j,curEpochFirstBlockNumber);
             curVerifiers.addAll(curNodes);
@@ -145,5 +144,4 @@ public class EpochRetryService {
             curVerifiers.addAll(curNodes);
         }
     }
-
 }
