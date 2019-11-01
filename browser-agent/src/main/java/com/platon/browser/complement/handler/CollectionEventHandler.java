@@ -1,4 +1,4 @@
-package com.platon.browser.complement.queue.handler;
+package com.platon.browser.complement.handler;
 
 import com.platon.browser.queue.collection.event.CollectionEvent;
 import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
