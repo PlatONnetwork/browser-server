@@ -1,45 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.persistence.dao.mapper.AddStakingMapper">
-<update id="addStaking" parameterType="com.platon.browser.persistence.dao.param.AddStakingParam">
--- 增持质押（1002）
--- 入参（input中参数）
-set @node_id = '0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18';
-set @amount = '500000000000000000000000000';
--- 入参（交易中参数）
-set @tx_hash = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
-set @block_number = '300';
-set @tx_timestamp = '2019-10-13 07:31:20';
--- 入参（进程缓存）
-set @sbn = 200;         -- 质押对应的区块高度
+    <update id="addStaking" parameterType="com.platon.browser.persistence.dao.param.AddStakingParam">
+	update `staking`  set
+		`staking_has` = `staking_has` + #{amount}
+	where
+		`node_id` = #{nodeId}
+	and
+		`staking_block_num` = #{stakingBlockNum};
 
--- 1. staking 更新
-      update `staking`  set
-      `staking_has` = `staking_has` + #{amount}
-      where `node_id` = #{nodeId}
-          and `staking_block_num` = #{stakingBlockNum};
+	update `node` set
+		`total_value` = `total_value` + #{amount},
+		`staking_has` = `staking_has` + #{amount}
+	where
+		`node_id` = #{nodeId};
 
--- 2. node 更新
-update `node`
-set `total_value` = `total_value` + @amount,
-   `staking_has` = `staking_has` + @amount
-where `node_id` = @node_id;
-
--- 3. node_opt 创建
-insert into `node_opt`
-	(`node_id`,
-	`type`,
-	`tx_hash`,
-	`block_number`,
-	`timestamp`
-	)
+	insert into `node_opt`
+		(`node_id`,
+		`type`,
+		`tx_hash`,
+		`b_num`,
+		`time`
+		)
 	values
-	(@node_id,
-	'2',
-	@tx_hash,
-	@block_number,
-	@tx_timestamp
-	);
+		(#{nodeId},
+		'2',
+		#{txHash},
+		#{bNum},
+		#{time}
+		);
 
   </update>
 </mapper>
