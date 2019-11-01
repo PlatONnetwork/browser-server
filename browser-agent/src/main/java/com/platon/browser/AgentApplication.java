@@ -45,7 +45,7 @@ public class AgentApplication implements ApplicationRunner {
 	@Autowired
 	private EpochService epochService;
 	// 已采集的最高块号
-	private Long collectedNumber = 79369L;
+	private Long collectedNumber = 0L;
 
 	@Override
 	public void run(ApplicationArguments args) {

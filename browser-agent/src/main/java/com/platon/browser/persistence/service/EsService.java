@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,24 +38,18 @@ public class EsService {
     @Autowired
     private NodeOptESRepository nodeOptESRepository;
 
-    public void batchInsertOrUpdate (List<Block> blocks, List<Transaction> transactions, List<NodeOpt> nodeOpts){
-
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public void batchInsertOrUpdate (List<Block> blocks, List<Transaction> transactions, List<NodeOpt> nodeOpts) throws IOException {
         if(!blocks.isEmpty()){
             Map<String,Block> blockMap = new HashMap<>();
             blocks.forEach(b->blockMap.put(String.valueOf(b.getNum()),b));
-
-            while (true)try {
-                blockESRepository.bulkAddOrUpdate(blockMap);
-                break;
-            } catch (Exception e) {
-                log.error("ES批量入库区块出错,将重试!",e);
-                try {
-                    TimeUnit.SECONDS.sleep(1L);
-                } catch (Exception ex) {
-                    log.error("{}",ex);
-                }
-            }
+            blockESRepository.bulkAddOrUpdate(blockMap);
         }
 
+        if(!transactions.isEmpty()){
+            Map<String,Transaction> transactionMap = new HashMap<>();
+            transactions.forEach(t->transactionMap.put(String.valueOf(t.getHash()),t));
+            transactionESRepository.bulkAddOrUpdate(transactionMap);
+        }
     }
 }
