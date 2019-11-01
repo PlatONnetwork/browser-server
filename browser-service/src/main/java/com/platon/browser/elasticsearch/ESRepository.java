@@ -3,8 +3,11 @@ package com.platon.browser.elasticsearch;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.dto.ESSortDto;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -29,6 +32,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -172,6 +176,37 @@ public abstract class ESRepository {
 				searchSourceBuilder.sort(esSortDto.getSortName(), esSortDto.getSortOrder());
 			});
 		}
+		searchRequest.source(searchSourceBuilder);
+		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+		log.debug("search:{}", JSON.toJSONString(response, true));
+		ESResult<T> esResult = new ESResult<>();
+		SearchHits hits = response.getHits();
+		esResult.setTotal(hits.getTotalHits().value);
+		List<T> list = new ArrayList<>();
+		Arrays.asList(hits.getHits()).forEach(hit -> list.add(JSON.parseObject(hit.getSourceAsString(), clazz)));
+		esResult.setRsData(list);
+		return esResult;
+	}
+	
+	/**
+	 * 搜索
+	 * 
+	 * @throws IOException
+	 */
+	public <T> ESResult<T> search(ESQueryBuilderConstructor constructor, Class<T> clazz,int pageNo,
+			int pageSize) throws IOException {
+		if (pageNo <= 0)
+			pageNo = 1;
+		SearchRequest searchRequest = new SearchRequest(getIndexName());
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		//排序
+        if (StringUtils.isNotEmpty(constructor.getAsc()))
+        	searchSourceBuilder.sort(constructor.getAsc(), SortOrder.ASC);
+        if (StringUtils.isNotEmpty(constructor.getDesc()))
+        	searchSourceBuilder.sort(constructor.getDesc(), SortOrder.DESC);
+        //设置查询体
+        searchSourceBuilder.query(constructor.listBuilders());
+        searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 		log.debug("search:{}", JSON.toJSONString(response, true));

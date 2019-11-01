@@ -17,7 +17,7 @@ public class ReqTransactionTypeEnumTest {
 	
 	@Test
 	public void testGetTxType() {
-		List<String> list = ReqTransactionTypeEnum.getTxType("transfer");
+		List<Object> list = ReqTransactionTypeEnum.getTxType("transfer");
 		assertTrue(list.size()>0);
 //		delegate
 		list = ReqTransactionTypeEnum.getTxType("delegate");

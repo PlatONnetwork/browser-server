@@ -11,6 +11,10 @@ import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.dto.DelegationStaking;
 import com.platon.browser.dto.StakingNode;
+import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.enums.StakingStatusEnum;
@@ -22,10 +26,13 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.resp.staking.*;
 import com.platon.browser.util.I18nUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,6 +48,8 @@ import java.util.List;
 @Service
 public class StakingServiceImpl implements StakingService {
 
+	private final Logger logger = LoggerFactory.getLogger(StakingServiceImpl.class);
+	
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 
@@ -53,8 +62,11 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
 	private CustomDelegationMapper customDelegationMapper;
 
+//	@Autowired
+//	private NodeOptMapper nodeOptMapper;
+	
 	@Autowired
-	private NodeOptMapper nodeOptMapper;
+	private NodeOptESRepository nodeOptESRepository;
 
 	@Autowired
 	private AddressMapper addressMapper;
@@ -286,15 +298,27 @@ public class StakingServiceImpl implements StakingService {
 
 	@Override
 	public RespPage<StakingOptRecordListResp> stakingOptRecordList( StakingOptRecordListReq req) {
-		NodeOptExample nodeOptExample = new NodeOptExample();
-		nodeOptExample.setOrderByClause(" id desc");
-		PageHelper.startPage(req.getPageNo(), req.getPageSize());
-		NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
-		criteria.andNodeIdEqualTo(req.getNodeId());
+//		NodeOptExample nodeOptExample = new NodeOptExample();
+//		nodeOptExample.setOrderByClause(" id desc");
+//		PageHelper.startPage(req.getPageNo(), req.getPageSize());
+//		NodeOptExample.Criteria criteria = nodeOptExample.createCriteria();
+//		criteria.andNodeIdEqualTo(req.getNodeId());
+//		/** 根据节点id查询节点操作记录 */
+//		List<NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
+		
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
+		ESResult<NodeOpt> items = new ESResult<>();
+		constructor.setDesc("id");
+		try {
+			items = nodeOptESRepository.search(constructor, NodeOpt.class, req.getPageNo(),req.getPageSize());
+		} catch (IOException e) {
+			logger.error("获取区块错误。", e);
+		}
+		List<NodeOpt> nodeOpts = items.getRsData();
 		RespPage<StakingOptRecordListResp> respPage = new RespPage<>();
 		List<StakingOptRecordListResp> lists = new LinkedList<>();
-		/** 根据节点id查询节点操作记录 */
-		List<NodeOpt> nodeOpts = nodeOptMapper.selectByExample(nodeOptExample);
 		for (NodeOpt nodeOpt: nodeOpts) {
 			StakingOptRecordListResp stakingOptRecordListResp = new StakingOptRecordListResp();
 			BeanUtils.copyProperties(nodeOpt, stakingOptRecordListResp);
@@ -341,9 +365,8 @@ public class StakingServiceImpl implements StakingService {
 			lists.add(stakingOptRecordListResp);
 		}
 		/** 查询分页总数 */
-		long size = nodeOptMapper.countByExample(nodeOptExample);
 		Page<?> page = new Page<>(req.getPageNo(), req.getPageSize());
-		page.setTotal(size);
+		page.setTotal(items.getTotal());
 		respPage.init(page, lists);
 		return respPage;
 	}

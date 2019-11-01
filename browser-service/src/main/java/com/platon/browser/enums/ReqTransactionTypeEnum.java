@@ -55,8 +55,8 @@ public enum ReqTransactionTypeEnum {
 	 * @param typeName
 	 * @return
 	 */
-	public static List<String> getTxType(String typeName){
-		List<String> list = new ArrayList<>();
+	public static List<Object> getTxType(String typeName){
+		List<Object> list = new ArrayList<>();
 		if(ReqTransactionTypeEnum.TRANSACTION_TRANSFER.getName().equals(typeName)) {
 			list.add(String.valueOf(TxTypeEnum.TRANSFER.getCode()));
 		}

@@ -6,7 +6,8 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.ESResult;
-import com.platon.browser.elasticsearch.dto.ESSortDto;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.now.service.BlockService;
@@ -25,7 +26,6 @@ import com.platon.browser.util.I18nUtil;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -42,10 +42,8 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  区块方法逻辑具体实现
@@ -102,27 +100,21 @@ public class BlockServiceImpl implements BlockService {
 				items = statisticCacheService.getBlockCache(req.getPageNo(), req.getPageSize());
 			}
 			for (Block blockRedis:items) {
-				BlockListResp blockListNewResp = new BlockListResp();
-				BeanUtils.copyProperties(blockRedis, blockListNewResp);
-				blockListNewResp.setServerTime(new Date().getTime());
-				blockListNewResp.setTimestamp(blockRedis.getTime().getTime());
+				BlockListResp blockListNewResp = this.transferBlockListResp(blockRedis);
 				lists.add(blockListNewResp);
 			}
 		} else {
 			/** 查询超过五十万条数据，根据区块号倒序 */
-			List<ESSortDto> esSortDtos = new ArrayList<>();
-			esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
 			ESResult<Block> blocks = new ESResult<>();
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			constructor.setDesc("num");
 			try {
-				blocks = blockESRepository.search(null, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
+				blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 			} catch (IOException e) {
 				logger.error("获取区块错误。", e);
 			}
 			for(Block block:blocks.getRsData()) {
-				BlockListResp blockListNewResp = new BlockListResp();
-				BeanUtils.copyProperties(block, blockListNewResp);
-				blockListNewResp.setServerTime(new Date().getTime());
-				blockListNewResp.setTimestamp(block.getTime().getTime());
+				BlockListResp blockListNewResp = this.transferBlockListResp(block);
 				lists.add(blockListNewResp);
 			}
 		}
@@ -131,17 +123,40 @@ public class BlockServiceImpl implements BlockService {
 		respPage.init(page, lists);
 		return respPage;
 	}
+	
+	private BlockListResp transferBlockListResp(Block block) {
+		BlockListResp blockListResp = new BlockListResp();
+		BeanUtils.copyProperties(block, blockListResp);
+		blockListResp.setBlockReward(block.getReward().toString());
+		blockListResp.setNumber(block.getNum());
+		blockListResp.setStatTxGasLimit(block.getTxGasLimit().toString());
+		blockListResp.setStatTxQty(block.getTxQty());
+		blockListResp.setServerTime(new Date().getTime());
+		blockListResp.setTimestamp(block.getTime().getTime());
+		blockListResp.setGasUsed(block.getGasUsed().toString());
+		return blockListResp;
+	}
 
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
 		/** 根据nodeId 查询区块列表，以区块号倒序  */
-		Map<String, Object> filter = new HashMap<>();
-		filter.put("nodeId", req.getNodeId());
-		List<ESSortDto> esSortDtos = new ArrayList<>();
-		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+//		Map<String, Object> filter = new HashMap<>();
+//		filter.put("nodeId", req.getNodeId());
+//		List<ESSortDto> esSortDtos = new ArrayList<>();
+//		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+//		ESResult<Block> blocks = new ESResult<>();
+//		try {
+//			blocks = blockESRepository.search(filter, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
+//		} catch (IOException e) {
+//			logger.error("获取区块错误。", e);
+//		}
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
+		constructor.setDesc("num");
 		ESResult<Block> blocks = new ESResult<>();
 		try {
-			blocks = blockESRepository.search(filter, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
+			blocks = blockESRepository.search(constructor, Block.class, req.getPageNo(), req.getPageSize());
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
@@ -149,10 +164,7 @@ public class BlockServiceImpl implements BlockService {
 		RespPage<BlockListResp> respPage = new RespPage<>();
 		List<BlockListResp> lists = new LinkedList<>();
 		for (Block block : blocks.getRsData()) {
-			BlockListResp blockListResp = new BlockListResp();
-			BeanUtils.copyProperties(block, blockListResp);
-			blockListResp.setServerTime(new Date().getTime());
-			blockListResp.setTimestamp(block.getTime().getTime());
+			BlockListResp blockListResp = this.transferBlockListResp(block);
 			lists.add(blockListResp);
 		}
 		/** 设置返回的分页数据 */
@@ -173,24 +185,32 @@ public class BlockServiceImpl implements BlockService {
 		String msg = dateFormat.format(now);
         logger.info("导出数据起始日期：{},结束时间：{}",date,msg);
         /** 限制最多导出3万条记录 */
-//        PageHelper.startPage(1,30000);
         /** 设置根据时间和nodeId查询数据 */
 //        BlockExample blockExample = new BlockExample();
 //        blockExample.setOrderByClause("number desc ");
 //        BlockExample.Criteria criteria = blockExample.createCriteria();
 //        criteria.andNodeIdEqualTo(nodeId);
-        
 //        criteria.andCreTimeBetween(new Date(date), now);
-        
 //        List<Block> blockList = blockMapper.selectByExample(blockExample);
         
-        Map<String, Object> filter = new HashMap<>();
-		filter.put("nodeId", nodeId);
-		List<ESSortDto> esSortDtos = new ArrayList<>();
-		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+//        Map<String, Object> filter = new HashMap<>();
+//		filter.put("nodeId", nodeId);
+//		List<ESSortDto> esSortDtos = new ArrayList<>();
+//		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
+//		ESResult<Block> blockList = new ESResult<>();
+//		try {
+//			blockList = blockESRepository.search(filter, Block.class, esSortDtos, 1, 30000);
+//		} catch (IOException e) {
+//			logger.error("获取区块错误。", e);
+//		}
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("nodeId", nodeId));
+		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), now.getTime()));
+		constructor.setDesc("num");
 		ESResult<Block> blockList = new ESResult<>();
 		try {
-			blockList = blockESRepository.search(filter, Block.class, esSortDtos, 1, 30000);
+			blockList = blockESRepository.search(constructor, Block.class, 1, 30000);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
@@ -254,12 +274,21 @@ public class BlockServiceImpl implements BlockService {
 
 	private BlockDetailResp queryBlockByNumber(long blockNumber) {
 		/** 根据区块号查询对应数据 */
-//		Block block = blockMapper.selectByPrimaryKey(blockNumber);
-		Map<String, Object> filter = new HashMap<>();
-		filter.put("num", blockNumber);
+//		Map<String, Object> filter = new HashMap<>();
+//		filter.put("num", blockNumber);
+//		ESResult<Block> blockList = new ESResult<>();
+//		try {
+//			blockList = blockESRepository.search(filter, Block.class, null, 1, 1);
+//		} catch (IOException e) {
+//			logger.error("获取区块错误。", e);
+//		}
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("num", blockNumber));
+		constructor.setDesc("num");
 		ESResult<Block> blockList = new ESResult<>();
 		try {
-			blockList = blockESRepository.search(filter, Block.class, null, 1, 1);
+			blockList = blockESRepository.search(constructor, Block.class, 1, 1);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
@@ -267,14 +296,20 @@ public class BlockServiceImpl implements BlockService {
 		if (blockList.getRsData() != null && blockList.getRsData().size() > 0) {
 			Block block = blockList.getRsData().get(0);
 			BeanUtils.copyProperties(block, blockDetailResp);
-			blockDetailResp.setTxQty(block.getTxQty());
-			blockDetailResp.setTransferQty(block.getTranQty());
+			blockDetailResp.setBlockReward(block.getReward().toString());
 			blockDetailResp.setDelegateQty(block.getdQty());
-			blockDetailResp.setStakingQty(block.getsQty());
+			blockDetailResp.setExtraData(block.getExtra());
+			blockDetailResp.setNumber(block.getNum());
+			blockDetailResp.setParentHash(block.getpHash());
 			blockDetailResp.setProposalQty(block.getpQty());
-
+			blockDetailResp.setStakingQty(block.getsQty());
+			blockDetailResp.setStatTxGasLimit(block.getTxGasLimit().toString());
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());
+			blockDetailResp.setTransferQty(block.getTranQty());
+			blockDetailResp.setGasLimit(block.getGasLimit().toString());
+			blockDetailResp.setGasUsed(block.getGasUsed().toString());
+			
 
 			/** 取上一个区块,如果存在则设置标识和hash */
 //			BlockExample blockExample = new BlockExample();

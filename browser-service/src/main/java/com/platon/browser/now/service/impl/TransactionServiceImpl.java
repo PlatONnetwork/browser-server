@@ -2,7 +2,6 @@ package com.platon.browser.now.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
@@ -15,7 +14,8 @@ import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.TransactionESRepository;
 import com.platon.browser.elasticsearch.dto.ESResult;
-import com.platon.browser.elasticsearch.dto.ESSortDto;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
@@ -37,7 +37,6 @@ import com.platon.browser.util.*;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -56,10 +55,8 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 交易方法逻辑实现
@@ -100,7 +97,10 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionListResp> lists = this.tranferList(items);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
-        result.setTotalCount(transactionCacheDto.getPage().getTotalCount());
+        
+        NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
+        result.setDisplayTotalCount(transactionCacheDto.getPage().getTotalCount());
+        result.setTotalCount(networkStat.getTxQty());
         result.setTotalPages(transactionCacheDto.getPage().getTotalPages());
         return result;
     }
@@ -108,23 +108,37 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public RespPage<TransactionListResp> getTransactionListByBlock(TransactionListByBlockRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
-        TransactionExample transactionExample = new TransactionExample();
-        TransactionExample.Criteria criteria = transactionExample.createCriteria()
-                .andNumEqualTo(req.getBlockNumber().longValue());
-        if (req.getTxType() != null && !req.getTxType().isEmpty()) {
-            criteria.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
-        }
+//        TransactionExample transactionExample = new TransactionExample();
+//        TransactionExample.Criteria criteria = transactionExample.createCriteria()
+//                .andNumEqualTo(req.getBlockNumber().longValue());
+//        if (req.getTxType() != null && !req.getTxType().isEmpty()) {
+//            criteria.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
+//        }
 //        PageHelper.startPage(req.getPageNo(),req.getPageSize());
 //        /** 根据区块号和类型分页查询交易信息 */
 //        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         
-        Map<String, Object> filter = new HashMap<>();
-		filter.put("num", req.getBlockNumber().longValue());
-        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//        Map<String, Object> filter = new HashMap<>();
+//		filter.put("num", req.getBlockNumber().longValue());
+//        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//		try {
+//			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+//		} catch (IOException e) {
+//			logger.error("查询es交易信息错误", e);
+//		}
+        
+        ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("num", req.getBlockNumber()));
+		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
+			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
+		}
+		constructor.setDesc("seq");
+		/** 根据区块号和类型分页查询交易信息 */
 		try {
-			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
-			logger.error("查询es交易信息错误", e);
+			logger.error("获取区块错误。", e);
 		}
         List<TransactionListResp> lists = this.tranferList(items.getRsData());
         /** 统计交易信息 */
@@ -138,29 +152,42 @@ public class TransactionServiceImpl implements TransactionService {
     public RespPage<TransactionListResp> getTransactionListByAddress(TransactionListByAddressRequest req) {
         RespPage<TransactionListResp> result = new RespPage<>();
 
-        TransactionExample transactionExample = new TransactionExample();
-        transactionExample.setOrderByClause("sequence desc");
-        /** 地址信息可能是from也可能是to */
-        TransactionExample.Criteria first = transactionExample.createCriteria()
-                .andFromEqualTo(req.getAddress());
-        TransactionExample.Criteria second = transactionExample.createCriteria()
-                .andToEqualTo(req.getAddress());
-        if (req.getTxType() != null && !req.getTxType().isEmpty()) {
-        	first.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
-        	second.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
-        }
+//        TransactionExample transactionExample = new TransactionExample();
+//        transactionExample.setOrderByClause("sequence desc");
+//        /** 地址信息可能是from也可能是to */
+//        TransactionExample.Criteria first = transactionExample.createCriteria()
+//                .andFromEqualTo(req.getAddress());
+//        TransactionExample.Criteria second = transactionExample.createCriteria()
+//                .andToEqualTo(req.getAddress());
+//        if (req.getTxType() != null && !req.getTxType().isEmpty()) {
+//        	first.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
+//        	second.andTypeIn(ReqTransactionTypeEnum.getTxType(req.getTxType()));
+//        }
 //        PageHelper.startPage(req.getPageNo(),req.getPageSize());
-        transactionExample.or(second);
+//        transactionExample.or(second);
         /** 根据地址查询分页交易信息 */
 //        List<TransactionWithBLOBs> items = transactionMapper.selectByExampleWithBLOBs(transactionExample);
         
-        Map<String, Object> filter = new HashMap<>();
-//		filter.put("num", req.getBlockNumber().longValue());
-        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//        Map<String, Object> filter = new HashMap<>();
+//        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//		try {
+//			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+//		} catch (IOException e) {
+//			logger.error("查询es交易信息错误", e);
+//		}
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.should(new ESQueryBuilders().term("from", req.getAddress()));
+		constructor.should(new ESQueryBuilders().term("to", req.getAddress()));
+		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
+			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
+		}
+		constructor.setDesc("seq");
 		try {
-			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, req.getPageNo(),req.getPageSize());
+			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
-			logger.error("查询es交易信息错误", e);
+			logger.error("获取区块错误。", e);
 		}
         List<TransactionListResp> lists = this.tranferList(items.getRsData());
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
@@ -175,6 +202,12 @@ public class TransactionServiceImpl implements TransactionService {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
+            transactionListResp.setActualTxCost(transaction.getCost().toString());
+            transactionListResp.setBlockNumber(transaction.getNum());
+            transactionListResp.setReceiveType(String.valueOf(transaction.getToType()));
+            transactionListResp.setTxReceiptStatus(transaction.getStatus());
+            transactionListResp.setTxType(transaction.getType());
+            transactionListResp.setValue(transaction.getValue().toString());
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
             lists.add(transactionListResp);
@@ -187,30 +220,41 @@ public class TransactionServiceImpl implements TransactionService {
         Date currentServerTime = new Date();
         String msg = dateFormat.format(currentServerTime);
         logger.info("导出地址交易列表数据起始日期：{},结束日期：{}", date, msg);
-        TransactionExample transactionExample = new TransactionExample();
-        transactionExample.setOrderByClause(" sequence desc");
-        /** 根据地址查询交易，则可能是from也可能是to */
-        TransactionExample.Criteria first = transactionExample.createCriteria();
-        TransactionExample.Criteria second = transactionExample.createCriteria();
-        first.andFromEqualTo(address);
-        second.andToEqualTo(address);
-    	first.andCreTimeBetween(new Date(date), currentServerTime);
-    	second.andCreTimeBetween(new Date(date), currentServerTime);
+//        TransactionExample transactionExample = new TransactionExample();
+//        transactionExample.setOrderByClause(" sequence desc");
+//        /** 根据地址查询交易，则可能是from也可能是to */
+//        TransactionExample.Criteria first = transactionExample.createCriteria();
+//        TransactionExample.Criteria second = transactionExample.createCriteria();
+//        first.andFromEqualTo(address);
+//        second.andToEqualTo(address);
+//    	first.andCreTimeBetween(new Date(date), currentServerTime);
+//    	second.andCreTimeBetween(new Date(date), currentServerTime);
 
         /** 限制最多导出3万条记录 */
-        PageHelper.startPage(1,30000);
-        transactionExample.or(second);
+//        PageHelper.startPage(1,30000);
+//        transactionExample.or(second);
 //        List<Transaction> items = transactionMapper.selectByExample(transactionExample);
         
-        Map<String, Object> filter = new HashMap<>();
-//		filter.put("num", req.getBlockNumber().longValue());
-        List<ESSortDto> esSortDtos = new ArrayList<>();
-        esSortDtos.add(new ESSortDto("seq", SortOrder.DESC));
-        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//        Map<String, Object> filter = new HashMap<>();
+//        List<ESSortDto> esSortDtos = new ArrayList<>();
+//        esSortDtos.add(new ESSortDto("seq", SortOrder.DESC));
+//        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+//		try {
+//			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, esSortDtos, 1,30000);
+//		} catch (IOException e) {
+//			logger.error("查询es交易信息错误", e);
+//		}
+		
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.should(new ESQueryBuilders().term("from", address));
+		constructor.should(new ESQueryBuilders().term("to", address));
+		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), currentServerTime.getTime()));
+		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		constructor.setDesc("seq");
 		try {
-			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, esSortDtos, 1,30000);
+			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 3000);
 		} catch (IOException e) {
-			logger.error("查询es交易信息错误", e);
+			logger.error("获取区块错误。", e);
 		}
         List<Object[]> rows = new ArrayList<>();
         items.getRsData().forEach(transaction -> {
@@ -272,18 +316,27 @@ public class TransactionServiceImpl implements TransactionService {
     	/** 根据hash查询具体的交易数据 */
 //    	TransactionWithBLOBs transaction = transactionMapper.selectByPrimaryKey(req.getTxHash());
     	
-    	Map<String, Object> filter = new HashMap<>();
-		filter.put("hash", req.getTxHash());
-        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
+		ESResult<TransactionWithBLOBs> items = new ESResult<>();
 		try {
-			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, 1,1);
+			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
 		} catch (IOException e) {
-			logger.error("查询es交易信息错误", e);
+			logger.error("获取区块错误。", e);
 		}
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(items!=null && items.getRsData().size() > 0) {
     		TransactionWithBLOBs transaction = items.getRsData().get(0);
     		BeanUtils.copyProperties(transaction, resp);
+    		resp.setActualTxCost(transaction.getCost().toString());
+    		resp.setBlockNumber(transaction.getNum());
+    		resp.setGasLimit(transaction.getGasLimit().toString());
+    		resp.setGasPrice(transaction.getGasPrice().toString());
+    		resp.setGasUsed(transaction.getGasUsed().toString());
+    		resp.setReceiveType(String.valueOf(transaction.getToType()));
+    		resp.setTxReceiptStatus(transaction.getStatus());
+    		resp.setTxType(transaction.getType());
+    		resp.setValue(transaction.getValue().toString());
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
     		resp.setServerTime(new Date().getTime());
@@ -552,13 +605,13 @@ public class TransactionServiceImpl implements TransactionService {
     	TransactionListResp resp = new TransactionListResp();
     	/** 根据hash查询交易具体指 */
 //    	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
-    	Map<String, Object> filter = new HashMap<>();
-		filter.put("hash", req.getTxHash());
-        ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
+		ESResult<TransactionWithBLOBs> items = new ESResult<>();
 		try {
-			items = transactionESRepository.search(filter, TransactionWithBLOBs.class, null, 1,1);
+			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
 		} catch (IOException e) {
-			logger.error("查询es交易信息错误", e);
+			logger.error("获取区块错误。", e);
 		}
     	if(items.getRsData() != null && items.getRsData().size() > 0) {
     		TransactionWithBLOBs currentDetail = items.getRsData().get(0);
