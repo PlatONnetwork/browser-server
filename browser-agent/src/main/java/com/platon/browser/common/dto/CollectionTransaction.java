@@ -5,23 +5,22 @@ import com.platon.browser.client.result.Receipt;
 import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
-import com.platon.browser.enums.ReceiveTypeEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.util.TxParamResolver;
-import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Slf4j
 public class CollectionTransaction extends Transaction {
     private CollectionTransaction(){}
-    public static final CollectionTransaction newInstance(){
+    static CollectionTransaction newInstance(){
         CollectionTransaction transaction = new CollectionTransaction();
         Date date = new Date();
         transaction.setCreTime(date);
@@ -36,12 +35,12 @@ public class CollectionTransaction extends Transaction {
         return transaction;
     }
 
-    public CollectionTransaction updateWithBlock(CollectionBlock block){
+    CollectionTransaction updateWithBlock(CollectionBlock block){
         this.setTime(block.getTime());
         return this;
     }
 
-    public CollectionTransaction updateWithRawTransaction(org.web3j.protocol.core.methods.response.Transaction transaction){
+    CollectionTransaction updateWithRawTransaction(org.web3j.protocol.core.methods.response.Transaction transaction){
         this.setNum(transaction.getBlockNumber().longValue());
         this.setBHash(transaction.getBlockHash());
         this.setHash(transaction.getHash());
@@ -55,7 +54,7 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    public CollectionTransaction updateWithReceipt(Receipt receipt) throws BeanCreateOrUpdateException {
+    CollectionTransaction updateWithBlockAndReceipt(CollectionBlock block,Receipt receipt) throws BeanCreateOrUpdateException {
         this.setGasUsed(new BigDecimal(receipt.getGasUsed()));
         this.setCost(this.getGasUsed().multiply(this.getGasPrice()));
         this.setFailReason(receipt.getFailReason());
@@ -81,6 +80,36 @@ public class CollectionTransaction extends Transaction {
         }
         this.setStatus(receipt.getStatus());
         this.setSeq(this.getNum()*10000+this.getIndex());
+
+        // 累加区块中的统计信息
+        switch (this.getTypeEnum()){
+            case TRANSFER: // 转账交易，from地址转账交易数加一
+                block.setTranQty(block.getTranQty()+1);
+                break;
+            case INCREASE_STAKING:// 增加自有质押
+            case CREATE_VALIDATOR:// 创建验证人
+            case EXIT_VALIDATOR:// 退出验证人
+            case REPORT_VALIDATOR:// 举报验证人
+            case EDIT_VALIDATOR:// 编辑验证人
+                block.setSQty(block.getSQty()+1);
+                break;
+            case DELEGATE:// 发起委托
+            case UN_DELEGATE:// 撤销委托
+                block.setDQty(block.getDQty()+1);
+                break;
+            case CANCEL_PROPOSAL:// 取消提案
+            case CREATE_PROPOSAL_TEXT:// 创建文本提案
+            case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
+            case DECLARE_VERSION:// 版本声明
+            case VOTING_PROPOSAL:// 提案投票
+                block.setPQty(block.getPQty()+1);
+                break;
+            default:
+        }
+        // 累加当前交易的手续费到当前区块的txFee
+        block.setTxFee(block.getTxFee().add(this.getCost()));
+        // 累加当前交易的能量限制到当前区块的txGasLimit
+        block.setTxGasLimit(block.getTxGasLimit().add(this.getGasLimit()));
         return this;
     }
 
@@ -176,5 +205,21 @@ public class CollectionTransaction extends Transaction {
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(ToTypeEnum en){return ENUMS.containsValue(en);}
+    }
+
+    /**
+     * 获取当前交易的交易类型枚举
+     * @return
+     */
+    public TypeEnum getTypeEnum(){
+        return TypeEnum.getEnum(this.getType());
+    }
+
+    /**
+     * 根据类型获取交易参数信息对象
+     * @return
+     */
+    public <T> T getTxParam (Class<T> clazz) {
+        return JSON.parseObject(this.getInfo(), clazz);
     }
 }

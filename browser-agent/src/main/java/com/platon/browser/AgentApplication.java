@@ -55,7 +55,6 @@ public class AgentApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
-
 		for (;true;){
 			try {
 				collectedNumber++;
@@ -67,6 +66,7 @@ public class AgentApplication implements ApplicationRunner {
 				EpochMessage epochMessage = new EpochMessage(BigInteger.valueOf(collectedNumber),platOnClient,specialContractApi);
 				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);
 			}catch (Exception e){
+				log.error("程序因错误而停止:",e);
 				break;
 			}
 		}

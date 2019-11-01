@@ -13,11 +13,9 @@ import java.math.BigInteger;
 @Data
 @Slf4j
 public class EpochMessage {
-    private BigInteger blockNumber;
     private ConsensusEpoch consensusEpoch=new ConsensusEpoch();
     private SettlementEpoch settlementEpoch=new SettlementEpoch();
     public EpochMessage(BigInteger blockNumber, PlatOnClient platOnClient, SpecialContractApi specialContractApi){
-        this.blockNumber = blockNumber;
         consensusEpoch.init(blockNumber,platOnClient,specialContractApi);
         settlementEpoch.init(blockNumber,platOnClient,specialContractApi);
     }

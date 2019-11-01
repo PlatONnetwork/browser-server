@@ -4,6 +4,7 @@ import com.platon.browser.client.result.Receipt;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class CollectionBlock extends Block {
     private List<CollectionTransaction> transactions=new ArrayList<>();
 
     private CollectionBlock(){}
-    public static final CollectionBlock newInstance(){
+    public static CollectionBlock newInstance(){
         CollectionBlock block = new CollectionBlock();
         Date date = new Date();
         block.setCreTime(date);
@@ -53,13 +54,16 @@ public class CollectionBlock extends Block {
         String nodeId = NodeTool.getPublicKey(block);
         nodeId = HexTool.prefix(nodeId);
         this.setNodeId(nodeId);
-        this.setTxGasLimit(new BigDecimal(block.getGasLimit()));
+        this.setGasLimit(new BigDecimal(block.getGasLimit()));
         this.setGasUsed(new BigDecimal(block.getGasUsed()));
 
+        if(block.getTransactions().isEmpty()) return this;
+
+        if(receiptResult.getResult().isEmpty()) throw new BusinessException("区块["+this.getNum()+"]有["+block.getTransactions().size()+"]笔交易,但查询不到回执!");
 
         // 解析交易
         List<PlatonBlock.TransactionResult> transactionResults = block.getTransactions();
-        if(receiptResult.getResult()!=null&&receiptResult.getResult().size()>0){
+        if(receiptResult.getResult()!=null&&!receiptResult.getResult().isEmpty()){
             Map<String,Receipt> receiptMap=receiptResult.getMap();
             for (PlatonBlock.TransactionResult tr : transactionResults) {
                 PlatonBlock.TransactionObject to = (PlatonBlock.TransactionObject) tr.get();
@@ -67,18 +71,10 @@ public class CollectionBlock extends Block {
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
-                        .updateWithReceipt(receiptMap.get(rawTransaction.getHash()));
+                        .updateWithBlockAndReceipt(this,receiptMap.get(rawTransaction.getHash()));
                 transactions.add(transaction);
             }
         }
-
-
         return this;
     }
-
-    public CollectionBlock updateWithReceipt(ReceiptResult receiptResult){
-        receiptResult.getResult();
-        return this;
-    }
-
 }
