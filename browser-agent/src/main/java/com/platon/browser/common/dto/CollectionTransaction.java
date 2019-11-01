@@ -1,16 +1,21 @@
 package com.platon.browser.common.dto;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.result.Receipt;
+import com.platon.browser.dto.CustomTransaction;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.InnerContractAddrEnum;
+import com.platon.browser.enums.ReceiveTypeEnum;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
+import com.platon.browser.util.TxParamResolver;
+import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 @Data
 @Slf4j
@@ -50,11 +55,31 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-    public CollectionTransaction updateWithReceipt(Receipt receipt){
+    public CollectionTransaction updateWithReceipt(Receipt receipt) throws BeanCreateOrUpdateException {
         this.setGasUsed(new BigDecimal(receipt.getGasUsed()));
         this.setCost(this.getGasUsed().multiply(this.getGasPrice()));
         this.setFailReason(receipt.getFailReason());
-        this.setStatus(receipt.getReceiptStatus());
+
+        // 默认取状态字段作为交易成功与否的状态
+        this.setStatus(receipt.getStatus());
+        if (InnerContractAddrEnum.getAddresses().contains(this.getTo())) {
+            // 如果接收者为内置合约, 取日志中的状态作为交易成功与否的状态
+            this.setStatus(receipt.getLogStatus());
+        }
+
+        try {
+            TxParamResolver.Result txParams = TxParamResolver.analysis(this.getInput());
+            this.setInfo(JSON.toJSONString(txParams.getParam()));
+            this.setType(String.valueOf(txParams.getTxTypeEnum().getCode()));
+            this.setToType(ToTypeEnum.CONTRACT.code);
+            if (this.getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(this.getTo())) {
+                this.setType(String.valueOf(CustomTransaction.TxTypeEnum.TRANSFER.getCode()));
+                this.setToType(ToTypeEnum.ACCOUNT.code);
+            }
+        } catch (Exception e) {
+            throw new BeanCreateOrUpdateException("交易[hash:" + this.getHash() + "]的参数解析出错:" + e.getMessage());
+        }
+        this.setStatus(receipt.getStatus());
         this.setSeq(this.getNum()*10000+this.getIndex());
         return this;
     }
@@ -126,5 +151,30 @@ public class CollectionTransaction extends Transaction {
         }
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(StatusEnum en){return ENUMS.containsValue(en);}
+    }
+
+    /**
+     * 交易接收者类型(to是合约还是账户):1合约,2账户
+     */
+    public enum ToTypeEnum{
+        CONTRACT(1, "合约"),
+        ACCOUNT(2, "账户")
+        ;
+        private int code;
+        private String desc;
+        ToTypeEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode(){return code;}
+        public String getDesc(){return desc;}
+        private static final Map<Integer, ToTypeEnum> ENUMS = new HashMap<>();
+        static {
+            Arrays.asList(ToTypeEnum.values()).forEach(en->ENUMS.put(en.code,en));}
+        public static ToTypeEnum getEnum(Integer code){
+            return ENUMS.get(code);
+        }
+        public static boolean contains(int code){return ENUMS.containsKey(code);}
+        public static boolean contains(ToTypeEnum en){return ENUMS.containsValue(en);}
     }
 }

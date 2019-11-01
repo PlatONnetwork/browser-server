@@ -3,6 +3,7 @@ package com.platon.browser.common.dto;
 import com.platon.browser.client.result.Receipt;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.Data;
@@ -41,7 +42,7 @@ public class CollectionBlock extends Block {
         return block;
     }
 
-    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block,ReceiptResult receiptResult){
+    public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block,ReceiptResult receiptResult) throws BeanCreateOrUpdateException {
         this.setNum(block.getNumber().longValue());
         this.setHash(block.getHash());
         this.setPHash(block.getParentHash());
@@ -60,15 +61,15 @@ public class CollectionBlock extends Block {
         List<PlatonBlock.TransactionResult> transactionResults = block.getTransactions();
         if(receiptResult.getResult()!=null&&receiptResult.getResult().size()>0){
             Map<String,Receipt> receiptMap=receiptResult.getMap();
-            transactionResults.forEach(tr->{
-                PlatonBlock.TransactionObject to = (PlatonBlock.TransactionObject)tr.get();
+            for (PlatonBlock.TransactionResult tr : transactionResults) {
+                PlatonBlock.TransactionObject to = (PlatonBlock.TransactionObject) tr.get();
                 Transaction rawTransaction = to.get();
                 CollectionTransaction transaction = CollectionTransaction.newInstance()
                         .updateWithBlock(this)
                         .updateWithRawTransaction(rawTransaction)
                         .updateWithReceipt(receiptMap.get(rawTransaction.getHash()));
                 transactions.add(transaction);
-            });
+            }
         }
 
 
