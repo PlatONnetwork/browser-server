@@ -1,0 +1,88 @@
+# ***************************开发配置**************************** #
+##集群模式
+spring:
+  redis:
+    cluster:
+      max-redirects: 3
+      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+    password: platscan
+##Sentinel模式
+#spring:
+#  redis:
+#    sentinel:
+#      master: mymaster
+#      nodes: 192.168.16.172:26379,192.168.16.172:26380,192.168.16.172:26381
+#    password: foobared
+#    database: 0
+#ES配置
+elasticsearch:
+  hosts: 192.168.120.172
+  port: 9200
+  schema: http
+  blockIndexName: browser_block_1
+  transactionIndexName: browser_transaction_1
+  nodeOptIndexName: browser_nodeopt_1
+# 应用版本
+version: 0.7.3.1
+# 当前激活的配置名称(请不要修改)
+profile: test
+# MySQL数据库连接地址
+dburl: jdbc:mysql://192.168.16.171:3306/platon_browser_${version}_${profile}?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+# MySQL数据库用户名
+dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
+# MySQL数据库密码
+dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
+web3j:
+  addresses: http://192.168.112.172:8789
+# 内存环形缓冲区大小，必须是2的指数倍
+disruptor:
+  queue:
+    ring.buffer.size: 1024
+#日志配置
+logging:
+  file: ./logs/${spring.application.name}-${version}-${profile}.log
+  #日志级别
+  level:
+    org.springframework: debug
+    com.platon.browser: debug
+    com.platon.browser.service: debug
+    com.platon.browser.task: debug
+    com.platon.browser.client: debug
+    com.platon.browser.dao: debug
+    com.platon.browser.engine: debug
+    com.platon.browser.engine.handler.epoch: error
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+#初始化链相关的配置
+platon.config:
+  # 质押节点统计年化率最多取多少个连续周期
+  maxSettlePeriodCount4AnnualizedRateStat: 4
+  #PlatON初始总发行量(LAT)
+  initIssueAmount: 10000000000
+  #每年固定增发比例
+  addIssueRate: 0.025
+  #每年增发分配给激励池的比例
+  incentiveRateFromIssue: 0.8
+  #每个共识轮中回退多少个块是选举下一轮验证人的时机
+  electionBackwardBlockCount: 20
+  #10年内计算士基金会向激励池填充额度: <第几年-补贴金额(LAT)>
+  foundationSubsidies: {
+    '1':62215742,
+    '2':55965742,
+    '3':49559492,
+    '4':42993086,
+    '5':36262520,
+    '6':29363689,
+    '7':22292388,
+    '8':15044304,
+    '9':7615018
+  }
+  # 初始内置节点默认质押金额(LAT)
+  defaultStakingLockedAmount: 1500000
+  #提案url参数模板
+  proposalUrlTemplate: https://github.com/danielgogo/PIPs/blob/master/PIP-{pip_id}.md
+  #keysBase网址
+  keyBase: https://keybase.io/
+  #keyBase api
+  keyBaseApi: _/api/1.0/user/autocomplete.json?q=
