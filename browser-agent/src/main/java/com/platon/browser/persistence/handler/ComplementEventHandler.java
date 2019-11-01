@@ -9,6 +9,7 @@ import com.platon.browser.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +32,10 @@ public class ComplementEventHandler implements IComplementEventHandler {
         blocks.add(event.getBlock());
         List<Transaction> transactions = new ArrayList<>(event.getTransactions());
 
-        esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
+        try {
+            esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
