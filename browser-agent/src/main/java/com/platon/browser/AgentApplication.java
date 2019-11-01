@@ -5,7 +5,7 @@ import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.epoch.EpochService;
 import com.platon.browser.collection.service.transaction.TransactionService;
-import com.platon.browser.common.dto.EpochMessage;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class AgentApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
-		for (;true;){
+		while (true) {
 			try {
 				collectedNumber++;
 				// 异步获取区块

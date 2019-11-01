@@ -1,4 +1,4 @@
-package com.platon.browser.common.dto;
+package com.platon.browser.common.collection.dto;
 
 import com.platon.browser.collection.service.epoch.EpochRetryService;
 import com.platon.browser.collection.service.epoch.EpochService;

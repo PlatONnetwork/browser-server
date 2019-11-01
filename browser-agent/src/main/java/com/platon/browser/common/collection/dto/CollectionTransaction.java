@@ -1,4 +1,4 @@
-package com.platon.browser.common.dto;
+package com.platon.browser.common.collection.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.result.Receipt;

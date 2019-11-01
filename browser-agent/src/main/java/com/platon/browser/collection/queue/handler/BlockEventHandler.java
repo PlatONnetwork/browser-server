@@ -3,7 +3,7 @@ package com.platon.browser.collection.queue.handler;
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
-import com.platon.browser.common.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import com.platon.browser.queue.collection.publisher.CollectionEventPublisher;
 import lombok.extern.slf4j.Slf4j;

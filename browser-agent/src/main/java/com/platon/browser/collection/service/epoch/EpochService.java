@@ -1,6 +1,6 @@
 package com.platon.browser.collection.service.epoch;
 
-import com.platon.browser.common.dto.EpochMessage;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;

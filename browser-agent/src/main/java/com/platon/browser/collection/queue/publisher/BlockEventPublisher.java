@@ -7,7 +7,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.collection.queue.handler.BlockEventHandler;
-import com.platon.browser.common.dto.EpochMessage;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,16 +24,13 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class BlockEventPublisher {
-    private static final EventTranslatorThreeArg<BlockEvent,CompletableFuture<PlatonBlock>,CompletableFuture<ReceiptResult>,EpochMessage> TRANSLATOR = (event, sequence, blockCF,receiptCF,epochMessage) -> {
-        event.setBlockCF(blockCF);
-        event.setReceiptCF(receiptCF);
-        event.setEpochMessage(epochMessage);
-    };
+    private static final EventTranslatorThreeArg<BlockEvent,CompletableFuture<PlatonBlock>,CompletableFuture<ReceiptResult>,EpochMessage>
+    TRANSLATOR = (event, sequence, blockCF,receiptCF,epochMessage)->event.setBlockCF(blockCF).setReceiptCF(receiptCF).setEpochMessage(epochMessage);
     private RingBuffer<BlockEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.block.buffer-size}")
     private int ringBufferSize;
-    private EventFactory<BlockEvent> eventFactory = BlockEvent::new;
+    private EventFactory<BlockEvent> eventFactory = BlockEvent::newInstance;
     @Autowired
     private BlockEventHandler handler;
     // 事件处理线程生产工厂
