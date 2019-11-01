@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 /**
  * @Auther: Chendongming
  * @Date: 2019/10/30 11:14
- * @Description: 交易服务
+ * @Description: 带重试功能的交易服务
  */
 @Slf4j
 @Service

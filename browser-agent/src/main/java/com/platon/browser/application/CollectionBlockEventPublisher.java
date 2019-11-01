@@ -3,6 +3,7 @@ package com.platon.browser.application;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.collection.producer.EventProducer;
 import com.platon.browser.complement.queue.handler.CollectionBlockEventHandler;
 import com.platon.browser.queue.event.collection.CollectionBlockEvent;
 import com.platon.browser.queue.event.collection.CollectionBlockEventBody;
@@ -31,7 +32,8 @@ public class CollectionBlockEventPublisher {
     @Autowired
     private CollectionBlockEventHandler handler;
 
-    private CollectionBlockEventProducerWithTranslator producer;
+    private EventProducer producer;
+
     @PostConstruct
     private void init(){
         // 事件生产工厂
@@ -67,6 +69,6 @@ public class CollectionBlockEventPublisher {
         eb.setBlockCB(blockCB);
         eb.setReceiptCF(receiptCF);
         eb.setReceiptCB(receiptCB);
-        producer.onData(eb);
+        producer.publish(eb);
     }
 }

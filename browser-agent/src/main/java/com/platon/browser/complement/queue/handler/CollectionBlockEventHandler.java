@@ -16,11 +16,11 @@ import java.util.concurrent.ExecutionException;
 @Component
 public class CollectionBlockEventHandler implements EventHandler<CollectionBlockEvent> {
     @Autowired
-    private CollectionBlockEventRetryHandler retryHandler;
+    private CollectionBlockEventChecker eventChecker;
     @Override
     public void onEvent(CollectionBlockEvent event, long sequence, boolean endOfBatch) throws BusinessException {
         // 等待CompletableFuture完成
-        retryHandler.isDone(event);
+        eventChecker.isDone(event);
         try {
             // 调用回调处理业务
             event.getBody().getBlockCB().call(event.getBody().getBlockCF().get());
@@ -31,6 +31,4 @@ public class CollectionBlockEventHandler implements EventHandler<CollectionBlock
             e.printStackTrace();
         }
     }
-
-
 }
