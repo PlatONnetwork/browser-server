@@ -8,7 +8,7 @@ import com.platon.browser.common.dto.CollectionBlock;
 import com.platon.browser.common.dto.CollectionTransaction;
 import com.platon.browser.common.dto.EpochMessage;
 import com.platon.browser.queue.collection.event.CollectionEvent;
-import com.platon.browser.queue.complement.handler.CollectionEventHandler;
+import com.platon.browser.queue.collection.handler.CollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

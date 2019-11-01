@@ -1,4 +1,4 @@
-package com.platon.browser.queue.complement.handler;
+package com.platon.browser.queue.collection.handler;
 
 import com.lmax.disruptor.EventHandler;
 import com.platon.browser.queue.collection.event.CollectionEvent;
@@ -18,6 +18,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException {
+
+        // 此处调用 complement模块的功能
 
         log.info("Block Number: {}", event.getBlock().getNum());
         log.info("Transactions: {}", event.getTransactions());
