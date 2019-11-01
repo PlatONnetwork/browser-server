@@ -1,23 +1,19 @@
-package com.platon.browser.queue.collection.handler;
+package com.platon.browser.complement.queue.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.platon.browser.queue.collection.event.CollectionEvent;
+import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * 区块事件处理器
  */
 @Slf4j
-@Component
-public class CollectionEventHandler implements EventHandler<CollectionEvent> {
+public class CollectionEventHandler implements ICollectionEventHandler {
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException {
+    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) {
 
         // 此处调用 complement模块的功能
 

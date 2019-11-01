@@ -8,7 +8,7 @@ import com.platon.browser.common.dto.CollectionBlock;
 import com.platon.browser.common.dto.CollectionTransaction;
 import com.platon.browser.common.dto.EpochMessage;
 import com.platon.browser.queue.collection.event.CollectionEvent;
-import com.platon.browser.queue.collection.handler.CollectionEventHandler;
+import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class CollectionEventPublisher {
     private int ringBufferSize;
     private EventFactory<CollectionEvent> eventFactory = CollectionEvent::new;
     @Autowired
-    private CollectionEventHandler handler;
+    private ICollectionEventHandler handler;
     // 事件处理线程生产工厂
     ThreadFactory consumeThreadFactory = Thread::new;
 
