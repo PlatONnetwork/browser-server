@@ -26,13 +26,13 @@ public class BusinessService {
         List<BusinessParam> businessParams = new ArrayList<>();
         if(transactions.isEmpty()) return businessParams;
         for (CollectionTransaction tx : transactions) {
-            supplementService.supplement(tx);
             try{
                 BusinessParam businessParam = businessParamService.getParameter(tx);
                 businessParams.add(businessParam);
             }catch (BusinessException e){
                 log.debug("{}",e);
             }
+            supplementService.supplement(tx);
         }
         return businessParams;
     }

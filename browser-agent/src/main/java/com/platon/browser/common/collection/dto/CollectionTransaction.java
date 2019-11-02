@@ -1,6 +1,7 @@
 package com.platon.browser.common.collection.dto;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.client.result.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -118,12 +119,11 @@ public class CollectionTransaction extends Transaction {
         return this;
     }
 
-
-
     /**
      * 获取当前交易的交易类型枚举
      * @return
      */
+    @JsonIgnore
     public TypeEnum getTypeEnum(){
         return TypeEnum.getEnum(this.getType());
     }
@@ -132,6 +132,7 @@ public class CollectionTransaction extends Transaction {
      * 根据类型获取交易参数信息对象
      * @return
      */
+    @JsonIgnore
     public <T> T getTxParam (Class<T> clazz) {
         return JSON.parseObject(this.getInfo(), clazz);
     }

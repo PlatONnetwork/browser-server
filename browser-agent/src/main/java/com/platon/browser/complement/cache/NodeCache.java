@@ -1,6 +1,5 @@
 package com.platon.browser.complement.cache;
 
-import com.platon.browser.dto.CustomNode;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.springframework.stereotype.Component;
 

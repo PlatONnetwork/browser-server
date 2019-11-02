@@ -6,14 +6,20 @@ import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
+import com.platon.browser.complement.cache.NodeCache;
+import com.platon.browser.complement.cache.NodeItem;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.param.StakeExitParam;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.util.VerUtil;
+import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +31,18 @@ import java.math.BigInteger;
 @Slf4j
 @Service
 public class ParameterService {
+    @Autowired
+    private NodeCache nodeCache;
+
+    private void updateNodeName(String nodeId,String nodeName){
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            nodeItem.setNodeName(StringUtils.isBlank(nodeName)?nodeItem.getNodeName():nodeName);
+        } catch (NoSuchBeanException e) {
+            NodeItem nodeItem = NodeItem.builder().nodeId(nodeId).nodeName(nodeName).build();
+            nodeCache.addNode(nodeItem);
+        }
+    }
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -53,24 +71,30 @@ public class ParameterService {
                         .programVersion(param1000.getProgramVersion().toString())
                         .build();
                 BeanUtils.copyProperties(param1000,businessParam);
+                // 更新节点缓存
+                updateNodeName(HexTool.prefix(param1000.getNodeId()),param1000.getNodeName());
                 return businessParam;
             case STAKE_MODIFY: // 1001
                 // 修改质押信息
                 StakeModifyParam param1001 = tx.getTxParam(StakeModifyParam.class);
                 businessParam= StakeModify.builder().build();
                 BeanUtils.copyProperties(param1001,businessParam);
+                // 更新节点缓存
+                updateNodeName(HexTool.prefix(param1001.getNodeId()),param1001.getNodeName());
                 return businessParam;
             case STAKE_INCREASE: // 1002
                 // 增持质押
                 StakeIncreaseParam param1002 = tx.getTxParam(StakeIncreaseParam.class);
                 businessParam= StakeIncrease.builder().build();
                 BeanUtils.copyProperties(param1002,businessParam);
+                updateNodeName(HexTool.prefix(param1002.getNodeId()),param1002.getNodeName());
                 return businessParam;
             case STAKE_EXIT: // 1003
                 // 撤销质押
                 StakeExitParam param1003 = tx.getTxParam(StakeExitParam.class);
                 businessParam= StakeExit.builder().build();
                 BeanUtils.copyProperties(param1003,businessParam);
+                updateNodeName(HexTool.prefix(param1003.getNodeId()),param1003.getNodeName());
                 return businessParam;
             case DELEGATE_CREATE: // 1004
                 // 发起委托
