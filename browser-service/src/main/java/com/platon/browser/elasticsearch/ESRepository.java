@@ -209,7 +209,7 @@ public abstract class ESRepository {
         searchSourceBuilder.from((pageNo - 1) * pageSize).size(pageSize);
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-		log.debug("search:{}", JSON.toJSONString(response, true));
+//		log.debug("search:{}", JSON.toJSONString(response, true));
 		ESResult<T> esResult = new ESResult<>();
 		SearchHits hits = response.getHits();
 		esResult.setTotal(hits.getTotalHits().value);

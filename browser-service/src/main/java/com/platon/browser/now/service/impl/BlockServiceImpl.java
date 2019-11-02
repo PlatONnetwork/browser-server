@@ -140,16 +140,6 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public RespPage<BlockListResp> blockListByNodeId(BlockListByNodeIdReq req) {
 		/** 根据nodeId 查询区块列表，以区块号倒序  */
-//		Map<String, Object> filter = new HashMap<>();
-//		filter.put("nodeId", req.getNodeId());
-//		List<ESSortDto> esSortDtos = new ArrayList<>();
-//		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
-//		ESResult<Block> blocks = new ESResult<>();
-//		try {
-//			blocks = blockESRepository.search(filter, Block.class, esSortDtos, req.getPageNo(), req.getPageSize());
-//		} catch (IOException e) {
-//			logger.error("获取区块错误。", e);
-//		}
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", req.getNodeId()));
@@ -183,7 +173,7 @@ public class BlockServiceImpl implements BlockService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date now = new Date();
 		String msg = dateFormat.format(now);
-        logger.info("导出数据起始日期：{},结束时间：{}",date,msg);
+        logger.info("导出数据起始日期：{},结束时间：{}",dateFormat.format(new Date(date)),msg);
         /** 限制最多导出3万条记录 */
         /** 设置根据时间和nodeId查询数据 */
 //        BlockExample blockExample = new BlockExample();
@@ -274,18 +264,9 @@ public class BlockServiceImpl implements BlockService {
 
 	private BlockDetailResp queryBlockByNumber(long blockNumber) {
 		/** 根据区块号查询对应数据 */
-//		Map<String, Object> filter = new HashMap<>();
-//		filter.put("num", blockNumber);
-//		ESResult<Block> blockList = new ESResult<>();
-//		try {
-//			blockList = blockESRepository.search(filter, Block.class, null, 1, 1);
-//		} catch (IOException e) {
-//			logger.error("获取区块错误。", e);
-//		}
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("num", blockNumber));
-		constructor.setDesc("num");
 		ESResult<Block> blockList = new ESResult<>();
 		try {
 			blockList = blockESRepository.search(constructor, Block.class, 1, 1);
@@ -343,11 +324,11 @@ public class BlockServiceImpl implements BlockService {
 	        
 	        /** 查询现阶段最大区块数 */
 	        blockDetailResp.setLast(false);
-			NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-			Long bNumber = networkStatRedis.getCurNumber();
-			if(blockNumber >= bNumber) {
-				blockDetailResp.setLast(true);
-			}
+//			NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+//			Long bNumber = networkStatRedis.getCurNumber();
+//			if(blockNumber >= bNumber) {
+//				blockDetailResp.setLast(true);
+//			}
 			
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 		}
