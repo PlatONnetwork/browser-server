@@ -31,7 +31,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
         event.getBlock().setTransactions(null);
         blocks.add(event.getBlock());
         List<Transaction> transactions = new ArrayList<>(event.getTransactions());
-
+        transactions.forEach(tr->tr.setId(tr.getNum()));
         try {
             esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
         } catch (IOException e) {
