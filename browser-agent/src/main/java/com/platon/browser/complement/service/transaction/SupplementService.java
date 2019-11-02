@@ -9,6 +9,7 @@ import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.param.DelegateRedeemParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,30 +34,38 @@ public class SupplementService {
                 case STAKE_INCREASE: // 增持质押
                     StakeIncreaseParam isp = tx.getTxParam(StakeIncreaseParam.class);
                     nodeId=isp.getNodeId();
-                    nodeItem = nodeCache.getNode(isp.getNodeId());
-                    isp.setNodeName(nodeItem.getNodeName());
-                    tx.setInfo(isp.toJSONString());
+                    if(StringUtils.isNotBlank(nodeId)){
+                        nodeItem = nodeCache.getNode(isp.getNodeId());
+                        isp.setNodeName(nodeItem.getNodeName());
+                        tx.setInfo(isp.toJSONString());
+                    }
                     break;
                 case STAKE_EXIT: // 撤销质押
                     StakeModifyParam evp = tx.getTxParam(StakeModifyParam.class);
                     nodeId=evp.getNodeId();
-                    nodeItem = nodeCache.getNode(evp.getNodeId());
-                    evp.setNodeName(nodeItem.getNodeName());
-                    tx.setInfo(evp.toJSONString());
+                    if(StringUtils.isNotBlank(nodeId)){
+                        nodeItem = nodeCache.getNode(evp.getNodeId());
+                        evp.setNodeName(nodeItem.getNodeName());
+                        tx.setInfo(evp.toJSONString());
+                    }
                     break;
                 case DELEGATE_CREATE: // 发起委托
                     DelegateCreateParam dp = tx.getTxParam(DelegateCreateParam.class);
                     nodeId=dp.getNodeId();
-                    nodeItem = nodeCache.getNode(dp.getNodeId());
-                    dp.setNodeName(nodeItem.getNodeName());
-                    tx.setInfo(dp.toJSONString());
+                    if(StringUtils.isNotBlank(nodeId)){
+                        nodeItem = nodeCache.getNode(dp.getNodeId());
+                        dp.setNodeName(nodeItem.getNodeName());
+                        tx.setInfo(dp.toJSONString());
+                    }
                     break;
                 case DELEGATE_EXIT: // 撤销委托
                     DelegateRedeemParam udp = tx.getTxParam(DelegateRedeemParam.class);
                     nodeId=udp.getNodeId();
-                    nodeItem = nodeCache.getNode(udp.getNodeId());
-                    udp.setNodeName(nodeItem.getNodeName());
-                    tx.setInfo(udp.toJSONString());
+                    if(StringUtils.isNotBlank(nodeId)){
+                        nodeItem = nodeCache.getNode(udp.getNodeId());
+                        udp.setNodeName(nodeItem.getNodeName());
+                        tx.setInfo(udp.toJSONString());
+                    }
                     break;
                 default:
                     break;
