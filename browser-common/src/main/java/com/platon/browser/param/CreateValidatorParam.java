@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -13,7 +15,9 @@ import java.math.BigInteger;
  * txType=1000,发起质押(创建验证人)
  */
 @Data
-public class CreateValidatorParam {
+@Builder
+@Accessors(chain = true)
+public class CreateValidatorParam extends TxParam{
     /**
      * 表示使用账户自由金额还是账户的锁仓金额做质押
      * 0: 自由金额
@@ -65,20 +69,6 @@ public class CreateValidatorParam {
      * blockNumber
      */
     private String blockNumber;
-
-    public void init(Integer type, String benefitAddress,
-                     String nodeId,String externalId,String nodeName,
-                     String website ,String details,String amount, String programVersion){
-        this.setType(type);
-        this.setBenefitAddress(benefitAddress);
-        this.setNodeId(nodeId);
-        this.setExternalId(externalId);
-        this.setNodeName(nodeName);
-        this.setWebsite(website);
-        this.setDetails(details);
-        this.setAmount(amount);
-        this.setProgramVersion(programVersion);
-    }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}

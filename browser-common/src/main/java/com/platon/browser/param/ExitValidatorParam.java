@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * User: dongqile
@@ -9,7 +11,9 @@ import lombok.Data;
  * tyType=1003撤销质押(退出验证人)
  */
 @Data
-public class ExitValidatorParam {
+@Builder
+@Accessors(chain = true)
+public class ExitValidatorParam extends TxParam{
     /**
      * 被质押的节点Id(也叫候选人的节点Id)
      */
@@ -29,10 +33,4 @@ public class ExitValidatorParam {
      *  撤销金额
      */
     private String amount;
-
-    public void init(String nodeId,String nodeName,String stakingBlockNum){
-        this.setNodeId(nodeId);
-        this.setNodeName(nodeName);
-        this.setStakingBlockNum(stakingBlockNum);
-    }
 }

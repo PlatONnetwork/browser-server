@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * User: dongqile
@@ -9,7 +11,9 @@ import lombok.Data;
  * tyType=2000提交文本提案(创建提案)
  */
 @Data
-public class CreateProposalTextParam {
+@Builder
+@Accessors(chain = true)
+public class CreateProposalTextParam extends TxParam {
 
     /**
      * 提交提案的验证人
@@ -25,12 +29,4 @@ public class CreateProposalTextParam {
      * 节点名称
      */
     private String nodeName;
-
-
-    public void init(String verifier,String pIDID){
-        this.setVerifier(verifier);
-        this.setPIDID(pIDID);
-    }
-
-
 }

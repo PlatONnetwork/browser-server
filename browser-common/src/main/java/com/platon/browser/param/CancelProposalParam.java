@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -10,7 +12,9 @@ import java.math.BigDecimal;
  * Time: 10:37
  */
 @Data
-public class CancelProposalParam {
+@Builder
+@Accessors(chain = true)
+public class CancelProposalParam extends TxParam {
 
     /**
      * 提交提案的验证人
@@ -36,14 +40,4 @@ public class CancelProposalParam {
      * 节点名称
      */
     private String nodeName;
-
-
-    public void init(String verifier,String pIDID,BigDecimal endVotingRound,String canceledProposalID){
-        this.setVerifier(verifier);
-        this.setPIDID(pIDID);
-        this.setEndVotingRound(endVotingRound);
-        this.setCanceledProposalID(canceledProposalID);
-
-
-    }
 }

@@ -3,6 +3,7 @@ package com.platon.browser.common.collection.dto;
 import com.platon.browser.collection.service.epoch.EpochRetryService;
 import com.platon.browser.collection.service.epoch.EpochService;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.web3j.platon.bean.Node;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Data
 @Slf4j
+@Accessors(chain = true)
 public class EpochMessage {
     private BigInteger currentBlockNumber; // 当前区块号
     private BigInteger consensusEpochRound=BigInteger.ZERO; // 当前所处共识周期轮数

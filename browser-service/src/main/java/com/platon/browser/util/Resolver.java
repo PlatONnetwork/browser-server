@@ -42,9 +42,10 @@ public  class Resolver {
             RlpList beanTypeList = (RlpList) beanType;
             RlpString parama = (RlpString) beanTypeList.getValues().get(0);
             RlpString paramb = (RlpString) beanTypeList.getValues().get(1);
-            PlanParam planParam = new PlanParam();
-            planParam.setEpoch(parama.asPositiveBigInteger().intValue());
-            planParam.setAmount(paramb.asPositiveBigInteger().toString());
+            PlanParam planParam = PlanParam.builder()
+                    .epoch(parama.asPositiveBigInteger().intValue())
+                    .amount(paramb.asPositiveBigInteger().toString())
+                    .build();
             list.add(planParam);
         }
         return list;

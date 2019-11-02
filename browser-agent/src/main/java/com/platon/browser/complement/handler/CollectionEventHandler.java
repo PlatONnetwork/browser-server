@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,6 +21,12 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     private ComplementEventPublisher complementEventPublisher;
 
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) {
+        // 确保交易从大到小的索引顺序
+        Collections.sort(event.getTransactions(),(c1,c2)->{
+            if(c1.getIndex()>c2.getIndex()) return 1;
+            if(c1.getIndex()<c2.getIndex()) return -1;
+            return 0;
+        });
 
         // 此处调用 complement模块的功能
         List<BusinessParam> businessParams = new ArrayList<>();

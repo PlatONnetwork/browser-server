@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * User: dongqile
@@ -9,7 +11,9 @@ import lombok.Data;
  * txType=2004版本声明
  */
 @Data
-public class DeclareVersionParam {
+@Builder
+@Accessors(chain = true)
+public class DeclareVersionParam extends TxParam{
 
     /**
      * 声明的节点，只能是验证人/候选人
@@ -30,9 +34,4 @@ public class DeclareVersionParam {
      * 声明的版本签名
      */
     private String versionSigns;
-    public void init(String activeNode,Integer version,String versionSigns){
-        this.setActiveNode(activeNode);
-        this.setVersion(version);
-        this.setVersionSigns(versionSigns);
-    }
 }

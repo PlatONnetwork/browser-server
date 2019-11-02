@@ -8,6 +8,7 @@ import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.NodeTool;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @Data
 @Slf4j
+@Accessors(chain = true)
 public class CollectionBlock extends Block {
     private List<CollectionTransaction> transactions=new ArrayList<>();
 
@@ -27,35 +29,35 @@ public class CollectionBlock extends Block {
     public static CollectionBlock newInstance(){
         CollectionBlock block = new CollectionBlock();
         Date date = new Date();
-        block.setCreTime(date);
-        block.setUpdTime(date);
-        block.setDQty(0);
-        block.setPQty(0);
-        block.setSQty(0);
-        block.setTranQty(0);
-        block.setTxQty(0);
-        block.setReward(BigDecimal.ZERO);
-        block.setGasLimit(BigDecimal.ZERO);
-        block.setGasUsed(BigDecimal.ZERO);
-        block.setTxFee(BigDecimal.ZERO);
-        block.setSize(0);
-        block.setTxGasLimit(BigDecimal.ZERO);
+        block.setCreTime(date)
+            .setUpdTime(date)
+            .setDQty(0)
+            .setPQty(0)
+            .setSQty(0)
+            .setTranQty(0)
+            .setTxQty(0)
+            .setReward(BigDecimal.ZERO)
+            .setGasLimit(BigDecimal.ZERO)
+            .setGasUsed(BigDecimal.ZERO)
+            .setTxFee(BigDecimal.ZERO)
+            .setSize(0)
+            .setTxGasLimit(BigDecimal.ZERO);
         return block;
     }
 
     public CollectionBlock updateWithRawBlockAndReceiptResult(PlatonBlock.Block block,ReceiptResult receiptResult) throws BeanCreateOrUpdateException {
-        this.setNum(block.getNumber().longValue());
-        this.setHash(block.getHash());
-        this.setPHash(block.getParentHash());
-        this.setSize(block.getSize().intValue());
-        this.setTime(new Date(block.getTimestamp().longValue()));
-        this.setExtra(block.getExtraData());
-        this.setMiner(block.getMiner());
         String nodeId = NodeTool.getPublicKey(block);
         nodeId = HexTool.prefix(nodeId);
-        this.setNodeId(nodeId);
-        this.setGasLimit(new BigDecimal(block.getGasLimit()));
-        this.setGasUsed(new BigDecimal(block.getGasUsed()));
+        this.setNum(block.getNumber().longValue())
+            .setHash(block.getHash())
+            .setPHash(block.getParentHash())
+            .setSize(block.getSize().intValue())
+            .setTime(new Date(block.getTimestamp().longValue()))
+            .setExtra(block.getExtraData())
+            .setMiner(block.getMiner())
+            .setNodeId(nodeId)
+            .setGasLimit(new BigDecimal(block.getGasLimit()))
+            .setGasUsed(new BigDecimal(block.getGasUsed()));
 
         if(block.getTransactions().isEmpty()) return this;
 
