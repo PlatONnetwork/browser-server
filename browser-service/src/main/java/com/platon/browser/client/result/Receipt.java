@@ -16,9 +16,8 @@ import java.util.List;
 
 @Data
 public class Receipt {
-
-    private static final int FAILURE = 0;
     private static final int SUCCESS = 1;
+    private static final int FAILURE = 2;
 
     private String gasUsed;
     private List<Log> logs;
