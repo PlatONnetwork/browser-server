@@ -31,8 +31,8 @@ public class TxParamResolver {
     @Data
     @Accessors(chain = true)
     public static class Result {
-        private TxParam param;
-        private Transaction.TypeEnum typeEnum;
+        private TxParam param=OthersTxParam.builder().build();
+        private Transaction.TypeEnum typeEnum= Transaction.TypeEnum.OTHERS;
     }
 
     public static Result analysis ( String input ) {
@@ -295,7 +295,6 @@ public class TxParamResolver {
         } catch (Exception e) {
             log.error("解析交易输入出错:",e);
         }
-        result.setTypeEnum(Transaction.TypeEnum.OTHERS);
         return result;
     }
 

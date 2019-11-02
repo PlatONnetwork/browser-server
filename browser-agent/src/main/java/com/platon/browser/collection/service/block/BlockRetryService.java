@@ -1,6 +1,8 @@
 package com.platon.browser.collection.service.block;
 
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.result.ReceiptResult;
+import com.platon.browser.common.collection.dto.CollectionBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -31,8 +33,13 @@ public class BlockRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     PlatonBlock getBlock(Long blockNumber) throws IOException {
-        log.debug("{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
-        DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
-        return client.getWeb3j().platonGetBlockByNumber(dp,true).send();
+        try {
+            log.debug("{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
+            DefaultBlockParameter dp = DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+            return client.getWeb3j().platonGetBlockByNumber(dp,true).send();
+        }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
     }
 }

@@ -4,11 +4,13 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.complement.service.transaction.BusinessService;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.queue.collection.event.CollectionEvent;
 import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.queue.complement.publisher.ComplementEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,14 +29,19 @@ public class CollectionEventHandler implements ICollectionEventHandler {
 
     private long transactionId = 0;
 
-    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) {
-        // 确保交易从小到大的索引顺序
-        event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));
-        for (CollectionTransaction tx : event.getTransactions()) tx.setId(++transactionId);
+    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+        try {
+            // 确保交易从小到大的索引顺序
+            event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));
+            for (CollectionTransaction tx : event.getTransactions()) tx.setId(++transactionId);
 
-        // 此处调用 complement模块的功能, 解析出业务参数
-        List<BusinessParam> businessParams = businessService.getParameters(event.getTransactions());
+            // 此处调用 complement模块的功能, 解析出业务参数
+            List<BusinessParam> businessParams = businessService.getParameters(event.getTransactions());
 
-        complementEventPublisher.publish(event.getBlock(),event.getTransactions(),businessParams);
+            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),businessParams);
+        }catch (Exception e){
+            log.error("{}",e);
+            throw e;
+        }
     }
 }

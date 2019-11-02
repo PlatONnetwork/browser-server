@@ -1,6 +1,7 @@
 package com.platon.browser.persistence.handler;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -30,20 +32,24 @@ public class ComplementEventHandler implements IComplementEventHandler {
 
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
-        // 此处调用 persistence模块功能
-
-        List<Block> blocks = new ArrayList<>();
-        event.getBlock().setTransactions(null);
-        blocks.add(event.getBlock());
-        List<Transaction> transactions = new ArrayList<>(event.getTransactions());
-        List<BusinessParam> businessParams = event.getBusinessParams();
         try {
-            // 入库MYSQL
-            dbService.insert(businessParams);
-            // 入库ES
-            esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
-        } catch (IOException e) {
-            e.printStackTrace();
+            // 此处调用 persistence模块功能
+            List<Block> blocks = new ArrayList<>();
+            event.getBlock().setTransactions(null);
+            blocks.add(event.getBlock());
+            List<Transaction> transactions = new ArrayList<>(event.getTransactions());
+            List<BusinessParam> businessParams = event.getBusinessParams();
+            try {
+                // 入库MYSQL
+                //dbService.insert(businessParams);
+                // 入库ES
+                esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }catch (Exception e){
+            log.error("{}",e);
+            throw e;
         }
     }
 }
