@@ -47,4 +47,18 @@ public class VerUtil {
     int patch = v & 0x000000ff;
     return String.format("%s.%s.%s", ver, lite, patch);
   }
+  
+  /**
+   * BigInteger转大版本号
+   * @method toVersion
+   * @param version
+   * @return
+   */
+  public static BigInteger transferBigVersion(BigInteger version) {
+    int v = version.intValue();
+    int ver = v >> 16 & 0x0000ffff;
+    int lite = v >> 8 & 0x000000ff;
+    String bigVersion = String.format("%s.%s.%s", ver, lite, 0);
+    return toInteger(bigVersion);
+  }
 }
