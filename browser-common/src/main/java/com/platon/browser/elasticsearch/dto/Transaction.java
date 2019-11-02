@@ -38,25 +38,25 @@ public class Transaction {
 
     public enum TypeEnum {
         TRANSFER(0, "转账"),
-        CONTRACT_CREATION(1,"合约发布(合约创建)"),
-        CONTRACT_EXECUTION(2,"合约调用(合约执行)"),
+        CONTRACT_CREATE(1,"合约发布(合约创建)"),
+        CONTRACT_EXEC(2,"合约调用(合约执行)"),
         OTHERS(4,"其他"),
         MPC(5,"MPC交易"),
-        CREATE_VALIDATOR(1000,"发起质押(创建验证人)"),
-        EDIT_VALIDATOR(1001,"修改质押信息(编辑验证人)"),
-        INCREASE_STAKING(1002,"增持质押(增加自有质押)"),
-        EXIT_VALIDATOR(1003,"撤销质押(退出验证人)"),
-        DELEGATE(1004,"发起委托(委托)"),
-        UN_DELEGATE(1005,"减持/撤销委托(赎回委托)"),
-        CREATE_PROPOSAL_TEXT(2000,"提交文本提案(创建提案)"),
-        CREATE_PROPOSAL_UPGRADE(2001,"提交升级提案(创建提案)"),
-        CREATE_PROPOSAL_PARAMETER(2002,"提交参数提案(创建提案)"),
-        CANCEL_PROPOSAL(2005,"提交取消提案"),
-        VOTING_PROPOSAL(2003,"给提案投票(提案投票)"),
-        DECLARE_VERSION(2004,"版本声明"),
-        REPORT_VALIDATOR(3000,"举报多签(举报验证人)"),
-        CREATE_RESTRICTING(4000,"创建锁仓计划(创建锁仓)"),
-        DUPLICATE_SIGN(11,"区块双签"),
+        STAKE_CREATE(1000,"发起质押(创建验证人)"),
+        STAKE_MODIFY(1001,"修改质押信息(编辑验证人)"),
+        STAKE_INCREASE(1002,"增持质押(增加自有质押)"),
+        STAKE_EXIT(1003,"撤销质押(退出验证人)"),
+        DELEGATE_CREATE(1004,"发起委托(委托)"),
+        DELEGATE_EXIT(1005,"减持/撤销委托(赎回委托)"),
+        PROPOSAL_TEXT(2000,"提交文本提案(创建提案)"),
+        PROPOSAL_UPGRADE(2001,"提交升级提案(创建提案)"),
+        PROPOSAL_PARAMETER(2002,"提交参数提案(创建提案)"),
+        PROPOSAL_CANCEL(2005,"提交取消提案"),
+        PROPOSAL_VOTE(2003,"给提案投票(提案投票)"),
+        VERSION_DECLARE(2004,"版本声明"),
+        REPORT(3000,"举报多签(举报验证人)"),
+        RESTRICTING_CREATE(4000,"创建锁仓计划(创建锁仓)"),
+        MULTI_SIGN(11,"区块双签"),
         ;
         private static Map<Integer, TypeEnum> map = new HashMap<>();
         static {
@@ -85,7 +85,7 @@ public class Transaction {
      */
     public enum StatusEnum{
         SUCCESS(1, "成功"),
-        FAILURE(0, "失败")
+        FAILURE(2, "失败")
         ;
         private int code;
         private String desc;

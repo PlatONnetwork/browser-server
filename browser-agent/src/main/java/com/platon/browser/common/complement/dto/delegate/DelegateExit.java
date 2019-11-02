@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
-public class DelegateReduce extends BusinessParam {
+public class DelegateExit extends BusinessParam {
     @Override
     public BusinessType getBusinessType() {
-        return BusinessType.DELEGATE_REDUCE;
+        return BusinessType.DELEGATE_EXIT;
     }
 }

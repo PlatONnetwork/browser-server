@@ -2,15 +2,13 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.param.CreateValidatorParam;
-import com.platon.browser.param.EditValidatorParam;
-import com.platon.browser.param.ExitValidatorParam;
-import com.platon.browser.param.IncreaseStakingParam;
+import com.platon.browser.param.StakeModifyParam;
+import com.platon.browser.param.StakeExitParam;
+import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -152,7 +150,7 @@ public class CustomStaking extends Staking {
      * 使用编辑验证人信息参数更新质押记录
      * @param param
      */
-    public void updateWithEditValidatorParam(EditValidatorParam param) {
+    public void updateWithEditValidatorParam(StakeModifyParam param) {
 //        this.setExternalId(param.getExternalId());
 //        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
 //        this.setDetails(param.getDetails());
@@ -165,7 +163,7 @@ public class CustomStaking extends Staking {
      * 使用增持验证人参数更新质押记录
      * @param param
      */
-    public void updateWithIncreaseStakingParam(IncreaseStakingParam param) {
+    public void updateWithIncreaseStakingParam(StakeIncreaseParam param) {
         if(StringUtils.isNotBlank(param.getAmount())){
             BigInteger addAmount = new BigInteger(param.getAmount());
 //            BigInteger stakingHas = new BigInteger(this.getStakingHas());
@@ -179,7 +177,7 @@ public class CustomStaking extends Staking {
      * @param param
      * @param curSettingEpoch
      */
-    public void updateWithExitValidatorParam(ExitValidatorParam param, BigInteger curSettingEpoch) {
+    public void updateWithExitValidatorParam(StakeExitParam param, BigInteger curSettingEpoch) {
 //        this.setStakingHas(BigInteger.ZERO.toString());
 //        this.setLeaveTime(new Date());
 //        BigInteger stakingLocked = new BigInteger(getStakingLocked());

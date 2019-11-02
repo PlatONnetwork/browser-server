@@ -91,16 +91,16 @@ public class ProposalContractTest {
 		try {
 			String num = "2";
 			PlatonSendTransaction platonSendTransaction = proposalContract.submitProposalReturnTransaction(
-					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(20000), BigInteger.valueOf(4)))
+					Proposal.createSubmitVersionProposalParam(nodeId, num, BigInteger.valueOf(2049), BigInteger.valueOf(4)))
 					.send();
 			BaseResponse<?> baseResponse = proposalContract
 					.getSubmitProposalResult(platonSendTransaction, FunctionType.SUBMIT_VERSION_FUNC_TYPE).send();
 			System.out.println("发起提案结果：" + baseResponse.toString());
 
-//			voteForProposal(platonSendTransaction.getTransactionHash());
+//			voteForProposal("0x4a042fae6c5b2599ada5db7baa47eac0318354ef0b0f01803c18276c9aca2f3d");
 //
 //			queryResult(platonSendTransaction.getTransactionHash());
-
+//
 			this.cancelProposal(platonSendTransaction.getTransactionHash(), String.valueOf(Integer.parseInt(num)+1));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -115,6 +115,10 @@ public class ProposalContractTest {
 		vote(proposalID,
 				"0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7",
 				"http://192.168.112.172:8789", VoteOption.YEAS);
+		
+	      vote(proposalID,
+			"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",
+			"http://192.168.112.171:7789", VoteOption.YEAS);
 //
 //        vote(proposalID,
 //        		"459d199acb83bfe08c26d5c484cbe36755b53b7ae2ea5f7a5f0a8f4c08e843b51c4661f3faa57b03b710b48a9e17118c2659c5307af0cc5329726c13119a6b85",

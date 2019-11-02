@@ -30,7 +30,7 @@ public class ComplementEventPublisher {
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.complement.buffer-size}")
     private int ringBufferSize;
-    private EventFactory<ComplementEvent> eventFactory = ComplementEvent::newInstance;
+    private EventFactory<ComplementEvent> eventFactory = () -> ComplementEvent.builder().build();
     @Autowired
     private IComplementEventHandler handler;
     // 事件处理线程生产工厂

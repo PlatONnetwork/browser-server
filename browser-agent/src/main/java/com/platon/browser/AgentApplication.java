@@ -4,7 +4,7 @@ import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.epoch.EpochService;
-import com.platon.browser.collection.service.transaction.TransactionService;
+import com.platon.browser.collection.service.transaction.ReceiptService;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
@@ -38,14 +38,14 @@ public class AgentApplication implements ApplicationRunner {
 	private BlockService blockService;
 	// 交易服务
 	@Autowired
-	private TransactionService transactionService;
+	private ReceiptService receiptService;
 	// 区块事件发布服务
 	@Autowired
 	private BlockEventPublisher blockEventPublisher;
 	@Autowired
 	private EpochService epochService;
 	// 已采集的最高块号
-	private Long collectedNumber = 79369L;
+	private Long collectedNumber = 0L;
 
 	@Override
 	public void run(ApplicationArguments args) {
@@ -57,7 +57,7 @@ public class AgentApplication implements ApplicationRunner {
 				// 异步获取区块
 				CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(collectedNumber);
 				// 异步获取交易回执
-				CompletableFuture<ReceiptResult> receiptCF = transactionService.getReceiptAsync(collectedNumber);
+				CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(collectedNumber);
 				// 获取周期切换消息
 				EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
 				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);

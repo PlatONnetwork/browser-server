@@ -12,5 +12,5 @@ public interface ICollectionEventHandler extends EventHandler<CollectionEvent> {
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    void onEvent(CollectionEvent event, long sequence, boolean endOfBatch);
+    void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception;
 }

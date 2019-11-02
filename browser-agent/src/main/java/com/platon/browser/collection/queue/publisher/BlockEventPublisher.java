@@ -30,7 +30,7 @@ public class BlockEventPublisher {
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.block.buffer-size}")
     private int ringBufferSize;
-    private EventFactory<BlockEvent> eventFactory = BlockEvent::newInstance;
+    private EventFactory<BlockEvent> eventFactory = () -> BlockEvent.builder().build();
     @Autowired
     private BlockEventHandler handler;
     // 事件处理线程生产工厂

@@ -30,7 +30,7 @@ public class CollectionEventPublisher {
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.collection.buffer-size}")
     private int ringBufferSize;
-    private EventFactory<CollectionEvent> eventFactory = CollectionEvent::newInstance;
+    private EventFactory<CollectionEvent> eventFactory = () -> CollectionEvent.builder().build();
     @Autowired
     private ICollectionEventHandler handler;
     // 事件处理线程生产工厂

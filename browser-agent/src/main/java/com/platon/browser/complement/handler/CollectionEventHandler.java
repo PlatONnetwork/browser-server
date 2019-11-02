@@ -1,14 +1,18 @@
 package com.platon.browser.complement.handler;
 
+import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.complement.service.transaction.BusinessService;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.BusinessException;
 import com.platon.browser.queue.collection.event.CollectionEvent;
 import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.queue.complement.publisher.ComplementEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,19 +22,26 @@ import java.util.List;
 public class CollectionEventHandler implements ICollectionEventHandler {
 
     @Autowired
+    private BusinessService businessService;
+
+    @Autowired
     private ComplementEventPublisher complementEventPublisher;
 
-    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) {
-        // 确保交易从大到小的索引顺序
-        Collections.sort(event.getTransactions(),(c1,c2)->{
-            if(c1.getIndex()>c2.getIndex()) return 1;
-            if(c1.getIndex()<c2.getIndex()) return -1;
-            return 0;
-        });
+    private long transactionId = 0;
 
-        // 此处调用 complement模块的功能
-        List<BusinessParam> businessParams = new ArrayList<>();
+    public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+        try {
+            // 确保交易从小到大的索引顺序
+            event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));
+            for (CollectionTransaction tx : event.getTransactions()) tx.setId(++transactionId);
 
-        complementEventPublisher.publish(event.getBlock(),event.getTransactions(),businessParams);
+            // 此处调用 complement模块的功能, 解析出业务参数
+            List<BusinessParam> businessParams = businessService.getParameters(event.getTransactions());
+
+            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),businessParams);
+        }catch (Exception e){
+            log.error("{}",e);
+            throw e;
+        }
     }
 }

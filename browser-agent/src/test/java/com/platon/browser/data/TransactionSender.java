@@ -41,7 +41,7 @@ import java.util.List;
 public class TransactionSender {
 	private static String chainId = "100";
     private static Logger logger = LoggerFactory.getLogger(TransactionSender.class);
-    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.172:8789"));
+    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:6789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.112.171:5789"));
 //    private Web3j currentValidWeb3j = Web3j.build(new HttpService("http://192.168.120.76:6797"));
     private Credentials delegateCredentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
@@ -50,13 +50,14 @@ public class TransactionSender {
     NodeContract nodeContract = NodeContract.load(currentValidWeb3j);
     StakingContract stakingContract = StakingContract.load(currentValidWeb3j,credentials,chainId);
     DelegateContract delegateContract = DelegateContract.load(currentValidWeb3j,delegateCredentials,chainId);
-    private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
-    private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
+//    private String stakingPubKey = "0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7";
+//    private String stakingBlsKey = "b601ed8838a8c02abd9e0a48aba3315d497ffcdde490cf9c4b46de4599135cdd276b45b49e44beb31eea4bfd1f147c0045c987baf45c0addb89f83089886e3b6e1d4443f00dc4be3808de96e1c9f02c060867040867a624085bb38d01bac0107";
 
 //    private String stakingPubKey = "bfc9d6578bab4e510755575e47b7d137fcf0ad0bcf10ed4d023640dfb41b197b9f0d8014e47ecbe4d51f15db514009cbda109ebcf0b7afe06600d6d423bb7fbf";
 //    private String stakingBlsKey = "b4713797d296c9fe1749d22eb59b03d9694ab896b71449b0e6daf2d1ecb3a9d3d6e9c258b37acb2d07fa82bcb55ced144fb4b056d6cd192a509859615b090128d6e5686e84df47951e1781625627907054975f76e427da8d32d3f30b9a53e60f";
 
-//    private String stakingBlsKey = "b8560588dc7e317e063dd312479426aeb003b106261a1eeaf48b7562168bbc18db5e1852d4d002bdf319fb96de120c63dfae9cbf55b6fed0a376c7916e5e650f";
+    private String stakingPubKey = "4fcc251cf6bf3ea53a748971a223f5676225ee4380b65c7889a2b491e1551d45fe9fcc19c6af54dcf0d5323b5aa8ee1d919791695082bae1f86dd282dba4150f";
+    private String stakingBlsKey = "4b86fc4f865658161d722937c48ac72e1d54d9e8afcbc2c78c5b84fb3ce0510187b5699beb9c91a130075b88cb00b90a2ec8c0c4715d084c7cc5fe734648eb8c935ef4660f7224abd4de28aae55cc25c34144f57a912204bf1eda85892392e13";
     public TransactionSender() throws IOException, CipherException {}
 
     @Before

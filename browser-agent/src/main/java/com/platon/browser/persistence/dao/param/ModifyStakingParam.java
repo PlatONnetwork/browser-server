@@ -1,6 +1,8 @@
 package com.platon.browser.persistence.dao.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -11,6 +13,8 @@ import java.util.Date;
  * @Description:
  */
 @Data
+@Builder
+@Accessors(chain = true)
 public class ModifyStakingParam {
 
     /**

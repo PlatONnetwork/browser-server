@@ -1,11 +1,9 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.param.DelegateParam;
+import com.platon.browser.param.DelegateCreateParam;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -25,7 +23,7 @@ public class CustomDelegation extends Delegation {
         this.setUpdateTime(date);
     }
 
-    public void updateWithDelegateParam( DelegateParam param,CustomTransaction tx){
+    public void updateWithDelegateParam(DelegateCreateParam param, CustomTransaction tx){
 //        this.setDelegateHas(param.getAmount());
 //        this.setDelegateLocked("0");
 //        this.setDelegateReduction("0");

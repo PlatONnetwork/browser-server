@@ -36,7 +36,7 @@ import java.util.Map.Entry;
  *	@author zhangrj
  *  @data 2019年8月31日
  */
-@Component
+//@Component
 public class StompPushJob {
 
 	private static Logger logger = LoggerFactory.getLogger(StompPushJob.class);

@@ -14,9 +14,9 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @Service
-public class TransactionService {
+public class ReceiptService {
     @Autowired
-    private TransactionRetryService retryService;
+    private ReceiptRetryService retryService;
 
     /**
      * 异步获取区块

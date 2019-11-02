@@ -25,11 +25,16 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     private CollectionEventPublisher collectionEventPublisher;
 
     @Override
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BlockEventHandler")
     public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
-        PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
-        ReceiptResult receiptResult = event.getReceiptCF().get();
-        CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
-        collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());
+        try {
+            PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
+            ReceiptResult receiptResult = event.getReceiptCF().get();
+            CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
+            collectionEventPublisher.publish(block,block.getTransactions(),event.getEpochMessage());
+        }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
     }
 }
