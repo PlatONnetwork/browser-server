@@ -8,6 +8,7 @@ import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.complement.cache.NodeCache;
 import com.platon.browser.complement.cache.NodeItem;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.StakeCreateParam;
@@ -50,6 +51,8 @@ public class ParameterService {
      * @return
      */
     public BusinessParam getParameter(CollectionTransaction tx){
+        // 失败的交易不分析业务数据
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) throw new BusinessException("此交易失败!");
         // 调用交易分析引擎分析交易，以补充相关数据
         BusinessParam businessParam;
         switch (tx.getTypeEnum()) {

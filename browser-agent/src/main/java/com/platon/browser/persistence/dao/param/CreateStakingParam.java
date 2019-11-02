@@ -91,27 +91,4 @@ public class CreateStakingParam {
      * 质押交易hash
      */
     private String txHash;
-
-/*    public void init ( String nodeId, BigDecimal stakingHas,String stakingName,
-                       String externalId,String benefitAddr,String programVersion,
-                       String bigVersion,String webSite,String details,int isInit,
-                       BigInteger stakingBlockNum,int stakingTxIndex,String stakingAddr,
-                       Date joinTime,String txHash ) {
-        this.nodeId = nodeId;
-        this.stakingHas = stakingHas;
-        this.stakingName = stakingName;
-        this.externalId = externalId;
-        this.benefitAddr = benefitAddr;
-        this.programVersion = programVersion;
-        this.bigVersion = bigVersion;
-        this.webSite = webSite;
-        this.details = details;
-        this.isInit = isInit;
-        this.stakingBlockNum = stakingBlockNum;
-        this.stakingTxIndex  = stakingTxIndex;
-        this.stakingAddr = stakingAddr;
-        this.joinTime = joinTime;
-        this.txHash = txHash;
-
-    }*/
 }

@@ -85,7 +85,7 @@ public class Transaction {
      */
     public enum StatusEnum{
         SUCCESS(1, "成功"),
-        FAILURE(0, "失败")
+        FAILURE(2, "失败")
         ;
         private int code;
         private String desc;
