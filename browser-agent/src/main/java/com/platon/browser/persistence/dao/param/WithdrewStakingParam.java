@@ -2,38 +2,26 @@ package com.platon.browser.persistence.dao.param;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * @Auther: dongqile
- * @Date: 2019/10/31
+ * @Date: 2019/11/1
  * @Description:
  */
 @Data
-public class AddStakingParam {
+public class WithdrewStakingParam {
 
     /**
-     * 节点Id
+     * 节点id
      */
     private String nodeId;
 
     /**
-     * 增持金额
+     * 交易hash
      */
-    private BigDecimal amount;
-
-
-    /**
-     *  交易Hash
-     */
-    private String Hash;
-
-    /**
-     * 交易快高
-     */
-    private BigInteger bNum;
+    private String txHash;
 
     /**
      * 质押交易所在块高
@@ -46,9 +34,12 @@ public class AddStakingParam {
     private Date time;
 
     /**
-     * 交易hash
+     * 交易块高
      */
-    private String txHash;
+    private BigInteger bNum;
 
-
+    /**
+     * 结算周期标识
+     */
+    private int stakingReductionEpoch;
 }

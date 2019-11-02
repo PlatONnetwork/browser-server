@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.AddStakingMapper">
     <update id="addStaking" parameterType="com.platon.browser.persistence.dao.param.AddStakingParam">
 	update `staking`  set
-		`staking_has` = `staking_has` + #{amount}
+		`staking_hes` = `staking_hes` + #{amount}
 	where
 		`node_id` = #{nodeId}
 	and
@@ -11,7 +11,7 @@
 
 	update `node` set
 		`total_value` = `total_value` + #{amount},
-		`staking_has` = `staking_has` + #{amount}
+		`staking_hes` = `staking_hes` + #{amount}
 	where
 		`node_id` = #{nodeId};
 
