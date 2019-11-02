@@ -90,22 +90,23 @@ public class CollectionTransaction extends Transaction {
             case TRANSFER: // 转账交易，from地址转账交易数加一
                 block.setTranQty(block.getTranQty()+1);
                 break;
-            case INCREASE_STAKING:// 增加自有质押
-            case CREATE_VALIDATOR:// 创建验证人
-            case EXIT_VALIDATOR:// 退出验证人
-            case REPORT_VALIDATOR:// 举报验证人
-            case EDIT_VALIDATOR:// 编辑验证人
+            case STAKE_CREATE:// 创建验证人
+            case STAKE_INCREASE:// 增加自有质押
+            case STAKE_MODIFY:// 编辑验证人
+            case STAKE_EXIT:// 退出验证人
+            case REPORT:// 举报验证人
                 block.setSQty(block.getSQty()+1);
                 break;
-            case DELEGATE:// 发起委托
-            case UN_DELEGATE:// 撤销委托
+            case DELEGATE_CREATE:// 发起委托
+            case DELEGATE_EXIT:// 撤销委托
                 block.setDQty(block.getDQty()+1);
                 break;
-            case CANCEL_PROPOSAL:// 取消提案
-            case CREATE_PROPOSAL_TEXT:// 创建文本提案
-            case CREATE_PROPOSAL_UPGRADE:// 创建升级提案
-            case DECLARE_VERSION:// 版本声明
-            case VOTING_PROPOSAL:// 提案投票
+            case PROPOSAL_TEXT:// 创建文本提案
+            case PROPOSAL_UPGRADE:// 创建升级提案
+            case PROPOSAL_VOTE:// 提案投票
+            case PROPOSAL_CANCEL:// 取消提案
+            case VERSION_DECLARE:// 版本声明
+
                 block.setPQty(block.getPQty()+1);
                 break;
             default:

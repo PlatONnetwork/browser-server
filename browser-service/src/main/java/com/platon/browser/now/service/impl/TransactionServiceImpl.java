@@ -386,7 +386,7 @@ public class TransactionServiceImpl implements TransactionService {
 	    		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
 					case CREATE_VALIDATOR:
-						CreateValidatorParam createValidatorParam = JSONObject.parseObject(txInfo, CreateValidatorParam.class);
+						StakeCreateParam createValidatorParam = JSONObject.parseObject(txInfo, StakeCreateParam.class);
 						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
 						resp.setNodeId(createValidatorParam.getNodeId());
@@ -394,13 +394,13 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setExternalId(createValidatorParam.getExternalId());
 						resp.setWebsite(createValidatorParam.getWebsite());
 						resp.setDetails(createValidatorParam.getDetails());
-						resp.setProgramVersion(createValidatorParam.getProgramVersion());
+						resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
 						resp.setTxAmount(createValidatorParam.getAmount());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//编辑验证人
 					case EDIT_VALIDATOR:
-						EditValidatorParam editValidatorParam = JSONObject.parseObject(txInfo, EditValidatorParam.class);
+						StakeModifyParam editValidatorParam = JSONObject.parseObject(txInfo, StakeModifyParam.class);
 						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
 						resp.setNodeId(editValidatorParam.getNodeId());
 						resp.setExternalId(editValidatorParam.getExternalId());
@@ -411,7 +411,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					//增加质押
 					case INCREASE_STAKING:
-						IncreaseStakingParam increaseStakingParam = JSONObject.parseObject(txInfo, IncreaseStakingParam.class);
+						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
 						resp.setTxAmount(increaseStakingParam.getAmount());
 						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
@@ -419,7 +419,7 @@ public class TransactionServiceImpl implements TransactionService {
 					//退出验证人
 					case EXIT_VALIDATOR:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
-						ExitValidatorParam exitValidatorParam = JSONObject.parseObject(txInfo, ExitValidatorParam.class);
+						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
 						resp.setNodeName(this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
 						resp.setApplyAmount(exitValidatorParam.getAmount());
@@ -445,7 +445,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 						//委托
 					case DELEGATE:
-						DelegateParam delegateParam = JSONObject.parseObject(txInfo, DelegateParam.class);
+						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
 						resp.setTxAmount(delegateParam.getAmount());
 						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
@@ -454,7 +454,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case UN_DELEGATE:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
 						// 通过txHash关联un_delegation表
-						UnDelegateParam unDelegateParam = JSONObject.parseObject(txInfo, UnDelegateParam.class);
+						DelegateRedeemParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateRedeemParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setApplyAmount(unDelegateParam.getAmount());
 						resp.setTxAmount(unDelegateParam.getAmount());
@@ -467,7 +467,7 @@ public class TransactionServiceImpl implements TransactionService {
 //						}
 						break;
 					case CREATE_PROPOSAL_TEXT:
-						CreateProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, CreateProposalTextParam.class);
+						ProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, ProposalTextParam.class);
 						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
 							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
 						}
@@ -478,7 +478,7 @@ public class TransactionServiceImpl implements TransactionService {
 						this.transferTransaction(resp, req.getTxHash());
 						break;
 					case CREATE_PROPOSAL_UPGRADE:
-						CreateProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, CreateProposalUpgradeParam.class);
+						ProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, ProposalUpgradeParam.class);
 						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
 						if(StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
 							resp.setPipNum("PIP-" + createProposalUpgradeParam.getPIDID());
@@ -491,7 +491,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case CREATE_PROPOSAL_PARAMETER:
 					case CANCEL_PROPOSAL:
-						CancelProposalParam cancelProposalParam = JSONObject.parseObject(txInfo, CancelProposalParam.class);
+						ProposalCancelParam cancelProposalParam = JSONObject.parseObject(txInfo, ProposalCancelParam.class);
 						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
 							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
 						}
@@ -503,7 +503,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case VOTING_PROPOSAL:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
-						VotingProposalParam votingProposalParam = JSONObject.parseObject(txInfo, VotingProposalParam.class);
+						ProposalVoteParam votingProposalParam = JSONObject.parseObject(txInfo, ProposalVoteParam.class);
 						resp.setNodeId(votingProposalParam.getVerifier());
 						resp.setProposalOption(votingProposalParam.getProposalType());
 						resp.setProposalHash(votingProposalParam.getProposalId());
@@ -540,7 +540,7 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 						//版本申明
 					case DECLARE_VERSION:
-						DeclareVersionParam declareVersionParam = JSONObject.parseObject(txInfo, DeclareVersionParam.class);
+						VersionDeclareParam declareVersionParam = JSONObject.parseObject(txInfo, VersionDeclareParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
 						resp.setNodeName(this.setStakingName(declareVersionParam.getActiveNode(), declareVersionParam.getNodeName()));
@@ -557,7 +557,7 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						break;
 					case REPORT_VALIDATOR:
-						ReportValidatorParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportValidatorParam.class);
+						ReportParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
 						transactionDetailsEvidencesResp.setVerify(reportValidatorParam.getVerify());
@@ -574,11 +574,11 @@ public class TransactionServiceImpl implements TransactionService {
 						break;
 					case CREATE_RESTRICTING:
 						// RPAccount + value + RPPlan
-						CreateRestrictingParam createRestrictingParam = JSONObject.parseObject(txInfo, CreateRestrictingParam.class);
+						RestrictingCreateParam createRestrictingParam = JSONObject.parseObject(txInfo, RestrictingCreateParam.class);
 						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
 						resp.setRPAccount(createRestrictingParam.getAccount());
 						BigDecimal amountSum = new BigDecimal(0);
-						for(PlanParam p:createRestrictingParam.getPlan()) {
+						for(RestrictingCreateParam.RestrictingPlan p:createRestrictingParam.getPlans()) {
 							TransactionDetailsRPPlanResp transactionDetailsRPPlanResp = new TransactionDetailsRPPlanResp();
 							amountSum = amountSum.add(new BigDecimal(p.getAmount()));
 							transactionDetailsRPPlanResp.setAmount(p.getAmount());

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class TransactionRetryService {
+public class ReceiptRetryService {
     private static final String RECEIPT_RPC_INTERFACE = "platon_getTransactionByBlock";
     @Autowired
     private PlatOnClient client;

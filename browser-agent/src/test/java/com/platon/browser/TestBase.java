@@ -119,78 +119,83 @@ public class TestBase {
     }
 */
     public CreateStakingParam stakingParam(){
-        CreateStakingParam createStakingParam = new CreateStakingParam();
-        createStakingParam.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        createStakingParam.setStakingHes(new BigDecimal("5000"));
-        createStakingParam.setNodeName("testNode01");
-        createStakingParam.setExternalId("externalId01");
-        createStakingParam.setBenefitAddr("0xff48d9712d8a55bf603dab28f4645b6985696a61");
-        createStakingParam.setProgramVersion("1794");
-        createStakingParam.setBigVersion("1700");
-        createStakingParam.setWebSite("web_site01");
-        createStakingParam.setDetails("details01");
-        createStakingParam.setIsInit(1);
-        createStakingParam.setStakingBlockNum(new BigInteger("200"));
-        createStakingParam.setStakingTxIndex(0);
-        createStakingParam.setStakingAddr("0xb58c7fd25437e2fcf038b948963ffb80276bd44d");
-        createStakingParam.setJoinTime(new Date(System.currentTimeMillis()));
-        createStakingParam.setTxHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7");
+        CreateStakingParam createStakingParam = CreateStakingParam.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .stakingHes(new BigDecimal("5000"))
+                .nodeName("testNode01")
+                .externalId("externalId01")
+                .benefitAddr("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .programVersion("1794")
+                .bigVersion("1700")
+                .webSite("web_site01")
+                .details("details01")
+                .isInit(1)
+                .stakingBlockNum(new BigInteger("200"))
+                .stakingTxIndex(0)
+                .stakingAddr("0xb58c7fd25437e2fcf038b948963ffb80276bd44d")
+                .joinTime(new Date(System.currentTimeMillis()))
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .build();
         return createStakingParam;
     }
 
     public ModifyStakingParam modifyStakingParam(){
-        ModifyStakingParam modifyStakingParam = new ModifyStakingParam();
-        modifyStakingParam.setNodeName("testNode02");
-        modifyStakingParam.setExternalId("externalId02");
-        modifyStakingParam.setBenefitAddr("0xff48d9712d8a55bf603dab28f4645b6985696a61");
-        modifyStakingParam.setWebSite("web_site01");
-        modifyStakingParam.setDetails("details01");
-        modifyStakingParam.setIsInit(2);
-        modifyStakingParam.setTxHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7");
-        modifyStakingParam.setStakingBlockNum(new BigInteger("200"));
-        modifyStakingParam.setBNum(new BigInteger("300"));
-        modifyStakingParam.setTime(new java.sql.Date(System.currentTimeMillis()));
-        modifyStakingParam.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
+        ModifyStakingParam modifyStakingParam = ModifyStakingParam.builder()
+                .nodeName("testNode02")
+                .externalId("externalId02")
+                .benefitAddr("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .webSite("web_site01")
+                .details("details01")
+                .isInit(2)
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .stakingBlockNum(new BigInteger("200"))
+                .bNum(new BigInteger("300"))
+                .time(new java.sql.Date(System.currentTimeMillis()))
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .build();
         return modifyStakingParam;
     }
 
     public AddStakingParam addStakingParam(){
-        AddStakingParam addStakingParam = new AddStakingParam();
-        addStakingParam.setAmount(new BigDecimal("500000000000000000000000000"));
-        addStakingParam.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        addStakingParam.setTxHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7");
-        addStakingParam.setBNum(new BigInteger("300"));
-        addStakingParam.setTime(new Date(System.currentTimeMillis()));
-        addStakingParam.setStakingBlockNum(new BigInteger("200"));
+        AddStakingParam addStakingParam = AddStakingParam.builder()
+                .amount(new BigDecimal("500000000000000000000000000"))
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .bNum(new BigInteger("300"))
+                .time(new Date(System.currentTimeMillis()))
+                .stakingBlockNum(new BigInteger("200"))
+                .build();
         return addStakingParam;
     }
 
     public WithdrewStakingParam withdrewStakingParam(){
-        WithdrewStakingParam withdrewStakingParam = new WithdrewStakingParam();
-        withdrewStakingParam.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        withdrewStakingParam.setTxHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7");
-        withdrewStakingParam.setBNum(new BigInteger("300"));
-        withdrewStakingParam.setStakingBlockNum(new BigInteger("200"));
-        withdrewStakingParam.setTime(new Date(System.currentTimeMillis()));
-        withdrewStakingParam.setStakingReductionEpoch(3);
+        WithdrewStakingParam withdrewStakingParam = WithdrewStakingParam.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .bNum(new BigInteger("300"))
+                .stakingBlockNum(new BigInteger("200"))
+                .time(new Date(System.currentTimeMillis()))
+                .stakingReductionEpoch(3)
+                .build();
         return withdrewStakingParam;
     }
 
     public ReportDuplicateSignParam reportDuplicateSignParam(){
-        ReportDuplicateSignParam reportDuplicateSignParam = new ReportDuplicateSignParam();
-        reportDuplicateSignParam.setTime(new Date(System.currentTimeMillis()));
-        reportDuplicateSignParam.setSettingEpoch(3);
-        reportDuplicateSignParam.setNodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        reportDuplicateSignParam.setStakingBlockNum(new BigInteger("200"));
-        reportDuplicateSignParam.setBNum(new BigInteger("200"));
-        reportDuplicateSignParam.setTxHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7");
-        reportDuplicateSignParam.setSlashRate("0.5");
-        reportDuplicateSignParam.setSlashData("json");
-        reportDuplicateSignParam.setBenefitAddr("0x02fba14f5e72092c8fca6ced087cd4e7be0d8fc5");
-        reportDuplicateSignParam.setCodeCurStakingLocked(new BigDecimal("50000000"));
-        reportDuplicateSignParam.setCodeNodeoptDesc("AMOUNT");
-        reportDuplicateSignParam.setCodeStatus(2);
-        reportDuplicateSignParam.setCodeRewardValue(new BigDecimal("1000000000"));
+        ReportDuplicateSignParam reportDuplicateSignParam = ReportDuplicateSignParam.builder()
+                .time(new Date(System.currentTimeMillis()))
+                .settingEpoch(3)
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .stakingBlockNum(new BigInteger("200"))
+                .bNum(new BigInteger("200"))
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .slashRate("0.5")
+                .slashData("json")
+                .benefitAddr("0x02fba14f5e72092c8fca6ced087cd4e7be0d8fc5")
+                .codeCurStakingLocked(new BigDecimal("50000000"))
+                .codeNodeoptDesc("AMOUNT")
+                .codeStatus(2)
+                .codeRewardValue(new BigDecimal("1000000000"))
+                .build();
         return  reportDuplicateSignParam;
     }
 }

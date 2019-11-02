@@ -2,8 +2,10 @@ package com.platon.browser.param;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.param.evidence.Evidence;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,8 +21,9 @@ import java.math.BigInteger;
 @Data
 @Slf4j
 @Builder
+@AllArgsConstructor
 @Accessors(chain = true)
-public class ReportValidatorParam extends TxParam{
+public class ReportParam extends TxParam{
 
     /**
      * 多签类型
