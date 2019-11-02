@@ -454,7 +454,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case UN_DELEGATE:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
 						// 通过txHash关联un_delegation表
-						DelegateRedeemParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateRedeemParam.class);
+						DelegateExitParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
 						resp.setApplyAmount(unDelegateParam.getAmount());
 						resp.setTxAmount(unDelegateParam.getAmount());

@@ -7,7 +7,7 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateCreateParam;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.param.StakeIncreaseParam;
-import com.platon.browser.param.DelegateRedeemParam;
+import com.platon.browser.param.DelegateExitParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,12 +59,12 @@ public class SupplementService {
                     }
                     break;
                 case DELEGATE_EXIT: // 撤销委托
-                    DelegateRedeemParam udp = tx.getTxParam(DelegateRedeemParam.class);
-                    nodeId=udp.getNodeId();
+                    DelegateExitParam uep = tx.getTxParam(DelegateExitParam.class);
+                    nodeId=uep.getNodeId();
                     if(StringUtils.isNotBlank(nodeId)){
-                        nodeItem = nodeCache.getNode(udp.getNodeId());
-                        udp.setNodeName(nodeItem.getNodeName());
-                        tx.setInfo(udp.toJSONString());
+                        nodeItem = nodeCache.getNode(uep.getNodeId());
+                        uep.setNodeName(nodeItem.getNodeName());
+                        tx.setInfo(uep.toJSONString());
                     }
                     break;
                 default:

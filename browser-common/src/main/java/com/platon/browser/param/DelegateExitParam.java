@@ -20,7 +20,7 @@ import java.math.BigInteger;
 @Builder
 @AllArgsConstructor
 @Accessors(chain = true)
-public class DelegateRedeemParam extends TxParam{
+public class DelegateExitParam extends TxParam{
 
     /**
      * 代表着某个node的某次质押的唯一标示
