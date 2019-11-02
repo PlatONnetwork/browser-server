@@ -1,7 +1,9 @@
 package com.platon.browser.param;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -13,6 +15,8 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExitValidatorParam extends TxParam{
     /**
      * 被质押的节点Id(也叫候选人的节点Id)

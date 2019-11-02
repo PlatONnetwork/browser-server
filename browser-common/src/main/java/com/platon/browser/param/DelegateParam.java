@@ -1,7 +1,9 @@
 package com.platon.browser.param;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +19,8 @@ import java.math.BigInteger;
 @Data
 @Builder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class DelegateParam extends TxParam{
     /**
      * 表示使用账户自由金额还是账户的锁仓金额做质押

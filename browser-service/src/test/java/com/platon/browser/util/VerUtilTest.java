@@ -36,4 +36,10 @@ public class VerUtilTest {
         String version = VerUtil.toVersion(BigInteger.valueOf(65792));
         assertEquals("1.1.0", version);
     }
+    
+    @Test
+    public void TestTransferBigVersion() {
+    	BigInteger version = VerUtil.transferBigVersion(BigInteger.valueOf(65792));
+        assertEquals("65792", version.toString());
+    }
 }

@@ -1,7 +1,9 @@
 package com.platon.browser.param;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +19,8 @@ import java.math.BigInteger;
 @Data
 @Builder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class PlanParam extends TxParam{
     /**
      * 表示结算周期的倍数。与每个结算周期出块数的乘积表示在目标区块高度上释放锁定的资金。Epoch * 每周期的区块数至少要大于最高不可逆区块高度
