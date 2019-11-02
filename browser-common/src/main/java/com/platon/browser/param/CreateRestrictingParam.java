@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -11,7 +13,9 @@ import java.util.List;
  * txType=4000创建锁仓计划(创建锁仓)
  */
 @Data
-public class CreateRestrictingParam {
+@Builder
+@Accessors(chain = true)
+public class CreateRestrictingParam extends TxParam{
     /**
      * 锁仓释放到账账户
      */

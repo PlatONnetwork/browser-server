@@ -2,7 +2,9 @@ package com.platon.browser.param;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.param.evidence.Evidence;
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -16,7 +18,9 @@ import java.math.BigInteger;
  */
 @Data
 @Slf4j
-public class ReportValidatorParam {
+@Builder
+@Accessors(chain = true)
+public class ReportValidatorParam extends TxParam{
 
     /**
      * 多签类型
@@ -43,12 +47,9 @@ public class ReportValidatorParam {
      */
     private String stakingBlockNum;
 
-    public void init ( BigInteger type, String data ) {
-        this.type = type;
-        this.data = data;
+    public void init() {
         this.verify = format(type, data);
     }
-
 
     private String format ( BigInteger type, String date ) {
         String info = "";

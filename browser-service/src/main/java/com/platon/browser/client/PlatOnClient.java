@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
@@ -159,5 +160,19 @@ public class PlatOnClient {
             cf = HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
         }
         return cf;
+    }
+
+    public BigInteger getLatestBlockNumber() throws IOException {
+        return getWeb3j().platonBlockNumber().send().getBlockNumber();
+    }
+
+    public List<Node> getLatestValidators() throws Exception {
+        List<Node> curNodes = getNodeContract().getValidatorList().send().data;
+        return curNodes;
+    }
+
+    public List<Node> getLatestVerifiers() throws Exception {
+        List<Node> curNodes = getNodeContract().getVerifierList().send().data;
+        return curNodes;
     }
 }

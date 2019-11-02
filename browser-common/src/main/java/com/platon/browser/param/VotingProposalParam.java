@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * User: dongqile
@@ -9,13 +11,13 @@ import lombok.Data;
  * txType=2003给提案投票(提案投票)
  */
 @Data
-public class VotingProposalParam {
-
+@Builder
+@Accessors(chain = true)
+public class VotingProposalParam extends TxParam{
     /**
      * 投票的验证人
      */
     private String verifier;
-
     /**
      * 提案ID
      */
@@ -58,15 +60,4 @@ public class VotingProposalParam {
      * 提案URL
      */
     private String url;
-
-
-
-    public void init(String verifier,String proposalId,String option,String programVersion,String versionSign){
-        this.setVerifier(verifier);
-        this.setProposalId(proposalId);
-        this.setOption(option);
-        this.setProgramVersion(programVersion);
-        this.setVersionSign(versionSign);
-    }
-
 }

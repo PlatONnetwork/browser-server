@@ -1,6 +1,7 @@
 package com.platon.browser.elasticsearch.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Data
+@Accessors(chain = true)
 public class Block {
     private Long num;
     private String hash;

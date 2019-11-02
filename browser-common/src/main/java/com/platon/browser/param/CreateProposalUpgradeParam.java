@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -11,7 +13,9 @@ import java.math.BigDecimal;
  * txType=2001提交升级提案(创建提案)
  */
 @Data
-public class CreateProposalUpgradeParam {
+@Builder
+@Accessors(chain = true)
+public class CreateProposalUpgradeParam extends TxParam {
 
     /**
      * 提交提案的验证人
@@ -37,12 +41,4 @@ public class CreateProposalUpgradeParam {
      * 节点名称
      */
     private String nodeName;
-
-
-    public void init( String verifier, String pIDID, BigDecimal endVotingRound,Integer newVersion){
-        this.setVerifier(verifier);
-        this.setPIDID(pIDID);
-        this.setEndVotingRound(endVotingRound);
-        this.setNewVersion(newVersion);
-    }
 }

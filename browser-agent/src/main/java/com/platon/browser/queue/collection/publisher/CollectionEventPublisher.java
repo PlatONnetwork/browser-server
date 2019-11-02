@@ -4,9 +4,9 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.platon.browser.common.dto.CollectionBlock;
-import com.platon.browser.common.dto.CollectionTransaction;
-import com.platon.browser.common.dto.EpochMessage;
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.queue.collection.event.CollectionEvent;
 import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +24,13 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class CollectionEventPublisher {
-    private static final EventTranslatorThreeArg<CollectionEvent, CollectionBlock, List<CollectionTransaction>,EpochMessage> TRANSLATOR = (event, sequence, block,transactions,epochMessage) -> {
-        event.setBlock(block);
-        event.setTransactions(transactions);
-        event.setEpochMessage(epochMessage);
-    };
+    private static final EventTranslatorThreeArg<CollectionEvent, CollectionBlock, List<CollectionTransaction>,EpochMessage>
+    TRANSLATOR = (event, sequence, block,transactions,epochMessage)->event.setBlock(block).setTransactions(transactions).setEpochMessage(epochMessage);
     private RingBuffer<CollectionEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.collection.buffer-size}")
     private int ringBufferSize;
-    private EventFactory<CollectionEvent> eventFactory = CollectionEvent::new;
+    private EventFactory<CollectionEvent> eventFactory = CollectionEvent::newInstance;
     @Autowired
     private ICollectionEventHandler handler;
     // 事件处理线程生产工厂

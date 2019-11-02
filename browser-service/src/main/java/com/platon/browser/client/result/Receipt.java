@@ -16,14 +16,25 @@ import java.util.List;
 
 @Data
 public class Receipt {
+
+    private static final int FAILURE = 0;
+    private static final int SUCCESS = 1;
+
     private String gasUsed;
     private List<Log> logs;
     private String transactionHash;
     private String transactionIndex;
+    private String status;
 
+    private int logStatus;
 
-    private int receiptStatus;
     private String failReason;
+
+    public int getStatus() {
+        if (null == status) return SUCCESS;
+        BigInteger statusQuantity = Numeric.decodeQuantity(status);
+        return BigInteger.ONE.equals(statusQuantity)?1:0;
+    }
 
     public BigInteger getGasUsed() {
         return Numeric.decodeQuantity(gasUsed);
@@ -34,29 +45,30 @@ public class Receipt {
      */
     public void decodeLogs(){
         if(logs==null||logs.isEmpty()){
-            receiptStatus=0;
-        }else {
-            Log log = logs.get(0);
-            String data = log.getData();
-            if(StringUtils.isNotBlank(data)) {
-                data=data.replace("0x","");
-            }else{
-                receiptStatus=0;
-            }
-            RlpList b = RlpDecoder.decode(Hex.decode(data));
-            RlpList group = (RlpList) b.getValues().get(0);
-            RlpString out = (RlpString) group.getValues().get(0);
-            String res = new String(out.getBytes());
-            BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
-            if(response==null) receiptStatus=0;
-            if(response!=null){
-                if(response.isStatusOk()) {
-                    receiptStatus=1;
-                }else{
-                    receiptStatus=0;
-                    failReason=response.errMsg;
-                }
-            }
+            logStatus=FAILURE;
+            return;
         }
+        Log log = logs.get(0);
+        String data = log.getData();
+        if(StringUtils.isBlank(data)){
+            logStatus=FAILURE;
+            return;
+        }
+        data=data.replace("0x","");
+        RlpList b = RlpDecoder.decode(Hex.decode(data));
+        RlpList group = (RlpList) b.getValues().get(0);
+        RlpString out = (RlpString) group.getValues().get(0);
+        String res = new String(out.getBytes());
+        BaseResponse response = JSONUtil.parseObject(res, BaseResponse.class);
+        if(response==null) {
+            logStatus=FAILURE;
+            return;
+        }
+        if(!response.isStatusOk()) {
+            logStatus=FAILURE;
+            failReason=response.errMsg;
+            return;
+        }
+        logStatus=SUCCESS;
     }
 }

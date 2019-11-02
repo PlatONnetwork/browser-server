@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -13,7 +15,9 @@ import java.math.BigInteger;
  * txType=1002增持质押(增加自有质押)
  */
 @Data
-public class IncreaseStakingParam {
+@Builder
+@Accessors(chain = true)
+public class IncreaseStakingParam extends TxParam{
     /**
      * 表示使用账户自由金额还是账户的锁仓金额做质押
      * 0: 自由金额
@@ -40,13 +44,6 @@ public class IncreaseStakingParam {
      * 质押交易快高
      */
     private String stakingBlockNum;
-
-    public void init(String nodeId, Integer type,String amount,String stakingBlockNum){
-        this.setNodeId(nodeId);
-        this.setType(type);
-        this.setAmount(amount);
-        this.setStakingBlockNum(stakingBlockNum);
-    }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}

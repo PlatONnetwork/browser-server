@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -13,7 +15,9 @@ import java.math.BigInteger;
  * txType=1005减持/撤销委托(赎回委托)
  */
 @Data
-public class UnDelegateParam {
+@Builder
+@Accessors(chain = true)
+public class UnDelegateParam extends TxParam{
 
     /**
      * 代表着某个node的某次质押的唯一标示
@@ -34,12 +38,6 @@ public class UnDelegateParam {
      * 被质押节点的名称(有长度限制，表示该节点的名称)
      */
     private String nodeName;
-
-    public void init(Long stakingBlockNum ,String nodeId,String amount){
-        this.setStakingBlockNum(stakingBlockNum);
-        this.setNodeId(nodeId);
-        this.setAmount(amount);
-    }
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}
     /********把字符串类数值转换为大整数的便捷方法********/

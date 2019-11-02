@@ -1,12 +1,11 @@
 package com.platon.browser;
 
-import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.client.result.ReceiptResult;
-import com.platon.browser.common.dto.EpochMessage;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
+import com.platon.browser.collection.service.epoch.EpochService;
 import com.platon.browser.collection.service.transaction.TransactionService;
+import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.web3j.protocol.core.methods.response.PlatonBlock;
 
-import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -45,9 +43,7 @@ public class AgentApplication implements ApplicationRunner {
 	@Autowired
 	private BlockEventPublisher blockEventPublisher;
 	@Autowired
-	private PlatOnClient platOnClient;
-	@Autowired
-	private SpecialContractApi specialContractApi;
+	private EpochService epochService;
 	// 已采集的最高块号
 	private Long collectedNumber = 79369L;
 
@@ -55,18 +51,18 @@ public class AgentApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
-
-		for (;true;){
+		while (true) {
 			try {
 				collectedNumber++;
 				// 异步获取区块
 				CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(collectedNumber);
 				// 异步获取交易回执
 				CompletableFuture<ReceiptResult> receiptCF = transactionService.getReceiptAsync(collectedNumber);
-				// 构造
-				EpochMessage epochMessage = new EpochMessage(BigInteger.valueOf(collectedNumber),platOnClient,specialContractApi);
+				// 获取周期切换消息
+				EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
 				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);
 			}catch (Exception e){
+				log.error("程序因错误而停止:",e);
 				break;
 			}
 		}

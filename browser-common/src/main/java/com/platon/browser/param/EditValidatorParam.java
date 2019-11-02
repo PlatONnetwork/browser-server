@@ -1,6 +1,8 @@
 package com.platon.browser.param;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * User: dongqile
@@ -9,7 +11,9 @@ import lombok.Data;
  * txType=1001修改质押信息(编辑验证人)
  */
 @Data
-public class EditValidatorParam {
+@Builder
+@Accessors(chain = true)
+public class EditValidatorParam extends TxParam{
 
     /**
      * 用于接受出块奖励和质押奖励的收益账户
@@ -47,15 +51,4 @@ public class EditValidatorParam {
     private String blockNumber;
 
     private String perNodeName;
-
-    public void init(String benefitAddress,String nodeId,String externalId,
-                     String nodeName,String website,String details){
-        this.setBenefitAddress(benefitAddress);
-        this.setNodeId(nodeId);
-        this.setExternalId(externalId);
-        this.setNodeName(nodeName);
-        this.setWebsite(website);
-        this.setDetails(details);
-
-    }
 }
