@@ -22,14 +22,14 @@ public class BusinessService {
     @Autowired
     private SupplementService supplementService;
     @Autowired
-    private ParameterService businessParamService;
+    private ParameterService parameterService;
 
     public List<BusinessParam> getParameters(List<CollectionTransaction> transactions) {
         List<BusinessParam> businessParams = new ArrayList<>();
         if(transactions.isEmpty()) return businessParams;
         for (CollectionTransaction tx : transactions) {
             try{
-                BusinessParam businessParam = businessParamService.getParameter(tx);
+                BusinessParam businessParam = parameterService.getParameter(tx);
                 businessParams.add(businessParam);
             }catch (BusinessException e){
                 log.debug("{}",e);
