@@ -167,6 +167,7 @@ public interface AppDocBlock {
 	
 	
     /**
+     * @apiDeprecated
      * @api {post} /block/blockDetailNavigate e.区块详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName blockDetailNavigate

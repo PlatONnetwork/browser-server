@@ -142,6 +142,7 @@ public interface AppDocHome {
 	
 	
     /**
+     * @apiDeprecated
      * @api {subscribe} /topic/block/list/new d.区块列表（websocket）
      * @apiVersion 1.0.0
      * @apiName topic/block/list/new

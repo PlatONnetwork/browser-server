@@ -62,14 +62,11 @@ public class StakingServiceImpl implements StakingService {
 	@Autowired
 	private CustomDelegationMapper customDelegationMapper;
 
-//	@Autowired
-//	private NodeOptMapper nodeOptMapper;
-	
 	@Autowired
 	private NodeOptESRepository nodeOptESRepository;
 
-	@Autowired
-	private AddressMapper addressMapper;
+//	@Autowired
+//	private AddressMapper addressMapper;
 
 	@Autowired
 	private I18nUtil i18n;

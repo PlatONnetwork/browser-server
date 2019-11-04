@@ -9,9 +9,12 @@ import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.AddressMapper;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.CustomRpPlanMapper;
 import com.platon.browser.dao.mapper.RpPlanMapper;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.AddressService;
@@ -65,9 +68,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private BlockChainConfig blockChainConfig;
-
+    
     @Autowired
-    private BlockMapper blockMapper;
+	private BlockESRepository blockESRepository;
 
     @Override
     public QueryDetailResp getDetails(QueryDetailRequest req) {
@@ -147,9 +150,16 @@ public class AddressServiceImpl implements AddressService {
 
 			detailsRPPlanResp.setBlockNumber(number);
 			/** 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间 */
-			Block block = blockMapper.selectByPrimaryKey(rPlan.getNumber());
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			constructor.must(new ESQueryBuilders().term("num", rPlan.getNumber()));
+			ESResult<Block> blockList = new ESResult<>();
+			try {
+				blockList = blockESRepository.search(constructor, Block.class, 1, 1);
+			} catch (IOException e) {
+				logger.error("获取区块错误。", e);
+			}
 			detailsRPPlanResp.setEstimateTime(blockChainConfig.getBlockInterval().multiply(BigInteger.valueOf(number - rPlan.getNumber()))
-					.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(block.getTime().getTime())).longValue());
+					.multiply(BigInteger.valueOf(1000)).add(BigInteger.valueOf(blockList.getRsData().get(0).getTime().getTime())).longValue());
 			detailsRPPlanResps.add(detailsRPPlanResp);
 		}
 		queryRPPlanDetailResp.setRpPlans(detailsRPPlanResps);

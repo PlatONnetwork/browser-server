@@ -1,6 +1,5 @@
 package com.platon.browser.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.RetEnum;
 import com.platon.browser.now.service.StakingService;
@@ -10,8 +9,6 @@ import com.platon.browser.res.RespPage;
 import com.platon.browser.resp.staking.*;
 import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -32,9 +29,6 @@ public class AppDocStakingController implements AppDocStaking {
 	@Autowired
 	private StakingService stakingService;
 	
-	@Autowired
-	private SimpMessageSendingOperations simpMessageSendingOperations;
-	
 	@Override
 	public BaseResp<StakingStatisticNewResp> stakingStatisticNew() {
 		StakingStatisticNewResp stakingStatisticNewResp = stakingService.stakingStatisticNew();
@@ -51,13 +45,13 @@ public class AppDocStakingController implements AppDocStaking {
 		return stakingService.historyStakingList(req);
 	}
 
-	@Override
-	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor) {
-		AliveStakingListReq req = new AliveStakingListReq();
-		RespPage<AliveStakingListResp> aliveStakingListResp = stakingService.aliveStakingList(req);
-		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSON.toJSONString(aliveStakingListResp));
-		return stakingService.aliveStakingList(req);
-	}
+//	@Override
+//	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor) {
+//		AliveStakingListReq req = new AliveStakingListReq();
+//		RespPage<AliveStakingListResp> aliveStakingListResp = stakingService.aliveStakingList(req);
+//		simpMessageSendingOperations.convertAndSendToUser(stompHeaderAccessor.getUser().getName(), "11",  JSON.toJSONString(aliveStakingListResp));
+//		return stakingService.aliveStakingList(req);
+//	}
 
 	@Override
 	public BaseResp<StakingDetailsResp> stakingDetails(@Valid StakingDetailsReq req) {

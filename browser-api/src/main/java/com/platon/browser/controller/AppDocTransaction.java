@@ -270,6 +270,7 @@ public interface AppDocTransaction {
     BaseResp<TransactionDetailsResp> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
 	
     /**
+     * @apiDeprecated
      * @api {post} transaction/transactionDetailNavigate f.交易详情前后跳转浏览
      * @apiVersion 1.0.0
      * @apiName transactionDetailNavigate

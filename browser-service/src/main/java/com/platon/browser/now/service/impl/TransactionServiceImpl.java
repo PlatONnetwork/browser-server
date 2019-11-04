@@ -69,8 +69,6 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
-//    @Autowired
-//    private TransactionMapper transactionMapper;
     @Autowired
     private TransactionESRepository transactionESRepository;
     @Autowired

@@ -60,9 +60,6 @@ public class BlockServiceImpl implements BlockService {
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 
-//	@Autowired
-//	private BlockMapper blockMapper;
-	
 	@Autowired
 	private BlockESRepository blockESRepository;
 
@@ -176,23 +173,6 @@ public class BlockServiceImpl implements BlockService {
         logger.info("导出数据起始日期：{},结束时间：{}",dateFormat.format(new Date(date)),msg);
         /** 限制最多导出3万条记录 */
         /** 设置根据时间和nodeId查询数据 */
-//        BlockExample blockExample = new BlockExample();
-//        blockExample.setOrderByClause("number desc ");
-//        BlockExample.Criteria criteria = blockExample.createCriteria();
-//        criteria.andNodeIdEqualTo(nodeId);
-//        criteria.andCreTimeBetween(new Date(date), now);
-//        List<Block> blockList = blockMapper.selectByExample(blockExample);
-        
-//        Map<String, Object> filter = new HashMap<>();
-//		filter.put("nodeId", nodeId);
-//		List<ESSortDto> esSortDtos = new ArrayList<>();
-//		esSortDtos.add(new ESSortDto("num", SortOrder.DESC));
-//		ESResult<Block> blockList = new ESResult<>();
-//		try {
-//			blockList = blockESRepository.search(filter, Block.class, esSortDtos, 1, 30000);
-//		} catch (IOException e) {
-//			logger.error("获取区块错误。", e);
-//		}
 		
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("nodeId", nodeId));
@@ -293,42 +273,21 @@ public class BlockServiceImpl implements BlockService {
 			
 
 			/** 取上一个区块,如果存在则设置标识和hash */
-//			BlockExample blockExample = new BlockExample();
-//	        blockExample.createCriteria().andNumEqualTo(blockNumber - 1);
-//	        List<Block> blocks = blockMapper.selectByExample(blockExample);
-//	        if (blocks.size()>1){
-//	            logger.error("duplicate block: block number {}",blockNumber);
-//	            throw new BusinessException(RetEnum.RET_FAIL.getCode(), i18n.i(I18nEnum.BLOCK_ERROR_DUPLICATE));
-//	        }
-//	        if(blocks.isEmpty()){
-//	        	blockDetailResp.setTimeDiff(0l);
-//	            /** 当前块没有上一个块证明这是第一个块, 设置first标识  */
-//	            blockDetailResp.setFirst(true);
-//	        }else{
-//	            Block prevBlock = blocks.get(0);
-//	            blockDetailResp.setTimeDiff(blockDetailResp.getTimestamp()-prevBlock.getTime().getTime());
-//	        }
 	        blockDetailResp.setFirst(false);
 	        if(blockNumber == 1) {
+	        	blockDetailResp.setTimeDiff(0l);
 	        	blockDetailResp.setFirst(true);
 	        } 
 
 	        /** 设置last标识 **/
-//	        blockExample = new BlockExample();
-//	        blockExample.createCriteria().andNumEqualTo(blockNumber+1);
-//	        blocks = blockMapper.selectByExample(blockExample);
-//	        if(blocks.isEmpty()){
-//	            /** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
-//	        	blockDetailResp.setLast(true);
-//	        }
-	        
 	        /** 查询现阶段最大区块数 */
 	        blockDetailResp.setLast(false);
-//			NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
-//			Long bNumber = networkStatRedis.getCurNumber();
-//			if(blockNumber >= bNumber) {
-//				blockDetailResp.setLast(true);
-//			}
+			NetworkStat networkStatRedis = statisticCacheService.getNetworkStatCache();
+			Long bNumber = networkStatRedis.getCurNumber();
+			if(blockNumber >= bNumber) {
+				/** 当前区块没有下一个块，则表示这是最后一个块，设置last标识   */
+				blockDetailResp.setLast(true);
+			}
 			
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 		}

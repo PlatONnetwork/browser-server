@@ -2,10 +2,13 @@ package com.platon.browser.now.service.impl;
 
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.dto.CustomStaking;
+import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
+import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.now.service.HomeService;
@@ -18,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -36,9 +40,9 @@ import java.util.List;
 public class HomeServiceImpl implements HomeService {
 
 	@Autowired
-	private BlockMapper blockMapper;
+	private BlockESRepository blockESRepository;
 	@Autowired
-	private TransactionMapper transactionMapper;
+	private TransactionESRepository transactionESRepository;
 	@Autowired
 	private StatisticCacheService statisticCacheService;
 	@Autowired
@@ -77,10 +81,17 @@ public class HomeServiceImpl implements HomeService {
 				throw new BusinessException(i18n.i(I18nEnum.SEARCH_KEYWORD_NO_RESULT));
 			}
 			/** 存在区块信息则返回区块号 */
-			Block block = blockMapper.selectByPrimaryKey(number);
-			if(block != null) {
+			ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+			constructor.must(new ESQueryBuilders().term("num", number));
+			ESResult<Block> blockList = new ESResult<>();
+			try {
+				blockList = blockESRepository.search(constructor, Block.class, 1, 1);
+			} catch (IOException e) {
+				log.error("获取区块错误。", e);
+			}
+			if(blockList.getTotal().intValue() > 0) {
 				result.setType("block");
-				queryNavigationStructResp.setNumber(Long.valueOf(keyword));
+				queryNavigationStructResp.setNumber(number);
 			}
 		} else {
 			/** 为false则可能为区块交易hash或者为账户  */
@@ -109,19 +120,32 @@ public class HomeServiceImpl implements HomeService {
 					 * 交易hash或者区块hash 逻辑分析 1、优先查询已完成交易 2、已完成交易查询无记录，则查询区块
 					 * 4、以上都无记录，则返回空结果
 					 */
-					Transaction transaction = transactionMapper.selectByPrimaryKey(keyword);
-					if(transaction != null) {
+					ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+					constructor.must(new ESQueryBuilders().term("hash", keyword));
+					ESResult<TransactionWithBLOBs> items = new ESResult<>();
+					try {
+						items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
+					} catch (IOException e) {
+						log.error("获取区块错误。", e);
+					}
+					if(items.getTotal().intValue() > 0) {
 						result.setType("transaction");
-						queryNavigationStructResp.setTxHash(transaction.getHash());
+						queryNavigationStructResp.setTxHash(keyword);
 					} else {
-						log.info("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
-						BlockExample blockExample = new BlockExample();
-						blockExample.createCriteria().andHashEqualTo(keyword);
-						List<Block> blockList = blockMapper.selectByExample(blockExample);
-						if (!blockList.isEmpty()) {
+						log.debug("在交易表查询不到Hash为[{}]的交易记录，尝试查询Hash为[{}]的区块信息...", keyword, keyword);
+						
+						ESQueryBuilderConstructor blockConstructor = new ESQueryBuilderConstructor();
+						blockConstructor.must(new ESQueryBuilders().term("hash", keyword));
+						ESResult<Block> blockList = new ESResult<>();
+						try {
+							blockList = blockESRepository.search(blockConstructor, Block.class, 1, 1);
+						} catch (IOException e) {
+							log.error("获取区块错误。", e);
+						}
+						if (blockList.getTotal() > 0l) {
 							/**  如果找到区块信息，则构造结果并返回  */
 							result.setType("block");
-							queryNavigationStructResp.setNumber(blockList.get(0).getNum());
+							queryNavigationStructResp.setNumber(blockList.getRsData().get(0).getNum());
 						}
 					}
 				}
@@ -238,8 +262,8 @@ public class HomeServiceImpl implements HomeService {
 		StakingExample stakingExample = new StakingExample();
 		StakingExample.Criteria criteria = stakingExample.createCriteria();
 		criteria.andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode()).andIsConsensusEqualTo(CustomStaking.YesNoEnum.YES.getCode());
-		stakingExample.setOrderByClause(" cast(staking_has as Decimal(30)) + cast(staking_locked  as Decimal(30))"
-				+ " + cast(stat_delegate_has  as Decimal(30)) + cast(stat_delegate_locked  as Decimal(30)) desc,staking_block_num desc ,staking_tx_index desc");
+		stakingExample.setOrderByClause(" big_version desc,staking_hes + staking_locked "
+				+ " + stat_delegate_hes + stat_delegate_locked desc,staking_block_num desc ,staking_tx_index desc");
 		List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
 
 		List<StakingListResp> lists = new LinkedList<>();

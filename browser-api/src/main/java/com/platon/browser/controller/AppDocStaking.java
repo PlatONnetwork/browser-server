@@ -7,9 +7,7 @@ import com.platon.browser.resp.staking.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -151,32 +149,8 @@ public interface AppDocStaking {
 	@PostMapping(value = "staking/historyStakingList", produces = { "application/json" })
     RespPage<HistoryStakingListResp> historyStakingList(@ApiParam(value = "HistoryStakingListReq ", required = true)@Valid @RequestBody HistoryStakingListReq req);
 	
-	
     /**
-     * @api {subscribe} /topic/staking/change/new d.实时验证人变更（websocket）
-     * @apiVersion 1.0.0
-     * @apiName topic/staking/change/new
-     * @apiGroup staking
-     * @apiDescription
-     * 1. 功能：.实时验证人变更<br/>
-     * 2. 实现逻辑：<br/>
-     * @apiSuccessExample  Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *    "errMsg":"",                 //描述信息
-     *    "code":0,                    //成功（0），失败则由相关失败码
-     *    "data":{
-     *       "isFlash":"",             //是否需要刷新列表
-     *       "其他属性"                   //同实时验证人列表中每个对象属性 
-     *    }
-     * }
-     */	
-	@ApiOperation(value = "topic/staking/change/new", nickname = "", notes = "", response = StakingChangeNewResp.class, tags = { "Staking" })
-	@MessageMapping(value = "/staking/change/new")
-	public RespPage<AliveStakingListResp> stakingChangeNew(String message, StompHeaderAccessor stompHeaderAccessor);
-	
-    /**
-     * @api {post} /staking/stakingDetails e.验证人详情
+     * @api {post} /staking/stakingDetails d.验证人详情
      * @apiVersion 1.0.0
      * @apiName stakingDetails
      * @apiGroup staking
@@ -227,7 +201,7 @@ public interface AppDocStaking {
     BaseResp<StakingDetailsResp> stakingDetails(@ApiParam(value = "StakingDetailsReq ", required = true)@Valid @RequestBody StakingDetailsReq req);
 	
     /**
-     * @api {post} /staking/stakingOptRecordList f.节点操作记录
+     * @api {post} /staking/stakingOptRecordList e.节点操作记录
      * @apiVersion 1.0.0
      * @apiName stakingOptRecordList
      * @apiGroup staking
@@ -272,7 +246,7 @@ public interface AppDocStaking {
     RespPage<StakingOptRecordListResp> stakingOptRecordList(@ApiParam(value = "StakingOptRecordListReq ", required = true)@Valid @RequestBody StakingOptRecordListReq req);
 	
     /**
-     * @api {post} /staking/delegationListByStaking g.验证人相关的委托列表
+     * @api {post} /staking/delegationListByStaking f.验证人相关的委托列表
      * @apiVersion 1.0.0
      * @apiName delegationListByStaking
      * @apiGroup staking
@@ -312,7 +286,7 @@ public interface AppDocStaking {
 	
 	
     /**
-     * @api {post} /staking/delegationListByAddress h.地址相关的委托列表
+     * @api {post} /staking/delegationListByAddress g.地址相关的委托列表
      * @apiVersion 1.0.0
      * @apiName delegationListByAddress
      * @apiGroup staking
@@ -356,7 +330,7 @@ public interface AppDocStaking {
     /**
      * 多余的接口
      * @apiDeprecated
-     * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date i.导出地址验证人委托列表
+     * @api {get} /staking/delegationListByAddressDownload?address=:address&date=:date h.导出地址验证人委托列表
      * @apiVersion 1.0.0
      * @apiName delegationListByAddressDownload
      * @apiGroup staking
