@@ -3,6 +3,7 @@ package com.platon.browser.client.result;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +15,7 @@ import java.util.concurrent.Executors;
 public class ReceiptResult {
     private String jsonrpc;
     private int id;
-    private List<Receipt> result;
+    private List<Receipt> result=new ArrayList<>();
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(100);
 

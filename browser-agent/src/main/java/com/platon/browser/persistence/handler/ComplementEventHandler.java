@@ -1,21 +1,14 @@
 package com.platon.browser.persistence.handler;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
 import com.platon.browser.persistence.service.DbService;
-import com.platon.browser.persistence.service.EsService;
 import com.platon.browser.queue.complement.event.ComplementEvent;
 import com.platon.browser.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,28 +18,21 @@ import java.util.List;
 public class ComplementEventHandler implements IComplementEventHandler {
 
     @Autowired
-    private EsService esService;
-    @Autowired
     private DbService dbService;
 
+    @Autowired
+    private PersistenceEventPublisher persistenceEventPublisher;
 
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
         try {
             // 此处调用 persistence模块功能
-            List<Block> blocks = new ArrayList<>();
             event.getBlock().setTransactions(null);
-            blocks.add(event.getBlock());
-            List<Transaction> transactions = new ArrayList<>(event.getTransactions());
             List<BusinessParam> businessParams = event.getBusinessParams();
-            try {
-                // 入库MYSQL
-                //dbService.insert(businessParams);
-                // 入库ES
-                esService.batchInsertOrUpdate(blocks,transactions, Collections.emptyList());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // 入库MYSQL
+//            dbService.insert(businessParams);
+            // 发布至持久化队列
+            persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
         }catch (Exception e){
             log.error("{}",e);
             throw e;

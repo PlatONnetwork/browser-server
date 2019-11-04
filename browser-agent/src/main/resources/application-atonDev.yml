@@ -21,6 +21,7 @@ elasticsearch:
   schema: http
   blockIndexName: browser_block_1
   transactionIndexName: browser_transaction_1
+  delegationIndexName: browser_delegation_1
   nodeOptIndexName: browser_nodeopt_1
 # 应用版本
 version: 0.7
