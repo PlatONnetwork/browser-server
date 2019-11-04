@@ -11,6 +11,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+/**
+ * @description: 增持质押 入库参数
+ * @author: chendongming@juzix.net
+ * @create: 2019-11-04 17:58:27
+ **/
 @Data
 @Slf4j
 @Builder

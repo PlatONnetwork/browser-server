@@ -6,7 +6,8 @@ import com.platon.browser.client.result.Receipt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.util.TxParamResolver;
+import com.platon.browser.util.decode.DecodedResult;
+import com.platon.browser.util.decode.TxInputUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -64,10 +65,10 @@ public class CollectionTransaction extends Transaction {
 
         try {
             // 解析交易的输入信息
-            TxParamResolver.Result txParams = TxParamResolver.analysis(getInput());
+            DecodedResult decodedResult = TxInputUtil.decode(getInput());
             // 参数信息
-            String info = txParams.getParam().toJSONString();
-            int type = txParams.getTypeEnum().getCode();
+            String info = decodedResult.getParam().toJSONString();
+            int type = decodedResult.getTypeEnum().getCode();
             int toType = ToTypeEnum.CONTRACT.getCode();
             if (getValue()!=null&&!InnerContractAddrEnum.getAddresses().contains(getTo())) {
                 type = TypeEnum.TRANSFER.getCode();

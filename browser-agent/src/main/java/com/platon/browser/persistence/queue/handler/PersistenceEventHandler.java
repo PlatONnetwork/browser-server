@@ -5,7 +5,8 @@ import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
 import com.platon.browser.persistence.service.elasticsearch.EsImportService;
-import com.platon.browser.persistence.service.RedisService;
+import com.platon.browser.persistence.service.redis.RedisImportService;
+import com.platon.browser.persistence.service.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +26,9 @@ import java.util.Set;
 public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
 
     @Autowired
-    private EsImportService esService;
+    private EsImportService esImportService;
     @Autowired
-    private RedisService redisService;
+    private RedisImportService redisImportService;
 
     @Value("${disruptor.queue.persistence.batch-size}")
     private int batchSize;
@@ -46,9 +47,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             if(blockStage.size()<batchSize) return;
 
             // 入库ES
-            esService.batchImport(blockStage,transactionStage, Collections.emptySet(),Collections.emptySet());
+            esImportService.batchImport(blockStage,transactionStage, Collections.emptySet(),Collections.emptySet());
             // 入库Redis
-            redisService.batchInsertOrUpdate(blockStage,transactionStage);
+            redisImportService.batchImport(blockStage,transactionStage,Collections.emptySet());
             blockStage.clear();
             transactionStage.clear();
         }catch (Exception e){

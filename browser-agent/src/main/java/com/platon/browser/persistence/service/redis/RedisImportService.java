@@ -1,7 +1,6 @@
-package com.platon.browser.persistence.service.elasticsearch;
+package com.platon.browser.persistence.service.redis;
 
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.NodeOpt;
+import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -16,25 +15,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * Redis数据批量入库服务
  * @Auther: Chendongming
  * @Date: 2019/10/25 15:12
  * @Description: ES服务
  */
 @Slf4j
 @Service
-public class EsImportService {
+public class RedisImportService {
     @Autowired
-    private EsBlockService blockService;
+    private RedisBlockService blockService;
     @Autowired
-    private EsTransactionService transactionService;
+    private RedisTransactionService transactionService;
     @Autowired
-    private EsDelegationService delegationService;
-    @Autowired
-    private EsNodeOptService nodeOptService;
+    private RedisStatisticService statisticService;
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
 
-    private <T> void submit(EsService<T> service,Set<T> data,CountDownLatch latch){
+    private <T> void submit(RedisService<T> service,Set<T> data,CountDownLatch latch){
         EXECUTOR.submit(()->{
             try {
                 service.save(data);
@@ -47,13 +45,12 @@ public class EsImportService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<Delegation> delegations, Set<NodeOpt> nodeOpts) throws InterruptedException {
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NetworkStat> statistics) throws InterruptedException {
         try{
-            CountDownLatch latch = new CountDownLatch(4);
+            CountDownLatch latch = new CountDownLatch(3);
             submit(blockService,blocks,latch);
             submit(transactionService,transactions,latch);
-            submit(delegationService,delegations,latch);
-            submit(nodeOptService,nodeOpts,latch);
+            submit(statisticService,statistics,latch);
             latch.await();
         }catch (Exception e){
             log.error("",e);

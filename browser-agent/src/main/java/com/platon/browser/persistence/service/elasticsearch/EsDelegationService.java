@@ -5,7 +5,7 @@ import com.platon.browser.elasticsearch.DelegationESRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Set;
  * @Description: ES服务
  */
 @Slf4j
-@Component
+@Service
 public class EsDelegationService implements EsService<Delegation> {
     @Autowired
     private DelegationESRepository delegationESRepository;
