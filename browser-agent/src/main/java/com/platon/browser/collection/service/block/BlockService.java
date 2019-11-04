@@ -28,9 +28,17 @@ public class BlockService {
                 PlatonBlock block = retryService.getBlock(blockNumber);
                 return block;
             } catch (Exception e) {
-                log.error("采集区块({})异常!",blockNumber,e);
+                log.error("重试采集区块({})异常:",blockNumber,e);
             }
             return null;
         });
+    }
+
+    public void checkBlockNumber(Long blockNumber){
+        try {
+            retryService.checkBlockNumber(blockNumber);
+        } catch (Exception e) {
+            log.error("重试同步链出错:",e);
+        }
     }
 }

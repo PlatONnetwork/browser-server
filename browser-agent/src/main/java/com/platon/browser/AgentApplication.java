@@ -54,6 +54,8 @@ public class AgentApplication implements ApplicationRunner {
 		while (true) {
 			try {
 				collectedNumber++;
+				// 检查区块号是否合法
+				blockService.checkBlockNumber(collectedNumber);
 				// 异步获取区块
 				CompletableFuture<PlatonBlock> blockCF = blockService.getBlockAsync(collectedNumber);
 				// 异步获取交易回执
