@@ -2,6 +2,7 @@ package com.platon.browser.complement.service.param;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.complement.dto.base.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.Settle;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +37,13 @@ public class BlockParameterService {
         List<BusinessParam> businessParams = new ArrayList<>();
         CollectionBlock block = event.getBlock();
 
-        List<String> preVerifierList = event.getEpochMessage().getPreVerifiers();
+        NewBlock newBlock = NewBlock.builder()
+                .nodeId(block.getNodeId())
+                .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
+                .feeRewardValue(block.getTxFee())
+                .build();
 
+        List<String> preVerifierList = event.getEpochMessage().getPreVerifiers();
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("选举验证人：Block Number({})", block.getNum());
             Election election = Election.builder()

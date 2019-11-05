@@ -32,6 +32,9 @@ public class ComplementEventHandler implements IComplementEventHandler {
             List<BusinessParam> businessParams = event.getBusinessParams();
             // 入库MYSQL
             dbService.insert(businessParams);
+
+            // TODO: 补充交易信息
+
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
         }catch (Exception e){
