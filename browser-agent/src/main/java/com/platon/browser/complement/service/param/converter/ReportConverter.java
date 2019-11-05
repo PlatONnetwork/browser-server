@@ -1,11 +1,8 @@
 package com.platon.browser.complement.service.param.converter;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.slash.Report;
-import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.param.ReportParam;
-import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -18,13 +15,13 @@ import java.math.BigInteger;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ReportConverter extends BusinessParamConverter {
+public class ReportConverter extends BusinessParamConverter<Report> {
 
     @Override
-    public BusinessParam convert(CollectionTransaction tx) {
+    public Report convert(CollectionTransaction tx) {
         // 修改质押信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
-        BusinessParam businessParam= Report.builder()
+        Report businessParam= Report.builder()
                 .nodeId(txParam.getVerify())
                 .slashData(txParam.getData())
                 .time(tx.getTime())

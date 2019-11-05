@@ -19,14 +19,15 @@ import java.math.BigInteger;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class StakeCreateConverter extends BusinessParamConverter {
+public class StakeCreateConverter extends BusinessParamConverter<StakeCreate> {
+
 
     @Override
-    public BusinessParam convert(CollectionTransaction tx) {
+    public StakeCreate convert(CollectionTransaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
         txParam.setBlockNumber(BigInteger.valueOf(tx.getNum()));
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
-        BusinessParam businessParam= StakeCreate.builder()
+        StakeCreate businessParam= StakeCreate.builder()
                 .benefitAddr(txParam.getBenefitAddress())
                 .stakingHes(new BigDecimal(txParam.getAmount()))
                 .webSite(txParam.getWebsite())
@@ -37,6 +38,7 @@ public class StakeCreateConverter extends BusinessParamConverter {
                 .stakingAddr(tx.getFrom())
                 .bigVersion(bigVersion.toString())
                 .programVersion(txParam.getProgramVersion().toString())
+                .isInit(BusinessParam.YesNoEnum.NO.getCode())
                 .build();
         BeanUtils.copyProperties(txParam,businessParam);
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());

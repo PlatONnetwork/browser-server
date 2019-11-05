@@ -32,7 +32,7 @@ public class BlockParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public List<BusinessParam> getParameter(CollectionEvent event){
+    public List<BusinessParam> getParameters(CollectionEvent event){
         List<BusinessParam> businessParams = new ArrayList<>();
         CollectionBlock block = event.getBlock();
 
@@ -71,6 +71,7 @@ public class BlockParameterService {
                     .preVerifierList(preVerifierList)
                     .curVerifierList(curVerifierList)
                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
+                    // TODO: 年化率计算
                     //.annualizedRate() // 年化率
                     //.annualizedRateInfo() // 年化率信息
                     //.feeRewardValue() // 交易手续费

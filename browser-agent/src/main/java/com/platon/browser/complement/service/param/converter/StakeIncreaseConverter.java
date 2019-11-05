@@ -1,7 +1,6 @@
 package com.platon.browser.complement.service.param.converter;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.utils.HexTool;
@@ -14,13 +13,13 @@ import org.springframework.stereotype.Service;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class StakeIncreaseConverter extends BusinessParamConverter {
+public class StakeIncreaseConverter extends BusinessParamConverter<StakeIncrease> {
 
     @Override
-    public BusinessParam convert(CollectionTransaction tx) {
+    public StakeIncrease convert(CollectionTransaction tx) {
         // 增持质押
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
-        BusinessParam businessParam= StakeIncrease.builder().build();
+        StakeIncrease businessParam= StakeIncrease.builder().build();
         BeanUtils.copyProperties(txParam,businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());

@@ -1,5 +1,6 @@
 package com.platon.browser.elasticsearch.dto;
 
+import com.platon.browser.dto.CustomStaking;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -129,4 +130,5 @@ public class Transaction {
         public static boolean contains(int code){return ENUMS.containsKey(code);}
         public static boolean contains(ToTypeEnum en){return ENUMS.containsValue(en);}
     }
+
 }

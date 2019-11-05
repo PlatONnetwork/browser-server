@@ -1,7 +1,6 @@
 package com.platon.browser.complement.service.param.converter;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.complement.cache.NodeCache;
 import com.platon.browser.complement.cache.NodeItem;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 17:58:27
  **/
-public abstract class BusinessParamConverter {
+public abstract class BusinessParamConverter<T> {
 
     @Autowired
     private NodeCache nodeCache;
@@ -28,5 +27,5 @@ public abstract class BusinessParamConverter {
         }
     }
 
-    abstract BusinessParam convert(CollectionTransaction tx);
+    abstract T convert(CollectionTransaction tx);
 }
