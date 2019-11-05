@@ -77,7 +77,7 @@ public class BlockParameterService {
 
         if (block.getNum() % chainConfig.getAddIssuePeriodBlockCount().longValue() == 0) {
             log.debug("增发周期切换：Block Number({})", block.getNum());
-
+            // TODO: 增发周期切换
         }
         return businessParams;
     }

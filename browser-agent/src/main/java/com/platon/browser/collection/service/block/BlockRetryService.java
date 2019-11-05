@@ -60,6 +60,7 @@ public class BlockRetryService {
                 throw new CollectionBlockException("currentBlockNumber("+currentBlockNumber+")>latestBlockNumber("+latestBlockNumber+"), wait for chain");
             }
         }catch (Exception e){
+            log.debug("",e);
             throw e;
         }
     }
