@@ -2,7 +2,8 @@ package com.platon.browser.complement.handler;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.complement.service.BusinessService;
+import com.platon.browser.complement.service.ComplementEpochService;
+import com.platon.browser.complement.service.ComplementTransactionService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.queue.collection.event.CollectionEvent;
 import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
@@ -20,7 +21,9 @@ import java.util.List;
 public class CollectionEventHandler implements ICollectionEventHandler {
 
     @Autowired
-    private BusinessService businessService;
+    private ComplementTransactionService transactionService;
+    @Autowired
+    private ComplementEpochService epochService;
 
     @Autowired
     private ComplementEventPublisher complementEventPublisher;
@@ -34,10 +37,13 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));
             for (CollectionTransaction tx : event.getTransactions()) tx.setId(++transactionId);
 
-            // 此处调用 complement模块的功能, 解析出业务参数
-            List<BusinessParam> businessParams = businessService.getParameters(event.getTransactions());
+            // 根据区块号解析出业务参数
+            List<BusinessParam> param1 = epochService.getParameters(event);
+            // 根据交易解析出业务参数
+            List<BusinessParam> param2 = transactionService.getParameters(event.getTransactions());
+            param1.addAll(param2);
 
-            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),businessParams);
+            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),param1);
         }catch (Exception e){
             log.error("{}",e);
             throw e;

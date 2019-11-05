@@ -2,7 +2,7 @@ package com.platon.browser.complement.service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.complement.service.param.ParameterService;
+import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 业务逻辑服务类
+ * 交易相关业务服务类
  */
 @Slf4j
 @Service
-public class BusinessService {
+public class ComplementTransactionService {
 
     @Autowired
     private SupplementService supplementService;
     @Autowired
-    private ParameterService parameterService;
+    private TransactionParameterService parameterService;
 
     public List<BusinessParam> getParameters(List<CollectionTransaction> transactions) {
         List<BusinessParam> businessParams = new ArrayList<>();

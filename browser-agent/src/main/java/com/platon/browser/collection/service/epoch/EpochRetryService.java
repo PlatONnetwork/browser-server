@@ -52,7 +52,9 @@ public class EpochRetryService {
     @Getter private BigInteger inciteAmount4Stake=BigInteger.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     @Getter private BigInteger settleStakeReward=BigInteger.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     @Getter private BigInteger stakeReward=BigInteger.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
+    @Getter private List<Node> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
     @Getter private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
+    @Getter private List<Node> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
     @Getter private List<Node> curVerifiers=new ArrayList<>(); // 当前结算周期验证人列表
 
     /**
@@ -106,6 +108,9 @@ public class EpochRetryService {
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 上一个周期的最后一个块号
             BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
+            List<Node> preNodes = specialContractApi.getHistoryValidatorList(web3j,preEpochLastBlockNumber);
+            preValidators.clear();
+            preValidators.addAll(preNodes);
             // 重置验证人
             curValidators.clear();
             if(latestEpoch.compareTo(currentEpoch)>0){
@@ -141,6 +146,9 @@ public class EpochRetryService {
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 上一个周期的最后一个块号
             BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
+            preVerifiers.clear();
+            List<Node> preNodes = specialContractApi.getHistoryVerifierList(web3j,preEpochLastBlockNumber);
+            preVerifiers.addAll(preNodes);
             // 重置验证人
             curVerifiers.clear();
             if(latestEpoch.compareTo(currentEpoch)>0){
