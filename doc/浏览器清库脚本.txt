@@ -1,8 +1,0 @@
-#清除数据库
-echo 'use platon_browser_0.5.0;truncate table block;truncate table block_missing;truncate table transaction;truncate table pending_tx;truncate table node_ranking;' > tmp.sql;
-mysql -uplaton -pplaton < tmp.sql
-#清除Redis缓存
-redis-cli -c -h <redis机器IP> -p <端口> DEL browser:0.5.0:prodtest:chain1:blocks;
-redis-cli -c -h <redis机器IP> -p <端口> DEL browser:0.5.0:prodtest:chain1:transactions;
-redis-cli -c -h <redis机器IP> -p <端口> DEL browser:0.5.0:prodtest:chain1:nodes;
-redis-cli -c -h <redis机器IP> -p <端口> DEL browser:0.5.0:prodtest:chain1:staticstics;
