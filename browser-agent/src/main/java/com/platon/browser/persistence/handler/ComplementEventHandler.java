@@ -7,6 +7,7 @@ import com.platon.browser.queue.complement.event.ComplementEvent;
 import com.platon.browser.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
             event.getBlock().setTransactions(null);
             List<BusinessParam> businessParams = event.getBusinessParams();
             // 入库MYSQL
-//            dbService.insert(businessParams);
+            dbService.insert(businessParams);
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
         }catch (Exception e){

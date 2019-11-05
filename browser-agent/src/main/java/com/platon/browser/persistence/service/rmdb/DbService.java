@@ -1,6 +1,7 @@
 package com.platon.browser.persistence.service.rmdb;
 
 import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.persistence.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ public class DbService {
     private StakeBusinessMapper stakeBusinessMapper;
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
+    @Autowired
+    private EpochBusinessMapper epochBusinessMapper;
 
     public void insert(List<BusinessParam> params){
         params.forEach(param->{
@@ -79,8 +82,20 @@ public class DbService {
                     //创建锁仓计划
 
                     return;
+                case NEW_BLOCK:
+
+                    return;
+                case CONSENSUS_EPOCH:
+                    epochBusinessMapper.consensus(param);
+                    return;
+                case ELECTION_EPOCH:
+                    epochBusinessMapper.election(param);
+                    return;
+                case SETTLE_EPOCH:
+                    epochBusinessMapper.settle(param);
+                    return;
                 default:
-                    break;
+                    return;
             }
         });
     }
