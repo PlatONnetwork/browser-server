@@ -7,7 +7,6 @@ import com.platon.browser.queue.complement.event.ComplementEvent;
 import com.platon.browser.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
