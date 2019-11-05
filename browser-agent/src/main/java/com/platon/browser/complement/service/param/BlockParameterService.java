@@ -7,7 +7,6 @@ import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.queue.collection.event.CollectionEvent;
-import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +35,7 @@ public class BlockParameterService {
         List<BusinessParam> businessParams = new ArrayList<>();
         CollectionBlock block = event.getBlock();
 
-        List<String> preVerifierList = new ArrayList<>();
-        event.getEpochMessage().getPreVerifiers().forEach(v->preVerifierList.add(HexTool.prefix(v.getNodeId())));
+        List<String> preVerifierList = event.getEpochMessage().getPreVerifiers();
 
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("选举验证人：Block Number({})", block.getNum());
@@ -52,8 +50,7 @@ public class BlockParameterService {
 
         if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
-            List<String> validatorList = new ArrayList<>();
-            event.getEpochMessage().getCurValidators().forEach(v->validatorList.add(HexTool.prefix(v.getNodeId())));
+            List<String> validatorList = event.getEpochMessage().getCurValidators();
             BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(validatorList.size()));
             Consensus consensus = Consensus.builder()
                     .nodeId(block.getNodeId())
@@ -65,11 +62,9 @@ public class BlockParameterService {
 
         if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
-            List<String> curVerifierList = new ArrayList<>();
-            event.getEpochMessage().getCurVerifiers().forEach(v->curVerifierList.add(HexTool.prefix(v.getNodeId())));
             Settle settle = Settle.builder()
                     .preVerifierList(preVerifierList)
-                    .curVerifierList(curVerifierList)
+                    .curVerifierList(event.getEpochMessage().getCurVerifiers())
                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                     // TODO: 年化率计算
                     //.annualizedRate() // 年化率
