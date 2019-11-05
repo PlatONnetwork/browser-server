@@ -11,13 +11,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    name: test
     url: jdbc:mysql://localhost:3306/browser_${version}_test?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: ENC(hkzKdE6lTNkwP0xXNAgjuA==)
     password: ENC(hkzKdE6lTNkwP0xXNAgjuA==)
-    #druid数据源
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
   #Redis配置
   redis:
     cluster:

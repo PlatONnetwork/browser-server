@@ -11,13 +11,9 @@ jasypt:
 spring:
   #数据源配置
   datasource:
-    name: test
     url: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: ENC(MnhyLpDl4QHrvI6j1ofu8g==)
     password: ENC(eqMAJvmLkdYCmZAdXS41WBnMG207Kg4/)
-    #druid数据源
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
   #Redis配置
   redis:
     cluster:

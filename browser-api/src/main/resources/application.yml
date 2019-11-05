@@ -11,6 +11,10 @@ spring:
   session.timeout: 1800  #以秒为单位
   #国际化配置
   messages.basename: messages
+  #数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
   #Redis集群配置
   redis:
     database: 0

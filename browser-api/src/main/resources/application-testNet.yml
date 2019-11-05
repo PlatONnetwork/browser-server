@@ -13,13 +13,9 @@ server.port: 9061
 spring:
   #数据源配置
   datasource:
-    name: test
     url: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
     username: ENC(6HSxXK+Bm31lAYRGgt+viw==)
     password: ENC(Lge7PE4Xy2pJv5/rxMAHsGJANTBUC9Xy)
-    #druid数据源
-    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
   #Redis配置
   redis:
     cluster:
