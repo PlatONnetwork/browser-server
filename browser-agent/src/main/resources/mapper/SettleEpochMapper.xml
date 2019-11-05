@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
+<update id="settle" parameterType="com.platon.browser.common.complement.dto.epoch.Settle">
+
+    update `staking` set
+        `staking_locked` = `staking_locked` + `staking_hes`,
+        `staking_hes` = 0,
+        `staking_reduction` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch} ,0, `staking_reduction`),
+        `status` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 3, `status`),
+        `staking_reward_value` = if(`node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach>, `staking_reward_value` + #{feeRewardValue}, `staking_reward_value`),
+        `is_settle` = if(`node_id` in <foreach open="(" collection="curVerifierList" item="curVerifier"  separator="," close=")"> #{curVerifier} </foreach>, 1,  2),
+        `annualized_rate` = #{annualizedRate},
+        `annualized_rate_info` = #{annualizedRateInfo}
+    where
+        `status` in (1, 2);
+
+
+    update `node` set
+        `staking_locked` = `staking_locked` + `staking_hes`,
+        `staking_hes` = 0,
+        `staking_reduction` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 0, `staking_reduction`),
+        `status` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 3, `status`),
+        `stat_staking_reward_value` = if(`node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach>, `stat_staking_reward_value` +  #{feeRewardValue}, `stat_staking_reward_value`),
+        `is_settle` = if(`node_id` in <foreach open="(" collection="curVerifierList" item="curVerifier"  separator="," close=")"> #{curVerifier} </foreach>, 1,  2),
+        `annualized_rate` = #{annualizedRate}
+    where
+      `status` in (1, 2);
+
+    update `delegation` set
+        `delegate_hes` = 0,
+        `delegate_locked` = `delegate_hes` + `delegate_locked`
+    where
+        `is_history` = 2
+    and
+        `delegate_hes` > 0;
+
+    update `staking` set
+    `stat_delegate_hes` = 0,
+    `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`
+    where
+      `stat_delegate_hes` > 0;
+
+
+
+</update>
+</mapper>
