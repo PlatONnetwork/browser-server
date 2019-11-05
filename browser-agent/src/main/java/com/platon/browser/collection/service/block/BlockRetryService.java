@@ -47,7 +47,7 @@ public class BlockRetryService {
      * @param currentBlockNumber
      * @throws
      */
-    BigInteger latestBlockNumber;
+    private BigInteger latestBlockNumber;
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     void checkBlockNumber(Long currentBlockNumber) throws IOException, CollectionBlockException {
         try {

@@ -18,11 +18,11 @@ import java.util.List;
  */
 @Configuration
 public class ElasticsearchConfig {
-    @Value("${elasticsearch.hosts}")
+    @Value("${spring.elasticsearch.high-level-client.hosts}")
     private List<String> addresses; // 集群地址，多个用,隔开
-    @Value("${elasticsearch.port}")
+    @Value("${spring.elasticsearch.high-level-client.port}")
     private int port; // 使用的端口号
-    @Value("${elasticsearch.schema}")
+    @Value("${spring.elasticsearch.high-level-client.schema}")
     private String schema; // 使用的协议
 
     private int connectTimeOut = 1000; // 连接超时时间

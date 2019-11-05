@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix="platon.config")
+@ConfigurationProperties(prefix="platon")
 public class BlockChainConfig {
     private static Logger logger = LoggerFactory.getLogger(BlockChainConfig.class);
 

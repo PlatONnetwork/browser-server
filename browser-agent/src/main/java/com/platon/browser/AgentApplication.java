@@ -45,6 +45,7 @@ public class AgentApplication implements ApplicationRunner {
 	@Autowired
 	private EpochService epochService;
 	// 已采集的最高块号
+	// TODO: 启动时需要使用初始化数据初始化
 	private Long collectedNumber = 0L;
 
 	@Override

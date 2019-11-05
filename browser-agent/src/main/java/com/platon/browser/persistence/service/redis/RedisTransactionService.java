@@ -16,11 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 交易缓存数据处理逻辑
- *  @file TransactionCacheServiceImpl.java
- *  @description
- *	@author zhangrj
- *  @data 2019年8月31日
+ * 交易缓存数据处理逻辑\
  */
 @Slf4j
 @Service
@@ -28,9 +24,9 @@ public class RedisTransactionService implements RedisService<Transaction>{
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     /** 交易缓存key */
-    @Value("${platon.redis.key.transactions}")
+    @Value("${spring.redis.key.transactions}")
     private String transactionsCacheKey;
-    @Value("${platon.redis.max-item}")
+    @Value("${spring.redis.max-item}")
     private long maxItemCount;
 
     @Autowired

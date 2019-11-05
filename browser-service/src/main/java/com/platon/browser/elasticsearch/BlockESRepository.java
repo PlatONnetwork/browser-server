@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class BlockESRepository extends ESRepository {
 
-    @Value("${elasticsearch.blockIndexName}")
+    @Value("${spring.elasticsearch.high-level-client.blockIndexName}")
     private String indexName;
 
     @Override

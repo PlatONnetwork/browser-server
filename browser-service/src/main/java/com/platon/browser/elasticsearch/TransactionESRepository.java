@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class TransactionESRepository extends ESRepository {
-    @Value("${elasticsearch.transactionIndexName}")
+    @Value("${spring.elasticsearch.high-level-client.transactionIndexName}")
     private String indexName;
 
     @Override

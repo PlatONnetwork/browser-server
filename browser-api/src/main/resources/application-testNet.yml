@@ -1,37 +1,42 @@
-# ***************************开发配置**************************** #
-#redis 配置
+# ***************************测试配置**************************** #
+# 应用版本
+version: 0.7.3.1
+# 当前激活的配置名称(请不要修改)
+profile: preprod
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+# 服务器端口号
+server.port: 9061
+#Spring框架内部配置
 spring:
+  #数据源配置
+  datasource:
+    name: test
+    url: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
+    username: ENC(6HSxXK+Bm31lAYRGgt+viw==)
+    password: ENC(Lge7PE4Xy2pJv5/rxMAHsGJANTBUC9Xy)
+    #druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+  #Redis配置
   redis:
     cluster:
       max-redirects: 3
       nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
     password: platscan
     ssl: true
-#ES配置
-elasticsearch:
-  hosts: 192.168.120.172
-  port: 9200
-  schema: http
-  blockIndexName: browser_block_1
-  transactionIndexName: browser_transaction_1
-  delegationIndexName: browser_delegation_1
-  nodeOptIndexName: browser_nodeopt_1
-# 服务器端口号
-port: 9061
-# 应用版本
-version: 0.7.2.0
-# 当前激活的配置名称(请不要修改)
-profile: testNet
-# MySQL数据库连接地址
-dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
-# MySQL数据库用户名
-dbuser: ENC(6HSxXK+Bm31lAYRGgt+viw==)
-# MySQL数据库密码
-dbpass: ENC(Lge7PE4Xy2pJv5/rxMAHsGJANTBUC9Xy)
-#web3j配置
-web3j:
-  addresses: http://18.140.20.252:6789
-  collect.batch-size: 100
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts:
+      port: 9200
+      schema: http
+      blockIndexName: browser_block_1
+      transactionIndexName: browser_transaction_1
+      delegationIndexName: browser_delegation_1
+      nodeOptIndexName: browser_nodeopt_1
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -43,13 +48,9 @@ logging:
     com.platon.browser.task: debug
     com.platon.browser.client: debug
     com.platon.browser.dao: debug
-    com.platon.browser.engine: debug
-    com.platon.browser.engine.handler.epoch: error
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #初始化链相关的配置
-platon.config:
+platon:
+  web3j.addresses: http://18.140.20.252:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

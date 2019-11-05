@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class NodeOptESRepository extends ESRepository {
-    @Value("${elasticsearch.nodeOptIndexName}")
+    @Value("${spring.elasticsearch.high-level-client.nodeOptIndexName}")
     private String indexName;
 
     @Override

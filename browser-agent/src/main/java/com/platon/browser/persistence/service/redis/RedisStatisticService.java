@@ -11,11 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 /**
- * 统计缓存数据处理逻辑
- *  @file NetworkStatCacheServiceImpl.java
- *  @description
- *	@author zhangrj
- *  @data 2019年8月31日
+ * 统计缓存数据处理逻辑\
  */
 @Slf4j
 @Service
@@ -24,7 +20,7 @@ public class RedisStatisticService implements RedisService<NetworkStat> {
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     /** 统计缓存信息key */
-    @Value("${platon.redis.key.networkStat}")
+    @Value("${spring.redis.key.networkStat}")
     private String networkStatCacheKey;
 
     public void clear() {

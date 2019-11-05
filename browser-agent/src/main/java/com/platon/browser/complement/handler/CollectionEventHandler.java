@@ -25,6 +25,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     @Autowired
     private ComplementEventPublisher complementEventPublisher;
 
+    // TODO: 启动时需要使用初始化数据初始化
     private long transactionId = 0;
 
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {

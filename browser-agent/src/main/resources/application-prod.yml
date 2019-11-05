@@ -1,33 +1,55 @@
-# ***************************生产配置**************************** #
+# ***************************开发配置**************************** #
+# 应用版本
+version: 0.7.3.1
+# 当前激活的配置名称(请不要修改)
+profile: prod
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+#Spring框架内部配置
 spring:
+  #数据源配置
+  datasource:
+    name: test
+    url: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ENC(MnhyLpDl4QHrvI6j1ofu8g==)
+    password: ENC(eqMAJvmLkdYCmZAdXS41WBnMG207Kg4/)
+    #druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+  #Redis配置
   redis:
     cluster:
       max-redirects: 3
       nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
     password: platscan
     ssl: true
-#ES配置
-elasticsearch:
-  hosts: 192.168.120.172
-  port: 9200
-  schema: http
-  blockIndexName: browser_block_1
-  transactionIndexName: browser_transaction_1
-  delegationIndexName: browser_delegation_1
-  nodeOptIndexName: browser_nodeopt_1
-# 应用版本
-version: 0.7.2.0
-# 当前激活的配置名称(请不要修改)
-profile: prod
-# MySQL数据库连接地址
-dburl: jdbc:mysql://ctdb.cxkzgtponliu.ap-southeast-1.rds.amazonaws.com:3306/platon_aton_0.7.0?useUnicode=true&characterEncoding=utf-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8
-# MySQL数据库用户名
-dbuser: ENC(MnhyLpDl4QHrvI6j1ofu8g==)
-# MySQL数据库密码
-dbpass: ENC(eqMAJvmLkdYCmZAdXS41WBnMG207Kg4/)
-web3j:
-  addresses: http://18.140.20.252:6789
-  collect.batch-size: 100
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts:
+      port: 9200
+      schema: http
+      blockIndexName: browser_block_1
+      transactionIndexName: browser_transaction_1
+      delegationIndexName: browser_delegation_1
+      nodeOptIndexName: browser_nodeopt_1
+# 内存环形缓冲区大小，必须是2的指数倍
+disruptor:
+  queue:
+    # 区块事件环形缓冲区大小
+    block.buffer-size: 1024
+    # 采集事件环形缓冲区大小
+    collection.buffer-size: 1024
+    # 数据补充环形缓冲区大小
+    complement.buffer-size: 1024
+    # 数据持久化
+    persistence:
+      #环形缓冲区大小
+      buffer-size: 1024
+      #每次处理多少个
+      batch-size: 10
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -35,17 +57,10 @@ logging:
   level:
     org.springframework: error
     com.platon.browser: error
-    com.platon.browser.service: error
-    com.platon.browser.task: error
-    com.platon.browser.client: error
-    com.platon.browser.dao: error
-    com.platon.browser.engine: error
-    com.platon.browser.engine.handler.epoch: error
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
-#初始化链相关的配置
-platon.config:
+#PlatOn相关配置
+platon:
+  # Web3j访问地址
+  web3j.addresses: http://18.140.20.252:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

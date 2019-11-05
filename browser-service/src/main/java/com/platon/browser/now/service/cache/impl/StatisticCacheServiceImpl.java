@@ -30,19 +30,19 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	private I18nUtil i18n;
 
 	/** 区块缓存key */
-	@Value("${platon.redis.key.blocks}")
+	@Value("${spring.redis.key.blocks}")
 	private String blockCacheKey;
 
 	/** 交易缓存key */
-	@Value("${platon.redis.key.transactions}")
+	@Value("${spring.redis.key.transactions}")
 	private String transactionCacheKey;
 
 	/** 统计缓存key */
-	@Value("${platon.redis.key.networkStat}")
+	@Value("${spring.redis.key.networkStat}")
 	private String networkStatCacheKey;
 
 	/** 最大item数目*/
-	@Value("${platon.redis.max-item}")
+	@Value("${spring.redis.max-item}")
 	private long maxItemNum;
 
 	@Autowired

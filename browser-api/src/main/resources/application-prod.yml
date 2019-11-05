@@ -1,42 +1,42 @@
-# ***************************生产配置**************************** #
-##集群模式
+# ***************************测试配置**************************** #
+# 应用版本
+version: 0.7.3.1
+# 当前激活的配置名称(请不要修改)
+profile: prod
+# 密码加密配置
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+# 服务器端口号
+server.port: 9061
+#Spring框架内部配置
 spring:
+  #数据源配置
+  datasource:
+    name: test
+    url: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: ENC(WdsbLfMqOVt4fifwvlrP/g==)
+    password: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
+    #druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+  #Redis配置
   redis:
     cluster:
       max-redirects: 3
-      nodes: 192.168.9.191:7001,192.168.9.191:7002,192.168.9.191:7003,192.168.9.191:7004,192.168.9.191:7005,192.168.9.191:7006
+      nodes: ctredis1.rfrbpt.clustercfg.apse1.cache.amazonaws.com:6379
     password: platscan
-##Sentinel模式
-#spring:
-#  redis:
-#    sentinel:
-#      master: mymaster
-#      nodes: 192.168.16.172:26379,192.168.16.172:26380,192.168.16.172:26381
-#    password: foobared
-#    database: 0
-#ES配置
-elasticsearch:
-  hosts: 192.168.120.172
-  port: 9200
-  schema: http
-  blockIndexName: browser_block_1
-  transactionIndexName: browser_transaction_1
-  delegationIndexName: browser_delegation_1
-  nodeOptIndexName: browser_nodeopt_1
-# 应用版本
-version: 0.7.2.0
-# 当前激活的配置名称(请不要修改)
-profile: prod
-# 服务器端口号
-port: 38030
-# MySQL数据库连接地址
-dburl: jdbc:mysql://52.187.38.88:3306/platon_browser_${version}?useUnicode=true&characterEncoding=utf-8&useSSL=false
-dbuser: ENC(WdsbLfMqOVt4fifwvlrP/g==)
-dbpass: ENC(YAS0fQLf2HgpNwy8EosToc3pBFUyvsla)
-#web3j配置
-web3j:
-  addresses: http://18.140.20.252:6789
-  collect.batch-size: 100
+    ssl: true
+  #ES配置
+  elasticsearch:
+    high-level-client:
+      hosts: 192.168.120.103,192.168.120.104,192.168.120.105
+      port: 9200
+      schema: http
+      blockIndexName: browser_block_1
+      transactionIndexName: browser_transaction_1
+      delegationIndexName: browser_delegation_1
+      nodeOptIndexName: browser_nodeopt_1
 #日志配置
 logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
@@ -48,13 +48,9 @@ logging:
     com.platon.browser.task: error
     com.platon.browser.client: error
     com.platon.browser.dao: error
-    com.platon.browser.engine: error
-    com.platon.browser.engine.handler.epoch: error
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
 #初始化链相关的配置
-platon.config:
+platon:
+  web3j.addresses: http://18.140.20.252:6789
   # 质押节点统计年化率最多取多少个连续周期
   maxSettlePeriodCount4AnnualizedRateStat: 4
   #PlatON初始总发行量(LAT)

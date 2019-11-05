@@ -28,10 +28,10 @@ public class RedisBlockService implements RedisService<Block> {
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
     /** 区块缓存key */
-    @Value("${platon.redis.key.blocks}")
+    @Value("${spring.redis.key.blocks}")
     private String blocksCacheKey;
     /** 最大数据 */
-    @Value("${platon.redis.max-item}")
+    @Value("${spring.redis.max-item}")
     private long maxItemCount;
     @Autowired
     private BlockMapper blockMapper;

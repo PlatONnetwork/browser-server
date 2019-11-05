@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class DelegationESRepository extends ESRepository {
-    @Value("${elasticsearch.delegationIndexName}")
+    @Value("${spring.elasticsearch.high-level-client.delegationIndexName}")
     private String indexName;
 
     @Override
