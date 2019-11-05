@@ -45,13 +45,18 @@ public class AgentApplication implements ApplicationRunner {
 	@Autowired
 	private EpochService epochService;
 	// 已采集的最高块号
-	// TODO: 启动时需要使用初始化数据初始化
+	// TODO: 启动时需要使用初始化数据初始化区块号
 	private Long collectedNumber = 0L;
 
 	@Override
 	public void run(ApplicationArguments args) {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
+
+		// TODO: 启动初始化子流程
+
+		// TODO: 启动(mysql/es/redis)一致性检查
+
 		while (true) {
 			try {
 				collectedNumber++;
