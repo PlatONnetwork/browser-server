@@ -1,4 +1,4 @@
-package com.platon.browser.mapper;
+package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;

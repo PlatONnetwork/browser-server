@@ -192,7 +192,7 @@ public class TestBase {
                 .slashData("json")
                 .benefitAddr("0x02fba14f5e72092c8fca6ced087cd4e7be0d8fc5")
                 .codeCurStakingLocked(new BigDecimal("50000000"))
-                .codeNodeoptDesc("AMOUNT")
+                .codeNodeOptDesc("AMOUNT")
                 .codeStatus(2)
                 .codeRewardValue(new BigDecimal("1000000000"))
                 .build();

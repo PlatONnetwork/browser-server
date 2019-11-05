@@ -81,5 +81,5 @@ public class ReportDuplicateSignParam {
     /**
      * 节点操作描述  'PERCENT|AMOUNT' 中
      */
-    private String codeNodeoptDesc;
+    private String codeNodeOptDesc;
 }

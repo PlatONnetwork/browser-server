@@ -3,7 +3,6 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.ReportDuplicateSignMapper">
 <update id="reportDuplicateSign" parameterType="com.platon.browser.persistence.dao.param.ReportDuplicateSignParam">
 
-
 	update `node` set
 		`leave_time` = #{time},
 		`status` =  #{codeStatus},
@@ -67,7 +66,7 @@
 		#{txHash},
 		#{bNum},
 		#{time},
-		#{codeNodeoptDesc}
+		#{codeNodeOptDesc}
 		);
 
 </update>
