@@ -72,7 +72,7 @@ public class StakeCreateParam extends TxParam{
     /**
      * blockNumber
      */
-    private Long blockNumber;
+    private BigInteger blockNumber;
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}

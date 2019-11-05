@@ -365,8 +365,8 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setApplyAmount(exitValidatorParam.getAmount());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
-						if(StringUtils.isNotBlank(exitValidatorParam.getStakingBlockNum())) {
-							stakingKeyE.setStakingBlockNum(Long.valueOf(exitValidatorParam.getStakingBlockNum()));
+						if(exitValidatorParam.getStakingBlockNum()==null) {
+							stakingKeyE.setStakingBlockNum(exitValidatorParam.getStakingBlockNum().longValue());
 						}
 						Staking staking = stakingMapper.selectByPrimaryKey(stakingKeyE);
 						if(staking!=null) {

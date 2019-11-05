@@ -20,16 +20,59 @@ import java.util.Date;
 @Builder
 @Accessors(chain = true)
 public class StakeModify extends BusinessParam {
+    /**
+     * 节点Id
+     */
     private String nodeId;
+
+    /**
+     * 节点名称
+     */
     private String nodeName;
+
+    /**
+     * 第三方社交软件关联id
+     */
     private String externalId;
+
+    /**
+     * 收益地址
+     */
     private String benefitAddr;
+
+    /**
+     * 节点的第三方主页
+     */
     private String webSite;
+
+    /**
+     * 节点的描述
+     */
     private String details;
+
+    /**
+     * 质押所在区块号
+     */
     private BigInteger stakingBlockNum;
+
+    /**
+     * 交易所在区块号
+     */
     private BigInteger bNum;
+
+    /**
+     * 时间
+     */
     private Date time;
+
+    /**
+     * 是否为链初始化时内置的候选人: 1是, 2否
+     */
     private int isInit;
+
+    /**
+     * 交易hash
+     */
     private String txHash;
 
     @Override

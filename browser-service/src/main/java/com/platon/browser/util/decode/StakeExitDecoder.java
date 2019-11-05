@@ -18,7 +18,7 @@ public class StakeExitDecoder extends Decoder {
         StakeExitParam param = StakeExitParam.builder()
                 .nodeId(nodeId)
                 .nodeName("")
-                .stakingBlockNum("")
+                .stakingBlockNum(null)
                 .build();
         return param;
     }

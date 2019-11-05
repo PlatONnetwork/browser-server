@@ -25,7 +25,7 @@ public class DelegateExitDecoder extends Decoder {
         BigInteger amount =  bigIntegerResolver((RlpString) rootList.getValues().get(3));
 
         DelegateExitParam param = DelegateExitParam.builder()
-                .stakingBlockNum(new BigInteger(blockNumber,16).longValue())
+                .stakingBlockNum(new BigInteger(blockNumber,16))
                 .nodeId(nodeId)
                 .amount(amount.toString())
                 .build();

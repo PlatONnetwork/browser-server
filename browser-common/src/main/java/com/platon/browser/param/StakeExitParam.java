@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigInteger;
+
 /**
  * User: dongqile
  * Date: 2019/8/6
@@ -30,7 +32,7 @@ public class StakeExitParam extends TxParam{
     /**
      * 质押交易快高
      */
-    private String stakingBlockNum;
+    private BigInteger stakingBlockNum;
 
     /**
      *  撤销金额

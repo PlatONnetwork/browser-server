@@ -48,7 +48,7 @@ public class ReportParam extends TxParam{
     /**
      * 质押交易快高
      */
-    private String stakingBlockNum;
+    private BigInteger stakingBlockNum;
 
     public void init() {
         this.verify = format(type, data);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.persistence.dao.mapper.ReportDuplicateSignMapper">
-<update id="reportDuplicateSign" parameterType="com.platon.browser.persistence.dao.param.ReportDuplicateSignParam">
+<mapper namespace="com.platon.browser.persistence.dao.mapper.SlashBusinessMapper">
+<update id="report" parameterType="com.platon.browser.common.complement.dto.slash.Report">
 
 	update `node` set
 		`leave_time` = #{time},

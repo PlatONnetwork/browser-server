@@ -24,13 +24,13 @@ public class StakeCreateConverter extends BusinessParamConverter {
     @Override
     public BusinessParam convert(CollectionTransaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
-        txParam.setBlockNumber(tx.getNum());
+        txParam.setBlockNumber(BigInteger.valueOf(tx.getNum()));
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
         BusinessParam businessParam= StakeCreate.builder()
                 .benefitAddr(txParam.getBenefitAddress())
                 .stakingHes(new BigDecimal(txParam.getAmount()))
                 .webSite(txParam.getWebsite())
-                .stakingBlockNum(BigInteger.valueOf(txParam.getBlockNumber()))
+                .stakingBlockNum(txParam.getBlockNumber())
                 .txHash(tx.getHash())
                 .stakingTxIndex(tx.getIndex())
                 .joinTime(tx.getTime())

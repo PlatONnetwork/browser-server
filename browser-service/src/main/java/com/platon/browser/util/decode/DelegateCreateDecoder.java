@@ -28,7 +28,7 @@ public class DelegateCreateDecoder extends Decoder {
                 .nodeId(nodeId)
                 .amount(amount.toString())
                 .nodeName("")
-                .stakingBlockNum("")
+                .stakingBlockNum(null)
                 .build();
         return param;
     }

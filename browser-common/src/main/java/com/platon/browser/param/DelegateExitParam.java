@@ -25,7 +25,7 @@ public class DelegateExitParam extends TxParam{
     /**
      * 代表着某个node的某次质押的唯一标示
      */
-    private Long stakingBlockNum;
+    private BigInteger stakingBlockNum;
 
     /**
      * 被质押的节点Id(也叫候选人的节点Id)

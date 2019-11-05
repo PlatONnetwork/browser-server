@@ -2,10 +2,7 @@ package com.platon.browser.complement.service.param;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.complement.service.param.converter.StakeCreateConverter;
-import com.platon.browser.complement.service.param.converter.StakeExitConverter;
-import com.platon.browser.complement.service.param.converter.StakeIncreaseConverter;
-import com.platon.browser.complement.service.param.converter.StakeModifyConverter;
+import com.platon.browser.complement.service.param.converter.*;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,8 @@ public class ParameterService {
     private StakeIncreaseConverter stakeIncreaseConverter;
     @Autowired
     private StakeExitConverter stakeExitConverter;
+    @Autowired
+    private ReportConverter reportConverter;
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -63,7 +62,7 @@ public class ParameterService {
             case VERSION_DECLARE: // 2004 版本声明
 
             case REPORT: // 3000 举报双签
-
+                return reportConverter.convert(tx);
             case RESTRICTING_CREATE: // 4000 创建锁仓计划
 
             default:

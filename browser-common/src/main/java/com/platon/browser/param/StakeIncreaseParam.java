@@ -46,7 +46,7 @@ public class StakeIncreaseParam extends TxParam{
     /**
      * 质押交易快高
      */
-    private String stakingBlockNum;
+    private BigInteger stakingBlockNum;
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
     public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}

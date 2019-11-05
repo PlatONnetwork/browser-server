@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigInteger;
+
 /**
  * User: dongqile
  * Date: 2019/8/6
@@ -51,7 +53,7 @@ public class StakeModifyParam extends TxParam{
     /**
      * blockNumber
      */
-    private String blockNumber;
+    private BigInteger blockNumber;
 
     private String perNodeName;
 }

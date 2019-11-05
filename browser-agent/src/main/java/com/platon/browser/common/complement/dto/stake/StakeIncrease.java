@@ -21,12 +21,41 @@ import java.util.Date;
 @Builder
 @Accessors(chain = true)
 public class StakeIncrease extends BusinessParam {
+    /**
+     * 节点Id
+     */
     private String nodeId;
+
+    /**
+     * 增持金额
+     */
     private BigDecimal amount;
+
+
+    /**
+     *  交易Hash
+     */
     private String Hash;
+
+    /**
+     * 交易快高
+     */
     private BigInteger bNum;
+
+    /**
+     * 质押交易所在块高
+     */
     private BigInteger stakingBlockNum;
+
+    /**
+     * 时间
+     */
     private Date time;
+
+    /**
+     * 交易hash
+     */
+    private String txHash;
 
     @Override
     public BusinessType getBusinessType() {

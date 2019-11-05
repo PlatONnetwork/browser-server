@@ -8,6 +8,8 @@ import com.platon.browser.utils.HexTool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+
 /**
  * @description: 退出质押业务参数转换器
  * @author: chendongming@juzix.net
@@ -20,7 +22,11 @@ public class StakeExitConverter extends BusinessParamConverter {
     public BusinessParam convert(CollectionTransaction tx) {
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
-        BusinessParam businessParam= StakeExit.builder().build();
+        BusinessParam businessParam= StakeExit.builder()
+                .bNum(txParam.getStakingBlockNum())
+                .nodeId(txParam.getNodeId())
+                .stakingBlockNum(txParam.getStakingBlockNum())
+                .build();
         BeanUtils.copyProperties(txParam,businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());

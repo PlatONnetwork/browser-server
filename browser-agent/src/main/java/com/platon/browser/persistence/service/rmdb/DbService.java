@@ -1,14 +1,9 @@
 package com.platon.browser.persistence.service.rmdb;
 
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.persistence.dao.mapper.AddStakingMapper;
-import com.platon.browser.persistence.dao.mapper.CreateStakingMapper;
-import com.platon.browser.persistence.dao.mapper.ModifyStakingMapper;
-import com.platon.browser.persistence.dao.param.AddStakingParam;
-import com.platon.browser.persistence.dao.param.CreateStakingParam;
-import com.platon.browser.persistence.dao.param.ModifyStakingParam;
+import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
+import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,36 +20,28 @@ import java.util.List;
 public class DbService {
 
     @Autowired
-    private CreateStakingMapper createStakingMapper;
+    private StakeBusinessMapper stakeBusinessMapper;
     @Autowired
-    private AddStakingMapper addStakingMapper;
-    @Autowired
-    private ModifyStakingMapper modifyStakingMapper;
+    private SlashBusinessMapper slashBusinessMapper;
 
     public void insert(List<BusinessParam> params){
         params.forEach(param->{
             switch (param.getBusinessType()) {
                 case STAKE_CREATE: // 1000
                     // 发起质押
-                    CreateStakingParam param1000 = CreateStakingParam.builder().build();
-                    BeanUtils.copyProperties(param,param1000);
-                    createStakingMapper.createStaking(param1000);
+                    stakeBusinessMapper.create(param);
                     return;
                 case STAKE_MODIFY: // 1001
                     // 修改质押信息
-                    ModifyStakingParam param1001 = ModifyStakingParam.builder().build();
-                    BeanUtils.copyProperties(param,param1001);
-                    modifyStakingMapper.modifyStaking(param1001);
+                    stakeBusinessMapper.modify(param);
                     return;
                 case STAKE_INCREASE: // 1002
                     // 增持质押
-                    AddStakingParam param1002 = AddStakingParam.builder().build();
-                    BeanUtils.copyProperties(param,param1002);
-                    addStakingMapper.addStaking(param1002);
+                    stakeBusinessMapper.increase(param);
                     return;
                 case STAKE_EXIT: // 1003
                     // 撤销质押
-
+                    stakeBusinessMapper.exit(param);
                     return;
                 case DELEGATE_CREATE: // 1004
                     // 发起委托
@@ -86,7 +73,7 @@ public class DbService {
                     return;
                 case REPORT: // 3000
                     // 举报双签
-
+                    slashBusinessMapper.report(param);
                     return;
                 case RESTRICTING_CREATE: // 4000
                     //创建锁仓计划

@@ -2,10 +2,13 @@ package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
+import com.platon.browser.common.complement.dto.slash.Report;
+import com.platon.browser.common.complement.dto.stake.StakeCreate;
+import com.platon.browser.common.complement.dto.stake.StakeExit;
+import com.platon.browser.common.complement.dto.stake.StakeIncrease;
+import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.persistence.dao.mapper.*;
-import com.platon.browser.persistence.dao.param.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +35,10 @@ import static org.junit.Assert.assertTrue;
 public class StakingMapperTest extends TestBase {
 
     @Autowired
-    private CreateStakingMapper createStakingMapper;
+    private StakeBusinessMapper stakeBusinessMapper;
 
     @Autowired
-    private ModifyStakingMapper modifyStakingMapper;
-
-    @Autowired
-    private AddStakingMapper addStakingMapper;
-
-    @Autowired
-    private WithdrewStakingMapper withdrewStakingMapper;
-
-    @Autowired
-    private ReportDuplicateSignMapper reportDuplicateSignMapper;
+    private SlashBusinessMapper slashBusinessMapper;
 
     @Autowired
     private NodeOptMapper nodeOptMapper;
@@ -63,11 +57,11 @@ public class StakingMapperTest extends TestBase {
 
     @Test
     public void createStakingMapper(){
-        CreateStakingParam createStakingParam = stakingParam();
+        StakeCreate createStakingParam = stakingParam();
         //删除数据
         deleteCreateStaking(createStakingParam);
         //数据插入
-        createStakingMapper.createStaking(createStakingParam);
+        stakeBusinessMapper.create(createStakingParam);
         //staking数据插入验证
         Staking staking = getStaking(createStakingParam.getNodeId(),createStakingParam.getStakingBlockNum().longValue());
         assertEquals(createStakingParam.getNodeId(), staking.getNodeId());
@@ -82,7 +76,7 @@ public class StakingMapperTest extends TestBase {
         assertEquals(nodeOptList.get(0).getNodeId(),createStakingParam.getNodeId());
     }
 
-    public void deleteCreateStaking(CreateStakingParam param){
+    public void deleteCreateStaking(StakeCreate param){
         //删除staking数据
         StakingKey stakingKey = new StakingKey();
         stakingKey.setNodeId(param.getNodeId());
@@ -98,8 +92,8 @@ public class StakingMapperTest extends TestBase {
 
     @Test
     public void modifyStakingMapper(){
-        ModifyStakingParam modifyStakingParam = modifyStakingParam();
-        modifyStakingMapper.modifyStaking(modifyStakingParam);
+        StakeModify modifyStakingParam = modifyStakingParam();
+        stakeBusinessMapper.modify(modifyStakingParam);
         //staking数据更新验证
         Staking staking = getStaking(modifyStakingParam.getNodeId(),modifyStakingParam.getStakingBlockNum().longValue());
         assertEquals(modifyStakingParam.getNodeName(), staking.getNodeName());
@@ -126,11 +120,11 @@ public class StakingMapperTest extends TestBase {
 
     @Test
     public void addStakingMapper(){
-        AddStakingParam addStakingParam = addStakingParam();
+        StakeIncrease addStakingParam = addStakingParam();
         Staking stakingAfter = getStaking(addStakingParam.getNodeId(),addStakingParam.getStakingBlockNum().longValue());
         Node nodeAfter = nodeMapper.selectByPrimaryKey(addStakingParam.getNodeId());
 
-        addStakingMapper.addStaking(addStakingParam);
+        stakeBusinessMapper.increase(addStakingParam);
         //staking数据更新验证
         Staking staking = getStaking(addStakingParam.getNodeId(),addStakingParam.getStakingBlockNum().longValue());
         assertEquals(stakingAfter.getStakingHes(),staking.getStakingHes().subtract(addStakingParam.getAmount()));
@@ -150,8 +144,8 @@ public class StakingMapperTest extends TestBase {
 
     @Test
     public void withdrewStakingMapper(){
-        WithdrewStakingParam withdrewStakingParam = withdrewStakingParam();
-        withdrewStakingMapper.withdrewStaking(withdrewStakingParam);
+        StakeExit withdrewStakingParam = withdrewStakingParam();
+        stakeBusinessMapper.exit(withdrewStakingParam);
         //delegation数据更新验证
         DelegationKey delegationKey = new Delegation();
         delegationKey.setNodeId(withdrewStakingParam.getNodeId());
@@ -176,8 +170,8 @@ public class StakingMapperTest extends TestBase {
 
     @Test
     public void reportDuplicateSignMapper(){
-        ReportDuplicateSignParam reportDuplicateSignParam = reportDuplicateSignParam();
-        reportDuplicateSignMapper.reportDuplicateSign(reportDuplicateSignParam);
+        Report reportDuplicateSignParam = reportDuplicateSignParam();
+        slashBusinessMapper.report(reportDuplicateSignParam);
         //node更新数据验证
         Node node = nodeMapper.selectByPrimaryKey(reportDuplicateSignParam.getNodeId());
         assertEquals(node.getStatus().intValue(),reportDuplicateSignParam.getCodeStatus());

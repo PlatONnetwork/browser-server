@@ -27,7 +27,7 @@ public class StakeIncreaseDecoder extends Decoder {
                 .nodeId(nodeId)
                 .type(type.intValue())
                 .amount(amount.toString())
-                .stakingBlockNum("")
+                .stakingBlockNum(null)
                 .build();
         return param;
     }
