@@ -64,7 +64,7 @@ public class EpochRetryService {
      * @param currentBlockNumber 当前区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void issueEpochChange(BigInteger currentBlockNumber) throws Exception {
+    public void issueChange(BigInteger currentBlockNumber) throws Exception {
         try {
             // >>>>如果增发周期变更,则更新相应的奖励字段
             // >>>>当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
@@ -83,9 +83,9 @@ public class EpochRetryService {
             // 当前增发周期内每个结算周期的质押奖励
             settleStakeReward = stakeRewardPart.divide(new BigDecimal(chainConfig.getSettlePeriodCountPerIssue()),0,RoundingMode.FLOOR).toBigInteger();
             // 触发共识周期变更
-            consensusEpochChange(currentBlockNumber);
+            consensusChange(currentBlockNumber);
             // 触发结算周期变更
-            settlementEpochChange(currentBlockNumber);
+            settlementChange(currentBlockNumber);
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = new BigDecimal(settleStakeReward).divide(BigDecimal.valueOf(curVerifiers.size()),0,RoundingMode.FLOOR).toBigInteger();
         }catch (Exception e){
@@ -99,7 +99,7 @@ public class EpochRetryService {
      * @param currentBlockNumber 当前区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void consensusEpochChange(BigInteger currentBlockNumber) throws Exception {
+    public void consensusChange(BigInteger currentBlockNumber) throws Exception {
         try {
             // 当前块所处的共识周期
             BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
@@ -138,7 +138,7 @@ public class EpochRetryService {
      * @param currentBlockNumber 当前区块号
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void settlementEpochChange(BigInteger currentBlockNumber) throws Exception {
+    public void settlementChange(BigInteger currentBlockNumber) throws Exception {
         try {
             // 当前块所处周期
             BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());

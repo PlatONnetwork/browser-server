@@ -65,13 +65,13 @@ public class EpochRetryServiceTest {
      */
     @Test
     public void issueEpochChange() throws Exception {
-        target.issueEpochChange(BigInteger.valueOf(501));
+        target.issueChange(BigInteger.valueOf(501));
         assertEquals(6000,target.getInciteAmount4Block().intValue());
         assertEquals(24,target.getBlockReward().intValue());
         assertEquals(4000,target.getInciteAmount4Stake().intValue());
         assertEquals(800,target.getSettleStakeReward().intValue());
         assertEquals(200,target.getStakeReward().intValue());
-        verify(target, times(1)).issueEpochChange(any(BigInteger.class));
+        verify(target, times(1)).issueChange(any(BigInteger.class));
     }
 
     /**
@@ -79,8 +79,8 @@ public class EpochRetryServiceTest {
      */
     @Test
     public void consensusEpochChange() throws Exception {
-        target.consensusEpochChange(BigInteger.valueOf(41));
-        verify(target, times(1)).consensusEpochChange(any(BigInteger.class));
+        target.consensusChange(BigInteger.valueOf(41));
+        verify(target, times(1)).consensusChange(any(BigInteger.class));
     }
 
     /**
@@ -88,7 +88,7 @@ public class EpochRetryServiceTest {
      */
     @Test
     public void settlementEpochChange() throws Exception {
-        target.settlementEpochChange(BigInteger.valueOf(321));
-        verify(target, times(1)).settlementEpochChange(any(BigInteger.class));
+        target.settlementChange(BigInteger.valueOf(321));
+        verify(target, times(1)).settlementChange(any(BigInteger.class));
     }
 }

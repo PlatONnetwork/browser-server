@@ -52,7 +52,7 @@ public class EpochService {
 
             // 共识周期变更
             try {
-                epochRetryService.consensusEpochChange(currentBlockNumber);
+                epochRetryService.consensusChange(currentBlockNumber);
             } catch (Exception e) {
                 log.error("共识周期变更执行失败:",e);
             }
@@ -64,7 +64,7 @@ public class EpochService {
 
                 // 结算周期变更
                 try {
-                    epochRetryService.settlementEpochChange(currentBlockNumber);
+                    epochRetryService.settlementChange(currentBlockNumber);
                 } catch (Exception e) {
                     log.error("结算周期变更执行失败:",e);
                 }
@@ -75,7 +75,7 @@ public class EpochService {
 
         if(oldIssueEpochRound.compareTo(this.issueEpochRound)!=0){
             try {
-                epochRetryService.issueEpochChange(currentBlockNumber);
+                epochRetryService.issueChange(currentBlockNumber);
             } catch (Exception e) {
                 log.error("增发周期变更执行失败:",e);
             }
