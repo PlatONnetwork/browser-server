@@ -58,7 +58,7 @@ public class BlockParameterService {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
             List<String> preVerifierList = new ArrayList<>();
-            event.getEpochMessage().getPreVerifiers().forEach(v->preVerifierList.add(v.getNodeId()));
+            event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierList.add(v.getNodeId()));
             
             Election election = Election.builder()
                     .bNum(BigInteger.valueOf(block.getNum()))
@@ -73,7 +73,7 @@ public class BlockParameterService {
         if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
             List<String> validatorList = new ArrayList<>();
-            event.getEpochMessage().getCurValidators().forEach(v->validatorList.add(v.getNodeId()));
+            event.getEpochMessage().getCurValidatorList().forEach(v->validatorList.add(v.getNodeId()));
 
             BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(validatorList.size()));
             Consensus consensus = Consensus.builder()
@@ -87,23 +87,21 @@ public class BlockParameterService {
         if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
             List<String> curVerifierList = new ArrayList<>();
-            event.getEpochMessage().getCurVerifiers().forEach(v->curVerifierList.add(v.getNodeId()));
+            event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
             List<String> preVerifierList = new ArrayList<>();
-            event.getEpochMessage().getPreVerifiers().forEach(v->preVerifierList.add(v.getNodeId()));
+            event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierList.add(v.getNodeId()));
             
             Settle settle = Settle.builder()
                     .preVerifierList(preVerifierList)
                     .curVerifierList(curVerifierList)
+                    .stakingReward(new BigDecimal(event.getEpochMessage().getStakeReward()))
                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                    // TODO: 年化率计算
-                    //.annualizedRate() // 年化率
-                    //.annualizedRateInfo() // 年化率信息
-                    //.feeRewardValue() // 交易手续费
-                    //.stakingLockEpoch() // 质押锁定的结算周期数
+                    .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
                     .build();
             businessParams.add(settle);
         }
 
+        // 
         if (block.getNum() % chainConfig.getAddIssuePeriodBlockCount().longValue() == 0) {
             log.debug("增发周期切换：Block Number({})", block.getNum());
             // TODO: 增发周期切换

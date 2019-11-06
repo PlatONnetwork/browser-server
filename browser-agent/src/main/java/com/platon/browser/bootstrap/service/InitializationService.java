@@ -94,9 +94,9 @@ public class InitializationService {
             NodeItem node = NodeItem.builder()
                     .nodeId(s.getNodeId())
                     .nodeName(s.getNodeName())
-                    .annualizedRateInfo(JSON.parseObject(s.getAnnualizedRateInfo(),AnnualizedRateInfo.class))
+//                    .annualizedRateInfo(JSON.parseObject(s.getAnnualizedRateInfo(),AnnualizedRateInfo.class))
                     .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
-                    .stakingTxIndex(s.getStakingTxIndex())
+//                    .stakingTxIndex(s.getStakingTxIndex())
                     .build();
             nodeCache.addNode(node);
         });

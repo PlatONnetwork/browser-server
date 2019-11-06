@@ -31,11 +31,6 @@ public class Settle  extends BusinessParam {
     private List<String> preVerifierList;
 
     /**
-     * 期望年化率
-     */
-    private Double annualizedRate;
-    
-    /**
      * 质押奖励(von)
      */
     private BigDecimal stakingReward;
@@ -49,11 +44,6 @@ public class Settle  extends BusinessParam {
      * 解除质押锁定金额的轮数
      */
     private int stakingLockEpoch;
-
-    /**
-     * 期望年化率依赖的数据
-     */
-    private String annualizedRateInfo;
 
     @Override
     public BusinessType getBusinessType () {

@@ -13,8 +13,8 @@ import java.math.BigInteger;
 public class NodeItem {
     private String nodeId;
     private String nodeName;
-    private Integer stakingTxIndex;
-    private AnnualizedRateInfo annualizedRateInfo;
+//    private Integer stakingTxIndex;
+//    private AnnualizedRateInfo annualizedRateInfo;
     // 最新的质押区块号,随验证人创建交易更新
     private BigInteger stakingBlockNum;
 }
