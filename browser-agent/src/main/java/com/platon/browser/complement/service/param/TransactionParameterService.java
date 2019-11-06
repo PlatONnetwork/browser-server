@@ -11,7 +11,7 @@ import com.platon.browser.complement.service.param.converter.*;
 import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
-import com.platon.browser.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,8 @@
 package com.platon.browser.common.collection.dto;
 
-import com.platon.browser.collection.service.epoch.EpochRetryService;
-import com.platon.browser.collection.service.epoch.EpochService;
+
+import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.common.service.epoch.EpochService;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;

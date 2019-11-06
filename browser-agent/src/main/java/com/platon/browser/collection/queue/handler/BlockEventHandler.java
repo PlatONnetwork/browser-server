@@ -5,7 +5,7 @@ import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.event.BlockEvent;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.queue.collection.publisher.CollectionEventPublisher;
+import com.platon.browser.common.queue.collection.publisher.CollectionEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;

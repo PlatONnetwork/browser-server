@@ -3,8 +3,8 @@ package com.platon.browser.persistence.handler;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
 import com.platon.browser.persistence.service.rmdb.DbService;
-import com.platon.browser.queue.complement.event.ComplementEvent;
-import com.platon.browser.queue.complement.handler.IComplementEventHandler;
+import com.platon.browser.common.queue.complement.event.ComplementEvent;
+import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

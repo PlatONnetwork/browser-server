@@ -2,8 +2,8 @@ package com.platon.browser.collection.service;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.collection.service.epoch.EpochRetryService;
-import com.platon.browser.common.service.AccountService;
+import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
 import org.junit.Before;
 import org.junit.Test;

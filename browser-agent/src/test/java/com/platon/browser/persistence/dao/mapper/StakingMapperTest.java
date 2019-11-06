@@ -248,7 +248,7 @@ public class StakingMapperTest extends TestBase {
         Consensus newConsensusParam = consensusParam();
         epochBusinessMapper.consensus(newConsensusParam);
         StakingExample stakingExample = new StakingExample();
-        stakingExample.createCriteria().andNodeIdEqualTo(newConsensusParam.getNodeId())
+        stakingExample.createCriteria()
                 .andStatusEqualTo(1);
         List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
         //staking更新数据验证
