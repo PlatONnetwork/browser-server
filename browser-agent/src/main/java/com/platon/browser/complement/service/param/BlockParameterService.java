@@ -2,9 +2,9 @@ package com.platon.browser.complement.service.param;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.complement.dto.base.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
+import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.queue.collection.event.CollectionEvent;

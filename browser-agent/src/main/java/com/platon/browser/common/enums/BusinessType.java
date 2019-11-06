@@ -20,6 +20,6 @@ public enum BusinessType {
     NEW_BLOCK,
     // 选举、共识周期、结算周期
     ELECTION_EPOCH,CONSENSUS_EPOCH,SETTLE_EPOCH,
-    // 网络统计
-    NETWORK_STATISTIC
+    // 网络统计、地址统计
+    NETWORK_STATISTIC, ADDRESS_STATISTIC
 }

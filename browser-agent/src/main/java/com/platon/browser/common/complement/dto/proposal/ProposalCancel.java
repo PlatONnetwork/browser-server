@@ -1,20 +1,19 @@
 package com.platon.browser.common.complement.dto.proposal;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.enums.BusinessType;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigInteger;
 import java.util.Date;
 
+import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.enums.BusinessType;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 @Data
-@Slf4j
 @Builder
 @Accessors(chain = true)
-public class ProposalUpgradeOrCancel extends BusinessParam {
+public class ProposalCancel extends BusinessParam {
 
     /**
      * 节点id
@@ -40,12 +39,7 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
      * 投票结束快高
      */
     private BigInteger endVotingBlock;
-
-    /**
-     * 生效块高
-     */
-    private BigInteger activeBlock;
-
+    
     /**
      * 提案主题
      */
@@ -61,6 +55,10 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
      */
     private String optDesc;
 
+    /**
+     * 被取消提案id
+     */
+    private String canceledId;
 
     /**
      * 交易hash
@@ -83,12 +81,8 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
      */
     private String stakingName;
 
-    /**
-     * version
-     */
-    private String newVersion;
     @Override
     public BusinessType getBusinessType() {
-        return BusinessType.PROPOSAL_UPGRADE;
+        return BusinessType.PROPOSAL_CANCEL;
     }
 }

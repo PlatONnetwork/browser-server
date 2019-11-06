@@ -49,6 +49,11 @@ public class StakeModify extends BusinessParam {
      * 节点的描述
      */
     private String details;
+    
+    /**
+     * 是否为链初始化时内置的候选人: 1是, 2否
+     */
+    private int isInit;
 
     /**
      * 质押所在区块号
@@ -64,11 +69,6 @@ public class StakeModify extends BusinessParam {
      * 时间
      */
     private Date time;
-
-    /**
-     * 是否为链初始化时内置的候选人: 1是, 2否
-     */
-    private int isInit;
 
     /**
      * 交易hash

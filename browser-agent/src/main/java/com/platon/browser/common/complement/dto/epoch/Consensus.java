@@ -1,14 +1,14 @@
 package com.platon.browser.common.complement.dto.epoch;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @Auther: dongqile
@@ -17,7 +17,6 @@ import java.util.List;
  */
 @Data
 @Builder
-@Slf4j
 @Accessors(chain = true)
 public class Consensus  extends BusinessParam {
 

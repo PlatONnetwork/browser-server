@@ -1,15 +1,15 @@
 package com.platon.browser.common.complement.dto.stake;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.enums.BusinessType;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+
+import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.enums.BusinessType;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @description: 增持质押 入库参数
@@ -17,7 +17,6 @@ import java.util.Date;
  * @create: 2019-11-04 17:58:27
  **/
 @Data
-@Slf4j
 @Builder
 @Accessors(chain = true)
 public class StakeIncrease extends BusinessParam {
@@ -30,12 +29,6 @@ public class StakeIncrease extends BusinessParam {
      * 增持金额
      */
     private BigDecimal amount;
-
-
-    /**
-     *  交易Hash
-     */
-    private String Hash;
 
     /**
      * 交易快高

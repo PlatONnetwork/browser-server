@@ -1,13 +1,13 @@
 package com.platon.browser.common.complement.dto.stake;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.enums.BusinessType;
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigInteger;
 import java.util.Date;
+
+import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.enums.BusinessType;
+
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * @description: 退出质押 入库参数
@@ -15,7 +15,6 @@ import java.util.Date;
  * @create: 2019-11-04 17:58:27
  **/
 @Data
-@Slf4j
 @Builder
 public class StakeExit extends BusinessParam {
     /**
