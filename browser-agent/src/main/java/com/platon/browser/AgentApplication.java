@@ -1,14 +1,14 @@
 package com.platon.browser;
 
+import com.platon.browser.bootstrap.bean.InitializationResult;
+import com.platon.browser.bootstrap.service.InitializationService;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
-import com.platon.browser.collection.service.bootstrap.InitialResult;
-import com.platon.browser.collection.service.bootstrap.InitialService;
-import com.platon.browser.collection.service.epoch.EpochService;
 import com.platon.browser.collection.service.transaction.ReceiptService;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.enums.AppStatus;
+import com.platon.browser.common.service.epoch.EpochService;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +47,7 @@ public class AgentApplication implements ApplicationRunner {
 	@Autowired
 	private EpochService epochService;
 	@Autowired
-	private InitialService initialService;
+	private InitializationService initializationService;
 	// 已采集的最高块号
 	// TODO: 启动时需要使用初始化数据初始化区块号
 	private Long collectedNumber = 0L;
@@ -58,7 +58,7 @@ public class AgentApplication implements ApplicationRunner {
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
 
 		// 启动初始化子流程
-		InitialResult initialResult = initialService.init();
+		InitializationResult initialResult = initializationService.init();
 		collectedNumber = initialResult.getCollectedBlockNumber();
 		// TODO: 启动(mysql/es/redis)一致性检查
 

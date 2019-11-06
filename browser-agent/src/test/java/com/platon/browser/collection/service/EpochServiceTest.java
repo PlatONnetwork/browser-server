@@ -1,7 +1,7 @@
 package com.platon.browser.collection.service;
 
-import com.platon.browser.collection.service.epoch.EpochRetryService;
-import com.platon.browser.collection.service.epoch.EpochService;
+import com.platon.browser.common.service.epoch.EpochRetryService;
+import com.platon.browser.common.service.epoch.EpochService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.exception.BlockNumberException;
 import org.junit.Before;

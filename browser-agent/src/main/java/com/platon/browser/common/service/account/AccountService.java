@@ -1,4 +1,4 @@
-package com.platon.browser.common.service;
+package com.platon.browser.common.service.account;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.InnerContractAddrEnum;

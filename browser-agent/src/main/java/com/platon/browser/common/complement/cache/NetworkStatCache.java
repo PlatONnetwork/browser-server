@@ -1,4 +1,4 @@
-package com.platon.browser.complement.cache;
+package com.platon.browser.common.complement.cache;
 
 import org.springframework.stereotype.Component;
 

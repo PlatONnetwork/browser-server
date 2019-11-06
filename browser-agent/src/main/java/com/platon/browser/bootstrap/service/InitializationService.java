@@ -1,10 +1,12 @@
-package com.platon.browser.collection.service.bootstrap;
+package com.platon.browser.bootstrap.service;
 
-import com.platon.browser.collection.exception.InitialException;
-import com.platon.browser.collection.service.epoch.EpochRetryService;
+
+import com.platon.browser.bootstrap.bean.InitializationResult;
+import com.platon.browser.bootstrap.exception.InitializationException;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import com.platon.browser.common.complement.bean.PeriodValueElement;
+import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
@@ -34,8 +36,8 @@ import java.util.*;
  **/
 @Slf4j
 @Service
-public class InitialService {
-    private static final InitialResult initialResult = new InitialResult();
+public class InitializationService {
+    private static final InitializationResult initialResult = new InitializationResult();
 
     @Autowired
     private EpochRetryService epochRetryService;
@@ -49,7 +51,7 @@ public class InitialService {
     private NetworkStatMapper networkStatMapper;
 
     @Transactional
-    public InitialResult init() throws Exception {
+    public InitializationResult init() throws Exception {
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
 
         List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
@@ -67,7 +69,7 @@ public class InitialService {
             return initialResult;
         }
 
-        if(networkStatList.size()>1) throw new InitialException("启动自检出错:network_stat表存在多条网络统计状态数据!");
+        if(networkStatList.size()>1) throw new InitializationException("启动自检出错:network_stat表存在多条网络统计状态数据!");
         NetworkStat networkStat = networkStatList.get(0);
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
         return initialResult;

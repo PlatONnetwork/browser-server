@@ -1,4 +1,4 @@
-package com.platon.browser.collection.exception;
+package com.platon.browser.common.exception;
 
 /**
  *

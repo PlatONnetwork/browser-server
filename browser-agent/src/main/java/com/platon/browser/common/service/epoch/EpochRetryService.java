@@ -1,9 +1,9 @@
-package com.platon.browser.collection.service.epoch;
+package com.platon.browser.common.service.epoch;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
-import com.platon.browser.collection.exception.CandidateException;
-import com.platon.browser.common.service.AccountService;
+import com.platon.browser.common.exception.CandidateException;
+import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.utils.EpochUtil;
 import com.platon.browser.utils.HexTool;
