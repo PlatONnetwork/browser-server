@@ -79,7 +79,7 @@ public class DbService {
                     epochBusinessMapper.election(param);
                     return;
                 case CONSENSUS_EPOCH: // 共识周期切换
-//                    epochBusinessMapper.consensus(param);
+                    epochBusinessMapper.consensus(param);
                     return;
                 case SETTLE_EPOCH: // 结算周期切换
 //                    epochBusinessMapper.settle(param);
