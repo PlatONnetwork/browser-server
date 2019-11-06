@@ -35,7 +35,7 @@ public class ProposalVote extends BusinessParam {
     /**
      * 投票选项
      */
-    private String voteOption;
+    private int voteOption;
 
     /**
      * 交易hash

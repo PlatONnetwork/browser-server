@@ -4,11 +4,16 @@ import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
+import com.platon.browser.common.complement.dto.proposal.ProposalText;
+import com.platon.browser.common.complement.dto.proposal.ProposalUpgradeOrCancel;
+import com.platon.browser.common.complement.dto.proposal.ProposalVote;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
+import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
+import com.platon.browser.common.complement.dto.statistic.NetworkStatChange;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
@@ -54,6 +59,12 @@ public class StakingMapperTest extends TestBase {
 
     @Autowired
     private DeletageBusinessMapper deletageBusinessMapper;
+
+    @Autowired
+    private ProposalBusinessMapper proposalBusinessMapper;
+
+    @Autowired
+    private StatisticBusinessMapper statisticBusinessMapper;
 
     @Autowired
     private NodeOptMapper nodeOptMapper;
@@ -287,5 +298,59 @@ public class StakingMapperTest extends TestBase {
         stakingKey.setStakingBlockNum(stakingBlockNumer);
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
         return staking;
+    }
+
+    /**
+     * 创建文本提案
+     */
+    @Test
+    public void proposalTestMapper(){
+        ProposalText proposalText = proposalTextParam();
+        proposalBusinessMapper.text(proposalText);
+    }
+
+    /**
+     * 创建升级提案
+     */
+    @Test
+    public void proposalUpgradeMapper(){
+        ProposalUpgradeOrCancel proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
+        proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
+    }
+
+    /**
+     * 取消提案
+     */
+    @Test
+    public void ProposalCancelMapper(){
+        ProposalUpgradeOrCancel proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
+        proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
+    }
+
+    /**
+     * 投票
+     */
+    @Test
+    public void proposalVoteMapper(){
+        ProposalVote proposalVote = proposalVoteParam();
+        proposalBusinessMapper.vote(proposalVote);
+    }
+
+    /**
+     * 地址数据统计
+     */
+    @Test
+    public void addressChangeMapper(){
+        AddressStatChange addressStatChange = addressStatChangeParam();
+        statisticBusinessMapper.addressChange(addressStatChange);
+    }
+
+    /**
+     *  其他数据统计
+     */
+    @Test
+    public void netWorkChangeMapper(){
+        NetworkStatChange networkStatChange = networkStatChangeParam();
+        statisticBusinessMapper.netWorkChange(networkStatChange);
     }
 }

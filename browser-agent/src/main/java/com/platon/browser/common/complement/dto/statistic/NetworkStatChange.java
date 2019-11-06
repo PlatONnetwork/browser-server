@@ -71,20 +71,79 @@ insert into `network_stat`
 @Builder
 @Accessors(chain = true)
 public class NetworkStatChange extends BusinessParam {
+	/**
+	 * id
+	 */
     private Integer id;
+
+	/**
+	 * 当前块号
+	 */
     private Long curNumber;
+
+	/**
+	 * 节点ID
+	 */
     private String nodeId;
+
+	/**
+	 * 节点名称
+	 */
     private String nodeName;
+
+	/**
+	 * 交易总数
+	 */
     private Integer txQty;
+
+	/**
+	 * 当前交易TPS
+	 */
     private Integer curTps;
+
+	/**
+	 * 最大交易TPS
+	 */
     private Integer maxTps;
+
+	/**
+	 * 当前发行量(von)
+	 */
     private BigDecimal issueValue;
+
+	/**
+	 * 当前流通量(von)
+	 */
     private BigDecimal turnValue;
+
+	/**
+	 * 提案总数
+	 */
     private Integer proposalQty;
+
+	/**
+	 * 当前出块奖励(von)
+	 */
     private BigDecimal blockReward;
+
+	/**
+	 * 当前质押奖励(von)
+	 */
     private BigDecimal stakingReward;
+
+	/**
+	 * 当前增发周期的开始块号
+	 */
     private Long addIssueBegin;
+
+	/**
+	 * 当前增发周期的结束块号
+	 */
     private Long addIssueEnd;
+
+	/**
+	 * 离下个结算周期的剩余块数
+	 */
     private Long nextSettle;
 	
 	@Override

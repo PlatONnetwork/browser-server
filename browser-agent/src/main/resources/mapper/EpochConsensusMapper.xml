@@ -8,16 +8,16 @@
         `pre_cons_block_qty` = `cur_cons_block_qty`,
         `cur_cons_block_qty` = 0
     where
-      `status` = 1
+        `status` = 1
     and
-      `node_id` = #{nodeId};
+        `node_id` = #{nodeId};
 
     update `node` set
         `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
-        `stat_verifier_time` = `stat_verifier_time` + 1,
-        `stat_expect_block_qty` = stat_expect_block_qty + #{expectBlockNum}
+        `stat_verifier_time` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, `stat_verifier_time` + 1,  `stat_verifier_time`),
+        `stat_expect_block_qty` =  if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>t, `stat_expect_block_qty` + #{expectBlockNum},  `stat_expect_block_qty`)
     where
-    `node_id` = #{nodeId};
+        `status` = 1;
 
 </update>
 </mapper>

@@ -8,12 +8,19 @@ import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.Settle;
+import com.platon.browser.common.complement.dto.proposal.ProposalText;
+import com.platon.browser.common.complement.dto.proposal.ProposalUpgradeOrCancel;
+import com.platon.browser.common.complement.dto.proposal.ProposalVote;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
+import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
+import com.platon.browser.common.complement.dto.statistic.NetworkStatChange;
 import com.platon.browser.common.enums.AppStatus;
+import com.platon.browser.dto.ProposalMarkDownDto;
+import com.platon.browser.persistence.dao.mapper.StatisticBusinessMapper;
 
 
 import java.math.BigDecimal;
@@ -196,5 +203,98 @@ public class TestBase {
                 .codeNodeIsLeave(false)
                 .build();
         return delegateExit;
+    }
+
+    public ProposalText proposalTextParam(){
+        ProposalText proposalText = ProposalText.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .pIDID("100")
+                .url("https://github.com/danielgogo/PIPs/PIP-100.md")
+                .pipNum("PIP-100")
+                .endVotingBlock(new BigInteger("2000"))
+                .topic("inquiry")
+                .description("inquiry")
+                .optDesc("ID|TITLE|TYPE|VERSION")
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .blockNumber(new BigInteger("300"))
+                .timestamp(new Date(System.currentTimeMillis()))
+                .stakingName("test01")
+                .build();
+        return proposalText;
+    }
+
+
+
+    public ProposalVote proposalVoteParam(){
+        ProposalVote proposalVote = ProposalVote.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .bNum(new BigInteger("300"))
+                .timestamp(new Date(System.currentTimeMillis()))
+                .optDesc("ID|TITLE|OPTION|TYPE|VERSION")
+                .proposalHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .voteOption(1)
+                .stakingName("test01")
+                .build();
+        return proposalVote;
+    }
+
+
+    public ProposalUpgradeOrCancel proposalUpgradeOrCancelParam(){
+        ProposalUpgradeOrCancel proposalUpgradeOrCancel = ProposalUpgradeOrCancel.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .pIDID("100")
+                .url("https://github.com/danielgogo/PIPs/PIP-100.md")
+                .pipNum("PIP-100")
+                .endVotingBlock(new BigInteger("2000"))
+                .activeBlock(new BigInteger("3000"))
+                .topic("inquiry")
+                .description("inquiry")
+                .optDesc("ID|TITLE|TYPE|VERSION")
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be1")
+                .blockNumber(new BigInteger("300"))
+                .timestamp(new Date(System.currentTimeMillis()))
+                .stakingName("test01")
+                .newVersion("1000")
+                .build();
+        return proposalUpgradeOrCancel;
+    }
+
+
+    public AddressStatChange addressStatChangeParam(){
+        AddressStatChange addressStatChange = AddressStatChange.builder()
+                .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .contractCreate("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .contractCreatehash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be9")
+                .contractName("test")
+                .delegateQty(1)
+                .proposalQty(1)
+                .stakingQty(1)
+                .transferQty(1)
+                .txQty(4)
+                .type(1)
+                .build();
+        return addressStatChange;
+    }
+
+    public NetworkStatChange networkStatChangeParam(){
+        NetworkStatChange networkStatChange = NetworkStatChange.builder()
+                .id(1)
+                .addIssueBegin(1L)
+                .addIssueEnd(2L)
+                .blockReward(new BigDecimal("100000000000000"))
+                .curNumber(100L)
+                .curTps(100)
+                .issueValue(new BigDecimal("100000000000000"))
+                .nextSettle(10L)
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .nodeName("testNode01")
+                .proposalQty(1)
+                .stakingReward(new BigDecimal("100000000000000"))
+                .turnValue(new BigDecimal("100000000000000"))
+                .txQty(1)
+                .maxTps(1)
+                .build();
+        return networkStatChange;
     }
 }

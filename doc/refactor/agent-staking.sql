@@ -430,22 +430,20 @@ where `node_id` = @node_id;
 -- 入参
 set @validator_list = ('0x001','0x002');    -- 当前共识周期验证人
 set @expect_block_num = 10;                 -- 每个验证人期望出块数 共识周期出块数/当轮验证人数量
-set @node_id = '0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18';  -- 从区块中解析
 
 -- 1. staking 更新
-update `staking` 
+update `staking`
 set `is_consensus` = if(`node_id` in @validator_list, 1,  2), -- 伪代码
     `pre_cons_block_qty` = `cur_cons_block_qty`,
     `cur_cons_block_qty` = 0
-where `status` = 1
-   and `node_id` = @node_id;
+where `status` = 1;
 
 -- 2. node 更新
-update `node` 
-set `is_consensus` = if(`node_id` in @validator_list, 1,  2), 
-	`stat_verifier_time` = `stat_verifier_time` + 1,
-	`stat_expect_block_qty` = stat_expect_block_qty + @expect_block_num
-where `node_id` = @node_id;
+update `node`
+set `is_consensus` = if(`node_id` in @validator_list, 1,  2),
+	`stat_verifier_time` = if(`node_id` in @validator_list, `stat_verifier_time` + 1,  `stat_verifier_time`),
+	`stat_expect_block_qty` = if(`node_id` in @validator_list, `stat_expect_block_qty` + @expect_block_num,  `stat_expect_block_qty`),
+where `status` = 1;
 
 
 -- 新的结算周期（event）（收益需求外面计算）

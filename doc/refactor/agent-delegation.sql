@@ -3,7 +3,6 @@
 set @node_id = '0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18';
 set @amount = '100000000000000';
 -- 入参（交易中参数）
-set @tx_hesh = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
 set @block_number = '300';
 set @tx_from = '0xff48d9712d8a55bf603dab28f4645b6985696a61';
 set @dele_sequence = "10000000";            -- @block_number * 100000 + @tx_index
@@ -47,6 +46,7 @@ insert into `delegation`
 	`cur_delegation_block_num` = @block_number;
 
 
+
 -- 减持/撤销委托（1005）
 -- 入参（input中参数）
 set @node_id = '0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18';
@@ -54,10 +54,7 @@ set @amount = '100000000000000';
 set @stakingBlockNum = '200';
 set @MinimumThreshold = '500000';   --最新委托阀值
 -- 入参（交易中参数）
-set @tx_hesh = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
 set @block_number = '300';
-set @tx_index = '1';
-set @tx_timestamp = '2019-10-13 07:31:20';
 set @tx_from = '0xff48d9712d8a55bf603dab28f4645b6985696a61';
 
 -- 1. 查询 delegation 信息

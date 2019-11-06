@@ -85,9 +85,17 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
 
 
     /**
-     * 质押名称
+     * 生效块高
      */
     private BigInteger activeBlock;
+
+    /**
+     * 新版本号
+     */
+    private String newVersion;
+
+
+
     @Override
     public BusinessType getBusinessType() {
         return BusinessType.PROPOSAL_CANCEL;
