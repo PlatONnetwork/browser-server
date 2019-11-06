@@ -3,6 +3,7 @@ package com.platon.browser;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
+import com.platon.browser.collection.service.bootstrap.InitialService;
 import com.platon.browser.collection.service.epoch.EpochService;
 import com.platon.browser.collection.service.transaction.ReceiptService;
 import com.platon.browser.common.collection.dto.EpochMessage;
@@ -44,17 +45,19 @@ public class AgentApplication implements ApplicationRunner {
 	private BlockEventPublisher blockEventPublisher;
 	@Autowired
 	private EpochService epochService;
+	@Autowired
+	private InitialService initialService;
 	// 已采集的最高块号
 	// TODO: 启动时需要使用初始化数据初始化区块号
 	private Long collectedNumber = 0L;
 
 	@Override
-	public void run(ApplicationArguments args) {
+	public void run(ApplicationArguments args) throws Exception {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
 
-		// TODO: 启动初始化子流程
-
+		// 启动初始化子流程
+		initialService.init();
 		// TODO: 启动(mysql/es/redis)一致性检查
 
 		while (true) {

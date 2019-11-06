@@ -2,6 +2,7 @@ package com.platon.browser.collection.service.epoch;
 
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.collection.exception.CandidateException;
 import com.platon.browser.common.service.AccountService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.utils.EpochUtil;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.web3j.platon.BaseResponse;
 import org.web3j.platon.bean.Node;
 import org.web3j.protocol.Web3j;
 
@@ -53,10 +55,11 @@ public class EpochRetryService {
     @Getter private BigInteger inciteAmount4Stake=BigInteger.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     @Getter private BigInteger settleStakeReward=BigInteger.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     @Getter private BigInteger stakeReward=BigInteger.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
-    @Getter private List<String> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
-    @Getter private List<String> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
-    @Getter private List<String> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
-    @Getter private List<String> curVerifiers=new ArrayList<>(); // 当前结算周期验证人列表
+    @Getter private List<Node> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
+    @Getter private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
+    @Getter private List<Node> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
+    @Getter private List<Node> curVerifiers=new ArrayList<>(); // 当前结算周期验证人列表
+    @Getter private Long expectBlockCount=0L; // 当前期望出块数
 
     /**
      * 增发周期变更:
@@ -109,12 +112,14 @@ public class EpochRetryService {
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getConsensusPeriodBlockCount());
             // 上一个周期的最后一个块号
             BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
-            List<Node> preNodes = specialContractApi.getHistoryValidatorList(web3j,preEpochLastBlockNumber);
-            preValidators.clear();
-            preNodes.forEach(n->preValidators.add(HexTool.prefix(n.getNodeId())));
-            // 重置验证人
-            curValidators.clear();
 
+            // 前一周期的验证人
+            List<Node> preNodes = specialContractApi.getHistoryValidatorList(web3j,preEpochLastBlockNumber);
+            preNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
+            preValidators.clear();
+            preValidators.addAll(preNodes);
+
+            // 当前周期的验证人
             List<Node> curNodes= Collections.emptyList();
             if(latestEpoch.compareTo(currentEpoch)>0){
                 // >>>>如果链上最新块所在周期>当前块所处周期, 则查询特殊节点历史接口
@@ -126,7 +131,12 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestValidators();
             }
-            curNodes.forEach(n->curValidators.add(HexTool.prefix(n.getNodeId())));
+            curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
+            curValidators.clear();
+            curValidators.addAll(curNodes);
+
+            // 更新期望出块数：期望出块数=共识周期块数/实际参与共识节点数
+            expectBlockCount=chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(curValidators.size())).longValue();
         }catch (Exception e){
             log.error("",e);
             throw e;
@@ -148,11 +158,14 @@ public class EpochRetryService {
             BigInteger latestEpoch = EpochUtil.getEpoch(latestBlockNumber,chainConfig.getSettlePeriodBlockCount());
             // 上一个周期的最后一个块号
             BigInteger preEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
-            preVerifiers.clear();
+
+            // 前一周期的验证人
             List<Node> preNodes = specialContractApi.getHistoryVerifierList(web3j,preEpochLastBlockNumber);
-            preNodes.forEach(n->preVerifiers.add(HexTool.prefix(n.getNodeId())));
-            // 重置验证人
-            curVerifiers.clear();
+            preNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
+            preVerifiers.clear();
+            preVerifiers.addAll(preNodes);
+
+            // 当前周期的验证人
             List<Node> curNodes = Collections.emptyList();
             if(latestEpoch.compareTo(currentEpoch)>0){
                 // >>>>如果链上最新块所在周期>当前块所处周期, 则查询特殊节点历史接口
@@ -164,8 +177,31 @@ public class EpochRetryService {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestVerifiers();
             }
-            curNodes.forEach(n->curVerifiers.add(HexTool.prefix(n.getNodeId())));
+            curNodes.forEach(n->n.setNodeId(HexTool.prefix(n.getNodeId())));
+            curVerifiers.clear();
+            curVerifiers.addAll(curNodes);
         }catch (Exception e){
+            log.error("",e);
+            throw e;
+        }
+    }
+
+
+    /**
+     * 获取实时候选人列表
+     * @return
+     * @throws Exception
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public List<Node> getCandidates() throws Exception {
+        try {
+            BaseResponse<List<Node>> br = platOnClient.getNodeContract().getCandidateList().send();
+            if (!br.isStatusOk()) throw new CandidateException(br.errMsg);
+            List<Node> candidates = br.data;
+            if(candidates==null) throw new CandidateException("实时候选节点列表为空!");
+            candidates.forEach(v->v.setNodeId(HexTool.prefix(v.getNodeId())));
+            return candidates;
+        } catch (Exception e) {
             log.error("",e);
             throw e;
         }

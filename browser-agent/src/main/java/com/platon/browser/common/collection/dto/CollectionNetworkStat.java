@@ -37,6 +37,11 @@ public class CollectionNetworkStat extends NetworkStat {
         stat.setMaxTps(0);
         stat.setProposalQty(0);
         stat.setStakingDelegationValue(BigDecimal.ZERO);
+        stat.setTxQty(0);
+        stat.setTurnValue(BigDecimal.ZERO);
+        stat.setStakingValue(BigDecimal.ZERO);
+        stat.setStakingReward(BigDecimal.ZERO);
+        stat.setStakingDelegationValue(BigDecimal.ZERO);
         return stat;
     }
 }
