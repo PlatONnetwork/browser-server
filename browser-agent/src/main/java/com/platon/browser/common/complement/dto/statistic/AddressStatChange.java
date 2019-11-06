@@ -6,6 +6,7 @@ import com.platon.browser.common.enums.BusinessType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 地址统计变更消息 <br/>
@@ -44,6 +45,7 @@ insert into `address`
  * @author chendai
  */
 @Data
+@Slf4j
 @Builder
 @Accessors(chain = true)
 public class AddressStatChange extends BusinessParam {    

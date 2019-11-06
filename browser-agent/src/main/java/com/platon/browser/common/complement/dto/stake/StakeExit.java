@@ -8,6 +8,8 @@ import com.platon.browser.common.enums.BusinessType;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @description: 退出质押 入库参数
@@ -15,7 +17,9 @@ import lombok.Data;
  * @create: 2019-11-04 17:58:27
  **/
 @Data
+@Slf4j
 @Builder
+@Accessors(chain = true)
 public class StakeExit extends BusinessParam {
     /**
      * 节点id

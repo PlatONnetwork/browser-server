@@ -9,8 +9,10 @@ import com.platon.browser.common.enums.BusinessType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 @Builder
 @Accessors(chain = true)
 public class ProposalUpgrade extends BusinessParam {

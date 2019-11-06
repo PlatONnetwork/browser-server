@@ -8,6 +8,7 @@ import com.platon.browser.common.enums.BusinessType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 网络统计变更消息<br/>
@@ -66,6 +67,7 @@ insert into `network_stat`
  * @author chendai
  */
 @Data
+@Slf4j
 @Builder
 @Accessors(chain = true)
 public class NetworkStatChange extends BusinessParam {
