@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder
 @Accessors(chain = true)
-public class ProposalCancel extends BusinessParam {
+public class ProposalUpgradeOrCancel extends BusinessParam {
 
     /**
      * 节点id
