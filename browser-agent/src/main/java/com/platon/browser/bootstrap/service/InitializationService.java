@@ -1,14 +1,19 @@
 package com.platon.browser.bootstrap.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.exception.InitializationException;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import com.platon.browser.common.complement.bean.PeriodValueElement;
+import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.service.epoch.EpochRetryService;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
@@ -50,6 +55,9 @@ public class InitializationService {
     @Autowired
     private NetworkStatMapper networkStatMapper;
 
+    @Autowired
+    private NodeCache nodeCache;
+
     @Transactional
     public InitializationResult init() throws Exception {
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
@@ -65,21 +73,40 @@ public class InitializationService {
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
 
-            initInnerStake();
+            List<Staking> stakings = initInnerStake();
+            initNodeCache(stakings);
             return initialResult;
         }
 
         if(networkStatList.size()>1) throw new InitializationException("启动自检出错:network_stat表存在多条网络统计状态数据!");
         NetworkStat networkStat = networkStatList.get(0);
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
+
+        StakingExample stakingExample = new StakingExample();
+        stakingExample.createCriteria().andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode());
+        List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
+        initNodeCache(stakings);
         return initialResult;
+    }
+
+    private void initNodeCache(List<Staking> stakings){
+        stakings.forEach(s->{
+            NodeItem node = NodeItem.builder()
+                    .nodeId(s.getNodeId())
+                    .nodeName(s.getNodeName())
+                    .annualizedRateInfo(JSON.parseObject(s.getAnnualizedRateInfo(),AnnualizedRateInfo.class))
+                    .stakingBlockNum(BigInteger.valueOf(s.getStakingBlockNum()))
+                    .stakingTxIndex(s.getStakingTxIndex())
+                    .build();
+            nodeCache.addNode(node);
+        });
     }
 
     /**
      * 初始化入库内部质押节点
      * @throws Exception
      */
-    private void initInnerStake() throws Exception {
+    private List<Staking> initInnerStake() throws Exception {
         epochRetryService.issueChange(BigInteger.ZERO);
 
         List<CustomNode> nodes = new ArrayList<>();
@@ -154,12 +181,13 @@ public class InitializationService {
 
             BeanUtils.copyProperties(staking,node);
             nodes.add(node);
-
             stakings.add(staking);
         });
 
         // 入库
         if(!nodes.isEmpty()) nodeMapper.batchInsert(new ArrayList<>(nodes));
-        if(!stakings.isEmpty()) stakingMapper.batchInsert(new ArrayList<>(stakings));
+        List<Staking> returnData = new ArrayList<>(stakings);
+        if(!stakings.isEmpty()) stakingMapper.batchInsert(returnData);
+        return new ArrayList<>(stakings);
     }
 }

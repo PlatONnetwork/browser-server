@@ -1,6 +1,8 @@
 package com.platon.browser.complement.service.param;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
@@ -8,6 +10,8 @@ import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.NoSuchBeanException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,8 @@ public class BlockParameterService {
 
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private NodeCache nodeCache;
 
     /**
      * 解析区块, 构造业务入库参数信息
@@ -38,12 +44,19 @@ public class BlockParameterService {
         CollectionBlock block = event.getBlock();
 
         // 新区块事件
-        NewBlock newBlock = NewBlock.builder()
-                .nodeId(block.getNodeId())
-                .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
-                .feeRewardValue(block.getTxFee())
-                .build();
-        businessParams.add(newBlock);
+        try {
+            NodeItem nodeItem = nodeCache.getNode(block.getNodeId());
+            NewBlock newBlock = NewBlock.builder()
+                    .nodeId(block.getNodeId())
+                    .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
+                    .feeRewardValue(block.getTxFee())
+                    .stakingBlockNum(nodeItem.getStakingBlockNum())
+                    .build();
+            businessParams.add(newBlock);
+        } catch (NoSuchBeanException e) {
+            throw new BusinessException("致命错误:每个区块必定由一个被质押的节点产生,因此必定有质押区块!");
+        }
+
 
         List<String> preVerifierList = new ArrayList<>();
         event.getEpochMessage().getPreVerifiers().forEach(v->preVerifierList.add(v.getNodeId()));

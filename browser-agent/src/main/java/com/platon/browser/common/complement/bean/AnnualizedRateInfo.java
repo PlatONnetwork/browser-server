@@ -2,6 +2,7 @@ package com.platon.browser.common.complement.bean;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.common.collection.dto.SlashInfo;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @Data
 @Builder
+@AllArgsConstructor
 @Accessors(chain = true)
 public class AnnualizedRateInfo {
     private List<PeriodValueElement> profit;
