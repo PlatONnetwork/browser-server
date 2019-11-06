@@ -46,6 +46,7 @@
 	FROM
 		tmp;
 
+	DROP TABLE tmp;
 
 </update>
 </mapper>
