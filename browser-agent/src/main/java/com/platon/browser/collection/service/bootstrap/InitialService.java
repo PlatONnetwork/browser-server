@@ -16,6 +16,7 @@ import com.platon.browser.util.VerUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,14 +99,6 @@ public class InitialService {
         epochRetryService.getPreVerifiers().forEach(v->{
             Node candidate = candidateMap.get(v.getNodeId());
 
-            CustomNode node = new CustomNode();
-            node.updateWithNode(v);
-            node.setTotalValue(BigDecimal.ZERO);
-            node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
-            node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
-            node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
-            nodes.add(node);
-
             CustomStaking staking = new CustomStaking();
             staking.updateWithNode(v);
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
@@ -117,7 +110,7 @@ public class InitialService {
             BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
             staking.setStakingLocked(initStakingLocked);
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
-            if(validatorSet.contains(node.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+            if(validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
 
             // 使用实时候选人信息更新质押
@@ -148,6 +141,18 @@ public class InitialService {
                     .cost(Collections.singletonList(pve))
                     .build();
             staking.setAnnualizedRateInfo(ari.toJSONString());
+
+
+            CustomNode node = new CustomNode();
+            node.updateWithNode(v);
+            node.setTotalValue(BigDecimal.ZERO);
+            node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
+            node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
+            node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
+
+            BeanUtils.copyProperties(staking,node);
+            nodes.add(node);
+
             stakings.add(staking);
         });
 

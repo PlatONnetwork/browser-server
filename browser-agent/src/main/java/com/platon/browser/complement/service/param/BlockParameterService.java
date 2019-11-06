@@ -45,7 +45,8 @@ public class BlockParameterService {
                 .build();
         businessParams.add(newBlock);
 
-        List<String> preVerifierList = event.getEpochMessage().getPreVerifiers();
+        List<String> preVerifierList = new ArrayList<>();
+        event.getEpochMessage().getPreVerifiers().forEach(v->preVerifierList.add(v.getNodeId()));
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("选举验证人：Block Number({})", block.getNum());
             Election election = Election.builder()
@@ -59,7 +60,9 @@ public class BlockParameterService {
 
         if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
-            List<String> validatorList = event.getEpochMessage().getCurValidators();
+            List<String> validatorList = new ArrayList<>();
+            event.getEpochMessage().getCurValidators().forEach(v->validatorList.add(v.getNodeId()));
+
             BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(validatorList.size()));
             Consensus consensus = Consensus.builder()
                     .nodeId(block.getNodeId())
@@ -71,9 +74,11 @@ public class BlockParameterService {
 
         if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
+            List<String> curVerifierList = new ArrayList<>();
+            event.getEpochMessage().getCurVerifiers().forEach(v->curVerifierList.add(v.getNodeId()));
             Settle settle = Settle.builder()
                     .preVerifierList(preVerifierList)
-                    .curVerifierList(event.getEpochMessage().getCurVerifiers())
+                    .curVerifierList(curVerifierList)
                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                     // TODO: 年化率计算
                     //.annualizedRate() // 年化率
