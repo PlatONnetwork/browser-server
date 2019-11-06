@@ -9,6 +9,7 @@ import com.platon.browser.utils.HexTool;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -30,49 +31,46 @@ public class CustomStaking extends Staking {
         this.setJoinTime(date);
         /* 初始化默认值 */
         // 质押金额(犹豫期金额)
-//        this.setStakingHas(BigInteger.ZERO.toString());
+        this.setStakingHes(BigDecimal.ZERO);
 //        // 质押金额(锁定金额)
-//        this.setStakingLocked(BigInteger.ZERO.toString());
+        this.setStakingLocked(BigDecimal.ZERO);
 //        // 委托交易总金额(犹豫期金额)
-//        this.setStatDelegateHas(BigInteger.ZERO.toString());
+        this.setStatDelegateHes(BigDecimal.ZERO);
 //        // 委托交易总金额(锁定期金额)
-//        this.setStatDelegateLocked(BigInteger.ZERO.toString());
+        this.setStatDelegateLocked(BigDecimal.ZERO);
+        setStatDelegateReleased(BigDecimal.ZERO);
 //        // 质押金额(退回中金额)
-//        this.setStakingReduction(BigInteger.ZERO.toString());
-//        // 委托交易总金额(退回中金额)
-//        this.setStatDelegateReduction(BigInteger.ZERO.toString());
+        this.setStakingReduction(BigDecimal.ZERO);
 //        // 节点名称(质押节点名称)
-//        this.setStakingName("Unknown");
+        this.setNodeName("Unknown");
 //        // 节点头像(关联external_id，第三方软件获取)
-//        this.setStakingIcon("");
+        this.setNodeIcon("");
 //        // 预计年化率
-//        this.setExpectedIncome(BigInteger.ZERO.toString());
+        this.setAnnualizedRate(0.0);
 //        // 出块奖励
-//        this.setBlockRewardValue(BigInteger.ZERO.toString());
+        this.setBlockRewardValue(BigDecimal.ZERO);
 //        // 程序版本
-//        this.setProgramVersion(BigInteger.ZERO.toString());
+        this.setProgramVersion(BigInteger.ZERO.toString());
 //        // 质押奖励
-//        this.setStakingRewardValue(BigInteger.ZERO.toString());
+        this.setStakingRewardValue(BigDecimal.ZERO);
 //        // 结算周期标识
-//        this.setStakingReductionEpoch(0);
-//        // 委托交易总数(关联的委托交易总数)
-//        this.setStatDelegateQty(0);
+        this.setStakingReductionEpoch(0);
 //        // 进入共识验证论次数
-//        this.setStatVerifierTime(0);
+        this.setStakingReductionEpoch(0);
 //        // 上个共识周期出块数
-//        this.setPreConsBlockQty(0l);
+        this.setPreConsBlockQty(0l);
 //        // 当前共识周期出块数
-//        this.setCurConsBlockQty(0l);
+        this.setCurConsBlockQty(0l);
 //        // 节点状态 1：候选中 2：退出中 3：已退出
-//        this.setStatus(StatusEnum.CANDIDATE.code);
+        this.setStatus(StatusEnum.CANDIDATE.code);
 //        //是否结算周期验证人
-//        this.setIsSetting(YesNoEnum.NO.code);
+        this.setIsSettle(YesNoEnum.NO.code);
 //        //是否共识周期验证人
-//        this.setIsConsensus(YesNoEnum.NO.code);
+        this.setIsConsensus(YesNoEnum.NO.code);
 //        // 是否为链初始化时内置的候选人
-//        this.setIsInit(YesNoEnum.NO.code);
+        this.setIsInit(YesNoEnum.NO.code);
 //        //节点质押期间手续费
-//        this.setFeeRewardValue("0");
+        this.setFeeRewardValue(BigDecimal.ZERO);
     }
 
     /********把字符串类数值转换为大浮点数的便捷方法********/
