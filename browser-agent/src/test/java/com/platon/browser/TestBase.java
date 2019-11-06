@@ -3,6 +3,8 @@ package com.platon.browser;//package com.platon.browser;
 
 
 import com.platon.browser.common.complement.dto.base.NewBlock;
+import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
+import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.Settle;
@@ -162,5 +164,39 @@ public class TestBase {
                 .time(new Date(System.currentTimeMillis()))
                 .preVerifierList(preVerifierList).build();
         return election;
+    }
+
+    public DelegateCreate delegateCreateParam(){
+        DelegateCreate delegateCreate = DelegateCreate.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .blockNumber(new BigInteger("300"))
+                .amount(new BigDecimal("100000000000000"))
+                .sequence(new BigInteger("10000000"))
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .stakingBlockNumber(new BigInteger("200"))
+                .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .build();
+        return  delegateCreate;
+    }
+
+    public DelegateExit delegateExitParam(){
+        DelegateExit delegateExit = DelegateExit.builder()
+                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
+                .amount(new BigDecimal("100000000000000"))
+                .stakingBlockNumber(new BigInteger("200"))
+                .minimumThreshold(new BigDecimal("500000"))
+                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
+                .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                .codeDelegateHes(new BigDecimal("100000000000000"))
+                .codeRmdelegateHes(new BigDecimal("50000000000000"))
+                .codeDelegateLocked(new BigDecimal("100000000000000"))
+                .codeRmDelegateLocked(new BigDecimal("50000000000000"))
+                .codeDelegateReleased(new BigDecimal("50000000000000"))
+                .codeRmDelegateReleased(new BigDecimal("200000000"))
+                .codeIsHistory(2)
+                .codeRealAmount(new BigDecimal("200000000"))
+                .codeNodeIsLeave(false)
+                .build();
+        return delegateExit;
     }
 }

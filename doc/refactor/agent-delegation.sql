@@ -5,8 +5,6 @@ set @amount = '100000000000000';
 -- 入参（交易中参数）
 set @tx_hash = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
 set @block_number = '300';
-set @tx_index = '1';
-set @tx_timestamp = '2019-10-13 07:31:20';
 set @tx_from = '0xff48d9712d8a55bf603dab28f4645b6985696a61';
 set @dele_sequence = "10000000";            -- @block_number * 100000 + @tx_index
 -- 入参（进程缓存）
@@ -41,12 +39,12 @@ insert into `delegation`
 	@node_id,
 	@amount,
 	@dele_sequence,
-	@dele_sequence
+	@block_number
 	)
 	on duplicate key update
 	`delegate_has` = `delegate_has` + @amount,
 	`is_history` = 2,
-	`cur_delegation_block_num` = @dele_sequence;
+	`cur_delegation_block_num` = @block_number;
 
 
 -- 减持/撤销委托（1005）

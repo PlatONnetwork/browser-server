@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.persistence.dao.mapper.DeletageBusinessMapper">
+    <update id="exit" parameterType="com.platon.browser.common.complement.dto.delegate.DelegateExit">
+
+    update `node` set
+        `total_value` = `total_value` - #{codeRmdelegateHes} - #{codeRmDelegateLocked},
+        `stat_delegate_value` = `stat_delegate_value` -  #{codeRmdelegateHes}  - #{codeRmDelegateLocked},
+        `stat_delegate_released` = `stat_delegate_released` - #{codeDelegateReleased},
+        `stat_valid_addrs` = if(2 = #{codeIsHistory} and #{codeNodeIsLeave} = 0 , `stat_valid_addrs`- 1 , `stat_valid_addrs` ),
+        stat_invalid_addrs = if(2 = #{codeIsHistory} and #{codeNodeIsLeave} = 1 , `stat_invalid_addrs`- 1 , `stat_invalid_addrs`)
+    where
+        `node_id` = #{nodeId};
+
+    update `delegation` set
+        `delegate_hes` = #{codeDelegateHes},
+        `delegate_locked` = #{codeDelegateLocked},
+        `delegate_released` = #{codeRmDelegateReleased},
+        `is_history` = #{codeIsHistory}
+    where
+      `delegate_addr` = #{txFrom}
+    and
+      `node_id` = #{nodeId}
+    and
+      `staking_block_num` = #{stakingBlockNumber};
+
+    update `staking` set
+        `stat_delegate_hes` = `stat_delegate_hes` - #{codeRmdelegateHes},
+        `stat_delegate_locked` = `stat_delegate_locked` - #{codeRmDelegateLocked},
+        `stat_delegate_released` = `stat_delegate_released` - #{codeRmDelegateReleased}
+    where
+        `node_id` = #{nodeId}
+    and
+        `staking_block_num` =  #{stakingBlockNumber};
+
+</update>
+</mapper>

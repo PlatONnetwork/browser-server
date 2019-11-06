@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @Auther: dongqile
  * @Date: 2019/10/31
- * @Description:
+ * @Description: 选举周期切换参数入库
  */
 @Data
 @Builder
