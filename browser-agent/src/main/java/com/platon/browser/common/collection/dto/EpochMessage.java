@@ -31,10 +31,10 @@ public class EpochMessage {
     private BigInteger inciteAmount4Stake=BigInteger.ZERO; // 当前增发周期开始时的激励池余额分给质押奖励部分 SR=IB*质押奖励比例
     private BigInteger settleStakeReward=BigInteger.ZERO;  // 当前增发周期的每个结算周期质押奖励值 SSR=SR/一个增发周期包含的结算周期数
     private BigInteger stakeReward=BigInteger.ZERO; // 当前结算周期每个节点的质押奖励值 PerNodeSR=SSR/当前结算周期实际验证人数
-    private List<Node> preValidators=new ArrayList<>(); // 前一共识周期验证人列表
-    private List<Node> curValidators=new ArrayList<>(); // 当前共识周期验证人列表
-    private List<Node> preVerifiers=new ArrayList<>(); // 前一结算周期验证人列表
-    private List<Node> curVerifiers=new ArrayList<>(); // 当前结算周期验证人列表
+    private List<Node> preValidatorList=new ArrayList<>(); // 前一共识周期验证人列表
+    private List<Node> curValidatorList=new ArrayList<>(); // 当前共识周期验证人列表
+    private List<Node> preVerifierList=new ArrayList<>(); // 前一结算周期验证人列表
+    private List<Node> curVerifierList=new ArrayList<>(); // 当前结算周期验证人列表
 
     private EpochMessage(){}
     public static EpochMessage newInstance(){
@@ -46,6 +46,10 @@ public class EpochMessage {
     }
     public EpochMessage updateWithEpochRetryService(EpochRetryService epochRetryService){
         BeanUtils.copyProperties(epochRetryService,this);
+        preValidatorList.addAll(epochRetryService.getPreValidators());
+        curValidatorList.addAll(epochRetryService.getCurValidators());
+        preVerifierList.addAll(epochRetryService.getPreVerifiers());
+        curVerifierList.addAll(epochRetryService.getCurVerifiers());
         return this;
     }
 }
