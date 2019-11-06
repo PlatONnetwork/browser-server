@@ -54,7 +54,7 @@ public class BlockParameterService {
 
         // 新选举周期事件
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0
-                ||event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
+                &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
             List<String> preVerifierList = new ArrayList<>();
