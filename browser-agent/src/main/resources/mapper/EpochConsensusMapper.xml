@@ -3,13 +3,12 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
 <update id="consensus" parameterType="com.platon.browser.common.complement.dto.epoch.Consensus">
 
-    update `staking`set
+    update `staking` set
         `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
         `pre_cons_block_qty` = `cur_cons_block_qty`,
         `cur_cons_block_qty` = 0
     where
-        `status` = 1
-
+        `status` = 1;
 
     update `node` set
         `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),
