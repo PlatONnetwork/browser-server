@@ -9,11 +9,43 @@ import com.platon.browser.common.complement.bean.PeriodValueElement;
 
 public class CalculateUtils {
 	
+	/**
+	 * 当前增发周期开始块高
+	 * @param addIssuePeriodBlockCount 每个增发周期块数
+	 * @param curAddIssueEpoch 当前增发周期轮数
+	 * @return
+	 */
+	public static Long calculateAddIssueBegin(BigInteger addIssuePeriodBlockCount, BigInteger curAddIssueEpoch) {
+		return addIssuePeriodBlockCount.multiply(curAddIssueEpoch).subtract(addIssuePeriodBlockCount).longValue();
+	}	
+	
+	/**
+	 * 当前增发周期结束块高 
+	 * @param addIssuePeriodBlockCount 每个增发周期块数
+	 * @param curAddIssueEpoch 当前增发周期轮数
+	 * @return
+	 */
+	public static Long calculateAddIssueEnd(BigInteger addIssuePeriodBlockCount, BigInteger curAddIssueEpoch) {
+		return addIssuePeriodBlockCount.multiply(curAddIssueEpoch).longValue();
+	}
+	
+	/**
+	 * 离下个结算周期剩余块高
+	 * @param settlePeriodBlockCount  每个结算周期区块总数
+	 * @param curSettingEpoch 当前结算周期轮数
+	 * @param curBlockNumber 当前块高
+	 * @return
+	 */
+	public static Long calculateNextSetting(BigInteger settlePeriodBlockCount, BigInteger curSettingEpoch, BigInteger curBlockNumber) {
+		return settlePeriodBlockCount.multiply(curSettingEpoch).subtract(curBlockNumber).longValue();
+	}
 	  
-    /**
-     * 计算年化率
-     * @param curStaking
-     */
+	/**
+	 * 年化率计算
+	 * @param ari 年化率信息
+	 * @param settlePeriodCountPerIssue 一个增发周期包含结算周期的个数
+	 * @return
+	 */
     public static BigDecimal calculateAnnualizedRate(AnnualizedRateInfo ari, BigInteger settlePeriodCountPerIssue){
         // 年化率推算信息
         BigDecimal profitSum=BigDecimal.ZERO;

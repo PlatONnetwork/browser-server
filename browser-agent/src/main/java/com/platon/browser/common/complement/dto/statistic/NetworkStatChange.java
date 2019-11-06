@@ -107,16 +107,6 @@ public class NetworkStatChange extends BusinessParam {
     private Integer maxTps;
 
 	/**
-	 * 当前发行量(von)
-	 */
-    private BigDecimal issueValue;
-
-	/**
-	 * 当前流通量(von)
-	 */
-    private BigDecimal turnValue;
-
-	/**
 	 * 提案总数
 	 */
     private Integer proposalQty;
