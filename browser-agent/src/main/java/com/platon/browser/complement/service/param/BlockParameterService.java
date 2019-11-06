@@ -37,11 +37,13 @@ public class BlockParameterService {
         List<BusinessParam> businessParams = new ArrayList<>();
         CollectionBlock block = event.getBlock();
 
+        // 新区块事件
         NewBlock newBlock = NewBlock.builder()
                 .nodeId(block.getNodeId())
                 .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
                 .feeRewardValue(block.getTxFee())
                 .build();
+        businessParams.add(newBlock);
 
         List<String> preVerifierList = event.getEpochMessage().getPreVerifiers();
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
