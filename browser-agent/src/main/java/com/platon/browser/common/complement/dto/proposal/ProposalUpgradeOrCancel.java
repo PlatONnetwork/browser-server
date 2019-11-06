@@ -83,6 +83,11 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
      */
     private String stakingName;
 
+
+    /**
+     * 质押名称
+     */
+    private BigInteger activeBlock;
     @Override
     public BusinessType getBusinessType() {
         return BusinessType.PROPOSAL_CANCEL;
