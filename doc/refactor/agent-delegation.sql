@@ -3,7 +3,7 @@
 set @node_id = '0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18';
 set @amount = '100000000000000';
 -- 入参（交易中参数）
-set @tx_hash = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
+set @tx_hesh = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
 set @block_number = '300';
 set @tx_from = '0xff48d9712d8a55bf603dab28f4645b6985696a61';
 set @dele_sequence = "10000000";            -- @block_number * 100000 + @tx_index
@@ -19,7 +19,7 @@ where `node_id` = @node_id;
 
 -- 2.staking 更新
 update `staking`
-set `stat_delegate_has` = `stat_delegate_has` + @amount
+set `stat_delegate_hes` = `stat_delegate_hes` + @amount
 where `node_id` = @node_id
    and `staking_block_num` = @sbn;
 
@@ -29,7 +29,7 @@ insert into `delegation`
 	`delegate_addr`, 
 	`staking_block_num`, 
 	`node_id`, 
-	`delegate_has`, 
+	`delegate_hes`,
 	`sequence`, 
 	`cur_delegation_block_num`
 	)
@@ -42,7 +42,7 @@ insert into `delegation`
 	@block_number
 	)
 	on duplicate key update
-	`delegate_has` = `delegate_has` + @amount,
+	`delegate_hes` = `delegate_hes` + @amount,
 	`is_history` = 2,
 	`cur_delegation_block_num` = @block_number;
 
@@ -54,7 +54,7 @@ set @amount = '100000000000000';
 set @stakingBlockNum = '200';
 set @MinimumThreshold = '500000';   --最新委托阀值
 -- 入参（交易中参数）
-set @tx_hash = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
+set @tx_hesh = '0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7';
 set @block_number = '300';
 set @tx_index = '1';
 set @tx_timestamp = '2019-10-13 07:31:20';
@@ -62,7 +62,7 @@ set @tx_from = '0xff48d9712d8a55bf603dab28f4645b6985696a61';
 
 -- 1. 查询 delegation 信息
 select 
-	delegate_has,
+	delegate_hes,
 	delegate_locked,
 	delegate_released
 from delegation
@@ -71,8 +71,8 @@ where delegate_addr = @tx_from
    and node_id = @node_id
    
 -- 2.程序计算逻辑
-set code_delegate_has;        --当前犹豫金额
-set code_rm_delegate_has;     --扣减犹豫金额
+set code_delegate_hes;        --当前犹豫金额
+set code_rm_delegate_hes;     --扣减犹豫金额
 set code_delegate_locked;     --当前锁定金额
 set code_rm_delegate_locked;  --扣减锁定金额
 set code_delegate_released;   --当前待赎回金额
@@ -81,14 +81,14 @@ set code_is_history;          --当前是否为历史
 set code_real_amount;   	  --真正退款金额
 set code_node_is_leave=false; --节点是否退出
 
-isRefundAll = delegate_has + delegate_locked + delegate_released - @amount < @MinimumThreshold
+isRefundAll = delegate_hes + delegate_locked + delegate_released - @amount < @MinimumThreshold
 if(delegate_released > 0 ){
 	code_node_is_leave = true;
 }
 if (isRefundAll = true){
 	code_is_history = 1
-	code_real_amount = delegate_has + delegate_locked + delegate_released;	
-	code_delegate_has = 0;
+	code_real_amount = delegate_hes + delegate_locked + delegate_released;	
+	code_delegate_hes = 0;
 	code_delegate_locked = 0;
 	code_delegate_released = 0;
 }else {
@@ -96,23 +96,23 @@ if (isRefundAll = true){
 	code_real_amount = @amount;
 	if(delegate_released > 0){
 		code_delegate_released = delegate_released - @amount;
-	}else if(delegate_has >=  @amount){
-		code_delegate_has = delegate_has - @amount;
+	}else if(delegate_hes >=  @amount){
+		code_delegate_hes = delegate_hes - @amount;
 		code_delegate_locked = delegate_locked;
 	}else{
-	 	code_delegate_has = 0;
-	  	code_delegate_locked = delegate_locked + delegate_has - @amount; 
+	 	code_delegate_hes = 0;
+	  	code_delegate_locked = delegate_locked + delegate_hes - @amount; 
 	}
 }
-code_rm_delegate_has = delegate_has - code_delegate_has;
+code_rm_delegate_hes = delegate_hes - code_delegate_hes;
 code_rm_delegate_locked = delegate_locked - code_delegate_locked;
 code_rm_delegate_released = delegate_released - code_delegate_released;
 
 
 -- 3. node 更新
 update `node`
-set `total_value` = `total_value` - @code_rm_delegate_has - @code_rm_delegate_locked,
-    `stat_delegate_value` = `stat_delegate_value` - @code_rm_delegate_has - @code_rm_delegate_locked,
+set `total_value` = `total_value` - @code_rm_delegate_hes - @code_rm_delegate_locked,
+    `stat_delegate_value` = `stat_delegate_value` - @code_rm_delegate_hes - @code_rm_delegate_locked,
 	`stat_delegate_released` = `stat_delegate_released` - @code_rm_delegate_released,
 	-- code_is_history = 2 and code_node_is_leave = false 时执行
 	`stat_valid_addrs` = `stat_valid_addrs`- 1,
@@ -122,7 +122,7 @@ where `node_id` = @node_id;
 
 -- 4.delegation 更新
 update `delegation` 
-set `delegate_has` = @code_delegate_has,
+set `delegate_hes` = @code_delegate_hes,
     `delegate_locked` = @code_delegate_locked,
 	`delegate_released` = @code_rm_delegate_released,
     `is_history` = @code_is_history
@@ -133,7 +133,7 @@ where
 
 -- 5.staking 更新
 update `staking`
-set `stat_delegate_has` = `stat_delegate_has` - @code_rm_delegate_has,
+set `stat_delegate_hes` = `stat_delegate_hes` - @code_rm_delegate_hes,
     `stat_delegate_locked` = `stat_delegate_locked` - @code_rm_delegate_locked,
     `stat_delegate_released` = `stat_delegate_released` - @code_rm_delegate_released,
 where s.`node_id` = @node_id
