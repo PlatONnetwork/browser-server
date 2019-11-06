@@ -129,7 +129,6 @@ public class TestBase {
         nodeIdList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         Consensus consensus =  Consensus.builder()
                 .validatorList(nodeIdList)
-                .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .expectBlockNum(new BigInteger("10"))
                 .build();
         return consensus;

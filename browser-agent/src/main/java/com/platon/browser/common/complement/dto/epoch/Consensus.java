@@ -11,20 +11,28 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * @Auther: dongqile
- * @Date: 2019/11/2
- * @Description: 共识周期切换参数入库
+ * 共识周期变更消息 <br/>
+ * <pre>
+-- 1. staking 更新
+update `staking` 
+set `is_consensus` = if(`node_id` in @validator_list, 1,  2), -- 伪代码
+    `pre_cons_block_qty` = `cur_cons_block_qty`,
+    `cur_cons_block_qty` = 0
+where `status` = 1;
+
+-- 2. node 更新
+update `node` 
+set `is_consensus` = if(`node_id` in @validator_list, 1,  2), 
+	`stat_verifier_time` = if(`node_id` in @validator_list, `stat_verifier_time` + 1,  `stat_verifier_time`),
+	`stat_expect_block_qty` = if(`node_id` in @validator_list, `stat_expect_block_qty` + @expect_block_num,  `stat_expect_block_qty`),  
+where `status` = 1;
+ * <pre/>
+ * @author chendai
  */
 @Data
 @Builder
 @Accessors(chain = true)
 public class Consensus  extends BusinessParam {
-
-
-    /**
-     * 节点Id
-     */
-    private String nodeId;
 
     /**
      * 每个验证人期望出块数 共识周期出块数/当轮验证人数量
