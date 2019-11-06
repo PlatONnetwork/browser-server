@@ -7,7 +7,7 @@ import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

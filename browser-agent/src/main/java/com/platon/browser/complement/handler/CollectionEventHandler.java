@@ -10,9 +10,9 @@ import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.complement.service.param.BlockParameterService;
 import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.queue.collection.event.CollectionEvent;
-import com.platon.browser.queue.collection.handler.ICollectionEventHandler;
-import com.platon.browser.queue.complement.publisher.ComplementEventPublisher;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
+import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
 

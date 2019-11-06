@@ -1,7 +1,7 @@
-package com.platon.browser.queue.collection.handler;
+package com.platon.browser.common.queue.collection.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import org.springframework.retry.annotation.Retryable;
 
 

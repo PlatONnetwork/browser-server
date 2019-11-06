@@ -1,7 +1,7 @@
-package com.platon.browser.queue.complement.handler;
+package com.platon.browser.common.queue.complement.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.queue.complement.event.ComplementEvent;
+import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import org.springframework.retry.annotation.Retryable;
 
 

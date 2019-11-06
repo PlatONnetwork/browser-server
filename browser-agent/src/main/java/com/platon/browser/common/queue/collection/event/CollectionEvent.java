@@ -1,4 +1,4 @@
-package com.platon.browser.queue.collection.event;
+package com.platon.browser.common.queue.collection.event;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;

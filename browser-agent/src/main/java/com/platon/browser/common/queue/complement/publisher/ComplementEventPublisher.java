@@ -1,4 +1,4 @@
-package com.platon.browser.queue.complement.publisher;
+package com.platon.browser.common.queue.complement.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
@@ -7,8 +7,8 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.queue.complement.event.ComplementEvent;
-import com.platon.browser.queue.complement.handler.IComplementEventHandler;
+import com.platon.browser.common.queue.complement.event.ComplementEvent;
+import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
