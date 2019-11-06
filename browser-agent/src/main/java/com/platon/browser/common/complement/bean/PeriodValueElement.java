@@ -1,4 +1,4 @@
-package com.platon.browser.common.collection.dto;
+package com.platon.browser.common.complement.bean;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,11 +1,11 @@
-package com.platon.browser.common.collection.dto;
+package com.platon.browser.common.complement.bean;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.common.collection.dto.SlashInfo;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

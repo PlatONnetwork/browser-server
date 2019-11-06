@@ -2,9 +2,9 @@ package com.platon.browser.collection.service.bootstrap;
 
 import com.platon.browser.collection.exception.InitialException;
 import com.platon.browser.collection.service.epoch.EpochRetryService;
-import com.platon.browser.common.collection.dto.AnnualizedRateInfo;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.common.collection.dto.PeriodValueElement;
+import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
+import com.platon.browser.common.complement.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;

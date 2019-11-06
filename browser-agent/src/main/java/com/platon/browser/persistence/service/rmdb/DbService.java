@@ -2,6 +2,7 @@ package com.platon.browser.persistence.service.rmdb;
 
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.persistence.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.persistence.dao.mapper.NewBlockMapper;
 import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +27,23 @@ public class DbService {
     private SlashBusinessMapper slashBusinessMapper;
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
+    @Autowired
+    private NewBlockMapper newBlockMapper;
 
     public void insert(List<BusinessParam> params){
         params.forEach(param->{
             switch (param.getBusinessType()) {
                 case STAKE_CREATE: // 1000 发起质押
-                    stakeBusinessMapper.create(param);
+//                    stakeBusinessMapper.create(param);
                     return;
                 case STAKE_MODIFY: // 1001 修改质押信息
-                    stakeBusinessMapper.modify(param);
+//                    stakeBusinessMapper.modify(param);
                     return;
                 case STAKE_INCREASE: // 1002 增持质押
-                    stakeBusinessMapper.increase(param);
+//                    stakeBusinessMapper.increase(param);
                     return;
                 case STAKE_EXIT: // 1003 撤销质押
-                    stakeBusinessMapper.exit(param);
+//                    stakeBusinessMapper.exit(param);
                     return;
                 case DELEGATE_CREATE: // 1004 TODO: 发起委托
 
@@ -64,22 +67,22 @@ public class DbService {
 
                     return;
                 case REPORT: // 3000 举报双签
-                    slashBusinessMapper.report(param);
+//                    slashBusinessMapper.report(param);
                     return;
                 case RESTRICTING_CREATE: // 4000 TODO: 创建锁仓计划
 
                     return;
                 case NEW_BLOCK: // TODO: 新区块
-
-                    return;
-                case CONSENSUS_EPOCH: // 共识周期切换
-                    epochBusinessMapper.consensus(param);
+                    newBlockMapper.newBlock(param);
                     return;
                 case ELECTION_EPOCH: // 选举事件
                     epochBusinessMapper.election(param);
                     return;
+                case CONSENSUS_EPOCH: // 共识周期切换
+//                    epochBusinessMapper.consensus(param);
+                    return;
                 case SETTLE_EPOCH: // 结算周期切换
-                    epochBusinessMapper.settle(param);
+//                    epochBusinessMapper.settle(param);
                     return;
                 default:
                     return;
