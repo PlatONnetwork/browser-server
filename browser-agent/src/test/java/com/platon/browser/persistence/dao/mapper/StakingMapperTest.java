@@ -2,6 +2,8 @@ package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
+import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
+import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
@@ -49,6 +51,9 @@ public class StakingMapperTest extends TestBase {
 
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
+
+    @Autowired
+    private DeletageBusinessMapper deletageBusinessMapper;
 
     @Autowired
     private NodeOptMapper nodeOptMapper;
@@ -256,6 +261,24 @@ public class StakingMapperTest extends TestBase {
     public void newElectionEpochMapper () {
         Election electionParam = electionParam();
         epochBusinessMapper.election(electionParam);
+    }
+
+    /**
+     * 创建委托
+     */
+    @Test
+    public void delegationCreateMapper(){
+        DelegateCreate delegateCreate = delegateCreateParam();
+        deletageBusinessMapper.create(delegateCreate);
+    }
+
+    /**
+     * 退出委托
+     */
+    @Test
+    public void delegationExitMapper(){
+        DelegateExit delegateExit = delegateExitParam();
+        deletageBusinessMapper.exit(delegateExit);
     }
 
     public Staking getStaking ( String nodeId, long stakingBlockNumer ) {

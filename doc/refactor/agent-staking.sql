@@ -23,7 +23,7 @@ insert into `staking`
 	`staking_block_num`, 
 	`staking_tx_index`, 
 	`staking_addr`, 
-	`staking_has`, 
+	`staking_hes`,
 	`staking_name`, 
 	`external_id`, 
 	`benefit_addr`, 
@@ -318,7 +318,7 @@ set code_cur_staking_locked; --当前锁定的
 code_slash_value = staking_locked * @slash_rate;
 code_reward_value = code_slash_value * @slash_2_report;
 code_nodeopt_desc = 'PERCENT|AMOUNT'.replace("AMOUNT",code_slash_value);
-code_cur_staking_locked = staking_locked - code_slash_value；
+code_cur_staking_locked = staking_locked - code_slash_value;
 if(cur_staking_locked > 0 )
 	code_status = 2
     staking_reduction_epoch = cur_epoch
@@ -328,7 +328,7 @@ else
 	staking_reduction_epoch = 0
 
 is_consensus = false
-is_setting = false
+is_settl = false
 staking_has = 0
 staking_locked = 0
 leave_time = transaction.timestamp
@@ -341,8 +341,8 @@ set `leave_time` = @tx_timestamp,
 	`staking_reduction_epoch` = @setting_epoch,
     `staking_reduction` = @code_cur_staking_locked,
     `staking_locked` = 0,
-	`staking_has` = 0,
-	`total_value` = `total_value` - `staking_locked` - `staking_has`,
+	`staking_hes` = 0,
+	`total_value` = `total_value` - `staking_locked` - `staking_hes`,
 	`stat_delegate_value` = 0,
 	`stat_delegate_released` = `stat_delegate_value`,
 	`stat_valid_addrs` = 0,
@@ -356,10 +356,10 @@ set `leave_time` = @tx_timestamp,
     `staking_reduction_epoch` = @setting_epoch,
     `staking_reduction` = @code_cur_staking_locked,
     `staking_locked` = 0,
-	`staking_has` = 0,
-	`stat_delegate_has` = 0,
+	`staking_hes` = 0,
+	`stat_delegate_hes` = 0,
 	`stat_delegate_locked` = 0,
-	`stat_delegate_released` = `stat_delegate_has` + `stat_delegate_locked`
+	`stat_delegate_released` = `stat_delegate_hes` + `stat_delegate_locked`
 where `node_id` = @node_id
     and `staking_block_num` = @sbn;
 
@@ -368,7 +368,7 @@ insert into `slash`
 	(`hash`, 
 	`node_id`, 
 	`slash_rate`, 
-    `slash_value`, 
+  `slash_value`,
 	`reward`, 
 	`denefit_addr`, 
 	`data`
@@ -388,8 +388,8 @@ insert into `node_opt`
 	(`node_id`, 
 	`type`, 
 	`tx_hash`, 
-	`block_number`, 
-	`timestamp`,
+	`b_num`,
+	`time`,
 	`desc`
 	)
 	values
@@ -473,7 +473,7 @@ where `status` in (1, 2);
 -- 2. node 更新
 update `node`
 set  -- 设置犹豫金额到锁定金额
-	`staking_locked` = `staking_locked` + `staking_has`,
+	`staking_locked` = `staking_locked` + `staking_hes`,
     `staking_has` = 0,
 	-- 退出中记录状态设置
     `staking_reduction` = if(`status` = 2 and `staking_reduction_epoch` + @staking_lock_epoch < @setting_epoch, 0, `staking_reduction`),
@@ -482,20 +482,20 @@ set  -- 设置犹豫金额到锁定金额
     `stat_staking_reward_value` = if(`node_id` in @pre_verifier_list, `stat_staking_reward_value` + @staking_fee, `stat_staking_reward_value`),
     -- 当前质押是下轮结算周期验证人
     `is_setting` = if(`node_id` in @cur_verifier_list, 1,  2),
-	`expected_income` = @expectedIncome
+	`annualized_rate` = @expectedIncome
 where `status` in (1, 2);
 
 -- 3. delegation更新
 update `delegation` 
-set `delegate_has` = 0,
-    `delegate_locked` = `delegate_has` + `delegate_locked`
+set `delegate_hes` = 0,
+    `delegate_locked` = `delegate_hes` + `delegate_locked`
 where `is_history` = 2 
 	and `delegate_has` > 0;
 
 -- 4. staking 更新
 update `staking`
-set `stat_delegate_has` = 0,
-    `stat_delegate_locked ` = `stat_delegate_has` + `stat_delegate_locked`
+set `stat_delegate_hes` = 0,
+    `stat_delegate_locked ` = `stat_delegate_hes` + `stat_delegate_locked`
 where `stat_delegate_has` > 0;
 	
 
@@ -525,7 +525,7 @@ set `staking_has` = 0,
     `staking_reduction_epoch` = @setting_epoch,
     `status` = if(`staking_locked` > 0, 2, 3), 
     `is_consensus` = 2,
-    `is_setting` = 2,
+    `is_settle` = 2,
     `leave_time` = @tx_timestamp
 where `status` = 1
 	and `node_id` in @pre_verifier_list
@@ -533,24 +533,24 @@ where `status` = 1
 
 -- 3. node 更新
 update `node`
-set `staking_has` = 0,
+set `staking_hes` = 0,
     `staking_locked` = 0,
     `staking_reduction` = `staking_locked`,
     `staking_reduction_epoch` = @setting_epoch,
     `status` = if(`staking_locked` > 0, 2, 3), 
     `is_consensus` = 2,
-    `is_setting` = 2,
+    `is_settle` = 2,
     `leave_time` = @tx_timestamp,
 	`stat_slash_low_qty` = `stat_slash_low_qty` +1
-	`total_value` = `total_value` - `staking_has` - `staking_locked`
+	`total_value` = `total_value` - `staking_hes` - `staking_locked`
 where `node_id` in nodeList;
 
 -- 4. node_opt 循环 for(nodeId in nodeList)
 insert into `node_opt` 
 	(`node_id`, 
 	`type`, 
-	`block_number`, 
-	`timestamp`,
+	`b_num`,
+	`time`,
 	`desc`
 	)
 	values
