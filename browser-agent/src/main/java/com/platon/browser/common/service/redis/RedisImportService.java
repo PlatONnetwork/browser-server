@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.redis;
+package com.platon.browser.common.service.redis;
 
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;

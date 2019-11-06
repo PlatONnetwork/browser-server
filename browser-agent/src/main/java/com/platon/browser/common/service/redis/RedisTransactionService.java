@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.redis;
+package com.platon.browser.common.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.dao.mapper.TransactionMapper;

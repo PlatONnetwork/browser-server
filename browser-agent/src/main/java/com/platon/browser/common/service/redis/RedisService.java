@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.redis;
+package com.platon.browser.common.service.redis;
 
 import java.io.IOException;
 import java.util.Set;

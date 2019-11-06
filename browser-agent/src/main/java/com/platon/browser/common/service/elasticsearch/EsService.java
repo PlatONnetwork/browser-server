@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.elasticsearch;
+package com.platon.browser.common.service.elasticsearch;
 
 import java.io.IOException;
 import java.util.Set;

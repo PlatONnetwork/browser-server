@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.elasticsearch;
+package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.elasticsearch.NodeOptESRepository;

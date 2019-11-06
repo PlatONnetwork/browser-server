@@ -1,6 +1,7 @@
 package com.platon.browser;
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
+import com.platon.browser.bootstrap.service.ConsistencyService;
 import com.platon.browser.bootstrap.service.InitializationService;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
@@ -46,8 +47,11 @@ public class AgentApplication implements ApplicationRunner {
 	private BlockEventPublisher blockEventPublisher;
 	@Autowired
 	private EpochService epochService;
-	@Autowired
+    @Autowired
+    private ConsistencyService consistencyService;
+    @Autowired
 	private InitializationService initializationService;
+
 	// 已采集的最高块号
 	// TODO: 启动时需要使用初始化数据初始化区块号
 	private Long collectedNumber = 0L;
@@ -57,10 +61,12 @@ public class AgentApplication implements ApplicationRunner {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
 
+        // 启动(mysql/es/redis)一致性检查
+        consistencyService.synchronize();
+
 		// 启动初始化子流程
 		InitializationResult initialResult = initializationService.init();
 		collectedNumber = initialResult.getCollectedBlockNumber();
-		// TODO: 启动(mysql/es/redis)一致性检查
 
 		while (true) {
 			try {

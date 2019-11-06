@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.service.elasticsearch;
+package com.platon.browser.common.service.elasticsearch;
 
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.dto.Block;
