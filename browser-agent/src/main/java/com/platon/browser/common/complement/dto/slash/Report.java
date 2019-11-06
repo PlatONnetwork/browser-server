@@ -1,18 +1,17 @@
 package com.platon.browser.common.complement.dto.slash;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.enums.BusinessType;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.enums.BusinessType;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 @Data
-@Slf4j
 @Builder
 @Accessors(chain = true)
 public class Report extends BusinessParam {
@@ -54,12 +53,19 @@ public class Report extends BusinessParam {
     /**
      * 双签惩罚比例
      */
-    private String slashRate;
+    private BigDecimal slashRate;
+    
+    /**
+     * 惩罚金分配给举报人比例
+     */
+    private BigDecimal slash2ReportRate;
 
     /**
-     * 节点状态
+     *  交易发送者
      */
-    private int codeStatus;
+    private String benefitAddr;
+    
+    
 
     /**
      * 当前锁定的
@@ -72,14 +78,14 @@ public class Report extends BusinessParam {
     private BigDecimal codeRewardValue;
 
     /**
-     *  交易发送者
-     */
-    private String benefitAddr;
-
-    /**
      * 节点操作描述  'PERCENT|AMOUNT' 中
      */
     private String codeNodeOptDesc;
+
+    /**
+     * 节点状态
+     */
+    private int codeStatus;
 
     @Override
     public BusinessType getBusinessType() {

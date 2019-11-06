@@ -2,7 +2,7 @@ package com.platon.browser;//package com.platon.browser;
 
 
 
-import com.platon.browser.common.complement.dto.base.NewBlock;
+import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
@@ -103,7 +103,7 @@ public class TestBase {
                 .stakingBlockNum(new BigInteger("200"))
                 .bNum(new BigInteger("200"))
                 .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
-                .slashRate("0.5")
+                .slashRate(new BigDecimal("0.5"))
                 .slashData("json")
                 .benefitAddr("0x02fba14f5e72092c8fca6ced087cd4e7be0d8fc5")
                 .codeCurStakingLocked(new BigDecimal("50000000"))
@@ -149,7 +149,7 @@ public class TestBase {
                 .annualizedRateInfo("json")
                 .settingEpoch(3)
                 .stakingLockEpoch(3)
-                .feeRewardValue(new BigDecimal("100000000000"))
+                .stakingReward(new BigDecimal("100000000000"))
                 .build();
         return settle;
     }
@@ -172,7 +172,6 @@ public class TestBase {
                 .blockNumber(new BigInteger("300"))
                 .amount(new BigDecimal("100000000000000"))
                 .sequence(new BigInteger("10000000"))
-                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
                 .stakingBlockNumber(new BigInteger("200"))
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
                 .build();
@@ -185,7 +184,6 @@ public class TestBase {
                 .amount(new BigDecimal("100000000000000"))
                 .stakingBlockNumber(new BigInteger("200"))
                 .minimumThreshold(new BigDecimal("500000"))
-                .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
                 .codeDelegateHes(new BigDecimal("100000000000000"))
                 .codeRmdelegateHes(new BigDecimal("50000000000000"))

@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Data
 @Builder
 @Accessors(chain = true)
-public class ProposalText extends BusinessParam {
+public class ProposalUpgrade extends BusinessParam {
 
     /**
      * 节点id
@@ -41,6 +41,11 @@ public class ProposalText extends BusinessParam {
     private BigInteger endVotingBlock;
 
     /**
+     * 生效块高
+     */
+    private BigInteger activeBlock;
+
+    /**
      * 提案主题
      */
     private String topic;
@@ -54,6 +59,11 @@ public class ProposalText extends BusinessParam {
      * 操作描述
      */
     private String optDesc;
+
+    /**
+     * version
+     */
+    private String newVersion;
 
     /**
      * 交易hash
@@ -75,8 +85,9 @@ public class ProposalText extends BusinessParam {
      * 质押名称
      */
     private String stakingName;
+
     @Override
     public BusinessType getBusinessType() {
-        return BusinessType.PROPOSAL_TEXT;
+        return BusinessType.PROPOSAL_UPGRADE;
     }
 }

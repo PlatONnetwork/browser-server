@@ -1,15 +1,14 @@
 package com.platon.browser.common.complement.dto.epoch;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @Auther: dongqile
@@ -18,7 +17,6 @@ import java.util.List;
  */
 @Data
 @Builder
-@Slf4j
 @Accessors(chain = true)
 public class Settle  extends BusinessParam {
 
@@ -36,6 +34,11 @@ public class Settle  extends BusinessParam {
      * 期望年化率
      */
     private Double annualizedRate;
+    
+    /**
+     * 质押奖励(von)
+     */
+    private BigDecimal stakingReward;
 
     /**
      *  结算周期
@@ -51,11 +54,6 @@ public class Settle  extends BusinessParam {
      * 期望年化率依赖的数据
      */
     private String annualizedRateInfo;
-
-    /**
-     * 出块奖励统计(手续费)(von)
-     */
-    private BigDecimal feeRewardValue;
 
     @Override
     public BusinessType getBusinessType () {

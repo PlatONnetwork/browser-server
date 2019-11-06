@@ -1,14 +1,14 @@
-package com.platon.browser.common.complement.dto.base;
-
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.enums.BusinessType;
-import lombok.Builder;
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
+package com.platon.browser.common.complement.dto.epoch;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.enums.BusinessType;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @Auther: dongqile
@@ -16,7 +16,6 @@ import java.math.BigInteger;
  * @Description: 新区块更新入参
  */
 @Data
-@Slf4j
 @Builder
 @Accessors(chain = true)
 public class NewBlock extends BusinessParam {
