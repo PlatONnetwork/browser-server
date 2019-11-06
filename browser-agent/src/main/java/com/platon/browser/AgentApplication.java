@@ -3,6 +3,7 @@ package com.platon.browser;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.queue.publisher.BlockEventPublisher;
 import com.platon.browser.collection.service.block.BlockService;
+import com.platon.browser.collection.service.bootstrap.InitialResult;
 import com.platon.browser.collection.service.bootstrap.InitialService;
 import com.platon.browser.collection.service.epoch.EpochService;
 import com.platon.browser.collection.service.transaction.ReceiptService;
@@ -57,7 +58,8 @@ public class AgentApplication implements ApplicationRunner {
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
 
 		// 启动初始化子流程
-		initialService.init();
+		InitialResult initialResult = initialService.init();
+		collectedNumber = initialResult.getCollectedBlockNumber();
 		// TODO: 启动(mysql/es/redis)一致性检查
 
 		while (true) {
