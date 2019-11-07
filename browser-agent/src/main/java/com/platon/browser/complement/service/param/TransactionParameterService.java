@@ -15,6 +15,7 @@ import com.platon.browser.common.complement.dto.proposal.ProposalText;
 import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.proposal.ProposalVersion;
 import com.platon.browser.common.complement.dto.proposal.ProposalVote;
+import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
@@ -29,6 +30,7 @@ import com.platon.browser.complement.service.param.converter.ProposalUpgradeConv
 import com.platon.browser.complement.service.param.converter.ProposalVersionConverter;
 import com.platon.browser.complement.service.param.converter.ProposalVoteConverter;
 import com.platon.browser.complement.service.param.converter.ReportConverter;
+import com.platon.browser.complement.service.param.converter.RestrictingCreateConverter;
 import com.platon.browser.complement.service.param.converter.StakeCreateConverter;
 import com.platon.browser.complement.service.param.converter.StakeExitConverter;
 import com.platon.browser.complement.service.param.converter.StakeIncreaseConverter;
@@ -74,6 +76,8 @@ public class TransactionParameterService {
     private ProposalVoteConverter  proposalVoteConverter;
     @Autowired
     private ProposalVersionConverter  proposalVersionConverter;
+    @Autowired
+    private RestrictingCreateConverter restrictingCreateConverter;
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -142,8 +146,9 @@ public class TransactionParameterService {
                         Report param3000 = reportConverter.convert(event,tx);
                         businessParams.add(param3000);
                         break;
-                    case RESTRICTING_CREATE: // 4000 TODO: 创建锁仓计划
-                    	
+                    case RESTRICTING_CREATE: // 4000
+                    	RestrictingCreate param4000 = restrictingCreateConverter.convert(event,tx);
+                    	 businessParams.add(param4000);
                         break;
                     default:
                         break;
