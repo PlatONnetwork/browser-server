@@ -4,6 +4,7 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.javassist.runtime.Inner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.math.BigInteger;
 @Service
 public class AccountService {
     private static final String INCITE_ACCOUNT_ADDR = InnerContractAddrEnum.INCENTIVE_POOL_CONTRACT.getAddress();
+    private static final String RESTRICTING_ADDR = InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress();
+    private static final String STAKING_ADDR = InnerContractAddrEnum.STAKING_CONTRACT.getAddress();
 
     @Autowired
     private PlatOnClient platOnClient;
@@ -35,6 +38,38 @@ public class AccountService {
                     .send().getBalance();
         }catch (Exception e){
             String error = "获取激励池["+INCITE_ACCOUNT_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
+            log.error("{}",error);
+            throw new BusinessException(error);
+        }
+    }
+
+    /**
+     * 带有重试功能的根据区块号获取锁仓池余额
+     * @param blockNumber
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public BigInteger getLockCabinBalance(BigInteger blockNumber){
+        try {
+           return platOnClient.getWeb3j().platonGetBalance(RESTRICTING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+                   .send().getBalance();
+        }catch (Exception e){
+            String error = "获取锁仓合约["+RESTRICTING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
+            log.error("{}",error);
+            throw new BusinessException(error);
+        }
+    }
+
+    /**
+     * 带有重试功能的根据区块号获取质押池余额
+     * @param blockNumber
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    public BigInteger getStakingBalance(BigInteger blockNumber){
+        try {
+            return platOnClient.getWeb3j().platonGetBalance(STAKING_ADDR,DefaultBlockParameter.valueOf(blockNumber))
+                    .send().getBalance();
+        }catch (Exception e){
+            String error = "获取质押合约["+STAKING_ADDR+"]在区块号["+blockNumber+"]的余额失败:"+e.getMessage();
             log.error("{}",error);
             throw new BusinessException(error);
         }

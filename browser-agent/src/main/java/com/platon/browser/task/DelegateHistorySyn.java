@@ -4,6 +4,7 @@ import com.platon.browser.common.service.elasticsearch.EsDelegationService;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationExample;
 import com.platon.browser.dao.mapper.DelegationMapper;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +33,7 @@ public class DelegateHistorySyn {
     //只查询委托历史列表
     private static final int isHistory = 1;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
         start();
     }
@@ -45,8 +46,13 @@ public class DelegateHistorySyn {
             if (delegationList.size() > 0 && null != delegationList) {
                 Syn(delegationList);
             }
+            log.debug("[DelegateHistorySyn Syn()] Syn delegate get to ES finish!!");
+            return;
         } catch (Exception e) {
-            log.error("[DelegateHistorySyn] Syn delegate Exception !!!...", e.getMessage());
+            //e.printStackTrace();
+            String error = e.getMessage();
+            log.error("{}",error);
+            throw new BusinessException(error);
         }
     }
 

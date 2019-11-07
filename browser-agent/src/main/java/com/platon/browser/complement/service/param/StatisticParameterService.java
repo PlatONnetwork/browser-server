@@ -1,10 +1,12 @@
 package com.platon.browser.complement.service.param;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.platon.browser.common.service.account.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,9 @@ public class StatisticParameterService {
     @Autowired
     private AddressCache addressCache;
 
+	@Autowired
+	private AccountService accountService;
+
     /**
      * 解析区块, 构造业务入库参数信息
      * @return
@@ -49,8 +54,17 @@ public class StatisticParameterService {
         List<BusinessParam> businessParams = new ArrayList<>();
         CollectionBlock block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
-        
-        // 网络统计
+        //获取激励池余额
+		BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(block.getNum()));
+		//获取质押余额
+		BigInteger stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(block.getNum()));
+		//获取锁仓余额
+		BigInteger restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(block.getNum()));
+		//计算发行量
+		BigDecimal issueValue = CalculateUtils.calculationIssueValue(epochMessage.getIssueEpochRound(),chainConfig,inciteBalance);
+		//计算流通量
+		BigDecimal turnValue = CalculateUtils.calculationTurnValue(issueValue,inciteBalance,stakingBalance,restrictBalance);
+		// 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
         NetworkStatChange networkStatChange = NetworkStatChange.builder()
         	.id(1)
@@ -66,8 +80,8 @@ public class StatisticParameterService {
         	.addIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
         	.addIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
         	.nextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
-			.issueValue(BigDecimal.ZERO) // 发行量
-			.turnValue(BigDecimal.ZERO) // 流通量
+			.issueValue(issueValue) // 发行量
+			.turnValue(turnValue) // 流通量
         	.build();
         businessParams.add(networkStatChange);
         
@@ -99,4 +113,7 @@ public class StatisticParameterService {
         
         return businessParams;
     }
+
+
+
 }

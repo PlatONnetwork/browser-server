@@ -3,12 +3,17 @@ package com.platon.browser.common.utils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Map;
 
 import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import com.platon.browser.common.complement.bean.PeriodValueElement;
+import com.platon.browser.config.BlockChainConfig;
+import org.web3j.utils.Convert;
 
 public class CalculateUtils {
-	
+
+
+
 	/**
 	 * 当前增发周期开始块高
 	 * @param addIssuePeriodBlockCount 每个增发周期块数
@@ -81,5 +86,41 @@ public class CalculateUtils {
                 .multiply(BigDecimal.valueOf(100));
         return rate.setScale(2,RoundingMode.FLOOR);
     }
-	
+
+	public static BigDecimal calculationIssueValue( BigInteger issueEpoch, BlockChainConfig chainConfig, BigInteger incentivePoolAccountBalance){
+		Map <Integer, BigDecimal> subsidiesMap = chainConfig.getFoundationSubsidies();
+		int curIssueEpoch=issueEpoch.intValue();
+		int subsidiesSize=subsidiesMap.size();
+
+		// 基金会补贴部分
+		BigDecimal foundationAmount = BigDecimal.ZERO;
+		// 前subsidiesSize年才有补贴，其余时候为0
+		if(curIssueEpoch<=subsidiesSize) foundationAmount = subsidiesMap.get(curIssueEpoch);
+
+		//获取初始发行金额
+		BigDecimal initIssueAmount = chainConfig.getInitIssueAmount();
+		initIssueAmount = Convert.toVon(initIssueAmount, Convert.Unit.LAT);
+		//获取增发比例
+		BigDecimal addIssueRate = chainConfig.getAddIssueRate();
+
+		//年份增发量 = (1+增发比例)的增发年份次方
+		BigDecimal circulationByYear = BigDecimal.ONE.add(addIssueRate).pow(curIssueEpoch);
+		//计算发行量 = 初始发行量 * 年份增发量 - 实时激励池余额 + 第N年基金会补贴
+		// 发行量
+		BigDecimal issueValue = initIssueAmount
+				.multiply(circulationByYear)
+				.subtract(new BigDecimal(incentivePoolAccountBalance))
+				.add(foundationAmount);
+		return issueValue;
+	}
+
+
+	public static BigDecimal calculationTurnValue(BigDecimal issueValue,BigInteger inciteBalance,BigInteger stakingBalance,BigInteger restrictBalance){
+		BigDecimal turnValue = issueValue
+				.subtract(new BigDecimal(restrictBalance))
+				.subtract(new BigDecimal(stakingBalance))
+				.subtract(new BigDecimal(inciteBalance));
+
+		return turnValue;
+	}
 }

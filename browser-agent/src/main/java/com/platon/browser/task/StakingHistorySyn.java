@@ -3,8 +3,11 @@ package com.platon.browser.task;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.CustomStakingHistoryMapper;
 import com.platon.browser.dao.mapper.StakingHistoryMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -27,9 +32,9 @@ public class StakingHistorySyn {
     private StakingMapper stakingMapper;
 
     @Autowired
-    private StakingHistoryMapper stakingHistoryMapper;
+    private CustomStakingHistoryMapper customStakingHistoryMapper;
 
-    @Scheduled(cron = "0/5  * * * * ?")
+    @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
         start();
     }
@@ -39,15 +44,22 @@ public class StakingHistorySyn {
             StakingExample stakingExample = new StakingExample();
             stakingExample.createCriteria().andStatusEqualTo(3);
             List <Staking> stakingList = stakingMapper.selectByExample(stakingExample);
+            Set <StakingHistory> stakingHistoryList = new HashSet <>();
             if(stakingList.size() > 0){
-                List <StakingHistory> stakingHistoryList = new ArrayList <>();
-                BeanUtils.copyProperties(stakingList,stakingHistoryList);
-                stakingHistoryMapper.batchInsert(stakingHistoryList);
+                stakingList.forEach(staking -> {
+                   StakingHistory stakingHistory = new StakingHistory();
+                   BeanUtils.copyProperties(staking,stakingHistory);
+                    stakingHistoryList.add(stakingHistory);
+                });
+                customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
             }
-            log.info("[StakingHistorySyn] ");
+            log.debug("[StakingHistorySyn Syn()] Syn StakingHistory finish!!");
             return;
         }catch (Exception e){
-            log.error("",e.getMessage());
+            e.printStackTrace();
+            String error = e.getMessage();
+            log.error("{}",error);
+            throw new BusinessException(error);
         }
     }
 
