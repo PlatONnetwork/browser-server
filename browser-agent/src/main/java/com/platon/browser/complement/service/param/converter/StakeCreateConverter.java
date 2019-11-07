@@ -26,6 +26,7 @@ public class StakeCreateConverter extends BusinessParamConverter<StakeCreate> {
     public StakeCreate convert(CollectionEvent event, CollectionTransaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
+        BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
         		.stakingHes(new BigDecimal(txParam.getAmount()))
@@ -37,13 +38,13 @@ public class StakeCreateConverter extends BusinessParamConverter<StakeCreate> {
         		.webSite(txParam.getWebsite())
         		.details(txParam.getDetails())
         		.isInit(isInit(txParam.getBenefitAddress())) 
-        		.stakingBlockNum(BigInteger.valueOf(tx.getNum()))
+        		.stakingBlockNum(stakingBlockNum)
         		.stakingTxIndex(tx.getIndex())
         		.stakingAddr(tx.getFrom())
         		.joinTime(tx.getTime())
         		.txHash(tx.getHash())               
                 .build();
-        updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
+        updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
         return businessParam;
     }
 }

@@ -1,16 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigInteger;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.ReportParam;
-import com.platon.browser.utils.HexTool;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigInteger;
 
 /**
  * @description: 举报验证人业务参数转换器
@@ -40,8 +40,7 @@ public class ReportConverter extends BusinessParamConverter<Report> {
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
         BeanUtils.copyProperties(txParam,businessParam);
-        // 更新节点缓存
-        updateNodeCache(HexTool.prefix(txParam.getVerify()),txParam.getNodeName());
+       
         return businessParam;
     }
 }

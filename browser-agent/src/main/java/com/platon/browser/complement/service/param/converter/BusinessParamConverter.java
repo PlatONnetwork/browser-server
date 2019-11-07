@@ -1,5 +1,7 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigInteger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +29,17 @@ public abstract class BusinessParamConverter<T> {
             nodeItem.setNodeName(StringUtils.isBlank(nodeName)?nodeItem.getNodeName():nodeName);
         } catch (NoSuchBeanException e) {
             NodeItem nodeItem = NodeItem.builder().nodeId(nodeId).nodeName(nodeName).build();
+            nodeCache.addNode(nodeItem);
+        }
+    }
+    
+    protected void updateNodeCache(String nodeId,String nodeName, BigInteger stakingBlockNum){
+        try {
+            NodeItem nodeItem = nodeCache.getNode(nodeId);
+            nodeItem.setNodeName(nodeName);
+            nodeItem.setStakingBlockNum(stakingBlockNum);
+        } catch (NoSuchBeanException e) {
+            NodeItem nodeItem = NodeItem.builder().nodeId(nodeId).nodeName(nodeName).stakingBlockNum(stakingBlockNum).build();
             nodeCache.addNode(nodeItem);
         }
     }
