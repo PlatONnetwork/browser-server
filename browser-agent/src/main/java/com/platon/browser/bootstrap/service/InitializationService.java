@@ -2,7 +2,6 @@ package com.platon.browser.bootstrap.service;
 
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.bootstrap.exception.InitializationException;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import com.platon.browser.common.complement.bean.PeriodValueElement;
@@ -19,8 +18,8 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.utils.VerUtil;
 import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.VerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -63,10 +62,10 @@ public class InitializationService {
     @Transactional
     public InitializationResult init() throws Exception {
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
-        List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
-        if(networkStatList.isEmpty()){
+        NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
+        if(networkStat==null){
             // 创建新的统计记录
-            NetworkStat networkStat = CollectionNetworkStat.newInstance();
+            networkStat = CollectionNetworkStat.newInstance();
             networkStat.setCurNumber(1L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(0L);
@@ -82,8 +81,6 @@ public class InitializationService {
             return initialResult;
         }
 
-        if(networkStatList.size()>1) throw new InitializationException("启动自检出错:network_stat表存在多条网络统计状态数据!");
-        NetworkStat networkStat = networkStatList.get(0);
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
 
         // 初始化内置节点
