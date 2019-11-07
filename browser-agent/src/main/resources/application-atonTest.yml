@@ -82,6 +82,8 @@ platon:
   defaultStakingLockedAmount: 1500000
   #提案url参数模板
   proposalUrlTemplate: https://github.com/danielgogo/PIPs/PIP-{pip_id}.md
+  #提案pip_num参数模板
+  proposalPipNumTemplate: PIP-%s
   #keysBase网址
   keyBase: https://keybase.io/
   #keyBase api
