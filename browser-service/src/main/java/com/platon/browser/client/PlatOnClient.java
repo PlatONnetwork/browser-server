@@ -1,12 +1,16 @@
 package com.platon.browser.client;
 
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.platon.bean.Node;
 import org.web3j.platon.contracts.*;
 import org.web3j.protocol.Web3j;
@@ -160,6 +164,19 @@ public class PlatOnClient {
             cf = HttpUtil.postAsync(getWeb3jAddress(),rpcParam.toJsonString(), ReceiptResult.class);
         }
         return cf;
+    }
+
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,backoff=@Backoff(value=3000L))
+    public EconomicConfig getEconomicConfig() throws IOException {
+        try {
+            EconomicConfig ec = getWeb3j().getEconomicConfig().send().getEconomicConfig();
+            String msg = JSON.toJSONString(ec,true);
+            logger.info("链上配置:{}",msg);
+            return ec;
+        } catch (Exception e) {
+            logger.error("获取链上配置出错({}),将重试!", e.getMessage());
+            throw e;
+        }
     }
 
     public BigInteger getLatestBlockNumber() throws IOException {

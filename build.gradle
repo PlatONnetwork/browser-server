@@ -54,6 +54,8 @@ subprojects {
         }
         compile "org.elasticsearch:elasticsearch:$elasticSearchVersion"
         compile "org.elasticsearch.client:elasticsearch-rest-client:$elasticSearchVersion"
+
+        compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
     }
 
 	//sonar扫描的路径

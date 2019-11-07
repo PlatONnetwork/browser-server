@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.Retryable;
 import org.web3j.platon.bean.EconomicConfig;
 import org.web3j.utils.Convert;
 
@@ -151,23 +152,8 @@ public class BlockChainConfig {
     private List<CustomStaking> defaultStakings=new ArrayList<>();
 
     @PostConstruct
-    private void init() {
-        EconomicConfig dec;
-        while (true) try {
-            dec = client.getWeb3j().getEconomicConfig().send().getEconomicConfig();
-            break;
-        } catch (IOException e) {
-            logger.error("初始化链配置错误,将重试:{}", e.getMessage());
-            client.updateCurrentValidWeb3j();
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (Exception ex) {
-                logger.error("",ex);
-            }
-        }
-        String msg = JSON.toJSONString(dec,true);
-        logger.info("链上配置:{}",msg);
-        updateWithEconomicConfig(dec);
+    private void init() throws IOException {
+        updateWithEconomicConfig(client.getEconomicConfig());
     }
 
     private void updateWithEconomicConfig(EconomicConfig dec) {
