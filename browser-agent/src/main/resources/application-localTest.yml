@@ -51,7 +51,7 @@ logging:
   #日志级别
   level:
     org.springframework: error
-    com.platon.browser: error
+    com.platon.browser: info
 #PlatOn相关配置
 platon:
   # Web3j访问地址
