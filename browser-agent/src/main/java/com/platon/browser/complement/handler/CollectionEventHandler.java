@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.complement.service.param.BlockParameterService;
-import com.platon.browser.complement.service.param.TransactionParameterService;
-import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
+import com.platon.browser.complement.service.param.BlockParameterService;
+import com.platon.browser.complement.service.param.StatisticParameterService;
+import com.platon.browser.complement.service.param.TransactionParameterService;
+import com.platon.browser.elasticsearch.dto.Transaction;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +27,8 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     private TransactionParameterService transactionParameterService;
     @Autowired
     private BlockParameterService blockParameterService;
+    @Autowired
+    private StatisticParameterService statisticParameterService;
     @Autowired
     private ComplementEventPublisher complementEventPublisher;
 
@@ -43,7 +46,11 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             List<BusinessParam> param1 = blockParameterService.getParameters(event);
             // 根据交易解析出业务参数
             List<BusinessParam> param2 = transactionParameterService.getParameters(event);
+            // 统计业务参数
+            List<BusinessParam> param3 = statisticParameterService.getParameters(event);
+          
             param1.addAll(param2);
+            param1.addAll(param3);
 
             complementEventPublisher.publish(event.getBlock(),event.getTransactions(),param1);
         }catch (Exception e){

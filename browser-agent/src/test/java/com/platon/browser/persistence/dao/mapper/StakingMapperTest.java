@@ -336,14 +336,14 @@ public class StakingMapperTest extends TestBase {
         proposalBusinessMapper.vote(proposalVote);
     }
 
-    /**
-     * 地址数据统计
-     */
-    @Test
-    public void addressChangeMapper(){
-        AddressStatChange addressStatChange = addressStatChangeParam();
-        statisticBusinessMapper.addressChange(addressStatChange);
-    }
+//    /**
+//     * 地址数据统计
+//     */
+//    @Test
+//    public void addressChangeMapper(){
+//        AddressStatChange addressStatChange = addressStatChangeParam();
+//        statisticBusinessMapper.addressChange(addressStatChange);
+//    }
 
     /**
      *  其他数据统计
