@@ -1,11 +1,12 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigInteger;
+
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
 import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.utils.HexTool;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 
 /**
  * @description: 退出质押业务参数转换器
@@ -20,17 +21,12 @@ public class StakeExitConverter extends BusinessParamConverter<StakeExit> {
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         StakeExit businessParam= StakeExit.builder()
-                .bNum(txParam.getStakingBlockNum())
-                .nodeId(txParam.getNodeId())
-                .stakingBlockNum(txParam.getStakingBlockNum())
-                .txHash(tx.getHash())
-                .time(tx.getTime())
-                // TODO: 补充质押退出时所在的结算周期
-                //.stakingReductionEpoch()
+        		.nodeId(txParam.getNodeId())
+        		.txHash(tx.getHash())
+        		.stakingBlockNum(txParam.getStakingBlockNum())
+        		.time(tx.getTime())
+                .bNum(BigInteger.valueOf(tx.getNum()))
                 .build();
-        BeanUtils.copyProperties(txParam,businessParam);
-        // 更新节点缓存
-        updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
         return businessParam;
     }
 }

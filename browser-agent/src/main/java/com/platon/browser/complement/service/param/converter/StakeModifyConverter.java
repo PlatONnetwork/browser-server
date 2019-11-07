@@ -1,11 +1,13 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigInteger;
+
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 
 /**
  * @description: 修改验证人业务参数转换器
@@ -20,15 +22,17 @@ public class StakeModifyConverter extends BusinessParamConverter<StakeModify> {
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
         StakeModify businessParam= StakeModify.builder()
-                .nodeId(txParam.getNodeId())
-                .benefitAddr(txParam.getBenefitAddress())
-                .bNum(txParam.getBlockNumber())
-                .details(txParam.getDetails())
-                .externalId(txParam.getExternalId())
-                // TODO: 修改质押时如何判断当前质押是否是内置节点
-                //.isInit()
+        		.nodeId(txParam.getNodeId())
+        		.nodeName(txParam.getNodeName())
+        		.externalId(txParam.getExternalId())
+        		.benefitAddr(txParam.getBenefitAddress())
+        		.webSite(txParam.getWebsite())
+        		.details(txParam.getDetails())
+        		.isInit(isInit(txParam.getBenefitAddress())) 
+        		.stakingBlockNum(BigInteger.valueOf(tx.getNum()))
+        		.time(tx.getTime())
+        		.txHash(tx.getHash())               
                 .build();
-        BeanUtils.copyProperties(txParam,businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
         return businessParam;

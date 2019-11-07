@@ -1,16 +1,15 @@
 package com.platon.browser.complement.service.param.converter;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.complement.dto.stake.StakeCreate;
-import com.platon.browser.param.StakeCreateParam;
-import com.platon.browser.utils.VerUtil;
-import com.platon.browser.utils.HexTool;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import org.springframework.stereotype.Service;
+
+import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.dto.stake.StakeCreate;
+import com.platon.browser.param.StakeCreateParam;
+import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.VerUtil;
 
 
 /**
@@ -25,22 +24,24 @@ public class StakeCreateConverter extends BusinessParamConverter<StakeCreate> {
     @Override
     public StakeCreate convert(CollectionTransaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
-        txParam.setBlockNumber(BigInteger.valueOf(tx.getNum()));
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
         StakeCreate businessParam= StakeCreate.builder()
-                .benefitAddr(txParam.getBenefitAddress())
-                .stakingHes(new BigDecimal(txParam.getAmount()))
-                .webSite(txParam.getWebsite())
-                .stakingBlockNum(txParam.getBlockNumber())
-                .txHash(tx.getHash())
-                .stakingTxIndex(tx.getIndex())
-                .joinTime(tx.getTime())
-                .stakingAddr(tx.getFrom())
-                .bigVersion(bigVersion.toString())
-                .programVersion(txParam.getProgramVersion().toString())
-                .isInit(BusinessParam.YesNoEnum.NO.getCode())
+        		.nodeId(txParam.getNodeId())
+        		.stakingHes(new BigDecimal(txParam.getAmount()))
+        		.nodeName(txParam.getNodeName())
+        		.externalId(txParam.getExternalId())
+        		.benefitAddr(txParam.getBenefitAddress())
+        		.programVersion(txParam.getProgramVersion().toString())
+        		.bigVersion(bigVersion.toString())
+        		.webSite(txParam.getWebsite())
+        		.details(txParam.getDetails())
+        		.isInit(isInit(txParam.getBenefitAddress())) 
+        		.stakingBlockNum(BigInteger.valueOf(tx.getNum()))
+        		.stakingTxIndex(tx.getIndex())
+        		.stakingAddr(tx.getFrom())
+        		.joinTime(tx.getTime())
+        		.txHash(tx.getHash())               
                 .build();
-        BeanUtils.copyProperties(txParam,businessParam);
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
         return businessParam;
     }
