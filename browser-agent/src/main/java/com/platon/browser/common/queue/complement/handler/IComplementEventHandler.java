@@ -12,5 +12,5 @@ public interface IComplementEventHandler extends EventHandler<ComplementEvent> {
 
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    void onEvent(ComplementEvent event, long sequence, boolean endOfBatch);
+    void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) throws Exception;
 }
