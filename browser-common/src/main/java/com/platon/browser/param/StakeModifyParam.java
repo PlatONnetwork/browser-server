@@ -1,5 +1,6 @@
 package com.platon.browser.param;
 
+import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,9 @@ public class StakeModifyParam extends TxParam{
      * 被质押的节点Id(也叫候选人的节点Id)
      */
     private String nodeId;
+    public void setNodeId(String nodeId){
+        this.nodeId= HexTool.prefix(nodeId);
+    }
 
     /**
      * 外部Id(有长度限制，给第三方拉取节点描述的Id)

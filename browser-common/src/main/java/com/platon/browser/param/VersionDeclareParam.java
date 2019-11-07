@@ -1,5 +1,6 @@
 package com.platon.browser.param;
 
+import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class VersionDeclareParam extends TxParam{
      * 声明的节点，只能是验证人/候选人
      */
     private String activeNode;
+    public void setActiveNode(String activeNode){
+        this.activeNode= HexTool.prefix(activeNode);
+    }
 
     /**
      * 声明的版本

@@ -1,5 +1,6 @@
 package com.platon.browser.param;
 
+import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,9 @@ public class ProposalVoteParam extends TxParam{
      * 投票的验证人
      */
     private String verifier;
+    public void setVerifier(String verifier){
+        this.verifier= HexTool.prefix(verifier);
+    }
     /**
      * 提案ID
      */
