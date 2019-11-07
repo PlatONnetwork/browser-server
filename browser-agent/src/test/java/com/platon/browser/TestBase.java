@@ -260,21 +260,21 @@ public class TestBase {
     }
 
 
-    public AddressStatChange addressStatChangeParam(){
-        AddressStatChange addressStatChange = AddressStatChange.builder()
-                .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
-                .contractCreate("0xff48d9712d8a55bf603dab28f4645b6985696a61")
-                .contractCreatehash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be9")
-                .contractName("test")
-                .delegateQty(1)
-                .proposalQty(1)
-                .stakingQty(1)
-                .transferQty(1)
-                .txQty(4)
-                .type(1)
-                .build();
-        return addressStatChange;
-    }
+//    public AddressStatChange addressStatChangeParam(){
+//        AddressStatChange addressStatChange = AddressStatChange.builder()
+//                .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+//                .contractCreate("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+//                .contractCreatehash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be9")
+//                .contractName("test")
+//                .delegateQty(1)
+//                .proposalQty(1)
+//                .stakingQty(1)
+//                .transferQty(1)
+//                .txQty(4)
+//                .type(1)
+//                .build();
+//        return addressStatChange;
+//    }
 
     public NetworkStatChange networkStatChangeParam(){
         NetworkStatChange networkStatChange = NetworkStatChange.builder()
