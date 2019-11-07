@@ -35,15 +35,20 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private Set<Block> blockStage = new HashSet<>();
     private Set<Transaction> transactionStage = new HashSet<>();
 
+    private Long preBlockNum=0L;
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
-            if(blockStage.size()<batchSize) return;
+            if(blockStage.size()<batchSize) {
+                preBlockNum=event.getBlock().getNum();
+                return;
+            }
 
             // 入库ES
             esImportService.batchImport(blockStage,transactionStage, Collections.emptySet(),Collections.emptySet());
@@ -51,6 +56,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             redisImportService.batchImport(blockStage,transactionStage,Collections.emptySet());
             blockStage.clear();
             transactionStage.clear();
+
+            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("",e);
             throw e;

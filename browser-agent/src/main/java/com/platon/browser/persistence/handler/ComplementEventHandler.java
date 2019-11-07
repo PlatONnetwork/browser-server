@@ -23,8 +23,11 @@ public class ComplementEventHandler implements IComplementEventHandler {
     @Autowired
     private PersistenceEventPublisher persistenceEventPublisher;
 
+    private Long preBlockNum=0L;
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
+        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
+
         try {
             // 此处调用 persistence模块功能
             event.getBlock().setTransactions(null);
@@ -36,6 +39,8 @@ public class ComplementEventHandler implements IComplementEventHandler {
 
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
+
+            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("{}",e);
             throw e;

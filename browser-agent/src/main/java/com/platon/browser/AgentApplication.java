@@ -62,6 +62,7 @@ public class AgentApplication implements ApplicationRunner {
 	// 已采集的最高块号
 	private Long collectedNumber = 0L;
 
+	private Long preBlockNum=0L;
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		String status = System.getProperty(AppStatus.class.getName());
@@ -74,6 +75,7 @@ public class AgentApplication implements ApplicationRunner {
 		// 进入区块采集主流程
 		while (true) {
 			try {
+				preBlockNum=collectedNumber;
 				collectedNumber++;
 				// 检查区块号是否合法
 				blockService.checkBlockNumber(collectedNumber);
@@ -84,6 +86,8 @@ public class AgentApplication implements ApplicationRunner {
 				// 获取周期切换消息
 				EpochMessage epochMessage = epochService.getEpochMessage(collectedNumber);
 				blockEventPublisher.publish(blockCF, receiptCF,epochMessage);
+
+				if(preBlockNum!=0L&&(collectedNumber-preBlockNum!=1)) throw new AssertionError();
 			}catch (Exception e){
 				log.error("程序因错误而停止:",e);
 				break;

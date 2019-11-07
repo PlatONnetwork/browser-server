@@ -51,7 +51,7 @@ public class DbService {
                     return;
                 /*------------------统计相关业务 START------------------*/
                 case NETWORK_STATISTIC: // 网络统计
-//                    statisticBusinessMapper.networkChange(param);
+                    statisticBusinessMapper.networkChange(param);
                     return;
                 case ADDRESS_STATISTIC: // 地址统计
 //                    statisticBusinessMapper.addressChange(param);

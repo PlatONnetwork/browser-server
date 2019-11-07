@@ -40,8 +40,12 @@ public class CollectionEventHandler implements ICollectionEventHandler {
 
     // 交易序号id
     private long transactionId = 0;
-    
+
+    private Long preBlockNum=0L;
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+
+        if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
+
         // 使用已入库的交易数量初始化交易ID初始值
         if(transactionId==0) transactionId=networkStatCache.getNetworkStat().getTxQty();
         try {
@@ -60,6 +64,8 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             param1.addAll(param3);
 
             complementEventPublisher.publish(event.getBlock(),event.getTransactions(),param1);
+
+            preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
             log.error("{}",e);
             throw e;

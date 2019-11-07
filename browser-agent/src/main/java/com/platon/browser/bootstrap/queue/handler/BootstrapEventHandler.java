@@ -38,6 +38,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private Set<Transaction> transactions=new HashSet<>();
     private Set<Delegation> delegations=new HashSet<>();
     private Set<NodeOpt> nodeOpts=new HashSet<>();
+
+    private Long preBlockNum=0L;
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
     public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
@@ -46,6 +48,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             ReceiptResult receiptResult = event.getReceiptCF().get();
             CollectionBlock block = CollectionBlock.newInstance().updateWithRawBlockAndReceiptResult(rawBlock,receiptResult);
 
+            if(preBlockNum!=0L&&(block.getNum()-preBlockNum!=1)) throw new AssertionError();
+
             clear();
             blocks.add(block);
             transactions.addAll(block.getTransactions());
@@ -53,6 +57,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             esImportService.batchImport(blocks,transactions,delegations,nodeOpts);
             redisImportService.batchImport(blocks,transactions, Collections.emptySet());
             clear();
+            preBlockNum=block.getNum();
             event.getCallback().call(block.getNum());
         }catch (Exception e){
             log.error("",e);

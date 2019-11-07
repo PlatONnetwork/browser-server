@@ -59,25 +59,33 @@ public class ConsistencyService {
         log.warn("MYSQL最高交易序号:{}",mysqlTransactionId);
         // 计算同步开始区块号
         long esMaxBlockNum = mysqlMaxBlockNum;
-        while (true){
-            if(esMaxBlockNum==0) break;
-            boolean exist = blockESRepository.exists(String.valueOf(esMaxBlockNum));
-            if(exist) break;
-            esMaxBlockNum--;
+        boolean exist =false;
+        while (!exist){
+            exist = blockESRepository.exists(String.valueOf(esMaxBlockNum));
+            if(!exist) {
+                esMaxBlockNum--;
+                // 小于等于0时需要退出
+                if(esMaxBlockNum<=0) {
+                    exist=true;
+                }
+            }
         }
         log.warn("ES区块索引最高区块号:{}",esMaxBlockNum);
         // 取ES中的交易最高序号
         long esMaxTransactionId = mysqlTransactionId;
-        while (true){
-            if(esMaxTransactionId==0) break;
+        exist=false;
+        while (!exist){
             Transaction tx = transactionESRepository.get(String.valueOf(esMaxTransactionId), Transaction.class);
-            if(tx!=null) {
+            if(tx==null){
+                esMaxTransactionId--;
+                // 小于等于0时需要退出
+                if(esMaxTransactionId<=0) exist=true;
+            } else {
+                exist=true;
                 // 更新区块号，以最小块号为准
                 esMaxBlockNum=tx.getNum()<esMaxBlockNum?tx.getNum():esMaxBlockNum;
                 log.warn("ES交易索引最高交易序号:{}",tx.getId());
-                break;
             }
-            esMaxTransactionId--;
         }
         log.warn("ES交易索引最高区块号:{}",esMaxBlockNum);
 
