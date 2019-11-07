@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
@@ -78,6 +79,8 @@ public class TransactionParameterService {
     private ProposalVersionConverter  proposalVersionConverter;
     @Autowired
     private RestrictingCreateConverter restrictingCreateConverter;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -88,10 +91,13 @@ public class TransactionParameterService {
         List<CollectionTransaction> transactions = event.getTransactions();
         List<BusinessParam> businessParams = new ArrayList<>();
         if(transactions.isEmpty()) return businessParams;
+        
+        int txQty = transactions.size();
+        int proposalQty = 0;
+
         for (CollectionTransaction tx : transactions) {
         	//补充txInfo
-        	supplementService.supplement(tx);
-             	
+        	supplementService.supplement(tx);      	
             try{
                 // 失败的交易不分析业务数据
                 if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) continue;
@@ -125,14 +131,17 @@ public class TransactionParameterService {
                     case PROPOSAL_TEXT: // 2000
                     	ProposalText param2000 = proposalTextConverter.convert(event,tx);
                         businessParams.add(param2000);
+                        proposalQty++;
                         break;
                     case PROPOSAL_UPGRADE: // 2001
                     	ProposalUpgrade param2001 = proposalUpgradeConverter.convert(event,tx);
                         businessParams.add(param2001);
+                        proposalQty++;
                         break;
                     case PROPOSAL_CANCEL: // 2005
                        	ProposalCancel param2005 = proposalCancelConverter.convert(event,tx);
                         businessParams.add(param2005);
+                        proposalQty++;
                         break;
                     case PROPOSAL_VOTE: // 2003
                      	ProposalVote param2003 = proposalVoteConverter.convert(event,tx);
@@ -142,13 +151,13 @@ public class TransactionParameterService {
                        	ProposalVersion param2004 = proposalVersionConverter.convert(event,tx);
                         businessParams.add(param2004);
                         break;
-                    case REPORT: // 3000 举报双签
+                    case REPORT: // 3000
                         Report param3000 = reportConverter.convert(event,tx);
                         businessParams.add(param3000);
                         break;
                     case RESTRICTING_CREATE: // 4000
                     	RestrictingCreate param4000 = restrictingCreateConverter.convert(event,tx);
-                    	 businessParams.add(param4000);
+                    	businessParams.add(param4000);
                         break;
                     default:
                         break;
@@ -158,7 +167,9 @@ public class TransactionParameterService {
             }
            
         }
-          
+        
+        networkStatCache.updateByBlock(txQty, proposalQty, event.getBlock().getTime());
+        
         return businessParams;
     }
 }

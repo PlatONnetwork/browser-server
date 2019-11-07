@@ -18,7 +18,7 @@ public class ProposalVersionConverter extends BusinessParamConverter<ProposalVer
     @Override
     public ProposalVersion convert(CollectionEvent event, CollectionTransaction tx) {
     	VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
-
+    	
     	ProposalVersion businessParam= ProposalVersion.builder()    		
                 .build();
         return businessParam;
