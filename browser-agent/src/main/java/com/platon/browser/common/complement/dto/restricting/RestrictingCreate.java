@@ -34,7 +34,7 @@ insert into `rp_plan`
 @Accessors(chain = true)
 public class RestrictingCreate extends BusinessParam {
 	
-	List<RestrictingItem> itemList = new ArrayList<RestrictingItem>();
+	List<RestrictingItem> itemList;
 
     @Override
     public BusinessType getBusinessType() {

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.proposal.ProposalVersion;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.VersionDeclareParam;
 
 /**
@@ -18,8 +19,14 @@ public class ProposalVersionConverter extends BusinessParamConverter<ProposalVer
     @Override
     public ProposalVersion convert(CollectionEvent event, CollectionTransaction tx) {
     	VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
+ 
+        String desc = CustomNodeOpt.TypeEnum.VERSION.getTpl()
+                .replace("NODE_NAME",txParam.getNodeName())
+                .replace("VERSION",String.valueOf(txParam.getVersion()))
+                .replace("ACTIVE_NODE", txParam.getActiveNode());
     	
-    	ProposalVersion businessParam= ProposalVersion.builder()    		
+    	ProposalVersion businessParam= ProposalVersion.builder()  
+    			.optDesc(desc)
                 .build();
         return businessParam;
     }
