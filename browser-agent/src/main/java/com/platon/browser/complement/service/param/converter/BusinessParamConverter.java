@@ -7,6 +7,7 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 
@@ -36,5 +37,5 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    abstract T convert(CollectionTransaction tx);
+    abstract T convert(CollectionEvent event, CollectionTransaction tx);
 }

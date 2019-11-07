@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.utils.HexTool;
 
@@ -19,7 +20,7 @@ import com.platon.browser.utils.HexTool;
 public class StakeIncreaseConverter extends BusinessParamConverter<StakeIncrease> {
 
     @Override
-    public StakeIncrease convert(CollectionTransaction tx) {
+    public StakeIncrease convert(CollectionEvent event, CollectionTransaction tx) {
         // 增持质押
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
         StakeIncrease businessParam= StakeIncrease.builder()        		

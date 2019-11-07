@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 
@@ -18,7 +19,7 @@ import com.platon.browser.utils.HexTool;
 public class StakeModifyConverter extends BusinessParamConverter<StakeModify> {
 
     @Override
-    public StakeModify convert(CollectionTransaction tx) {
+    public StakeModify convert(CollectionEvent event, CollectionTransaction tx) {
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
         StakeModify businessParam= StakeModify.builder()

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.DelegateExitParam;
 
@@ -23,7 +24,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
     private BlockChainConfig chainConfig;
 	
     @Override
-    public DelegateExit convert(CollectionTransaction tx) {
+    public DelegateExit convert(CollectionEvent event, CollectionTransaction tx) {
     	DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
 
         DelegateExit businessParam= DelegateExit.builder()

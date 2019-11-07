@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
@@ -22,7 +23,7 @@ public class StakeCreateConverter extends BusinessParamConverter<StakeCreate> {
 
 
     @Override
-    public StakeCreate convert(CollectionTransaction tx) {
+    public StakeCreate convert(CollectionEvent event, CollectionTransaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
         StakeCreate businessParam= StakeCreate.builder()

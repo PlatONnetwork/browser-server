@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeExitParam;
 
 /**
@@ -17,7 +18,7 @@ import com.platon.browser.param.StakeExitParam;
 public class StakeExitConverter extends BusinessParamConverter<StakeExit> {
 
     @Override
-    public StakeExit convert(CollectionTransaction tx) {
+    public StakeExit convert(CollectionEvent event, CollectionTransaction tx) {
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         StakeExit businessParam= StakeExit.builder()
@@ -26,7 +27,9 @@ public class StakeExitConverter extends BusinessParamConverter<StakeExit> {
         		.stakingBlockNum(txParam.getStakingBlockNum())
         		.time(tx.getTime())
                 .bNum(BigInteger.valueOf(tx.getNum()))
+                .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
+        
         return businessParam;
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.DelegateCreateParam;
 
 /**
@@ -18,7 +19,7 @@ import com.platon.browser.param.DelegateCreateParam;
 public class DelegateCreateConverter extends BusinessParamConverter<DelegateCreate> {
 
     @Override
-    public DelegateCreate convert(CollectionTransaction tx) {
+    public DelegateCreate convert(CollectionEvent event, CollectionTransaction tx) {
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
 
         DelegateCreate businessParam= DelegateCreate.builder()
