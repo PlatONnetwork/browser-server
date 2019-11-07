@@ -1,5 +1,6 @@
 package com.platon.browser.param;
 
+import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,9 @@ public class DelegateExitParam extends TxParam{
      * 被质押的节点Id(也叫候选人的节点Id)
      */
     private String nodeId;
+    public void setNodeId(String nodeId){
+        this.nodeId= HexTool.prefix(nodeId);
+    }
 
     /**
      * 减持委托的金额(按照最小单位算，1LAT = 10**18 von)

@@ -31,6 +31,7 @@ public class RestrictingCreateParam extends TxParam{
      */
     @Data
     @Builder
+    @AllArgsConstructor
     @Accessors(chain = true)
     public static class RestrictingPlan {
         /**

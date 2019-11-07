@@ -57,14 +57,14 @@ public class BlockParameterService {
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            List<String> preVerifierList = new ArrayList<>();
-            event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierList.add(v.getNodeId()));
+            List<String> preValidatorList = new ArrayList<>();
+            event.getEpochMessage().getPreValidatorList().forEach(v->preValidatorList.add(v.getNodeId()));
             
             Election election = Election.builder()
                     .bNum(BigInteger.valueOf(block.getNum()))
                     .time(block.getTime())
                     .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                    .preVerifierList(preVerifierList)
+                    .preValidatorList(preValidatorList)
                     .build();
             businessParams.add(election);
         }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 区块事件处理器
@@ -41,6 +42,11 @@ public class ComplementEventHandler implements IComplementEventHandler {
             persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
 
             preBlockNum=event.getBlock().getNum();
+            try {
+                TimeUnit.MICROSECONDS.sleep(200);
+            }catch (InterruptedException e){
+                log.error("",e);
+            }
         }catch (Exception e){
             log.error("{}",e);
             throw e;
