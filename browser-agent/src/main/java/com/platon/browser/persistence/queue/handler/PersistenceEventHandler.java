@@ -50,9 +50,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
                 return;
             }
 
-            // 入库ES
+            // 入库ES TODO: 入库委托记录和节点操作记录到ES
             esImportService.batchImport(blockStage,transactionStage, Collections.emptySet(),Collections.emptySet());
-            // 入库Redis
+            // 入库Redis TODO: 更新Redis中的统计记录
             redisImportService.batchImport(blockStage,transactionStage,Collections.emptySet());
             blockStage.clear();
             transactionStage.clear();

@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
 <update id="election" parameterType="com.platon.browser.common.complement.dto.epoch.Election">
 	create temporary table tmp(`id` varchar(130)) ENGINE = MEMORY;
-	insert into tmp(`id`) select `node_id` from staking where `status` = 1 and `node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach> and `pre_cons_block_qty` = 0;
+	insert into tmp(`id`) select `node_id` from staking where `status` = 1 and `node_id` in <foreach open="(" collection="preValidatorList" item="item"  separator="," close=")"> #{item} </foreach> and `pre_cons_block_qty` = 0;
 
 	update `staking` set
 	`staking_hes` = 0,
@@ -17,7 +17,7 @@
 	where
 	`status` = 1
 	and
-	`node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach>
+	`node_id` in <foreach open="(" collection="preValidatorList" item="item"  separator="," close=")"> #{item} </foreach>
 	and
 	`pre_cons_block_qty` = 0;
 

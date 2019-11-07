@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +26,7 @@ public class Election  extends BusinessParam {
     /**
      * 上轮结算周期验证人
      */
-    private List <String> preVerifierList;
+    private List <String> preValidatorList;
 
     /**
      *  结算周期
