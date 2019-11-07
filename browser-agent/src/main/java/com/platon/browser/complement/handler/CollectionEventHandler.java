@@ -3,6 +3,7 @@ package com.platon.browser.complement.handler;
 import java.util.Comparator;
 import java.util.List;
 
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -16,6 +17,8 @@ import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 
 import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 区块事件处理器
@@ -32,11 +35,15 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     @Autowired
     private ComplementEventPublisher complementEventPublisher;
 
-    // TODO: 启动时需要使用初始化数据初始化交易序号id
+    @Autowired
+    private NetworkStatCache networkStatCache;
+
+    // 交易序号id
     private long transactionId = 0;
     
-    
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+        // 使用已入库的交易数量初始化交易ID初始值
+        if(transactionId==0) transactionId=networkStatCache.getNetworkStat().getTxQty();
         try {
             // 确保交易从小到大的索引顺序
             event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));

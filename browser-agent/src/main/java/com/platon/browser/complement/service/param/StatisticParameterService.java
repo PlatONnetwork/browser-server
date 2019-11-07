@@ -66,6 +66,8 @@ public class StatisticParameterService {
         	.addIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
         	.addIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
         	.nextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
+			.issueValue(BigDecimal.ZERO) // 发行量
+			.turnValue(BigDecimal.ZERO) // 流通量
         	.build();
         businessParams.add(networkStatChange);
         
