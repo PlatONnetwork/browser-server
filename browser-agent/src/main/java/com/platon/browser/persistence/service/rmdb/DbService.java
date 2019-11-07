@@ -1,10 +1,7 @@
 package com.platon.browser.persistence.service.rmdb;
 
 import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.persistence.dao.mapper.EpochBusinessMapper;
-import com.platon.browser.persistence.dao.mapper.NewBlockMapper;
-import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
-import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.persistence.dao.mapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,8 @@ public class DbService {
     private EpochBusinessMapper epochBusinessMapper;
     @Autowired
     private NewBlockMapper newBlockMapper;
+    @Autowired
+    private StatisticBusinessMapper statisticBusinessMapper;
 
     public void insert(List<BusinessParam> params){
         params.forEach(param->{
@@ -66,6 +65,9 @@ public class DbService {
                 case VERSION_DECLARE: // 2004 TODO: 版本声明
 
                     return;
+                case SLASH_LOW_RATE: // 低出块率
+
+                    return;
                 case REPORT: // 3000 举报双签
 //                    slashBusinessMapper.report(param);
                     return;
@@ -84,6 +86,13 @@ public class DbService {
                 case SETTLE_EPOCH: // 结算周期切换
 //                    epochBusinessMapper.settle(param);
                     return;
+                case NETWORK_STATISTIC: // 网络统计
+                    statisticBusinessMapper.networkChange(param);
+                    return;
+                case ADDRESS_STATISTIC: // 地址统计
+
+                    return;
+
                 default:
                     return;
             }

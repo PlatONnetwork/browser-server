@@ -58,7 +58,7 @@ public class StakingMapperTest extends TestBase {
     private EpochBusinessMapper epochBusinessMapper;
 
     @Autowired
-    private DeletageBusinessMapper deletageBusinessMapper;
+    private DelegateBusinessMapper delegateBusinessMapper;
 
     @Autowired
     private ProposalBusinessMapper proposalBusinessMapper;
@@ -280,7 +280,7 @@ public class StakingMapperTest extends TestBase {
     @Test
     public void delegationCreateMapper(){
         DelegateCreate delegateCreate = delegateCreateParam();
-        deletageBusinessMapper.create(delegateCreate);
+        delegateBusinessMapper.create(delegateCreate);
     }
 
     /**
@@ -289,7 +289,7 @@ public class StakingMapperTest extends TestBase {
     @Test
     public void delegationExitMapper(){
         DelegateExit delegateExit = delegateExitParam();
-        deletageBusinessMapper.exit(delegateExit);
+        delegateBusinessMapper.exit(delegateExit);
     }
 
     public Staking getStaking ( String nodeId, long stakingBlockNumer ) {
@@ -351,6 +351,6 @@ public class StakingMapperTest extends TestBase {
     @Test
     public void netWorkChangeMapper(){
         NetworkStatChange networkStatChange = networkStatChangeParam();
-        statisticBusinessMapper.netWorkChange(networkStatChange);
+        statisticBusinessMapper.networkChange(networkStatChange);
     }
 }

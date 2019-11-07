@@ -50,8 +50,8 @@ logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
-    org.springframework: debug
-    com.platon.browser.complement.queue.callback: debug
+    org.springframework: error
+    com.platon.browser: error
 #PlatOn相关配置
 platon:
   # Web3j访问地址

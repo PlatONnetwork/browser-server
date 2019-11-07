@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @Date:  2019/10/31
  * @Description:
  */
-public interface DeletageBusinessMapper {
+public interface DelegateBusinessMapper {
     /**
      * 发起委托
      * @param param

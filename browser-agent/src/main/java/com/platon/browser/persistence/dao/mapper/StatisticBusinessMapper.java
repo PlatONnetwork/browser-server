@@ -21,7 +21,7 @@ public interface StatisticBusinessMapper {
      * @param param
      */
     @Transactional
-    void netWorkChange ( BusinessParam param );
+    void networkChange ( BusinessParam param );
 
 
 }
