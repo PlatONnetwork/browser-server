@@ -3,29 +3,33 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
 <update id="settle" parameterType="com.platon.browser.common.complement.dto.epoch.Settle">
 
-    update `staking` set
-        `staking_locked` = `staking_locked` + `staking_hes`,
-        `staking_hes` = 0,
-        `staking_reduction` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch} ,0, `staking_reduction`),
-        `status` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 3, `status`),
-        `staking_reward_value` = if(`node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach>, `staking_reward_value` + #{feeRewardValue}, `staking_reward_value`),
-        `is_settle` = if(`node_id` in <foreach open="(" collection="curVerifierList" item="curVerifier"  separator="," close=")"> #{curVerifier} </foreach>, 1,  2),
-        `annualized_rate` = #{annualizedRate},
-        `annualized_rate_info` = #{annualizedRateInfo}
-    where
-        `status` in (1, 2);
+    <foreach collection="stakingList" item="staking"  separator="," >
+        update `staking` set
+        `staking_locked` = #{staking.stakingLocked},
+        `staking_hes` = #{staking.stakingHes},
+        `staking_reduction` = #{staking.stakingReduction},
+        `status` = #{staking.status},
+        `staking_reward_value` =  `staking_reward_value` + #{staking.feeRewardValue},
+        `is_settle` = #{staking.isSettle},
+        `annualized_rate` = #{staking.annualizedRate},
+        `annualized_rate_info` = #{staking.annualizedRateInfo}
+        where `node_id` = #{staking.nodeId}
+        and staking_block_num = #{staking.stakingBlockNum};
+    </foreach>
 
-
-    update `node` set
-        `staking_locked` = `staking_locked` + `staking_hes`,
-        `staking_hes` = 0,
-        `staking_reduction` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 0, `staking_reduction`),
-        `status` = if(`status` = 2 and `staking_reduction_epoch` + #{stakingLockEpoch} &lt; #{settingEpoch}, 3, `status`),
-        `stat_staking_reward_value` = if(`node_id` in <foreach open="(" collection="preVerifierList" item="preVerifier"  separator="," close=")"> #{preVerifier} </foreach>, `stat_staking_reward_value` +  #{feeRewardValue}, `stat_staking_reward_value`),
-        `is_settle` = if(`node_id` in <foreach open="(" collection="curVerifierList" item="curVerifier"  separator="," close=")"> #{curVerifier} </foreach>, 1,  2),
-        `annualized_rate` = #{annualizedRate}
-    where
-      `status` in (1, 2);
+    <foreach collection="stakingList" item="staking"  separator="," >
+      update `node` set
+        `staking_locked` = #{staking.stakingLocked},
+        `staking_hes` = #{staking.stakingHes},
+        `staking_reduction` = #{staking.stakingReduction},
+        `status` = #{staking.status},
+        `stat_staking_reward_value` = `staking_reward_value` + #{staking.feeRewardValue},
+        `is_settle` = #{staking.isSettle},
+        `annualized_rate` = #{staking.annualizedRate},
+        `annualized_rate_info` = #{staking.annualizedRateInfo}
+      where
+        `node_id` =  #{staking.nodeId}
+    </foreach>
 
     update `delegation` set
         `delegate_hes` = 0,
@@ -40,8 +44,6 @@
     `stat_delegate_locked` = `stat_delegate_hes` + `stat_delegate_locked`
     where
       `stat_delegate_hes` > 0;
-
-
 
 </update>
 </mapper>

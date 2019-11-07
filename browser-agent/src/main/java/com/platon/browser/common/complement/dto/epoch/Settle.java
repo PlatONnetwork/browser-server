@@ -6,6 +6,7 @@ import java.util.List;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.enums.BusinessType;
 
+import com.platon.browser.dao.entity.Staking;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -44,6 +45,12 @@ public class Settle  extends BusinessParam {
      * 解除质押锁定金额的轮数
      */
     private int stakingLockEpoch;
+
+
+    /**
+     * 候选中，退出中，列表
+     */
+    private List<Staking> stakingList;
 
     @Override
     public BusinessType getBusinessType () {
