@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 
 /**
- * @description: 修改验证人业务参数转换器
+ * @description: 举报验证人业务参数转换器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 17:58:27
  **/
@@ -19,7 +19,7 @@ public class ReportConverter extends BusinessParamConverter<Report> {
 
     @Override
     public Report convert(CollectionTransaction tx) {
-        // 修改质押信息
+        // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         Report businessParam= Report.builder()
                 .nodeId(txParam.getVerify())

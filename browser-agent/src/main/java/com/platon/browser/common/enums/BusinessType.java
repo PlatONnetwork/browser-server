@@ -10,8 +10,8 @@ public enum BusinessType {
     DELEGATE_CREATE,DELEGATE_EXIT,
     // 提案：文本、版本、升级、投票、取消
     PROPOSAL_TEXT,PROPOSAL_VERSION,PROPOSAL_UPGRADE,PROPOSAL_VOTE,PROPOSAL_CANCEL,
-    // 处罚：低出块率、举报
-    SLASH_LOW_RATE,REPORT,
+    // 处罚：举报
+    REPORT,
     // 版本声明
     VERSION_DECLARE,
     // 创建锁仓计划
