@@ -4,7 +4,7 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.param.StakeCreateParam;
-import com.platon.browser.util.VerUtil;
+import com.platon.browser.utils.VerUtil;
 import com.platon.browser.utils.HexTool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

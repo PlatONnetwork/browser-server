@@ -1,12 +1,12 @@
 package com.platon.browser.bootstrap.service;
 
 
-import com.alibaba.fastjson.JSON;
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.bootstrap.exception.InitializationException;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
 import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import com.platon.browser.common.complement.bean.PeriodValueElement;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.service.epoch.EpochRetryService;
@@ -19,7 +19,7 @@ import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomNode;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.util.VerUtil;
+import com.platon.browser.utils.VerUtil;
 import com.platon.browser.utils.HexTool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,11 +57,12 @@ public class InitializationService {
 
     @Autowired
     private NodeCache nodeCache;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 
     @Transactional
     public InitializationResult init() throws Exception {
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
-
         List<NetworkStat> networkStatList = networkStatMapper.selectByExample(null);
         if(networkStatList.isEmpty()){
             // 创建新的统计记录
@@ -69,12 +70,15 @@ public class InitializationService {
             networkStat.setCurNumber(1L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(0L);
-
+            // 删除节点表和质押表数据
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
-
+            // 初始化内置节点
             List<Staking> stakings = initInnerStake();
+            // 初始化节点缓存
             initNodeCache(stakings);
+            // 初始化网络缓存
+            networkStatCache.setNetworkStat(networkStat);
             return initialResult;
         }
 
@@ -82,10 +86,13 @@ public class InitializationService {
         NetworkStat networkStat = networkStatList.get(0);
         initialResult.setCollectedBlockNumber(networkStat.getCurNumber());
 
+        // 初始化内置节点
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria().andStatusEqualTo(CustomStaking.StatusEnum.CANDIDATE.getCode());
         List<Staking> stakings = stakingMapper.selectByExample(stakingExample);
         initNodeCache(stakings);
+        // 初始化网络缓存
+        networkStatCache.setNetworkStat(networkStat);
         return initialResult;
     }
 

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import com.platon.browser.util.VerUtil;
+import com.platon.browser.utils.VerUtil;
 
 /**
  * 

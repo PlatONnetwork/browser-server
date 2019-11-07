@@ -3,7 +3,7 @@ package com.platon.browser.config;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.platon.browser.util.VerUtil;
+import com.platon.browser.utils.VerUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

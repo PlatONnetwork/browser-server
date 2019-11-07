@@ -6,6 +6,7 @@ import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.param.StakeExitParam;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.utils.HexTool;
+import com.platon.browser.utils.VerUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -110,14 +111,19 @@ public class CustomStaking extends Staking {
         // 第三方社交软件关联id
         this.setExternalId(node.getExternalId());
         // 收益地址
-//        this.setDenefitAddr(node.getBenifitAddress());
+        this.setBenefitAddr(node.getBenifitAddress());
 //        // 节点状态 1：候选中 2：退出中 3：已退出
 //        if(node.getStatus()!=null) this.setStatus(node.getStatus().intValue());
 //        // 节点名称(质押节点名称)
-//        this.setStakingName(StringUtils.isBlank(node.getNodeName())?this.getStakingName():node.getNodeName());
+        this.setNodeIcon(StringUtils.isBlank(node.getNodeName())?this.getNodeName():node.getNodeName());
         // 节点的第三方主页
         this.setWebSite(node.getWebsite());
         this.setDetails(node.getDetails());
+
+        BigInteger programVersion=node.getProgramVersion();
+        BigInteger bigVersion = VerUtil.transferBigVersion(programVersion);
+        this.setProgramVersion(programVersion.toString());
+        this.setBigVersion(bigVersion.toString());
     }
 
     /**
