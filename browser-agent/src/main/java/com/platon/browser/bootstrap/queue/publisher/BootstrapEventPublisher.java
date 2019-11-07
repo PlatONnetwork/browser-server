@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * 区块事件生产者
+ * 自检事件生产者
  */
 @Slf4j
 @Component

@@ -60,21 +60,18 @@ public class AgentApplication implements ApplicationRunner {
 	private InitializationService initializationService;
 
 	// 已采集的最高块号
-	// TODO: 启动时需要使用初始化数据初始化区块号
 	private Long collectedNumber = 0L;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		String status = System.getProperty(AppStatus.class.getName());
 		if(StringUtils.isNotBlank(status)&&AppStatus.valueOf(status)==AppStatus.STOP) return;
-
-        // 启动(mysql/es/redis)一致性检查
+        // 进入一致性自检子流程
         consistencyService.synchronize();
-
-		// 启动初始化子流程
+		// 进入应用初始化子流程
 		InitializationResult initialResult = initializationService.init();
 		collectedNumber = initialResult.getCollectedBlockNumber();
-
+		// 进入区块采集主流程
 		while (true) {
 			try {
 				collectedNumber++;

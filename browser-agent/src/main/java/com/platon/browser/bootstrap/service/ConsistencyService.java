@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @description: MySQL/ES/Redis启动一致性服务
+ * @description: MySQL/ES/Redis启动一致性自检服务
  * @author: chendongming@juzix.net
  * @create: 2019-11-06 10:10:30
  **/

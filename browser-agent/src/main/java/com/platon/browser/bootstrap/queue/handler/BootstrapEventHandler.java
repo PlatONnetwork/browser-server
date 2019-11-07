@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
- * 区块事件处理器
+ * 自检事件处理器
  */
 @Slf4j
 @Component

@@ -10,7 +10,7 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 区块搜集事件
+ * 自检事件
  */
 @Data
 @Builder
