@@ -142,6 +142,8 @@ public class BlockChainConfig {
     private Map<Integer,BigDecimal> foundationSubsidies;
     //提案url参数模板
     private String proposalUrlTemplate;
+    //提案pip_num参数模板
+    private String proposalPipNumTemplate;
     //keyBase
     private String keyBase;
     //keyBaseApi

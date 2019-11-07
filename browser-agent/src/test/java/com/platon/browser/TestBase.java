@@ -9,7 +9,7 @@ import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.common.complement.dto.proposal.ProposalText;
-import com.platon.browser.common.complement.dto.proposal.ProposalUpgradeOrCancel;
+import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.proposal.ProposalVote;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
@@ -239,8 +239,8 @@ public class TestBase {
     }
 
 
-    public ProposalUpgradeOrCancel proposalUpgradeOrCancelParam(){
-        ProposalUpgradeOrCancel proposalUpgradeOrCancel = ProposalUpgradeOrCancel.builder()
+    public ProposalUpgrade proposalUpgradeOrCancelParam(){
+        ProposalUpgrade proposalUpgradeOrCancel = ProposalUpgrade.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .pIDID("100")
                 .url("https://github.com/danielgogo/PIPs/PIP-100.md")

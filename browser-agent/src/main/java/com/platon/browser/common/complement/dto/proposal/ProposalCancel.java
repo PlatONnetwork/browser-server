@@ -9,13 +9,11 @@ import com.platon.browser.common.enums.BusinessType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
-@Slf4j
 @Builder
 @Accessors(chain = true)
-public class ProposalUpgradeOrCancel extends BusinessParam {
+public class ProposalCancel extends BusinessParam {
 
     /**
      * 节点id
@@ -82,19 +80,6 @@ public class ProposalUpgradeOrCancel extends BusinessParam {
      * 质押名称
      */
     private String stakingName;
-
-
-    /**
-     * 生效块高
-     */
-    private BigInteger activeBlock;
-
-    /**
-     * 新版本号
-     */
-    private String newVersion;
-
-
 
     @Override
     public BusinessType getBusinessType() {

@@ -5,7 +5,7 @@ import com.platon.browser.TestBase;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.proposal.ProposalText;
-import com.platon.browser.common.complement.dto.proposal.ProposalUpgradeOrCancel;
+import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.proposal.ProposalVote;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
@@ -314,7 +314,7 @@ public class StakingMapperTest extends TestBase {
      */
     @Test
     public void proposalUpgradeMapper(){
-        ProposalUpgradeOrCancel proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
+        ProposalUpgrade proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
         proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
     }
 
@@ -323,7 +323,7 @@ public class StakingMapperTest extends TestBase {
      */
     @Test
     public void ProposalCancelMapper(){
-        ProposalUpgradeOrCancel proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
+        ProposalUpgrade proposalUpgradeOrCancel = proposalUpgradeOrCancelParam();
         proposalBusinessMapper.upgrade(proposalUpgradeOrCancel);
     }
 

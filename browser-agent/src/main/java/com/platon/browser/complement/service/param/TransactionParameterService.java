@@ -11,6 +11,7 @@ import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.proposal.ProposalText;
+import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
@@ -28,6 +29,7 @@ import com.platon.browser.complement.service.param.converter.StakeModifyConverte
 import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
+import com.platon.browser.param.ProposalUpgradeParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -109,8 +111,9 @@ public class TransactionParameterService {
                         businessParams.add(param2000);
                         break;
                     case PROPOSAL_UPGRADE: // 2001 TODO: 提交升级提案
-
-                        break;
+//                    	ProposalUpgrade param2001 = proposalUpgradeConverter.convert(tx);
+//                        businessParams.add(param2000);
+//                        break;
                     case PROPOSAL_CANCEL: // 2005 TODO: 提交取消提案
 
                         break;
