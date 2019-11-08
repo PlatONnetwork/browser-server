@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
@@ -81,6 +82,8 @@ public class TransactionParameterService {
     private RestrictingCreateConverter restrictingCreateConverter;
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private AddressCache addressCache;
 
     /**
      * 解析交易, 构造业务入库参数信息
@@ -97,7 +100,9 @@ public class TransactionParameterService {
 
         for (CollectionTransaction tx : transactions) {
         	//补充txInfo
-        	supplementService.supplement(tx);      	
+        	supplementService.supplement(tx);
+        	addressCache.update(tx);
+        	
             try{
                 // 失败的交易不分析业务数据
                 if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) continue;
