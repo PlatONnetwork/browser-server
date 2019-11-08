@@ -47,16 +47,23 @@ public class ProposalTextConverter extends BusinessParamConverter<Optional<Compl
     			.timestamp(tx.getTime())
     			.stakingName(txParam.getNodeName())
                 .build();
-    	
-    	String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
+    	proposalBusinessMapper.text(businessParam);
+
+
+		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode())
 				.replace("VERSION","");
- 
 
-    	proposalBusinessMapper.text(businessParam);
-    	
-        return Optional.ofNullable(null);
+		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+		c.setNodeId(txParam.getVerifier());
+		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+		c.setDesc(desc);
+		c.setTxHash(tx.getHash());
+		c.setBNum(event.getBlock().getNum());
+		c.setTime(event.getBlock().getTime());
+
+        return Optional.ofNullable(c);
     }
 }

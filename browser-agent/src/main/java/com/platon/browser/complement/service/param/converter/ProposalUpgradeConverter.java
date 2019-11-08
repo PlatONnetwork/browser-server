@@ -50,15 +50,26 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<Co
     			.newVersion(String.valueOf(txParam.getNewVersion()))
                 .build();
     	
-    	String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
+
+
+
+    	proposalBusinessMapper.upgrade(businessParam);
+
+
+		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode())
 				.replace("VERSION",businessParam.getNewVersion());
- 
 
-    	proposalBusinessMapper.upgrade(businessParam);
-    	
-        return Optional.ofNullable(null);
+
+		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+		c.setNodeId(txParam.getVerifier());
+		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+		c.setDesc(desc);
+		c.setTxHash(tx.getHash());
+		c.setBNum(event.getBlock().getNum());
+		c.setTime(event.getBlock().getTime());
+        return Optional.ofNullable(c);
     }
 }

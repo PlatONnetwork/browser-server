@@ -224,7 +224,6 @@ public class TestBase {
                 .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
                 .bNum(new BigInteger("300"))
                 .timestamp(new Date(System.currentTimeMillis()))
-                .optDesc("ID|TITLE|OPTION|TYPE|VERSION")
                 .proposalHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
                 .voteOption(1)
                 .stakingName("test01")

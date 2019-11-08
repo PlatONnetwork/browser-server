@@ -3,6 +3,8 @@ package com.platon.browser.complement.service.param.converter;
 import java.math.BigInteger;
 import java.util.Optional;
 
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.CustomVote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,17 +41,24 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<Compl
     			.voteOption(Integer.valueOf(txParam.getOption()))
                 .build();
     	
-        String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
-                .replace("ID","") //TODO
-                .replace("TITLE","") //TODO
-                .replace("OPTION",txParam.getOption())
-                .replace("TYPE","")
-                .replace("VERSION","");
- 
-    	businessParam.setOptDesc(desc);
-    	
+
+
     	proposalBusinessMapper.vote(businessParam);
-    	
-        return Optional.ofNullable(null);
+
+		String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
+				.replace("ID",txParam.getProposalId())
+				.replace("TITLE","") //TODO
+				.replace("OPTION",txParam.getOption())
+				.replace("TYPE", "")//TODO
+				.replace("VERSION","");//TODO
+
+		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+		c.setNodeId(txParam.getVerifier());
+		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.VOTE.getCode()));
+		c.setDesc(desc);
+		c.setTxHash(tx.getHash());
+		c.setBNum(event.getBlock().getNum());
+		c.setTime(event.getBlock().getTime());
+        return Optional.ofNullable(c);
     }
 }

@@ -23,11 +23,6 @@ public class ProposalVote extends BusinessParam {
     private String nodeId;
 
     /**
-     * 操作描述
-     */
-    private String optDesc;
-
-    /**
      * 提案hash
      */
     private String proposalHash;

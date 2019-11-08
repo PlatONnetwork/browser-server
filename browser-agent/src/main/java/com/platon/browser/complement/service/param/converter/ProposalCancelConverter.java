@@ -3,6 +3,7 @@ package com.platon.browser.complement.service.param.converter;
 import java.math.BigInteger;
 import java.util.Optional;
 
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,9 +56,16 @@ public class ProposalCancelConverter extends BusinessParamConverter<Optional<Com
 				.replace("TYPE",CustomProposal.TypeEnum.CANCEL.getCode())
 				.replace("VERSION","");
  
-
     	proposalBusinessMapper.cancel(businessParam);
-    	
-        return Optional.ofNullable(null);
+
+		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+		c.setNodeId(txParam.getVerifier());
+		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+		c.setDesc(desc);
+		c.setTxHash(tx.getHash());
+		c.setBNum(event.getBlock().getNum());
+		c.setTime(event.getBlock().getTime());
+
+        return Optional.ofNullable(c);
     }
 }

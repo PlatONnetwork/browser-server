@@ -29,10 +29,13 @@ public class ProposalVersionConverter extends BusinessParamConverter<Optional<Co
                 .replace("VERSION",String.valueOf(txParam.getVersion()))
                 .replace("ACTIVE_NODE", txParam.getActiveNode());
     	
-    	ProposalVersion businessParam= ProposalVersion.builder()  
-    			.optDesc(desc)
-                .build();
-    	
-        return Optional.ofNullable(null);
+        ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+        c.setNodeId(txParam.getActiveNode());
+        c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+        c.setDesc(desc);
+        c.setTxHash(tx.getHash());
+        c.setBNum(event.getBlock().getNum());
+        c.setTime(event.getBlock().getTime());
+        return Optional.ofNullable(c);
     }
 }
