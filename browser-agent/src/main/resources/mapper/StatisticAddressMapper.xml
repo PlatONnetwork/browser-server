@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.persistence.dao.mapper.StatisticBusinessMapper">
 <update id="addressChange" parameterType="com.platon.browser.common.complement.dto.statistic.AddressStatChange">
-    <foreach collection="addressStatItemList" item="item" separator=";">
+
     insert into `address`
     (
         `address`,
@@ -17,6 +17,7 @@
         `contract_createHash`
     )
     values
+    <foreach collection="addressStatItemList" item="item" separator=",">
     (
         #{item.address},
         #{item.type},
@@ -29,6 +30,7 @@
         #{item.contractCreate},
         #{item.contractCreatehash}
     )
+    </foreach>
     on duplicate
     key update
         `tx_qty` = `tx_qty` + #{item.txQty},
@@ -36,6 +38,6 @@
         `delegate_qty` = `delegate_qty` + #{item.delegateQty},
         `staking_qty` = `staking_qty` + #{item.stakingQty},
         `proposal_qty` = `proposal_qty` + #{item.proposalQty}
-    </foreach>
+
 </update>
 </mapper>
