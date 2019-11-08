@@ -1,16 +1,20 @@
 package com.platon.browser.complement.service.param.converter;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.param.epoch.Settle;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.complement.mapper.EpochBusinessMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.complement.param.epoch.Settle;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.mapper.EpochBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingExample;
+import com.platon.browser.dao.mapper.StakingMapper;
 
 @Service
 public class OnSettleConverter {
@@ -19,6 +23,8 @@ public class OnSettleConverter {
     private BlockChainConfig chainConfig;
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
+    @Autowired
+    private StakingMapper stakingMapper;
 	
 	public void convert(CollectionEvent event,CollectionBlock block) throws Exception {
         List<String> curVerifierList = new ArrayList<>();
