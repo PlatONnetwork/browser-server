@@ -53,6 +53,9 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             transactionStage.addAll(event.getTransactions());
             nodeOptStage.addAll(event.getNodeOpts());
 
+            // 把区块的交易列表属性置为null,防止把交易信息存储到区块信息中
+            event.getBlock().setTransactions(null);
+
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if(blockStage.size()<batchSize) {
                 preBlockNum=event.getBlock().getNum();
