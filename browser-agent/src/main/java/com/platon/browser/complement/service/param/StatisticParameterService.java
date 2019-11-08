@@ -99,6 +99,7 @@ public class StatisticParameterService {
                 			.transferQty(address.getTransferQty())
                 			.delegateQty(address.getDelegateQty())
                 			.stakingQty(address.getStakingQty())
+                			.proposalQty(address.getProposalQty())
                 			.contractName(address.getContractName())
                 			.contractCreate(address.getContractCreate())
                 			.contractCreatehash(address.getContractCreatehash())
