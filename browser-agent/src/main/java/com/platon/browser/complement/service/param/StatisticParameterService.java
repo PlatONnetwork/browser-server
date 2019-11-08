@@ -3,10 +3,10 @@ package com.platon.browser.complement.service.param;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.platon.browser.common.service.account.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +20,10 @@ import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
 import com.platon.browser.common.complement.dto.statistic.AddressStatItem;
 import com.platon.browser.common.complement.dto.statistic.NetworkStatChange;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.common.utils.CalculateUtils;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 
 /**
@@ -86,10 +88,9 @@ public class StatisticParameterService {
         businessParams.add(networkStatChange);
         
         // 地址统计
-        if(!addressCache.getAddressMap().isEmpty()) {
-            List<AddressStatItem> addressStatItemList =  addressCache
-                	.getAddressMap()
-                	.values()
+        Collection<Address> addressList = addressCache.getAll();
+        if(addressList.size()> 0) {
+            List<AddressStatItem> addressStatItemList =  addressList
                 	.stream()
                 	.map(address->{ return AddressStatItem.builder()
                 			.address(address.getAddress())
@@ -103,7 +104,8 @@ public class StatisticParameterService {
                 			.contractCreatehash(address.getContractCreatehash())
                 			.build();})
                 	.collect(Collectors.toList());
-                addressCache.getAddressMap().clear();
+                
+            	addressCache.cleanAll();;
            
                 AddressStatChange addressStatChange = AddressStatChange.builder()
             		.addressStatItemList(addressStatItemList)
@@ -113,7 +115,5 @@ public class StatisticParameterService {
         
         return businessParams;
     }
-
-
 
 }

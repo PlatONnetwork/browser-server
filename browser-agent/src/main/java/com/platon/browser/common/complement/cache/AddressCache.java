@@ -1,5 +1,6 @@
 package com.platon.browser.common.complement.cache;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,10 +12,7 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 
-import lombok.Data;
-
 @Component
-@Data
 public class AddressCache {
     private Map<String,Address> addressMap = new HashMap<String, Address>();
     
@@ -25,6 +23,13 @@ public class AddressCache {
     	updateAddress(tx,to);
     }
     
+    public Collection<Address> getAll(){
+    	return addressMap.values();
+    }
+    
+    public void cleanAll() {
+    	addressMap.clear();
+    }
     
     private void updateAddress(CollectionTransaction tx, String addr) {
     	Address address = addressMap.get(addr);
