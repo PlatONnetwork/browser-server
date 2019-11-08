@@ -2,7 +2,6 @@ package com.platon.browser.persistence.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
-import com.lmax.disruptor.EventTranslatorTwoArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.elasticsearch.dto.Block;
