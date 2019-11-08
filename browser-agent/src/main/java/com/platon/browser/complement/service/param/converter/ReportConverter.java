@@ -14,7 +14,7 @@ import com.platon.browser.common.complement.param.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.ReportParam;
-import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
+import com.platon.browser.complement.mapper.SlashBusinessMapper;
 
 /**
  * @description: 举报验证人业务参数转换器

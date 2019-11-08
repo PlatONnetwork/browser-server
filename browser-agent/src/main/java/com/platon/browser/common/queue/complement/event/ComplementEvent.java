@@ -2,7 +2,6 @@ package com.platon.browser.common.queue.complement.event;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +19,4 @@ public class ComplementEvent {
     private List<CollectionTransaction> transactions;
     // 交易列表
     private List<ComplementNodeOpt> nodeOpts;
-    // 业务参数
-    private List<BusinessParam> businessParams;
 }

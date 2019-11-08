@@ -10,7 +10,7 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.param.delegate.DelegateCreate;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.DelegateCreateParam;
-import com.platon.browser.persistence.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.complement.mapper.DelegateBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器

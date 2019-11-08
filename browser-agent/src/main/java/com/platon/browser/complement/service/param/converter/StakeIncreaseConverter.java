@@ -4,7 +4,7 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.param.stake.StakeIncrease;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeIncreaseParam;
-import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.complement.mapper.StakeBusinessMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

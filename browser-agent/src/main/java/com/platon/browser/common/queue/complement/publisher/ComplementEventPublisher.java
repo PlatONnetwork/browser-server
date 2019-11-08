@@ -4,9 +4,10 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.platon.browser.common.complement.param.BusinessParam;
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,11 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class ComplementEventPublisher {
-    private static final EventTranslatorThreeArg<ComplementEvent, CollectionEvent,List<ComplementNodeOpt>, List<BusinessParam>>
-    TRANSLATOR = (event, sequence, collectionEvent,nodeOpts,businessParam)->event
-            .setBlock(collectionEvent.getBlock())
-            .setTransactions(collectionEvent.getTransactions())
-            .setNodeOpts(nodeOpts)
-            .setBusinessParams(businessParam);
+    private static final EventTranslatorThreeArg<ComplementEvent, CollectionBlock,List<CollectionTransaction>,List<ComplementNodeOpt>>
+    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->event
+            .setBlock(block)
+            .setTransactions(transactions)
+            .setNodeOpts(nodeOpts);
     private RingBuffer<ComplementEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.complement.buffer-size}")
@@ -51,7 +51,7 @@ public class ComplementEventPublisher {
         ringBuffer = disruptor.getRingBuffer();
     }
 
-    public void publish(CollectionEvent event, List<ComplementNodeOpt> nodeOpts,List<BusinessParam> businessParams) {
-        ringBuffer.publishEvent(TRANSLATOR, event,nodeOpts,businessParams);
+    public void publish(CollectionBlock block,List<CollectionTransaction> transactions, List<ComplementNodeOpt> nodeOpts) {
+        ringBuffer.publishEvent(TRANSLATOR, block,transactions,nodeOpts);
     }
 }

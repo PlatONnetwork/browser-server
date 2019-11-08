@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.persistence.dao.mapper.SlashBusinessMapper">
+<mapper namespace="com.platon.browser.complement.mapper.SlashBusinessMapper">
 <update id="report" parameterType="com.platon.browser.common.complement.param.slash.Report">
 
 	update `node` set

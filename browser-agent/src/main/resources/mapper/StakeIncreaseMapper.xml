@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.platon.browser.persistence.dao.mapper.StakeBusinessMapper">
+<mapper namespace="com.platon.browser.complement.mapper.StakeBusinessMapper">
     <update id="increase" parameterType="com.platon.browser.common.complement.param.stake.StakeIncrease">
 	update `staking`  set
 		`staking_hes` = `staking_hes` + #{amount}

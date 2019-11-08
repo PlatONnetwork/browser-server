@@ -9,7 +9,7 @@ import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.param.stake.StakeExit;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.complement.mapper.StakeBusinessMapper;
 
 /**
  * @description: 退出质押业务参数转换器

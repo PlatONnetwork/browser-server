@@ -65,7 +65,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             // TODO: 根据交易解析出节点操作日志记录
             List<ComplementNodeOpt> nodeOpts = new ArrayList<>();
 
-            complementEventPublisher.publish(event,nodeOpts,param1);
+            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),nodeOpts);
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){

@@ -1,4 +1,4 @@
-package com.platon.browser.persistence.dao.mapper;
+package com.platon.browser.complement.mapper;
 
 import com.platon.browser.common.complement.param.BusinessParam;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,12 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
  * @Date:  2019/10/31
  * @Description:
  */
-public interface RestrictingBusinessMapper {
+public interface DelegateBusinessMapper {
     /**
-     * 创建锁仓计划
+     * 发起委托
      * @param param
      */
     @Transactional
     void create ( BusinessParam param );
 
+    /**
+     * 退出委托
+     */
+    @Transactional
+    void exit ( BusinessParam param );
 }

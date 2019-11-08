@@ -10,7 +10,7 @@ import com.platon.browser.common.complement.param.proposal.ProposalVote;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.ProposalVoteParam;
-import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.complement.mapper.ProposalBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器

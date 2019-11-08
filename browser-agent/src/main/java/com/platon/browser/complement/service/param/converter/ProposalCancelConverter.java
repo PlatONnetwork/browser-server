@@ -12,7 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.param.ProposalCancelParam;
-import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.complement.mapper.ProposalBusinessMapper;
 import com.platon.browser.util.RoundCalculation;
 
 /**

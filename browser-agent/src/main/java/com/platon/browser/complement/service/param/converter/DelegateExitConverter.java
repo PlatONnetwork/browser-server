@@ -11,7 +11,7 @@ import com.platon.browser.common.complement.param.delegate.DelegateExit;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.DelegateExitParam;
-import com.platon.browser.persistence.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.complement.mapper.DelegateBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器
