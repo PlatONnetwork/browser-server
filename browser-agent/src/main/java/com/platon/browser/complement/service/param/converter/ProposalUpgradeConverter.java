@@ -1,7 +1,5 @@
 package com.platon.browser.complement.service.param.converter;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -58,8 +56,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<Co
 				.replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode())
 				.replace("VERSION",businessParam.getNewVersion());
  
-    	businessParam.setOptDesc(desc);
-    	
+
     	proposalBusinessMapper.upgrade(businessParam);
     	
         return Optional.ofNullable(null);
