@@ -1,17 +1,18 @@
 package com.platon.browser.complement.service.param.converter;
 
+import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.complement.param.epoch.Consensus;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.persistence.dao.mapper.EpochBusinessMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.dto.epoch.Consensus;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.persistence.dao.mapper.EpochBusinessMapper;
-
+@Service
 public class OnConsensusConverter {
 	
     @Autowired

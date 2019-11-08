@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
-import com.platon.browser.common.complement.dto.restricting.RestrictingItem;
+import com.platon.browser.common.complement.param.restricting.RestrictingCreate;
+import com.platon.browser.common.complement.param.restricting.RestrictingItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.RestrictingCreateParam;
 

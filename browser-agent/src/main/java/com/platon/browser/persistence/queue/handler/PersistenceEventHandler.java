@@ -1,11 +1,14 @@
 package com.platon.browser.persistence.queue.handler;
 
 import com.lmax.disruptor.EventHandler;
-import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.persistence.queue.event.PersistenceEvent;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.persistence.queue.event.PersistenceEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +16,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,11 +31,15 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     @Autowired
     private RedisImportService redisImportService;
 
+    @Autowired
+    private NetworkStatCache networkStatCache;
+
     @Value("${disruptor.queue.persistence.batch-size}")
     private int batchSize;
 
     private Set<Block> blockStage = new HashSet<>();
     private Set<Transaction> transactionStage = new HashSet<>();
+    private Set<NodeOpt> nodeOptStage = new HashSet<>();
 
     private Long preBlockNum=0L;
     @Override
@@ -45,6 +51,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
         try {
             blockStage.add(event.getBlock());
             transactionStage.addAll(event.getTransactions());
+            nodeOptStage.addAll(event.getNodeOpts());
 
             // 如区块暂存区的区块数量达不到批量入库大小,则返回
             if(blockStage.size()<batchSize) {
@@ -53,9 +60,11 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             }
 
             // 入库ES TODO: 入库委托记录和节点操作记录到ES
-            esImportService.batchImport(blockStage,transactionStage, Collections.emptySet(),Collections.emptySet());
+            esImportService.batchImport(blockStage,transactionStage,nodeOptStage);
             // 入库Redis TODO: 更新Redis中的统计记录
-            redisImportService.batchImport(blockStage,transactionStage,Collections.emptySet());
+            Set<NetworkStat> statistics = new HashSet<>();
+            statistics.add(networkStatCache.getNetworkStat());
+            redisImportService.batchImport(blockStage,transactionStage,statistics);
             blockStage.clear();
             transactionStage.clear();
 

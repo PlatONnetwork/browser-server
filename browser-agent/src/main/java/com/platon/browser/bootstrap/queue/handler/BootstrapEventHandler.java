@@ -6,9 +6,8 @@ import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
 
     private Set<Block> blocks=new HashSet<>();
     private Set<Transaction> transactions=new HashSet<>();
-    private Set<Delegation> delegations=new HashSet<>();
     private Set<NodeOpt> nodeOpts=new HashSet<>();
 
     private Long preBlockNum=0L;
@@ -56,7 +54,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             blocks.add(block);
             transactions.addAll(block.getTransactions());
             block.setTransactions(null);
-            esImportService.batchImport(blocks,transactions,delegations,nodeOpts);
+            esImportService.batchImport(blocks,transactions,nodeOpts);
             redisImportService.batchImport(blocks,transactions, Collections.emptySet());
             clear();
             preBlockNum=block.getNum();
@@ -70,7 +68,6 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     private void clear(){
         blocks.clear();
         transactions.clear();
-        delegations.clear();
         nodeOpts.clear();
     }
 }

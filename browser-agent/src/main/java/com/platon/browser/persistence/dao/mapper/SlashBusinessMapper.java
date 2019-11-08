@@ -1,6 +1,6 @@
 package com.platon.browser.persistence.dao.mapper;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.complement.param.BusinessParam;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

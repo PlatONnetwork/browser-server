@@ -1,16 +1,15 @@
 package com.platon.browser.persistence.handler;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
-import com.platon.browser.persistence.service.rmdb.DbService;
+import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
+import com.platon.browser.persistence.queue.publisher.PersistenceEventPublisher;
+import com.platon.browser.persistence.service.rmdb.DbService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 区块事件处理器
@@ -42,8 +41,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
             // TODO: 补充交易信息
 
             // 发布至持久化队列
-            persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
-
+            persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()),new ArrayList<>(event.getNodeOpts()));
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){

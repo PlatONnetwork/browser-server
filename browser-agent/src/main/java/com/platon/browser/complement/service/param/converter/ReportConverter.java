@@ -2,17 +2,15 @@ package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.slash.Report;
+import com.platon.browser.common.complement.param.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.ReportParam;

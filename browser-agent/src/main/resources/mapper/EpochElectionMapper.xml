@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
-<update id="election" parameterType="com.platon.browser.common.complement.dto.epoch.Election">
+<update id="election" parameterType="com.platon.browser.common.complement.param.epoch.Election">
 	create temporary table tmp(`id` varchar(130)) ENGINE = MEMORY;
 	insert into tmp(`id`) select `node_id` from staking where `status` = 1 and `node_id` in <foreach open="(" collection="preValidatorList" item="item"  separator="," close=")"> #{item} </foreach> and `pre_cons_block_qty` = 0;
 

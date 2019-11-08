@@ -44,6 +44,8 @@ public class NetworkStat {
 
     private Long nextSettle;
 
+    private Long nodeOptSeq;
+
     private Date createTime;
 
     private Date updateTime;
@@ -200,6 +202,14 @@ public class NetworkStat {
         this.nextSettle = nextSettle;
     }
 
+    public Long getNodeOptSeq() {
+        return nodeOptSeq;
+    }
+
+    public void setNodeOptSeq(Long nodeOptSeq) {
+        this.nodeOptSeq = nodeOptSeq;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -243,6 +253,7 @@ public class NetworkStat {
         addIssueBegin("add_issue_begin", "addIssueBegin", "BIGINT", false),
         addIssueEnd("add_issue_end", "addIssueEnd", "BIGINT", false),
         nextSettle("next_settle", "nextSettle", "BIGINT", false),
+        nodeOptSeq("node_opt_seq", "nodeOptSeq", "BIGINT", false),
         createTime("create_time", "createTime", "TIMESTAMP", false),
         updateTime("update_time", "updateTime", "TIMESTAMP", false);
 

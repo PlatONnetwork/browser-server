@@ -106,9 +106,16 @@
         <table tableName="transaction" domainObjectName="Transaction">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
-        </table>-->
+        </table>
 
         <table tableName="staking_history" domainObjectName="StakingHistory">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        -->
+
+        <table tableName="network_stat" domainObjectName="NetworkStat">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

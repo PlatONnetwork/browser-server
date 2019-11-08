@@ -1,10 +1,12 @@
 package com.platon.browser.persistence.queue.publisher;
 
 import com.lmax.disruptor.EventFactory;
+import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.EventTranslatorTwoArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.persistence.queue.event.PersistenceEvent;
 import com.platon.browser.persistence.queue.handler.PersistenceEventHandler;
@@ -23,8 +25,8 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class PersistenceEventPublisher {
-    private static final EventTranslatorTwoArg<PersistenceEvent, Block, List<Transaction>>
-    TRANSLATOR = (event, sequence, block,transactions)->event.setBlock(block).setTransactions(transactions);
+    private static final EventTranslatorThreeArg<PersistenceEvent, Block, List<Transaction>,List<NodeOpt>>
+    TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->event.setBlock(block).setTransactions(transactions).setNodeOpts(nodeOpts);
     private RingBuffer<PersistenceEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
     @Value("${disruptor.queue.persistence.buffer-size}")
@@ -46,7 +48,7 @@ public class PersistenceEventPublisher {
         ringBuffer = disruptor.getRingBuffer();
     }
 
-    public void publish(Block block,List<Transaction> transactions){
-        ringBuffer.publishEvent(TRANSLATOR, block,transactions);
+    public void publish(Block block, List<Transaction> transactions, List<NodeOpt> nodeOpts){
+        ringBuffer.publishEvent(TRANSLATOR, block,transactions,nodeOpts);
     }
 }

@@ -21,6 +21,7 @@
     <result column="add_issue_begin" jdbcType="BIGINT" property="addIssueBegin" />
     <result column="add_issue_end" jdbcType="BIGINT" property="addIssueEnd" />
     <result column="next_settle" jdbcType="BIGINT" property="nextSettle" />
+    <result column="node_opt_seq" jdbcType="BIGINT" property="nodeOptSeq" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -85,8 +86,8 @@
   <sql id="Base_Column_List">
     id, cur_number, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, turn_value, 
     staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, address_qty, 
-    block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, create_time, 
-    update_time
+    block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, node_opt_seq, 
+    create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="BaseResultMap">
     select
@@ -125,16 +126,16 @@
       staking_delegation_value, staking_value, doing_proposal_qty, 
       proposal_qty, address_qty, block_reward, 
       staking_reward, add_issue_begin, add_issue_end, 
-      next_settle, create_time, update_time
-      )
+      next_settle, node_opt_seq, create_time, 
+      update_time)
     values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
       #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, #{curTps,jdbcType=INTEGER}, 
       #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, #{turnValue,jdbcType=DECIMAL}, 
       #{stakingDelegationValue,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, 
       #{proposalQty,jdbcType=INTEGER}, #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, 
       #{stakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
-      #{nextSettle,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -195,6 +196,9 @@
       </if>
       <if test="nextSettle != null">
         next_settle,
+      </if>
+      <if test="nodeOptSeq != null">
+        node_opt_seq,
       </if>
       <if test="createTime != null">
         create_time,
@@ -260,6 +264,9 @@
       </if>
       <if test="nextSettle != null">
         #{nextSettle,jdbcType=BIGINT},
+      </if>
+      <if test="nodeOptSeq != null">
+        #{nodeOptSeq,jdbcType=BIGINT},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -335,6 +342,9 @@
       <if test="record.nextSettle != null">
         next_settle = #{record.nextSettle,jdbcType=BIGINT},
       </if>
+      <if test="record.nodeOptSeq != null">
+        node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
+      </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
@@ -367,6 +377,7 @@
       add_issue_begin = #{record.addIssueBegin,jdbcType=BIGINT},
       add_issue_end = #{record.addIssueEnd,jdbcType=BIGINT},
       next_settle = #{record.nextSettle,jdbcType=BIGINT},
+      node_opt_seq = #{record.nodeOptSeq,jdbcType=BIGINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -430,6 +441,9 @@
       <if test="nextSettle != null">
         next_settle = #{nextSettle,jdbcType=BIGINT},
       </if>
+      <if test="nodeOptSeq != null">
+        node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -459,6 +473,7 @@
       add_issue_begin = #{addIssueBegin,jdbcType=BIGINT},
       add_issue_end = #{addIssueEnd,jdbcType=BIGINT},
       next_settle = #{nextSettle,jdbcType=BIGINT},
+      node_opt_seq = #{nodeOptSeq,jdbcType=BIGINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
@@ -472,8 +487,8 @@
     insert into network_stat
     (id, cur_number, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, turn_value, 
       staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, address_qty, 
-      block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, create_time, 
-      update_time)
+      block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, node_opt_seq, 
+      create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, 
@@ -483,7 +498,8 @@
         #{item.doingProposalQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
         #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
         #{item.addIssueBegin,jdbcType=BIGINT}, #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, 
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+        #{item.nodeOptSeq,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -558,6 +574,9 @@
         <if test="'next_settle'.toString() == column.value">
           #{item.nextSettle,jdbcType=BIGINT}
         </if>
+        <if test="'node_opt_seq'.toString() == column.value">
+          #{item.nodeOptSeq,jdbcType=BIGINT}
+        </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
         </if>
@@ -568,4 +587,5 @@
       )
     </foreach>
   </insert>
+
 </mapper>

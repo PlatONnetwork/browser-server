@@ -1,17 +1,18 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
-import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
-import com.platon.browser.common.complement.dto.statistic.AddressStatItem;
+import com.platon.browser.common.complement.param.statistic.AddressStatChange;
+import com.platon.browser.common.complement.param.statistic.AddressStatItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
 public class StatisticsAddressConverter {
 	
     @Autowired

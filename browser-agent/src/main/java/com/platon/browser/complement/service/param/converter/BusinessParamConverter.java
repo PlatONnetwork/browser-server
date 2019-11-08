@@ -1,17 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigInteger;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
-import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigInteger;
 
 /**
  * @description: 业务参数转换器基类

@@ -3,8 +3,8 @@ package com.platon.browser.bootstrap.service;
 
 import com.platon.browser.bootstrap.bean.InitializationResult;
 import com.platon.browser.common.collection.dto.CollectionNetworkStat;
-import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
-import com.platon.browser.common.complement.bean.PeriodValueElement;
+import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
+import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;

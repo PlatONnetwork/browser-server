@@ -1,7 +1,7 @@
 package com.platon.browser.common.service.elasticsearch;
 
-import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;

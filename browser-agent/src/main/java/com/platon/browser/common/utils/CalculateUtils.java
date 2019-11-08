@@ -1,14 +1,14 @@
 package com.platon.browser.common.utils;
 
+import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
+import com.platon.browser.common.complement.dto.PeriodValueElement;
+import com.platon.browser.config.BlockChainConfig;
+import org.web3j.utils.Convert;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Map;
-
-import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
-import com.platon.browser.common.complement.bean.PeriodValueElement;
-import com.platon.browser.config.BlockChainConfig;
-import org.web3j.utils.Convert;
 
 public class CalculateUtils {
 

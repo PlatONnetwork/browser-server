@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.persistence.dao.mapper.StatisticBusinessMapper">
-<update id="addressChange" parameterType="com.platon.browser.common.complement.dto.statistic.AddressStatChange">
+<update id="addressChange" parameterType="com.platon.browser.common.complement.param.statistic.AddressStatChange">
 
     insert into `address`
     (

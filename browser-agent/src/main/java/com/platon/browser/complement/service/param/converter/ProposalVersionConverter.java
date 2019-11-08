@@ -1,14 +1,11 @@
 package com.platon.browser.complement.service.param.converter;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.proposal.ProposalVersion;
+import com.platon.browser.common.complement.param.proposal.ProposalVersion;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.VersionDeclareParam;
-import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
+import org.springframework.stereotype.Service;
 
 /**
  * @description: 委托业务参数转换器

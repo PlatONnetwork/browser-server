@@ -1,28 +1,26 @@
 package com.platon.browser;//package com.platon.browser;
 
 
-import com.platon.browser.common.complement.dto.epoch.NewBlock;
-import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
-import com.platon.browser.common.complement.dto.delegate.DelegateExit;
-import com.platon.browser.common.complement.dto.epoch.Consensus;
-import com.platon.browser.common.complement.dto.epoch.Election;
-import com.platon.browser.common.complement.dto.epoch.Settle;
-import com.platon.browser.common.complement.dto.proposal.ProposalText;
-import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
-import com.platon.browser.common.complement.dto.proposal.ProposalVote;
-import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
-import com.platon.browser.common.complement.dto.restricting.RestrictingItem;
-import com.platon.browser.common.complement.dto.slash.Report;
-import com.platon.browser.common.complement.dto.stake.StakeCreate;
-import com.platon.browser.common.complement.dto.stake.StakeExit;
-import com.platon.browser.common.complement.dto.stake.StakeIncrease;
-import com.platon.browser.common.complement.dto.stake.StakeModify;
-import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
-import com.platon.browser.common.complement.dto.statistic.AddressStatItem;
-import com.platon.browser.common.complement.dto.statistic.NetworkStatChange;
+import com.platon.browser.common.complement.param.epoch.NewBlock;
+import com.platon.browser.common.complement.param.delegate.DelegateCreate;
+import com.platon.browser.common.complement.param.delegate.DelegateExit;
+import com.platon.browser.common.complement.param.epoch.Consensus;
+import com.platon.browser.common.complement.param.epoch.Election;
+import com.platon.browser.common.complement.param.epoch.Settle;
+import com.platon.browser.common.complement.param.proposal.ProposalText;
+import com.platon.browser.common.complement.param.proposal.ProposalUpgrade;
+import com.platon.browser.common.complement.param.proposal.ProposalVote;
+import com.platon.browser.common.complement.param.restricting.RestrictingCreate;
+import com.platon.browser.common.complement.param.restricting.RestrictingItem;
+import com.platon.browser.common.complement.param.slash.Report;
+import com.platon.browser.common.complement.param.stake.StakeCreate;
+import com.platon.browser.common.complement.param.stake.StakeExit;
+import com.platon.browser.common.complement.param.stake.StakeIncrease;
+import com.platon.browser.common.complement.param.stake.StakeModify;
+import com.platon.browser.common.complement.param.statistic.AddressStatChange;
+import com.platon.browser.common.complement.param.statistic.AddressStatItem;
+import com.platon.browser.common.complement.param.statistic.NetworkStatChange;
 import com.platon.browser.common.enums.AppStatus;
-import com.platon.browser.dto.ProposalMarkDownDto;
-import com.platon.browser.persistence.dao.mapper.StatisticBusinessMapper;
 
 
 import java.math.BigDecimal;

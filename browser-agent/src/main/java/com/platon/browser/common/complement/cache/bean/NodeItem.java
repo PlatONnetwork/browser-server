@@ -1,6 +1,5 @@
 package com.platon.browser.common.complement.cache.bean;
 
-import com.platon.browser.common.complement.bean.AnnualizedRateInfo;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;

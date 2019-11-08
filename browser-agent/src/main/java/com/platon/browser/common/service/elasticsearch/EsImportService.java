@@ -1,8 +1,7 @@
 package com.platon.browser.common.service.elasticsearch;
 
-import com.platon.browser.dao.entity.Delegation;
-import com.platon.browser.dao.entity.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class EsImportService {
     @Autowired
     private EsNodeOptService nodeOptService;
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
 
     private <T> void submit(EsService<T> service,Set<T> data,CountDownLatch latch){
         EXECUTOR.submit(()->{
@@ -47,14 +46,13 @@ public class EsImportService {
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
-    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<Delegation> delegations, Set<NodeOpt> nodeOpts) throws InterruptedException {
+    public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NodeOpt> nodeOpts) throws InterruptedException {
         log.debug("ES批量导入:{}(blocks({}),transactions({}),statistics({}),delegations({}),nodeOpts({}))",
-                Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),delegations.size(),nodeOpts.size());
+                Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),nodeOpts.size());
         try{
-            CountDownLatch latch = new CountDownLatch(4);
+            CountDownLatch latch = new CountDownLatch(3);
             submit(blockService,blocks,latch);
             submit(transactionService,transactions,latch);
-            submit(delegationService,delegations,latch);
             submit(nodeOptService,nodeOpts,latch);
             latch.await();
         }catch (Exception e){

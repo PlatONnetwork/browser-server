@@ -1,15 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.dto.epoch.NewBlock;
+import com.platon.browser.common.complement.param.epoch.NewBlock;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.persistence.dao.mapper.NewBlockMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
+@Service
 public class OnNewBlockConverter {
 	
     @Autowired

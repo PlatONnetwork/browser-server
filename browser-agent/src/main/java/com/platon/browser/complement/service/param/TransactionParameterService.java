@@ -1,47 +1,29 @@
 package com.platon.browser.complement.service.param;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
-import com.platon.browser.common.complement.dto.delegate.DelegateExit;
-import com.platon.browser.common.complement.dto.proposal.ProposalCancel;
-import com.platon.browser.common.complement.dto.proposal.ProposalText;
-import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
-import com.platon.browser.common.complement.dto.proposal.ProposalVersion;
-import com.platon.browser.common.complement.dto.proposal.ProposalVote;
-import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
-import com.platon.browser.common.complement.dto.slash.Report;
-import com.platon.browser.common.complement.dto.stake.StakeCreate;
-import com.platon.browser.common.complement.dto.stake.StakeExit;
-import com.platon.browser.common.complement.dto.stake.StakeIncrease;
-import com.platon.browser.common.complement.dto.stake.StakeModify;
+import com.platon.browser.common.complement.param.BusinessParam;
+import com.platon.browser.common.complement.param.delegate.DelegateCreate;
+import com.platon.browser.common.complement.param.delegate.DelegateExit;
+import com.platon.browser.common.complement.param.proposal.*;
+import com.platon.browser.common.complement.param.restricting.RestrictingCreate;
+import com.platon.browser.common.complement.param.slash.Report;
+import com.platon.browser.common.complement.param.stake.StakeCreate;
+import com.platon.browser.common.complement.param.stake.StakeExit;
+import com.platon.browser.common.complement.param.stake.StakeIncrease;
+import com.platon.browser.common.complement.param.stake.StakeModify;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.service.param.converter.DelegateCreateConverter;
-import com.platon.browser.complement.service.param.converter.DelegateExitConverter;
-import com.platon.browser.complement.service.param.converter.ProposalCancelConverter;
-import com.platon.browser.complement.service.param.converter.ProposalTextConverter;
-import com.platon.browser.complement.service.param.converter.ProposalUpgradeConverter;
-import com.platon.browser.complement.service.param.converter.ProposalVersionConverter;
-import com.platon.browser.complement.service.param.converter.ProposalVoteConverter;
-import com.platon.browser.complement.service.param.converter.ReportConverter;
-import com.platon.browser.complement.service.param.converter.RestrictingCreateConverter;
-import com.platon.browser.complement.service.param.converter.StakeCreateConverter;
-import com.platon.browser.complement.service.param.converter.StakeExitConverter;
-import com.platon.browser.complement.service.param.converter.StakeIncreaseConverter;
-import com.platon.browser.complement.service.param.converter.StakeModifyConverter;
+import com.platon.browser.complement.service.param.converter.*;
 import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 业务入库参数服务

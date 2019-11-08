@@ -1,6 +1,7 @@
 package com.platon.browser.persistence.queue.event;
 
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,6 @@ public class PersistenceEvent {
     private Block block;
     // 交易
     private List<Transaction> transactions;
+    // 节点操作记录
+    private List<NodeOpt> nodeOpts;
 }

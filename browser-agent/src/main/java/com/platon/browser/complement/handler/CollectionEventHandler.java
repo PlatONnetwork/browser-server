@@ -1,13 +1,9 @@
 package com.platon.browser.complement.handler;
 
-import java.util.Comparator;
-import java.util.List;
-
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.complement.param.BusinessParam;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
 import com.platon.browser.common.queue.complement.publisher.ComplementEventPublisher;
@@ -15,10 +11,12 @@ import com.platon.browser.complement.service.param.BlockParameterService;
 import com.platon.browser.complement.service.param.StatisticParameterService;
 import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.elasticsearch.dto.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * 区块事件处理器
@@ -64,7 +62,10 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             param1.addAll(param2);
             param1.addAll(param3);
 
-            complementEventPublisher.publish(event.getBlock(),event.getTransactions(),param1);
+            // TODO: 根据交易解析出节点操作日志记录
+            List<ComplementNodeOpt> nodeOpts = new ArrayList<>();
+
+            complementEventPublisher.publish(event,nodeOpts,param1);
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){

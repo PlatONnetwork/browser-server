@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.dto.BusinessParam;
-import com.platon.browser.common.complement.dto.epoch.Consensus;
-import com.platon.browser.common.complement.dto.epoch.Election;
-import com.platon.browser.common.complement.dto.epoch.NewBlock;
-import com.platon.browser.common.complement.dto.epoch.Settle;
+import com.platon.browser.common.complement.param.BusinessParam;
+import com.platon.browser.common.complement.param.epoch.Consensus;
+import com.platon.browser.common.complement.param.epoch.Election;
+import com.platon.browser.common.complement.param.epoch.NewBlock;
+import com.platon.browser.common.complement.param.epoch.Settle;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.service.param.converter.OnConsensusConverter;
 import com.platon.browser.complement.service.param.converter.OnElectionConverter;

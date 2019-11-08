@@ -1,6 +1,6 @@
 package com.platon.browser.persistence.service.rmdb;
 
-import com.platon.browser.common.complement.dto.BusinessParam;
+import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.persistence.dao.mapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

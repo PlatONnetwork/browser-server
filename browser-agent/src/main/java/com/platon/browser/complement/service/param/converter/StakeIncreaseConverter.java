@@ -1,17 +1,15 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.stake.StakeIncrease;
+import com.platon.browser.common.complement.param.stake.StakeIncrease;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
-import com.platon.browser.utils.HexTool;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @description: 增持质押业务参数转换器

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
-<update id="consensus" parameterType="com.platon.browser.common.complement.dto.epoch.Consensus">
+<update id="consensus" parameterType="com.platon.browser.common.complement.param.epoch.Consensus">
 
     update `staking` set
         `is_consensus` = if(`node_id` in <foreach open="(" collection="validatorList" item="validator"  separator="," close=")"> #{validator} </foreach>, 1,  2),

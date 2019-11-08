@@ -1266,6 +1266,66 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andNodeOptSeqIsNull() {
+            addCriterion("node_opt_seq is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqIsNotNull() {
+            addCriterion("node_opt_seq is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqEqualTo(Long value) {
+            addCriterion("node_opt_seq =", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqNotEqualTo(Long value) {
+            addCriterion("node_opt_seq <>", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqGreaterThan(Long value) {
+            addCriterion("node_opt_seq >", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqGreaterThanOrEqualTo(Long value) {
+            addCriterion("node_opt_seq >=", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqLessThan(Long value) {
+            addCriterion("node_opt_seq <", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqLessThanOrEqualTo(Long value) {
+            addCriterion("node_opt_seq <=", value, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqIn(List<Long> values) {
+            addCriterion("node_opt_seq in", values, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqNotIn(List<Long> values) {
+            addCriterion("node_opt_seq not in", values, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqBetween(Long value1, Long value2) {
+            addCriterion("node_opt_seq between", value1, value2, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andNodeOptSeqNotBetween(Long value1, Long value2) {
+            addCriterion("node_opt_seq not between", value1, value2, "nodeOptSeq");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
