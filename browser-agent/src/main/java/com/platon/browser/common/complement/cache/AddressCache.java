@@ -81,7 +81,11 @@ public class AddressCache {
         	address.setContractName(cde.getContractName());
         	address.setContractCreate(cde.getCreator());
         	address.setContractCreatehash(cde.getContractHash());
-        }    	
+        } else {
+        	address.setContractName("");
+        	address.setContractCreate("");
+        	address.setContractCreatehash("");
+		}    	
     	
         address.setTxQty(0);
         address.setTransferQty(0);
