@@ -50,15 +50,15 @@ logging:
   file: ./logs/${spring.application.name}-${version}-${profile}.log
   #日志级别
   level:
-    org.springframework: debug
+    org.springframework: error
     org.springframework.retry: error
     com.platon.browser: error
-    com.platon.browser.bootstrap: debug
-    com.platon.browser.collection: debug
-    com.platon.browser.common: debug
-    com.platon.browser.complement: debug
-    com.platon.browser.persistence: debug
-    com.platon.browser.task: debug
+    com.platon.browser.bootstrap: error
+    com.platon.browser.collection: error
+    com.platon.browser.common: error
+    com.platon.browser.complement: error
+    com.platon.browser.persistence: error
+    com.platon.browser.task: error
 #PlatOn相关配置
 platon:
   # Web3j访问地址

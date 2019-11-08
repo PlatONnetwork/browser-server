@@ -24,6 +24,8 @@ public class SupplementService {
      * @param tx
      */
     public void supplement(Transaction tx){
+        long startTime = System.currentTimeMillis();
+
         String nodeId="";
         try {
             NodeItem nodeItem;
@@ -132,5 +134,6 @@ public class SupplementService {
         } catch (NoSuchBeanException e) {
             log.error("缓存中找不到交易[{}]参数中的节点ID[{}]对应的节点名称信息!",tx.getHash(),nodeId);
         }
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

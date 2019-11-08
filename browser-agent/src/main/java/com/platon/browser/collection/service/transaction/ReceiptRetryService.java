@@ -36,6 +36,8 @@ public class ReceiptRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     ReceiptResult getReceipt(Long blockNumber) throws HttpRequestException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+
         try {
             log.debug("获取回执:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blockNumber);
             RpcParam param = new RpcParam();
@@ -44,6 +46,9 @@ public class ReceiptRetryService {
             ReceiptResult result = HttpUtil.post(client.getWeb3jAddress(),param.toJsonString(),ReceiptResult.class);
             result.resolve();
             log.debug("回执结果:{}", result);
+
+            log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
             return result;
         }catch (Exception e){
             log.error("",e);

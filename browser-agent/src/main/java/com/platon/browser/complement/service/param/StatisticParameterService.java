@@ -7,6 +7,7 @@ import com.platon.browser.complement.service.param.converter.StatisticsAddressCo
 import com.platon.browser.complement.service.param.converter.StatisticsNetworkConverter;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.elasticsearch.dto.Block;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Collection;
  * 统计入库参数服务 
  * @author chendai
  */
+@Slf4j
 @Service
 public class StatisticParameterService {
     
@@ -31,6 +33,8 @@ public class StatisticParameterService {
      * @return
      */
     public void getParameters(CollectionEvent event) throws Exception{
+        long startTime = System.currentTimeMillis();
+
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
         
@@ -41,6 +45,8 @@ public class StatisticParameterService {
         if(!addressList.isEmpty()) {
         	statisticsAddressConverter.convert(event, block, epochMessage);
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 
 }

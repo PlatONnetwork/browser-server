@@ -41,6 +41,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
     public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+        long startTime = System.currentTimeMillis();
+
         log.debug("BootstrapEvent处理:{}(event(blockCF({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlockCF().toString(),event.getReceiptCF().toString(),sequence,endOfBatch);
         try {
@@ -63,6 +65,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
             log.error("",e);
             throw e;
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 
     private void clear(){

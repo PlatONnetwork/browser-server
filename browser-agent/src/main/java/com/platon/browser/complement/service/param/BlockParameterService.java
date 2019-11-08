@@ -45,6 +45,8 @@ public class BlockParameterService {
      * @return
      */
     public List<NodeOpt> getParameters(CollectionEvent event) throws Exception{
+        long startTime = System.currentTimeMillis();
+
         List<NodeOpt> nodeOptList = new ArrayList<>();
         Block block = event.getBlock();
 
@@ -71,6 +73,9 @@ public class BlockParameterService {
             log.debug("结算周期切换：Block Number({})", block.getNum());
             onSettleConverter.convert(event, block);
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
         return nodeOptList;
     }
 }

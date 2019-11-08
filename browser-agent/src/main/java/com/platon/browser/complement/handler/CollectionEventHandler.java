@@ -44,6 +44,8 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     private Long preBlockNum=0L;
     @Transactional
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
+        long startTime = System.currentTimeMillis();
+
         log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
         if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
@@ -71,5 +73,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
             log.error("{}",e);
             throw e;
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

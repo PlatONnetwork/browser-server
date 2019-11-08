@@ -18,6 +18,8 @@ public class ComplementEventHandler implements IComplementEventHandler {
     private Long preBlockNum=0L;
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
+        long startTime = System.currentTimeMillis();
+
         log.debug("ComplementEvent处理:{}(event(block({}),transactions({}),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
         if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
@@ -30,5 +32,7 @@ public class ComplementEventHandler implements IComplementEventHandler {
             log.error("{}",e);
             throw e;
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

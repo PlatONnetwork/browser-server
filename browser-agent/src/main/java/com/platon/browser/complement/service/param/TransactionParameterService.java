@@ -66,6 +66,8 @@ public class TransactionParameterService {
      * @return
      */
     public List<NodeOpt> getParameters(CollectionEvent event){
+        long startTime = System.currentTimeMillis();
+
         List<Transaction> transactions = event.getTransactions();
         List<NodeOpt> nodeOptList = new ArrayList<>();
         
@@ -139,7 +141,9 @@ public class TransactionParameterService {
         }
         
         networkStatCache.updateByBlock(txQty, proposalQty, event.getBlock().getTime());
-        
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
+
         return nodeOptList;
     }
 }

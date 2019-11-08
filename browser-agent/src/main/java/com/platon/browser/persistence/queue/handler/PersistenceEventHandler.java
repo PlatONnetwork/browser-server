@@ -45,6 +45,8 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "PersistenceEventHandler")
     public void onEvent(PersistenceEvent event, long sequence, boolean endOfBatch) throws IOException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+
         log.debug("PersistenceEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
         if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
@@ -77,5 +79,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             log.error("",e);
             throw e;
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }

@@ -28,6 +28,8 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BlockEventHandler")
     public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+        long startTime = System.currentTimeMillis();
+
         log.debug("BlockEvent处理:{}(event(block({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getEpochMessage().getCurrentBlockNumber(),sequence,endOfBatch);
         try {
@@ -43,5 +45,7 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
             log.error("",e);
             throw e;
         }
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
     }
 }
