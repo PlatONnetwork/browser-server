@@ -59,7 +59,8 @@ public class StatisticsNetworkConverter {
                 .setAddIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
                 .setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
                 .setIssueValue(issueValue) // 发行量
-                .setTurnValue(turnValue); // 流通量
+                .setTurnValue(turnValue) // 流通量
+                .setNodeOptSeq(networkStat.getNodeOptSeq());
         statisticBusinessMapper.networkChange(networkStatChange);
     }
 }
