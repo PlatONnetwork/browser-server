@@ -48,19 +48,5 @@
 			`staking_block_num` = #{stakingBlockNum};
 
 
-		insert into `node_opt`
-			(`node_id`,
-			`type`,
-			`tx_hash`,
-			`b_num`,
-			`time`
-			)
-		values
-			(#{nodeId},
-			'2',
-			#{txHash},
-			#{bNum},
-			#{time}
-			);
 </update>
 </mapper>

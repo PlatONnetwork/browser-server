@@ -4,6 +4,7 @@ import com.platon.browser.dao.entity.Node;
 import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.utils.HexTool;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -15,8 +16,6 @@ import java.util.*;
  */
 @Data
 public class CustomNode extends Node {
-    // <质押区块号 - 质押实体>
-    private TreeMap<Long, CustomStaking> stakings = new TreeMap<>();
 
      public CustomNode(){
          super();
@@ -64,24 +63,11 @@ public class CustomNode extends Node {
          setStatSlashMultiQty(0);
      }
 
-     public void updateWithNode(org.web3j.platon.bean.Node node){
-          this.setNodeId(HexTool.prefix(node.getNodeId()));
-     }
-
-    public void updateWithCustomStaking(CustomStaking staking) {
-        this.setNodeId(staking.getNodeId());
-        // 创建时间与质押节点加入时间一致
-        this.setCreateTime(staking.getJoinTime());
+    public CustomNode updateWithCustomStaking(CustomStaking staking) {
+        BeanUtils.copyProperties(staking,this);
+        return this;
     }
 
-    /**
-     * 获取指定节点的最新质押记录
-     */
-    public CustomStaking getLatestStaking() throws NoSuchBeanException {
-        Map.Entry<Long, CustomStaking> lastEntry = stakings.lastEntry();
-        if(lastEntry==null) throw new NoSuchBeanException("没有质押记录！");
-        return lastEntry.getValue();
-    }
     /**
      * 节点是否官方推荐类型枚举类：
      *  1.是

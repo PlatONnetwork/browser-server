@@ -27,11 +27,6 @@ public class StakeExit extends BusinessParam {
     private String nodeId;
 
     /**
-     * 交易hash
-     */
-    private String txHash;
-
-    /**
      * 质押交易所在块高
      */
     private BigInteger stakingBlockNum;
@@ -40,11 +35,6 @@ public class StakeExit extends BusinessParam {
      * 时间
      */
     private Date time;
-
-    /**
-     * 交易块高
-     */
-    private BigInteger bNum;
 
     /**
      * 结算周期标识

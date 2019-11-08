@@ -92,19 +92,5 @@
         `annualized_rate` = '0',
         `total_value` = `total_value` + #{stakingHes};
 
-    insert into `node_opt`
-        (`node_id`,
-        `type`,
-        `tx_hash`,
-        `b_num`,
-        `time`
-        )
-        values
-        (#{nodeId},
-        '1',
-        #{txHash},
-        #{stakingBlockNum},
-        #{joinTime}
-        );
   </update>
 </mapper>

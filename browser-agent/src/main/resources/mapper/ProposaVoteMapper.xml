@@ -21,23 +21,5 @@
         #{timestamp}
     );
 
-    insert into `node_opt`
-    (
-        `node_id`,
-        `type`,
-        `tx_hash`,
-        `b_num`,
-        `time`,
-        `desc`
-    )
-    values
-    (
-        #{nodeId},
-        '5',
-        #{txHash},
-        #{bNum},
-        #{timestamp},
-        #{optDesc}
-    );
 </update>
 </mapper>

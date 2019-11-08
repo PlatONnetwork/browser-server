@@ -3,6 +3,7 @@ package com.platon.browser.complement.service.param.converter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,24 +48,19 @@ public class StatisticsNetworkConverter {
 		BigDecimal turnValue = CalculateUtils.calculationTurnValue(issueValue,inciteBalance,stakingBalance,restrictBalance);
 		// 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
-        NetworkStatChange networkStatChange = NetworkStatChange.builder()
-        	.id(1)
-        	.curNumber(block.getNum())
-        	.nodeId(block.getNodeId())
-        	.nodeName(nodeCache.getNode(block.getNodeId()).getNodeName())
-        	.txQty(networkStat.getTxQty())
-        	.curTps(networkStat.getCurTps())
-        	.maxTps(networkStat.getMaxTps())
-        	.proposalQty(networkStat.getProposalQty())
-        	.blockReward(new BigDecimal(epochMessage.getBlockReward()))
-        	.stakingReward(new BigDecimal(epochMessage.getStakeReward()))
-        	.addIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
-        	.addIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
-        	.nextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
-			.issueValue(issueValue) // 发行量
-			.turnValue(turnValue) // 流通量
-        	.build();
-        
+        NetworkStatChange networkStatChange = NetworkStatChange.builder().build();
+        BeanUtils.copyProperties(networkStat,networkStatChange);
+        // 设置需要根据当前上下文更新的数据字段
+        networkStatChange.setCurNumber(block.getNum())
+                .setNodeId(block.getNodeId())
+                .setNodeName(nodeCache.getNode(block.getNodeId()).getNodeName())
+                .setBlockReward(new BigDecimal(epochMessage.getBlockReward()))
+                .setStakingReward(new BigDecimal(epochMessage.getStakeReward()))
+                .setAddIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
+                .setAddIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
+                .setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
+                .setIssueValue(issueValue) // 发行量
+                .setTurnValue(turnValue); // 流通量
         statisticBusinessMapper.networkChange(networkStatChange);
     }
 }

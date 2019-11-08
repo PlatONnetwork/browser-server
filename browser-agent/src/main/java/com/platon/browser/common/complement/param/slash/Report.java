@@ -31,11 +31,6 @@ public class Report extends BusinessParam {
     private String txHash;
 
     /**
-     * 交易块高
-     */
-    private BigInteger bNum;
-
-    /**
      * 时间
      */
     private Date time;
@@ -65,8 +60,6 @@ public class Report extends BusinessParam {
      */
     private String benefitAddr;
     
-    
-
     /**
      * 当前锁定的
      */
@@ -76,11 +69,6 @@ public class Report extends BusinessParam {
      * 奖励的金额
      */
     private BigDecimal codeRewardValue;
-
-    /**
-     * 节点操作描述  'PERCENT|AMOUNT' 中
-     */
-    private String codeNodeOptDesc;
 
     /**
      * 节点状态

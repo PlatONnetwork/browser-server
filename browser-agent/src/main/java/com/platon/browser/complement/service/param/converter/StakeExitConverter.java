@@ -30,10 +30,8 @@ public class StakeExitConverter extends BusinessParamConverter<Optional<Compleme
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         StakeExit businessParam= StakeExit.builder()
         		.nodeId(txParam.getNodeId())
-        		.txHash(tx.getHash())
         		.stakingBlockNum(txParam.getStakingBlockNum())
         		.time(tx.getTime())
-                .bNum(BigInteger.valueOf(tx.getNum()))
                 .stakingReductionEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
         
