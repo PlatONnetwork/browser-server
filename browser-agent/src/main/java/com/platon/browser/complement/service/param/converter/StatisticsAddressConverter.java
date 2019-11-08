@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.AddressExample;
 import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
-import com.platon.browser.common.complement.param.statistic.AddressStatChange;
-import com.platon.browser.common.complement.param.statistic.AddressStatItem;
+import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
+import com.platon.browser.complement.dao.param.statistic.AddressStatItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.StatisticBusinessMapper;
+import com.platon.browser.complement.dao.mapper.StatisticBusinessMapper;
 
 @Service
 public class StatisticsAddressConverter {
@@ -31,7 +31,7 @@ public class StatisticsAddressConverter {
 	private AddressMapper addressMapper;
     
 	
-    public void convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
 		List<AddressStatItem> addressStatItemList =   addressCache.getAll()
             	.stream()
             	.map(address->{ return AddressStatItem.builder()

@@ -1,5 +1,7 @@
 package com.platon.browser.elasticsearch.dto;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platon.browser.dto.CustomStaking;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -131,4 +133,21 @@ public class Transaction {
         public static boolean contains(ToTypeEnum en){return ENUMS.containsValue(en);}
     }
 
+    /**
+     * 获取当前交易的交易类型枚举
+     * @return
+     */
+    @JsonIgnore
+    public TypeEnum getTypeEnum(){
+        return TypeEnum.getEnum(this.getType());
+    }
+
+    /**
+     * 根据类型获取交易参数信息对象
+     * @return
+     */
+    @JsonIgnore
+    public <T> T getTxParam (Class<T> clazz) {
+        return JSON.parseObject(this.getInfo(), clazz);
+    }
 }

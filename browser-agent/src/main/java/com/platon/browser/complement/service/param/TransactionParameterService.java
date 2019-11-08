@@ -7,6 +7,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.service.param.converter.*;
 import com.platon.browser.complement.service.supplement.SupplementService;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -64,14 +65,14 @@ public class TransactionParameterService {
      * @param event
      * @return
      */
-    public List<ComplementNodeOpt> getParameters(CollectionEvent event){
-        List<CollectionTransaction> transactions = event.getTransactions();
-        List<ComplementNodeOpt> nodeOptList = new ArrayList<>();
+    public List<NodeOpt> getParameters(CollectionEvent event){
+        List<Transaction> transactions = event.getTransactions();
+        List<NodeOpt> nodeOptList = new ArrayList<>();
         
         int txQty = transactions.size();
         int proposalQty = 0;
 
-        for (CollectionTransaction tx : transactions) {
+        for (Transaction tx : transactions) {
         	//补充txInfo
         	supplementService.supplement(tx);
         	addressCache.update(tx);
@@ -81,7 +82,7 @@ public class TransactionParameterService {
                 if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) continue;
                 // 调用交易分析引擎分析交易，以补充相关数据
                 
-                Optional<ComplementNodeOpt> nodeOpt = Optional.ofNullable(null);
+                Optional<NodeOpt> nodeOpt = Optional.ofNullable(null);
                 switch (tx.getTypeEnum()) {
                     case STAKE_CREATE: // 1000 创建验证人
                     	nodeOpt = stakeCreateConverter.convert(event,tx);

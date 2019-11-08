@@ -1,17 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.platon.browser.complement.dao.param.epoch.Consensus;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.elasticsearch.dto.Block;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.param.epoch.Consensus;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.EpochBusinessMapper;
-import com.platon.browser.config.BlockChainConfig;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OnConsensusConverter {
@@ -21,7 +20,7 @@ public class OnConsensusConverter {
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
 	
-	public void convert(CollectionEvent event,CollectionBlock block) throws Exception {
+	public void convert(CollectionEvent event, Block block) throws Exception {
         List<String> validatorList = new ArrayList<>();
         event.getEpochMessage().getCurValidatorList().forEach(v->validatorList.add(v.getNodeId()));
 

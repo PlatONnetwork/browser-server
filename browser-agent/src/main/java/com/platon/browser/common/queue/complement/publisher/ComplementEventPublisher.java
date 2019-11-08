@@ -4,12 +4,12 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.BusinessParam;
 import com.platon.browser.common.queue.complement.event.ComplementEvent;
 import com.platon.browser.common.queue.complement.handler.IComplementEventHandler;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class ComplementEventPublisher {
-    private static final EventTranslatorThreeArg<ComplementEvent, CollectionBlock,List<CollectionTransaction>,List<ComplementNodeOpt>>
+    private static final EventTranslatorThreeArg<ComplementEvent, Block,List<Transaction>,List<NodeOpt>>
     TRANSLATOR = (event, sequence, block,transactions,nodeOpts)->event
             .setBlock(block)
             .setTransactions(transactions)
@@ -51,7 +51,7 @@ public class ComplementEventPublisher {
         ringBuffer = disruptor.getRingBuffer();
     }
 
-    public void publish(CollectionBlock block,List<CollectionTransaction> transactions, List<ComplementNodeOpt> nodeOpts) {
+    public void publish(Block block, List<Transaction> transactions, List<NodeOpt> nodeOpts) {
         ringBuffer.publishEvent(TRANSLATOR, block,transactions,nodeOpts);
     }
 }

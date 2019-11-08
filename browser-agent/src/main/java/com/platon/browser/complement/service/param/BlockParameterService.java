@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,9 +44,9 @@ public class BlockParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public List<ComplementNodeOpt> getParameters(CollectionEvent event) throws Exception{
-        List<ComplementNodeOpt> nodeOptList = new ArrayList<>();
-        CollectionBlock block = event.getBlock();
+    public List<NodeOpt> getParameters(CollectionEvent event) throws Exception{
+        List<NodeOpt> nodeOptList = new ArrayList<>();
+        Block block = event.getBlock();
 
         // 新区块事件
         onNewBlockConverter.convert(event,block);
@@ -54,8 +56,8 @@ public class BlockParameterService {
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            Optional<List<ComplementNodeOpt>> nodeOpt = onElectionConverter.convert(event, block);
-            nodeOpt.ifPresent(np -> nodeOptList.addAll(np));
+            Optional<List<NodeOpt>> nodeOpt = onElectionConverter.convert(event, block);
+            nodeOpt.ifPresent(nodeOptList::addAll);
         }
 
         // 新共识周期事件

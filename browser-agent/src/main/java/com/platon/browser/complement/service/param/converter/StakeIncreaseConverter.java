@@ -1,18 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Optional;
-
+import com.platon.browser.complement.dao.param.stake.StakeIncrease;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.StakeIncreaseParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.stake.StakeIncrease;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.StakeBusinessMapper;
-import com.platon.browser.param.StakeIncreaseParam;
+import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @description: 增持质押业务参数转换器
@@ -20,13 +18,13 @@ import com.platon.browser.param.StakeIncreaseParam;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class StakeIncreaseConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
+public class StakeIncreaseConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
     
     @Override
-    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         // 增持质押
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
         StakeIncrease businessParam= StakeIncrease.builder()        		

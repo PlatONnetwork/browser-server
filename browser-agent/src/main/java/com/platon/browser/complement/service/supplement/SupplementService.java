@@ -1,25 +1,14 @@
 package com.platon.browser.complement.service.supplement;
 
+import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.common.complement.cache.bean.NodeItem;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
+import com.platon.browser.param.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.cache.bean.NodeItem;
-import com.platon.browser.exception.NoSuchBeanException;
-import com.platon.browser.param.DelegateCreateParam;
-import com.platon.browser.param.DelegateExitParam;
-import com.platon.browser.param.ProposalCancelParam;
-import com.platon.browser.param.ProposalTextParam;
-import com.platon.browser.param.ProposalUpgradeParam;
-import com.platon.browser.param.ProposalVoteParam;
-import com.platon.browser.param.ReportParam;
-import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.param.StakeIncreaseParam;
-import com.platon.browser.param.VersionDeclareParam;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 缺失信息补充服务
@@ -34,7 +23,7 @@ public class SupplementService {
      * 补充节点相关信息
      * @param tx
      */
-    public void supplement(CollectionTransaction tx){
+    public void supplement(Transaction tx){
         String nodeId="";
         try {
             NodeItem nodeItem;

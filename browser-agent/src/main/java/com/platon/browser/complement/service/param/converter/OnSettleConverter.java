@@ -1,16 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
-import com.platon.browser.common.complement.param.epoch.Settle;
+import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.utils.CalculateUtils;
-import com.platon.browser.complement.mapper.EpochBusinessMapper;
+import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class OnSettleConverter {
     @Autowired
     private StakingMapper stakingMapper;
 
-	public void convert(CollectionEvent event,CollectionBlock block) throws Exception {
+	public void convert(CollectionEvent event, Block block) throws Exception {
         List<String> curVerifierList = new ArrayList<>();
         event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
         List<String> preVerifierList = new ArrayList<>();

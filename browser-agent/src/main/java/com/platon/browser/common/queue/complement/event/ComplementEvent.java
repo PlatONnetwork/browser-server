@@ -1,8 +1,8 @@
 package com.platon.browser.common.queue.complement.event;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -14,9 +14,9 @@ import java.util.List;
 @Accessors(chain = true)
 public class ComplementEvent {
     // 区块信息
-    private CollectionBlock block;
+    private Block block;
     // 交易列表
-    private List<CollectionTransaction> transactions;
+    private List<Transaction> transactions;
     // 交易列表
-    private List<ComplementNodeOpt> nodeOpts;
+    private List<NodeOpt> nodeOpts;
 }

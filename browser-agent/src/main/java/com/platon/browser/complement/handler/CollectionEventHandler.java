@@ -3,6 +3,7 @@ package com.platon.browser.complement.handler;
 import java.util.Comparator;
 import java.util.List;
 
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,12 +53,12 @@ public class CollectionEventHandler implements ICollectionEventHandler {
         try {
             // 确保交易从小到大的索引顺序
             event.getTransactions().sort(Comparator.comparing(Transaction::getIndex));
-            for (CollectionTransaction tx : event.getTransactions()) tx.setId(++transactionId);
+            for (Transaction tx : event.getTransactions()) tx.setId(++transactionId);
 
             // 根据区块号解析出业务参数
-            List<ComplementNodeOpt> nodeOpts1 = blockParameterService.getParameters(event);
+            List<NodeOpt> nodeOpts1 = blockParameterService.getParameters(event);
             // 根据交易解析出业务参数
-            List<ComplementNodeOpt> nodeOpts2 = transactionParameterService.getParameters(event);
+            List<NodeOpt> nodeOpts2 = transactionParameterService.getParameters(event);
             // 统计业务参数
             statisticParameterService.getParameters(event);
           

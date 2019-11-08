@@ -1,21 +1,19 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigInteger;
-import java.util.Optional;
-
-import com.platon.browser.dto.CustomProposal;
-import com.platon.browser.dto.CustomVote;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
+import com.platon.browser.complement.dao.param.proposal.ProposalVote;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.dto.CustomNodeOpt;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.ProposalVoteParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.proposal.ProposalVote;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.ProposalBusinessMapper;
-import com.platon.browser.dto.CustomNodeOpt;
-import com.platon.browser.param.ProposalVoteParam;
+import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * @description: 委托业务参数转换器
@@ -23,7 +21,7 @@ import com.platon.browser.param.ProposalVoteParam;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ProposalVoteConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
+public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 	
     @Autowired
     private ProposalBusinessMapper proposalBusinessMapper;
@@ -31,7 +29,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<Compl
     private NetworkStatCache networkStatCache;
 	
     @Override
-    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
     	ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
 
     	ProposalVote businessParam= ProposalVote.builder()
@@ -55,14 +53,14 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<Compl
 				.replace("TYPE", "")//TODO
 				.replace("VERSION","");//TODO
 
-		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
-		c.setId(networkStatCache.getAndIncrementNodeOptSeq());
-		c.setNodeId(txParam.getVerifier());
-		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.VOTE.getCode()));
-		c.setDesc(desc);
-		c.setTxHash(tx.getHash());
-		c.setBNum(event.getBlock().getNum());
-		c.setTime(event.getBlock().getTime());
-        return Optional.ofNullable(c);
+		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+		nodeOpt.setNodeId(txParam.getVerifier());
+		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.VOTE.getCode()));
+		nodeOpt.setDesc(desc);
+		nodeOpt.setTxHash(tx.getHash());
+		nodeOpt.setBNum(event.getBlock().getNum());
+		nodeOpt.setTime(event.getBlock().getTime());
+        return Optional.ofNullable(nodeOpt);
     }
 }

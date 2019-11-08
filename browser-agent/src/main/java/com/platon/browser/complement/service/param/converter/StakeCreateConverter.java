@@ -1,22 +1,22 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.stake.StakeCreate;
+import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.StakeBusinessMapper;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.dto.CustomNodeOpt;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Optional;
 
 
 /**
@@ -25,7 +25,7 @@ import com.platon.browser.utils.VerUtil;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class StakeCreateConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
+public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 	
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
@@ -33,7 +33,7 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<Comple
     private NetworkStatCache networkStatCache;
 
     @Override
-    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);
         BigInteger bigVersion = VerUtil.transferBigVersion(txParam.getProgramVersion());
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
@@ -59,13 +59,13 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<Comple
         
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
         
-        ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
-        complementNodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
-		complementNodeOpt.setNodeId(txParam.getNodeId());
-		complementNodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.CREATE.getCode()));
-		complementNodeOpt.setTxHash(tx.getHash());
-		complementNodeOpt.setBNum(tx.getNum());
-		complementNodeOpt.setTime(tx.getTime());        
-        return Optional.ofNullable(complementNodeOpt);
+        NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
+        nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
+		nodeOpt.setNodeId(txParam.getNodeId());
+		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.CREATE.getCode()));
+		nodeOpt.setTxHash(tx.getHash());
+		nodeOpt.setBNum(tx.getNum());
+		nodeOpt.setTime(tx.getTime());
+        return Optional.ofNullable(nodeOpt);
     }
 }

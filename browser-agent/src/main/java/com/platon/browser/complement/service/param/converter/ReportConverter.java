@@ -1,22 +1,20 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.slash.Report;
+import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.SlashBusinessMapper;
+import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ReportParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @description: 举报验证人业务参数转换器
@@ -24,7 +22,7 @@ import com.platon.browser.param.ReportParam;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ReportConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
+public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 	
     @Autowired
     private BlockChainConfig chainConfig;
@@ -35,7 +33,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<ComplementN
     private StakingMapper stakingMapper;
 
     @Override
-    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         Report businessParam= Report.builder()

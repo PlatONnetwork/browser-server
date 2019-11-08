@@ -1,17 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
+import com.platon.browser.complement.dao.param.restricting.RestrictingCreate;
+import com.platon.browser.complement.dao.param.restricting.RestrictingItem;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.RestrictingCreateParam;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.param.restricting.RestrictingCreate;
-import com.platon.browser.common.complement.param.restricting.RestrictingItem;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.param.RestrictingCreateParam;
 
 /**
  * @description: 委托业务参数转换器
@@ -22,7 +21,7 @@ import com.platon.browser.param.RestrictingCreateParam;
 public class RestrictingCreateConverter extends BusinessParamConverter<RestrictingCreate> {
 	
     @Override
-    public RestrictingCreate convert(CollectionEvent event, CollectionTransaction tx) {
+    public RestrictingCreate convert(CollectionEvent event, Transaction tx) {
     	RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);
     	String account = txParam.getAccount();
     	

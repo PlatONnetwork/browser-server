@@ -14,7 +14,6 @@ import org.web3j.protocol.core.methods.response.PlatonBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +22,6 @@ import java.util.Map;
 @Slf4j
 @Accessors(chain = true)
 public class CollectionBlock extends Block {
-    private List<CollectionTransaction> transactions=new ArrayList<>();
-
     private CollectionBlock(){}
     public static CollectionBlock newInstance(){
         CollectionBlock block = new CollectionBlock();

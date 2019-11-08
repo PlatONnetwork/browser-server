@@ -4,11 +4,11 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.queue.collection.handler.ICollectionEventHandler;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
 @Slf4j
 @Component
 public class CollectionEventPublisher {
-    private static final EventTranslatorThreeArg<CollectionEvent, CollectionBlock, List<CollectionTransaction>,EpochMessage>
+    private static final EventTranslatorThreeArg<CollectionEvent, Block, List<Transaction>,EpochMessage>
     TRANSLATOR = (event, sequence, block,transactions,epochMessage)->event.setBlock(block).setTransactions(transactions).setEpochMessage(epochMessage);
     private RingBuffer<CollectionEvent> ringBuffer;
     // 指定环形队列大小,必须是2的指数倍
@@ -47,7 +47,7 @@ public class CollectionEventPublisher {
         ringBuffer = disruptor.getRingBuffer();
     }
 
-    public void publish(CollectionBlock block, List<CollectionTransaction> transactions,EpochMessage epochMessage){
+    public void publish(Block block, List<Transaction> transactions,EpochMessage epochMessage){
         ringBuffer.publishEvent(TRANSLATOR, block,transactions,epochMessage);
     }
 }

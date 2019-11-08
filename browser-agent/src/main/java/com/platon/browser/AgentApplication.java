@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.complement.mapper"})
+@MapperScan(basePackages = {"com.platon.browser.dao.mapper","com.platon.browser.complement.dao.mapper"})
 public class AgentApplication implements ApplicationRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(AgentApplication.class, args);

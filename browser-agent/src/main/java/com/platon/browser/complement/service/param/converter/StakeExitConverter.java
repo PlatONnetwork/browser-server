@@ -1,17 +1,15 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigInteger;
-import java.util.Optional;
-
+import com.platon.browser.complement.dao.param.stake.StakeExit;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.StakeExitParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.common.complement.param.stake.StakeExit;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.StakeBusinessMapper;
-import com.platon.browser.param.StakeExitParam;
+import java.util.Optional;
 
 /**
  * @description: 退出质押业务参数转换器
@@ -19,13 +17,13 @@ import com.platon.browser.param.StakeExitParam;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class StakeExitConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
+public class StakeExitConverter extends BusinessParamConverter<Optional<NodeOpt>> {
 
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
 	
     @Override
-    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
         // 撤销质押
         StakeExitParam txParam = tx.getTxParam(StakeExitParam.class);
         StakeExit businessParam= StakeExit.builder()

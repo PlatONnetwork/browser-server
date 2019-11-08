@@ -1,10 +1,10 @@
 package com.platon.browser.common.complement.dto;
 
-import com.platon.browser.common.complement.param.slash.Report;
-import com.platon.browser.common.complement.param.stake.StakeCreate;
-import com.platon.browser.common.complement.param.stake.StakeExit;
-import com.platon.browser.common.complement.param.stake.StakeIncrease;
-import com.platon.browser.common.complement.param.stake.StakeModify;
+import com.platon.browser.complement.dao.param.slash.Report;
+import com.platon.browser.complement.dao.param.stake.StakeCreate;
+import com.platon.browser.complement.dao.param.stake.StakeExit;
+import com.platon.browser.complement.dao.param.stake.StakeIncrease;
+import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
 import lombok.Data;

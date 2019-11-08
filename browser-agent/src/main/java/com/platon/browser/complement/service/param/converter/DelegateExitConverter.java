@@ -1,17 +1,16 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
+import com.platon.browser.complement.dao.param.delegate.DelegateExit;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.DelegateExitParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.param.delegate.DelegateExit;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.param.DelegateExitParam;
-import com.platon.browser.complement.mapper.DelegateBusinessMapper;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @description: 委托业务参数转换器
@@ -27,7 +26,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
     private DelegateBusinessMapper delegateBusinessMapper;
 	
     @Override
-    public DelegateExit convert(CollectionEvent event, CollectionTransaction tx) {
+    public DelegateExit convert(CollectionEvent event, Transaction tx) {
     	DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
 
         DelegateExit businessParam= DelegateExit.builder()

@@ -1,16 +1,15 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
+import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
+import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.param.DelegateCreateParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
-import com.platon.browser.common.complement.param.delegate.DelegateCreate;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.param.DelegateCreateParam;
-import com.platon.browser.complement.mapper.DelegateBusinessMapper;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @description: 委托业务参数转换器
@@ -24,7 +23,7 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
     private DelegateBusinessMapper delegateBusinessMapper;
 
     @Override
-    public DelegateCreate convert(CollectionEvent event, CollectionTransaction tx) {
+    public DelegateCreate convert(CollectionEvent event, Transaction tx) {
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
 
         DelegateCreate businessParam= DelegateCreate.builder()

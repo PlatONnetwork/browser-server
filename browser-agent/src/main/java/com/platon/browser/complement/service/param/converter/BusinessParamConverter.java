@@ -1,10 +1,10 @@
 package com.platon.browser.complement.service.param.converter;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
-import com.platon.browser.common.complement.param.BusinessParam;
+import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.NoSuchBeanException;
 import org.apache.commons.lang3.StringUtils;
@@ -49,5 +49,5 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    abstract T convert(CollectionEvent event, CollectionTransaction tx);
+    abstract T convert(CollectionEvent event, Transaction tx);
 }

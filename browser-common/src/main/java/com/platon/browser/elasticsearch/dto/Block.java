@@ -1,16 +1,19 @@
 package com.platon.browser.elasticsearch.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Accessors(chain = true)
 public class Block {
+    @JsonIgnore
+    protected List<Transaction> transactions=new ArrayList<>();
     private Long num;
     private String hash;
     private String pHash;

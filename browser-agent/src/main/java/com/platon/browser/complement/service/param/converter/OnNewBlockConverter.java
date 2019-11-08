@@ -1,15 +1,14 @@
 package com.platon.browser.complement.service.param.converter;
 
-import java.math.BigDecimal;
-
+import com.platon.browser.common.complement.cache.NodeCache;
+import com.platon.browser.complement.dao.param.epoch.NewBlock;
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.dao.mapper.NewBlockMapper;
+import com.platon.browser.elasticsearch.dto.Block;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.cache.NodeCache;
-import com.platon.browser.common.complement.param.epoch.NewBlock;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.mapper.NewBlockMapper;
+import java.math.BigDecimal;
 
 @Service
 public class OnNewBlockConverter {
@@ -20,7 +19,7 @@ public class OnNewBlockConverter {
     @Autowired
     private NewBlockMapper newBlockMapper;
 
-	public void convert(CollectionEvent event,CollectionBlock block) throws Exception {
+	public void convert(CollectionEvent event, Block block) throws Exception {
       
 		NewBlock newBlock = NewBlock.builder()
                 .nodeId(block.getNodeId())
