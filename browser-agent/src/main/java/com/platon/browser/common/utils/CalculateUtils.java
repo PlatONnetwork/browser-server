@@ -129,23 +129,38 @@ public class CalculateUtils {
 
 
 	/**
-	 * 记录利润
+	 * 轮换记录利润
 	 * @param staking
 	 */
-	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig blockChainConfig)  {
-/*		if(ari==null){
-			throw new SettleEpochChangeException("年化率信息为空，无法计算!");
-		}*/
-		// 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
+	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig chainConfig)  {
 		// 添加上一周期的收益
-
 		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue());
 		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));
-		if(ari.getProfit().size()>blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+		if(ari.getProfit().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
 			// 按结算周期由大到小排序
 			ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
 			// 删除多余的元素
-			for (int i=ari.getProfit().size()-1;i>=blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+			for (int i=ari.getProfit().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+		}
+	}
+
+	/**
+	 * 轮换记录成本
+	 * @param staking
+	 * @param curSettingEpoch
+	 * @param ari
+	 * @param chainConfig
+	 */
+	public static void rotateCost(Staking staking,BigInteger curSettingEpoch,AnnualizedRateInfo ari,BlockChainConfig chainConfig) {
+		// 添加下一周期的质押成本
+		BigDecimal cost = staking.getStakingLocked().add(staking.getStakingHes());
+		ari.getCost().add(new PeriodValueElement(curSettingEpoch.add(BigInteger.ONE).longValue(),cost));
+		// 保留指定数量最新的记录
+		if(ari.getCost().size()>chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1){
+			// 按结算周期由大到小排序
+			ari.getCost().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+			// 删除多余的元素
+			for (int i=ari.getCost().size()-1;i>=chainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()+1;i--) ari.getCost().remove(i);
 		}
 	}
 

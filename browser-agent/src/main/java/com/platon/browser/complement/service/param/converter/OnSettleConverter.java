@@ -1,33 +1,20 @@
 package com.platon.browser.complement.service.param.converter;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.param.epoch.Settle;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.utils.CalculateUtils;
-import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.complement.mapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.enums.StakingStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -99,9 +86,16 @@ public class OnSettleConverter {
                 if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
                 if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
             }
+            // 对超出数量的收益轮换
             CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
             BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig.getSettlePeriodCountPerIssue());
             staking.setAnnualizedRate(annualizedRate.doubleValue());
+
+            // 如果当前节点在下一轮结算周期还是验证人,则记录下下一轮结算周期的成本
+            if(curVerifierList.contains(staking.getNodeId())){
+                CalculateUtils.rotateCost(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
+            }
+
             staking.setAnnualizedRateInfo(ari.toJSONString());
         });
         settle.setStakingList(stakingList);
