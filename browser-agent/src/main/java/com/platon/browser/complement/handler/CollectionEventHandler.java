@@ -13,6 +13,7 @@ import com.platon.browser.complement.service.param.TransactionParameterService;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,6 +41,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     private long transactionId = 0;
 
     private Long preBlockNum=0L;
+    @Transactional
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
