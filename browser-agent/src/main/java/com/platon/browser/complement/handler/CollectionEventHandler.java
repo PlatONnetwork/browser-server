@@ -43,7 +43,8 @@ public class CollectionEventHandler implements ICollectionEventHandler {
 
     private Long preBlockNum=0L;
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
-
+        log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
         if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
 
         // 使用已入库的交易数量初始化交易ID初始值

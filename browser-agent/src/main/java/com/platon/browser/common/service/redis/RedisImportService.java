@@ -46,6 +46,7 @@ public class RedisImportService {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<NetworkStat> statistics) throws InterruptedException {
+        log.debug("Redis批量导入:{}(blocks({}),transactions({}),statistics({})",Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),statistics.size());
         try{
             CountDownLatch latch = new CountDownLatch(3);
             submit(blockService,blocks,latch);

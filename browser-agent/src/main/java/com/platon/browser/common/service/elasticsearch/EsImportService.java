@@ -48,6 +48,8 @@ public class EsImportService {
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void batchImport(Set<Block> blocks, Set<Transaction> transactions, Set<Delegation> delegations, Set<NodeOpt> nodeOpts) throws InterruptedException {
+        log.debug("ES批量导入:{}(blocks({}),transactions({}),statistics({}),delegations({}),nodeOpts({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),blocks.size(),transactions.size(),delegations.size(),nodeOpts.size());
         try{
             CountDownLatch latch = new CountDownLatch(4);
             submit(blockService,blocks,latch);

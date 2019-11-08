@@ -28,6 +28,8 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BlockEventHandler")
     public void onEvent(BlockEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+        log.debug("BlockEvent处理:{}(event(block({})),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getEpochMessage().getCurrentBlockNumber(),sequence,endOfBatch);
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();

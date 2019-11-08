@@ -43,6 +43,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
     @Override
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE,label = "BootstrapEventHandler")
     public void onEvent(BootstrapEvent event, long sequence, boolean endOfBatch) throws ExecutionException, InterruptedException, BeanCreateOrUpdateException {
+        log.debug("BootstrapEvent处理:{}(event(blockCF({}),transactions({})),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlockCF().toString(),event.getReceiptCF().toString(),sequence,endOfBatch);
         try {
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             ReceiptResult receiptResult = event.getReceiptCF().get();

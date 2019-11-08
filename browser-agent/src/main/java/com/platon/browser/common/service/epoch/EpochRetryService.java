@@ -68,6 +68,7 @@ public class EpochRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void issueChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("增发周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // >>>>如果增发周期变更,则更新相应的奖励字段
             // >>>>当前增发周期的初始激励池余额需要在上一增发周期最后一个块时候确定
@@ -103,6 +104,7 @@ public class EpochRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void consensusChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("共识周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // 当前块所处的共识周期
             BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getConsensusPeriodBlockCount());
@@ -149,6 +151,7 @@ public class EpochRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void settlementChange(BigInteger currentBlockNumber) throws Exception {
+        log.debug("结算周期变更:{}({})",Thread.currentThread().getStackTrace()[1].getMethodName(),currentBlockNumber);
         try {
             // 当前块所处周期
             BigInteger currentEpoch = EpochUtil.getEpoch(currentBlockNumber,chainConfig.getSettlePeriodBlockCount());
@@ -194,6 +197,7 @@ public class EpochRetryService {
      */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public List<Node> getCandidates() throws Exception {
+        log.debug("获取实时候选人列表:{}()",Thread.currentThread().getStackTrace()[1].getMethodName());
         try {
             BaseResponse<List<Node>> br = platOnClient.getNodeContract().getCandidateList().send();
             if (!br.isStatusOk()) throw new CandidateException(br.errMsg);

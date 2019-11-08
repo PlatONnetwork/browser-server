@@ -27,6 +27,8 @@ public class ComplementEventHandler implements IComplementEventHandler {
     private Long preBlockNum=0L;
     @Override
     public void onEvent(ComplementEvent event, long sequence, boolean endOfBatch) {
+        log.debug("ComplementEvent处理:{}(event(block({}),transactions({}),businessParams({})),sequence({}),endOfBatch({}))",
+                Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),event.getBusinessParams().size(),sequence,endOfBatch);
         if(preBlockNum!=0L&&(event.getBlock().getNum()-preBlockNum!=1)) throw new AssertionError();
 
         try {
