@@ -11,6 +11,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.stake.StakeModify;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.mapper.StakeBusinessMapper;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.StakeModifyParam;
 import com.platon.browser.utils.HexTool;
 
@@ -43,6 +44,13 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<Comple
         stakeBusinessMapper.modify(businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
-        return Optional.ofNullable(null);
+        
+        ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
+		complementNodeOpt.setNodeId(txParam.getNodeId());
+		complementNodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.MODIFY.getCode()));
+		complementNodeOpt.setTxHash(tx.getHash());
+		complementNodeOpt.setBNum(tx.getNum());
+		complementNodeOpt.setTime(tx.getTime());   
+        return Optional.ofNullable(complementNodeOpt);
     }
 }
