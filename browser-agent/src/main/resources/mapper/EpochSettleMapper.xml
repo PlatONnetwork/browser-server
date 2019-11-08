@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.persistence.dao.mapper.EpochBusinessMapper">
 <update id="settle" parameterType="com.platon.browser.common.complement.dto.epoch.Settle">
 
-    <foreach collection="stakingList" item="staking"  separator="," >
+    <foreach collection="stakingList" item="staking" separator=";">
         update `staking` set
         `staking_locked` = #{staking.stakingLocked},
         `staking_hes` = #{staking.stakingHes},
@@ -14,10 +14,10 @@
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo}
         where `node_id` = #{staking.nodeId}
-        and staking_block_num = #{staking.stakingBlockNum};
+        and staking_block_num = #{staking.stakingBlockNum}
     </foreach>
 
-    <foreach collection="stakingList" item="staking"  separator="," >
+    <foreach collection="stakingList" item="staking" separator=";">
       update `node` set
         `staking_locked` = #{staking.stakingLocked},
         `staking_hes` = #{staking.stakingHes},
