@@ -6,7 +6,7 @@
 	update `node` set
 		`leave_time` = #{time},
 		`status` =  #{codeStatus},
-		`staking_reduction_epoch` = #{settingEpoch},
+		`staking_reduction_epoch` = #{codeStakingReductionEpoch},
 		`staking_reduction` = #{codeCurStakingLocked},
 		`staking_locked` = 0,
 		`staking_hes` = 0,
@@ -21,7 +21,7 @@
 	update `staking` set
 		`leave_time` = #{time},
 		`status` =  #{codeStatus},
-		`staking_reduction_epoch` = #{settingEpoch},
+		`staking_reduction_epoch` = #{codeStakingReductionEpoch},
 		`staking_reduction` = #{codeCurStakingLocked},
 		`staking_locked` = 0,
 		`staking_hes` = 0,

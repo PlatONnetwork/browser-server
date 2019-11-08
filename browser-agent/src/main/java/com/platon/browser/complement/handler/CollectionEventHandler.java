@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
@@ -40,6 +41,7 @@ public class CollectionEventHandler implements ICollectionEventHandler {
     private long transactionId = 0;
 
     private Long preBlockNum=0L;
+    @Transactional
     public void onEvent(CollectionEvent event, long sequence, boolean endOfBatch) throws Exception {
         log.debug("CollectionEvent处理:{}(event(block({}),transactions({})),sequence({}),endOfBatch({}))",
                 Thread.currentThread().getStackTrace()[1].getMethodName(),event.getBlock().getNum(),event.getTransactions().size(),sequence,endOfBatch);
