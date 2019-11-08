@@ -20,7 +20,7 @@ public class OnSettleConverter {
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
 	
-	public Settle convert(CollectionEvent event,CollectionBlock block) throws Exception {
+	public void convert(CollectionEvent event,CollectionBlock block) throws Exception {
         List<String> curVerifierList = new ArrayList<>();
         event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
         List<String> preVerifierList = new ArrayList<>();
@@ -35,8 +35,6 @@ public class OnSettleConverter {
                 .build();
         
         epochBusinessMapper.settle(settle);
-       
-		return settle;
 	}
 
 }

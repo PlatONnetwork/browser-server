@@ -1,25 +1,29 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.param.statistic.AddressStatChange;
 import com.platon.browser.common.complement.param.statistic.AddressStatItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.platon.browser.complement.mapper.StatisticBusinessMapper;
 
 @Service
 public class StatisticsAddressConverter {
 	
     @Autowired
     private AddressCache addressCache;
+    @Autowired
+    private StatisticBusinessMapper statisticBusinessMapper;
     
 	
-    public AddressStatChange convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
     	
         List<AddressStatItem> addressStatItemList =   addressCache.getAll()
             	.stream()
@@ -37,11 +41,11 @@ public class StatisticsAddressConverter {
             			.build();})
             	.collect(Collectors.toList());
             
-        	addressCache.cleanAll();;
+        addressCache.cleanAll();;
        
-            AddressStatChange addressStatChange = AddressStatChange.builder()
+        AddressStatChange addressStatChange = AddressStatChange.builder()
         		.addressStatItemList(addressStatItemList)
         		.build();
-        return addressStatChange;
+        statisticBusinessMapper.addressChange(addressStatChange);
     }
 }

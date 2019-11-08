@@ -2,19 +2,21 @@ package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Optional;
 
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.dao.mapper.StakingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.param.ReportParam;
 import com.platon.browser.complement.mapper.SlashBusinessMapper;
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
+import com.platon.browser.param.ReportParam;
 
 /**
  * @description: 举报验证人业务参数转换器
@@ -22,7 +24,7 @@ import com.platon.browser.complement.mapper.SlashBusinessMapper;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ReportConverter extends BusinessParamConverter<Report> {
+public class ReportConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
 	
     @Autowired
     private BlockChainConfig chainConfig;
@@ -33,7 +35,7 @@ public class ReportConverter extends BusinessParamConverter<Report> {
     private StakingMapper stakingMapper;
 
     @Override
-    public Report convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
         // 举报信息
         ReportParam txParam = tx.getTxParam(ReportParam.class);
         Report businessParam= Report.builder()
@@ -68,6 +70,6 @@ public class ReportConverter extends BusinessParamConverter<Report> {
         
         
         slashBusinessMapper.report(businessParam);
-        return businessParam;
+        return Optional.ofNullable(null);
     }
 }

@@ -1,5 +1,11 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
@@ -8,13 +14,9 @@ import com.platon.browser.common.complement.param.statistic.NetworkStatChange;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.common.utils.CalculateUtils;
+import com.platon.browser.complement.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @Service
 public class StatisticsNetworkConverter {
@@ -27,9 +29,11 @@ public class StatisticsNetworkConverter {
 	private AccountService accountService;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private StatisticBusinessMapper statisticBusinessMapper;
     
 	
-    public NetworkStatChange convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
     	
         //获取激励池余额
 		BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(block.getNum()));
@@ -60,7 +64,7 @@ public class StatisticsNetworkConverter {
 			.issueValue(issueValue) // 发行量
 			.turnValue(turnValue) // 流通量
         	.build();
-    	
-        return networkStatChange;
+        
+        statisticBusinessMapper.networkChange(networkStatChange);
     }
 }

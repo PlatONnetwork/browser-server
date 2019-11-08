@@ -1,18 +1,20 @@
 package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.proposal.ProposalCancel;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.mapper.ProposalBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.param.ProposalCancelParam;
-import com.platon.browser.complement.mapper.ProposalBusinessMapper;
 import com.platon.browser.util.RoundCalculation;
 
 /**
@@ -21,7 +23,7 @@ import com.platon.browser.util.RoundCalculation;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ProposalCancelConverter extends BusinessParamConverter<ProposalCancel> {
+public class ProposalCancelConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
 
     @Autowired
     private BlockChainConfig chainConfig;
@@ -29,7 +31,7 @@ public class ProposalCancelConverter extends BusinessParamConverter<ProposalCanc
     private ProposalBusinessMapper proposalBusinessMapper;
 	
     @Override
-    public ProposalCancel convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
     	ProposalCancelParam txParam = tx.getTxParam(ProposalCancelParam.class);
 
     	ProposalCancel businessParam= ProposalCancel.builder()
@@ -57,6 +59,6 @@ public class ProposalCancelConverter extends BusinessParamConverter<ProposalCanc
     	
     	proposalBusinessMapper.cancel(businessParam);
     	
-        return businessParam;
+        return Optional.ofNullable(null);
     }
 }
