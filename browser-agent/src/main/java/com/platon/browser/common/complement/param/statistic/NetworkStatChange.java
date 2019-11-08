@@ -145,6 +145,12 @@ public class NetworkStatChange extends BusinessParam {
 	 * 当前流通量(von)
 	 */
 	private BigDecimal turnValue;
+
+	/**
+	 * 节点操作记录最新序号
+	 */
+	private Long nodeOptSeq;
+
 	@Override
 	public BusinessType getBusinessType() {
 		return BusinessType.NETWORK_STATISTIC;

@@ -1,7 +1,5 @@
 package com.platon.browser.complement.service.param.converter;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.math.BigInteger;
 import java.util.Optional;
 

@@ -66,6 +66,7 @@ public class InitializationService {
         if(networkStat==null){
             // 创建新的统计记录
             networkStat = CollectionNetworkStat.newInstance();
+            networkStat.setId(1);
             networkStat.setCurNumber(1L);
             networkStatMapper.insert(networkStat);
             initialResult.setCollectedBlockNumber(0L);
@@ -135,35 +136,44 @@ public class InitializationService {
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue()); // 提前设置验证轮数
             staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
             staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
-            // 内置节点默认设置状态为1
             staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
-            // 设置内置节点质押锁定金额
-            BigDecimal initStakingLocked = Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT);
-            staking.setStakingLocked(initStakingLocked);
+            staking.setStakingLocked(Convert.toVon(chainConfig.getDefaultStakingLockedAmount(), Convert.Unit.LAT));
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if(validatorSet.contains(v.getNodeId())) staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
 
-
             // 使用实时候选人信息更新质押
             if(candidate!=null) {
+                // 设置节点名称
                 String nodeName = candidate.getNodeName();
+                if(StringUtils.isNotBlank(nodeName)) staking.setNodeName(nodeName);
+                // 设置程序版本号
                 String programVersion=candidate.getProgramVersion().toString();
-                BigInteger bigVersion = VerUtil.transferBigVersion(candidate.getProgramVersion());
-                staking.setNodeName(nodeName);
-                staking.setProgramVersion(programVersion);
-                staking.setBigVersion(bigVersion.toString());
-                staking.setExternalId(candidate.getExternalId());
-                staking.setBenefitAddr(candidate.getBenifitAddress());
-                staking.setDetails(candidate.getDetails());
-                staking.setWebSite(candidate.getWebsite());
+                if(StringUtils.isNotBlank(programVersion)){
+                    staking.setProgramVersion(programVersion);
+                    BigInteger bigVersion = VerUtil.transferBigVersion(candidate.getProgramVersion());
+                    staking.setBigVersion(bigVersion.toString());
+                }
+                // 设置外部ID
+                String externalId = candidate.getExternalId();
+                if(StringUtils.isNotBlank(externalId)) staking.setExternalId(externalId);
+                // 设置收益地址
+                String benefitAddr = candidate.getBenifitAddress();
+                if(StringUtils.isNotBlank(benefitAddr)) staking.setBenefitAddr(benefitAddr);
+                // 设置详情
+                String details = candidate.getDetails();
+                if(StringUtils.isNotBlank(details)) staking.setDetails(details);
+                // 设置官网
+                String website = candidate.getWebsite();
+                if(StringUtils.isNotBlank(website)) staking.setWebSite(website);
             }
 
             // 使用配置文件中的信息更新质押
             CustomStaking defaultStaking = defaultStakingMap.get(staking.getNodeId());
-            if(StringUtils.isBlank(staking.getNodeName())&&defaultStaking!=null)
+            if(StringUtils.isBlank(staking.getNodeName())&&defaultStaking!=null){
                 staking.setNodeName(defaultStaking.getNodeName());
+            }
 
-            // 记录年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
+            // 更新年化率信息, 由于是周期开始，所以只记录成本，收益需要在结算周期切换时算
             PeriodValueElement pve = PeriodValueElement.builder()
                     .period(1L)
                     .value(staking.getStakingLocked())
@@ -173,15 +183,14 @@ public class InitializationService {
                     .build();
             staking.setAnnualizedRateInfo(ari.toJSONString());
 
-
+            // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
-            node.updateWithNode(v);
+            node.updateWithCustomStaking(staking);
             node.setTotalValue(BigDecimal.ZERO);
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());
             node.setStatVerifierTime(BigInteger.ONE.intValue()); // 提前设置验证轮数
             node.setStatExpectBlockQty(epochRetryService.getExpectBlockCount()); // 期望出块数=共识周期块数/实际参与共识节点数
 
-            BeanUtils.copyProperties(staking,node);
             nodes.add(node);
             stakings.add(staking);
         });

@@ -18,7 +18,8 @@
         `staking_reward`,
         `add_issue_begin`,
         `add_issue_end`,
-        `next_settle`
+        `next_settle`,
+        `node_opt_seq`
     )
     values
     (
@@ -36,7 +37,8 @@
         #{stakingReward},
         #{addIssueBegin},
         #{addIssueEnd},
-        #{nextSettle}
+        #{nextSettle},
+        #{nodeOptSeq}
     )
     on duplicate
     key update
@@ -53,6 +55,7 @@
         `staking_reward` = #{stakingReward},
         `add_issue_begin` = #{addIssueBegin},
         `add_issue_end` = #{addIssueEnd},
-        `next_settle` = #{nextSettle};
+        `next_settle` = #{nextSettle},
+        `node_opt_seq` = #{nodeOptSeq};
 </update>
 </mapper>
