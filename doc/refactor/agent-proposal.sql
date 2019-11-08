@@ -19,8 +19,8 @@ set @stakingName = "";  -- 质押名称
 insert into `proposal` 
 	(`hash`, 
 	`type`, 
-	`node_id`, 
-	`node_name`, 
+	`verifier`, 
+	`verifier_name`, 
 	`url`, 
 	`end_voting_block`, 
 	`timestamp`, 
@@ -50,15 +50,15 @@ insert into `node_opt`
 	(`node_id`, 
 	`type`, 
 	`tx_hash`, 
-	`b_num`,
-	`time`,
+	`block_number`, 
+	`timestamp`,
 	`desc`
 	)
 	values
 	(@node_id, 
 	'4', 
 	@tx_hash, 
-	@block_number,
+	@block_number, 
 	@tx_timestamp,
 	@opt_desc
 	);
@@ -87,8 +87,8 @@ set @stakingName = "";  -- 质押名称
 insert into `proposal` 
 	(`hash`, 
 	`type`, 
-	`node_id`, 
-	`node_name`, 
+	`verifier`, 
+	`verifier_name`, 
 	`url`,
 	`new_version`, 
 	`end_voting_block`, 
@@ -122,8 +122,8 @@ insert into `node_opt`
 	(`node_id`, 
 	`type`, 
 	`tx_hash`, 
-	`b_num`,
-	`time`,
+	`block_number`, 
+	`timestamp`,
 	`desc`
 	)
 	values
@@ -158,8 +158,8 @@ set @stakingName = "";  -- 质押名称
 insert into `proposal` 
 	(`hash`, 
 	`type`, 
-	`node_id`, 
-	`node_name`, 
+	`verifier`, 
+	`verifier_name`, 
 	`url`, 
 	`end_voting_block`, 
 	`timestamp`, 
@@ -191,8 +191,8 @@ insert into `node_opt`
 	(`node_id`, 
 	`type`, 
 	`tx_hash`, 
-	`b_num`,
-	`time`,
+	`block_number`, 
+	`timestamp`,
 	`desc`
 	)
 	values
@@ -221,8 +221,8 @@ set @stakingName = "";  -- 质押名称
 -- 1. vote 创建
 insert into `vote` 
 	(`hash`, 
-	`node_name`, 
-	`node_id`, 
+	`verifier_name`, 
+	`verifier`, 
 	`option`, 
 	`proposal_hash`, 
 	`timestamp`
@@ -241,8 +241,8 @@ insert into `node_opt`
 	(`node_id`, 
 	`type`, 
 	`tx_hash`, 
-	`b_num`,
-	`time`,
+	`block_number`, 
+	`timestamp`,
 	`desc`
 	)
 	values
