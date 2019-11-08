@@ -115,7 +115,7 @@
 
         -->
 
-        <table tableName="network_stat" domainObjectName="NetworkStat">
+        <table tableName="node" domainObjectName="Node">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

@@ -2356,66 +2356,6 @@ public class NodeExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatFeeRewardValueIsNull() {
-            addCriterion("stat_fee_reward_value is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueIsNotNull() {
-            addCriterion("stat_fee_reward_value is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueEqualTo(BigDecimal value) {
-            addCriterion("stat_fee_reward_value =", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueNotEqualTo(BigDecimal value) {
-            addCriterion("stat_fee_reward_value <>", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueGreaterThan(BigDecimal value) {
-            addCriterion("stat_fee_reward_value >", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("stat_fee_reward_value >=", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueLessThan(BigDecimal value) {
-            addCriterion("stat_fee_reward_value <", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("stat_fee_reward_value <=", value, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueIn(List<BigDecimal> values) {
-            addCriterion("stat_fee_reward_value in", values, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueNotIn(List<BigDecimal> values) {
-            addCriterion("stat_fee_reward_value not in", values, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("stat_fee_reward_value between", value1, value2, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatFeeRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("stat_fee_reward_value not between", value1, value2, "statFeeRewardValue");
-            return (Criteria) this;
-        }
-
         public Criteria andStatStakingRewardValueIsNull() {
             addCriterion("stat_staking_reward_value is null");
             return (Criteria) this;
@@ -2473,6 +2413,66 @@ public class NodeExample {
 
         public Criteria andStatStakingRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("stat_staking_reward_value not between", value1, value2, "statStakingRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueIsNull() {
+            addCriterion("stat_fee_reward_value is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueIsNotNull() {
+            addCriterion("stat_fee_reward_value is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueEqualTo(BigDecimal value) {
+            addCriterion("stat_fee_reward_value =", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotEqualTo(BigDecimal value) {
+            addCriterion("stat_fee_reward_value <>", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueGreaterThan(BigDecimal value) {
+            addCriterion("stat_fee_reward_value >", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("stat_fee_reward_value >=", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueLessThan(BigDecimal value) {
+            addCriterion("stat_fee_reward_value <", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("stat_fee_reward_value <=", value, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueIn(List<BigDecimal> values) {
+            addCriterion("stat_fee_reward_value in", values, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotIn(List<BigDecimal> values) {
+            addCriterion("stat_fee_reward_value not in", values, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("stat_fee_reward_value between", value1, value2, "statFeeRewardValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatFeeRewardValueNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("stat_fee_reward_value not between", value1, value2, "statFeeRewardValue");
             return (Criteria) this;
         }
 

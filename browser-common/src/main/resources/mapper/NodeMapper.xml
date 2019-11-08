@@ -38,10 +38,13 @@
     <result column="stat_valid_addrs" jdbcType="INTEGER" property="statValidAddrs" />
     <result column="stat_invalid_addrs" jdbcType="INTEGER" property="statInvalidAddrs" />
     <result column="stat_block_reward_value" jdbcType="DECIMAL" property="statBlockRewardValue" />
-    <result column="stat_fee_reward_value" jdbcType="DECIMAL" property="statFeeRewardValue" />
     <result column="stat_staking_reward_value" jdbcType="DECIMAL" property="statStakingRewardValue" />
+    <result column="stat_fee_reward_value" jdbcType="DECIMAL" property="statFeeRewardValue" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.Node">
+    <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -108,9 +111,28 @@
     node_icon, external_id, external_name, staking_addr, benefit_addr, annualized_rate, 
     program_version, big_version, web_site, details, join_time, leave_time, `status`, 
     is_consensus, is_settle, is_init, stat_delegate_value, stat_delegate_released, stat_valid_addrs, 
-    stat_invalid_addrs, stat_block_reward_value, stat_fee_reward_value, stat_staking_reward_value, 
+    stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, stat_fee_reward_value, 
     create_time, update_time
   </sql>
+  <sql id="Blob_Column_List">
+    annualized_rate_info
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from node
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NodeExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -125,9 +147,11 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from node
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </select>
@@ -154,9 +178,9 @@
       leave_time, `status`, is_consensus, 
       is_settle, is_init, stat_delegate_value, 
       stat_delegate_released, stat_valid_addrs, stat_invalid_addrs, 
-      stat_block_reward_value, stat_fee_reward_value, 
-      stat_staking_reward_value, create_time, update_time
-      )
+      stat_block_reward_value, stat_staking_reward_value, 
+      stat_fee_reward_value, create_time, update_time, 
+      annualized_rate_info)
     values (#{nodeId,jdbcType=VARCHAR}, #{statSlashMultiQty,jdbcType=INTEGER}, #{statSlashLowQty,jdbcType=INTEGER}, 
       #{statBlockQty,jdbcType=BIGINT}, #{statExpectBlockQty,jdbcType=BIGINT}, #{statVerifierTime,jdbcType=INTEGER}, 
       #{isRecommend,jdbcType=INTEGER}, #{totalValue,jdbcType=DECIMAL}, #{stakingBlockNum,jdbcType=BIGINT}, 
@@ -169,9 +193,9 @@
       #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{isConsensus,jdbcType=INTEGER}, 
       #{isSettle,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, #{statDelegateValue,jdbcType=DECIMAL}, 
       #{statDelegateReleased,jdbcType=DECIMAL}, #{statValidAddrs,jdbcType=INTEGER}, #{statInvalidAddrs,jdbcType=INTEGER}, 
-      #{statBlockRewardValue,jdbcType=DECIMAL}, #{statFeeRewardValue,jdbcType=DECIMAL}, 
-      #{statStakingRewardValue,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{statBlockRewardValue,jdbcType=DECIMAL}, #{statStakingRewardValue,jdbcType=DECIMAL}, 
+      #{statFeeRewardValue,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{annualizedRateInfo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Node">
     insert into node
@@ -284,17 +308,20 @@
       <if test="statBlockRewardValue != null">
         stat_block_reward_value,
       </if>
-      <if test="statFeeRewardValue != null">
-        stat_fee_reward_value,
-      </if>
       <if test="statStakingRewardValue != null">
         stat_staking_reward_value,
+      </if>
+      <if test="statFeeRewardValue != null">
+        stat_fee_reward_value,
       </if>
       <if test="createTime != null">
         create_time,
       </if>
       <if test="updateTime != null">
         update_time,
+      </if>
+      <if test="annualizedRateInfo != null">
+        annualized_rate_info,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -406,17 +433,20 @@
       <if test="statBlockRewardValue != null">
         #{statBlockRewardValue,jdbcType=DECIMAL},
       </if>
-      <if test="statFeeRewardValue != null">
-        #{statFeeRewardValue,jdbcType=DECIMAL},
-      </if>
       <if test="statStakingRewardValue != null">
         #{statStakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="statFeeRewardValue != null">
+        #{statFeeRewardValue,jdbcType=DECIMAL},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="annualizedRateInfo != null">
+        #{annualizedRateInfo,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -537,11 +567,11 @@
       <if test="record.statBlockRewardValue != null">
         stat_block_reward_value = #{record.statBlockRewardValue,jdbcType=DECIMAL},
       </if>
-      <if test="record.statFeeRewardValue != null">
-        stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
-      </if>
       <if test="record.statStakingRewardValue != null">
         stat_staking_reward_value = #{record.statStakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.statFeeRewardValue != null">
+        stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -549,7 +579,57 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.annualizedRateInfo != null">
+        annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update node
+    set node_id = #{record.nodeId,jdbcType=VARCHAR},
+      stat_slash_multi_qty = #{record.statSlashMultiQty,jdbcType=INTEGER},
+      stat_slash_low_qty = #{record.statSlashLowQty,jdbcType=INTEGER},
+      stat_block_qty = #{record.statBlockQty,jdbcType=BIGINT},
+      stat_expect_block_qty = #{record.statExpectBlockQty,jdbcType=BIGINT},
+      stat_verifier_time = #{record.statVerifierTime,jdbcType=INTEGER},
+      is_recommend = #{record.isRecommend,jdbcType=INTEGER},
+      total_value = #{record.totalValue,jdbcType=DECIMAL},
+      staking_block_num = #{record.stakingBlockNum,jdbcType=BIGINT},
+      staking_tx_index = #{record.stakingTxIndex,jdbcType=INTEGER},
+      staking_hes = #{record.stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{record.stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{record.stakingReduction,jdbcType=DECIMAL},
+      staking_reduction_epoch = #{record.stakingReductionEpoch,jdbcType=INTEGER},
+      node_name = #{record.nodeName,jdbcType=VARCHAR},
+      node_icon = #{record.nodeIcon,jdbcType=VARCHAR},
+      external_id = #{record.externalId,jdbcType=VARCHAR},
+      external_name = #{record.externalName,jdbcType=VARCHAR},
+      staking_addr = #{record.stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{record.benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{record.annualizedRate,jdbcType=DOUBLE},
+      program_version = #{record.programVersion,jdbcType=INTEGER},
+      big_version = #{record.bigVersion,jdbcType=INTEGER},
+      web_site = #{record.webSite,jdbcType=VARCHAR},
+      details = #{record.details,jdbcType=VARCHAR},
+      join_time = #{record.joinTime,jdbcType=TIMESTAMP},
+      leave_time = #{record.leaveTime,jdbcType=TIMESTAMP},
+      `status` = #{record.status,jdbcType=INTEGER},
+      is_consensus = #{record.isConsensus,jdbcType=INTEGER},
+      is_settle = #{record.isSettle,jdbcType=INTEGER},
+      is_init = #{record.isInit,jdbcType=INTEGER},
+      stat_delegate_value = #{record.statDelegateValue,jdbcType=DECIMAL},
+      stat_delegate_released = #{record.statDelegateReleased,jdbcType=DECIMAL},
+      stat_valid_addrs = #{record.statValidAddrs,jdbcType=INTEGER},
+      stat_invalid_addrs = #{record.statInvalidAddrs,jdbcType=INTEGER},
+      stat_block_reward_value = #{record.statBlockRewardValue,jdbcType=DECIMAL},
+      stat_staking_reward_value = #{record.statStakingRewardValue,jdbcType=DECIMAL},
+      stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -592,8 +672,8 @@
       stat_valid_addrs = #{record.statValidAddrs,jdbcType=INTEGER},
       stat_invalid_addrs = #{record.statInvalidAddrs,jdbcType=INTEGER},
       stat_block_reward_value = #{record.statBlockRewardValue,jdbcType=DECIMAL},
-      stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{record.statStakingRewardValue,jdbcType=DECIMAL},
+      stat_fee_reward_value = #{record.statFeeRewardValue,jdbcType=DECIMAL},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -708,11 +788,11 @@
       <if test="statBlockRewardValue != null">
         stat_block_reward_value = #{statBlockRewardValue,jdbcType=DECIMAL},
       </if>
-      <if test="statFeeRewardValue != null">
-        stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
-      </if>
       <if test="statStakingRewardValue != null">
         stat_staking_reward_value = #{statStakingRewardValue,jdbcType=DECIMAL},
+      </if>
+      <if test="statFeeRewardValue != null">
+        stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -720,7 +800,54 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="annualizedRateInfo != null">
+        annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    where node_id = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.platon.browser.dao.entity.Node">
+    update node
+    set stat_slash_multi_qty = #{statSlashMultiQty,jdbcType=INTEGER},
+      stat_slash_low_qty = #{statSlashLowQty,jdbcType=INTEGER},
+      stat_block_qty = #{statBlockQty,jdbcType=BIGINT},
+      stat_expect_block_qty = #{statExpectBlockQty,jdbcType=BIGINT},
+      stat_verifier_time = #{statVerifierTime,jdbcType=INTEGER},
+      is_recommend = #{isRecommend,jdbcType=INTEGER},
+      total_value = #{totalValue,jdbcType=DECIMAL},
+      staking_block_num = #{stakingBlockNum,jdbcType=BIGINT},
+      staking_tx_index = #{stakingTxIndex,jdbcType=INTEGER},
+      staking_hes = #{stakingHes,jdbcType=DECIMAL},
+      staking_locked = #{stakingLocked,jdbcType=DECIMAL},
+      staking_reduction = #{stakingReduction,jdbcType=DECIMAL},
+      staking_reduction_epoch = #{stakingReductionEpoch,jdbcType=INTEGER},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_icon = #{nodeIcon,jdbcType=VARCHAR},
+      external_id = #{externalId,jdbcType=VARCHAR},
+      external_name = #{externalName,jdbcType=VARCHAR},
+      staking_addr = #{stakingAddr,jdbcType=VARCHAR},
+      benefit_addr = #{benefitAddr,jdbcType=VARCHAR},
+      annualized_rate = #{annualizedRate,jdbcType=DOUBLE},
+      program_version = #{programVersion,jdbcType=INTEGER},
+      big_version = #{bigVersion,jdbcType=INTEGER},
+      web_site = #{webSite,jdbcType=VARCHAR},
+      details = #{details,jdbcType=VARCHAR},
+      join_time = #{joinTime,jdbcType=TIMESTAMP},
+      leave_time = #{leaveTime,jdbcType=TIMESTAMP},
+      `status` = #{status,jdbcType=INTEGER},
+      is_consensus = #{isConsensus,jdbcType=INTEGER},
+      is_settle = #{isSettle,jdbcType=INTEGER},
+      is_init = #{isInit,jdbcType=INTEGER},
+      stat_delegate_value = #{statDelegateValue,jdbcType=DECIMAL},
+      stat_delegate_released = #{statDelegateReleased,jdbcType=DECIMAL},
+      stat_valid_addrs = #{statValidAddrs,jdbcType=INTEGER},
+      stat_invalid_addrs = #{statInvalidAddrs,jdbcType=INTEGER},
+      stat_block_reward_value = #{statBlockRewardValue,jdbcType=DECIMAL},
+      stat_staking_reward_value = #{statStakingRewardValue,jdbcType=DECIMAL},
+      stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.Node">
@@ -760,8 +887,8 @@
       stat_valid_addrs = #{statValidAddrs,jdbcType=INTEGER},
       stat_invalid_addrs = #{statInvalidAddrs,jdbcType=INTEGER},
       stat_block_reward_value = #{statBlockRewardValue,jdbcType=DECIMAL},
-      stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
       stat_staking_reward_value = #{statStakingRewardValue,jdbcType=DECIMAL},
+      stat_fee_reward_value = #{statFeeRewardValue,jdbcType=DECIMAL},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where node_id = #{nodeId,jdbcType=VARCHAR}
@@ -779,8 +906,8 @@
       node_icon, external_id, external_name, staking_addr, benefit_addr, annualized_rate, 
       program_version, big_version, web_site, details, join_time, leave_time, `status`, 
       is_consensus, is_settle, is_init, stat_delegate_value, stat_delegate_released, 
-      stat_valid_addrs, stat_invalid_addrs, stat_block_reward_value, stat_fee_reward_value, 
-      stat_staking_reward_value, create_time, update_time)
+      stat_valid_addrs, stat_invalid_addrs, stat_block_reward_value, stat_staking_reward_value, 
+      stat_fee_reward_value, create_time, update_time, annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
       (#{item.nodeId,jdbcType=VARCHAR}, #{item.statSlashMultiQty,jdbcType=INTEGER}, #{item.statSlashLowQty,jdbcType=INTEGER}, 
@@ -796,9 +923,10 @@
         #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, #{item.isSettle,jdbcType=INTEGER}, 
         #{item.isInit,jdbcType=INTEGER}, #{item.statDelegateValue,jdbcType=DECIMAL}, #{item.statDelegateReleased,jdbcType=DECIMAL}, 
         #{item.statValidAddrs,jdbcType=INTEGER}, #{item.statInvalidAddrs,jdbcType=INTEGER}, 
-        #{item.statBlockRewardValue,jdbcType=DECIMAL}, #{item.statFeeRewardValue,jdbcType=DECIMAL}, 
-        #{item.statStakingRewardValue,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP})
+        #{item.statBlockRewardValue,jdbcType=DECIMAL}, #{item.statStakingRewardValue,jdbcType=DECIMAL}, 
+        #{item.statFeeRewardValue,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP}, 
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        )
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -924,11 +1052,11 @@
         <if test="'stat_block_reward_value'.toString() == column.value">
           #{item.statBlockRewardValue,jdbcType=DECIMAL}
         </if>
-        <if test="'stat_fee_reward_value'.toString() == column.value">
-          #{item.statFeeRewardValue,jdbcType=DECIMAL}
-        </if>
         <if test="'stat_staking_reward_value'.toString() == column.value">
           #{item.statStakingRewardValue,jdbcType=DECIMAL}
+        </if>
+        <if test="'stat_fee_reward_value'.toString() == column.value">
+          #{item.statFeeRewardValue,jdbcType=DECIMAL}
         </if>
         <if test="'create_time'.toString() == column.value">
           #{item.createTime,jdbcType=TIMESTAMP}
@@ -936,8 +1064,12 @@
         <if test="'update_time'.toString() == column.value">
           #{item.updateTime,jdbcType=TIMESTAMP}
         </if>
+        <if test="'annualized_rate_info'.toString() == column.value">
+          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+        </if>
       </foreach>
       )
     </foreach>
   </insert>
+
 </mapper>

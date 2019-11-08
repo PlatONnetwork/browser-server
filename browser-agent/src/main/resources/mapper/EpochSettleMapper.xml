@@ -3,7 +3,7 @@
 <mapper namespace="com.platon.browser.complement.mapper.EpochBusinessMapper">
 <update id="settle" parameterType="com.platon.browser.common.complement.param.epoch.Settle">
 
-    <foreach collection="stakingList" item="staking" separator=";">
+    <foreach collection="stakingList" item="staking">
         update `staking` set
         `staking_locked` = #{staking.stakingLocked},
         `staking_hes` = #{staking.stakingHes},
@@ -14,21 +14,21 @@
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo}
         where `node_id` = #{staking.nodeId}
-        and staking_block_num = #{staking.stakingBlockNum}
+        and staking_block_num = #{staking.stakingBlockNum};
     </foreach>
 
-    <foreach collection="stakingList" item="staking" separator=";">
+    <foreach collection="stakingList" item="staking">
       update `node` set
         `staking_locked` = #{staking.stakingLocked},
         `staking_hes` = #{staking.stakingHes},
         `staking_reduction` = #{staking.stakingReduction},
         `status` = #{staking.status},
-        `stat_staking_reward_value` = `staking_reward_value` + #{staking.feeRewardValue},
+        `stat_staking_reward_value` = `stat_staking_reward_value` + #{staking.feeRewardValue},
         `is_settle` = #{staking.isSettle},
         `annualized_rate` = #{staking.annualizedRate},
         `annualized_rate_info` = #{staking.annualizedRateInfo}
       where
-        `node_id` =  #{staking.nodeId}
+        `node_id` =  #{staking.nodeId};
     </foreach>
 
     update `delegation` set

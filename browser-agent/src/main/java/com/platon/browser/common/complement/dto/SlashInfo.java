@@ -1,5 +1,6 @@
-package com.platon.browser.common.collection.dto;
+package com.platon.browser.common.complement.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,6 +16,7 @@ import java.util.Date;
  */
 @Data
 @Builder
+@AllArgsConstructor
 @Accessors(chain = true)
 public class SlashInfo {
     private BigInteger blockNumber;

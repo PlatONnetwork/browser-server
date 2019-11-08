@@ -1,7 +1,6 @@
 package com.platon.browser.common.complement.dto;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.common.collection.dto.SlashInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

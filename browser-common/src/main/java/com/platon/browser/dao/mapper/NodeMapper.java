@@ -16,15 +16,21 @@ public interface NodeMapper {
 
     int insertSelective(Node record);
 
+    List<Node> selectByExampleWithBLOBs(NodeExample example);
+
     List<Node> selectByExample(NodeExample example);
 
     Node selectByPrimaryKey(String nodeId);
 
     int updateByExampleSelective(@Param("record") Node record, @Param("example") NodeExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") Node record, @Param("example") NodeExample example);
+
     int updateByExample(@Param("record") Node record, @Param("example") NodeExample example);
 
     int updateByPrimaryKeySelective(Node record);
+
+    int updateByPrimaryKeyWithBLOBs(Node record);
 
     int updateByPrimaryKey(Node record);
 

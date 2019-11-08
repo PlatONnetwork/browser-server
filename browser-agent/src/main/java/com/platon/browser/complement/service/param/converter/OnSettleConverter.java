@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ public class OnSettleConverter {
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
-        List<Staking> stakingList = stakingMapper.selectByExample(stakingExample);
+        List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
         //todo:stakinglist为空
         stakingList.forEach(staking -> {
             //犹豫期金额
@@ -87,11 +88,21 @@ public class OnSettleConverter {
                 staking.setIsSettle(2);
             }
             //计算年化率
-            if(staking.getStatus() == StakingStatusEnum.CANDIDATE.getCode()){
-                CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()),JSON.parseObject(staking.getAnnualizedRateInfo(),AnnualizedRateInfo.class),chainConfig);
-                BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(JSON.parseObject(staking.getAnnualizedRateInfo(), AnnualizedRateInfo.class),chainConfig.getSettlePeriodCountPerIssue());
-                staking.setAnnualizedRate(annualizedRate.doubleValue());
+            AnnualizedRateInfo ari = AnnualizedRateInfo.builder()
+                    .cost(new ArrayList<>())
+                    .profit(new ArrayList<>())
+                    .slash(new ArrayList<>())
+                    .build();
+            String ariString = staking.getAnnualizedRateInfo();
+            if(StringUtils.isNotBlank(ariString)){
+                ari = JSON.parseObject(ariString,AnnualizedRateInfo.class);
+                if(ari.getProfit()==null) ari.setProfit(new ArrayList<>());
+                if(ari.getSlash()==null) ari.setSlash(new ArrayList<>());
             }
+            CalculateUtils.rotateProfit(staking,BigInteger.valueOf(settle.getSettingEpoch()),ari,chainConfig);
+            BigDecimal annualizedRate = CalculateUtils.calculateAnnualizedRate(ari,chainConfig.getSettlePeriodCountPerIssue());
+            staking.setAnnualizedRate(annualizedRate.doubleValue());
+            staking.setAnnualizedRateInfo(ari.toJSONString());
         });
         settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
