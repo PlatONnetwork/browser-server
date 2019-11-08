@@ -55,6 +55,8 @@ public class OnSettleConverter {
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
                 .build();
+
+
         List<Integer> statusList = new ArrayList <>();
         statusList.add(1);
         statusList.add(2);
@@ -62,6 +64,7 @@ public class OnSettleConverter {
         stakingExample.createCriteria()
                 .andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExample(stakingExample);
+        //todo:stakinglist为空
         stakingList.forEach(staking -> {
             //犹豫期金额
             staking.setStakingLocked(staking.getStakingLocked().add(staking.getStakingHes()));
@@ -90,6 +93,7 @@ public class OnSettleConverter {
                 staking.setAnnualizedRate(annualizedRate.doubleValue());
             }
         });
+        settle.setStakingList(stakingList);
         epochBusinessMapper.settle(settle);
 	}
 
