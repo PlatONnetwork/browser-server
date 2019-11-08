@@ -12,6 +12,7 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.stake.StakeCreate;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.mapper.StakeBusinessMapper;
+import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.StakeCreateParam;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
@@ -55,7 +56,12 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<Comple
         
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
         
-        
-        return Optional.ofNullable(null);
+        ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
+		complementNodeOpt.setNodeId(txParam.getNodeId());
+		complementNodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.CREATE.getCode()));
+		complementNodeOpt.setTxHash(tx.getHash());
+		complementNodeOpt.setBNum(tx.getNum());
+		complementNodeOpt.setTime(tx.getTime());        
+        return Optional.ofNullable(complementNodeOpt);
     }
 }
