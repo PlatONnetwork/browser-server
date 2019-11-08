@@ -1,4 +1,4 @@
-package com.platon.browser.complement.service.param.converter;
+package com.platon.browser.complement.converter;
 
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
@@ -49,5 +49,5 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    abstract T convert(CollectionEvent event, Transaction tx);
+    public abstract T convert(CollectionEvent event, Transaction tx);
 }

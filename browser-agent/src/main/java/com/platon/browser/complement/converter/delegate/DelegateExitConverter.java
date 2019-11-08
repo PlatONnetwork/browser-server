@@ -1,11 +1,13 @@
-package com.platon.browser.complement.service.param.converter;
+package com.platon.browser.complement.converter.delegate;
 
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.DelegateExitParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.math.BigInteger;
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 17:58:27
  **/
+@Slf4j
 @Service
 public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> {
 
@@ -27,6 +30,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
 	
     @Override
     public DelegateExit convert(CollectionEvent event, Transaction tx) {
+        long startTime = System.currentTimeMillis();
+
     	DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
 
         DelegateExit businessParam= DelegateExit.builder()
@@ -39,6 +44,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                 .build();
         
         delegateBusinessMapper.exit(businessParam);
+
+        log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
         return businessParam;
     }
 }

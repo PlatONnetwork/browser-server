@@ -1,11 +1,17 @@
 package com.platon.browser.complement.service.param;
 
-import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.cache.AddressCache;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.service.param.converter.*;
+import com.platon.browser.complement.converter.delegate.DelegateCreateConverter;
+import com.platon.browser.complement.converter.delegate.DelegateExitConverter;
+import com.platon.browser.complement.converter.proposal.*;
+import com.platon.browser.complement.converter.restricting.RestrictingCreateConverter;
+import com.platon.browser.complement.converter.slash.ReportConverter;
+import com.platon.browser.complement.converter.stake.StakeCreateConverter;
+import com.platon.browser.complement.converter.stake.StakeExitConverter;
+import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
+import com.platon.browser.complement.converter.stake.StakeModifyConverter;
 import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -48,11 +54,11 @@ public class TransactionParameterService {
     @Autowired
     private ProposalUpgradeConverter proposalUpgradeConverter;
     @Autowired
-    private ProposalCancelConverter  proposalCancelConverter;
+    private ProposalCancelConverter proposalCancelConverter;
     @Autowired
-    private ProposalVoteConverter  proposalVoteConverter;
+    private ProposalVoteConverter proposalVoteConverter;
     @Autowired
-    private ProposalVersionConverter  proposalVersionConverter;
+    private ProposalVersionConverter proposalVersionConverter;
     @Autowired
     private RestrictingCreateConverter restrictingCreateConverter;
     @Autowired

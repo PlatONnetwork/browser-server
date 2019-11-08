@@ -9,13 +9,11 @@ import com.platon.browser.elasticsearch.dto.NodeOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
-import com.platon.browser.complement.service.param.converter.OnConsensusConverter;
-import com.platon.browser.complement.service.param.converter.OnElectionConverter;
-import com.platon.browser.complement.service.param.converter.OnNewBlockConverter;
-import com.platon.browser.complement.service.param.converter.OnSettleConverter;
+import com.platon.browser.complement.converter.epoch.OnConsensusConverter;
+import com.platon.browser.complement.converter.epoch.OnElectionConverter;
+import com.platon.browser.complement.converter.epoch.OnNewBlockConverter;
+import com.platon.browser.complement.converter.epoch.OnSettleConverter;
 import com.platon.browser.config.BlockChainConfig;
 
 import lombok.extern.slf4j.Slf4j;
