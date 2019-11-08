@@ -67,7 +67,7 @@ public class DbService {
                     stakeBusinessMapper.increase(param);
                     return;
                 case STAKE_EXIT: // 1003 撤销质押
-                    stakeBusinessMapper.exit(param);
+//                    stakeBusinessMapper.exit(param);
                     return;
                 /*------------------委托相关业务 START------------------*/
                 case DELEGATE_CREATE: // 1004 发起委托
