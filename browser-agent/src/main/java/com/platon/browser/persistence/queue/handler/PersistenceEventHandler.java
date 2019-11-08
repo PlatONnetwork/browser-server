@@ -70,6 +70,7 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             redisImportService.batchImport(blockStage,transactionStage,statistics);
             blockStage.clear();
             transactionStage.clear();
+            nodeOptStage.clear();
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){
