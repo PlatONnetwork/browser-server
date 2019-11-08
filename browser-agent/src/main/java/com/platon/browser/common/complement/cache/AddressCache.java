@@ -84,6 +84,7 @@ public class AddressCache {
         }    	
     	
         address.setTxQty(0);
+        address.setTransferQty(0);
         address.setStakingQty(0);
         address.setDelegateQty(0);
         address.setProposalQty(0);
