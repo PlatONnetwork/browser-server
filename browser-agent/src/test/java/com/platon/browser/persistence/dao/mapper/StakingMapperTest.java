@@ -272,12 +272,22 @@ public class StakingMapperTest extends TestBase {
 
 
     /**
+     * 选举周期切换-查询待踢出验证人
+     */
+    @Test
+    public void newElectionEpochMapperQuerySlashNode() {
+        List<String> nodeList = electionQuerySlashNodeParam();
+        epochBusinessMapper.querySlashNode(nodeList);
+        
+    }
+    
+    /**
      * 选举周期切换
      */
     @Test
     public void newElectionEpochMapper () {
-        Election electionParam = electionParam();
-        epochBusinessMapper.election(electionParam);
+        Election electionParam = electionSlashNodeParam();
+        epochBusinessMapper.slashNode(electionParam);
     }
 
     /**

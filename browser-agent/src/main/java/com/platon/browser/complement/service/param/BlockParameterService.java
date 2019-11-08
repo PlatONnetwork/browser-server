@@ -54,8 +54,8 @@ public class BlockParameterService {
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            Optional<ComplementNodeOpt> nodeOpt = onElectionConverter.convert(event, block);
-            nodeOpt.ifPresent(np -> nodeOptList.add(np));
+            Optional<List<ComplementNodeOpt>> nodeOpt = onElectionConverter.convert(event, block);
+            nodeOpt.ifPresent(np -> nodeOptList.addAll(np));
         }
 
         // 新共识周期事件

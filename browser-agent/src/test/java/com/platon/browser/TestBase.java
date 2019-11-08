@@ -160,16 +160,22 @@ public class TestBase {
         return settle;
     }
 
-    public Election electionParam () {
-        List <String> preValidatorList = new ArrayList <>();
-        preValidatorList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        preValidatorList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
+    public Election electionSlashNodeParam () {
+        List <String> slashNodeList = new ArrayList <>();
+        slashNodeList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
+        slashNodeList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
         Election election = Election.builder()
-                .bNum(new BigInteger("200"))
                 .settingEpoch(3)
                 .time(new Date(System.currentTimeMillis()))
-                .preValidatorList(preValidatorList).build();
+                .slashNodeList(slashNodeList).build();
         return election;
+    }
+    
+    public List<String> electionQuerySlashNodeParam () {
+        List <String> slashNodeList = new ArrayList <>();
+        slashNodeList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
+        slashNodeList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
+        return slashNodeList;
     }
 
     public DelegateCreate delegateCreateParam () {
