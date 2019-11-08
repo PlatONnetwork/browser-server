@@ -33,20 +33,15 @@ public class ComplementEventHandler implements IComplementEventHandler {
             // 此处调用 persistence模块功能
             event.getBlock().setTransactions(null);
             List<BusinessParam> businessParams = event.getBusinessParams();
-            // 入库MYSQL
-            dbService.insert(businessParams);
 
             // TODO: 补充交易信息
 
             // 发布至持久化队列
             persistenceEventPublisher.publish(event.getBlock(),new ArrayList<>(event.getTransactions()));
+            // 入库MYSQL
+            dbService.insert(businessParams);
 
             preBlockNum=event.getBlock().getNum();
-            try {
-                TimeUnit.MICROSECONDS.sleep(200);
-            }catch (InterruptedException e){
-                log.error("",e);
-            }
         }catch (Exception e){
             log.error("{}",e);
             throw e;
