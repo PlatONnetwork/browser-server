@@ -312,7 +312,7 @@ set code_reward_value;       --奖励的金额
 set code_status;             --节点状态
 set code_nodeopt_desc;       --节点操作描述  'PERCENT|AMOUNT' 中
 set code_cur_staking_locked; --当前锁定的
-set code_staking_reduction_epoch; --当前锁定的
+set code_staking_reduction_epoch; --当前退出中
 
 code_slash_value = staking_locked * @slash_rate;
 code_reward_value = code_slash_value * @slash_2_report;
@@ -325,26 +325,20 @@ else
     code_status = 3
 	code_staking_reduction_epoch = 0
 
-is_consensus = false
-is_setting = false
-staking_has = 0
-staking_locked = 0
-leave_time = transaction.timestamp
-
 
 -- 1. node 更新
 update `node` 
 set `leave_time` = @tx_timestamp,
-	`status` =  @code_status,
-	`staking_reduction_epoch` = @code_staking_reduction_epoch,
+	  `status` =  @code_status,
+	  `staking_reduction_epoch` = @code_staking_reduction_epoch,
     `staking_reduction` = @code_cur_staking_locked,
     `staking_locked` = 0,
-	`staking_hes` = 0,
-	`total_value` = `total_value` - `staking_locked` - `staking_hes`,
-	`stat_delegate_value` = 0,
-	`stat_delegate_released` = `stat_delegate_value`,
-	`stat_valid_addrs` = 0,
-	`stat_invalid_addrs` = select count(1) from delegation where node_id = @node_id and is_history = 2 group by delegate_addr
+	  `staking_hes` = 0,
+	  `total_value` = `total_value` - `staking_locked` - `staking_hes`,
+	  `stat_delegate_value` = 0,
+	  `stat_delegate_released` = `stat_delegate_value`,
+	  `stat_valid_addrs` = 0,
+	  `stat_invalid_addrs` = select count(1) from delegation where node_id = @node_id and is_history = 2 group by delegate_addr
 where `node_id` = @node_id;
 
 -- 2. staking 更新
@@ -354,10 +348,10 @@ set `leave_time` = @tx_timestamp,
     `staking_reduction_epoch` = @code_staking_reduction_epoch,
     `staking_reduction` = @code_cur_staking_locked,
     `staking_locked` = 0,
-	`staking_hes` = 0,
-	`stat_delegate_has` = 0,
-	`stat_delegate_locked` = 0,
-	`stat_delegate_released` = `stat_delegate_has` + `stat_delegate_locked`
+	  `staking_hes` = 0,
+	  `stat_delegate_has` = 0,
+	  `stat_delegate_locked` = 0,
+	  `stat_delegate_released` = `stat_delegate_has` + `stat_delegate_locked`
 where `node_id` = @node_id
     and `staking_block_num` = @sbn;
 

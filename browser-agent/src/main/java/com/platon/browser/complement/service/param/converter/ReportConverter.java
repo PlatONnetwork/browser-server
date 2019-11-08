@@ -50,6 +50,8 @@ public class ReportConverter extends BusinessParamConverter<Report> {
                 .build();
         
         StakingKey stakingKey = new StakingKey();
+        stakingKey.setNodeId(businessParam.getNodeId());
+        stakingKey.setStakingBlockNum(businessParam.getStakingBlockNum().longValue());
         Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
         //惩罚的金额
         BigDecimal codeSlashValue = staking.getStakingLocked().multiply(businessParam.getSlashRate());
@@ -61,9 +63,10 @@ public class ReportConverter extends BusinessParamConverter<Report> {
         BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
         if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) == 1){
             businessParam.setCodeStatus(2);
+            businessParam.setCodeStakingReductionEpoch(businessParam.getSettingEpoch());
         }else {
             businessParam.setCodeStatus(3);
-
+            businessParam.setCodeStakingReductionEpoch(0);
         }
         
         

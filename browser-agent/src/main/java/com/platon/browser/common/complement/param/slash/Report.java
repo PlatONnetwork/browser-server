@@ -87,6 +87,11 @@ public class Report extends BusinessParam {
      */
     private int codeStatus;
 
+    /**
+     * 当前退出中
+     */
+    private int codeStakingReductionEpoch;
+
     @Override
     public BusinessType getBusinessType() {
         return BusinessType.REPORT;
