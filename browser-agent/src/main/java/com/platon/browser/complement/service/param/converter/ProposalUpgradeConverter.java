@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.proposal.ProposalUpgrade;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -29,6 +30,8 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<Co
     private BlockChainConfig chainConfig;
     @Autowired
     private ProposalBusinessMapper proposalBusinessMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 	
     @Override
     public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
@@ -64,6 +67,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<Co
 
 
 		ComplementNodeOpt c = ComplementNodeOpt.newInstance();
+		c.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		c.setNodeId(txParam.getVerifier());
 		c.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
 		c.setDesc(desc);

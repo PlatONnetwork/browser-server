@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.epoch.Election;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -20,6 +21,8 @@ public class OnElectionConverter {
 	
     @Autowired
     private EpochBusinessMapper epochBusinessMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 	
 	public Optional<List<ComplementNodeOpt>> convert(CollectionEvent event,CollectionBlock block) throws Exception {
 		//前一周期共识验证人
@@ -48,6 +51,7 @@ public class OnElectionConverter {
 		List<ComplementNodeOpt> complementNodeOpts = slashNodeList.stream()
 				.map(node -> {
 					ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
+					complementNodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 					complementNodeOpt.setNodeId(node);
 					complementNodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
 					complementNodeOpt.setBNum(bNum.longValue());

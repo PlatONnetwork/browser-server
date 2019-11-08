@@ -35,5 +35,13 @@ public class NetworkStatCache {
     	}
     }
     
-    
+    /**
+     * 获得操作日志需要
+     * @return
+     */
+    public long getAndIncrementNodeOptSeq() {
+    	long seq = networkStat.getNodeOptSeq() == null? 1: networkStat.getNodeOptSeq() + 1;
+    	networkStat.setNodeOptSeq(seq);
+    	return seq;
+    }    
 }

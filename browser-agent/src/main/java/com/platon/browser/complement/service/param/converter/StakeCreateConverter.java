@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.stake.StakeCreate;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -28,6 +29,8 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<Comple
 	
     @Autowired
     private StakeBusinessMapper stakeBusinessMapper;
+    @Autowired
+    private NetworkStatCache networkStatCache;
 
     @Override
     public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
@@ -57,6 +60,7 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<Comple
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName(),stakingBlockNum);
         
         ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
+        complementNodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		complementNodeOpt.setNodeId(txParam.getNodeId());
 		complementNodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.CREATE.getCode()));
 		complementNodeOpt.setTxHash(tx.getHash());
