@@ -1,7 +1,12 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.entity.StakingKey;
+import com.platon.browser.dao.mapper.StakingMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,9 @@ public class ReportConverter extends BusinessParamConverter<Report> {
     @Autowired
     private SlashBusinessMapper slashBusinessMapper;
 
+    @Autowired
+    private StakingMapper stakingMapper;
+
     @Override
     public Report convert(CollectionEvent event, CollectionTransaction tx) {
         // 举报信息
@@ -42,10 +50,26 @@ public class ReportConverter extends BusinessParamConverter<Report> {
                 .slash2ReportRate(chainConfig.getDuplicateSignReportRate())
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
-        BeanUtils.copyProperties(txParam,businessParam);
+        
+        StakingKey stakingKey = new StakingKey();
+        Staking staking = stakingMapper.selectByPrimaryKey(stakingKey);
+        //惩罚的金额
+        BigDecimal codeSlashValue = staking.getStakingLocked().multiply(businessParam.getSlashRate());
+        //奖励的金额
+        BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
+        //节点操作描述
+        String codeNodeoptDesc = "PERCENT|AMOUNT".replace("AMOUNT",codeSlashValue.toString());
+        //当前锁定的
+        BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
+        if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) == 1){
+            businessParam.setCodeStatus(2);
+        }else {
+            businessParam.setCodeStatus(3);
+
+        }
+        
         
         slashBusinessMapper.report(businessParam);
-       
         return businessParam;
     }
 }

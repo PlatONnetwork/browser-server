@@ -1,6 +1,7 @@
 package com.platon.browser.common.complement.dto.restricting;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,5 @@ public class RestrictingItem {
     private String address;
     private Long epoch;
     private BigDecimal amount;
-    private Long number;
+    private BigInteger number;
 }

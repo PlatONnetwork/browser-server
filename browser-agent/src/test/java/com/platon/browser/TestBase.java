@@ -1,7 +1,6 @@
 package com.platon.browser;//package com.platon.browser;
 
 
-
 import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.delegate.DelegateCreate;
 import com.platon.browser.common.complement.dto.delegate.DelegateExit;
@@ -11,12 +10,15 @@ import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.common.complement.dto.proposal.ProposalText;
 import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.proposal.ProposalVote;
+import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
+import com.platon.browser.common.complement.dto.restricting.RestrictingItem;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
 import com.platon.browser.common.complement.dto.stake.StakeIncrease;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.common.complement.dto.statistic.AddressStatChange;
+import com.platon.browser.common.complement.dto.statistic.AddressStatItem;
 import com.platon.browser.common.complement.dto.statistic.NetworkStatChange;
 import com.platon.browser.common.enums.AppStatus;
 import com.platon.browser.dto.ProposalMarkDownDto;
@@ -37,10 +39,10 @@ import java.util.List;
 public class TestBase {
 
     static {
-        System.setProperty(AppStatus.class.getName(),AppStatus.STOP.name());
+        System.setProperty(AppStatus.class.getName(), AppStatus.STOP.name());
     }
 
-    public StakeCreate stakingParam(){
+    public StakeCreate stakingParam () {
         StakeCreate createStakingParam = StakeCreate.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .stakingHes(new BigDecimal("5000"))
@@ -61,7 +63,7 @@ public class TestBase {
         return createStakingParam;
     }
 
-    public StakeModify modifyStakingParam(){
+    public StakeModify modifyStakingParam () {
         StakeModify modifyStakingParam = StakeModify.builder()
                 .nodeName("testNode02")
                 .externalId("externalId02")
@@ -78,7 +80,7 @@ public class TestBase {
         return modifyStakingParam;
     }
 
-    public StakeIncrease addStakingParam(){
+    public StakeIncrease addStakingParam () {
         StakeIncrease addStakingParam = StakeIncrease.builder()
                 .amount(new BigDecimal("500000000000000000000000000"))
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
@@ -90,7 +92,7 @@ public class TestBase {
         return addStakingParam;
     }
 
-    public StakeExit withdrewStakingParam(){
+    public StakeExit withdrewStakingParam () {
         StakeExit withdrewStakingParam = StakeExit.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
@@ -102,7 +104,7 @@ public class TestBase {
         return withdrewStakingParam;
     }
 
-    public Report reportDuplicateSignParam(){
+    public Report reportDuplicateSignParam () {
         Report reportDuplicateSignParam = Report.builder()
                 .time(new Date(System.currentTimeMillis()))
                 .settingEpoch(3)
@@ -118,10 +120,10 @@ public class TestBase {
                 .codeStatus(2)
                 .codeRewardValue(new BigDecimal("1000000000"))
                 .build();
-        return  reportDuplicateSignParam;
+        return reportDuplicateSignParam;
     }
 
-    public NewBlock blockParam(){
+    public NewBlock blockParam () {
         NewBlock newBlockParam = NewBlock.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .blockRewardValue(new BigDecimal("100000000000"))
@@ -131,21 +133,21 @@ public class TestBase {
         return newBlockParam;
     }
 
-    public Consensus consensusParam(){
+    public Consensus consensusParam () {
         List <String> nodeIdList = new ArrayList <>();
         nodeIdList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
-        Consensus consensus =  Consensus.builder()
+        Consensus consensus = Consensus.builder()
                 .validatorList(nodeIdList)
                 .expectBlockNum(new BigInteger("10"))
                 .build();
         return consensus;
     }
 
-    public Settle settleParam(){
-        List<String> curVerifierList = new ArrayList <>();
+    public Settle settleParam () {
+        List <String> curVerifierList = new ArrayList <>();
         curVerifierList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         curVerifierList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
-        List<String> preVerifierList = new ArrayList <>();
+        List <String> preVerifierList = new ArrayList <>();
         preVerifierList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         preVerifierList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
         Settle settle = Settle.builder()
@@ -160,8 +162,8 @@ public class TestBase {
         return settle;
     }
 
-    public Election electionParam(){
-        List<String> preValidatorList = new ArrayList <>();
+    public Election electionParam () {
+        List <String> preValidatorList = new ArrayList <>();
         preValidatorList.add("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18");
         preValidatorList.add("0x0aa9805681d8f77c05f317efc141c97d5adb511ffb51f5a251d2d7a4a3a96d9a12adf39f06b702f0ccdff9eddc1790eb272dca31b0c47751d49b5931c58701e7");
         Election election = Election.builder()
@@ -172,7 +174,7 @@ public class TestBase {
         return election;
     }
 
-    public DelegateCreate delegateCreateParam(){
+    public DelegateCreate delegateCreateParam () {
         DelegateCreate delegateCreate = DelegateCreate.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .blockNumber(new BigInteger("300"))
@@ -181,10 +183,10 @@ public class TestBase {
                 .stakingBlockNumber(new BigInteger("200"))
                 .txFrom("0xff48d9712d8a55bf603dab28f4645b6985696a61")
                 .build();
-        return  delegateCreate;
+        return delegateCreate;
     }
 
-    public DelegateExit delegateExitParam(){
+    public DelegateExit delegateExitParam () {
         DelegateExit delegateExit = DelegateExit.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .amount(new BigDecimal("100000000000000"))
@@ -204,7 +206,7 @@ public class TestBase {
         return delegateExit;
     }
 
-    public ProposalText proposalTextParam(){
+    public ProposalText proposalTextParam () {
         ProposalText proposalText = ProposalText.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .pIDID("100")
@@ -223,8 +225,7 @@ public class TestBase {
     }
 
 
-
-    public ProposalVote proposalVoteParam(){
+    public ProposalVote proposalVoteParam () {
         ProposalVote proposalVote = ProposalVote.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .txHash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be7")
@@ -239,7 +240,7 @@ public class TestBase {
     }
 
 
-    public ProposalUpgrade proposalUpgradeOrCancelParam(){
+    public ProposalUpgrade proposalUpgradeOrCancelParam () {
         ProposalUpgrade proposalUpgradeOrCancel = ProposalUpgrade.builder()
                 .nodeId("0x20a090d94bc5015c9339a46e9ca5d80057a5ef25cc14e71cef67b502ec32949253f046821e80dfb6ff666ef0e0badf58fdb719368c38393f7c40ebcf18d8ed18")
                 .pIDID("100")
@@ -260,23 +261,48 @@ public class TestBase {
     }
 
 
-//    public AddressStatChange addressStatChangeParam(){
-//        AddressStatChange addressStatChange = AddressStatChange.builder()
-//                .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
-//                .contractCreate("0xff48d9712d8a55bf603dab28f4645b6985696a61")
-//                .contractCreatehash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be9")
-//                .contractName("test")
-//                .delegateQty(1)
-//                .proposalQty(1)
-//                .stakingQty(1)
-//                .transferQty(1)
-//                .txQty(4)
-//                .type(1)
-//                .build();
-//        return addressStatChange;
-//    }
+    public AddressStatChange addressStatChangeParam () {
+        List <AddressStatItem> addressStatItems = new ArrayList <>();
+        for (int i=0;i<3;i++) {
+            AddressStatItem addressStatItem = AddressStatItem.builder()
+                    .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                    .contractCreate("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                    .contractCreatehash("0xaa85c7e85542ac8e8d2428c618130d02723138437d105d06d405f9e735469be9")
+                    .contractName("test")
+                    .delegateQty(i)
+                    .proposalQty(i)
+                    .stakingQty(i)
+                    .transferQty(i)
+                    .txQty(i)
+                    .type(i)
+                    .build();
+            addressStatItems.add(addressStatItem);
+        }
+        AddressStatChange addressStatChange = AddressStatChange.builder()
+                .addressStatItemList(addressStatItems)
+                .build();
+        return addressStatChange;
+    }
 
-    public NetworkStatChange networkStatChangeParam(){
+
+    public RestrictingCreate restrictingCreateParam () {
+        List <RestrictingItem> restrictingItems = new ArrayList <>();
+        for(int i=0;i<3;i++){
+            RestrictingItem restrictingItem = RestrictingItem.builder()
+                    .address("0xff48d9712d8a55bf603dab28f4645b6985696a61")
+                    .amount(new BigDecimal("100000000000000"))
+                    .epoch(Long.valueOf(i))
+                    .number(new BigInteger("100"))
+                    .build();
+            restrictingItems.add(restrictingItem);
+        }
+        RestrictingCreate restrictingCreate = RestrictingCreate.builder()
+                .itemList(restrictingItems)
+                .build();
+        return restrictingCreate;
+    }
+
+    public NetworkStatChange networkStatChangeParam () {
         NetworkStatChange networkStatChange = NetworkStatChange.builder()
                 .id(1)
                 .addIssueBegin(1L)
@@ -294,4 +320,7 @@ public class TestBase {
                 .build();
         return networkStatChange;
     }
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,8 +21,6 @@ import com.platon.browser.param.RestrictingCreateParam;
 @Service
 public class RestrictingCreateConverter extends BusinessParamConverter<RestrictingCreate> {
 	
-	
-	
     @Override
     public RestrictingCreate convert(CollectionEvent event, CollectionTransaction tx) {
     	RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);
@@ -31,7 +30,7 @@ public class RestrictingCreateConverter extends BusinessParamConverter<Restricti
 				.address(account)
 				.amount(new BigDecimal(plan.getAmount()))
 				.epoch(plan.getEpoch().longValue())
-				.number(tx.getNum())
+				.number(BigInteger.valueOf(tx.getNum()))
 				.build();
 			}).collect(Collectors.toList());
     	

@@ -7,6 +7,8 @@ import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.complement.dto.proposal.ProposalText;
 import com.platon.browser.common.complement.dto.proposal.ProposalUpgrade;
 import com.platon.browser.common.complement.dto.proposal.ProposalVote;
+import com.platon.browser.common.complement.dto.restricting.RestrictingCreate;
+import com.platon.browser.common.complement.dto.restricting.RestrictingItem;
 import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.complement.dto.stake.StakeCreate;
 import com.platon.browser.common.complement.dto.stake.StakeExit;
@@ -65,6 +67,9 @@ public class StakingMapperTest extends TestBase {
 
     @Autowired
     private StatisticBusinessMapper statisticBusinessMapper;
+
+    @Autowired
+    private RestrictingBusinessMapper restrictingBusinessMapper;
 
     @Autowired
     private NodeOptMapper nodeOptMapper;
@@ -336,16 +341,26 @@ public class StakingMapperTest extends TestBase {
         proposalBusinessMapper.vote(proposalVote);
     }
 
-//    /**
-//     * 地址数据统计
-//     */
-//    @Test
-//    public void addressChangeMapper(){
-//        AddressStatChange addressStatChange = addressStatChangeParam();
-//        statisticBusinessMapper.addressChange(addressStatChange);
-//    }
+    /**
+     * 地址数据统计
+     */
+    @Test
+    public void addressChangeMapper(){
+        AddressStatChange addressStatChange = addressStatChangeParam();
+        statisticBusinessMapper.addressChange(addressStatChange);
+    }
 
     /**
+     * 创建锁仓计划
+     */
+    @Test
+    public void restrcingCrateMapper(){
+        RestrictingCreate restrictingCreate = restrictingCreateParam();
+        restrictingBusinessMapper.create(restrictingCreate);
+    }
+
+
+     /**
      *  其他数据统计
      */
     @Test
