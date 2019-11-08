@@ -2,6 +2,7 @@ package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigInteger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -9,6 +10,7 @@ import com.platon.browser.common.complement.dto.proposal.ProposalVote;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.ProposalVoteParam;
+import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器
@@ -17,6 +19,9 @@ import com.platon.browser.param.ProposalVoteParam;
  **/
 @Service
 public class ProposalVoteConverter extends BusinessParamConverter<ProposalVote> {
+	
+    @Autowired
+    private ProposalBusinessMapper proposalBusinessMapper;
 	
     @Override
     public ProposalVote convert(CollectionEvent event, CollectionTransaction tx) {
@@ -40,6 +45,8 @@ public class ProposalVoteConverter extends BusinessParamConverter<ProposalVote> 
                 .replace("VERSION","");
  
     	businessParam.setOptDesc(desc);
+    	
+    	proposalBusinessMapper.vote(businessParam);
     	
         return businessParam;
     }

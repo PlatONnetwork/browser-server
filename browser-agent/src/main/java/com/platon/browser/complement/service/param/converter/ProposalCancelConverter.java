@@ -12,6 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.param.ProposalCancelParam;
+import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.util.RoundCalculation;
 
 /**
@@ -24,6 +25,8 @@ public class ProposalCancelConverter extends BusinessParamConverter<ProposalCanc
 
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private ProposalBusinessMapper proposalBusinessMapper;
 	
     @Override
     public ProposalCancel convert(CollectionEvent event, CollectionTransaction tx) {
@@ -51,6 +54,8 @@ public class ProposalCancelConverter extends BusinessParamConverter<ProposalCanc
 				.replace("VERSION","");
  
     	businessParam.setOptDesc(desc);
+    	
+    	proposalBusinessMapper.cancel(businessParam);
     	
         return businessParam;
     }

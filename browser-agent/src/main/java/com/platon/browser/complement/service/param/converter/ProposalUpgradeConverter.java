@@ -12,6 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.param.ProposalUpgradeParam;
+import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.util.RoundCalculation;
 
 /**
@@ -24,6 +25,8 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<ProposalUpg
 
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private ProposalBusinessMapper proposalBusinessMapper;
 	
     @Override
     public ProposalUpgrade convert(CollectionEvent event, CollectionTransaction tx) {
@@ -52,6 +55,8 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<ProposalUpg
 				.replace("VERSION",businessParam.getNewVersion());
  
     	businessParam.setOptDesc(desc);
+    	
+    	proposalBusinessMapper.upgrade(businessParam);
     	
         return businessParam;
     }

@@ -20,6 +20,8 @@ import com.platon.browser.param.RestrictingCreateParam;
 @Service
 public class RestrictingCreateConverter extends BusinessParamConverter<RestrictingCreate> {
 	
+	
+	
     @Override
     public RestrictingCreate convert(CollectionEvent event, CollectionTransaction tx) {
     	RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);

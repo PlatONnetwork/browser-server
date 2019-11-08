@@ -2,12 +2,14 @@ package com.platon.browser.complement.service.param.converter;
 
 import java.math.BigInteger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
 import com.platon.browser.common.complement.dto.stake.StakeModify;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.param.StakeModifyParam;
+import com.platon.browser.persistence.dao.mapper.StakeBusinessMapper;
 import com.platon.browser.utils.HexTool;
 
 /**
@@ -17,6 +19,9 @@ import com.platon.browser.utils.HexTool;
  **/
 @Service
 public class StakeModifyConverter extends BusinessParamConverter<StakeModify> {
+	
+    @Autowired
+    private StakeBusinessMapper stakeBusinessMapper;
 
     @Override
     public StakeModify convert(CollectionEvent event, CollectionTransaction tx) {
@@ -34,6 +39,8 @@ public class StakeModifyConverter extends BusinessParamConverter<StakeModify> {
         		.time(tx.getTime())
         		.txHash(tx.getHash())               
                 .build();
+        
+        stakeBusinessMapper.modify(businessParam);
         // 更新节点缓存
         updateNodeCache(HexTool.prefix(txParam.getNodeId()),txParam.getNodeName());
         return businessParam;

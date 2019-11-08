@@ -11,6 +11,7 @@ import com.platon.browser.common.complement.dto.slash.Report;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.ReportParam;
+import com.platon.browser.persistence.dao.mapper.SlashBusinessMapper;
 
 /**
  * @description: 举报验证人业务参数转换器
@@ -22,6 +23,8 @@ public class ReportConverter extends BusinessParamConverter<Report> {
 	
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private SlashBusinessMapper slashBusinessMapper;
 
     @Override
     public Report convert(CollectionEvent event, CollectionTransaction tx) {
@@ -40,6 +43,8 @@ public class ReportConverter extends BusinessParamConverter<Report> {
                 .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
                 .build();
         BeanUtils.copyProperties(txParam,businessParam);
+        
+        slashBusinessMapper.report(businessParam);
        
         return businessParam;
     }

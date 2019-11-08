@@ -12,6 +12,7 @@ import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.param.ProposalTextParam;
+import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.util.RoundCalculation;
 
 /**
@@ -24,6 +25,8 @@ public class ProposalTextConverter extends BusinessParamConverter<ProposalText> 
 
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private ProposalBusinessMapper proposalBusinessMapper;
 	
     @Override
     public ProposalText convert(CollectionEvent event, CollectionTransaction tx) {
@@ -50,6 +53,8 @@ public class ProposalTextConverter extends BusinessParamConverter<ProposalText> 
 				.replace("VERSION","");
  
     	businessParam.setOptDesc(desc);
+    	
+    	proposalBusinessMapper.text(businessParam);
     	
         return businessParam;
     }

@@ -1,7 +1,5 @@
 package com.platon.browser.complement.service.param;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.common.complement.dto.BusinessParam;
 import com.platon.browser.common.complement.dto.epoch.Consensus;
 import com.platon.browser.common.complement.dto.epoch.Election;
 import com.platon.browser.common.complement.dto.epoch.NewBlock;
 import com.platon.browser.common.complement.dto.epoch.Settle;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.service.param.converter.OnConsensusConverter;
+import com.platon.browser.complement.service.param.converter.OnElectionConverter;
+import com.platon.browser.complement.service.param.converter.OnNewBlockConverter;
+import com.platon.browser.complement.service.param.converter.OnSettleConverter;
 import com.platon.browser.config.BlockChainConfig;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +32,15 @@ public class BlockParameterService {
 
     @Autowired
     private BlockChainConfig chainConfig;
-    
     @Autowired
-    private NodeCache nodeCache;
-
+    private OnNewBlockConverter onNewBlockConverter;
+    @Autowired
+    private OnElectionConverter onElectionConverter;
+    @Autowired
+    private OnConsensusConverter onConsensusConverter;
+    @Autowired
+    private OnSettleConverter onSettleConverter;
+    
     /**
      * 解析区块, 构造业务入库参数信息
      * @return
@@ -44,12 +50,7 @@ public class BlockParameterService {
         CollectionBlock block = event.getBlock();
 
         // 新区块事件
-        NewBlock newBlock = NewBlock.builder()
-                .nodeId(block.getNodeId())
-                .stakingBlockNum(nodeCache.getNode(block.getNodeId()).getStakingBlockNum())
-                .blockRewardValue(new BigDecimal(event.getEpochMessage().getBlockReward()))
-                .feeRewardValue(block.getTxFee())
-                .build();
+        NewBlock newBlock = onNewBlockConverter.convert(event,block);
         businessParams.add(newBlock);
 
         // 新选举周期事件
@@ -57,47 +58,21 @@ public class BlockParameterService {
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            List<String> preValidatorList = new ArrayList<>();
-            event.getEpochMessage().getPreValidatorList().forEach(v->preValidatorList.add(v.getNodeId()));
-            
-            Election election = Election.builder()
-                    .bNum(BigInteger.valueOf(block.getNum()))
-                    .time(block.getTime())
-                    .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                    .preValidatorList(preValidatorList)
-                    .build();
+            Election election = onElectionConverter.convert(event, block);
             businessParams.add(election);
         }
 
         // 新共识周期事件
         if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
-            List<String> validatorList = new ArrayList<>();
-            event.getEpochMessage().getCurValidatorList().forEach(v->validatorList.add(v.getNodeId()));
-
-            BigInteger expectBlockNum = chainConfig.getConsensusPeriodBlockCount().divide(BigInteger.valueOf(validatorList.size()));
-            Consensus consensus = Consensus.builder()
-                    .expectBlockNum(expectBlockNum)
-                    .validatorList(validatorList)
-                    .build();
+            Consensus consensus = onConsensusConverter.convert(event, block);
             businessParams.add(consensus);
         }
 
         // 新结算周期事件
         if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
-            List<String> curVerifierList = new ArrayList<>();
-            event.getEpochMessage().getCurVerifierList().forEach(v->curVerifierList.add(v.getNodeId()));
-            List<String> preVerifierList = new ArrayList<>();
-            event.getEpochMessage().getPreVerifierList().forEach(v->preVerifierList.add(v.getNodeId()));
-            
-            Settle settle = Settle.builder()
-                    .preVerifierList(preVerifierList)
-                    .curVerifierList(curVerifierList)
-                    .stakingReward(new BigDecimal(event.getEpochMessage().getStakeReward()))
-                    .settingEpoch(event.getEpochMessage().getSettleEpochRound().intValue())
-                    .stakingLockEpoch(chainConfig.getUnStakeRefundSettlePeriodCount().intValue())
-                    .build();
+            Settle settle = onSettleConverter.convert(event, block);
             businessParams.add(settle);
         }
         return businessParams;

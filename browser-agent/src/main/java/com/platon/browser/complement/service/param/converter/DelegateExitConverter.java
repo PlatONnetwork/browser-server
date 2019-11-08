@@ -11,6 +11,7 @@ import com.platon.browser.common.complement.dto.delegate.DelegateExit;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.param.DelegateExitParam;
+import com.platon.browser.persistence.dao.mapper.DelegateBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器
@@ -22,6 +23,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
 
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private DelegateBusinessMapper delegateBusinessMapper;
 	
     @Override
     public DelegateExit convert(CollectionEvent event, CollectionTransaction tx) {
@@ -35,6 +38,8 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
         		.stakingBlockNumber(txParam.getStakingBlockNum())
         		.minimumThreshold(chainConfig.getDelegateThreshold())
                 .build();
+        
+        delegateBusinessMapper.exit(businessParam);
         return businessParam;
     }
 }

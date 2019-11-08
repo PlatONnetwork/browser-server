@@ -1,5 +1,6 @@
 package com.platon.browser.complement.service.param.converter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionTransaction;
@@ -7,6 +8,7 @@ import com.platon.browser.common.complement.dto.proposal.ProposalVersion;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.VersionDeclareParam;
+import com.platon.browser.persistence.dao.mapper.ProposalBusinessMapper;
 
 /**
  * @description: 委托业务参数转换器
@@ -15,6 +17,7 @@ import com.platon.browser.param.VersionDeclareParam;
  **/
 @Service
 public class ProposalVersionConverter extends BusinessParamConverter<ProposalVersion> {
+	
 	
     @Override
     public ProposalVersion convert(CollectionEvent event, CollectionTransaction tx) {
@@ -28,6 +31,7 @@ public class ProposalVersionConverter extends BusinessParamConverter<ProposalVer
     	ProposalVersion businessParam= ProposalVersion.builder()  
     			.optDesc(desc)
                 .build();
+    	
         return businessParam;
     }
 }
