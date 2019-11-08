@@ -1,5 +1,6 @@
 package com.platon.browser.complement.service.param.converter;
 
+import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.NodeCache;
 import com.platon.browser.complement.dao.param.epoch.NewBlock;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
@@ -19,7 +20,12 @@ public class OnNewBlockConverter {
     @Autowired
     private NewBlockMapper newBlockMapper;
 
+    @Autowired
+    private NetworkStatCache networkStatCache;
+
 	public void convert(CollectionEvent event, Block block) throws Exception {
+
+	    networkStatCache.getNetworkStat().setCurNumber(event.getBlock().getNum());
       
 		NewBlock newBlock = NewBlock.builder()
                 .nodeId(block.getNodeId())
