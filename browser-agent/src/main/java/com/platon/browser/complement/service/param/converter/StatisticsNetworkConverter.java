@@ -1,5 +1,12 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionBlock;
 import com.platon.browser.common.collection.dto.EpochMessage;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
@@ -8,13 +15,9 @@ import com.platon.browser.common.complement.param.statistic.NetworkStatChange;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.common.service.account.AccountService;
 import com.platon.browser.common.utils.CalculateUtils;
+import com.platon.browser.complement.mapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @Service
 public class StatisticsNetworkConverter {
@@ -27,9 +30,11 @@ public class StatisticsNetworkConverter {
 	private AccountService accountService;
     @Autowired
     private BlockChainConfig chainConfig;
+    @Autowired
+    private StatisticBusinessMapper statisticBusinessMapper;
     
 	
-    public NetworkStatChange convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
+    public void convert(CollectionEvent event,CollectionBlock block, EpochMessage epochMessage) throws Exception {
     	
         //获取激励池余额
 		BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(block.getNum()));
@@ -43,24 +48,19 @@ public class StatisticsNetworkConverter {
 		BigDecimal turnValue = CalculateUtils.calculationTurnValue(issueValue,inciteBalance,stakingBalance,restrictBalance);
 		// 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
-        NetworkStatChange networkStatChange = NetworkStatChange.builder()
-        	.id(1)
-        	.curNumber(block.getNum())
-        	.nodeId(block.getNodeId())
-        	.nodeName(nodeCache.getNode(block.getNodeId()).getNodeName())
-        	.txQty(networkStat.getTxQty())
-        	.curTps(networkStat.getCurTps())
-        	.maxTps(networkStat.getMaxTps())
-        	.proposalQty(networkStat.getProposalQty())
-        	.blockReward(new BigDecimal(epochMessage.getBlockReward()))
-        	.stakingReward(new BigDecimal(epochMessage.getStakeReward()))
-        	.addIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
-        	.addIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
-        	.nextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
-			.issueValue(issueValue) // 发行量
-			.turnValue(turnValue) // 流通量
-        	.build();
-    	
-        return networkStatChange;
+        NetworkStatChange networkStatChange = NetworkStatChange.builder().build();
+        BeanUtils.copyProperties(networkStat,networkStatChange);
+        // 设置需要根据当前上下文更新的数据字段
+        networkStatChange.setCurNumber(block.getNum())
+                .setNodeId(block.getNodeId())
+                .setNodeName(nodeCache.getNode(block.getNodeId()).getNodeName())
+                .setBlockReward(new BigDecimal(epochMessage.getBlockReward()))
+                .setStakingReward(new BigDecimal(epochMessage.getStakeReward()))
+                .setAddIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
+                .setAddIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
+                .setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
+                .setIssueValue(issueValue) // 发行量
+                .setTurnValue(turnValue); // 流通量
+        statisticBusinessMapper.networkChange(networkStatChange);
     }
 }

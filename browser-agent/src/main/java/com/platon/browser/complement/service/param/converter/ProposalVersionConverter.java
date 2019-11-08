@@ -1,11 +1,15 @@
 package com.platon.browser.complement.service.param.converter;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.collection.dto.CollectionTransaction;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.complement.param.proposal.ProposalVersion;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.param.VersionDeclareParam;
-import org.springframework.stereotype.Service;
 
 /**
  * @description: 委托业务参数转换器
@@ -13,11 +17,11 @@ import org.springframework.stereotype.Service;
  * @create: 2019-11-04 17:58:27
  **/
 @Service
-public class ProposalVersionConverter extends BusinessParamConverter<ProposalVersion> {
+public class ProposalVersionConverter extends BusinessParamConverter<Optional<ComplementNodeOpt>> {
 	
 	
     @Override
-    public ProposalVersion convert(CollectionEvent event, CollectionTransaction tx) {
+    public Optional<ComplementNodeOpt> convert(CollectionEvent event, CollectionTransaction tx) {
     	VersionDeclareParam txParam = tx.getTxParam(VersionDeclareParam.class);
  
         String desc = CustomNodeOpt.TypeEnum.VERSION.getTpl()
@@ -29,6 +33,6 @@ public class ProposalVersionConverter extends BusinessParamConverter<ProposalVer
     			.optDesc(desc)
                 .build();
     	
-        return businessParam;
+        return Optional.ofNullable(null);
     }
 }

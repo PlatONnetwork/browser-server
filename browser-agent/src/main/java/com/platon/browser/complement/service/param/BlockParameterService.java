@@ -2,16 +2,13 @@ package com.platon.browser.complement.service.param;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.platon.browser.common.collection.dto.CollectionBlock;
-import com.platon.browser.common.complement.param.BusinessParam;
-import com.platon.browser.common.complement.param.epoch.Consensus;
-import com.platon.browser.common.complement.param.epoch.Election;
-import com.platon.browser.common.complement.param.epoch.NewBlock;
-import com.platon.browser.common.complement.param.epoch.Settle;
+import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.service.param.converter.OnConsensusConverter;
 import com.platon.browser.complement.service.param.converter.OnElectionConverter;
@@ -45,36 +42,33 @@ public class BlockParameterService {
      * 解析区块, 构造业务入库参数信息
      * @return
      */
-    public List<BusinessParam> getParameters(CollectionEvent event) throws Exception{
-        List<BusinessParam> businessParams = new ArrayList<>();
+    public List<ComplementNodeOpt> getParameters(CollectionEvent event) throws Exception{
+        List<ComplementNodeOpt> nodeOptList = new ArrayList<>();
         CollectionBlock block = event.getBlock();
 
         // 新区块事件
-        NewBlock newBlock = onNewBlockConverter.convert(event,block);
-        businessParams.add(newBlock);
+        onNewBlockConverter.convert(event,block);
 
         // 新选举周期事件
         if ((block.getNum()+chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0
                 &&event.getEpochMessage().getConsensusEpochRound().longValue()>1) {
             // 共识轮数等于大于1的时候才进来
             log.debug("选举验证人：Block Number({})", block.getNum());
-            Election election = onElectionConverter.convert(event, block);
-            businessParams.add(election);
+            Optional<ComplementNodeOpt> nodeOpt = onElectionConverter.convert(event, block);
+            nodeOpt.ifPresent(np -> nodeOptList.add(np));
         }
 
         // 新共识周期事件
         if (block.getNum() % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
             log.debug("共识周期切换：Block Number({})", block.getNum());
-            Consensus consensus = onConsensusConverter.convert(event, block);
-            businessParams.add(consensus);
+            onConsensusConverter.convert(event, block);
         }
 
         // 新结算周期事件
         if (block.getNum() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             log.debug("结算周期切换：Block Number({})", block.getNum());
-            Settle settle = onSettleConverter.convert(event, block);
-            businessParams.add(settle);
+            onSettleConverter.convert(event, block);
         }
-        return businessParams;
+        return nodeOptList;
     }
 }

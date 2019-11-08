@@ -21,8 +21,6 @@ import java.util.*;
  */
 @Data
 public class CustomStaking extends Staking {
-    // <委托交易发送者地址-质押记录> 映射
-    private Map<String, CustomDelegation> delegations = new HashMap<>();
 
     public CustomStaking() {
         super();
@@ -74,27 +72,6 @@ public class CustomStaking extends Staking {
         this.setFeeRewardValue(BigDecimal.ZERO);
     }
 
-    /********把字符串类数值转换为大浮点数的便捷方法********/
-//    public BigDecimal decimalStakingLocked(){return new BigDecimal(this.getStakingLocked());}
-//    public BigDecimal decimalStakingHas(){return new BigDecimal(this.getStakingHas());}
-//    public BigDecimal decimalBlockRewardValue(){return new BigDecimal(this.getBlockRewardValue());}
-//    public BigDecimal decimalStakingRewardValue(){return new BigDecimal(this.getStakingRewardValue());}
-//    public BigDecimal decimalStakingReduction(){return new BigDecimal(this.getStakingReduction());}
-//    public BigDecimal decimalStatDelegateHas(){return new BigDecimal(this.getStatDelegateHas());}
-//    public BigDecimal decimalStatDelegateLocked(){return new BigDecimal(this.getStatDelegateLocked());}
-//    public BigDecimal decimalStatDelegateReduction(){return new BigDecimal(this.getStatDelegateReduction());}
-//    public BigDecimal decimalStatFeeRwardValue(){return new BigDecimal(this.getFeeRewardValue());}
-//    /********把字符串类数值转换为大整数的便捷方法********/
-//    public BigInteger integerStakingLocked(){return new BigInteger(this.getStakingLocked());}
-//    public BigInteger integerStakingHas(){return new BigInteger(this.getStakingHas());}
-//    public BigInteger integerBlockRewardValue(){return new BigInteger(this.getBlockRewardValue());}
-//    public BigInteger integerStakingRewardValue(){return new BigInteger(this.getStakingRewardValue());}
-//    public BigInteger integerStakingReduction(){return new BigInteger(this.getStakingReduction());}
-//    public BigInteger integerStatDelegateHas(){return new BigInteger(this.getStatDelegateHas());}
-//    public BigInteger integerStatDelegateLocked(){return new BigInteger(this.getStatDelegateLocked());}
-//    public BigInteger integerStatDelegateReduction(){return new BigInteger(this.getStatDelegateReduction());}
-//    public BigInteger integerStakingBlockNum(){return BigInteger.valueOf(this.getStakingBlockNum());}
-//    public BigInteger integerStakingFeeRwardValue(){return new BigInteger(this.getFeeRewardValue());}
     /**
      * 使用节点信息更新质押信息
      * @param node
