@@ -53,11 +53,6 @@ public class ProposalText extends BusinessParam {
     private String description;
 
     /**
-     * 操作描述
-     */
-    private String optDesc;
-
-    /**
      * 交易hash
      */
     private String txHash;

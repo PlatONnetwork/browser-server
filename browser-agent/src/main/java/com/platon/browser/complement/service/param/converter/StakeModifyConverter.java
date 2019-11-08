@@ -36,8 +36,6 @@ public class StakeModifyConverter extends BusinessParamConverter<StakeModify> {
         		.details(txParam.getDetails())
         		.isInit(isInit(txParam.getBenefitAddress())) 
         		.stakingBlockNum(BigInteger.valueOf(tx.getNum()))
-        		.time(tx.getTime())
-        		.txHash(tx.getHash())               
                 .build();
         
         stakeBusinessMapper.modify(businessParam);

@@ -52,8 +52,7 @@ public class ProposalTextConverter extends BusinessParamConverter<ProposalText> 
 				.replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode())
 				.replace("VERSION","");
  
-    	businessParam.setOptDesc(desc);
-    	
+
     	proposalBusinessMapper.text(businessParam);
     	
         return businessParam;

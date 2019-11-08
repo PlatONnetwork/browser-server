@@ -52,22 +52,5 @@
 		#{slashData}
 		);
 
-	insert into `node_opt`
-		(`node_id`,
-		`type`,
-		`tx_hash`,
-		`b_num`,
-		`time`,
-		`desc`
-		)
-	values
-		(#{nodeId},
-		'6',
-		#{txHash},
-		#{bNum},
-		#{time},
-		#{codeNodeOptDesc}
-		);
-
 </update>
 </mapper>

@@ -56,11 +56,6 @@ public class ProposalUpgrade extends BusinessParam {
     private String description;
 
     /**
-     * 操作描述
-     */
-    private String optDesc;
-
-    /**
      * version
      */
     private String newVersion;

@@ -3,6 +3,8 @@ package com.platon.browser.common.utils;
 import com.platon.browser.common.complement.dto.AnnualizedRateInfo;
 import com.platon.browser.common.complement.dto.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dto.CustomStaking;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
@@ -123,4 +125,27 @@ public class CalculateUtils {
 
 		return turnValue;
 	}
+
+
+	/**
+	 * 记录利润
+	 * @param staking
+	 */
+	public static void rotateProfit( Staking staking,BigInteger curSettingEpoch, AnnualizedRateInfo ari,BlockChainConfig blockChainConfig)  {
+/*		if(ari==null){
+			throw new SettleEpochChangeException("年化率信息为空，无法计算!");
+		}*/
+		// 如果年化率推算信息不为空，则证明当前质押信息已经连续了几个结算周期，做以下操作：
+		// 添加上一周期的收益
+
+		BigDecimal profit = staking.getStakingRewardValue().add(staking.getBlockRewardValue());
+		ari.getProfit().add(new PeriodValueElement(curSettingEpoch.longValue(),profit));
+		if(ari.getProfit().size()>blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue()){
+			// 按结算周期由大到小排序
+			ari.getProfit().sort((c1, c2) -> Integer.compare(0, c1.getPeriod().compareTo(c2.getPeriod())));
+			// 删除多余的元素
+			for (int i=ari.getProfit().size()-1;i>=blockChainConfig.getMaxSettlePeriodCount4AnnualizedRateStat().longValue();i--) ari.getProfit().remove(i);
+		}
+	}
+
 }

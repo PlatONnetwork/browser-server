@@ -53,8 +53,7 @@ public class ProposalCancelConverter extends BusinessParamConverter<ProposalCanc
 				.replace("TYPE",CustomProposal.TypeEnum.CANCEL.getCode())
 				.replace("VERSION","");
  
-    	businessParam.setOptDesc(desc);
-    	
+
     	proposalBusinessMapper.cancel(businessParam);
     	
         return businessParam;

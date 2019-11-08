@@ -23,20 +23,6 @@
 		`is_init` = #{isInit}
 	where `node_id` = #{nodeId};
 
-	insert into `node_opt`
-		(`node_id`,
-		`type`,
-		`tx_hash`,
-		`b_num`,
-		`time`
-		)
-	values
-		(#{nodeId},
-		'2',
-		#{txHash},
-		#{bNum},
-		#{time}
-		);
 
 </update>
 </mapper>

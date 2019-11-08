@@ -40,7 +40,6 @@ public class ReportConverter extends BusinessParamConverter<Report> {
         		.slashData(txParam.getData())
                 .nodeId(txParam.getVerify())
                 .txHash(tx.getHash())
-                .bNum(BigInteger.valueOf(tx.getNum()))
                 .time(tx.getTime())
                 .stakingBlockNum(txParam.getStakingBlockNum())
                 .slashRate(chainConfig.getDuplicateSignSlashRate())
@@ -57,8 +56,6 @@ public class ReportConverter extends BusinessParamConverter<Report> {
         BigDecimal codeSlashValue = staking.getStakingLocked().multiply(businessParam.getSlashRate());
         //奖励的金额
         BigDecimal codeRewardValue = codeSlashValue.multiply(businessParam.getSlash2ReportRate());
-        //节点操作描述
-        String codeNodeoptDesc = "PERCENT|AMOUNT".replace("AMOUNT",codeSlashValue.toString());
         //当前锁定的
         BigDecimal codeCurStakingLocked = staking.getStakingLocked().subtract(codeSlashValue);
         if(codeCurStakingLocked.compareTo(BigDecimal.ZERO) == 1){
@@ -68,8 +65,8 @@ public class ReportConverter extends BusinessParamConverter<Report> {
             businessParam.setCodeStatus(3);
             businessParam.setCodeStakingReductionEpoch(0);
         }
-        
-        
+        businessParam.setCodeRewardValue(codeRewardValue);
+
         slashBusinessMapper.report(businessParam);
         return businessParam;
     }

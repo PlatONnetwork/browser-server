@@ -29,10 +29,7 @@ public class StakeIncreaseConverter extends BusinessParamConverter<StakeIncrease
         StakeIncrease businessParam= StakeIncrease.builder()        		
         		.nodeId(txParam.getNodeId())
         		.amount(new BigDecimal(txParam.getAmount()))
-        		.bNum(BigInteger.valueOf(tx.getNum()))
         		.stakingBlockNum(txParam.getStakingBlockNum())
-        		.time(tx.getTime())
-        		.txHash(tx.getHash())
                 .build();
         
         stakeBusinessMapper.increase(businessParam);

@@ -51,11 +51,6 @@ public class ProposalCancel extends BusinessParam {
     private String description;
 
     /**
-     * 操作描述
-     */
-    private String optDesc;
-
-    /**
      * 被取消提案id
      */
     private String canceledId;

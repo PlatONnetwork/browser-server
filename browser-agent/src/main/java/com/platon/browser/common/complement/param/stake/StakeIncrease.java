@@ -32,25 +32,12 @@ public class StakeIncrease extends BusinessParam {
      */
     private BigDecimal amount;
 
-    /**
-     * 交易快高
-     */
-    private BigInteger bNum;
 
     /**
      * 质押交易所在块高
      */
     private BigInteger stakingBlockNum;
 
-    /**
-     * 时间
-     */
-    private Date time;
-
-    /**
-     * 交易hash
-     */
-    private String txHash;
 
     @Override
     public BusinessType getBusinessType() {

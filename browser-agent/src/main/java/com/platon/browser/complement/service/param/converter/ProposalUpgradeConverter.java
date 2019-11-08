@@ -54,8 +54,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<ProposalUpg
 				.replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode())
 				.replace("VERSION",businessParam.getNewVersion());
  
-    	businessParam.setOptDesc(desc);
-    	
+
     	proposalBusinessMapper.upgrade(businessParam);
     	
         return businessParam;

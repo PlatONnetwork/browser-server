@@ -60,21 +60,6 @@ public class StakeModify extends BusinessParam {
      */
     private BigInteger stakingBlockNum;
 
-    /**
-     * 交易所在区块号
-     */
-    private BigInteger bNum;
-
-    /**
-     * 时间
-     */
-    private Date time;
-
-    /**
-     * 交易hash
-     */
-    private String txHash;
-
     @Override
     public BusinessType getBusinessType() {
         return BusinessType.STAKE_MODIFY;
