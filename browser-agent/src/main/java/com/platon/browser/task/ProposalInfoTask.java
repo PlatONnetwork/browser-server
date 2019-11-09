@@ -108,7 +108,7 @@ public class ProposalInfoTask {
                     }
                 }
             }catch (Exception e){
-
+                log.error("on ProposalInfoTask error",e);
             }
             customProposalMapper.updateProposalInfoList(proposals);
         }
