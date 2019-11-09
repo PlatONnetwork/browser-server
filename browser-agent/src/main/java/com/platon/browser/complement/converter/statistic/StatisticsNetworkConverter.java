@@ -38,16 +38,6 @@ public class StatisticsNetworkConverter {
     public void convert(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        //获取激励池余额
-		BigInteger inciteBalance = accountService.getInciteBalance(BigInteger.valueOf(block.getNum()));
-		//获取质押余额
-		BigInteger stakingBalance = accountService.getStakingBalance(BigInteger.valueOf(block.getNum()));
-		//获取锁仓余额
-		BigInteger restrictBalance = accountService.getLockCabinBalance(BigInteger.valueOf(block.getNum()));
-		//计算发行量
-		BigDecimal issueValue = CalculateUtils.calculationIssueValue(epochMessage.getIssueEpochRound(),chainConfig,inciteBalance);
-		//计算流通量
-		BigDecimal turnValue = CalculateUtils.calculationTurnValue(issueValue,inciteBalance,stakingBalance,restrictBalance);
 		// 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
         NetworkStatChange networkStatChange = NetworkStatChange.builder().build();
@@ -61,8 +51,8 @@ public class StatisticsNetworkConverter {
                 .setAddIssueBegin(CalculateUtils.calculateAddIssueBegin(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
                 .setAddIssueEnd(CalculateUtils.calculateAddIssueEnd(chainConfig.getAddIssuePeriodBlockCount(), epochMessage.getIssueEpochRound()))
                 .setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()))
-                .setIssueValue(issueValue) // 发行量
-                .setTurnValue(turnValue) // 流通量
+                .setIssueValue(BigDecimal.ZERO) // TODO: 发行量 需要在入库时合并RPC定时任务缓存中对应的值
+                .setTurnValue(BigDecimal.ZERO) // TODO: 流通量 需要在入库时合并RPC定时任务缓存中对应的值
                 .setNodeOptSeq(networkStat.getNodeOptSeq());
         statisticBusinessMapper.networkChange(networkStatChange);
 
