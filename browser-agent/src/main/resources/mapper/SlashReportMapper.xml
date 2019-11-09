@@ -14,7 +14,7 @@
 		`stat_delegate_value` = 0,
 		`stat_delegate_released` = `stat_delegate_value`,
 		`stat_valid_addrs` = 0,
-		`stat_invalid_addrs` = (select count(1) from delegation where node_id = #{nodeId} and is_history = 2 group by delegate_addr)
+		`stat_invalid_addrs` = select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2
 	where
 		`node_id` = #{nodeId};
 
