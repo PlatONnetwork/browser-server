@@ -8,13 +8,13 @@
 		`status` =  #{codeStatus},
 		`staking_reduction_epoch` = #{codeStakingReductionEpoch},
 		`staking_reduction` = #{codeCurStakingLocked},
+		`total_value` = `total_value` - `staking_locked` - `staking_hes`,
 		`staking_locked` = 0,
 		`staking_hes` = 0,
-		`total_value` = `total_value` - `staking_locked` - `staking_hes`,
 		`stat_delegate_value` = 0,
 		`stat_delegate_released` = `stat_delegate_value`,
 		`stat_valid_addrs` = 0,
-		`stat_invalid_addrs` = select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2
+		`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2)
 	where
 		`node_id` = #{nodeId};
 
