@@ -1,9 +1,9 @@
 package com.platon.browser.complement.converter.stake;
 
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.dao.param.stake.StakeIncrease;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.complement.dao.param.stake.StakeIncrease;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.StakeIncreaseParam;
@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
@@ -34,7 +33,7 @@ public class StakeIncreaseConverter extends BusinessParamConverter<Optional<Node
         StakeIncreaseParam txParam = tx.getTxParam(StakeIncreaseParam.class);
         StakeIncrease businessParam= StakeIncrease.builder()        		
         		.nodeId(txParam.getNodeId())
-        		.amount(new BigDecimal(txParam.getAmount()))
+        		.amount(txParam.getAmount())
         		.stakingBlockNum(txParam.getStakingBlockNum())
                 .build();
         

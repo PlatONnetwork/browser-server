@@ -2,10 +2,10 @@ package com.platon.browser.complement.converter.stake;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
+import com.platon.browser.complement.dao.param.stake.StakeCreate;
 import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -44,7 +43,7 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOp
         BigInteger stakingBlockNum = BigInteger.valueOf(tx.getNum());
         StakeCreate businessParam= StakeCreate.builder()
         		.nodeId(txParam.getNodeId())
-        		.stakingHes(new BigDecimal(txParam.getAmount()))
+        		.stakingHes(txParam.getAmount())
         		.nodeName(txParam.getNodeName())
         		.externalId(txParam.getExternalId())
         		.benefitAddr(txParam.getBenefitAddress())

@@ -32,7 +32,7 @@ public class RestrictingCreateConverter extends BusinessParamConverter<Restricti
     	
     	List<RestrictingItem> restrictingItems = txParam.getPlans().stream().map(plan -> { return RestrictingItem.builder()
 				.address(account)
-				.amount(new BigDecimal(plan.getAmount()))
+				.amount(plan.getAmount())
 				.epoch(plan.getEpoch().longValue())
 				.number(BigInteger.valueOf(tx.getNum()))
 				.build();

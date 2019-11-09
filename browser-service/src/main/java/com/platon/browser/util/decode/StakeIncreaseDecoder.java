@@ -5,6 +5,7 @@ import com.platon.browser.param.TxParam;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -26,7 +27,7 @@ public class StakeIncreaseDecoder extends Decoder {
         StakeIncreaseParam param = StakeIncreaseParam.builder()
                 .nodeId(nodeId)
                 .type(type.intValue())
-                .amount(amount.toString())
+                .amount(new BigDecimal(amount))
                 .stakingBlockNum(null)
                 .build();
         return param;

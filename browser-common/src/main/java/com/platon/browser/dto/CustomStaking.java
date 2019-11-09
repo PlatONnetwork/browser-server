@@ -145,12 +145,7 @@ public class CustomStaking extends Staking {
      * @param param
      */
     public void updateWithIncreaseStakingParam(StakeIncreaseParam param) {
-        if(StringUtils.isNotBlank(param.getAmount())){
-            BigInteger addAmount = new BigInteger(param.getAmount());
-//            BigInteger stakingHas = new BigInteger(this.getStakingHas());
-//            BigInteger total = stakingHas.add(addAmount);
-//            this.setStakingHas(total.toString());
-        }
+
     }
 
     /**

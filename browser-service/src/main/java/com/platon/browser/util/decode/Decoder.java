@@ -8,6 +8,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public abstract class Decoder {
             RlpString paramb = (RlpString) beanTypeList.getValues().get(1);
             RestrictingCreateParam.RestrictingPlan planParam = RestrictingCreateParam.RestrictingPlan.builder()
                     .epoch(parama.asPositiveBigInteger().intValue())
-                    .amount(paramb.asPositiveBigInteger().toString())
+                    .amount(new BigDecimal(paramb.asPositiveBigInteger()))
                     .build();
             list.add(planParam);
         }

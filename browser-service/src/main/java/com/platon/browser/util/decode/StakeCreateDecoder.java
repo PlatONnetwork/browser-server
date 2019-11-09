@@ -6,6 +6,7 @@ import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -48,7 +49,7 @@ public class StakeCreateDecoder extends Decoder {
                 .nodeName(nodeName)
                 .website(website)
                 .details(details)
-                .amount(amount.toString())
+                .amount(new BigDecimal(amount))
                 .programVersion(version)
                 .build();
         return param;

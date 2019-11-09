@@ -4,9 +4,7 @@ import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -66,7 +64,7 @@ public class StakeCreateParam extends TxParam{
     /**
      * 质押的von
      */
-    private String amount;
+    private BigDecimal amount;
 
     /**
      * 程序的真实版本，治理rpc获取
@@ -77,9 +75,4 @@ public class StakeCreateParam extends TxParam{
      * blockNumber
      */
     private BigInteger blockNumber;
-
-    /********把字符串类数值转换为大浮点数的便捷方法********/
-    public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}
-    /********把字符串类数值转换为大整数的便捷方法********/
-    public BigInteger integerAmount(){return StringUtils.isBlank(amount)?BigInteger.ZERO:new BigInteger(amount);}
 }

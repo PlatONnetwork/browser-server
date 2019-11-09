@@ -4,9 +4,9 @@ import com.platon.browser.utils.HexTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -41,5 +41,5 @@ public class StakeExitParam extends TxParam{
     /**
      *  撤销金额
      */
-    private String amount;
+    private BigDecimal amount;
 }

@@ -1,15 +1,12 @@
 package com.platon.browser.param;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * User: dongqile
@@ -42,11 +39,7 @@ public class RestrictingCreateParam extends TxParam{
         /**
          * 表示目标区块上待释放的金额
          */
-        private String amount;
-        /********把字符串类数值转换为大浮点数的便捷方法********/
-        public BigDecimal decimalAmount(){return StringUtils.isBlank(amount)?BigDecimal.ZERO:new BigDecimal(amount);}
-        /********把字符串类数值转换为大整数的便捷方法********/
-        public BigInteger integerAmount(){return StringUtils.isBlank(amount)?BigInteger.ZERO:new BigInteger(amount);}
+        private BigDecimal amount;
     }
 
     /**

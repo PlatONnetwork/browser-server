@@ -5,6 +5,7 @@ import com.platon.browser.param.TxParam;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -27,7 +28,7 @@ public class DelegateExitDecoder extends Decoder {
         DelegateExitParam param = DelegateExitParam.builder()
                 .stakingBlockNum(new BigInteger(blockNumber,16))
                 .nodeId(nodeId)
-                .amount(amount.toString())
+                .amount(new BigDecimal(amount))
                 .build();
         return param;
     }

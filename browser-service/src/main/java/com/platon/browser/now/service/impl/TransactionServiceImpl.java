@@ -327,7 +327,7 @@ public class TransactionServiceImpl implements TransactionService {
 		    		/** 创建验证人 */
 					case CREATE_VALIDATOR:
 						StakeCreateParam createValidatorParam = JSONObject.parseObject(txInfo, StakeCreateParam.class);
-						resp.setTxAmount(createValidatorParam.getAmount());
+						resp.setTxAmount(createValidatorParam.getAmount().toString());
 						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
 						resp.setNodeId(createValidatorParam.getNodeId());
 						resp.setNodeName(createValidatorParam.getNodeName());
@@ -335,7 +335,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setWebsite(createValidatorParam.getWebsite());
 						resp.setDetails(createValidatorParam.getDetails());
 						resp.setProgramVersion(createValidatorParam.getProgramVersion().toString());
-						resp.setTxAmount(createValidatorParam.getAmount());
+						resp.setTxAmount(createValidatorParam.getAmount().toString());
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//编辑验证人
@@ -353,7 +353,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case INCREASE_STAKING:
 						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
-						resp.setTxAmount(increaseStakingParam.getAmount());
+						resp.setTxAmount(increaseStakingParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
 					//退出验证人
@@ -362,7 +362,7 @@ public class TransactionServiceImpl implements TransactionService {
 						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
 						resp.setNodeName(this.setStakingName(exitValidatorParam.getNodeId(), exitValidatorParam.getNodeName()));
-						resp.setApplyAmount(exitValidatorParam.getAmount());
+						resp.setApplyAmount(exitValidatorParam.getAmount().toString());
 						StakingKey stakingKeyE = new StakingKey();
 						stakingKeyE.setNodeId(exitValidatorParam.getNodeId());
 						if(exitValidatorParam.getStakingBlockNum()==null) {
@@ -387,7 +387,7 @@ public class TransactionServiceImpl implements TransactionService {
 					case DELEGATE:
 						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
-						resp.setTxAmount(delegateParam.getAmount());
+						resp.setTxAmount(delegateParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
 					//委托赎回
@@ -396,8 +396,8 @@ public class TransactionServiceImpl implements TransactionService {
 						// 通过txHash关联un_delegation表
 						DelegateExitParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateExitParam.class);
 						resp.setNodeId(unDelegateParam.getNodeId());
-						resp.setApplyAmount(unDelegateParam.getAmount());
-						resp.setTxAmount(unDelegateParam.getAmount());
+						resp.setApplyAmount(unDelegateParam.getAmount().toString());
+						resp.setTxAmount(unDelegateParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(unDelegateParam.getNodeId(), unDelegateParam.getNodeName()));
 //						UnDelegation unDelegation = unDelegationMapper.selectByPrimaryKey(req.getTxHash());
 //						if(unDelegation!=null) {
@@ -520,8 +520,8 @@ public class TransactionServiceImpl implements TransactionService {
 						BigDecimal amountSum = new BigDecimal(0);
 						for(RestrictingCreateParam.RestrictingPlan p:createRestrictingParam.getPlans()) {
 							TransactionDetailsRPPlanResp transactionDetailsRPPlanResp = new TransactionDetailsRPPlanResp();
-							amountSum = amountSum.add(new BigDecimal(p.getAmount()));
-							transactionDetailsRPPlanResp.setAmount(p.getAmount());
+							amountSum = amountSum.add(p.getAmount());
+							transactionDetailsRPPlanResp.setAmount(p.getAmount().toString());
 							transactionDetailsRPPlanResp.setEpoch(p.getEpoch());
 							//锁仓周期对应快高  结算周期 * epoch
 							transactionDetailsRPPlanResp.setBlockNumber(blockChainConfig.getSettlePeriodBlockCount()
