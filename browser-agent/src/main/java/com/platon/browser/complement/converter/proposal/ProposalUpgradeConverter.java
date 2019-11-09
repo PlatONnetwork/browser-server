@@ -74,7 +74,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
 		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
-				.replace("TYPE",CustomProposal.TypeEnum.UPGRADE.getCode())
+				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()))
 				.replace("VERSION",businessParam.getNewVersion());
 
 

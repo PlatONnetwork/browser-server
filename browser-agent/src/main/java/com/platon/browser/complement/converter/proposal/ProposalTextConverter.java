@@ -70,7 +70,7 @@ public class ProposalTextConverter extends BusinessParamConverter<Optional<NodeO
 		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
-				.replace("TYPE",CustomProposal.TypeEnum.TEXT.getCode())
+				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()))
 				.replace("VERSION","");
 
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
