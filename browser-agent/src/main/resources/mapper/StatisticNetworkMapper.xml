@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StatisticBusinessMapper">
-<update id="networkChange" parameterType="com.platon.browser.complement.dao.param.statistic.NetworkStatChange">
+
+<select id="getNetworkStatisticsFromNode"  resultType="com.platon.browser.complement.dao.entity.NetworkStatistics">
+	select sum(total_value) as totalValue,
+	    sum(staking_hes + staking_locked) as stakingValue
+	 from node 
+	 where status = 1
+</select>
+
+<select id="getNetworkStatisticsFromAddress"  resultType="INTEGER">
+	select count(1) from proposal where status = 1
+</select>
+
+<select id="getNetworkStatisticsFromProposal"  resultType="INTEGER">
+	select count(1) from proposal where status = 1
+</select>
+
+<update id="networkChange" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into `network_stat`
     (
         `id`,
@@ -19,7 +35,12 @@
         `add_issue_begin`,
         `add_issue_end`,
         `next_settle`,
-        `node_opt_seq`
+        `node_opt_seq`,
+        `cur_block_hash`,
+        `staking_delegation_value`,
+        `staking_value`,
+        `doing_proposal_qty`,
+        `address_qty`
     )
     values
     (
@@ -38,7 +59,12 @@
         #{addIssueBegin},
         #{addIssueEnd},
         #{nextSettle},
-        #{nodeOptSeq}
+        #{nodeOptSeq},
+        #{curBlockHash},
+        #{stakingDelegationValue},
+        #{stakingValue},
+        #{doingProposalQty},
+        #{addressQty}
     )
     on duplicate
     key update
@@ -56,6 +82,11 @@
         `add_issue_begin` = #{addIssueBegin},
         `add_issue_end` = #{addIssueEnd},
         `next_settle` = #{nextSettle},
-        `node_opt_seq` = #{nodeOptSeq};
+        `node_opt_seq` = #{nodeOptSeq},
+        `cur_block_hash` = #{curBlockHash},
+        `staking_delegation_value` = #{stakingDelegationValue},
+        `staking_value` = #{stakingValue},
+        `doing_proposal_qty`= #{doingProposalQty},
+        `address_qty` = #{addressQty};
 </update>
 </mapper>

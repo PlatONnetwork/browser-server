@@ -136,7 +136,7 @@ public class TransactionParameterService {
            
         }
         
-        networkStatCache.updateByBlock(txQty, proposalQty, event.getBlock().getTime());
+        networkStatCache.updateByBlock(txQty, proposalQty, event.getBlock().getTime(), event.getBlock().getHash());
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);
 
