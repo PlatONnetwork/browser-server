@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.platon.browser.complement.dao.entity.NetworkStatistics;
 import com.platon.browser.complement.dao.param.BusinessParam;
+import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 
 /*
@@ -43,6 +44,12 @@ public interface StatisticBusinessMapper {
      * @return
      */
 	Integer getNetworkStatisticsFromProposal();
+	
+    /**
+     * 获得地址数
+     * @return
+     */
+	Address getAddressStatisticsFromStaking();
 
 
 }
