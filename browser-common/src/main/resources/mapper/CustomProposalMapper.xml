@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.browser.dao.mapper.CustomProposalMapper">
+<update id="updateProposalList" >
+    <foreach collection="proposalList" item="item">
+        update `proposal`
+        <set>
+        <if test="item.topic != null">
+        `topic` = #{item.topic},
+        </if>
+
+        <if test="item.description != null">
+        `description` = #{item.description},
+        </if>
+
+        <if test="item.canceledTopic != null">
+        `canceled_topic` = #{item.canceledTopic},
+        </if>
+
+        <if test="item.yeas != null">
+        `yeas` = #{item.yeas},
+        </if>
+
+        <if test="item.nays != null">
+        `nays` =  #{item.nays},
+        </if>
+
+        <if test="item.abstentions != null">
+        `abstentions` = #{item.abstentions}
+        </if>
+
+        <if test="item.abstentions != null">
+         `accu_verifiers` = #{item.accuVerifiers}
+        </if>
+        </set>
+        where `hash` = #{item.hash}
+    </foreach>
+</update>
+</mapper>

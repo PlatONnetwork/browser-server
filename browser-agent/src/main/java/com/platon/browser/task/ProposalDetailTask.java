@@ -1,0 +1,114 @@
+package com.platon.browser.task;
+
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.ProposalParticiantStat;
+import com.platon.browser.client.SpecialContractApi;
+import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.task.ProposalTaskCache;
+import com.platon.browser.common.task.TaskCacheProposal;
+import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.dao.entity.ProposalExample;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
+import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dto.CustomProposal;
+import com.platon.browser.dto.ProposalMarkDownDto;
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.BusinessException;
+import com.platon.browser.exception.ContractInvokeException;
+import com.platon.browser.exception.HttpRequestException;
+import com.platon.browser.util.MarkDownParserUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.web3j.platon.BaseResponse;
+import org.web3j.platon.bean.TallyResult;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Auther: dongqile
+ * @Date: 2019/8/17 20:09
+ * @Description: 提案信息更新任务
+ */
+@Slf4j
+@Component
+public class ProposalDetailTask {
+    @Autowired
+    private CustomProposalMapper customProposalMapper;
+    @Autowired
+    private ProposalMapper proposalMapper;
+
+    /**
+     * 1.查询数据库未同步完成的提案信息
+     * 2.根据proposalId查询keybase上信息
+     * 3.查询到的信息更新并修改数据库
+     */
+    @Scheduled(cron = "0/5  * * * * ?")
+    private void cron () {
+        start();
+    }
+
+    private void start () {
+        //数据库获取信息未完成同步信息的提案
+        ProposalExample proposalExample = new ProposalExample();
+        proposalExample.createCriteria().andCompletionFlagEqualTo(CustomProposal.FlagEnum.INCOMPLETE.getCode());
+        List <Proposal> proposals = proposalMapper.selectByExample(proposalExample);
+        //如果已经补充则无需补充
+        if (proposals.isEmpty()) return;
+
+        for (Proposal proposal : proposals) {
+            ProposalMarkDownDto resp;
+            try {
+                resp = getMarkdownInfo(proposal.getUrl());
+            } catch (HttpRequestException e) {
+                log.error("更新提案(proposal={})出错: {}", proposal.getHash(), e.getMessage());
+                continue;
+            }
+
+            try {
+                proposal.setTopic(resp.getTopic());
+                proposal.setDescription(resp.getDescription());
+
+                if (CustomProposal.TypeEnum.CANCEL.getCode() == proposal.getType()) {
+                    //补充对应被取消的提案相关信息
+                    Proposal cp = proposalMapper.selectByPrimaryKey(proposal.getCanceledPipId());
+                    proposal.setCanceledTopic(cp.getTopic());
+                }
+            } catch (Exception e) {
+                log.error("更新提案(proposal={})出错: {}", proposal.getHash(), e.getMessage());
+                continue;
+            }
+            //将同步完成的proposal信息修改状态已完成
+            proposal.setCompletionFlag(CustomProposal.FlagEnum.COMPLETE.getCode());
+        }
+        customProposalMapper.updateProposalList(proposals);
+
+    }
+
+
+    /**
+     * 根据URL获取markdown信息
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws BusinessException
+     */
+    public ProposalMarkDownDto getMarkdownInfo ( String url ) throws HttpRequestException {
+        try {
+            String fileUrl = MarkDownParserUtil.acquireMD(url);
+            if (fileUrl == null) throw new BusinessException("获取不到" + url);
+            String proposalMarkString = MarkDownParserUtil.parserMD(fileUrl);
+            return JSON.parseObject(proposalMarkString, ProposalMarkDownDto.class);
+        } catch (Exception e) {
+            throw new HttpRequestException(e.getMessage());
+        }
+    }
+
+
+}

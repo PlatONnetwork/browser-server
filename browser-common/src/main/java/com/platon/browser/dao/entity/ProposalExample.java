@@ -1594,6 +1594,66 @@ public class ProposalExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andCompletionFlagIsNull() {
+            addCriterion("completion_flag is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagIsNotNull() {
+            addCriterion("completion_flag is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagEqualTo(Integer value) {
+            addCriterion("completion_flag =", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagNotEqualTo(Integer value) {
+            addCriterion("completion_flag <>", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagGreaterThan(Integer value) {
+            addCriterion("completion_flag >", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagGreaterThanOrEqualTo(Integer value) {
+            addCriterion("completion_flag >=", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagLessThan(Integer value) {
+            addCriterion("completion_flag <", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagLessThanOrEqualTo(Integer value) {
+            addCriterion("completion_flag <=", value, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagIn(List<Integer> values) {
+            addCriterion("completion_flag in", values, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagNotIn(List<Integer> values) {
+            addCriterion("completion_flag not in", values, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagBetween(Integer value1, Integer value2) {
+            addCriterion("completion_flag between", value1, value2, "completionFlag");
+            return (Criteria) this;
+        }
+
+        public Criteria andCompletionFlagNotBetween(Integer value1, Integer value2) {
+            addCriterion("completion_flag not between", value1, value2, "completionFlag");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -99,4 +99,38 @@ public class CustomProposal extends Proposal {
             return ENUMS.containsValue(en);
         }
     }
+    /**
+     * 提案信息同步类型枚举类：
+     *  1.已完成
+     *  0.未完成
+     */
+    public enum FlagEnum {
+        COMPLETE(1, "已完成"),
+        INCOMPLETE(0, "未完成");
+        private int code;
+        private String desc;
+        FlagEnum ( int code, String desc ) {
+            this.code = code;
+            this.desc = desc;
+        }
+        public int getCode () {
+            return code;
+        }
+        public String getDesc () {
+            return desc;
+        }
+        private static final Map <Integer, FlagEnum> ENUMS = new HashMap <>();
+        static {
+            Arrays.asList(FlagEnum.values()).forEach(en -> ENUMS.put(en.code, en));
+        }
+        public static FlagEnum getEnum ( int code ) {
+            return ENUMS.get(code);
+        }
+        public static boolean contains ( int code ) {
+            return ENUMS.containsKey(code);
+        }
+        public static boolean contains ( FlagEnum en ) {
+            return ENUMS.containsValue(en);
+        }
+    }
 }
