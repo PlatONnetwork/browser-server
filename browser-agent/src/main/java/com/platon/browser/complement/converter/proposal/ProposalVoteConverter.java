@@ -53,10 +53,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
         long startTime = System.currentTimeMillis();
 
 		// 获得参数
-    	ProposalVoteParam txParam = tx.getTxParam(ProposalVoteParam.class);
-        String nodeId = txParam.getVerifier();
         String proposalId = txParam.getProposalId();
-        NodeItem nodeItem = nodeCache.getNode(nodeId);
         String nodeName = nodeItem.getNodeName();
         String txHash = tx.getHash();
         Long blockNum = event.getBlock().getNum();
@@ -95,7 +92,6 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 		nodeOpt.setTime(time);
 
         // 补充txInfo
-        txParam.setNodeName(nodeName);
         txParam.setPIDID(proposal.getPipId());
         txParam.setProposalType(String.valueOf(proposal.getType()));
         tx.setInfo(txParam.toJSONString());
