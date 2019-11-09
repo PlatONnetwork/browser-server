@@ -63,6 +63,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                 .add(delegation.getDelegateReleased())
                 .subtract(txParam.getAmount()).compareTo(chainConfig.getDelegateThreshold())<0;
         if(delegation.getDelegateReleased().compareTo(BigDecimal.ONE)>0){
+            // 如果待提取金额大于0,则把节点置为已退出
             businessParam.setCodeNodeIsLeave(true);
         }
         if(isRefundAll){
@@ -86,6 +87,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
                     .setCodeDelegateLocked(delegation.getDelegateLocked().add(delegation.getDelegateHes()).subtract(txParam.getAmount()));
             }
         }
+
         businessParam.setCodeRmdelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
                 .setCodeRmDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeDelegateReleased()));
