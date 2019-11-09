@@ -1,9 +1,15 @@
 package com.platon.browser.common.task;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
-public class TaskProposal {
+@Builder
+@AllArgsConstructor
+@Accessors(chain = true)
+public class TaskCacheProposal extends TaskCacheBase {
     private String hash;
     private Long yeas;
     private Long nays;

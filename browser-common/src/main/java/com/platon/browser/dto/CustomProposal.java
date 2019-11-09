@@ -54,29 +54,29 @@ public class CustomProposal extends Proposal {
      *  4.取消提案
      */
     public enum TypeEnum {
-        TEXT("1", "文本提案"),
-        UPGRADE("2", "升级提案"),
-        CANCEL("4", "取消提案");
-        private String code;
+        TEXT(1, "文本提案"),
+        UPGRADE(2, "升级提案"),
+        CANCEL(4, "取消提案");
+        private int code;
         private String desc;
-        TypeEnum ( String code, String desc ) {
+        TypeEnum ( int code, String desc ) {
             this.code = code;
             this.desc = desc;
         }
-        public String getCode () {
+        public int getCode () {
             return code;
         }
         public String getDesc () {
             return desc;
         }
-        private static final Map <String, TypeEnum> ENUMS = new HashMap <>();
+        private static final Map <Integer, TypeEnum> ENUMS = new HashMap <>();
         static {
             Arrays.asList(TypeEnum.values()).forEach(en -> ENUMS.put(en.code, en));
         }
-        public static TypeEnum getEnum ( String code ) {
+        public static TypeEnum getEnum ( int code ) {
             return ENUMS.get(code);
         }
-        public static boolean contains ( String code ) {
+        public static boolean contains ( int code ) {
             return ENUMS.containsKey(code);
         }
         public static boolean contains ( TypeEnum en ) {
