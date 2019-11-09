@@ -3,9 +3,7 @@ package com.platon.browser.task;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
 import com.platon.browser.dao.entity.StakingHistory;
-import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.CustomStakingHistoryMapper;
-import com.platon.browser.dao.mapper.StakingHistoryMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,11 +19,11 @@ import java.util.Set;
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: 定时同步质押历史数据至质押历史表
+ * @Description: 质押表中的历史数据迁移至ES任务
  */
 @Component
 @Slf4j
-public class StakingHistorySyn {
+public class StakingMigrateTask {
 
     @Autowired
     private StakingMapper stakingMapper;

@@ -18,11 +18,11 @@ import java.util.Set;
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: 数据中已解除的委托删除并存入es中数据操作任务
+ * @Description: 委托表中的历史数据迁移至ES任务
  */
 @Component
 @Slf4j
-public class DelegateHistorySyn {
+public class DelegateMigrateTask {
 
     @Autowired
     private DelegationMapper delegationMapper;

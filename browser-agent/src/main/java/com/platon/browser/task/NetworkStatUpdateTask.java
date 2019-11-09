@@ -7,11 +7,12 @@ import org.springframework.stereotype.Component;
 /**
  * @Auther: dongqile
  * @Date: 2019/11/6
- * @Description: 网络统计任务
+ * @Description: TODO: 网络统计相关信息更新任务
  */
+
 @Component
 @Slf4j
-public class NetworkStatTask {
+public class NetworkStatUpdateTask {
 
 
     @Scheduled(cron = "0/30  * * * * ?")
