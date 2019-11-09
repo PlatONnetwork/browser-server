@@ -8,5 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface CustomProposalMapper {
-    int updateProposalList( @Param("proposalList") List <Proposal> list );
+    int updateProposalDetailList( @Param("proposalList") List <Proposal> list );
+    int updateProposalInfoList( @Param("proposalList") List <Proposal> list );
 }

@@ -86,7 +86,7 @@ public class ProposalDetailTask {
             //将同步完成的proposal信息修改状态已完成
             proposal.setCompletionFlag(CustomProposal.FlagEnum.COMPLETE.getCode());
         }
-        customProposalMapper.updateProposalList(proposals);
+        customProposalMapper.updateProposalDetailList(proposals);
 
     }
 

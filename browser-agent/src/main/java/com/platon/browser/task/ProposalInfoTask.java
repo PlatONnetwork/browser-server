@@ -7,6 +7,7 @@ import com.platon.browser.client.SpecialContractApi;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.entity.ProposalExample;
+import com.platon.browser.dao.mapper.CustomProposalMapper;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.dto.ProposalMarkDownDto;
@@ -42,6 +43,8 @@ public class ProposalInfoTask {
     private NetworkStatCache networkStatCache;
     @Autowired
     private ProposalMapper proposalMapper;
+    @Autowired
+    private CustomProposalMapper customProposalMapper;
 
     /**
      *
@@ -107,7 +110,7 @@ public class ProposalInfoTask {
             }catch (Exception e){
 
             }
-
+            customProposalMapper.updateProposalInfoList(proposals);
         }
     }
 
