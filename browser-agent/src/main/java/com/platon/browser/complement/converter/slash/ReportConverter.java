@@ -1,9 +1,15 @@
 package com.platon.browser.complement.converter.slash;
 
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.dao.param.slash.Report;
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
+import com.platon.browser.complement.dao.param.slash.Report;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
@@ -11,12 +17,8 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ReportParam;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @description: 举报验证人业务参数转换器
@@ -72,6 +74,7 @@ public class ReportConverter extends BusinessParamConverter<Optional<NodeOpt>> {
             businessParam.setCodeStakingReductionEpoch(0);
         }
         businessParam.setCodeRewardValue(codeRewardValue);
+        businessParam.setCodeCurStakingLocked(codeCurStakingLocked);
 
         slashBusinessMapper.report(businessParam);
 
