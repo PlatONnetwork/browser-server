@@ -4,7 +4,10 @@ import com.lmax.disruptor.EventHandler;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.service.elasticsearch.EsImportService;
 import com.platon.browser.common.service.redis.RedisImportService;
-import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.common.utils.BakDataDeleteUtil;
+import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.mapper.NOptBakMapper;
+import com.platon.browser.dao.mapper.TxBakMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,9 +34,12 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
     private EsImportService esImportService;
     @Autowired
     private RedisImportService redisImportService;
-
     @Autowired
     private NetworkStatCache networkStatCache;
+    @Autowired
+    private NOptBakMapper nOptBakMapper;
+    @Autowired
+    private TxBakMapper txBakMapper;
 
     @Value("${disruptor.queue.persistence.batch-size}")
     private int batchSize;
@@ -73,6 +80,28 @@ public class PersistenceEventHandler implements EventHandler<PersistenceEvent> {
             blockStage.clear();
             transactionStage.clear();
             nodeOptStage.clear();
+
+            // 查询序号最大的一条交易备份记录, 通知备份数据删除任务删除记录
+            TxBakExample txBakExample = new TxBakExample();
+            txBakExample.setOrderByClause("id desc limit 1");
+            List<TxBak> txBaks = txBakMapper.selectByExample(txBakExample);
+            Long txMaxId = 0L;
+            if(!txBaks.isEmpty()){
+                TxBak txBak = txBaks.get(0);
+                txMaxId=txBak.getId();
+            }
+            BakDataDeleteUtil.updateTxBakMaxId(txMaxId);
+
+            // 查询序号最大的一条操作记录, 通知日志备份数据删除任务删除记录
+            NOptBakExample nOptBakExample = new NOptBakExample();
+            nOptBakExample.setOrderByClause("id desc limit 1");
+            List<NOptBak> nOptBaks = nOptBakMapper.selectByExample(nOptBakExample);
+            Long nOptMaxId = 0L;
+            if(!nOptBaks.isEmpty()){
+                NOptBak nOptBak = nOptBaks.get(0);
+                nOptMaxId=nOptBak.getId();
+            }
+            BakDataDeleteUtil.updateNOptBakMaxId(nOptMaxId);
 
             preBlockNum=event.getBlock().getNum();
         }catch (Exception e){

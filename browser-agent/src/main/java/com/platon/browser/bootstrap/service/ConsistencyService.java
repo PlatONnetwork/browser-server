@@ -6,6 +6,7 @@ import com.platon.browser.bootstrap.queue.publisher.BootstrapEventPublisher;
 import com.platon.browser.client.result.ReceiptResult;
 import com.platon.browser.collection.service.block.BlockService;
 import com.platon.browser.collection.service.transaction.ReceiptService;
+import com.platon.browser.common.utils.BakDataDeleteUtil;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.BlockESRepository;
@@ -49,7 +50,10 @@ public class ConsistencyService {
      */
     public void synchronize() throws IOException {
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
-        if(networkStat==null) return;
+        if(networkStat==null) {
+            BakDataDeleteUtil.setBootstrapDone(true);
+            return;
+        }
 
         // mysql中的最高块号
         long mysqlMaxBlockNum = networkStat.getCurNumber();
@@ -91,6 +95,7 @@ public class ConsistencyService {
 
         if(esMaxBlockNum>=mysqlMaxBlockNum) {
             log.warn("MYSQL/ES/REDIS中的数据已同步!");
+            BakDataDeleteUtil.setBootstrapDone(true);
             return;
         }
 
@@ -109,6 +114,7 @@ public class ConsistencyService {
         }
         while (!callback.isDone()) SleepUtil.sleep(1L);
         bootstrapEventPublisher.shutdown();
+        BakDataDeleteUtil.setBootstrapDone(true);
         log.warn("MYSQL/ES/REDIS中的数据同步完成!");
     }
 }
