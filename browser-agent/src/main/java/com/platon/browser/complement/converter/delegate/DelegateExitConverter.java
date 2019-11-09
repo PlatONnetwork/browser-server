@@ -5,6 +5,7 @@ import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.BusinessParam;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
+import com.platon.browser.complement.error.BusinessError;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;
@@ -19,7 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * @description: 委托业务参数转换器
+ * @description: 撤销委托业务参数转换器
  * @author: chendongming@juzix.net
  * @create: 2019-11-04 17:58:27
  **/
@@ -47,7 +48,7 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
         delegationKey.setStakingBlockNum(txParam.getStakingBlockNum().longValue());
         Delegation delegation = delegationMapper.selectByPrimaryKey(delegationKey);
 
-        if(delegation==null) throw new Error("找不到对应的委托信息:[delegateAddr="+tx.getFrom()+",nodeId="+txParam.getNodeId()+",stakingBlockNum="+txParam.getStakingBlockNum()+"]");
+        if(delegation==null) throw new BusinessError("找不到对应的委托信息:[delegateAddr="+tx.getFrom()+",nodeId="+txParam.getNodeId()+",stakingBlockNum="+txParam.getStakingBlockNum()+"]");
         DelegateExit businessParam= DelegateExit.builder()
                 .nodeId(txParam.getNodeId())
                 .amount(txParam.getAmount())
