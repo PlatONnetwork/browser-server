@@ -4,6 +4,7 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.bootstrap.queue.callback.Callback;
 import com.platon.browser.bootstrap.queue.event.BootstrapEvent;
 import com.platon.browser.bootstrap.queue.handler.BootstrapEventHandler;
@@ -34,14 +35,12 @@ public class BootstrapEventPublisher {
     private EventFactory<BootstrapEvent> eventFactory = () -> BootstrapEvent.builder().build();
     @Autowired
     private BootstrapEventHandler handler;
-    // 事件处理线程生产工厂
-    ThreadFactory consumeThreadFactory = Thread::new;
 
     @Getter private Disruptor<BootstrapEvent> disruptor;
 
     @PostConstruct
     private void init(){
-        disruptor = new Disruptor<>(eventFactory, ringBufferSize, consumeThreadFactory);
+        disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
         // 设置事件处理器
         disruptor.handleEventsWith(handler);
         // 启动Disruptor,让所有生产和消费线程运行

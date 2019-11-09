@@ -4,6 +4,7 @@ import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorThreeArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.util.DaemonThreadFactory;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -33,12 +34,10 @@ public class PersistenceEventPublisher {
     private EventFactory<PersistenceEvent> eventFactory = () -> PersistenceEvent.builder().build();
     @Autowired
     private PersistenceEventHandler handler;
-    // 事件处理线程生产工厂
-    ThreadFactory consumeThreadFactory = Thread::new;
 
     @PostConstruct
     private void init(){
-        Disruptor<PersistenceEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, consumeThreadFactory);
+        Disruptor<PersistenceEvent> disruptor = new Disruptor<>(eventFactory, ringBufferSize, DaemonThreadFactory.INSTANCE);
         // 设置事件处理器
         disruptor.handleEventsWith(handler);
         // 启动Disruptor,让所有生产和消费线程运行
