@@ -37,30 +37,31 @@ public class AddressCache {
     		addressMap.put(addr, address);
     	}
     	
-    	 switch (tx.getTypeEnum()){
-	         case TRANSFER: // 转账交易
-	        	 address.setTxQty(address.getTxQty() + 1);
-	             break;
-	         case STAKE_CREATE:// 创建验证人
-	         case STAKE_INCREASE:// 增加自有质押
-	         case STAKE_MODIFY:// 编辑验证人
-	         case STAKE_EXIT:// 退出验证人
-	         case REPORT:// 举报验证人
-	        	 address.setStakingQty(address.getStakingQty()+1);
-	             break;
-	         case DELEGATE_CREATE:// 发起委托
-	         case DELEGATE_EXIT:// 撤销委托
-	        	 address.setDelegateQty(address.getDelegateQty()+1);
-	             break;
-	         case PROPOSAL_TEXT:// 创建文本提案
-	         case PROPOSAL_UPGRADE:// 创建升级提案
-	         case PROPOSAL_VOTE:// 提案投票
-	         case PROPOSAL_CANCEL:// 取消提案
-	         case VERSION_DECLARE:// 版本声明
-	        	 address.setProposalQty(address.getProposalQty()+1); 
-	             break;
-	         default:
-    	 }    	
+		address.setTxQty(address.getTxQty() + 1);
+		switch (tx.getTypeEnum()){
+		    case TRANSFER: // 转账交易
+			 address.setTransferQty(address.getTransferQty() + 1);
+		    break;
+		case STAKE_CREATE:// 创建验证人
+		case STAKE_INCREASE:// 增加自有质押
+		case STAKE_MODIFY:// 编辑验证人
+		case STAKE_EXIT:// 退出验证人
+		case REPORT:// 举报验证人
+			 address.setStakingQty(address.getStakingQty()+1);
+		    break;
+		case DELEGATE_CREATE:// 发起委托
+		case DELEGATE_EXIT:// 撤销委托
+			 address.setDelegateQty(address.getDelegateQty()+1);
+		    break;
+		case PROPOSAL_TEXT:// 创建文本提案
+		case PROPOSAL_UPGRADE:// 创建升级提案
+		case PROPOSAL_VOTE:// 提案投票
+		case PROPOSAL_CANCEL:// 取消提案
+		case VERSION_DECLARE:// 版本声明
+		   	 address.setProposalQty(address.getProposalQty()+1); 
+		        break;
+		    default:
+		}    	
     }
     
     private Address createDefaultAddress(String addr) {
