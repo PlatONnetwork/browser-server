@@ -71,7 +71,7 @@ public class TransactionParameterService {
      * @param event
      * @return
      */
-    public List<NodeOpt> getParameters(CollectionEvent event){
+    public List<NodeOpt> getParameters(CollectionEvent event) throws Exception{
         long startTime = System.currentTimeMillis();
 
         List<Transaction> transactions = event.getTransactions();

@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.complement.dao.mapper.StakeBusinessMapper">
-<update id="exit" parameterType="com.platon.browser.complement.dao.param.stake.StakeExit">
 
+<select id="queryStakingValue" resultType="DECIMAL">
+	select
+	    `staking_hes` + `staking_locked`
+	from staking
+	where `node_id` = #{nodeId}
+	   and  `staking_block_num` = #{stakingBlockNum};
+</select>
+
+
+<update id="exit" parameterType="com.platon.browser.complement.dao.param.stake.StakeExit">
 
 		update `delegation` set
 			`delegate_hes` = 0,
@@ -27,7 +36,7 @@
 			`stat_delegate_value` = 0,
 			`stat_delegate_released` = `stat_delegate_value`,
 			`stat_valid_addrs` = 0,
-			`stat_invalid_addrs` = select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2
+			`stat_invalid_addrs` = (select count(distinct delegate_addr) from delegation where node_id = #{nodeId} and is_history = 2)
 		where
 			`node_id` = #{nodeId};
 

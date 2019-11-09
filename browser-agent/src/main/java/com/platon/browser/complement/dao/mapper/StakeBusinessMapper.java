@@ -1,6 +1,9 @@
 package com.platon.browser.complement.dao.mapper;
 
 import com.platon.browser.complement.dao.param.BusinessParam;
+
+import java.math.BigDecimal;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -31,4 +34,10 @@ public interface StakeBusinessMapper {
      */
     @Transactional
     void exit(BusinessParam param);
+    
+    /**
+     * 查询质押总金额
+     */
+    @Transactional
+    BigDecimal queryStakingValue(BusinessParam param);
 }

@@ -20,7 +20,7 @@ import java.math.BigInteger;
 public abstract class BusinessParamConverter<T> {
 
     @Autowired
-    private NodeCache nodeCache;
+    protected NodeCache nodeCache;
 
     protected void updateNodeCache(String nodeId,String nodeName){
         try {
@@ -49,5 +49,5 @@ public abstract class BusinessParamConverter<T> {
     			:BusinessParam.YesNoEnum.NO.getCode();
     }
 
-    public abstract T convert(CollectionEvent event, Transaction tx);
+    public abstract T convert(CollectionEvent event, Transaction tx) throws Exception;
 }

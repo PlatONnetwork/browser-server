@@ -41,15 +41,7 @@ public class SupplementService {
                     }
                     break;
                 case STAKE_EXIT: // 撤销质押
-                	StakeExitParam evp = tx.getTxParam(StakeExitParam.class);
-                    nodeId=evp.getNodeId();
-                    if(StringUtils.isNotBlank(nodeId)){
-                        nodeItem = nodeCache.getNode(nodeId);
-                        evp.setNodeName(nodeItem.getNodeName());
-                        evp.setStakingBlockNum(nodeItem.getStakingBlockNum());
-                        //TODO    amount":"",                     //<需要冗余> 质押的von
-                        tx.setInfo(evp.toJSONString());
-                    }
+                	// 迁移到 com.platon.browser.complement.converter.stake.StakeExitConverter.convert(CollectionEvent, Transaction)
                     break;
                 case DELEGATE_CREATE: // 发起委托
                     DelegateCreateParam dp = tx.getTxParam(DelegateCreateParam.class);
