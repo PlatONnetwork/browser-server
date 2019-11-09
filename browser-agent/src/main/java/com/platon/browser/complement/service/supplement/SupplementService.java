@@ -91,15 +91,7 @@ public class SupplementService {
                     }
                     break;
                 case PROPOSAL_VOTE:
-                	ProposalVoteParam pvp = tx.getTxParam(ProposalVoteParam.class);
-                    nodeId=pvp.getVerifier();
-                    if(StringUtils.isNotBlank(nodeId)){
-                        nodeItem = nodeCache.getNode(nodeId);
-                        pvp.setNodeName(nodeItem.getNodeName());
-                        //TODO  "pIDID":"",                            //<需要冗余>提案的pIDID
-                        //TODO  "proposalType":"",                    //<需要冗余>提案类型  1:文本提案 2:升级提案 4:取消提案
-                        tx.setInfo(pvp.toJSONString());
-                    }
+                	//迁移到 com.platon.browser.complement.converter.proposal.ProposalVoteConverter.convert(CollectionEvent, Transaction)
                     break;
                 case VERSION_DECLARE:
                 	VersionDeclareParam vdp = tx.getTxParam(VersionDeclareParam.class);
