@@ -28,6 +28,7 @@ public class CollectionNetworkStat extends NetworkStat {
         stat.setAddressQty(0);
         stat.setBlockReward(BigDecimal.ZERO);
         stat.setCurNumber(0L);
+        stat.setCurBlockHash("");
         stat.setCurTps(0);
         stat.setDoingProposalQty(0);
         stat.setIssueValue(BigDecimal.ZERO);
