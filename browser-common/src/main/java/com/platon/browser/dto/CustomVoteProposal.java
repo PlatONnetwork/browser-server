@@ -1,7 +1,6 @@
 package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Vote;
-import com.platon.browser.param.ProposalVoteParam;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -45,17 +44,6 @@ public class CustomVoteProposal extends Vote {
         this.setUpdateTime(date);
     }
 
-    public void updateWithVote( CustomTransaction tx, ProposalVoteParam param ){
-        this.setHash(tx.getHash());
-        this.setProposalHash(param.getProposalId());
-//        this.setOption(param.getOption());
-//        this.setTimestamp(tx.getTimestamp());
-//        this.setVerifier(param.getVerifier());
-    }
-
-    //   public OptionEnum getOptionEnum(){
-//        return OptionEnum.getEnum(this.getOption());
-//    }
     /**
      * 投票类型枚举类：
      *  1.支持

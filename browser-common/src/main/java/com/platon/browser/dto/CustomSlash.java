@@ -25,16 +25,6 @@ public class CustomSlash extends Slash {
         this.setUpdateTime(date);
     }
 
-    public void updateWithSlash( CustomTransaction tx , ReportParam param){
-        this.setNodeId(param.getVerify());
-        String date = JSON.toJSONString(param);
-        this.setData(date);
-//        this.setDenefitAddr(tx.getFrom());
-//        this.setHash(tx.getHash());
-//        this.setStatus(StatusEnum.SUCCESS.code);
-        this.setIsQuit(YesNoEnum.YES.code);
-    }
-
     /**
      * 举报成败类型枚举类：
      *  1.成功

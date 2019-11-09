@@ -1,7 +1,6 @@
 package com.platon.browser.now.service.cache;
 
 import com.platon.browser.TestBase;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 
@@ -9,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

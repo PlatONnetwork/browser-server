@@ -2,8 +2,13 @@ package com.platon.browser.persistence.dao.mapper;
 
 import com.platon.browser.AgentApplication;
 import com.platon.browser.TestBase;
+import com.platon.browser.complement.dao.mapper.*;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.complement.dao.param.delegate.DelegateExit;
+import com.platon.browser.complement.dao.param.epoch.Consensus;
+import com.platon.browser.complement.dao.param.epoch.Election;
+import com.platon.browser.complement.dao.param.epoch.NewBlock;
+import com.platon.browser.complement.dao.param.epoch.Settle;
 import com.platon.browser.complement.dao.param.proposal.ProposalText;
 import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
 import com.platon.browser.complement.dao.param.proposal.ProposalVote;
@@ -15,13 +20,8 @@ import com.platon.browser.complement.dao.param.stake.StakeIncrease;
 import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.complement.dao.param.statistic.AddressStatChange;
 import com.platon.browser.complement.dao.param.statistic.NetworkStatChange;
-import com.platon.browser.complement.dao.mapper.*;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.complement.dao.param.epoch.Consensus;
-import com.platon.browser.complement.dao.param.epoch.Election;
-import com.platon.browser.complement.dao.param.epoch.NewBlock;
-import com.platon.browser.complement.dao.param.epoch.Settle;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class StakingMapperTest extends TestBase {
     private RestrictingBusinessMapper restrictingBusinessMapper;
 
     @Autowired
-    private NodeOptMapper nodeOptMapper;
+    private NOptBakMapper nOptBakMapper;
 
     @Autowired
     private StakingMapper stakingMapper;
@@ -101,10 +101,10 @@ public class StakingMapperTest extends TestBase {
         Node node = nodeMapper.selectByPrimaryKey(createStakingParam.getNodeId());
         assertEquals(createStakingParam.getStakingBlockNum(), new BigInteger(node.getStakingBlockNum().toString()));
         //opt数据插入验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(createStakingParam.getNodeId())
                 .andBNumEqualTo(createStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(nodeOptList.get(0).getNodeId(), createStakingParam.getNodeId());
     }
 
@@ -117,9 +117,9 @@ public class StakingMapperTest extends TestBase {
         //删除node数据
         nodeMapper.deleteByPrimaryKey(param.getNodeId());
         //删除opt数据
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(param.getNodeId()).andBNumEqualTo(param.getStakingBlockNum().longValue());
-        nodeOptMapper.deleteByExample(nodeOptExample);
+        nOptBakMapper.deleteByExample(nodeOptExample);
     }
 
     @Test
@@ -143,10 +143,10 @@ public class StakingMapperTest extends TestBase {
         assertEquals(modifyStakingParam.getWebSite(), node.getWebSite());
         assertEquals(modifyStakingParam.getIsInit(), node.getIsInit().intValue());
         //opt插入数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(modifyStakingParam.getNodeId())
                 .andBNumEqualTo(modifyStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(modifyStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -167,10 +167,10 @@ public class StakingMapperTest extends TestBase {
         assertEquals(nodeAfter.getStakingHes().longValue(), nodeBefore.getStakingHes().subtract(addStakingParam.getAmount()).longValue());
 
         //opt插入数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(addStakingParam.getNodeId())
                 .andBNumEqualTo(addStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(addStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -193,10 +193,10 @@ public class StakingMapperTest extends TestBase {
         Staking staking = getStaking(withdrewStakingParam.getNodeId(), withdrewStakingParam.getStakingBlockNum().longValue());
         assertEquals(withdrewStakingParam.getStakingReductionEpoch(), staking.getStakingReductionEpoch().intValue());
         //opt数据验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(withdrewStakingParam.getNodeId())
                 .andBNumEqualTo(withdrewStakingParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(withdrewStakingParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 
@@ -218,10 +218,10 @@ public class StakingMapperTest extends TestBase {
         Slash slash = slashMapper.selectByPrimaryKey(reportDuplicateSignParam.getTxHash());
         assertTrue(!StringUtils.isEmpty(slash));
         //opt插入验证
-        NodeOptExample nodeOptExample = new NodeOptExample();
+        NOptBakExample nodeOptExample = new NOptBakExample();
         nodeOptExample.createCriteria().andNodeIdEqualTo(reportDuplicateSignParam.getNodeId())
                 .andBNumEqualTo(reportDuplicateSignParam.getStakingBlockNum().longValue());
-        List <NodeOpt> nodeOptList = nodeOptMapper.selectByExample(nodeOptExample);
+        List <NOptBak> nodeOptList = nOptBakMapper.selectByExample(nodeOptExample);
         assertEquals(reportDuplicateSignParam.getNodeId(), nodeOptList.get(0).getNodeId());
     }
 

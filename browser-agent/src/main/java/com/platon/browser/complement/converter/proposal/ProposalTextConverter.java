@@ -8,7 +8,6 @@ import com.platon.browser.complement.dao.param.proposal.ProposalText;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -67,7 +66,7 @@ public class ProposalTextConverter extends BusinessParamConverter<Optional<NodeO
     	proposalBusinessMapper.text(businessParam);
 
 
-		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
+		String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.TEXT.getCode()))
@@ -76,7 +75,7 @@ public class ProposalTextConverter extends BusinessParamConverter<Optional<NodeO
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(txParam.getVerifier());
-		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
 		nodeOpt.setDesc(desc);
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(event.getBlock().getNum());

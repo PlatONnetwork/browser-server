@@ -1,7 +1,6 @@
 package com.platon.browser.common.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.mapper.BlockMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,6 @@ public class RedisBlockService implements RedisService<Block> {
     /** 最大数据 */
     @Value("${spring.redis.max-item}")
     private long maxItemCount;
-    @Autowired
-    private BlockMapper blockMapper;
 
     /**
      * 清除区块缓存

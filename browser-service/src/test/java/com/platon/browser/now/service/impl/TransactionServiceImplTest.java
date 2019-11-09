@@ -71,13 +71,4 @@ public class TransactionServiceImplTest extends TestBase{
 		assertNotNull(resp);
 	}
 	
-	@Test
-	public void transactionDetailNavigate() {
-		TransactionDetailNavigateReq req = new TransactionDetailNavigateReq();
-		req.setTxHash("0x215eb99a9ee0d0e75e88a99897aa2b71711c09a7296a66591fa88e9c39b13a6f");
-		req.setDirection("prev");
-		TransactionListResp resp = this.transactionService.transactionDetailNavigate(req);
-		assertNotNull(resp);
-	}
-	
 }

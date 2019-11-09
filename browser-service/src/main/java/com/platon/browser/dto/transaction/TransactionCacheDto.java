@@ -1,9 +1,9 @@
 package com.platon.browser.dto.transaction;
 
-import java.util.List;
-
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.res.RespPage;
+
+import java.util.List;
 
 /**
  * 交易缓存dto
@@ -18,19 +18,19 @@ public class TransactionCacheDto {
 	 * 交易构造初始方法
 	 * @param page
 	 */
-	public TransactionCacheDto( List<TransactionWithBLOBs> transactionList, RespPage<?> page) {
+	public TransactionCacheDto(List<Transaction> transactionList, RespPage<?> page) {
 		this.transactionList = transactionList;
 		this.page = page;
 	}
-	private List<TransactionWithBLOBs> transactionList;
+	private List<Transaction> transactionList;
 	
 	private RespPage<?> page;
 
-	public List<TransactionWithBLOBs> getTransactionList() {
+	public List<Transaction> getTransactionList() {
 		return transactionList;
 	}
 
-	public void setTransactionList(List<TransactionWithBLOBs> transactionList) {
+	public void setTransactionList(List<Transaction> transactionList) {
 		this.transactionList = transactionList;
 	}
 

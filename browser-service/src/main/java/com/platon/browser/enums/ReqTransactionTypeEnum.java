@@ -1,6 +1,6 @@
 package com.platon.browser.enums;
 
-import com.platon.browser.dto.CustomTransaction.TxTypeEnum;
+import com.platon.browser.elasticsearch.dto.Transaction.TypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,26 +58,26 @@ public enum ReqTransactionTypeEnum {
 	public static List<Object> getTxType(String typeName){
 		List<Object> list = new ArrayList<>();
 		if(ReqTransactionTypeEnum.TRANSACTION_TRANSFER.getName().equals(typeName)) {
-			list.add(String.valueOf(TxTypeEnum.TRANSFER.getCode()));
+			list.add(String.valueOf(TypeEnum.TRANSFER.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_DELEGATE.getName().equals(typeName)) {
-			list.add(String.valueOf(TxTypeEnum.DELEGATE.getCode()));
-			list.add(String.valueOf(TxTypeEnum.UN_DELEGATE.getCode()));
+			list.add(String.valueOf(TypeEnum.DELEGATE_CREATE.getCode()));
+			list.add(String.valueOf(TypeEnum.DELEGATE_EXIT.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_STAKING.getName().equals(typeName)) {
-			list.add(String.valueOf(TxTypeEnum.CREATE_VALIDATOR.getCode()));
-			list.add(String.valueOf(TxTypeEnum.EDIT_VALIDATOR.getCode()));
-			list.add(String.valueOf(TxTypeEnum.INCREASE_STAKING.getCode()));
-			list.add(String.valueOf(TxTypeEnum.EXIT_VALIDATOR.getCode()));
-			list.add(String.valueOf(TxTypeEnum.REPORT_VALIDATOR.getCode()));
+			list.add(String.valueOf(TypeEnum.STAKE_CREATE.getCode()));
+			list.add(String.valueOf(TypeEnum.STAKE_MODIFY.getCode()));
+			list.add(String.valueOf(TypeEnum.STAKE_INCREASE.getCode()));
+			list.add(String.valueOf(TypeEnum.STAKE_EXIT.getCode()));
+			list.add(String.valueOf(TypeEnum.REPORT.getCode()));
 		}
 		if(ReqTransactionTypeEnum.TRANSACTION_PROPOSAL.getName().equals(typeName)) {
-			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_TEXT.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_UPGRADE.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CREATE_PROPOSAL_PARAMETER.getCode()));
-			list.add(String.valueOf(TxTypeEnum.CANCEL_PROPOSAL.getCode()));
-			list.add(String.valueOf(TxTypeEnum.VOTING_PROPOSAL.getCode()));
-			list.add(String.valueOf(TxTypeEnum.DECLARE_VERSION.getCode()));
+			list.add(String.valueOf(TypeEnum.PROPOSAL_TEXT.getCode()));
+			list.add(String.valueOf(TypeEnum.PROPOSAL_UPGRADE.getCode()));
+			list.add(String.valueOf(TypeEnum.PROPOSAL_PARAMETER.getCode()));
+			list.add(String.valueOf(TypeEnum.PROPOSAL_CANCEL.getCode()));
+			list.add(String.valueOf(TypeEnum.PROPOSAL_VOTE.getCode()));
+			list.add(String.valueOf(TypeEnum.VERSION_DECLARE.getCode()));
 		}
 		return list;
 	}

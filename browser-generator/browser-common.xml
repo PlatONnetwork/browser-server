@@ -115,7 +115,12 @@
 
         -->
 
-        <table tableName="network_stat" domainObjectName="NetworkStat">
+        <table tableName="n_opt_bak" domainObjectName="NOptBak">
+            <columnRenamingRule searchString="^D_"
+                                replaceString=""/>
+        </table>
+
+        <table tableName="tx_bak" domainObjectName="TxBak">
             <columnRenamingRule searchString="^D_"
                                 replaceString=""/>
         </table>

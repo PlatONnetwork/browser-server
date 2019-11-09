@@ -1,7 +1,6 @@
 package com.platon.browser.common.service.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.mapper.TransactionMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class RedisTransactionService implements RedisService<Transaction>{
     private String transactionsCacheKey;
     @Value("${spring.redis.max-item}")
     private long maxItemCount;
-
-    @Autowired
-    private TransactionMapper transactionMapper;
 
     /**
      * 清除首页统计缓存

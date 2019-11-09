@@ -28,25 +28,6 @@ public class CustomProposal extends Proposal {
         this.setUpdateTime(date);
     }
 
-    public void updateWithCustomTransaction(CustomTransaction tx,Long accuVerSum) {
-        this.setHash(tx.getHash());
-        this.setYeas(0L);
-        this.setNays(0L);
-        this.setAbstentions(0L);
-        this.setAccuVerifiers(accuVerSum);
-//        this.setTimestamp(tx.getTimestamp());
-        this.setStatus(StatusEnum.VOTING.code);
-        //设置成查询中，以便任务过滤并查询分析主题&描述
-        this.setTopic(QUERY_FLAG);
-        this.setDescription(QUERY_FLAG);
-//        this.setBlockNumber(tx.getBlockNumber().toString());
-    }
-
-    public void updateWithProposalMarkDown(ProposalMarkDownDto proposalMarkDownDto) {
-       this.setTopic(proposalMarkDownDto.getTopic());
-       this.setDescription(proposalMarkDownDto.getDescription());
-    }
-
     /**
      * 委托类型枚举类：
      *  1.文本提案

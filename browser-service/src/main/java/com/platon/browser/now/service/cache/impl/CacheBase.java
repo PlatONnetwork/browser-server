@@ -1,8 +1,8 @@
 package com.platon.browser.now.service.cache.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.entity.Block;
-import com.platon.browser.dao.entity.Transaction;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.res.RespPage;
 import com.platon.browser.util.I18nUtil;

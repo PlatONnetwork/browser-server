@@ -1,11 +1,10 @@
 package com.platon.browser.now.service.cache.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.dao.entity.Transaction;
-import com.platon.browser.dao.entity.TransactionWithBLOBs;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 	private RedisTemplate<String, String> redisTemplate;
 
 	@Override
-	public List<Block> getBlockCache( Integer pageNum, Integer pageSize) {
+	public List<Block> getBlockCache(Integer pageNum, Integer pageSize) {
 		/** 分页根据key来获取数据 */
 		CachePageInfo<Class<Block>> cpi = this.getCachePageInfo(blockCacheKey, pageNum, pageSize, Block.class, i18n,
 				redisTemplate, maxItemNum);
@@ -74,10 +73,10 @@ public class StatisticCacheServiceImpl extends CacheBase implements StatisticCac
 		/** 分页根据key来获取交易数据  */
 		CachePageInfo<Class<Transaction>> cpi = this.getCachePageInfo(transactionCacheKey, pageNum, pageSize, Transaction.class, i18n,
 				redisTemplate, maxItemNum);
-		List<TransactionWithBLOBs> transactionRedisList = new LinkedList<>();
+		List<Transaction> transactionRedisList = new LinkedList<>();
 		cpi.data.forEach(str -> {
 			/** 获取数据转换成对象 */
-			TransactionWithBLOBs transactionRedis = JSON.parseObject(str, TransactionWithBLOBs.class);
+			Transaction transactionRedis = JSON.parseObject(str, Transaction.class);
 			transactionRedisList.add(transactionRedis);
 		});
 		return new TransactionCacheDto(transactionRedisList, cpi.page);

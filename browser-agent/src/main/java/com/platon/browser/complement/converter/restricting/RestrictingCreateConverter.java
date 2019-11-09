@@ -1,18 +1,16 @@
 package com.platon.browser.complement.converter.restricting;
 
+import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.param.restricting.RestrictingCreate;
 import com.platon.browser.complement.dao.param.restricting.RestrictingItem;
-import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.RestrictingCreateParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

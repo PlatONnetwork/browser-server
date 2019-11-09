@@ -78,15 +78,4 @@ public class AppDocTransactionController implements AppDocTransaction {
 		return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionDetailsResp);
 	}
 
-	@Override
-	public BaseResp<TransactionListResp> transactionDetailNavigate(@Valid TransactionDetailNavigateReq req) {
-		try {
-			TransactionListResp transactionListResp = transactionService.transactionDetailNavigate(req);
-			return BaseResp.build(RetEnum.RET_SUCCESS.getCode(),i18n.i(I18nEnum.SUCCESS),transactionListResp);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new ResponseException(i18n.i(I18nEnum.FAILURE));
-		}
-	}
-
 }

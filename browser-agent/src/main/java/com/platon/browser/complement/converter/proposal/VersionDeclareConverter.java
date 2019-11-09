@@ -5,7 +5,6 @@ import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.NoSuchBeanException;
@@ -41,7 +40,7 @@ public class VersionDeclareConverter extends BusinessParamConverter<Optional<Nod
 
         long startTime = System.currentTimeMillis();
  
-        String desc = CustomNodeOpt.TypeEnum.VERSION.getTpl()
+        String desc = NodeOpt.TypeEnum.VERSION.getTpl()
                 .replace("NODE_NAME",txParam.getNodeName())
                 .replace("VERSION",String.valueOf(txParam.getVersion()))
                 .replace("ACTIVE_NODE", txParam.getActiveNode());
@@ -49,7 +48,7 @@ public class VersionDeclareConverter extends BusinessParamConverter<Optional<Nod
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
         nodeOpt.setNodeId(txParam.getActiveNode());
-        nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+        nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
         nodeOpt.setDesc(desc);
         nodeOpt.setTxHash(tx.getHash());
         nodeOpt.setBNum(event.getBlock().getNum());

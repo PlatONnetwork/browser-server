@@ -4,27 +4,28 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
+import com.platon.browser.dao.mapper.CustomVoteMapper;
+import com.platon.browser.dao.mapper.ProposalMapper;
+import com.platon.browser.dao.mapper.SlashMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
-import com.platon.browser.dto.CustomTransaction;
-import com.platon.browser.dto.CustomTransaction.TxReceiptStatusEnum;
 import com.platon.browser.dto.CustomVoteProposal;
 import com.platon.browser.dto.account.AccountDownload;
 import com.platon.browser.dto.keybase.KeyBaseUser;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
 import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
-import com.platon.browser.enums.NavigateEnum;
 import com.platon.browser.enums.RedeemStatusEnum;
 import com.platon.browser.enums.ReqTransactionTypeEnum;
 import com.platon.browser.now.service.TransactionService;
 import com.platon.browser.now.service.cache.StatisticCacheService;
 import com.platon.browser.param.*;
 import com.platon.browser.req.PageReq;
-import com.platon.browser.req.newtransaction.TransactionDetailNavigateReq;
 import com.platon.browser.req.newtransaction.TransactionDetailsReq;
 import com.platon.browser.req.newtransaction.TransactionListByAddressRequest;
 import com.platon.browser.req.newtransaction.TransactionListByBlockRequest;
@@ -91,8 +92,8 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
         /** 分页查询redis交易数据 */
         TransactionCacheDto transactionCacheDto = statisticCacheService.getTransactionCache(req.getPageNo(), req.getPageSize());
-        List<TransactionWithBLOBs> items = transactionCacheDto.getTransactionList();
-        List<TransactionListResp> lists = this.tranferList(items);
+        List<Transaction> items = transactionCacheDto.getTransactionList();
+        List<TransactionListResp> lists = this.transferList(items);
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
         
@@ -108,18 +109,18 @@ public class TransactionServiceImpl implements TransactionService {
         RespPage<TransactionListResp> result = new RespPage<>();
         ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("num", req.getBlockNumber()));
-		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESResult<Transaction> items = new ESResult<>();
 		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
 			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
 		}
 		constructor.setDesc("seq");
 		/** 根据区块号和类型分页查询交易信息 */
 		try {
-			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, req.getPageNo(),req.getPageSize());
+			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
-        List<TransactionListResp> lists = this.tranferList(items.getRsData());
+        List<TransactionListResp> lists = this.transferList(items.getRsData());
         /** 统计交易信息 */
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
@@ -134,26 +135,26 @@ public class TransactionServiceImpl implements TransactionService {
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.should(new ESQueryBuilders().term("from", req.getAddress()));
 		constructor.should(new ESQueryBuilders().term("to", req.getAddress()));
-		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESResult<Transaction> items = new ESResult<>();
 		if (req.getTxType() != null && !req.getTxType().isEmpty()) {
 			constructor.must(new ESQueryBuilders().terms("type", ReqTransactionTypeEnum.getTxType(req.getTxType())));
 		}
 		constructor.setDesc("seq");
 		try {
-			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, req.getPageNo(),req.getPageSize());
+			items = transactionESRepository.search(constructor, Transaction.class, req.getPageNo(),req.getPageSize());
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
-        List<TransactionListResp> lists = this.tranferList(items.getRsData());
+        List<TransactionListResp> lists = this.transferList(items.getRsData());
         Page<?> page = new Page<>(req.getPageNo(),req.getPageSize());
         result.init(page, lists);
         result.setTotalCount(items.getTotal());
         return result;
     }
 
-    private List<TransactionListResp> tranferList(List<TransactionWithBLOBs> items) {
+    private List<TransactionListResp> transferList(List<Transaction> items) {
     	List<TransactionListResp> lists = new LinkedList<>();
-    	for (TransactionWithBLOBs transaction:items) {
+    	for (Transaction transaction:items) {
         	TransactionListResp transactionListResp = new TransactionListResp();
         	BeanUtils.copyProperties(transaction, transactionListResp);
             transactionListResp.setTxHash(transaction.getHash());
@@ -161,7 +162,7 @@ public class TransactionServiceImpl implements TransactionService {
             transactionListResp.setBlockNumber(transaction.getNum());
             transactionListResp.setReceiveType(String.valueOf(transaction.getToType()));
             transactionListResp.setTxReceiptStatus(transaction.getStatus());
-            transactionListResp.setTxType(transaction.getType());
+            transactionListResp.setTxType(String.valueOf(transaction.getType()));
             transactionListResp.setValue(transaction.getValue().toString());
             transactionListResp.setServerTime(new Date().getTime());
             transactionListResp.setTimestamp(transaction.getTime().getTime());
@@ -182,10 +183,10 @@ public class TransactionServiceImpl implements TransactionService {
 		constructor.should(new ESQueryBuilders().term("from", address));
 		constructor.should(new ESQueryBuilders().term("to", address));
 		constructor.must(new ESQueryBuilders().range("time", new Date(date).getTime(), currentServerTime.getTime()));
-		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESResult<Transaction> items = new ESResult<>();
 		constructor.setDesc("seq");
 		try {
-			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 3000);
+			items = transactionESRepository.search(constructor, Transaction.class, 1, 3000);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
@@ -203,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transaction.getHash(),
                     transaction.getNum(),
                     DateUtil.timeZoneTransfer(transaction.getTime(), "0", timeZone),
-                    i18n.getMessageForStr(CustomTransaction.TxTypeEnum.getEnum(transaction.getType()).toString(), local),
+                    i18n.getMessageForStr(Transaction.TypeEnum.getEnum(transaction.getType()).toString(), local),
                     transaction.getFrom(),
                     transaction.getTo(),
                     /** 数值von转换成lat，并保留十八位精确度 */
@@ -249,15 +250,15 @@ public class TransactionServiceImpl implements TransactionService {
     	/** 根据hash查询具体的交易数据 */
 		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
-		ESResult<TransactionWithBLOBs> items = new ESResult<>();
+		ESResult<Transaction> items = new ESResult<>();
 		try {
-			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
+			items = transactionESRepository.search(constructor, Transaction.class, 1, 1);
 		} catch (IOException e) {
 			logger.error("获取区块错误。", e);
 		}
     	TransactionDetailsResp resp = new TransactionDetailsResp();
     	if(items!=null && items.getRsData().size() > 0) {
-    		TransactionWithBLOBs transaction = items.getRsData().get(0);
+    		Transaction transaction = items.getRsData().get(0);
     		BeanUtils.copyProperties(transaction, resp);
     		resp.setActualTxCost(transaction.getCost().toString());
     		resp.setBlockNumber(transaction.getNum());
@@ -266,7 +267,7 @@ public class TransactionServiceImpl implements TransactionService {
     		resp.setGasUsed(transaction.getGasUsed().toString());
     		resp.setReceiveType(String.valueOf(transaction.getToType()));
     		resp.setTxReceiptStatus(transaction.getStatus());
-    		resp.setTxType(transaction.getType());
+    		resp.setTxType(String.valueOf(transaction.getType()));
     		resp.setValue(transaction.getValue().toString());
     		resp.setTxHash(transaction.getHash());
     		resp.setTimestamp(transaction.getTime().getTime());
@@ -296,9 +297,9 @@ public class TransactionServiceImpl implements TransactionService {
     			/** 根据id查询具体的交易数据 */
         		constructor = new ESQueryBuilderConstructor();
         		constructor.must(new ESQueryBuilders().term("id", transaction.getId()-1));
-        		ESResult<TransactionWithBLOBs> first = new ESResult<>();
+        		ESResult<Transaction> first = new ESResult<>();
         		try {
-        			first = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
+        			first = transactionESRepository.search(constructor, Transaction.class, 1, 1);
         		} catch (IOException e) {
         			logger.error("获取交易错误。", e);
         		}
@@ -309,9 +310,9 @@ public class TransactionServiceImpl implements TransactionService {
     		/** 根据id查询具体的交易数据 */
     		constructor = new ESQueryBuilderConstructor();
     		constructor.must(new ESQueryBuilders().term("id", transaction.getId()+1));
-    		ESResult<TransactionWithBLOBs> last = new ESResult<>();
+    		ESResult<Transaction> last = new ESResult<>();
     		try {
-    			last = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
+    			last = transactionESRepository.search(constructor, Transaction.class, 1, 1);
     		} catch (IOException e) {
     			logger.error("获取交易错误。", e);
     		}
@@ -323,9 +324,9 @@ public class TransactionServiceImpl implements TransactionService {
     		String txInfo = transaction.getInfo();
     		/** 根据不同交易类型判断逻辑 */
     		if(StringUtils.isNotBlank(txInfo) || (!"null".equals(txInfo))) {
-	    		switch (CustomTransaction.TxTypeEnum.getEnum(transaction.getType())) {
+	    		switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
 		    		/** 创建验证人 */
-					case CREATE_VALIDATOR:
+					case STAKE_CREATE:
 						StakeCreateParam createValidatorParam = JSONObject.parseObject(txInfo, StakeCreateParam.class);
 						resp.setTxAmount(createValidatorParam.getAmount().toString());
 						resp.setBenefitAddr(createValidatorParam.getBenefitAddress());
@@ -339,7 +340,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setExternalUrl(this.getStakingUrl(createValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//编辑验证人
-					case EDIT_VALIDATOR:
+					case STAKE_MODIFY:
 						StakeModifyParam editValidatorParam = JSONObject.parseObject(txInfo, StakeModifyParam.class);
 						resp.setBenefitAddr(editValidatorParam.getBenefitAddress());
 						resp.setNodeId(editValidatorParam.getNodeId());
@@ -350,14 +351,14 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setExternalUrl(this.getStakingUrl(editValidatorParam.getExternalId(), resp.getTxReceiptStatus()));
 						break;
 					//增加质押
-					case INCREASE_STAKING:
+					case STAKE_INCREASE:
 						StakeIncreaseParam increaseStakingParam = JSONObject.parseObject(txInfo, StakeIncreaseParam.class);
 						resp.setNodeId(increaseStakingParam.getNodeId());
 						resp.setTxAmount(increaseStakingParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(increaseStakingParam.getNodeId(), increaseStakingParam.getNodeName()));
 						break;
 					//退出验证人
-					case EXIT_VALIDATOR:
+					case STAKE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus + redeemUnLockedBlock
 						StakeExitParam exitValidatorParam = JSONObject.parseObject(txInfo, StakeExitParam.class);
 						resp.setNodeId(exitValidatorParam.getNodeId());
@@ -384,14 +385,14 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						break;
 						//委托
-					case DELEGATE:
+					case DELEGATE_CREATE:
 						DelegateCreateParam delegateParam = JSONObject.parseObject(txInfo, DelegateCreateParam.class);
 						resp.setNodeId(delegateParam.getNodeId());
 						resp.setTxAmount(delegateParam.getAmount().toString());
 						resp.setNodeName(this.setStakingName(delegateParam.getNodeId(), delegateParam.getNodeName()));
 						break;
 					//委托赎回
-					case UN_DELEGATE:
+					case DELEGATE_EXIT:
 						// nodeId + nodeName + applyAmount + redeemLocked + redeemStatus
 						// 通过txHash关联un_delegation表
 						DelegateExitParam unDelegateParam = JSONObject.parseObject(txInfo, DelegateExitParam.class);
@@ -406,7 +407,7 @@ public class TransactionServiceImpl implements TransactionService {
 //							resp.setRedeemStatus(unDelegation.getStatus());
 //						}
 						break;
-					case CREATE_PROPOSAL_TEXT:
+					case PROPOSAL_TEXT:
 						ProposalTextParam createProposalTextParam = JSONObject.parseObject(txInfo, ProposalTextParam.class);
 						if(StringUtils.isNotBlank(createProposalTextParam.getPIDID())) {
 							resp.setPipNum("PIP-" + createProposalTextParam.getPIDID());
@@ -417,7 +418,7 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
-					case CREATE_PROPOSAL_UPGRADE:
+					case PROPOSAL_UPGRADE:
 						ProposalUpgradeParam createProposalUpgradeParam = JSONObject.parseObject(txInfo, ProposalUpgradeParam.class);
 						resp.setProposalNewVersion(String.valueOf(createProposalUpgradeParam.getNewVersion()));
 						if(StringUtils.isNotBlank(createProposalUpgradeParam.getPIDID())) {
@@ -429,8 +430,8 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
-					case CREATE_PROPOSAL_PARAMETER:
-					case CANCEL_PROPOSAL:
+					case PROPOSAL_PARAMETER:
+					case PROPOSAL_CANCEL:
 						ProposalCancelParam cancelProposalParam = JSONObject.parseObject(txInfo, ProposalCancelParam.class);
 						if(StringUtils.isNotBlank(cancelProposalParam.getPIDID())) {
 							resp.setPipNum("PIP-" + cancelProposalParam.getPIDID());
@@ -441,7 +442,7 @@ public class TransactionServiceImpl implements TransactionService {
 						/** 如果数据库有值，以数据库为准 */
 						this.transferTransaction(resp, req.getTxHash());
 						break;
-					case VOTING_PROPOSAL:
+					case PROPOSAL_VOTE:
 						// nodeId + nodeName + txType + proposalUrl + proposalHash + proposalNewVersion +  proposalOption
 						ProposalVoteParam votingProposalParam = JSONObject.parseObject(txInfo, ProposalVoteParam.class);
 						resp.setNodeId(votingProposalParam.getVerifier());
@@ -468,7 +469,7 @@ public class TransactionServiceImpl implements TransactionService {
 						/**
 						 * 失败情况下需要到提案上获取提案信息
 						 */
-						if(resp.getTxReceiptStatus().intValue() == TxReceiptStatusEnum.FAILURE.getCode()) {
+						if(resp.getTxReceiptStatus() == Transaction.StatusEnum.FAILURE.getCode()) {
 							Proposal proposal = proposalMapper.selectByPrimaryKey(votingProposalParam.getProposalId());
 							if(proposal != null) {
 								resp.setPipNum(proposal.getPipNum());
@@ -479,7 +480,7 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 						break;
 						//版本申明
-					case DECLARE_VERSION:
+					case VERSION_DECLARE:
 						VersionDeclareParam declareVersionParam = JSONObject.parseObject(txInfo, VersionDeclareParam.class);
 						resp.setNodeId(declareVersionParam.getActiveNode());
 						resp.setDeclareVersion(String.valueOf(declareVersionParam.getVersion()));
@@ -496,7 +497,7 @@ public class TransactionServiceImpl implements TransactionService {
 							}
 						}
 						break;
-					case REPORT_VALIDATOR:
+					case REPORT:
 						ReportParam reportValidatorParam = JSONObject.parseObject(txInfo, ReportParam.class);
 						List<TransactionDetailsEvidencesResp> transactionDetailsEvidencesResps = new ArrayList<>();
 						TransactionDetailsEvidencesResp transactionDetailsEvidencesResp = new TransactionDetailsEvidencesResp();
@@ -512,7 +513,7 @@ public class TransactionServiceImpl implements TransactionService {
 						resp.setReportType(reportValidatorParam.getType().intValue());
 						resp.setEvidences(transactionDetailsEvidencesResps);
 						break;
-					case CREATE_RESTRICTING:
+					case RESTRICTING_CREATE:
 						// RPAccount + value + RPPlan
 						RestrictingCreateParam createRestrictingParam = JSONObject.parseObject(txInfo, RestrictingCreateParam.class);
 						List<TransactionDetailsRPPlanResp> rpPlanResps = new ArrayList<>();
@@ -536,45 +537,6 @@ public class TransactionServiceImpl implements TransactionService {
 					break;
 				}
     		}
-    	}
-    	return resp;
-    }
-
-    @Override
-    public TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req) {
-    	TransactionListResp resp = new TransactionListResp();
-    	/** 根据hash查询交易具体指 */
-//    	TransactionWithBLOBs currentDetail = transactionMapper.selectByPrimaryKey(req.getTxHash());
-		ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
-		constructor.must(new ESQueryBuilders().term("hash", req.getTxHash()));
-		ESResult<TransactionWithBLOBs> items = new ESResult<>();
-		try {
-			items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
-		} catch (IOException e) {
-			logger.error("获取区块错误。", e);
-		}
-    	if(items.getRsData() != null && items.getRsData().size() > 0) {
-    		TransactionWithBLOBs currentDetail = items.getRsData().get(0);
-	    	TransactionExample condition = new TransactionExample();
-	    	TransactionExample.Criteria criteria = condition.createCriteria();
-	    	/** 区分是上一条数据还是下一条数据 */
-			NavigateEnum navigateEnum = NavigateEnum.valueOf(req.getDirection().toUpperCase());
-			if (navigateEnum == NavigateEnum.PREV) {
-				criteria.andSeqLessThan(currentDetail.getSeq());
-				condition.setOrderByClause("sequence desc");
-			} else if (navigateEnum == NavigateEnum.NEXT) {
-				criteria.andSeqGreaterThan(currentDetail.getSeq());
-				condition.setOrderByClause("sequence asc");
-			}
-//	    	List<TransactionWithBLOBs> transactions = transactionMapper.selectByExampleWithBLOBs(condition);
-//	    	if(!transactions.isEmpty()){
-//	    		/** 获取数据第一条进行转换对象 */
-//	        	TransactionWithBLOBs transaction = transactions.get(0);
-//	        	BeanUtils.copyProperties(transaction, resp);
-//	        	resp.setTxHash(transaction.getHash());
-//	        	resp.setServerTime(new Date().getTime());
-//	        	resp.setTimestamp(transaction.getTime().getTime());
-//	    	}
     	}
     	return resp;
     }
@@ -645,7 +607,7 @@ public class TransactionServiceImpl implements TransactionService {
 			/**
 			 * 如果为失败的交易直接设置默认的url然后跳出
 			 */
-			if(txReceiptStatus.intValue() == TxReceiptStatusEnum.FAILURE.getCode()) {
+			if(txReceiptStatus == Transaction.StatusEnum.FAILURE.getCode()) {
 				return defaultBaseUrl;
 			}
 

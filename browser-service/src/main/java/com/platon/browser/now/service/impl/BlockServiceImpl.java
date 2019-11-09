@@ -2,9 +2,9 @@ package com.platon.browser.now.service.impl;
 
 import com.github.pagehelper.Page;
 import com.platon.browser.common.BrowserConst;
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.BlockESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESResult;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
@@ -258,12 +258,12 @@ public class BlockServiceImpl implements BlockService {
 			Block block = blockList.getRsData().get(0);
 			BeanUtils.copyProperties(block, blockDetailResp);
 			blockDetailResp.setBlockReward(block.getReward().toString());
-			blockDetailResp.setDelegateQty(block.getdQty());
+			blockDetailResp.setDelegateQty(block.getDQty());
 			blockDetailResp.setExtraData(block.getExtra());
 			blockDetailResp.setNumber(block.getNum());
-			blockDetailResp.setParentHash(block.getpHash());
-			blockDetailResp.setProposalQty(block.getpQty());
-			blockDetailResp.setStakingQty(block.getsQty());
+			blockDetailResp.setParentHash(block.getPHash());
+			blockDetailResp.setProposalQty(block.getPQty());
+			blockDetailResp.setStakingQty(block.getSQty());
 			blockDetailResp.setStatTxGasLimit(block.getTxGasLimit().toString());
 			blockDetailResp.setTimestamp(block.getTime().getTime());
 			blockDetailResp.setServerTime(new Date().getTime());

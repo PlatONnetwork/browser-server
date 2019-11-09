@@ -6,7 +6,9 @@ import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.elasticsearch.BlockESRepository;
 import com.platon.browser.elasticsearch.TransactionESRepository;
+import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -122,9 +124,9 @@ public class HomeServiceImpl implements HomeService {
 					 */
 					ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
 					constructor.must(new ESQueryBuilders().term("hash", keyword));
-					ESResult<TransactionWithBLOBs> items = new ESResult<>();
+					ESResult<Transaction> items = new ESResult<>();
 					try {
-						items = transactionESRepository.search(constructor, TransactionWithBLOBs.class, 1, 1);
+						items = transactionESRepository.search(constructor, Transaction.class, 1, 1);
 					} catch (IOException e) {
 						log.error("获取区块错误。", e);
 					}

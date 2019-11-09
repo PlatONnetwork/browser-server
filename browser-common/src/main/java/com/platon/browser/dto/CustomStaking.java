@@ -2,9 +2,6 @@ package com.platon.browser.dto;
 
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingKey;
-import com.platon.browser.param.StakeModifyParam;
-import com.platon.browser.param.StakeExitParam;
-import com.platon.browser.param.StakeIncreaseParam;
 import com.platon.browser.utils.HexTool;
 import com.platon.browser.utils.VerUtil;
 import lombok.Data;
@@ -102,76 +99,6 @@ public class CustomStaking extends Staking {
         this.setProgramVersion(programVersion.toString());
         this.setBigVersion(bigVersion.toString());
     }
-
-    /**
-     * 使用交易信息更新质押信息
-     * @param tx
-     */
-    public void updateWithCustomTransaction(CustomTransaction tx){
-//        // 质押块号
-//        this.setStakingBlockNum(tx.getBlockNumber());
-//        // 质押交易索引
-//        this.setStakingTxIndex(tx.getTransactionIndex());
-//        // 发起质押的账户地址
-//        this.setStakingAddr(tx.getFrom());
-//        /**********从交易入参中取相关信息***********/
-//        CreateValidatorParam param = tx.getTxParam(CreateValidatorParam.class);
-//        this.setNodeId(param.getNodeId());
-//        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
-//        this.setDenefitAddr(param.getBenefitAddress());
-//        this.setStakingHas(param.getAmount());
-//        this.setWebSite(param.getWebsite());
-//        this.setProgramVersion(param.getProgramVersion());
-//        this.setDetails(param.getDetails());
-//        this.setExternalId(param.getExternalId());
-//        this.setJoinTime(tx.getTimestamp());
-    }
-
-    /**
-     * 使用编辑验证人信息参数更新质押记录
-     * @param param
-     */
-    public void updateWithEditValidatorParam(StakeModifyParam param) {
-//        this.setExternalId(param.getExternalId());
-//        this.setStakingName(StringUtils.isBlank(param.getNodeName())?this.getStakingName():param.getNodeName());
-//        this.setDetails(param.getDetails());
-//        this.setDenefitAddr(param.getBenefitAddress());
-//        this.setWebSite(param.getWebsite());
-//        this.setUpdateTime(new Date());
-    }
-
-    /**
-     * 使用增持验证人参数更新质押记录
-     * @param param
-     */
-    public void updateWithIncreaseStakingParam(StakeIncreaseParam param) {
-
-    }
-
-    /**
-     * 使用退出验证人参数更新质押记录
-     * @param param
-     * @param curSettingEpoch
-     */
-    public void updateWithExitValidatorParam(StakeExitParam param, BigInteger curSettingEpoch) {
-//        this.setStakingHas(BigInteger.ZERO.toString());
-//        this.setLeaveTime(new Date());
-//        BigInteger stakingLocked = new BigInteger(getStakingLocked());
-//        if(stakingLocked.compareTo(BigInteger.ZERO)>0){
-//            this.setStakingReduction(getStakingLocked());
-//            this.setStakingLocked(BigInteger.ZERO.toString());
-//            this.setStakingReductionEpoch(curSettingEpoch.intValue());
-//            this.setStatus(StatusEnum.EXITING.code);
-//        }else {
-//            this.setStakingLocked(BigInteger.ZERO.toString());
-//            this.setStatus(StatusEnum.EXITED.code);
-//        }
-    }
-
-    public StatusEnum getStatusEnum(){
-        return StatusEnum.getEnum(this.getStatus());
-    }
-
 
     /**
      * 质押状态类型枚举类：

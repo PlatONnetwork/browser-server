@@ -268,25 +268,5 @@ public interface AppDocTransaction {
 	@ApiOperation(value = "transaction/transactionDetails", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
 	@PostMapping(value = "transaction/transactionDetails", produces = { "application/json" })
     BaseResp<TransactionDetailsResp> transactionDetails(@ApiParam(value = "TransactionDetailsReq ", required = true)@Valid @RequestBody TransactionDetailsReq req);
-	
-    /**
-     * @apiDeprecated
-     * @api {post} transaction/transactionDetailNavigate f.交易详情前后跳转浏览
-     * @apiVersion 1.0.0
-     * @apiName transactionDetailNavigate
-     * @apiGroup transaction
-     * @apiDescription 同 《交易详情接口》
-     * @apiParamExample {json} Request-Example:
-     * {
-     *    "txHash":""                  //交易Hash(必填)
-     *    "direction":""               //方向：prev-上一个，next-下一个 (必填)
-     * }
-     * @apiSuccessExample {json} Success-Response:
-     * HTTP/1.1 200 OK
-     * > 返回值同《交易详情接口》返回值
-     */
-	@ApiOperation(value = "transaction/transactionDetailNavigate", nickname = "", notes = "", response = TransactionListResp.class, tags = { "Transaction" })
-	@PostMapping(value = "transaction/transactionDetailNavigate", produces = { "application/json" })
-    BaseResp<TransactionListResp> transactionDetailNavigate(@ApiParam(value = "TransactionDetailNavigateReq req ", required = true)@Valid @RequestBody TransactionDetailNavigateReq req);
-	
+
 }

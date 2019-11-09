@@ -3,12 +3,11 @@ package com.platon.browser.complement.converter.proposal;
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
+import com.platon.browser.complement.dao.param.proposal.ProposalUpgrade;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
@@ -71,7 +70,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
     	proposalBusinessMapper.upgrade(businessParam);
 
 
-		String desc = CustomNodeOpt.TypeEnum.PROPOSALS.getTpl()
+		String desc = NodeOpt.TypeEnum.PROPOSALS.getTpl()
 				.replace("ID",txParam.getPIDID())
 				.replace("TITLE",businessParam.getTopic())
 				.replace("TYPE",String.valueOf(CustomProposal.TypeEnum.UPGRADE.getCode()))
@@ -81,7 +80,7 @@ public class ProposalUpgradeConverter extends BusinessParamConverter<Optional<No
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(txParam.getVerifier());
-		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.PROPOSALS.getCode()));
+		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.PROPOSALS.getCode()));
 		nodeOpt.setDesc(desc);
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(event.getBlock().getNum());

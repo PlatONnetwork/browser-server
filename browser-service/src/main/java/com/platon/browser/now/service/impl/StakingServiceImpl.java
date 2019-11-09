@@ -6,13 +6,13 @@ import com.platon.browser.common.BrowserConst;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.*;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomStaking;
 import com.platon.browser.dto.CustomStaking.StatusEnum;
 import com.platon.browser.dto.DelegationStaking;
 import com.platon.browser.dto.StakingNode;
 import com.platon.browser.elasticsearch.NodeOptESRepository;
 import com.platon.browser.elasticsearch.dto.ESResult;
+import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilderConstructor;
 import com.platon.browser.elasticsearch.service.impl.ESQueryBuilders;
 import com.platon.browser.enums.I18nEnum;
@@ -323,7 +323,7 @@ public class StakingServiceImpl implements StakingService {
 			if(StringUtils.isNotBlank(nodeOpt.getDesc())) {
 				String[] desces = nodeOpt.getDesc().split(BrowserConst.OPT_SPILT);
 				/** 根据不同类型组合返回 */
-				switch (CustomNodeOpt.TypeEnum.getEnum(String.valueOf(nodeOpt.getType()))) {
+				switch (NodeOpt.TypeEnum.getEnum(String.valueOf(nodeOpt.getType()))) {
 					/** 提案类型 */
 					case PROPOSALS:
 						stakingOptRecordListResp.setId(BrowserConst.PIP_NAME + desces[0]);

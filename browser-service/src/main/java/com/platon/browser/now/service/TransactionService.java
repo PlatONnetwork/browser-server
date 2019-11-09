@@ -59,12 +59,4 @@ public interface TransactionService {
      * @return
      */
 	TransactionDetailsResp transactionDetails( TransactionDetailsReq req);
-
-	/**
-	 * 切换交易详情上一个下一个
-	 * @method transactionDetailNavigate
-	 * @param req
-	 * @return
-	 */
-	TransactionListResp transactionDetailNavigate( TransactionDetailNavigateReq req);
 }

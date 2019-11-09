@@ -1,12 +1,5 @@
 package com.platon.browser.complement.converter.proposal;
 
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
@@ -16,12 +9,16 @@ import com.platon.browser.complement.dao.mapper.ProposalBusinessMapper;
 import com.platon.browser.complement.dao.param.proposal.ProposalVote;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.ProposalVoteParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * @description: 委托业务参数转换器
@@ -75,7 +72,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 
     	proposalBusinessMapper.vote(businessParam);
 
-		String desc = CustomNodeOpt.TypeEnum.VOTE.getTpl()
+		String desc = NodeOpt.TypeEnum.VOTE.getTpl()
 				.replace("ID",proposalId)
 				.replace("TITLE",proposal.getTopic())
 				.replace("OPTION",txParam.getOption())
@@ -85,7 +82,7 @@ public class ProposalVoteConverter extends BusinessParamConverter<Optional<NodeO
 		NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 		nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(nodeId);
-		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.VOTE.getCode()));
+		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.VOTE.getCode()));
 		nodeOpt.setDesc(desc);
 		nodeOpt.setTxHash(txHash);
 		nodeOpt.setBNum(blockNum);

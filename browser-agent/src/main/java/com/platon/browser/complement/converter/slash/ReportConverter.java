@@ -1,13 +1,6 @@
 package com.platon.browser.complement.converter.slash;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-
 import com.platon.browser.common.complement.cache.bean.NodeItem;
-import com.platon.browser.exception.NoSuchBeanException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.SlashBusinessMapper;
@@ -18,9 +11,14 @@ import com.platon.browser.dao.entity.StakingKey;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ReportParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @description: 举报验证人业务参数转换器

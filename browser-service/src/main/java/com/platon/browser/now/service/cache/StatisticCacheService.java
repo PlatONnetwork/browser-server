@@ -1,8 +1,8 @@
 package com.platon.browser.now.service.cache;
 
-import com.platon.browser.dao.entity.Block;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dto.transaction.TransactionCacheDto;
+import com.platon.browser.elasticsearch.dto.Block;
 
 import java.util.List;
 
@@ -21,12 +21,10 @@ public interface StatisticCacheService {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<Block> getBlockCache( Integer pageNum, Integer pageSize);
+	public List<Block> getBlockCache(Integer pageNum, Integer pageSize);
 	
 	/**
 	 * 根据开始结束获取区块缓存数据
-	 * @param pageNum
-	 * @param pageSize
 	 * @return
 	 */
 	public List<Block> getBlockCacheByStartEnd(Long start, Long end);

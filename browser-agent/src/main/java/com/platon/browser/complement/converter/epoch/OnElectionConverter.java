@@ -5,7 +5,6 @@ import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.complement.dao.param.epoch.Election;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.dao.mapper.EpochBusinessMapper;
-import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class OnElectionConverter {
 					NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
 					nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 					nodeOpt.setNodeId(node);
-					nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
+					nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.LOW_BLOCK_RATE.getCode()));
 					nodeOpt.setBNum(bNum.longValue());
 					nodeOpt.setTime(block.getTime());
 					nodeOpt.setDesc("0|0|0|1");

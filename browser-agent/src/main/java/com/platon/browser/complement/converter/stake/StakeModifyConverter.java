@@ -2,11 +2,10 @@ package com.platon.browser.complement.converter.stake;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
-import com.platon.browser.complement.converter.BusinessParamConverter;
-import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
+import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.StakeBusinessMapper;
-import com.platon.browser.dto.CustomNodeOpt;
+import com.platon.browser.complement.dao.param.stake.StakeModify;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.StakeModifyParam;
@@ -61,7 +60,7 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
         NodeOpt nodeOpt = ComplementNodeOpt.newInstance();
         nodeOpt.setId(networkStatCache.getAndIncrementNodeOptSeq());
 		nodeOpt.setNodeId(txParam.getNodeId());
-		nodeOpt.setType(Integer.valueOf(CustomNodeOpt.TypeEnum.MODIFY.getCode()));
+		nodeOpt.setType(Integer.valueOf(NodeOpt.TypeEnum.MODIFY.getCode()));
 		nodeOpt.setTxHash(tx.getHash());
 		nodeOpt.setBNum(tx.getNum());
 		nodeOpt.setTime(tx.getTime());
