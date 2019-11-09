@@ -12,7 +12,6 @@ import com.platon.browser.complement.converter.stake.StakeCreateConverter;
 import com.platon.browser.complement.converter.stake.StakeExitConverter;
 import com.platon.browser.complement.converter.stake.StakeIncreaseConverter;
 import com.platon.browser.complement.converter.stake.StakeModifyConverter;
-import com.platon.browser.complement.service.supplement.SupplementService;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
@@ -32,9 +31,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class TransactionParameterService {
-
-    @Autowired
-    private SupplementService supplementService;
     @Autowired
     private StakeCreateConverter stakeCreateConverter;
     @Autowired
@@ -58,7 +54,7 @@ public class TransactionParameterService {
     @Autowired
     private ProposalVoteConverter proposalVoteConverter;
     @Autowired
-    private ProposalVersionConverter proposalVersionConverter;
+    private VersionDeclareConverter proposalVersionConverter;
     @Autowired
     private RestrictingCreateConverter restrictingCreateConverter;
     @Autowired
@@ -81,15 +77,9 @@ public class TransactionParameterService {
         int proposalQty = 0;
 
         for (Transaction tx : transactions) {
-        	//补充txInfo
-        	supplementService.supplement(tx);
         	addressCache.update(tx);
-        	
             try{
-                // 失败的交易不分析业务数据
-                if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) continue;
                 // 调用交易分析引擎分析交易，以补充相关数据
-                
                 Optional<NodeOpt> nodeOpt = Optional.ofNullable(null);
                 switch (tx.getTypeEnum()) {
                     case STAKE_CREATE: // 1000 创建验证人

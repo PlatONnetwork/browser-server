@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.platon.browser.dao.entity.NetworkStat">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="cur_number" jdbcType="BIGINT" property="curNumber" />
+    <result column="cur_block_hash" jdbcType="VARCHAR" property="curBlockHash" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
     <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
     <result column="tx_qty" jdbcType="INTEGER" property="txQty" />
@@ -84,10 +85,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, cur_number, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, turn_value, 
-    staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, address_qty, 
-    block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, node_opt_seq, 
-    create_time, update_time
+    id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
+    turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
+    address_qty, block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, 
+    node_opt_seq, create_time, update_time
   </sql>
   <select id="selectByExample" parameterType="com.platon.browser.dao.entity.NetworkStatExample" resultMap="BaseResultMap">
     select
@@ -120,22 +121,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.NetworkStat">
-    insert into network_stat (id, cur_number, node_id, 
-      node_name, tx_qty, cur_tps, 
-      max_tps, issue_value, turn_value, 
-      staking_delegation_value, staking_value, doing_proposal_qty, 
-      proposal_qty, address_qty, block_reward, 
-      staking_reward, add_issue_begin, add_issue_end, 
-      next_settle, node_opt_seq, create_time, 
-      update_time)
-    values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{nodeId,jdbcType=VARCHAR}, 
-      #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, #{curTps,jdbcType=INTEGER}, 
-      #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, #{turnValue,jdbcType=DECIMAL}, 
-      #{stakingDelegationValue,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, #{doingProposalQty,jdbcType=INTEGER}, 
-      #{proposalQty,jdbcType=INTEGER}, #{addressQty,jdbcType=INTEGER}, #{blockReward,jdbcType=DECIMAL}, 
-      #{stakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, #{addIssueEnd,jdbcType=BIGINT}, 
-      #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+    insert into network_stat (id, cur_number, cur_block_hash, 
+      node_id, node_name, tx_qty, 
+      cur_tps, max_tps, issue_value, 
+      turn_value, staking_delegation_value, staking_value, 
+      doing_proposal_qty, proposal_qty, address_qty, 
+      block_reward, staking_reward, add_issue_begin, 
+      add_issue_end, next_settle, node_opt_seq, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{curNumber,jdbcType=BIGINT}, #{curBlockHash,jdbcType=VARCHAR}, 
+      #{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{txQty,jdbcType=INTEGER}, 
+      #{curTps,jdbcType=INTEGER}, #{maxTps,jdbcType=INTEGER}, #{issueValue,jdbcType=DECIMAL}, 
+      #{turnValue,jdbcType=DECIMAL}, #{stakingDelegationValue,jdbcType=DECIMAL}, #{stakingValue,jdbcType=DECIMAL}, 
+      #{doingProposalQty,jdbcType=INTEGER}, #{proposalQty,jdbcType=INTEGER}, #{addressQty,jdbcType=INTEGER}, 
+      #{blockReward,jdbcType=DECIMAL}, #{stakingReward,jdbcType=DECIMAL}, #{addIssueBegin,jdbcType=BIGINT}, 
+      #{addIssueEnd,jdbcType=BIGINT}, #{nextSettle,jdbcType=BIGINT}, #{nodeOptSeq,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.NetworkStat">
     insert into network_stat
@@ -145,6 +146,9 @@
       </if>
       <if test="curNumber != null">
         cur_number,
+      </if>
+      <if test="curBlockHash != null">
+        cur_block_hash,
       </if>
       <if test="nodeId != null">
         node_id,
@@ -213,6 +217,9 @@
       </if>
       <if test="curNumber != null">
         #{curNumber,jdbcType=BIGINT},
+      </if>
+      <if test="curBlockHash != null">
+        #{curBlockHash,jdbcType=VARCHAR},
       </if>
       <if test="nodeId != null">
         #{nodeId,jdbcType=VARCHAR},
@@ -291,6 +298,9 @@
       <if test="record.curNumber != null">
         cur_number = #{record.curNumber,jdbcType=BIGINT},
       </if>
+      <if test="record.curBlockHash != null">
+        cur_block_hash = #{record.curBlockHash,jdbcType=VARCHAR},
+      </if>
       <if test="record.nodeId != null">
         node_id = #{record.nodeId,jdbcType=VARCHAR},
       </if>
@@ -360,6 +370,7 @@
     update network_stat
     set id = #{record.id,jdbcType=INTEGER},
       cur_number = #{record.curNumber,jdbcType=BIGINT},
+      cur_block_hash = #{record.curBlockHash,jdbcType=VARCHAR},
       node_id = #{record.nodeId,jdbcType=VARCHAR},
       node_name = #{record.nodeName,jdbcType=VARCHAR},
       tx_qty = #{record.txQty,jdbcType=INTEGER},
@@ -389,6 +400,9 @@
     <set>
       <if test="curNumber != null">
         cur_number = #{curNumber,jdbcType=BIGINT},
+      </if>
+      <if test="curBlockHash != null">
+        cur_block_hash = #{curBlockHash,jdbcType=VARCHAR},
       </if>
       <if test="nodeId != null">
         node_id = #{nodeId,jdbcType=VARCHAR},
@@ -456,6 +470,7 @@
   <update id="updateByPrimaryKey" parameterType="com.platon.browser.dao.entity.NetworkStat">
     update network_stat
     set cur_number = #{curNumber,jdbcType=BIGINT},
+      cur_block_hash = #{curBlockHash,jdbcType=VARCHAR},
       node_id = #{nodeId,jdbcType=VARCHAR},
       node_name = #{nodeName,jdbcType=VARCHAR},
       tx_qty = #{txQty,jdbcType=INTEGER},
@@ -485,21 +500,21 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into network_stat
-    (id, cur_number, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, turn_value, 
-      staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, address_qty, 
-      block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, node_opt_seq, 
-      create_time, update_time)
+    (id, cur_number, cur_block_hash, node_id, node_name, tx_qty, cur_tps, max_tps, issue_value, 
+      turn_value, staking_delegation_value, staking_value, doing_proposal_qty, proposal_qty, 
+      address_qty, block_reward, staking_reward, add_issue_begin, add_issue_end, next_settle, 
+      node_opt_seq, create_time, update_time)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.nodeId,jdbcType=VARCHAR}, 
-        #{item.nodeName,jdbcType=VARCHAR}, #{item.txQty,jdbcType=INTEGER}, #{item.curTps,jdbcType=INTEGER}, 
-        #{item.maxTps,jdbcType=INTEGER}, #{item.issueValue,jdbcType=DECIMAL}, #{item.turnValue,jdbcType=DECIMAL}, 
-        #{item.stakingDelegationValue,jdbcType=DECIMAL}, #{item.stakingValue,jdbcType=DECIMAL}, 
-        #{item.doingProposalQty,jdbcType=INTEGER}, #{item.proposalQty,jdbcType=INTEGER}, 
-        #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, #{item.stakingReward,jdbcType=DECIMAL}, 
-        #{item.addIssueBegin,jdbcType=BIGINT}, #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, 
-        #{item.nodeOptSeq,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
-        )
+      (#{item.id,jdbcType=INTEGER}, #{item.curNumber,jdbcType=BIGINT}, #{item.curBlockHash,jdbcType=VARCHAR}, 
+        #{item.nodeId,jdbcType=VARCHAR}, #{item.nodeName,jdbcType=VARCHAR}, #{item.txQty,jdbcType=INTEGER}, 
+        #{item.curTps,jdbcType=INTEGER}, #{item.maxTps,jdbcType=INTEGER}, #{item.issueValue,jdbcType=DECIMAL}, 
+        #{item.turnValue,jdbcType=DECIMAL}, #{item.stakingDelegationValue,jdbcType=DECIMAL}, 
+        #{item.stakingValue,jdbcType=DECIMAL}, #{item.doingProposalQty,jdbcType=INTEGER}, 
+        #{item.proposalQty,jdbcType=INTEGER}, #{item.addressQty,jdbcType=INTEGER}, #{item.blockReward,jdbcType=DECIMAL}, 
+        #{item.stakingReward,jdbcType=DECIMAL}, #{item.addIssueBegin,jdbcType=BIGINT}, 
+        #{item.addIssueEnd,jdbcType=BIGINT}, #{item.nextSettle,jdbcType=BIGINT}, #{item.nodeOptSeq,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
   <insert id="batchInsertSelective" parameterType="map">
@@ -522,6 +537,9 @@
         </if>
         <if test="'cur_number'.toString() == column.value">
           #{item.curNumber,jdbcType=BIGINT}
+        </if>
+        <if test="'cur_block_hash'.toString() == column.value">
+          #{item.curBlockHash,jdbcType=VARCHAR}
         </if>
         <if test="'node_id'.toString() == column.value">
           #{item.nodeId,jdbcType=VARCHAR}
@@ -587,5 +605,4 @@
       )
     </foreach>
   </insert>
-
 </mapper>

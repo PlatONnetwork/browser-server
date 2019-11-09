@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,9 @@ public class RestrictingCreateConverter extends BusinessParamConverter<Restricti
 	
     @Override
     public RestrictingCreate convert(CollectionEvent event, Transaction tx) {
+		// 失败的交易不分析业务数据
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+
 		long startTime = System.currentTimeMillis();
 
     	RestrictingCreateParam txParam = tx.getTxParam(RestrictingCreateParam.class);

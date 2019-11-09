@@ -36,6 +36,9 @@ public class StakeCreateConverter extends BusinessParamConverter<Optional<NodeOp
 
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
+		// 失败的交易不分析业务数据
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+
 		long startTime = System.currentTimeMillis();
 
         StakeCreateParam txParam = tx.getTxParam(StakeCreateParam.class);

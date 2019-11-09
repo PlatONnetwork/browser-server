@@ -1,12 +1,15 @@
 package com.platon.browser.complement.converter.delegate;
 
+import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
 import com.platon.browser.complement.dao.param.delegate.DelegateCreate;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateCreateParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +28,19 @@ public class DelegateCreateConverter extends BusinessParamConverter<DelegateCrea
     private DelegateBusinessMapper delegateBusinessMapper;
 
     @Override
-    public DelegateCreate convert(CollectionEvent event, Transaction tx) {
-        long startTime = System.currentTimeMillis();
-
+    public DelegateCreate convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+        // 发起委托
         DelegateCreateParam txParam = tx.getTxParam(DelegateCreateParam.class);
+        // 补充节点名称
+        String nodeId=txParam.getNodeId();
+        NodeItem nodeItem = nodeCache.getNode(nodeId);
+        txParam.setNodeName(nodeItem.getNodeName());
+        txParam.setStakingBlockNum(nodeItem.getStakingBlockNum());
+        tx.setInfo(txParam.toJSONString());
+        // 失败的交易不分析业务数据
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+
+        long startTime = System.currentTimeMillis();
 
         DelegateCreate businessParam= DelegateCreate.builder()
         		.nodeId(txParam.getNodeId())

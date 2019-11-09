@@ -34,10 +34,15 @@ public class StakeModifyConverter extends BusinessParamConverter<Optional<NodeOp
 
     @Override
     public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
-        long startTime = System.currentTimeMillis();
-
         // 修改质押信息
         StakeModifyParam txParam = tx.getTxParam(StakeModifyParam.class);
+
+        // 失败的交易不分析业务数据
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
+
+        long startTime = System.currentTimeMillis();
+
+
         StakeModify businessParam= StakeModify.builder()
         		.nodeId(txParam.getNodeId())
         		.nodeName(txParam.getNodeName())

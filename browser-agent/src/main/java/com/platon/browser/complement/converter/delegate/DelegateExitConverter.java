@@ -1,5 +1,6 @@
 package com.platon.browser.complement.converter.delegate;
 
+import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.queue.collection.event.CollectionEvent;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.mapper.DelegateBusinessMapper;
@@ -11,8 +12,10 @@ import com.platon.browser.dao.entity.Delegation;
 import com.platon.browser.dao.entity.DelegationKey;
 import com.platon.browser.dao.mapper.DelegationMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.DelegateExitParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +39,18 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
     private DelegationMapper delegationMapper;
 	
     @Override
-    public DelegateExit convert(CollectionEvent event, Transaction tx) {
+    public DelegateExit convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+        // 退出委托
+        DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
+        // 补充节点名称
+        String nodeId=txParam.getNodeId();
+        NodeItem nodeItem = nodeCache.getNode(nodeId);
+        txParam.setNodeName(nodeItem.getNodeName());
+        // 失败的交易不分析业务数据
+        if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return null;
+
         long startTime = System.currentTimeMillis();
 
-    	DelegateExitParam txParam = tx.getTxParam(DelegateExitParam.class);
 
         // 查询出撤销委托交易对应的委托信息
         DelegationKey delegationKey = new DelegationKey();
@@ -91,7 +102,11 @@ public class DelegateExitConverter extends BusinessParamConverter<DelegateExit> 
         businessParam.setCodeRmdelegateHes(delegation.getDelegateHes().subtract(businessParam.getCodeDelegateHes()))
                 .setCodeRmDelegateLocked(delegation.getDelegateLocked().subtract(businessParam.getCodeDelegateLocked()))
                 .setCodeRmDelegateReleased(delegation.getDelegateReleased().subtract(businessParam.getCodeDelegateReleased()));
-        
+
+        // 补充真实退款金额
+        txParam.setRealAmount(businessParam.getCodeRealAmount());
+        tx.setInfo(txParam.toJSONString());
+
         delegateBusinessMapper.exit(businessParam);
 
         log.debug("处理耗时:{} ms",System.currentTimeMillis()-startTime);

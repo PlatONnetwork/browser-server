@@ -1,6 +1,7 @@
 package com.platon.browser.complement.converter.proposal;
 
 import com.platon.browser.common.complement.cache.NetworkStatCache;
+import com.platon.browser.common.complement.cache.bean.NodeItem;
 import com.platon.browser.common.complement.dto.ComplementNodeOpt;
 import com.platon.browser.complement.converter.BusinessParamConverter;
 import com.platon.browser.complement.dao.param.proposal.ProposalCancel;
@@ -11,6 +12,7 @@ import com.platon.browser.dto.CustomNodeOpt;
 import com.platon.browser.dto.CustomProposal;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.ProposalCancelParam;
 import com.platon.browser.util.RoundCalculation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +39,17 @@ public class ProposalCancelConverter extends BusinessParamConverter<Optional<Nod
     private NetworkStatCache networkStatCache;
 	
     @Override
-    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) {
-		long startTime = System.currentTimeMillis();
+    public Optional<NodeOpt> convert(CollectionEvent event, Transaction tx) throws NoSuchBeanException {
+		ProposalCancelParam txParam = tx.getTxParam(ProposalCancelParam.class);
+		// 补充节点名称
+		String nodeId=txParam.getVerifier();
+		NodeItem nodeItem = nodeCache.getNode(nodeId);
+		txParam.setNodeName(nodeItem.getNodeName());
+		tx.setInfo(txParam.toJSONString());
+		// 失败的交易不分析业务数据
+		if(Transaction.StatusEnum.FAILURE.getCode()==tx.getStatus()) return Optional.ofNullable(null);
 
-    	ProposalCancelParam txParam = tx.getTxParam(ProposalCancelParam.class);
+		long startTime = System.currentTimeMillis();
 
     	ProposalCancel businessParam= ProposalCancel.builder()
     			.nodeId(txParam.getVerifier())

@@ -10,6 +10,8 @@ public class NetworkStat {
 
     private Long curNumber;
 
+    private String curBlockHash;
+
     private String nodeId;
 
     private String nodeName;
@@ -64,6 +66,14 @@ public class NetworkStat {
 
     public void setCurNumber(Long curNumber) {
         this.curNumber = curNumber;
+    }
+
+    public String getCurBlockHash() {
+        return curBlockHash;
+    }
+
+    public void setCurBlockHash(String curBlockHash) {
+        this.curBlockHash = curBlockHash == null ? null : curBlockHash.trim();
     }
 
     public String getNodeId() {
@@ -236,6 +246,7 @@ public class NetworkStat {
     public enum Column {
         id("id", "id", "INTEGER", false),
         curNumber("cur_number", "curNumber", "BIGINT", false),
+        curBlockHash("cur_block_hash", "curBlockHash", "VARCHAR", false),
         nodeId("node_id", "nodeId", "VARCHAR", false),
         nodeName("node_name", "nodeName", "VARCHAR", false),
         txQty("tx_qty", "txQty", "INTEGER", false),

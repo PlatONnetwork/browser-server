@@ -226,6 +226,76 @@ public class NetworkStatExample {
             return (Criteria) this;
         }
 
+        public Criteria andCurBlockHashIsNull() {
+            addCriterion("cur_block_hash is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashIsNotNull() {
+            addCriterion("cur_block_hash is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashEqualTo(String value) {
+            addCriterion("cur_block_hash =", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashNotEqualTo(String value) {
+            addCriterion("cur_block_hash <>", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashGreaterThan(String value) {
+            addCriterion("cur_block_hash >", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashGreaterThanOrEqualTo(String value) {
+            addCriterion("cur_block_hash >=", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashLessThan(String value) {
+            addCriterion("cur_block_hash <", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashLessThanOrEqualTo(String value) {
+            addCriterion("cur_block_hash <=", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashLike(String value) {
+            addCriterion("cur_block_hash like", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashNotLike(String value) {
+            addCriterion("cur_block_hash not like", value, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashIn(List<String> values) {
+            addCriterion("cur_block_hash in", values, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashNotIn(List<String> values) {
+            addCriterion("cur_block_hash not in", values, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashBetween(String value1, String value2) {
+            addCriterion("cur_block_hash between", value1, value2, "curBlockHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andCurBlockHashNotBetween(String value1, String value2) {
+            addCriterion("cur_block_hash not between", value1, value2, "curBlockHash");
+            return (Criteria) this;
+        }
+
         public Criteria andNodeIdIsNull() {
             addCriterion("node_id is null");
             return (Criteria) this;
