@@ -41,6 +41,7 @@ public class RedisTransactionService implements RedisService<Transaction>{
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void save(Set<Transaction> items){
+        if(items.isEmpty()) return;
         long startTime = System.currentTimeMillis();
         log.debug("开始更新Redis交易缓存:timestamp({})",startTime);
         // 取出缓存中的交易总数

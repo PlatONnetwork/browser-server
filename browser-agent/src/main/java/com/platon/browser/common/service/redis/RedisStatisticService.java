@@ -30,6 +30,7 @@ public class RedisStatisticService implements RedisService<NetworkStat> {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void save(Set<NetworkStat> items) {
+        if(items.isEmpty()) return;
         long startTime = System.currentTimeMillis();
         log.debug("开始更新Redis统计缓存:timestamp({})",startTime);
         // 取出缓存中的交易总数

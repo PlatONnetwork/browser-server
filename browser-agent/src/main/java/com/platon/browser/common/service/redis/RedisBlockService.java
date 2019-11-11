@@ -46,6 +46,7 @@ public class RedisBlockService implements RedisService<Block> {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void save(Set<Block> items){
+        if(items.isEmpty()) return;
         long startTime = System.currentTimeMillis();
         log.debug("开始更新Redis区块缓存:timestamp({})",startTime);
         // 取出缓存中的区块总数
