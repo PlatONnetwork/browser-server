@@ -157,7 +157,9 @@ public class AddressUpdateTask {
 				hasChange = true;
 			}
 			
-			delegation.getNodeIdSet().add(delegation.getNodeId());	
+			if(delegation != null) {
+				delegation.getNodeIdSet().add(delegation.getNodeId());	
+			}
 			Integer candidateCount = delegation == null ? 0 : delegation.getNodeIdSet().size();
 			if(candidateCount != item.getCandidateCount()) {
 				item.setCandidateCount(candidateCount);
