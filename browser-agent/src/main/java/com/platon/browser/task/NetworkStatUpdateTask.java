@@ -40,10 +40,9 @@ public class NetworkStatUpdateTask {
 	
     @Scheduled(cron = "0/30  * * * * ?")
     private void cron () throws InterruptedException {
-		start();
 		// 只有程序正常运行才执行任务
 		if(!AppStatusUtil.isRunning()) return;
-
+    	start();
     }
 	protected void start () throws InterruptedException {
 		try {
